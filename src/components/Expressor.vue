@@ -1,20 +1,26 @@
 <template>
-  <div id="viewport">
+  <div>
+    <span>radius: </span>
+    <Node :node="radiusNode" />
   </div>
 </template>
 
 <script>
-import Two from "two.js";
+import Node from "./Node";
+import Store from '../code/Store';
 
 export default {
-  name: 'Viewport',
+  name: 'Expressor',
+  components: {
+    Node,
+  },
   props: {
   },
   data: () => {
-    return {};
+    return {
+      radiusNode: Store.radius,
+    };
   },
-  mounted: () => {
-  }
 }
 </script>
 

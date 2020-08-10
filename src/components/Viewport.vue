@@ -5,6 +5,7 @@
 
 <script>
 import Two from "two.js";
+import Store from "../code/Store";
 
 export default {
   name: 'Viewport',
@@ -22,7 +23,9 @@ export default {
     circle.fill = '#FF8000';
     circle.stroke = 'orangered';
 
-    two.update();
+    two.bind('update', function() {
+      circle.radius = Store.radius.eval();
+    }).play();
   }
 }
 </script>
