@@ -6,6 +6,7 @@
 <script>
 import Two from "two.js";
 import Store from "../code/Store";
+import { MetaNode } from '../code/MetaNodes';
 
 export default {
   name: 'Viewport',
@@ -24,7 +25,8 @@ export default {
     circle.stroke = 'orangered';
 
     two.bind('update', function() {
-      circle.radius = Store.radius.eval();
+      circle.radius = MetaNode.eval(Store.circle.radius);
+      circle.radius = Math.max(1, circle.radius);
     }).play();
   }
 }

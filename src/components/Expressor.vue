@@ -1,7 +1,7 @@
 <template>
   <div>
     <span>radius: </span>
-    <Node :node="radiusNode" />
+    <Node :astNode="store.circle.radius" />
   </div>
 </template>
 
@@ -18,9 +18,12 @@ export default {
   },
   data: () => {
     return {
-      radiusNode: Store.radius,
+      store: Store,
     };
   },
+  created() {
+    // this.store = Store;
+  }
 }
 </script>
 
