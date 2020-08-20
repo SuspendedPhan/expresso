@@ -1,17 +1,15 @@
 import Node from "./Node";
 import { MetanodesByName } from "./Metanodes";
+import Functions from "./Functions";
 
 export class Actions {
   static replaceNode(store, oldNode, newNode) {
     const parentByNode = store.parentByNode;
     
-    // need recurse here
-    for (const child of oldNode.children ?? []) {
-      parentByNode.delete(child);
-    }
-
     const parent = parentByNode.get(oldNode);
-    parentByNode.delete(oldNode);
+    Functions.topDown(oldNode, (node) => parentByNode.delete(node));
+
+    if (parent.children == null) throw {};
     
     var childKey = null;
     for (const key in parent.children) {
@@ -21,6 +19,7 @@ export class Actions {
     }
 
     console.assert(childKey != null);
+
     parent.children[childKey] = newNode;
     parentByNode.set(newNode, parent);
     for (const child of newNode.children ?? []) {

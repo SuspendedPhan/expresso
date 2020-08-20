@@ -123,7 +123,6 @@ describe('HelloWorld.vue', () => {
     // circle -> radius -> number
     // this is wrong! need to get rid of adds!
     Actions.replaceNode(store, circle.radius.children[0], makeNumber());
-    console.log(store.parentByNode);
     expect(store.parentByNode.size).to.equal(2);
     expect(circle.radius.metaname).to.equal('Variable');
     expect(circle.radius.children[0].metaname).to.equal('Number');
