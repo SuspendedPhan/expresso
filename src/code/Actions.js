@@ -3,7 +3,18 @@ import { MetanodesByName } from "./Metanodes";
 import Functions from "./Functions";
 
 export class Actions {
-  static replaceNode(store, oldNode, newNode) {
+  static replaceNode(store, oldNode, newMetanode, makeArgs) {
+    var store;
+    var oldNode;
+    var newNode;
+    if (arguments.length === 3) {
+      [store, oldNode, newNode] = arguments;
+    } else if (arguments.length === 4) {
+      newNode = Node.make(newMetanode, makeArgs);
+    } else {
+      console.error('wrong argument count');
+    }
+
     const parentByNode = store.parentByNode;
     
     const parent = parentByNode.get(oldNode);
@@ -29,8 +40,20 @@ export class Actions {
 
   static addProperty(store, entity, propertyName) {
     const node = Node.make(MetanodesByName.get('Variable'));
+    node.storetype = 'Property';
     entity[propertyName] = node;
     store.parentByNode.set(node, entity);
     store.parentByNode.set(node.children[0], node);
   }
+
+  static addEntity(store, entityName) {
+    store[entityName] = { storetype: 'Entity' };
+  }
+
+  // static addVariable(store, entity, variableName) {
+  //   const node = Node.make(MetanodesByName.get('Variable'));
+  //   entity.variables.push(node);
+  //   store.parentByNode.set(node, entity);
+  //   store.parentByNode.set(node.children[0], node);
+  // }
 }

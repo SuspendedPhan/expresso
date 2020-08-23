@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "lodash": "^4.17.20",
     "two.js": "^0.7.0-stable.1",
+    "uuid": "^8.3.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.5"
   },
