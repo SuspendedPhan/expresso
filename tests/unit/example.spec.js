@@ -4,6 +4,7 @@ import Metanodes, { MetanodesByName } from '../../src/code/Metanodes';
 import Actions from '../../src/code/Actions';
 import Gets from '../../src/code/Gets';
 import Functions from '../../src/code/Functions';
+import { StoreMaker } from '../../src/code/Store';
 
 function makeNumber(value) {
   const num = Node.make(MetanodesByName.get('Number'));
@@ -274,5 +275,10 @@ describe('HelloWorld.vue', () => {
 
     const expected = [radius, x, y];
     expect(Gets.properties(circle)).to.deep.equal(expected);
+  })
+
+  it('render', () => {
+    // const store = StoreMaker.make();
+    // store.
   })
 })

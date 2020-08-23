@@ -56,6 +56,13 @@ export default class Actions {
     return Gets.entity(store, entityName);
   }
 
+  static render(store) {
+    const entities = Gets.entities(store);
+    for (const entity of entities) {
+      
+    }
+  }
+
   // static addVariable(store, entity, variableName) {
   //   const node = Node.make(MetanodesByName.get('Variable'));
   //   entity.variables.push(node);
