@@ -1,8 +1,10 @@
 import Node from "./Node";
 import { MetanodesByName } from "./Metanodes";
 import Functions from "./Functions";
+import Gets from "./Gets";
+import Vue from 'vue';
 
-export class Actions {
+export default class Actions {
   static replaceNode(store, oldNode, newMetanode, makeArgs) {
     var store;
     var oldNode;
@@ -10,7 +12,9 @@ export class Actions {
     if (arguments.length === 3) {
       [store, oldNode, newNode] = arguments;
     } else if (arguments.length === 4) {
-      newNode = Node.make(newMetanode, makeArgs);
+      console.assert(oldNode.storetype === 'node', new Error().stack);
+      console.assert(Array.isArray(makeArgs), new Error().stack);
+      newNode = Node.make(newMetanode, ...makeArgs);
     } else {
       console.error('wrong argument count');
     }
@@ -31,7 +35,7 @@ export class Actions {
 
     console.assert(childKey != null);
 
-    parent.children[childKey] = newNode;
+    Vue.set(parent.children, childKey, newNode);
     parentByNode.set(newNode, parent);
     for (const child of newNode.children ?? []) {
       parentByNode.set(child, newNode);
@@ -48,6 +52,7 @@ export class Actions {
 
   static addEntity(store, entityName) {
     store[entityName] = { storetype: 'Entity' };
+    return Gets.entity(store, entityName);
   }
 
   // static addVariable(store, entity, variableName) {

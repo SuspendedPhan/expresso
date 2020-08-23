@@ -1,48 +1,60 @@
 <template>
   <span class='node-root'>
-    <span v-if='astNode.value != null' @click='click'>{{ astNode.value }}</span>
+    <span v-if='astNode.value != null' @click='click' :class='{ picking }'>{{ astNode.value }}</span>
+    <span v-else-if='astNode.metaname === "Reference"' @click='click' :class='{ picking }'>{{ referenceToString(astNode) }}</span>
     <span v-else>
-      <span @click='click'>{{ astNode.name.toLowerCase() }}(</span>
+      <span @click='click' :class='["function", { picking }]'>{{ astNode.metaname }}(</span>
       <span v-for='(child, index) in astNode.children' :key='index'>
         <Node :astNode='child' />
         <span v-if='index !== astNode.children.length - 1'>, </span>
       </span>
-      <span>)</span>
+      <span :class='{ picking }'>)</span>
     </span>
-    <MetaNodeSearcher ref='searcher' @blur='blur' v-if='showSearcher' @metaNodeSelected='metaNodeSelected' class='searcher' />
+    <NodePicker
+      ref='searcher'
+      v-if='picking'
+      :nodeToReplace="astNode"
+      @blur='blur'
+      @nodePicked='nodePicked'
+      :class='["searcher", { "bring-to-front": picking }]'
+    />
   </span>
 </template>
 
 <script>
-import MetaNodeSearcher from "./MetaNodeSearcher";
-import NodeActions from "../code/NodeActions";
+import NodePicker from "./NodePicker";
+import Actions from "../code/Actions";
+import Store from '../code/Store';
+import Gets from '../code/Gets';
 
 export default {
   name: 'Node',
   components: {
-    MetaNodeSearcher,
+    NodePicker,
   },
   props: {
     astNode: { value: 0 }
   },
   data: () => {
     return {
-      showSearcher: false,
+      picking: false,
     };
   },
   methods: {
-    metaNodeSelected(entry) {
-      console.log(entry);
-      NodeActions.replace(this.astNode, entry.metaNode.make(this.astNode.parent, entry.params));
+    nodePicked(metanode, makeArgs) {
+      Actions.replaceNode(Store, this.astNode, metanode, makeArgs);
     },
     click() {
-      this.showSearcher = true;
+      this.picking = true;
       this.$nextTick().then(() => {
         this.$refs['searcher'].focus();
       });
     },
     blur() {
-      this.showSearcher = false;
+      this.picking = false;
+    },
+    referenceToString(referenceNode) {
+      return Gets.propertyName(Store, referenceNode.target);
     }
   }
 }
@@ -56,4 +68,14 @@ export default {
 .node-root {
   position: relative;
 }
+.function {
+  text-transform: lowercase;
+}
+.picking {
+  font-weight: bold;
+}
+.bring-to-front {
+  z-index: 1;
+}
+
 </style>

@@ -1,4 +1,4 @@
-const { MetanodesByName } = require("./Metanodes");
+import { MetanodesByName } from "./Metanodes";
 import { v4 as uuidv4 } from 'uuid';
 
 function getMetanodeByDatatype() {
@@ -10,6 +10,7 @@ export default class Node {
     const answer = {
       metaname: metanode.name,
       id: uuidv4(),
+      storetype: 'node',
     };
     if (metanode.metatype === 'Function') {
       answer.children = metanode.params.map(param => Node.make(getMetanodeByDatatype(param.datatype)));

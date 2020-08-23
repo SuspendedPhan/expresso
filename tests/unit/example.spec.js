@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import Node from '../../src/code/Node';
 import Metanodes, { MetanodesByName } from '../../src/code/Metanodes';
-import { Actions } from '../../src/code/Actions';
+import Actions from '../../src/code/Actions';
 import Gets from '../../src/code/Gets';
 import Functions from '../../src/code/Functions';
 
@@ -190,7 +190,7 @@ describe('HelloWorld.vue', () => {
       store,
       Gets.property(circle, 'x').children[0],
       MetanodesByName.get('Number'),
-      5);
+      [5]);
 
     expect(Node.eval(Gets.property(circle, 'x'))).to.equal(5);
 
@@ -198,7 +198,7 @@ describe('HelloWorld.vue', () => {
       store,
       Gets.property(circle, 'radius').children[0],
       MetanodesByName.get('Reference'),
-      Gets.property(circle, 'x'));
+      [Gets.property(circle, 'x')]);
 
     expect(Node.eval(Gets.property(circle, 'radius'))).to.equal(5);
   })
@@ -252,5 +252,15 @@ describe('HelloWorld.vue', () => {
       args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
     }));
     expect(Array.from(actual)).to.deep.equal(expected);
+  })
+
+  it('propname', () => {
+    const store = { parentByNode: new Map() };
+    Actions.addEntity(store, 'circle');
+    const circle = Gets.entity(store, 'circle');
+    Actions.addProperty(store, circle, 'radius');
+
+    const name = Gets.propertyName(store, Gets.property(circle, 'radius'));
+    expect(name).to.equal('radius');
   })
 })

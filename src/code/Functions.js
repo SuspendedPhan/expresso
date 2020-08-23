@@ -8,10 +8,10 @@ export default class Functions {
 
   static * ancestors(store, node) {
     const parentByNode = store.parentByNode;
-    while (true) {
-      var parent = parentByNode.get(node);
-      if (parent == null) break;
-      yield parent;
+    var ancestor = parentByNode.get(node);
+    while (ancestor != null) {
+      yield ancestor;
+      ancestor = parentByNode.get(ancestor);
     }
   }
 

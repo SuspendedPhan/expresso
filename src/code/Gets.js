@@ -29,14 +29,14 @@ export default class Gets {
       console.assert(propertyNode.metaname === 'Variable', new Error().stack);
 
       // const path = Gets.path(store, propertyNode);
-      if (pickInput.length === 0 || path.includes(pickInput)) {
+      if (pickInput.length === 0 || Gets.propertyName(store, propertyNode).includes(pickInput)) {
         yield { metanode: MetanodesByName.get('Reference'), args: [propertyNode], text: property };
       }
     }
 
     yield* Metanodes
       .filter(metanode => metanode.metatype === 'Function')
-      .filter(metanode => pickInput.length === 0 || metanode.name.includes(pickInput))
+      .filter(metanode => pickInput.length === 0 || metanode.name.toLowerCase().includes(pickInput.toLowerCase()))
       .map(metanode => ({
         metanode,
         args: [],
@@ -54,6 +54,7 @@ export default class Gets {
     for (const ancestor of Functions.ancestors(store, node)) {
       if (ancestor.storetype === 'Entity') return ancestor;
     }
+    console.assert(false, new Error().stack);
   }
 
   static propertyForNode(store, node) {
@@ -62,6 +63,16 @@ export default class Gets {
     for (const visit of Functions.ancestors(store, node)) {
       if (visit.storetype === 'Property') return visit;
     }
+  }
+
+  static propertyName(store, propertyNode) {
+    console.assert(arguments.length === 2, new Error().stack);
+    console.assert(propertyNode.storetype === 'Property', new Error().stack);
+    const entity = Gets.entityForNode(store, propertyNode);
+    for (const propertyName in entity) {
+      if (entity[propertyName] === propertyNode) return propertyName;
+    }
+    console.assert(false, new Error().stack);
   }
 
   // static path(store, propertyNode) {

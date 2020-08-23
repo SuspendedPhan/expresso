@@ -19,4 +19,10 @@ export default {
 </script>
 
 <style>
+body {
+  font-size: 16pt;
+}
+input {
+  font-size: 16pt;
+}
 </style>

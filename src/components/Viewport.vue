@@ -6,7 +6,8 @@
 <script>
 import Two from "two.js";
 import Store from "../code/Store";
-import { MetaNode } from '../code/MetaNodes';
+import Node from '../code/Node';
+import Gets from '../code/Gets';
 
 export default {
   name: 'Viewport',
@@ -24,9 +25,15 @@ export default {
     circle.fill = '#FF8000';
     circle.stroke = 'orangered';
 
+    const storeCircle = Gets.entity(Store, 'circle');
+
     two.bind('update', function() {
-      circle.radius = MetaNode.eval(Store.circle.radius);
+      circle.radius = Node.eval(Gets.property(storeCircle, 'radius'));
       circle.radius = Math.max(1, circle.radius);
+      
+      const x = Node.eval(Gets.property(storeCircle, 'x'));
+      const y = Node.eval(Gets.property(storeCircle, 'y'));
+      circle.translation.set(x, y);
     }).play();
   }
 }
