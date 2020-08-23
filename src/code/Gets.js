@@ -75,6 +75,14 @@ export default class Gets {
     console.assert(false, new Error().stack);
   }
 
+  static properties(entity) {
+    console.assert(arguments.length === 1, new Error().stack);
+    console.assert(entity.storetype === 'Entity', new Error().stack);
+    const blacklist = ['name', 'id', 'storetype'];
+    const keys = _.keys(entity);
+    return keys.filter(key => !blacklist.includes(key)).map(key => entity[key]);
+  }
+
   // static path(store, propertyNode) {
   //   console.assert(arguments.length === 2);
   //   return [propertyNode.name, ...Functions.ancestors(store, propertyNode)].reverse().join('.');

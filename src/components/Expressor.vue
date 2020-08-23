@@ -1,18 +1,8 @@
 <template>
   <div>
-    <div>
-      <span>radius: </span>
-      <Node :astNode="radiusNode" />
-    </div>
-
-    <div>
-      <span>x: </span>
-      <Node :astNode="xNode" />
-    </div>
-
-    <div>
-      <span>y: </span>
-      <Node :astNode="yNode" />
+    <div v-for='property in properties' :key='property.id'>
+      <span>{{ propertyName(property) }}: </span>
+      <Node :astNode="nodeForProperty(property)" />
     </div>
   </div>
 </template>
@@ -35,22 +25,18 @@ export default {
     };
   },
   computed: {
-    // nodes: function() {
-    //   const entity = Gets.entity(this.store, 'circle');
-    //   return Array.from(Gets.properties(entity));
-    // },
-    radiusNode: function() {
+    properties: function() {
       const entity = Gets.entity(this.store, 'circle');
-      return Gets.property(entity, 'radius').children[0];
+      return Array.from(Gets.properties(entity));
     },
-    xNode: function() {
-      const entity = Gets.entity(this.store, 'circle');
-      return Gets.property(entity, 'x').children[0];
+  },
+  methods: {
+    propertyName: function(property) {
+      return Gets.propertyName(Store, property);
     },
-    yNode: function() {
-      const entity = Gets.entity(this.store, 'circle');
-      return Gets.property(entity, 'y').children[0];
-    },
+    nodeForProperty: function(property) {
+      return property.children[0];
+    }
   },
   created() {
     // this.store = Store;

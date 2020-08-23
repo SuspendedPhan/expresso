@@ -263,4 +263,16 @@ describe('HelloWorld.vue', () => {
     const name = Gets.propertyName(store, Gets.property(circle, 'radius'));
     expect(name).to.equal('radius');
   })
+
+  it('properties', () => {
+    const store = { parentByNode: new Map() };
+    Actions.addEntity(store, 'circle');
+    const circle = Gets.entity(store, 'circle');
+    const radius = Actions.addProperty(store, circle, 'radius');
+    const x = Actions.addProperty(store, circle, 'x');
+    const y = Actions.addProperty(store, circle, 'y');
+
+    const expected = [radius, x, y];
+    expect(Gets.properties(circle)).to.deep.equal(expected);
+  })
 })

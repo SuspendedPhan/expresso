@@ -48,6 +48,7 @@ export default class Actions {
     entity[propertyName] = node;
     store.parentByNode.set(node, entity);
     store.parentByNode.set(node.children[0], node);
+    return node;
   }
 
   static addEntity(store, entityName) {
