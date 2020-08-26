@@ -40,19 +40,20 @@ export default class Actions {
     for (const child of newNode.children ?? []) {
       parentByNode.set(child, newNode);
     }
+    return newNode;
   }
 
   static addProperty(store, entity, propertyName) {
     const node = Node.make(MetanodesByName.get('Variable'));
     node.storetype = 'Property';
-    entity[propertyName] = node;
+    entity.properties[propertyName] = node;
     store.parentByNode.set(node, entity);
     store.parentByNode.set(node.children[0], node);
     return node;
   }
 
   static addEntity(store, entityName) {
-    store[entityName] = { storetype: 'Entity' };
+    store[entityName] = { storetype: 'Entity', properties: {}, computedProperties: {} };
     return Gets.entity(store, entityName);
   }
 
@@ -60,6 +61,40 @@ export default class Actions {
     const entities = Gets.entities(store);
     for (const entity of entities) {
       
+    }
+  }
+
+  static addComputedProperty(store, entity, propertyName) {
+    const node = Node.make(MetanodesByName.get('Variable'));
+    node.storetype = 'Property';
+    entity.computedProperties[propertyName] = node;
+    store.parentByNode.set(node, entity);
+    store.parentByNode.set(node.children[0], node);
+    return node;
+  }
+
+  static assignVariable(store, variable, newMetanode, makeArgs) {
+    return Actions.replaceNode(store, variable.children[0], newMetanode, makeArgs);
+  }
+
+  static eval(store, node) {
+    return Node.eval(node);
+  }
+
+  static * computeRenderCommands(store, entity) {
+    const clonesNode = Gets.property(entity, 'clones');
+    const clones = Actions.eval(store, clonesNode);
+    const cloneNumberNode = Gets.computedProperty(entity, 'cloneNumber');
+    for (let cloneNumber = 0; cloneNumber < clones; cloneNumber++) {
+      Actions.assignVariable(store, cloneNumberNode, MetanodesByName.get('Number'), [cloneNumber]);
+      const command = {};
+      for (const property of _.values(Gets.properties(entity))) {
+        if (property === clonesNode) continue;
+        if (property === cloneNumberNode) continue;
+        const propertyName = Gets.propertyName(store, property);
+        command[propertyName] = Actions.eval(store, property);
+      }
+      yield command;
     }
   }
 

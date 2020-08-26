@@ -96,96 +96,95 @@ describe('HelloWorld.vue', () => {
   })
 
   it('nested add', () => {
-    const store = { circle: {}, parentByNode: new Map() };
+    const store = { parentByNode: new Map() };
     
     // circle -> radius -> number
-    Actions.addProperty(store, store.circle, 'radius');
-    Actions.replaceNode(store, store.circle.radius.children[0], makeNumber(5));
+    const circle = Actions.addEntity(store, 'circle');
+    const radius = Actions.addProperty(store, circle, 'radius');
+    Actions.replaceNode(store, radius.children[0], makeNumber(5));
 
-    const circle = store.circle;
-
-    expect(store.parentByNode.get(circle.radius.children[0])).to.equal(circle.radius);
+    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
     expect(store.parentByNode.size).to.equal(2);
     
     // circle -> radius -> add -> number | number
-    Actions.replaceNode(store, circle.radius.children[0], makeAdd());
-    expect(store.parentByNode.get(circle.radius.children[0])).to.equal(circle.radius);
+    Actions.replaceNode(store, radius.children[0], makeAdd());
+    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
     expect(store.parentByNode.size).to.equal(4);
     
     // circle -> radius -> add -> number | add(number, number)
-    Actions.replaceNode(store, circle.radius.children[0].children[0], makeAdd());
-    expect(store.parentByNode.get(circle.radius.children[0])).to.equal(circle.radius);
-    expect(store.parentByNode.get(circle.radius.children[0].children[0])).to.equal(circle.radius.children[0]);
+    Actions.replaceNode(store, radius.children[0].children[0], makeAdd());
+    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
+    expect(store.parentByNode.get(radius.children[0].children[0])).to.equal(radius.children[0]);
     expect(store.parentByNode.size).to.equal(6);
-    expect(circle.radius.metaname).to.equal('Variable');
-    expect(circle.radius.children[0].metaname).to.equal('Add');
-    expect(circle.radius.children[0].children[0].metaname).to.equal('Add');
-    expect(circle.radius.children[0].children[1].metaname).to.equal('Number');
-    expect(circle.radius.children[0].children[0].children[0].metaname).to.equal('Number');
+    expect(radius.metaname).to.equal('Variable');
+    expect(radius.children[0].metaname).to.equal('Add');
+    expect(radius.children[0].children[0].metaname).to.equal('Add');
+    expect(radius.children[0].children[1].metaname).to.equal('Number');
+    expect(radius.children[0].children[0].children[0].metaname).to.equal('Number');
     
     // circle -> radius -> number
-    // this is wrong! need to get rid of adds!
-    Actions.replaceNode(store, circle.radius.children[0], makeNumber());
+    Actions.replaceNode(store, radius.children[0], makeNumber());
     expect(store.parentByNode.size).to.equal(2);
-    expect(circle.radius.metaname).to.equal('Variable');
-    expect(circle.radius.children[0].metaname).to.equal('Number');
+    expect(radius.metaname).to.equal('Variable');
+    expect(radius.children[0].metaname).to.equal('Number');
     
-    expect(() => Actions.replaceNode(store, circle.radius, makeNumber())).to.throw();
+    expect(() => Actions.replaceNode(store, radius, makeNumber())).to.throw();
   })
 
   it('reassign variable', () => {
-    const store = { circle: {}, parentByNode: new Map() };
+    const store = { parentByNode: new Map() };
+    const circle = Actions.addEntity(store, 'circle');
     
-    Actions.addProperty(store, store.circle, 'radius');
-    Actions.addProperty(store, store.circle, 'x');
-    Actions.addProperty(store, store.circle, 'y');
+    const radius = Actions.addProperty(store, circle, 'radius');
+    const x = Actions.addProperty(store, circle, 'x');
+    const y = Actions.addProperty(store, circle, 'y');
 
-    expect(Node.eval(store.circle.radius)).to.equal(0);
-    expect(Node.eval(store.circle.x)).to.equal(0);
-    expect(Node.eval(store.circle.y)).to.equal(0);
+    expect(Node.eval(radius)).to.equal(0);
+    expect(Node.eval(x)).to.equal(0);
+    expect(Node.eval(y)).to.equal(0);
 
-    Actions.replaceNode(store, store.circle.radius.children[0], makeNumber(5));
-    Actions.replaceNode(store, store.circle.x.children[0], makeNumber(7));
-    Actions.replaceNode(store, store.circle.y.children[0], makeNumber(9));
+    Actions.replaceNode(store, radius.children[0], makeNumber(5));
+    Actions.replaceNode(store, x.children[0], makeNumber(7));
+    Actions.replaceNode(store, y.children[0], makeNumber(9));
     
-    expect(Node.eval(store.circle.radius)).to.equal(5);
-    expect(Node.eval(store.circle.x)).to.equal(7);
-    expect(Node.eval(store.circle.y)).to.equal(9);
+    expect(Node.eval(radius)).to.equal(5);
+    expect(Node.eval(x)).to.equal(7);
+    expect(Node.eval(y)).to.equal(9);
     
     // x = radius
-    Actions.replaceNode(store, store.circle.x.children[0], makeReference(store.circle.radius));
+    Actions.replaceNode(store, x.children[0], makeReference(radius));
 
-    expect(Node.eval(store.circle.radius)).to.equal(5);
-    expect(Node.eval(store.circle.x)).to.equal(5);
-    expect(Node.eval(store.circle.y)).to.equal(9);
+    expect(Node.eval(radius)).to.equal(5);
+    expect(Node.eval(x)).to.equal(5);
+    expect(Node.eval(y)).to.equal(9);
 
     // x = y
-    Actions.replaceNode(store, store.circle.x.children[0], makeReference(store.circle.y));
+    Actions.replaceNode(store, x.children[0], makeReference(y));
 
-    expect(Node.eval(store.circle.radius)).to.equal(5);
-    expect(Node.eval(store.circle.x)).to.equal(9);
-    expect(Node.eval(store.circle.y)).to.equal(9);
+    expect(Node.eval(radius)).to.equal(5);
+    expect(Node.eval(x)).to.equal(9);
+    expect(Node.eval(y)).to.equal(9);
 
     // y = 2
-    Actions.replaceNode(store, store.circle.y.children[0], makeNumber(2));
+    Actions.replaceNode(store, y.children[0], makeNumber(2));
     
-    expect(Node.eval(store.circle.radius)).to.equal(5);
-    expect(Node.eval(store.circle.x)).to.equal(2);
-    expect(Node.eval(store.circle.y)).to.equal(2);
+    expect(Node.eval(radius)).to.equal(5);
+    expect(Node.eval(x)).to.equal(2);
+    expect(Node.eval(y)).to.equal(2);
     
     // x = 3
-    Actions.replaceNode(store, store.circle.x.children[0], makeNumber(3));
+    Actions.replaceNode(store, x.children[0], makeNumber(3));
 
-    expect(Node.eval(store.circle.radius)).to.equal(5);
-    expect(Node.eval(store.circle.x)).to.equal(3);
-    expect(Node.eval(store.circle.y)).to.equal(2);
+    expect(Node.eval(radius)).to.equal(5);
+    expect(Node.eval(x)).to.equal(3);
+    expect(Node.eval(y)).to.equal(2);
   })
 
   it('new replaceNode API', () => {
-    const store = { circle: {}, parentByNode: new Map() };
-    const circle = store.circle;
-    Actions.addProperty(store, store.circle, 'radius');
-    Actions.addProperty(store, store.circle, 'x');
+    const store = { parentByNode: new Map() };
+    const circle = Actions.addEntity(store, 'circle');
+    Actions.addProperty(store, circle, 'radius');
+    Actions.addProperty(store, circle, 'x');
 
     Actions.replaceNode(
       store,
@@ -223,11 +222,10 @@ describe('HelloWorld.vue', () => {
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
-    Actions.addProperty(store, circle, 'radius');
-    Actions.addProperty(store, circle, 'x');
-    Actions.addProperty(store, circle, 'y');
-    const x = Gets.property(circle, 'x');
-    const y = Gets.property(circle, 'y');
+    const radius = Actions.addProperty(store, circle, 'radius');
+    const x = Actions.addProperty(store, circle, 'x');
+    const y = Actions.addProperty(store, circle, 'y');
+    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
 
     var expected;
     var actual;
@@ -242,6 +240,7 @@ describe('HelloWorld.vue', () => {
     expected = [
       { metanode: MetanodesByName.get('Reference'), args: [x], text: 'x' },
       { metanode: MetanodesByName.get('Reference'), args: [y], text: 'y' },
+      { metanode: MetanodesByName.get('Reference'), args: [cloneNumber], text: 'cloneNumber' },
       { metanode: MetanodesByName.get('Add'), args: [], text: 'Add' },
     ];
     actual = Array.from(actual).map(result => ({
@@ -272,13 +271,35 @@ describe('HelloWorld.vue', () => {
     const radius = Actions.addProperty(store, circle, 'radius');
     const x = Actions.addProperty(store, circle, 'x');
     const y = Actions.addProperty(store, circle, 'y');
+    // const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
 
-    const expected = [radius, x, y];
+    const expected = { radius, x, y };
     expect(Gets.properties(circle)).to.deep.equal(expected);
+    // expect(Gets.computedProperties(circle)).to.deep.equal([cloneNumber]);
   })
 
   it('render', () => {
-    // const store = StoreMaker.make();
-    // store.
+    const store = StoreMaker.make();
+    const circle = Actions.addEntity(store, 'circle');
+    const x = Actions.addProperty(store, circle, 'x');
+    const clones = Actions.addProperty(store, circle, 'clones');
+    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
+    Actions.assignVariable(store, clones, MetanodesByName.get('Number'), [3]);
+
+    expect(Actions.eval(store, x)).to.equal(0);  // addProperty
+    expect(Actions.eval(store, cloneNumber)).to.equal(0);  // addComputed
+    expect(Actions.eval(store, clones)).to.equal(3);  // assignVariable
+    
+    const add = Actions.assignVariable(store, x, MetanodesByName.get('Add'), []);
+    Actions.replaceNode(store, add.children[0], MetanodesByName.get('Reference'), [cloneNumber]);
+    Actions.replaceNode(store, add.children[1], MetanodesByName.get('Number'), [3]);
+    
+    const expected = [
+      { x: 3 },
+      { x: 4 },
+      { x: 5 },
+    ];
+    const actual = Array.from(Actions.computeRenderCommands(store, store.circle));
+    expect(actual).to.deep.equal(expected);
   })
 })

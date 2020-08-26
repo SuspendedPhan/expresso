@@ -3,12 +3,6 @@ import Functions from "./Functions";
 import _, { pick } from "lodash";
 
 export default class Gets {
-  static property(entity, propertyName) {
-    const answer = entity[propertyName];
-    console.assert(answer);
-    return answer;
-  }
-
   static * nodePicks(store, pickInput, nodeToReplace) {
     console.assert(arguments.length === 3, new Error().stack);
     console.assert(typeof pickInput === 'string', new Error().stack);
@@ -21,16 +15,17 @@ export default class Gets {
 
     const entity = Gets.entityForNode(store, nodeToReplace);
     const propertyToReplace = Gets.propertyForNode(store, nodeToReplace);
-    for (const property in entity) {
-      if (property === 'storetype') continue;
-      const propertyNode = entity[property];
+    const properties = _.concat(_.values(Gets.properties(entity)), _.values(Gets.computedProperties(entity)));
+    for (const propertyNode of properties) {
       if (propertyNode === propertyToReplace) continue;
 
       console.assert(propertyNode.metaname === 'Variable', new Error().stack);
 
+      const propertyName = Gets.propertyName(store, propertyNode) ?? Gets.computedPropertyName(store, propertyNode);
+
       // const path = Gets.path(store, propertyNode);
       if (pickInput.length === 0 || Gets.propertyName(store, propertyNode).includes(pickInput)) {
-        yield { metanode: MetanodesByName.get('Reference'), args: [propertyNode], text: property };
+        yield { metanode: MetanodesByName.get('Reference'), args: [propertyNode], text: propertyName };
       }
     }
 
@@ -69,8 +64,18 @@ export default class Gets {
     console.assert(arguments.length === 2, new Error().stack);
     console.assert(propertyNode.storetype === 'Property', new Error().stack);
     const entity = Gets.entityForNode(store, propertyNode);
-    for (const propertyName in entity) {
-      if (entity[propertyName] === propertyNode) return propertyName;
+    for (const propertyName in entity.properties) {
+      if (entity.properties[propertyName] === propertyNode) return propertyName;
+    }
+    console.assert(false, new Error().stack);
+  }
+
+  static computedPropertyName(store, propertyNode) {
+    console.assert(arguments.length === 2, new Error().stack);
+    console.assert(propertyNode.storetype === 'Property', new Error().stack);
+    const entity = Gets.entityForNode(store, propertyNode);
+    for (const propertyName in entity.computedProperties) {
+      if (entity.computedProperties[propertyName] === propertyNode) return propertyName;
     }
     console.assert(false, new Error().stack);
   }
@@ -78,9 +83,25 @@ export default class Gets {
   static properties(entity) {
     console.assert(arguments.length === 1, new Error().stack);
     console.assert(entity.storetype === 'Entity', new Error().stack);
-    const blacklist = ['name', 'id', 'storetype'];
-    const keys = _.keys(entity);
-    return keys.filter(key => !blacklist.includes(key)).map(key => entity[key]);
+    return entity.properties;
+  }
+
+  static property(entity, propertyName) {
+    const answer = entity.properties[propertyName];
+    console.assert(answer);
+    return answer;
+  }
+
+  static computedProperties(entity) {
+    console.assert(arguments.length === 1, new Error().stack);
+    console.assert(entity.storetype === 'Entity', new Error().stack);
+    return entity.computedProperties;
+  }
+
+  static computedProperty(entity, propertyName) {
+    const answer = entity.computedProperties[propertyName];
+    console.assert(answer);
+    return answer;
   }
 
   // static path(store, propertyNode) {
