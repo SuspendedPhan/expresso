@@ -13,6 +13,15 @@ export const Metanodes = [
     eval: (a, b) => Node.eval(a) + Node.eval(b),
   },
   {
+    name: 'Subtract',
+    metatype: 'Function',
+    params: [ 
+      { name: 'a' },
+      { name: 'b' },
+    ],
+    eval: (a, b) => Node.eval(a) - Node.eval(b),
+  },
+  {
     name: 'Multiply',
     metatype: 'Function',
     params: [ 
@@ -20,6 +29,34 @@ export const Metanodes = [
       { name: 'b' },
     ],
     eval: (a, b) => Node.eval(a) * Node.eval(b),
+  },
+  {
+    name: 'Divide',
+    metatype: 'Function',
+    params: [ 
+      { name: 'a' },
+      { name: 'b' },
+    ],
+    eval: (a, b) => Node.eval(a) / Node.eval(b),
+  },
+  {
+    name: 'Lerp',
+    metatype: 'Function',
+    params: [ 
+      { name: 'start' },
+      { name: 'end' },
+      { name: 't' },
+    ],
+    eval: (start, end, t) => Node.eval(start) + Node.eval(t) * (Node.eval(end) - Node.eval(start)),
+  },
+  {
+    name: 'Distance',
+    metatype: 'Function',
+    params: [ 
+      { name: 'a' },
+      { name: 'b' },
+    ],
+    eval: (a, b) => Math.abs(Node.eval(a) - Node.eval(b)),
   },
   {
     name: 'Number',

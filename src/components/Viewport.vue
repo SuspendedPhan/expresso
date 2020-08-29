@@ -31,6 +31,10 @@ export default {
     
 
     const storeCircle = Gets.entity(Store, 'circle');
+    const storeWidth = Actions.addComputedProperty(Store, storeCircle, 'width');
+    const storeHeight = Actions.addComputedProperty(Store, storeCircle, 'height');
+    Actions.assignNumberToVariable(Store, storeWidth, two.width);
+    Actions.assignNumberToVariable(Store, storeHeight, two.height);
 
     two.bind('update', function() {
       two.clear();
@@ -40,11 +44,13 @@ export default {
         const radius = renderCommand.radius;
         const x = renderCommand.x;
         const y = renderCommand.y;
-        if (radius <= 0) continue;
+        if (radius <= 0 || !Number.isFinite(radius)) continue;
+        if (!Number.isFinite(x)) continue;
+        if (!Number.isFinite(y)) continue;
 
         const circle = two.makeCircle(x, y, radius);
-        circle.fill = '#FF8000';
-        circle.stroke = 'orangered';
+        circle.fill = 'hsla(0, 50%, 50%, .5)';
+        circle.stroke = 'none';
       }
     }).play();
   }

@@ -77,6 +77,10 @@ export default class Actions {
     return Actions.replaceNode(store, variable.children[0], newMetanode, makeArgs);
   }
 
+  static assignNumberToVariable(store, variable, value) {
+    return Actions.replaceNode(store, variable.children[0], MetanodesByName.get('Number'), [value]);
+  }
+
   static eval(store, node) {
     return Node.eval(node);
   }
@@ -85,12 +89,16 @@ export default class Actions {
     const clonesNode = Gets.property(entity, 'clones');
     const clones = Actions.eval(store, clonesNode);
     const cloneNumberNode = Gets.computedProperty(entity, 'cloneNumber');
+    const cloneNumber01Node = Gets.computedProperty(entity, 'cloneNumber01');
     for (let cloneNumber = 0; cloneNumber < clones; cloneNumber++) {
       Actions.assignVariable(store, cloneNumberNode, MetanodesByName.get('Number'), [cloneNumber]);
+      const cloneNumber01 = cloneNumber / Math.max(1, clones - 1);
+      Actions.assignVariable(store, cloneNumber01Node, MetanodesByName.get('Number'), [cloneNumber01]);
       const command = {};
       for (const property of _.values(Gets.properties(entity))) {
         if (property === clonesNode) continue;
         if (property === cloneNumberNode) continue;
+        if (property === cloneNumber01Node) continue;
         const propertyName = Gets.propertyName(store, property);
         command[propertyName] = Actions.eval(store, property);
       }

@@ -23,8 +23,7 @@ export default class Gets {
 
       const propertyName = Gets.propertyName(store, propertyNode) ?? Gets.computedPropertyName(store, propertyNode);
 
-      // const path = Gets.path(store, propertyNode);
-      if (pickInput.length === 0 || propertyName.includes(pickInput)) {
+      if (pickInput.length === 0 || propertyName.toLowerCase().includes(pickInput.toLowerCase())) {
         yield { metanode: MetanodesByName.get('Reference'), args: [propertyNode], text: propertyName };
       }
     }

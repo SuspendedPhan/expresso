@@ -319,4 +319,42 @@ describe('HelloWorld.vue', () => {
     const actual = Array.from(Actions.computeRenderCommands(store, store.circle));
     expect(actual).to.deep.equal(expected);
   })
+
+  it('assign variable by value', () => {
+    const store = StoreMaker.make();
+    const circle = Actions.addEntity(store, 'circle');
+    const storeWidth = Actions.addComputedProperty(store, circle, 'width');
+    const storeHeight = Actions.addComputedProperty(store, circle, 'height');
+    Actions.assignNumberToVariable(store, storeWidth, 10);
+    Actions.assignNumberToVariable(store, storeHeight, 20);
+    expect(Actions.eval(store, storeWidth)).to.equal(10);
+    expect(Actions.eval(store, storeHeight)).to.equal(20);
+  })
+
+  it('clonenumber01', () => {
+    const store = StoreMaker.make();
+    const circle = Actions.addEntity(store, 'circle');
+    const clones = Actions.addProperty(store, circle, 'clones');
+    const radius = Actions.addProperty(store, circle, 'radius');
+    Actions.addComputedProperty(store, circle, 'cloneNumber');
+    const cloneNumber01 = Actions.addComputedProperty(store, circle, 'cloneNumber01');
+    Actions.assignNumberToVariable(store, clones, 1);
+    Actions.assignVariable(store, radius, MetanodesByName.get('Reference'), [cloneNumber01]);
+    
+    let actual = Array.from(Actions.computeRenderCommands(store, store.circle));
+    let expected = [
+      { radius: 0 },
+    ];
+    expect(actual).to.deep.equal(expected);
+
+
+    Actions.assignNumberToVariable(store, clones, 3);
+    actual = Array.from(Actions.computeRenderCommands(store, store.circle));
+    expected = [
+      { radius: 0 },
+      { radius: .5 },
+      { radius: 1 },
+    ];
+    expect(actual).to.deep.equal(expected);
+  })
 })
