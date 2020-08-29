@@ -1,13 +1,14 @@
 <template>
-  <div id="viewport">
+  <div id='viewport' class='viewport'>
   </div>
 </template>
 
 <script>
-import Two from "two.js";
-import Store from "../code/Store";
+import Two from 'two.js';
+import Store from '../code/Store';
 import Node from '../code/Node';
 import Gets from '../code/Gets';
+import Actions from '../code/Actions';
 
 export default {
   name: 'Viewport',
@@ -18,27 +19,43 @@ export default {
   },
   mounted: () => {
     var elem = document.getElementById('viewport');
-    var params = { type: Two.Types.webgl };
+    var params = { 
+      type: Two.Types.webgl,
+      width: elem.clientWidth,
+      height: elem.clientHeight,
+    };
+    console.log(elem.clientHeight);
     var two = new Two(params).appendTo(elem);
 
     var circle = two.makeCircle(0, 0, 50);
-    circle.fill = '#FF8000';
-    circle.stroke = 'orangered';
+    
 
     const storeCircle = Gets.entity(Store, 'circle');
 
     two.bind('update', function() {
-      circle.radius = Node.eval(Gets.property(storeCircle, 'radius'));
-      circle.radius = Math.max(1, circle.radius);
-      
-      const x = Node.eval(Gets.property(storeCircle, 'x'));
-      const y = Node.eval(Gets.property(storeCircle, 'y'));
-      circle.translation.set(x, y);
-      // TODO render the rendercommands
+      two.clear();
+
+      const renderCommands = Actions.computeRenderCommands(Store, storeCircle);
+      for (const renderCommand of renderCommands) {
+        const radius = renderCommand.radius;
+        const x = renderCommand.x;
+        const y = renderCommand.y;
+        if (radius <= 0) continue;
+
+        const circle = two.makeCircle(x, y, radius);
+        circle.fill = '#FF8000';
+        circle.stroke = 'orangered';
+      }
     }).play();
   }
 }
 </script>
 
 <style scoped>
+.viewport {
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  height: 50vh;
+}
 </style>
