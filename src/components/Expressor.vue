@@ -11,6 +11,7 @@
 import Node from "./Node";
 import Store from '../code/Store';
 import Gets from '../code/Gets';
+import wu from 'wu';
 
 export default {
   name: 'Expressor',
@@ -27,7 +28,8 @@ export default {
   computed: {
     properties: function() {
       const entity = Gets.entity(this.store, 'circle');
-      return Array.from(Gets.properties(entity));
+      const props = wu.values(Gets.properties(entity));
+      return Array.from(props);
     },
   },
   methods: {

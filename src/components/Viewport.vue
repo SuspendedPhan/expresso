@@ -34,6 +34,7 @@ export default {
       const x = Node.eval(Gets.property(storeCircle, 'x'));
       const y = Node.eval(Gets.property(storeCircle, 'y'));
       circle.translation.set(x, y);
+      // TODO render the rendercommands
     }).play();
   }
 }

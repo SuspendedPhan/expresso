@@ -17,6 +17,7 @@ Actions.addProperty(store, circle, 'clones');
 Actions.addProperty(store, circle, 'radius');
 Actions.addProperty(store, circle, 'x');
 Actions.addProperty(store, circle, 'y');
+Actions.addComputedProperty(store, circle, 'cloneNumber');
 
 const Store = store;
 export default Store;

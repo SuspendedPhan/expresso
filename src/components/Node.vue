@@ -54,7 +54,7 @@ export default {
       this.picking = false;
     },
     referenceToString(referenceNode) {
-      return Gets.propertyName(Store, referenceNode.target);
+      return Gets.propertyName(Store, referenceNode.target) ?? Gets.computedPropertyName(Store, referenceNode.target);
     }
   }
 }

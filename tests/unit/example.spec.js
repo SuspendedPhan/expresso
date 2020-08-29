@@ -236,6 +236,7 @@ describe('HelloWorld.vue', () => {
     ];
     expect(Array.from(actual)).to.deep.equal(expected);
     
+    // -- Test --
     actual = Gets.nodePicks(store, '', Gets.property(circle, 'radius'));
     expected = [
       { metanode: MetanodesByName.get('Reference'), args: [x], text: 'x' },
@@ -244,6 +245,22 @@ describe('HelloWorld.vue', () => {
       { metanode: MetanodesByName.get('Add'), args: [], text: 'Add' },
     ];
     actual = Array.from(actual).map(result => ({
+      ...result,
+      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
+    }));
+    expected = Array.from(expected).map(result => ({
+      ...result,
+      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
+    }));
+    expect(Array.from(actual)).to.deep.equal(expected);
+
+    // -- Test --
+    actual = Gets.nodePicks(store, 'c', Gets.property(circle, 'radius'));
+    expected = [
+      { metanode: MetanodesByName.get('Reference'), args: [cloneNumber], text: 'cloneNumber' },
+    ];
+    actual = Array.from(actual);
+    actual = actual.map(result => ({
       ...result,
       args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
     }));

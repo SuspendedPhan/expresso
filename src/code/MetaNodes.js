@@ -13,6 +13,15 @@ export const Metanodes = [
     eval: (a, b) => Node.eval(a) + Node.eval(b),
   },
   {
+    name: 'Multiply',
+    metatype: 'Function',
+    params: [ 
+      { name: 'a' },
+      { name: 'b' },
+    ],
+    eval: (a, b) => Node.eval(a) * Node.eval(b),
+  },
+  {
     name: 'Number',
     metatype: 'Value',
     defaultValue: 0,

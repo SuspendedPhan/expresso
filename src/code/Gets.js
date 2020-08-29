@@ -24,7 +24,7 @@ export default class Gets {
       const propertyName = Gets.propertyName(store, propertyNode) ?? Gets.computedPropertyName(store, propertyNode);
 
       // const path = Gets.path(store, propertyNode);
-      if (pickInput.length === 0 || Gets.propertyName(store, propertyNode).includes(pickInput)) {
+      if (pickInput.length === 0 || propertyName.includes(pickInput)) {
         yield { metanode: MetanodesByName.get('Reference'), args: [propertyNode], text: propertyName };
       }
     }
@@ -67,7 +67,7 @@ export default class Gets {
     for (const propertyName in entity.properties) {
       if (entity.properties[propertyName] === propertyNode) return propertyName;
     }
-    console.assert(false, new Error().stack);
+    // console.assert(false, new Error().stack);
   }
 
   static computedPropertyName(store, propertyNode) {
