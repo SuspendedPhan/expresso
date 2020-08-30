@@ -6,7 +6,10 @@ const { Number } = Metanodes;
 
 export class StoreMaker {
   static make() {
-    return { parentByNode: new Map() };
+    return {
+      parentByNode: new Map(),
+      pointedNode: null,
+    };
   }
 }
 

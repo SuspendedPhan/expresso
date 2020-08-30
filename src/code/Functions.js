@@ -1,3 +1,5 @@
+import wu from 'wu';
+
 export default class Functions {
   static topDown(node, action) {
     action(node);
@@ -34,6 +36,35 @@ export default class Functions {
     }
     yield parent;
     yield * Functions.traverseLeft(parent, parentGetter, childrenGetter);
+  }
+
+  // does not yield the node
+  static * traverseRight(node, parentGetter, childrenGetter) {
+    // yield my children
+    for (const child of childrenGetter(node)) {
+      yield * Functions.traversePreOrder(child, childrenGetter);
+    }
+    
+    let visitNode = node;
+    while (true) {
+      const parent = parentGetter(visitNode);
+      if (parent == null) return;
+
+      const children = wu(childrenGetter(parent))
+        .dropWhile(child => child !== visitNode)
+        .drop(1);
+      for (const child of children) {
+        yield * Functions.traversePreOrder(child, childrenGetter);
+      }
+      visitNode = parent;
+    }
+  }
+
+  static * traversePreOrder(node, childrenGetter) {
+    yield node;
+    for (const child of childrenGetter(node)) {
+      yield * Functions.traversePreOrder(child);
+    }
   }
 
   // yields the node

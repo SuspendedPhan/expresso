@@ -428,5 +428,22 @@ describe('HelloWorld.vue', () => {
 
     traverse = Functions.traverseLeft(tree.a, parentGetter, childrenGetter);
     expect(wu.some(() => true, traverse)).to.be.false;
+
+    // -- right --
+
+    traverse = Functions.traverseRight(tree.a.e.g, parentGetter, childrenGetter);
+    actual = traverse.next().value;
+    expect(actual).to.equal(tree.a.e.g.i);
+
+    traverse = Functions.traverseRight(tree.a.e.g.i.k, parentGetter, childrenGetter);
+    actual = traverse.next().value;
+    expect(actual).to.equal(tree.a.e.g.l);
+
+    traverse = Functions.traverseRight(tree.a.b, parentGetter, childrenGetter);
+    actual = traverse.next().value;
+    expect(actual).to.equal(tree.a.b.c);
+
+    traverse = Functions.traverseRight(tree.a.e.h, parentGetter, childrenGetter);
+    expect(wu.some(() => true, traverse)).to.be.false;
   })
 })

@@ -106,6 +106,24 @@ export default class Actions {
     }
   }
 
+  static movePointerLeft(store) {
+    console.assert(store.pointedNode != null, new Error().stack);
+  }
+
+  static movePointerRight(store) {
+    console.assert(store.pointedNode != null, new Error().stack);
+  }
+
+  static startPicking() {
+
+  }
+
+  static finishPicking() {
+    
+  }
+
+
+
   // static addVariable(store, entity, variableName) {
   //   const node = Node.make(MetanodesByName.get('Variable'));
   //   entity.variables.push(node);
