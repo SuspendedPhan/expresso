@@ -29,6 +29,7 @@ export default {
         const result = this.results[0];
         this.$emit('nodePicked', result.metanode, result.args);
         this.blur();
+        event.stopPropagation();
       }
     },
     focus() {

@@ -12,6 +12,7 @@ import Node from "./Node";
 import Store from '../code/Store';
 import Gets from '../code/Gets';
 import wu from 'wu';
+import Actions from '../code/Actions';
 
 export default {
   name: 'Expressor',
@@ -40,8 +41,18 @@ export default {
       return property.children[0];
     }
   },
-  created() {
-    // this.store = Store;
+  mounted() {
+    document.addEventListener('keydown', event => {
+      if (Store.cursorPosition === null) return;
+      if (event.key === 'Enter') {
+        Actions.enterTokenPicking(Store);
+      } else if (event.key === 'ArrowLeft' && !Store.tokenPickingInProgress) {
+        Actions.moveCursorLeft(Store);
+      } else if (event.key === 'ArrowRight' && !Store.tokenPickingInProgress) {
+        Actions.moveCursorRight(Store);
+      }
+      console.log(event.key);
+    });
   }
 }
 </script>

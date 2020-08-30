@@ -106,20 +106,46 @@ export default class Actions {
     }
   }
 
-  static movePointerLeft(store) {
-    console.assert(store.pointedNode != null, new Error().stack);
+  static moveCursorToNode(store, node) {
+    console.assert(arguments.length === 2, new Error().stack);
+    // store.cursorPosition = node;
+    Vue.set(store, 'cursorPosition', node);
   }
 
-  static movePointerRight(store) {
-    console.assert(store.pointedNode != null, new Error().stack);
+  static moveCursorLeft(store) {
+    console.assert(store.cursorPosition != null, new Error().stack);
+    this.moveCursor(store, Functions.traverseLeft);
   }
 
-  static startPicking() {
-
+  static moveCursorRight(store) {
+    console.assert(store.cursorPosition != null, new Error().stack);
+    this.moveCursor(store, Functions.traverseRight);
   }
 
-  static finishPicking() {
-    
+  static moveCursor(store, traverseFunction) {
+    console.assert(store.cursorPosition != null, new Error().stack);
+    const parentGetter = (node) => {
+      const parent = Gets.parentForNode(store, node);
+      if (parent.metaname === 'Variable') return null;
+      return parent;
+    };
+    const childrenGetter = (node) => Gets.childrenForNode(node) ?? [];
+    const traverse = traverseFunction(store.cursorPosition, parentGetter, childrenGetter);
+    const node = traverse.next().value;
+    if (node !== undefined) {
+      this.moveCursorToNode(store, node);
+    }
+  }
+
+  static enterTokenPicking(store) {
+    Vue.set(store, 'tokenPickingInProgress', true);
+    store.tokenPickingInProgress = true;
+    console.log('enter');
+  }
+  
+  static exitTokenPicking(store) {
+    Vue.set(store, 'tokenPickingInProgress', false);
+    console.log('exot');
   }
 
 

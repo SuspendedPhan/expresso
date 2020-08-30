@@ -51,6 +51,15 @@ export default class Gets {
     console.assert(false, new Error().stack);
   }
 
+  static parentForNode(store, node) {
+    console.assert(arguments.length === 2, new Error().stack);
+    return store.parentByNode.get(node);
+  }
+
+  static childrenForNode(node) {
+    return node.children;
+  }
+
   static propertyForNode(store, node) {
     console.assert(arguments.length === 2, new Error().stack);
     if (node.storetype === 'Property') return node;

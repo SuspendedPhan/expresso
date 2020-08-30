@@ -70,7 +70,7 @@ export default class Functions {
   // yields the node
   static * traversePostOrder(node, childrenGetter) {
     for (const child of childrenGetter(node)) {
-      yield * traversePostOrder(child, childrenGetter);
+      yield * this.traversePostOrder(child, childrenGetter);
     }
     yield node;
   }

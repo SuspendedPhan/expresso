@@ -7,3 +7,6 @@
 - make building faster
 - build time profiler
 - make testing faster
+
+
+get rid of stack traces in asserts
