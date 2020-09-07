@@ -100,6 +100,14 @@ export default class Gets {
     return answer;
   }
 
+  static editableProperties(entity) {
+    return this.properties(entity);
+  }
+  
+  static editableProperty(entity, propertyName) {
+    return this.property(entity);
+  }
+
   static computedProperties(entity) {
     console.assert(arguments.length === 1, new Error().stack);
     console.assert(entity.storetype === 'Entity', new Error().stack);
@@ -122,4 +130,8 @@ export default class Gets {
   //   console.assert(answer);
   //   return answer;
   // }
+
+  static entities(store) {
+    return [this.entity(store, 'circle')];
+  }
 }

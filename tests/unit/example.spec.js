@@ -7,136 +7,31 @@ import Functions from '../../src/code/Functions';
 import { StoreMaker } from '../../src/code/Store';
 import wu from 'wu';
 
+function storeEquals(storeA, storeB) {
+  // for (const entityA of Gets.entities(storeA)) {
+  //   const entityB = Gets.entities(storeB);
+  //   for (const propertyA of Gets.properties()) {
+      
+  //   }
+  // }
+}
+
 function makeNumber(value) {
   const num = Node.make(MetanodesByName.get('Number'));
   num.value = value;
-  return num;
-}
-
-function makeVariable() {
-  return Node.make(MetanodesByName.get('Variable'));
+  // return num;
 }
 
 function makeReference(target) {
   expect(target).to.not.be.null;
   const answer = Node.make(MetanodesByName.get('Reference'));
   answer.target = target;
-  return answer;
-}
-
-function makeAdd() {
-  return Node.make(MetanodesByName.get('Add'));
+  // return answer;
 }
 
 describe('HelloWorld.vue', () => {
-  it('ultimate make and eval test', () => {
-    return;
-    const store = {
-      name: 'GodlyCircle',
-      radius: {
-        metaname: 'Variable',
-        path: 'GodlyCircle.radius',
-        children: [{
-          metaname: 'Number',
-          value: 5,
-        }],
-      },
-      children: [{
-        name: 'UnholyCircle',
-        radius: {
-          metaname: 'Variable',
-          path: 'GodlyCircle.UnholyCircle.radius',
-          children: [],
-        },
-        children: [{
-          name: 'DivineHellCircle',
-          radius: {
-            metaname: 'Variable',
-            path: 'GodlyCircle.UnholyCircle.DivineHellCircle.radius',
-            children: [],
-          },
-          variables: [
-            {
-              metaname: 'Variable',
-              path: 'GodlyCircle.UnholyCircle.DivineHellCircle.addTest',
-              children: [],
-            }
-          ],
-        }]
-      }],
-      variables: [{
-        metaname: 'Variable',
-        path: 'GodlyCircle.myTea',
-        children: [{
-          metaname: 'Number',
-          value: 10,
-        }],
-      }],
-    };
-
-    store.children[0].radius.children[0] = makeReference(store.radius);
-    store.children[0].children[0].radius.children[0] = makeReference(store.variables[0]);
-
-    expect(store.children[0].radius.children[0].target.path).to.equal('GodlyCircle.radius');
-    expect(store.children[0].children[0].radius.children[0].target.path).to.equal('GodlyCircle.myTea');
-    
-    expect(Node.eval(store.children[0].radius)).to.equal(5);
-    expect(Node.eval(store.children[0].children[0].radius)).to.equal(10);
-    
-    const addNode = Node.make(MetanodesByName.get('Add'));
-    addNode.children[0] = Node.make(MetanodesByName.get('Variable'));
-    addNode.children[1] = Node.make(MetanodesByName.get('Variable'));
-    addNode.children[0].children[0] = makeReference(store.radius);
-    addNode.children[1].children[0] = makeReference(store.variables[0]);
-    store.children[0].children[0].variables[0].children[0] = makeReference(addNode);
-    
-    expect(Node.eval(store.children[0].children[0].variables[0])).to.equal(15);
-  })
-
-  it('simple make add test', () => {
-    return;
-    Node.make(MetanodesByName.get('Add'));
-  })
-
-  it('nested add', () => {
-    return;
-    const store = { parentByNode: new Map() };
-    
-    // circle -> radius -> number
-    const circle = Actions.addEntity(store, 'circle');
-    const radius = Actions.addProperty(store, circle, 'radius');
-    Actions.replaceNode(store, radius.children[0], makeNumber(5));
-
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.size).to.equal(2);
-    
-    // circle -> radius -> add -> number | number
-    Actions.replaceNode(store, radius.children[0], makeAdd());
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.size).to.equal(4);
-    
-    // circle -> radius -> add -> number | add(number, number)
-    Actions.replaceNode(store, radius.children[0].children[0], makeAdd());
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.get(radius.children[0].children[0])).to.equal(radius.children[0]);
-    expect(store.parentByNode.size).to.equal(6);
-    expect(radius.metaname).to.equal('Variable');
-    expect(radius.children[0].metaname).to.equal('Add');
-    expect(radius.children[0].children[0].metaname).to.equal('Add');
-    expect(radius.children[0].children[1].metaname).to.equal('Number');
-    expect(radius.children[0].children[0].children[0].metaname).to.equal('Number');
-    
-    // circle -> radius -> number
-    Actions.replaceNode(store, radius.children[0], makeNumber());
-    expect(store.parentByNode.size).to.equal(2);
-    expect(radius.metaname).to.equal('Variable');
-    expect(radius.children[0].metaname).to.equal('Number');
-    
-    expect(() => Actions.replaceNode(store, radius, makeNumber())).to.throw();
-  })
-
   it('reassign variable', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     const circle = Actions.addEntity(store, 'circle');
     
@@ -148,37 +43,37 @@ describe('HelloWorld.vue', () => {
     expect(Node.eval(x)).to.equal(0);
     expect(Node.eval(y)).to.equal(0);
 
-    Actions.replaceNode(store, radius.children[0], makeNumber(5));
-    Actions.replaceNode(store, x.children[0], makeNumber(7));
-    Actions.replaceNode(store, y.children[0], makeNumber(9));
+    Actions.replaceNode(store, radius.children[0], MetanodesByName.get('Number'), [5]);
+    Actions.replaceNode(store, x.children[0], MetanodesByName.get('Number'), [7]);
+    Actions.replaceNode(store, y.children[0], MetanodesByName.get('Number'), [9]);
     
     expect(Node.eval(radius)).to.equal(5);
     expect(Node.eval(x)).to.equal(7);
     expect(Node.eval(y)).to.equal(9);
     
     // x = radius
-    Actions.replaceNode(store, x.children[0], makeReference(radius));
+    Actions.replaceNode(store, x.children[0], MetanodesByName.get('Reference'), [radius]);
 
     expect(Node.eval(radius)).to.equal(5);
     expect(Node.eval(x)).to.equal(5);
     expect(Node.eval(y)).to.equal(9);
 
     // x = y
-    Actions.replaceNode(store, x.children[0], makeReference(y));
+    Actions.replaceNode(store, x.children[0], MetanodesByName.get('Reference'), [y]);
 
     expect(Node.eval(radius)).to.equal(5);
     expect(Node.eval(x)).to.equal(9);
     expect(Node.eval(y)).to.equal(9);
 
     // y = 2
-    Actions.replaceNode(store, y.children[0], makeNumber(2));
+    Actions.replaceNode(store, y.children[0], MetanodesByName.get('Number'), [2]);
     
     expect(Node.eval(radius)).to.equal(5);
     expect(Node.eval(x)).to.equal(2);
     expect(Node.eval(y)).to.equal(2);
     
     // x = 3
-    Actions.replaceNode(store, x.children[0], makeNumber(3));
+    Actions.replaceNode(store, x.children[0], MetanodesByName.get('Number'), [3]);
 
     expect(Node.eval(radius)).to.equal(5);
     expect(Node.eval(x)).to.equal(3);
@@ -186,7 +81,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('new replaceNode API', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     const circle = Actions.addEntity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
@@ -210,7 +105,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('filterprops', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
@@ -226,7 +121,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('nodepicks', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
@@ -280,7 +175,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('propname', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
@@ -291,7 +186,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('properties', () => {
-    return;
+    // return;
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
@@ -332,7 +227,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('assign variable by value', () => {
-    return;
+    // return;
     const store = StoreMaker.make();
     const circle = Actions.addEntity(store, 'circle');
     const storeWidth = Actions.addComputedProperty(store, circle, 'width');
@@ -344,7 +239,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('clonenumber01', () => {
-    return;
+    // return;
     const store = StoreMaker.make();
     const circle = Actions.addEntity(store, 'circle');
     const clones = Actions.addProperty(store, circle, 'clones');
@@ -394,7 +289,7 @@ describe('HelloWorld.vue', () => {
     const childrenGetter = (node) => {
       const children = Array.from(wu.values(node));
       children.sort();
-      return children;
+      // return children;
     };
     const parents = new Map();
     const setParents = (node) => {
@@ -446,4 +341,12 @@ describe('HelloWorld.vue', () => {
     traverse = Functions.traverseRight(tree.a.e.h, parentGetter, childrenGetter);
     expect(wu.some(() => true, traverse)).to.be.false;
   })
+
+  // it('serialization', () => {
+  //   const store = StoreMaker.make();
+  //   const store2 = StoreMaker.make();
+  //   const serializedStore = Actions.serialize(store);
+  //   Actions.deserialize(store2, serializedStore);
+  //   storeEquals(store, store2);
+  // })
 })

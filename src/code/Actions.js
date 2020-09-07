@@ -5,6 +5,9 @@ import Gets from "./Gets";
 import Vue from 'vue';
 
 export default class Actions {
+  /**
+   * @param {array} makeArgs
+   */
   static replaceNode(store, oldNode, newMetanode, makeArgs) {
     var store;
     var oldNode;
@@ -50,6 +53,10 @@ export default class Actions {
     store.parentByNode.set(node, entity);
     store.parentByNode.set(node.children[0], node);
     return node;
+  }
+
+  static addEditableProperty(store, entity, propertyName) {
+    return this.addProperty(...arguments);
   }
 
   static addEntity(store, entityName) {
