@@ -1,5 +1,6 @@
 <template>
-  <div id='viewport' class='viewport'>
+  <div>
+    Hello!
   </div>
 </template>
 
@@ -24,10 +25,4 @@ export default {
 </script>
 
 <style scoped>
-.viewport {
-  border-color: black;
-  border-style: solid;
-  border-width: 1px;
-  height: 50vh;
-}
 </style>
