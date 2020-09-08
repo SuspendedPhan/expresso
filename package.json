@@ -15,11 +15,13 @@
     "uuid": "^8.3.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.5",
+    "vue-router": "^3.2.0",
     "wu": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",
     "@vue/cli-plugin-eslint": "~4.4.0",
+    "@vue/cli-plugin-router": "^4.5.4",
     "@vue/cli-plugin-unit-mocha": "~4.4.0",
     "@vue/cli-service": "~4.4.0",
     "@vue/test-utils": "^1.0.3",

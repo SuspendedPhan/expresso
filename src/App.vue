@@ -1,28 +1,32 @@
 <template>
   <div id="app">
-    <Viewport msg="Welcome to Your Vue.js App"/>
-    <Expressor />
+    <div id="nav">
+      <router-link to="/">Home</router-link> |
+      <router-link to="/about">About</router-link>
+    </div>
+    <router-view/>
   </div>
 </template>
 
-<script>
-import Viewport from './components/Viewport.vue'
-import Expressor from './components/Expressor.vue'
-
-export default {
-  name: 'App',
-  components: {
-    Viewport,
-    Expressor,
-  }
-}
-</script>
-
 <style>
-body {
-  font-size: 16pt;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
 }
-input {
-  font-size: 16pt;
+
+#nav {
+  padding: 30px;
+}
+
+#nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+#nav a.router-link-exact-active {
+  color: #42b983;
 }
 </style>
