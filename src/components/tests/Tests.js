@@ -1,26 +1,42 @@
-import { expect } from 'chai'
-import Node from '../../src/code/Node';
-import Metanodes, { MetanodesByName } from '../../src/code/Metanodes';
-import Actions from '../../src/code/Actions';
-import Gets from '../../src/code/Gets';
-import Functions from '../../src/code/Functions';
-import { StoreMaker } from '../../src/code/Store';
+import { assert, config } from 'chai'
+import Node from '../../code/Node';
+import Metanodes, { MetanodesByName } from '../../code/Metanodes';
+import Actions from '../../code/Actions';
+import Gets from '../../code/Gets';
+import Functions from '../../code/Functions';
+import { StoreMaker } from '../../code/Store';
 import wu from 'wu';
+import { describe, it } from './TestRunner';
 
-const Tests = [];
-export default Tests;
-
-function it(name, testFn) {
-  Tests.push({ name, testFn });
+config.includeStack = false;
+function expect(actual) {
+  return {
+    to: {
+      equal: function (expected) {
+        try {
+          assert.strictEqual(actual, expected);
+        } catch (ex) {
+          console.error(ex);
+          throw ex;
+        }
+      },
+      deep: {
+        equal: function (expected) {
+          try {
+            assert.deepStrictEqual(actual, expected);
+          } catch (ex) {
+            console.error(ex);
+            throw ex;
+          }
+        }
+      }
+    }
+  };
 }
-
-// function expect(actual) {
-// }
-
 
 it('nested add', () => {
   // return;
-  expect({ a: 2, c: 4}).to.deep.equal({ a: 2, b: 4});
+  expect({ a: 2, c: 4}).to.deep.equal({ a: 2, c: 3});
   const store = { parentByNode: new Map() };
   
   // circle -> radius -> number

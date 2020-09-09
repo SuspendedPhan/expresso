@@ -1,13 +1,16 @@
 <template>
   <div>
-    <div v-for='test in tests' :key='test.name'>
-      {{test.name}}
+    <div v-for='test in store.tests' :key='test.name'>
+      <span>{{ test.status }}</span>
+      <span>{{ test.name }}</span>
     </div>
   </div>
 </template>
 
 <script>
-import Tests from '../code/Tests';
+import * as TestRunner from './TestRunner.js';
+import { Store } from './TestRunner.js';
+import './Tests';
 
 export default {
   name: 'TestRunner',
@@ -15,16 +18,12 @@ export default {
   },
   data: () => {
     return {
-      tests: Tests,
+      store: Store,
     };
   },
   mounted: function() {
-    for (const test of this.tests) {
-      try {
-        test.testFn();
-      } catch {
-        
-      }
+    for (const test of TestRunner.getTests()) {
+      TestRunner.runTests();
     }
   }
 }
