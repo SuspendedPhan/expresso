@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-for='test in store.tests' :key='test.name'>
+    <div v-for='test in store.tests' :key='test.name' class='flex'>
       <span>{{ test.status }}</span>
       <span>{{ test.name }}</span>
     </div>
@@ -22,12 +22,15 @@ export default {
     };
   },
   mounted: function() {
-    for (const test of TestRunner.getTests()) {
-      TestRunner.runTests();
-    }
+    TestRunner.runTests();
   }
 }
 </script>
 
 <style scoped>
+.flex {
+  display: grid;
+  grid-template-columns: max-content max-content;
+  gap: 20px;
+}
 </style>

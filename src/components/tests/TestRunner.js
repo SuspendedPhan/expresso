@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import StackTrace from 'stacktrace-js';
@@ -10,6 +11,8 @@ export const Status = {
   'NotRun': 'NotRun',
 };
 
+export class AssertionError { }
+
 // Store
 
 const makeStore = () => ({
@@ -21,18 +24,28 @@ export const Store = store;
 
 // Actions
 
+export function clearStore() {
+  Vue.set(store, 'tests', []);
+}
+
 export function runTests() {
   for (const test of store.tests) {
     try {
       test.testFn();
       test.status = Status.Passed;
-    } catch (ex) {
+    } catch (error) {
       test.status = Status.Failed;
+      if (!(error instanceof AssertionError)) {
+        console.error(error);
+      }
+      continue;
     }
   }
 }
 
-export function describe(name, testSuite) { };
+export function describe(name, testSuite) {
+  testSuite();
+};
 
 export function it(name, testFn) {
   store.tests.push({ name, testFn, id: uuidv4(), status: Status.NotRun });

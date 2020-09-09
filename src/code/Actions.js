@@ -57,13 +57,6 @@ export default class Actions {
     return Gets.entity(store, entityName);
   }
 
-  static render(store) {
-    const entities = Gets.entities(store);
-    for (const entity of entities) {
-      
-    }
-  }
-
   static addComputedProperty(store, entity, propertyName) {
     const node = Node.make(MetanodesByName.get('Variable'));
     node.storetype = 'Property';
