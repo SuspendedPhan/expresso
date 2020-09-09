@@ -20,7 +20,11 @@ export default {
   },
   mounted: function() {
     for (const test of this.tests) {
-      test.testFn();
+      try {
+        test.testFn();
+      } catch {
+        
+      }
     }
   }
 }
