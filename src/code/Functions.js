@@ -1,19 +1,27 @@
 import wu from 'wu';
+import Gets from './Gets';
 
 export default class Functions {
-  static topDown(node, action) {
-    action(node);
+
+  static * allNodes(store) {
+    const circle = Gets.entity(store, 'circle');
+    for (const property of Gets.properties(circle)) {
+      yield * Functions.topDown(property);
+    }
+  }
+  
+  static * topDown(node) {
+    yield node;
     for (const child of node.children ?? []) {
-      this.topDown(child, action);
+      yield * this.topDown(child);
     }
   }
 
   static * ancestors(store, node) {
-    const parentByNode = store.parentByNode;
-    var ancestor = parentByNode.get(node);
+    var ancestor = Gets.parentForNode(store, node);
     while (ancestor != null) {
       yield ancestor;
-      ancestor = parentByNode.get(ancestor);
+      ancestor = Gets.parentForNode(store, ancestor);
     }
   }
 
@@ -75,11 +83,23 @@ export default class Functions {
     yield node;
   }
 
+  // ------------------------------------------------------------
+
   static filterProps(obj, ...props) {
     const answer = {};
     for (const prop of props) {
       answer[prop] = obj[prop];
     }
     return answer;
+  }
+
+  // ------------------------------------------------------------
+
+  static serialize(store) {
+    return JSON.stringify(store);
+  }
+
+  static deserialize(text) {
+    return JSON.parse(text);
   }
 }

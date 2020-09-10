@@ -63,26 +63,26 @@ TestRunner.clearStore();
 describe('HelloWorld.vue', () => {
   it('nested add', () => {
     // expect({ a: 2, c: 4}).to.deep.equal({ a: 2, c: 3});
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     
     // circle -> radius -> number
     const circle = Actions.addEntity(store, 'circle');
     const radius = Actions.addProperty(store, circle, 'radius');
     Actions.replaceNode(store, radius.children[0], makeNumber(5));
 
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.size).to.equal(2);
+    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
+    expect(Object.keys(store.parentIdByNodeId).length).to.equal(2);
     
     // circle -> radius -> add -> number | number
     Actions.replaceNode(store, radius.children[0], makeAdd());
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.size).to.equal(4);
+    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
+    expect(Object.keys(store.parentIdByNodeId).length).to.equal(4);
     
     // circle -> radius -> add -> number | add(number, number)
     Actions.replaceNode(store, radius.children[0].children[0], makeAdd());
-    expect(store.parentByNode.get(radius.children[0])).to.equal(radius);
-    expect(store.parentByNode.get(radius.children[0].children[0])).to.equal(radius.children[0]);
-    expect(store.parentByNode.size).to.equal(6);
+    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
+    expect(Gets.parentForNode(store, radius.children[0].children[0])).to.equal(radius.children[0]);
+    expect(Object.keys(store.parentIdByNodeId).length).to.equal(6);
     expect(radius.metaname).to.equal('Variable');
     expect(radius.children[0].metaname).to.equal('Add');
     expect(radius.children[0].children[0].metaname).to.equal('Add');
@@ -91,7 +91,7 @@ describe('HelloWorld.vue', () => {
     
     // circle -> radius -> number
     Actions.replaceNode(store, radius.children[0], makeNumber());
-    expect(store.parentByNode.size).to.equal(2);
+    expect(Object.keys(store.parentIdByNodeId).length).to.equal(2);
     expect(radius.metaname).to.equal('Variable');
     expect(radius.children[0].metaname).to.equal('Number');
     
@@ -99,7 +99,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('reassign variable', () => {
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     const circle = Actions.addEntity(store, 'circle');
     
     const radius = Actions.addProperty(store, circle, 'radius');
@@ -148,7 +148,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('new replaceNode API', () => {
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     const circle = Actions.addEntity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
     Actions.addProperty(store, circle, 'x');
@@ -171,7 +171,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('filterprops', () => {
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
@@ -187,7 +187,7 @@ describe('HelloWorld.vue', () => {
 
   it('nodepicks', () => {
     return;
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     const radius = Actions.addProperty(store, circle, 'radius');
@@ -240,7 +240,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('propname', () => {
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
@@ -250,7 +250,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('properties', () => {
-    const store = { parentByNode: new Map() };
+    const store = StoreMaker.make();
     const circle = Actions.addEntity(store, 'circle');
     const radius = Actions.addEditableProperty(store, circle, 'radius');
     const x = Actions.addEditableProperty(store, circle, 'x');
@@ -430,6 +430,9 @@ describe('HelloWorld.vue', () => {
 
     expect(Actions.eval(store2, Gets.editableProperty(circle, 'x'))).to.equal(10);
     expect(Actions.eval(store2, Gets.editableProperty(circle, 'y'))).to.equal(10);
+
+    Actions.assignVariable(store, Gets.editableProperty(circle, 'x'), MetanodesByName.get('Number'), [1]);
+    expect(Actions.eval(store2, Gets.editableProperty(circle, 'x'))).to.equal(1);
   })
 })
 

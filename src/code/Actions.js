@@ -3,6 +3,7 @@ import { MetanodesByName } from "./Metanodes";
 import Functions from "./Functions";
 import Gets from "./Gets";
 import Vue from 'vue';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class Actions {
   static replaceNode(store, oldNode, newMetanode, makeArgs) {
@@ -19,10 +20,10 @@ export default class Actions {
       console.error('wrong argument count');
     }
 
-    const parentByNode = store.parentByNode;
-    
-    const parent = parentByNode.get(oldNode);
-    Functions.topDown(oldNode, (node) => parentByNode.delete(node));
+    const parent = Gets.parentForNode(store, oldNode);
+    for (const node of Functions.topDown(oldNode)) {
+      Actions.unparent(store, node);
+    }
 
     if (parent.children == null) throw {};
     
@@ -36,16 +37,24 @@ export default class Actions {
     console.assert(childKey != null);
 
     Vue.set(parent.children, childKey, newNode);
-    parentByNode.set(newNode, parent);
+    Actions.setParent(store, newNode, parent);
     for (const child of newNode.children ?? []) {
-      parentByNode.set(child, newNode);
+      Actions.setParent(store, child, newNode);
     }
+    store.storeObjectById[newNode.id] = newNode;
     return newNode;
   }
 
   static addEntity(store, entityName) {
-    store[entityName] = { storetype: 'Entity', editableProperties: {}, computedProperties: {} };
-    return Gets.entity(store, entityName);
+    const entity = { 
+      storetype: 'Entity',
+      editableProperties: {},
+      computedProperties: {},
+      id: uuidv4(),
+    };
+    store[entityName] = entity;
+    store.storeObjectById[entity.id] = entity;
+    return entity;
   }
 
   static addProperty(store, entity, propertyName) {
@@ -56,8 +65,9 @@ export default class Actions {
     const node = Node.make(MetanodesByName.get('Variable'));
     node.storetype = 'Property';
     entity.editableProperties[propertyName] = node;
-    store.parentByNode.set(node, entity);
-    store.parentByNode.set(node.children[0], node);
+    Actions.setParent(store, node, entity);
+    Actions.setParent(store, node.children[0], node);
+    store.storeObjectById[node.id] = node;
     return node;
   }
 
@@ -65,10 +75,13 @@ export default class Actions {
     const node = Node.make(MetanodesByName.get('Variable'));
     node.storetype = 'Property';
     entity.computedProperties[propertyName] = node;
-    store.parentByNode.set(node, entity);
-    store.parentByNode.set(node.children[0], node);
+    Actions.setParent(store, node, entity);
+    Actions.setParent(store, node.children[0], node);
+    store.storeObjectById[node.id] = node;
     return node;
   }
+
+  // --------- variables -----------
 
   /**
    * @param {[]} makeArgs array
@@ -80,6 +93,8 @@ export default class Actions {
   static assignNumberToVariable(store, variable, value) {
     return Actions.replaceNode(store, variable.children[0], MetanodesByName.get('Number'), [value]);
   }
+
+  // ----------------------------------
 
   static eval(store, node) {
     return Node.eval(node);
@@ -105,6 +120,8 @@ export default class Actions {
       yield command;
     }
   }
+
+  // ----------------------------------
 
   static moveCursorToNode(store, node) {
     console.assert(arguments.length === 2, new Error().stack);
@@ -137,6 +154,8 @@ export default class Actions {
     }
   }
 
+  // --------------------------------------------------------------------
+
   static enterTokenPicking(store) {
     Vue.set(store, 'tokenPickingInProgress', true);
     store.tokenPickingInProgress = true;
@@ -150,11 +169,32 @@ export default class Actions {
 
   // --------------------------------------------------------------------
 
-  static serialize(store) {
-
+  static setParent(store, node, parent) {
+    store.parentIdByNodeId[node.id] = parent.id;
   }
 
-  static deserialize(text) {
+  static unparent(store, node) {
+    delete store.parentIdByNodeId[node.id];
+  }
 
+  // --------------------------------------------------------------------
+
+  static save(store) {
+    delete store.storeObjectById;
+    window.localStorage.setItem('save', Functions.serialize(store));
+    this.load(store);
+  }
+
+  static load(store) {
+    const text = window.localStorage.getItem('save');
+    if (text !== null) {
+      const loadedStore = Functions.deserialize(text);
+      for (const key in store) delete store[key];
+      Object.assign(store, loadedStore);
+      loadedStore.storeObjectById = {};
+      for (const node of Functions.allNodes(loadedStore)) {
+        loadedStore.storeObjectById[node.id] = node;
+      }
+    }
   }
 }

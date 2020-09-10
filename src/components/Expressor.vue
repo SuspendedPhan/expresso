@@ -42,6 +42,7 @@ export default {
     }
   },
   mounted() {
+    Actions.load(this.store);
     document.addEventListener('keydown', event => {
       if (Store.cursorPosition === null) return;
       if (event.key === 'Enter') {
@@ -51,7 +52,6 @@ export default {
       } else if (event.key === 'ArrowRight' && !Store.tokenPickingInProgress) {
         Actions.moveCursorRight(Store);
       }
-      console.log(event.key);
     });
   }
 }

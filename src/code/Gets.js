@@ -48,12 +48,14 @@ export default class Gets {
     for (const ancestor of Functions.ancestors(store, node)) {
       if (ancestor.storetype === 'Entity') return ancestor;
     }
+    console.log(node);
     console.assert(false, new Error().stack);
   }
 
   static parentForNode(store, node) {
     console.assert(arguments.length === 2, new Error().stack);
-    return store.parentByNode.get(node);
+    const parentId = store.parentIdByNodeId[node.id];
+    return store.storeObjectById[parentId];
   }
 
   static childrenForNode(node) {
@@ -124,4 +126,8 @@ export default class Gets {
     console.assert(entity.storetype === 'Entity', new Error().stack);
     return entity.computedProperties;
   }
+
+  // -------------------------------------------------------------
+
+  
 }

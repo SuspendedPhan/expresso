@@ -7,7 +7,8 @@ const { Number } = Metanodes;
 export class StoreMaker {
   static make() {
     return {
-      parentByNode: new Map(),
+      parentIdByNodeId: {},
+      storeObjectById: {},
       cursorPosition: null,
       tokenPickingInProgress: false,
     };

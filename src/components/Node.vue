@@ -56,6 +56,7 @@ export default {
       const node = Actions.replaceNode(Store, this.astNode, metanode, makeArgs);
       Actions.exitTokenPicking(Store);
       Actions.moveCursorToNode(Store, node);
+      Actions.save(Store);
     },
     click() {
       Actions.moveCursorToNode(Store, this.astNode);
