@@ -159,12 +159,10 @@ export default class Actions {
   static enterTokenPicking(store) {
     Vue.set(store, 'tokenPickingInProgress', true);
     store.tokenPickingInProgress = true;
-    console.log('enter');
   }
   
   static exitTokenPicking(store) {
     Vue.set(store, 'tokenPickingInProgress', false);
-    console.log('exot');
   }
 
   // --------------------------------------------------------------------
@@ -180,21 +178,29 @@ export default class Actions {
   // --------------------------------------------------------------------
 
   static save(store) {
-    delete store.storeObjectById;
-    window.localStorage.setItem('save', Functions.serialize(store));
-    this.load(store);
+    const copy = {};
+    Object.assign(copy, store);
+    delete copy.storeObjectById;
+    window.localStorage.setItem('save', Functions.serialize(copy));
+    console.log(copy);
   }
 
   static load(store) {
+    // return;
     const text = window.localStorage.getItem('save');
     if (text !== null) {
-      const loadedStore = Functions.deserialize(text);
+      console.log(text);
       for (const key in store) delete store[key];
-      Object.assign(store, loadedStore);
+
+      const loadedStore = Functions.deserialize(text);
       loadedStore.storeObjectById = {};
       for (const node of Functions.allNodes(loadedStore)) {
         loadedStore.storeObjectById[node.id] = node;
       }
+      const circle = Gets.entity(loadedStore, 'circle');
+      loadedStore.storeObjectById[circle.id] = circle;
+
+      Object.assign(store, loadedStore);
     }
   }
 }

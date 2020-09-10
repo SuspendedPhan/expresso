@@ -24,7 +24,6 @@ export default {
       width: elem.clientWidth,
       height: elem.clientHeight,
     };
-    console.log(elem.clientHeight);
     var two = new Two(params).appendTo(elem);
 
     var circle = two.makeCircle(0, 0, 50);
@@ -39,7 +38,7 @@ export default {
     two.bind('update', function() {
       two.clear();
 
-      const renderCommands = Actions.computeRenderCommands(Store, storeCircle);
+      const renderCommands = Actions.computeRenderCommands(Store, Gets.entity(store, 'circle'));
       for (const renderCommand of renderCommands) {
         const radius = renderCommand.radius;
         const x = renderCommand.x;

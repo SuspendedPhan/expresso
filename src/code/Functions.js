@@ -5,11 +5,11 @@ export default class Functions {
 
   static * allNodes(store) {
     const circle = Gets.entity(store, 'circle');
-    for (const property of Gets.properties(circle)) {
+    for (const property of wu.values(Gets.properties(circle))) {
       yield * Functions.topDown(property);
     }
   }
-  
+
   static * topDown(node) {
     yield node;
     for (const child of node.children ?? []) {

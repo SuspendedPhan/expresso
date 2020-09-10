@@ -48,7 +48,6 @@ export default class Gets {
     for (const ancestor of Functions.ancestors(store, node)) {
       if (ancestor.storetype === 'Entity') return ancestor;
     }
-    console.log(node);
     console.assert(false, new Error().stack);
   }
 
