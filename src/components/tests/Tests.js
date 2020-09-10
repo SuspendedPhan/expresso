@@ -402,6 +402,35 @@ describe('HelloWorld.vue', () => {
     traverse = Functions.traverseRight(tree.a.e.h, parentGetter, childrenGetter);
     expect(wu.some(() => true, traverse)).to.equal(false);
   })
+
+  it('serialize', () => {
+    // references
+    // functions
+    
+    // x = add(2, add(5, 3))
+    // y = x
+
+    const store = StoreMaker.make();
+    const circle = Actions.addEntity(store, 'circle');
+    const x = Actions.addEditableProperty(store, circle, 'x');
+    const y = Actions.addEditableProperty(store, circle, 'y');
+    const addNode = Actions.assignVariable(store, x, MetanodesByName.get('Add'), []);
+    Actions.replaceNode(store, addNode.children[0], MetanodesByName.get('Number'), [2]);
+    const addNode2 = Actions.replaceNode(store, addNode.children[1], MetanodesByName.get('Add'), []);
+    Actions.replaceNode(store, addNode2.children[0], MetanodesByName.get('Number'), [5]);
+    Actions.replaceNode(store, addNode2.children[1], MetanodesByName.get('Number'), [3]);
+
+    Actions.assignVariable(store, y, MetanodesByName.get('Reference'), [x]);
+
+    expect(Actions.eval(store, Gets.editableProperty(circle, 'x'))).to.equal(10);
+    expect(Actions.eval(store, Gets.editableProperty(circle, 'y'))).to.equal(10);
+
+    const text = Functions.serialize(store);
+    const store2 = Functions.deserialize(text);
+
+    expect(Actions.eval(store2, Gets.editableProperty(circle, 'x'))).to.equal(10);
+    expect(Actions.eval(store2, Gets.editableProperty(circle, 'y'))).to.equal(10);
+  })
 })
 
 function makeNumber(value) {

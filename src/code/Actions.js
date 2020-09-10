@@ -70,6 +70,9 @@ export default class Actions {
     return node;
   }
 
+  /**
+   * @param {[]} makeArgs array
+   */
   static assignVariable(store, variable, newMetanode, makeArgs) {
     return Actions.replaceNode(store, variable.children[0], newMetanode, makeArgs);
   }

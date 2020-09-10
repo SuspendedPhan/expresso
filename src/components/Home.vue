@@ -25,6 +25,7 @@ export default {
 <style scoped>
 .runner {
   bottom: 0px;
+  right: 0px;
   position: absolute;
 }
 </style>
