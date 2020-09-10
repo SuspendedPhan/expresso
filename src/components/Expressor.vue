@@ -29,7 +29,7 @@ export default {
   computed: {
     properties: function() {
       const entity = Gets.entity(this.store, 'circle');
-      const props = wu.values(Gets.properties(entity));
+      const props = wu.values(Gets.editableProperties(entity));
       return Array.from(props);
     },
   },

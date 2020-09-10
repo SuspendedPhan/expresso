@@ -43,18 +43,22 @@ export default class Actions {
     return newNode;
   }
 
+  static addEntity(store, entityName) {
+    store[entityName] = { storetype: 'Entity', editableProperties: {}, computedProperties: {} };
+    return Gets.entity(store, entityName);
+  }
+
   static addProperty(store, entity, propertyName) {
+    return this.addEditableProperty(store, entity, propertyName);
+  }
+
+  static addEditableProperty(store, entity, propertyName) {
     const node = Node.make(MetanodesByName.get('Variable'));
     node.storetype = 'Property';
-    entity.properties[propertyName] = node;
+    entity.editableProperties[propertyName] = node;
     store.parentByNode.set(node, entity);
     store.parentByNode.set(node.children[0], node);
     return node;
-  }
-
-  static addEntity(store, entityName) {
-    store[entityName] = { storetype: 'Entity', properties: {}, computedProperties: {} };
-    return Gets.entity(store, entityName);
   }
 
   static addComputedProperty(store, entity, propertyName) {

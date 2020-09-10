@@ -38,6 +38,7 @@ export function runTests() {
       if (!(error instanceof AssertionError)) {
         console.error(error);
       }
+      console.log(`${test.name} failed`);
       continue;
     }
   }

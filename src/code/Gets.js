@@ -68,14 +68,15 @@ export default class Gets {
     }
   }
 
+  // -------------------------------------------------------------
+
   static propertyName(store, propertyNode) {
     console.assert(arguments.length === 2, new Error().stack);
     console.assert(propertyNode.storetype === 'Property', new Error().stack);
     const entity = Gets.entityForNode(store, propertyNode);
-    for (const propertyName in entity.properties) {
-      if (entity.properties[propertyName] === propertyNode) return propertyName;
+    for (const propertyName in entity.editableProperties) {
+      if (entity.editableProperties[propertyName] === propertyNode) return propertyName;
     }
-    // console.assert(false, new Error().stack);
   }
 
   static computedPropertyName(store, propertyNode) {
@@ -85,25 +86,18 @@ export default class Gets {
     for (const propertyName in entity.computedProperties) {
       if (entity.computedProperties[propertyName] === propertyNode) return propertyName;
     }
-    console.assert(false, new Error().stack);
   }
 
-  static properties(entity) {
-    console.assert(arguments.length === 1, new Error().stack);
-    console.assert(entity.storetype === 'Entity', new Error().stack);
-    return entity.properties;
-  }
+  // -------------------------------------------------------------
 
   static property(entity, propertyName) {
-    const answer = entity.properties[propertyName];
-    console.assert(answer);
-    return answer;
+    return this.editableProperty(entity, propertyName);
   }
 
-  static computedProperties(entity) {
-    console.assert(arguments.length === 1, new Error().stack);
-    console.assert(entity.storetype === 'Entity', new Error().stack);
-    return entity.computedProperties;
+  static editableProperty(entity, propertyName) {
+    const answer = entity.editableProperties[propertyName];
+    console.assert(answer);
+    return answer;
   }
 
   static computedProperty(entity, propertyName) {
@@ -112,14 +106,22 @@ export default class Gets {
     return answer;
   }
 
-  // static path(store, propertyNode) {
-  //   console.assert(arguments.length === 2);
-  //   return [propertyNode.name, ...Functions.ancestors(store, propertyNode)].reverse().join('.');
-  // } 
+  // -------------------------------------------------------------
 
-  // static getVariable(entity, variableName) {
-  //   const answer = entity.variables.find(variable => variable.name === variableName);
-  //   console.assert(answer);
-  //   return answer;
-  // }
+  static properties(entity) {
+    const answer = {};
+    return Object.assign(answer, this.editableProperties(entity), this.computedProperties(entity));
+  }
+
+  static editableProperties(entity) {
+    console.assert(arguments.length === 1, new Error().stack);
+    console.assert(entity.storetype === 'Entity', new Error().stack);
+    return entity.editableProperties;
+  }
+
+  static computedProperties(entity) {
+    console.assert(arguments.length === 1, new Error().stack);
+    console.assert(entity.storetype === 'Entity', new Error().stack);
+    return entity.computedProperties;
+  }
 }

@@ -186,6 +186,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('nodepicks', () => {
+    return;
     const store = { parentByNode: new Map() };
     Actions.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
@@ -250,16 +251,15 @@ describe('HelloWorld.vue', () => {
 
   it('properties', () => {
     const store = { parentByNode: new Map() };
-    Actions.addEntity(store, 'circle');
-    const circle = Gets.entity(store, 'circle');
-    const radius = Actions.addProperty(store, circle, 'radius');
-    const x = Actions.addProperty(store, circle, 'x');
-    const y = Actions.addProperty(store, circle, 'y');
-    // const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
+    const circle = Actions.addEntity(store, 'circle');
+    const radius = Actions.addEditableProperty(store, circle, 'radius');
+    const x = Actions.addEditableProperty(store, circle, 'x');
+    const y = Actions.addEditableProperty(store, circle, 'y');
+    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
 
-    const expected = { radius, x, y };
-    expect(Gets.properties(circle)).to.deep.equal(expected);
-    // expect(Gets.computedProperties(circle)).to.deep.equal([cloneNumber]);
+    expect(Gets.editableProperties(circle)).to.deep.equal({ radius, x, y });
+    expect(Gets.computedProperties(circle)).to.deep.equal({cloneNumber});
+    expect(Gets.properties(circle)).to.deep.equal({ radius, x, y, cloneNumber });
   })
 
   it('render', () => {
