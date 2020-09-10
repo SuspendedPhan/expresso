@@ -148,12 +148,13 @@ export default class Actions {
     console.log('exot');
   }
 
+  // --------------------------------------------------------------------
 
+  static serialize(store) {
 
-  // static addVariable(store, entity, variableName) {
-  //   const node = Node.make(MetanodesByName.get('Variable'));
-  //   entity.variables.push(node);
-  //   store.parentByNode.set(node, entity);
-  //   store.parentByNode.set(node.children[0], node);
-  // }
+  }
+
+  static deserialize(text) {
+
+  }
 }
