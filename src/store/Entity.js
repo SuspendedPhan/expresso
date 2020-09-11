@@ -1,36 +1,43 @@
 import { v4 as uuidv4 } from 'uuid';
+import wu from 'wu';
 
-export function makeStore() {
+function makeStore() {
   return {
-    storetype: 'Entity',
-    editableProperties: {},
-    computedProperties: {},
-    id: uuidv4(),
+    makeEntity: (name) => ({
+      storetype: 'Entity',
+      id: uuidv4(),
+      name,
+    }),
+    entities: [],
+
+    /** { propertyId, parentEntityId } */
+    propertyParents: [],
+  };
+}
+
+function makeGets(root, store) {
+  return {
+    fromName: function (name) {
+      return wu(store.entities).find(entity => entity.name === name);
+    }
   }
 }
 
-// -------------------- GETS -----------------------
-
-
-// -------------------- ACTIONS --------------------
-
-export function addEntity(root, entityName) {
-  const entity = makeStore();
-  root[entityName] = entity;
-  root.storeObjectById[entity.id] = entity;
-  return entity;
-}
-
-// fix imports
-export function entity(store, entityName) {
-  console.assert(arguments.length === 2, new Error().stack);
-  return store[entityName];
-}
-
-export function entityForNode(store, node) {
-  console.assert(arguments.length === 2, new Error().stack);
-  for (const ancestor of Functions.ancestors(store, node)) {
-    if (ancestor.storetype === 'Entity') return ancestor;
+function makeActions(root, store) {
+  return {
+    put: function (name) {
+      const entity = store.makeEntity(name);
+      store.entities.push(entity);
+      return entity;
+    }
   }
-  console.assert(false, new Error().stack);
+}
+
+export function make(root) {
+  const store = makeStore();
+  return {
+    store,
+    gets: makeGets(root, store),
+    actions: makeActions(root, store),
+  };
 }
