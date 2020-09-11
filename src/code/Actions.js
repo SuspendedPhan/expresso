@@ -3,7 +3,6 @@ import { MetanodesByName } from "./Metanodes";
 import Functions from "./Functions";
 import Gets from "./Gets";
 import Vue from 'vue';
-import { v4 as uuidv4 } from 'uuid';
 
 export default class Actions {
   static replaceNode(store, oldNode, newMetanode, makeArgs) {
@@ -45,17 +44,7 @@ export default class Actions {
     return newNode;
   }
 
-  static addEntity(store, entityName) {
-    const entity = { 
-      storetype: 'Entity',
-      editableProperties: {},
-      computedProperties: {},
-      id: uuidv4(),
-    };
-    store[entityName] = entity;
-    store.storeObjectById[entity.id] = entity;
-    return entity;
-  }
+  
 
   static addProperty(store, entity, propertyName) {
     return this.addEditableProperty(store, entity, propertyName);

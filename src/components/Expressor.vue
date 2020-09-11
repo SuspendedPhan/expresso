@@ -9,7 +9,7 @@
 
 <script>
 import Node from "./Node";
-import Store from '../code/Store';
+import Store from '../store/Root';
 import Gets from '../code/Gets';
 import wu from 'wu';
 import Actions from '../code/Actions';

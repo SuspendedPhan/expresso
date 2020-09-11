@@ -5,7 +5,7 @@
 
 <script>
 import Two from 'two.js';
-import Store from '../code/Store';
+import Store from '../store/Root';
 import Node from '../code/Node';
 import Gets from '../code/Gets';
 import Actions from '../code/Actions';

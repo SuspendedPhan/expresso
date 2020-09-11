@@ -1,6 +1,7 @@
-import Metanodes from "./Metanodes";
-import Actions from "./Actions";
-import Gets from "./Gets";
+import Metanodes from "../code/Metanodes";
+import Actions from "../code/Actions";
+import Gets from "../code/Gets";
+import * as Entity from './Entity';
 
 const { Number } = Metanodes;
 
@@ -11,13 +12,13 @@ export class StoreMaker {
       storeObjectById: {},
       cursorPosition: null,
       tokenPickingInProgress: false,
+      entities: [],
     };
   }
 }
 
 const store = StoreMaker.make();
-
-const circle = Actions.addEntity(store, 'circle');
+const circle = Entity.addEntity(store, 'circle');
 const clones = Actions.addProperty(store, circle, 'clones');
 const radius = Actions.addProperty(store, circle, 'radius');
 Actions.addProperty(store, circle, 'x');

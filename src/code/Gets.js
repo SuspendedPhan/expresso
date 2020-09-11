@@ -38,19 +38,6 @@ export default class Gets {
       }));
   }
 
-  static entity(store, entityName) {
-    console.assert(arguments.length === 2, new Error().stack);
-    return store[entityName];
-  }
-
-  static entityForNode(store, node) {
-    console.assert(arguments.length === 2, new Error().stack);
-    for (const ancestor of Functions.ancestors(store, node)) {
-      if (ancestor.storetype === 'Entity') return ancestor;
-    }
-    console.assert(false, new Error().stack);
-  }
-
   static parentForNode(store, node) {
     console.assert(arguments.length === 2, new Error().stack);
     const parentId = store.parentIdByNodeId[node.id];

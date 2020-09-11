@@ -11,7 +11,7 @@
 
 <script>
 import Gets from '../code/Gets';
-import Store from '../code/Store';
+import Store from '../store/Root';
 
 export default {
   name: 'NodePicker',

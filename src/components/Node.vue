@@ -24,7 +24,7 @@
 <script>
 import NodePicker from "./NodePicker";
 import Actions from "../code/Actions";
-import Store from '../code/Store';
+import Store from '../store/Root';
 import Gets from '../code/Gets';
 
 export default {

@@ -4,10 +4,11 @@ import Metanodes, { MetanodesByName } from '../../code/Metanodes';
 import Actions from '../../code/Actions';
 import Gets from '../../code/Gets';
 import Functions from '../../code/Functions';
-import { StoreMaker } from '../../code/Store';
+import { StoreMaker } from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
+import * as Entity from '../../store/Entity';
 
 function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
@@ -66,7 +67,7 @@ describe('HelloWorld.vue', () => {
     const store = StoreMaker.make();
     
     // circle -> radius -> number
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const radius = Actions.addProperty(store, circle, 'radius');
     Actions.replaceNode(store, radius.children[0], makeNumber(5));
 
@@ -100,7 +101,7 @@ describe('HelloWorld.vue', () => {
 
   it('reassign variable', () => {
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     
     const radius = Actions.addProperty(store, circle, 'radius');
     const x = Actions.addProperty(store, circle, 'x');
@@ -149,7 +150,7 @@ describe('HelloWorld.vue', () => {
 
   it('new replaceNode API', () => {
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
     Actions.addProperty(store, circle, 'x');
 
@@ -172,7 +173,7 @@ describe('HelloWorld.vue', () => {
 
   it('filterprops', () => {
     const store = StoreMaker.make();
-    Actions.addEntity(store, 'circle');
+    Entity.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
     const radius = Gets.property(circle, 'radius');
@@ -188,7 +189,7 @@ describe('HelloWorld.vue', () => {
   it('nodepicks', () => {
     return;
     const store = StoreMaker.make();
-    Actions.addEntity(store, 'circle');
+    Entity.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     const radius = Actions.addProperty(store, circle, 'radius');
     const x = Actions.addProperty(store, circle, 'x');
@@ -241,7 +242,7 @@ describe('HelloWorld.vue', () => {
 
   it('propname', () => {
     const store = StoreMaker.make();
-    Actions.addEntity(store, 'circle');
+    Entity.addEntity(store, 'circle');
     const circle = Gets.entity(store, 'circle');
     Actions.addProperty(store, circle, 'radius');
 
@@ -251,7 +252,7 @@ describe('HelloWorld.vue', () => {
 
   it('properties', () => {
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const radius = Actions.addEditableProperty(store, circle, 'radius');
     const x = Actions.addEditableProperty(store, circle, 'x');
     const y = Actions.addEditableProperty(store, circle, 'y');
@@ -264,7 +265,7 @@ describe('HelloWorld.vue', () => {
 
   it('render', () => {
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const x = Actions.addProperty(store, circle, 'x');
     const clones = Actions.addProperty(store, circle, 'clones');
     const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
@@ -291,7 +292,7 @@ describe('HelloWorld.vue', () => {
   it('assign variable by value', () => {
     expect(true).to.equal(true);
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const storeWidth = Actions.addComputedProperty(store, circle, 'width');
     const storeHeight = Actions.addComputedProperty(store, circle, 'height');
     Actions.assignNumberToVariable(store, storeWidth, 10);
@@ -302,7 +303,7 @@ describe('HelloWorld.vue', () => {
 
   it('clonenumber01', () => {
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const clones = Actions.addProperty(store, circle, 'clones');
     const radius = Actions.addProperty(store, circle, 'radius');
     Actions.addComputedProperty(store, circle, 'cloneNumber');
@@ -411,7 +412,7 @@ describe('HelloWorld.vue', () => {
     // y = x
 
     const store = StoreMaker.make();
-    const circle = Actions.addEntity(store, 'circle');
+    const circle = Entity.addEntity(store, 'circle');
     const x = Actions.addEditableProperty(store, circle, 'x');
     const y = Actions.addEditableProperty(store, circle, 'y');
     const addNode = Actions.assignVariable(store, x, MetanodesByName.get('Add'), []);
