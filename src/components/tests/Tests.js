@@ -73,45 +73,43 @@ describe('HelloWorld.vue', () => {
     const root = Root.make();
     const circle = root.entity.actions.put('circle');
     const radius = root.property.actions.putEditable(circle, 'radius');
-    const radius2 = root.property.gets.editableFromName(circle, 'radius');
-    expect(radius).to.equal(radius2);
+  })
+
+  it('node', () => {
+    const root = Root.make();
   })
 
   it('nested add', () => {
     // return;
+
     const root = Root.make();
+    function makeNumber(value) {
+      return root.node.actions.create(MetanodesByName.get('Number'), [value]);
+    }
     
     // circle -> radius -> number
     const circle = root.entity.actions.put('circle');
-    const radius = root.property.actions.put(circle, 'radius');
-    Actions.replaceNode(store, radius.children[0], makeNumber(5));
+    const radius = root.property.actions.putEditable(circle, 'radius');
+    const radiusRoot = root.property.gets.rootNode(radius);
+    const radiusChild = root.node.actions.putChild(radiusRoot, 0, makeNumber(5));
 
-    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
-    expect(Object.keys(store.parentIdByNodeId).length).to.equal(2);
+    expect(root.node.gets.parent(radiusChild)).to.equal(radiusRoot);
+    expect(root.node.gets.child(radiusRoot, 0)).to.equal(radiusChild);
+    expect(root.node.store.nodes.length === 2);
     
-    // circle -> radius -> add -> number | number
-    Actions.replaceNode(store, radius.children[0], makeAdd());
-    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
-    expect(Object.keys(store.parentIdByNodeId).length).to.equal(4);
-    
-    // circle -> radius -> add -> number | add(number, number)
-    Actions.replaceNode(store, radius.children[0].children[0], makeAdd());
-    expect(Gets.parentForNode(store, radius.children[0])).to.equal(radius);
-    expect(Gets.parentForNode(store, radius.children[0].children[0])).to.equal(radius.children[0]);
-    expect(Object.keys(store.parentIdByNodeId).length).to.equal(6);
-    expect(radius.metaname).to.equal('Variable');
-    expect(radius.children[0].metaname).to.equal('Add');
-    expect(radius.children[0].children[0].metaname).to.equal('Add');
-    expect(radius.children[0].children[1].metaname).to.equal('Number');
-    expect(radius.children[0].children[0].children[0].metaname).to.equal('Number');
-    
-    // circle -> radius -> number
-    Actions.replaceNode(store, radius.children[0], makeNumber());
-    expect(Object.keys(store.parentIdByNodeId).length).to.equal(2);
-    expect(radius.metaname).to.equal('Variable');
-    expect(radius.children[0].metaname).to.equal('Number');
-    
-    expect(() => Actions.replaceNode(store, radius, makeNumber())).to.throw();
+    // circle -> radius -> variable -> add -> number | number
+    const add = root.node.actions.create(MetanodesByName.get('Add'), []);
+    root.node.actions.putChild(radiusRoot, 0, add);
+    expect(() => root.node.actions.putChild(radiusRoot, 1, add)).to.throw();
+
+    expect(root.node.gets.child(radiusRoot, 0).metaname).to.equal('Add');
+    expect(root.node.store.nodes.length).to.equal(4);
+    console.log(root);
+
+    const add2 = root.node.actions.create(MetanodesByName.get('Add'), []);
+    root.node.actions.putChild(add, 0, add2);
+
+    expect(root.node.store.nodes.length).to.equal(6);
   })
 
   it('reassign variable', () => {

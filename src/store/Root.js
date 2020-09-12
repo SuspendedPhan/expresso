@@ -6,27 +6,25 @@ export function makeStore() {
   return {};
 }
 
-function makeGets(root, store) {
+function makeGets(root) {
   return {
   }
 }
 
-function makeActions(root, store) {
+function makeActions(root) {
   return {
   }
 }
 
-export function make(root) {
-  const store = makeStore();
-  return {
-    store,
-    gets: makeGets(root, store),
-    actions: makeActions(root, store),
-
-    entity: Entity.make(),
-    property: Property.make(),
-    node: Node.make(),
-  };
+export function make() {
+  const root = {};
+  root.store = makeStore(root);
+  root.gets = makeGets(root);
+  root.actions = makeActions();
+  root.entity = Entity.make(root);
+  root.property = Property.make(root);
+  root.node = Node.make(root);
+  return root;
 }
 
 const root = make();
