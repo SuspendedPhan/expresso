@@ -29,6 +29,10 @@ export default class PropertyStore {
     this.rootNodes = [];
   }
 
+  get nodeStore() {
+    return this.rootStore.nodeStore;
+  }
+
   getParent(property) {
     const answer = wu(this.propertyParents).find(row => row.childPropertyId === property);
     console.assert(answer, 'prop has no parent entity');
@@ -44,7 +48,7 @@ export default class PropertyStore {
 
   putEditable(entity, propertyName) {
     const answer = makeEditableProperty(propertyName);
-    const rootNode = this.rootStore.nodeStore.create(MetanodesByName.get('Variable'))
+    const rootNode = this.nodeStore.addVariable();
     this.editableProperties.push(answer);
     this.propertyParents.push({ childPropertyId: answer.id, parentEntityId: entity.id });
     this.rootNodes.push({ propertyId: answer.id, rootNodeId: rootNode.id });

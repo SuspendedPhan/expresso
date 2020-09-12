@@ -1,5 +1,4 @@
 import wu from "wu";
-import { MetanodesByName } from "../code/Metanodes";
 import { v4 as uuidv4 } from 'uuid';
 
 export default class NodeStore {
@@ -37,32 +36,45 @@ export default class NodeStore {
 
   // --- ACTIONS ---
 
-  create(metanode, args) {
-    if (args === undefined) args = [];
+  addNumber(value) {
+    const answer = this.addNode('Number');
+    answer.value = value;
+    answer.eval = () => answer.value;
+    return answer;
+  }
 
+  addVariable() {
+    const answer = this.addNode('Variable');
+    const child = this.addNumber(0);
+    this.putChild(answer, 0, child);
+    answer.eval = () => this.getChild(answer, 0).eval();
+    return answer;
+  }
+
+  addReference(targetNode) {
+    const answer = this.addNode('Reference');
+    answer.targetNodeId = targetNode.id;
+    answer.eval = () => this.getFromId(answer.targetNodeId).eval();
+    return answer;
+  }
+
+  addFun(metafun) {
+    const answer = this.addNode('Function');
+    for (let i = 0; i < metafun.paramCount; i++) {
+      this.putChild(answer, i, this.addNumber(0));
+    }
+    answer.funId = metafun.id;
+    answer.eval = () => metafun.eval(...this.getChildren(answer));
+    return answer;
+  }
+
+  addNode(metaname) {
     const answer = {
-      metaname: metanode.name,
+      metaname,
       id: uuidv4(),
       storetype: 'node',
     };
-
-    if (metanode.metatype === 'Function') {
-      for (let i = 0; i < metanode.params.length; i++) {
-        const param = metanode.params[i];
-        const child = this.create(MetanodesByName.get('Number'));
-        this.putChild(answer, i, child);
-      }
-      answer.children = metanode.params.map(param => MetanodesByName.get('Number'));
-    } else if (metanode.metatype === 'Value') {
-      answer.value = args[0] ?? metanode.defaultValue;
-    } else if (metanode.name === 'Variable') {
-      const child = this.create(MetanodesByName.get('Number'));
-      this.putChild(answer, 0, child);
-    } else if (metanode.name === 'Reference') {
-      answer.target = args[0] ?? null;
-    }
-
-    this.nodes.push(answer); 
+    this.nodes.push(answer);
     return answer;
   }
 
@@ -90,14 +102,5 @@ export default class NodeStore {
     });
     console.assert(parent.id);
     return child;
-  }
-
-  eval(node) {
-    const metanode = MetanodesByName.get(node.metaname);
-    if (metanode.metatype === 'Function') {
-      return metanode.eval(...node.children);
-    } else {
-      return metanode.eval(node);
-    }
   }
 }

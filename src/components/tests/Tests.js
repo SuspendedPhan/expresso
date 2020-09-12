@@ -83,31 +83,27 @@ describe('HelloWorld.vue', () => {
     const propertyStore = root.propertyStore;
     const entityStore = root.entityStore;
     const nodeStore = root.nodeStore;
-
-    function makeNumber(value) {
-      return nodeStore.create(MetanodesByName.get('Number'), [value]);
-    }
+    const metafunStore = root.metafunStore;
     
     // circle -> radius -> number
     const circle = entityStore.put('circle');
     const radius = propertyStore.putEditable(circle, 'radius');
     const radiusRoot = propertyStore.getRootNode(radius);
-    const radiusChild = nodeStore.putChild(radiusRoot, 0, makeNumber(5));
+    const radiusChild = nodeStore.putChild(radiusRoot, 0, nodeStore.addNumber(5));
 
     expect(nodeStore.getParent(radiusChild)).to.equal(radiusRoot);
     expect(nodeStore.getChild(radiusRoot, 0)).to.equal(radiusChild);
     expect(nodeStore.nodes.length === 2);
     
     // circle -> radius -> variable -> add -> number | number
-    const add = nodeStore.create(MetanodesByName.get('Add'), []);
+    const add = nodeStore.addFun(metafunStore.getFromName('Add'));
     nodeStore.putChild(radiusRoot, 0, add);
     expect(() => nodeStore.putChild(radiusRoot, 1, add)).to.throw();
 
-    expect(nodeStore.getChild(radiusRoot, 0).metaname).to.equal('Add');
+    expect(nodeStore.getChild(radiusRoot, 0).metaname).to.equal('Function');
     expect(nodeStore.nodes.length).to.equal(4);
-    console.log(root);
 
-    const add2 = nodeStore.create(MetanodesByName.get('Add'), []);
+    const add2 = nodeStore.addFun(metafunStore.getFromName('Add'));
     nodeStore.putChild(add, 0, add2);
 
     expect(nodeStore.nodes.length).to.equal(6);
@@ -120,74 +116,49 @@ describe('HelloWorld.vue', () => {
     const nodeStore = root.nodeStore;
 
     const circle = entityStore.put('circle');
-    const radius = propertyStore.putEditable(circle, 'radius');
-    const x = propertyStore.putEditable(circle, 'x');
-    const y = propertyStore.putEditable(circle, 'y');
+    const radius = propertyStore.getRootNode(propertyStore.putEditable(circle, 'radius'));
+    const x = propertyStore.getRootNode(propertyStore.putEditable(circle, 'x'));
+    const y = propertyStore.getRootNode(propertyStore.putEditable(circle, 'y'));
     
-    expect(nodeStore.eval(propertyStore.getRootNode(radius))).to.equal(0);
-    expect(nodeStore.eval(propertyStore.getRootNode(x))).to.equal(0);
-    expect(nodeStore.eval(propertyStore.getRootNode(y))).to.equal(0);
-    return;
+    expect(radius.eval()).to.equal(0);
+    expect(x.eval()).to.equal(0);
+    expect(y.eval()).to.equal(0);
 
-    Actions.replaceNode(store, radius.children[0], makeNumber(5));
-    Actions.replaceNode(store, x.children[0], makeNumber(7));
-    Actions.replaceNode(store, y.children[0], makeNumber(9));
+    nodeStore.putChild(radius, 0, nodeStore.addNumber(5));
+    nodeStore.putChild(x, 0, nodeStore.addNumber(7));
+    nodeStore.putChild(y, 0, nodeStore.addNumber(9));
     
-    expect(Node.eval(radius)).to.equal(5);
-    expect(Node.eval(x)).to.equal(7);
-    expect(Node.eval(y)).to.equal(9);
-    
+    expect(radius.eval()).to.equal(5);
+    expect(x.eval()).to.equal(7);
+    expect(y.eval()).to.equal(9);
+
     // x = radius
-    Actions.replaceNode(store, x.children[0], makeReference(radius));
+    nodeStore.putChild(x, 0, nodeStore.addReference(radius));
 
-    expect(Node.eval(radius)).to.equal(5);
-    expect(Node.eval(x)).to.equal(5);
-    expect(Node.eval(y)).to.equal(9);
+    expect(radius.eval()).to.equal(5);
+    expect(x.eval()).to.equal(5);
+    expect(y.eval()).to.equal(9);
 
     // x = y
-    Actions.replaceNode(store, x.children[0], makeReference(y));
+    nodeStore.putChild(x, 0, nodeStore.addReference(y));
 
-    expect(Node.eval(radius)).to.equal(5);
-    expect(Node.eval(x)).to.equal(9);
-    expect(Node.eval(y)).to.equal(9);
+    expect(radius.eval()).to.equal(5);
+    expect(x.eval()).to.equal(9);
+    expect(y.eval()).to.equal(9);
 
     // y = 2
-    Actions.replaceNode(store, y.children[0], makeNumber(2));
+    nodeStore.putChild(y, 0, nodeStore.addNumber(2));
     
-    expect(Node.eval(radius)).to.equal(5);
-    expect(Node.eval(x)).to.equal(2);
-    expect(Node.eval(y)).to.equal(2);
+    expect(radius.eval()).to.equal(5);
+    expect(x.eval()).to.equal(2);
+    expect(y.eval()).to.equal(2);
     
     // x = 3
-    Actions.replaceNode(store, x.children[0], makeNumber(3));
+    nodeStore.putChild(x, 0, nodeStore.addNumber(3));
 
-    expect(Node.eval(radius)).to.equal(5);
-    expect(Node.eval(x)).to.equal(3);
-    expect(Node.eval(y)).to.equal(2);
-  })
-
-  it('new replaceNode API', () => {
-    return;
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    Actions.addProperty(store, circle, 'radius');
-    Actions.addProperty(store, circle, 'x');
-
-    Actions.replaceNode(
-      store,
-      Gets.property(circle, 'x').children[0],
-      MetanodesByName.get('Number'),
-      [5]);
-
-    expect(Node.eval(Gets.property(circle, 'x'))).to.equal(5);
-
-    Actions.replaceNode(
-      store,
-      Gets.property(circle, 'radius').children[0],
-      MetanodesByName.get('Reference'),
-      [Gets.property(circle, 'x')]);
-
-    expect(Node.eval(Gets.property(circle, 'radius'))).to.equal(5);
+    expect(radius.eval()).to.equal(5);
+    expect(x.eval()).to.equal(3);
+    expect(y.eval()).to.equal(2);
   })
 
   it('filterprops', () => {
