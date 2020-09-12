@@ -1,58 +1,53 @@
 import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import { MetanodesByName } from '../code/Metanodes';
+import { RootStore } from './Root';
 
-function makeStore(root) {
-  return {
-    computedProperties: [],
-    editableProperties: [],
-    makeEditableProperty: (name) => ({
-      name,
-      id: uuidv4(),
-    }),
+const makeEditableProperty = (name) => ({
+  name,
+  id: uuidv4(),
+});
+
+/**
+ * 
+ * @param {RootStore} rootStore
+ */
+export default class PropertyStore {
+  /**
+   * @param {RootStore} rootStore 
+   */
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+    this.computedProperties = [];
+    this.editableProperties = [];
+    
     
     /** { childPropertyId, parentEntityId } */
-    propertyParents: [],
+    this.propertyParents = [];
 
     /** { propertyId, rootNodeId } */
-    rootNodes: [],
-  };
-}
-
-function makeGets(root, moduleRoot) {
-  return {
-    parent(property) {
-      const answer = wu(moduleRoot.gets.propertyParents).find(row => row.childPropertyId === property);
-      console.assert(answer, 'prop has no parent entity');
-      return answer;
-    },
-
-    rootNode(property) {
-      const row = wu(moduleRoot.store.rootNodes).find(row => row.propertyId === property.id);
-      console.assert(row, 'has root node');
-      return root.node.gets.fromId(row.rootNodeId);
-    }
+    this.rootNodes = [];
   }
-}
 
-function makeActions(root, moduleRoot) {
-  return {
-    putEditable: function (entity, propertyName) {
-      const answer = moduleRoot.store.makeEditableProperty(name);
-      const rootNode = root.node.actions.create(MetanodesByName.get('Variable'))
-      moduleRoot.store.editableProperties.push(answer);
-      moduleRoot.store.propertyParents.push({ childPropertyId: answer.id, parentEntityId: entity.id });
-      moduleRoot.store.rootNodes.push({ propertyId: answer.id, rootNodeId: rootNode.id });
-      return answer;
-    }
+  getParent(property) {
+    const answer = wu(this.propertyParents).find(row => row.childPropertyId === property);
+    console.assert(answer, 'prop has no parent entity');
+    return answer;
   }
-}
 
-export function make(root) {
-  const moduleRoot = {};
-  moduleRoot.store = makeStore(root);
-  moduleRoot.gets = makeGets(root, moduleRoot);
-  moduleRoot.actions = makeActions(root, moduleRoot);
-  return moduleRoot;
-}
+  getRootNode(property) {
+    const row = wu(this.rootNodes).find(row => row.propertyId === property.id);
+    console.assert(row, 'has root node');
+    
+    return this.rootStore.nodeStore.getFromId(row.rootNodeId);
+  }
 
+  putEditable(entity, propertyName) {
+    const answer = makeEditableProperty(propertyName);
+    const rootNode = this.rootStore.nodeStore.create(MetanodesByName.get('Variable'))
+    this.editableProperties.push(answer);
+    this.propertyParents.push({ childPropertyId: answer.id, parentEntityId: entity.id });
+    this.rootNodes.push({ propertyId: answer.id, rootNodeId: rootNode.id });
+    return answer;
+  }
+};

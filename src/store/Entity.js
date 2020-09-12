@@ -1,43 +1,34 @@
 import { v4 as uuidv4 } from 'uuid';
 import wu from 'wu';
+import { RootStore } from './Root';
 
-function makeStore() {
+function makeEntity({ name }) {
   return {
-    makeEntity: (name) => ({
-      storetype: 'Entity',
-      id: uuidv4(),
-      name,
-    }),
-    entities: [],
+    storetype: 'Entity',
+    id: uuidv4(),
+    name,
+  };
+}
+
+export default class EntityStore {
+  /**
+   * @param {RootStore} rootStore 
+   */
+  constructor(rootStore) {
+    this.rootStore = rootStore;
+    this.entities = [];
 
     /** { propertyId, parentEntityId } */
-    propertyParents: [],
-  };
-}
-
-function makeGets(root, store) {
-  return {
-    fromName: function (name) {
-      return wu(store.entities).find(entity => entity.name === name);
-    }
+    this.propertyParents = [];
   }
-}
 
-function makeActions(root, store) {
-  return {
-    put: function (name) {
-      const entity = store.makeEntity(name);
-      store.entities.push(entity);
-      return entity;
-    }
+  getFromName(name) {
+    return wu(this.entities).find(entity => entity.name === name);
   }
-}
 
-export function make(root) {
-  const store = makeStore();
-  return {
-    store,
-    gets: makeGets(root, store),
-    actions: makeActions(root, store),
-  };
+  put(name) {
+    const entity = makeEntity({ name });
+    this.entities.push(entity);
+    return entity;
+  }
 }

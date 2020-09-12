@@ -4,7 +4,7 @@ import Metanodes, { MetanodesByName } from '../../code/Metanodes';
 import Actions from '../../code/Actions';
 import Gets from '../../code/Gets';
 import Functions from '../../code/Functions';
-import * as Root from '../../store/Root';
+import { RootStore }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
@@ -63,67 +63,71 @@ TestRunner.clearStore();
 
 describe('HelloWorld.vue', () => {
   it('entity', () => {
-    const root = Root.make();
-    const circle = root.entity.actions.put('circle');
-    const circle2 = root.entity.gets.fromName('circle');
+    const root = new RootStore();
+    const entityStore = root.entityStore;
+    const circle = entityStore.put('circle');
+    const circle2 = entityStore.getFromName('circle');
     expect(circle).to.equal(circle2);
   })
 
   it('property', () => {
-    const root = Root.make();
-    const circle = root.entity.actions.put('circle');
-    const radius = root.property.actions.putEditable(circle, 'radius');
-  })
-
-  it('node', () => {
-    const root = Root.make();
+    const root = new RootStore();
+    const propertyStore = root.propertyStore;
+    const entityStore = root.entityStore;
+    const circle = entityStore.put('circle');
+    const radius = propertyStore.putEditable(circle, 'radius');
   })
 
   it('nested add', () => {
-    // return;
+    const root = new RootStore();
+    const propertyStore = root.propertyStore;
+    const entityStore = root.entityStore;
+    const nodeStore = root.nodeStore;
 
-    const root = Root.make();
     function makeNumber(value) {
-      return root.node.actions.create(MetanodesByName.get('Number'), [value]);
+      return nodeStore.create(MetanodesByName.get('Number'), [value]);
     }
     
     // circle -> radius -> number
-    const circle = root.entity.actions.put('circle');
-    const radius = root.property.actions.putEditable(circle, 'radius');
-    const radiusRoot = root.property.gets.rootNode(radius);
-    const radiusChild = root.node.actions.putChild(radiusRoot, 0, makeNumber(5));
+    const circle = entityStore.put('circle');
+    const radius = propertyStore.putEditable(circle, 'radius');
+    const radiusRoot = propertyStore.getRootNode(radius);
+    const radiusChild = nodeStore.putChild(radiusRoot, 0, makeNumber(5));
 
-    expect(root.node.gets.parent(radiusChild)).to.equal(radiusRoot);
-    expect(root.node.gets.child(radiusRoot, 0)).to.equal(radiusChild);
-    expect(root.node.store.nodes.length === 2);
+    expect(nodeStore.getParent(radiusChild)).to.equal(radiusRoot);
+    expect(nodeStore.getChild(radiusRoot, 0)).to.equal(radiusChild);
+    expect(nodeStore.nodes.length === 2);
     
     // circle -> radius -> variable -> add -> number | number
-    const add = root.node.actions.create(MetanodesByName.get('Add'), []);
-    root.node.actions.putChild(radiusRoot, 0, add);
-    expect(() => root.node.actions.putChild(radiusRoot, 1, add)).to.throw();
+    const add = nodeStore.create(MetanodesByName.get('Add'), []);
+    nodeStore.putChild(radiusRoot, 0, add);
+    expect(() => nodeStore.putChild(radiusRoot, 1, add)).to.throw();
 
-    expect(root.node.gets.child(radiusRoot, 0).metaname).to.equal('Add');
-    expect(root.node.store.nodes.length).to.equal(4);
+    expect(nodeStore.getChild(radiusRoot, 0).metaname).to.equal('Add');
+    expect(nodeStore.nodes.length).to.equal(4);
     console.log(root);
 
-    const add2 = root.node.actions.create(MetanodesByName.get('Add'), []);
-    root.node.actions.putChild(add, 0, add2);
+    const add2 = nodeStore.create(MetanodesByName.get('Add'), []);
+    nodeStore.putChild(add, 0, add2);
 
-    expect(root.node.store.nodes.length).to.equal(6);
+    expect(nodeStore.nodes.length).to.equal(6);
   })
 
   it('reassign variable', () => {
-    return;
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    
-    const radius = Actions.addProperty(store, circle, 'radius');
-    const x = Actions.addProperty(store, circle, 'x');
-    const y = Actions.addProperty(store, circle, 'y');
+    const root = new RootStore();
+    const propertyStore = root.propertyStore;
+    const entityStore = root.entityStore;
+    const nodeStore = root.nodeStore;
 
-    expect(Node.eval(radius)).to.equal(0);
-    expect(Node.eval(x)).to.equal(0);
-    expect(Node.eval(y)).to.equal(0);
+    const circle = entityStore.put('circle');
+    const radius = propertyStore.putEditable(circle, 'radius');
+    const x = propertyStore.putEditable(circle, 'x');
+    const y = propertyStore.putEditable(circle, 'y');
+    
+    expect(nodeStore.eval(propertyStore.getRootNode(radius))).to.equal(0);
+    expect(nodeStore.eval(propertyStore.getRootNode(x))).to.equal(0);
+    expect(nodeStore.eval(propertyStore.getRootNode(y))).to.equal(0);
+    return;
 
     Actions.replaceNode(store, radius.children[0], makeNumber(5));
     Actions.replaceNode(store, x.children[0], makeNumber(7));
