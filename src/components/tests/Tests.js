@@ -70,25 +70,25 @@ describe('HelloWorld.vue', () => {
     expect(circle).to.equal(circle2);
   })
 
-  it('property', () => {
+  it('attribute', () => {
     const root = new RootStore();
-    const propertyStore = root.propertyStore;
+    const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const circle = organismStore.put('circle');
-    const radius = propertyStore.putEditable(circle, 'radius');
+    const radius = attributeStore.putEditable(circle, 'radius');
   })
 
   it('nested add', () => {
     const root = new RootStore();
-    const propertyStore = root.propertyStore;
+    const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
     const metafunStore = root.metafunStore;
     
     // circle -> radius -> number
     const circle = organismStore.put('circle');
-    const radius = propertyStore.putEditable(circle, 'radius');
-    const radiusRoot = propertyStore.getRootNode(radius);
+    const radius = attributeStore.putEditable(circle, 'radius');
+    const radiusRoot = attributeStore.getRootNode(radius);
     const radiusChild = nodeStore.putChild(radiusRoot, 0, nodeStore.addNumber(5));
 
     expect(nodeStore.getParent(radiusChild)).to.equal(radiusRoot);
@@ -111,14 +111,14 @@ describe('HelloWorld.vue', () => {
 
   it('reassign variable', () => {
     const root = new RootStore();
-    const propertyStore = root.propertyStore;
+    const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
 
     const circle = organismStore.put('circle');
-    const radius = propertyStore.getRootNode(propertyStore.putEditable(circle, 'radius'));
-    const x = propertyStore.getRootNode(propertyStore.putEditable(circle, 'x'));
-    const y = propertyStore.getRootNode(propertyStore.putEditable(circle, 'y'));
+    const radius = attributeStore.getRootNode(attributeStore.putEditable(circle, 'radius'));
+    const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
+    const y = attributeStore.getRootNode(attributeStore.putEditable(circle, 'y'));
     
     expect(radius.eval()).to.equal(0);
     expect(x.eval()).to.equal(0);
