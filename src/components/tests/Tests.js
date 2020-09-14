@@ -8,7 +8,7 @@ import { RootStore }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
-import * as Entity from '../../store/Entity';
+import * as Organism from '../../store/Organism';
 
 function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
@@ -62,31 +62,31 @@ function expect(actual) {
 TestRunner.clearStore();
 
 describe('HelloWorld.vue', () => {
-  it('entity', () => {
+  it('organism', () => {
     const root = new RootStore();
-    const entityStore = root.entityStore;
-    const circle = entityStore.put('circle');
-    const circle2 = entityStore.getFromName('circle');
+    const organismStore = root.organismStore;
+    const circle = organismStore.put('circle');
+    const circle2 = organismStore.getFromName('circle');
     expect(circle).to.equal(circle2);
   })
 
   it('property', () => {
     const root = new RootStore();
     const propertyStore = root.propertyStore;
-    const entityStore = root.entityStore;
-    const circle = entityStore.put('circle');
+    const organismStore = root.organismStore;
+    const circle = organismStore.put('circle');
     const radius = propertyStore.putEditable(circle, 'radius');
   })
 
   it('nested add', () => {
     const root = new RootStore();
     const propertyStore = root.propertyStore;
-    const entityStore = root.entityStore;
+    const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
     const metafunStore = root.metafunStore;
     
     // circle -> radius -> number
-    const circle = entityStore.put('circle');
+    const circle = organismStore.put('circle');
     const radius = propertyStore.putEditable(circle, 'radius');
     const radiusRoot = propertyStore.getRootNode(radius);
     const radiusChild = nodeStore.putChild(radiusRoot, 0, nodeStore.addNumber(5));
@@ -112,10 +112,10 @@ describe('HelloWorld.vue', () => {
   it('reassign variable', () => {
     const root = new RootStore();
     const propertyStore = root.propertyStore;
-    const entityStore = root.entityStore;
+    const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
 
-    const circle = entityStore.put('circle');
+    const circle = organismStore.put('circle');
     const radius = propertyStore.getRootNode(propertyStore.putEditable(circle, 'radius'));
     const x = propertyStore.getRootNode(propertyStore.putEditable(circle, 'x'));
     const y = propertyStore.getRootNode(propertyStore.putEditable(circle, 'y'));
