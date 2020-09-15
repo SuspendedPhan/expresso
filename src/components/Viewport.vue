@@ -5,10 +5,7 @@
 
 <script>
 import Two from 'two.js';
-import Store from '../store/Root';
-import Node from '../code/Node';
-import Gets from '../code/Gets';
-import Actions from '../code/Actions';
+import Root from '../store/Root';
 
 export default {
   name: 'Viewport',
@@ -26,19 +23,21 @@ export default {
     };
     var two = new Two(params).appendTo(elem);
 
-    var circle = two.makeCircle(0, 0, 50);
-    
-
-    const storeCircle = Gets.entity(Store, 'circle');
-    const storeWidth = Actions.addComputedProperty(Store, storeCircle, 'width');
-    const storeHeight = Actions.addComputedProperty(Store, storeCircle, 'height');
-    Actions.assignNumberToVariable(Store, storeWidth, two.width);
-    Actions.assignNumberToVariable(Store, storeHeight, two.height);
+    const storeCircle = Root.organismStore.put('circle');
+    Root.attributeStore.putEditable(storeCircle, 'clones');
+    Root.attributeStore.putEditable(storeCircle, 'x');
+    Root.attributeStore.putEditable(storeCircle, 'y');
+    Root.attributeStore.putEditable(storeCircle, 'radius');
+    const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
+    const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
+    Root.attributeStore.assignNumber(storeWidth, two.width);
+    Root.attributeStore.assignNumber(storeHeight, two.height);
+    Root.attributeStore.putEmergent(storeCircle, 'cloneNumber');
 
     two.bind('update', function() {
       two.clear();
 
-      const renderCommands = Actions.computeRenderCommands(Store, Gets.entity(store, 'circle'));
+      const renderCommands = Root.computeRenderCommands();
       for (const renderCommand of renderCommands) {
         const radius = renderCommand.radius;
         const x = renderCommand.x;

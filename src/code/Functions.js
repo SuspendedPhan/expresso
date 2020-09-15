@@ -1,5 +1,4 @@
 import wu from 'wu';
-import Gets from './Gets';
 
 export default class Functions {
 
@@ -12,27 +11,27 @@ export default class Functions {
     return answer;
   }
 
-  static * allNodes(store) {
-    const circle = Gets.entity(store, 'circle');
-    for (const property of wu.values(Gets.properties(circle))) {
-      yield * Functions.topDown(property);
-    }
-  }
+  // static * allNodes(store) {
+  //   const circle = Gets.entity(store, 'circle');
+  //   for (const property of wu.values(Gets.properties(circle))) {
+  //     yield * Functions.topDown(property);
+  //   }
+  // }
 
-  static * topDown(node) {
-    yield node;
-    for (const child of node.children ?? []) {
-      yield * this.topDown(child);
-    }
-  }
+  // static * topDown(node) {
+  //   yield node;
+  //   for (const child of node.children ?? []) {
+  //     yield * this.topDown(child);
+  //   }
+  // }
 
-  static * ancestors(store, node) {
-    var ancestor = Gets.parentForNode(store, node);
-    while (ancestor != null) {
-      yield ancestor;
-      ancestor = Gets.parentForNode(store, ancestor);
-    }
-  }
+  // static * ancestors(store, node) {
+  //   var ancestor = Gets.parentForNode(store, node);
+  //   while (ancestor != null) {
+  //     yield ancestor;
+  //     ancestor = Gets.parentForNode(store, ancestor);
+  //   }
+  // }
 
   // does not yield the node
   static * traverseLeft(node, parentGetter, childrenGetter) {

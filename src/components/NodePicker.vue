@@ -1,16 +1,16 @@
 <template>
 <div class='node-picker'>
-  <input ref="input" @blur='blur' @keydown='keydown' v-model='searchText' />
+  <input ref="input" @blur='blur' @keydown='keydown' v-model='query' />
   <div>
-    <div v-for='(result, index) in results' :key='index' class='result'>
-      {{ result.text }}
+    <div v-for='(suggestion, index) in suggestions' :key='index' class='suggestion'>
+      {{ suggestion.text }}
     </div>
   </div>
 </div>
 </template>
 
 <script>
-import Gets from '../code/Gets';
+import Root from '../store/Root';
 import Store from '../store/Root';
 
 export default {
@@ -21,13 +21,16 @@ export default {
   data: function() {
     return {
       searchText: '',
+      Root: Root,
+      nodeStore: Root.nodeStore,
+      penStore: Root.penStore,
     };
   },
   methods: {
     keydown(event) {
-      if (event.key === 'Enter' && this.results.length > 0) {
-        const result = this.results[0];
-        this.$emit('nodePicked', result.metanode, result.args);
+      if (event.key === 'Enter' && this.suggestions.length > 0) {
+        const result = this.suggestions[0];
+        Root.penStore.commitSuggestion(result);
         this.blur();
         event.stopPropagation();
       }
@@ -40,8 +43,16 @@ export default {
     }
   },
   computed: {
-    results() {
-      return Array.from(Gets.nodePicks(Store, this.searchText, this.nodeToReplace));
+    suggestions() {
+      return Array.from(Root.penStore.getReplacementSuggestions());
+    },
+    query: {
+      get: function() {
+        return Root.penStore.getQuery();
+      },
+      set: function(query) {
+        Root.penStore.setQuery(query);
+      }
     }
   }
 }
@@ -55,7 +66,7 @@ export default {
   border-style: solid;
   /* padding: 2px; */
 }
-.result {
+.suggestion {
   text-transform: lowercase;
 }
 </style>

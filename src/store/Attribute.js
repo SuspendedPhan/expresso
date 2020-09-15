@@ -1,6 +1,5 @@
 import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
-import { MetanodesByName } from '../code/Metanodes';
 import { RootStore } from './Root';
 import Functions from '../code/Functions';
 
@@ -59,8 +58,10 @@ export default class AttributeStore {
   getAttributesForOrganism(organism) {
     let answer = wu(this.attributeParents)
         .filter(row => row.parentOrganismId === organism.id);
+
     answer = answer.map(row => {
       const attr = this.attributes.find(attr => attr.id === row.childAttributeId);
+      console.assert(attr);
       return attr;
     });
     return answer;
@@ -69,7 +70,6 @@ export default class AttributeStore {
   getEditables(organism) {
     let answer = wu(this.getAttributesForOrganism(organism));
     answer = answer.filter(row => row.attributeType === 'Editable');
-    // console.log(answer.toArray());
     return answer;
   }
   
@@ -79,7 +79,7 @@ export default class AttributeStore {
 
   getRootNodeFromName(organism, attributeName) {
     const attribute = this.getAttributeFromName(organism, attributeName);
-    // console.assert(attribute);
+    console.assert(attribute, `couldn't find ${attributeName}`);
     return this.getRootNode(attribute);
   }
 
@@ -90,7 +90,7 @@ export default class AttributeStore {
   }
 
   getAttributeFromId(attributeId) {
-    return this.attributes.find(row => row.id = attributeId);
+    return this.attributes.find(row => row.id === attributeId);
   }
 
   getAttributeForNode(node) {
@@ -101,6 +101,7 @@ export default class AttributeStore {
       root = parent;
     }
     const row = this.rootNodes.find(row => row.rootNodeId === root.id);
+    console.assert(row, 'no attribute for root node');
     const attribute = this.getAttributeFromId(row.attributeId);
     return attribute;
   }
@@ -113,10 +114,23 @@ export default class AttributeStore {
     return organism;
   }
 
+  getEvaled(attribute) {
+    return this.getRootNode(attribute).eval();
+  }
+
+  isRootNode(node) {
+    const answer = wu(this.rootNodes).map(row => row.rootNodeId).has(node.id);
+    return answer;
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
     Object.assign(this, store);
+  }
+
+  assignNumber(attribute, value) {
+    this.nodeStore.putChild(this.getRootNode(attribute), 0, this.nodeStore.addNumber(value));
   }
 
   putEditable(organism, attributeName) {

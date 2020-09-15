@@ -1,18 +1,16 @@
 <template>
   <div>
-    <div v-for='property in properties' :key='property.id'>
-      <span>{{ propertyName(property) }}: </span>
-      <Node :astNode="nodeForProperty(property)" />
+    <div v-for='attribute in attributes' :key='attribute.id'>
+      <span>{{ attribute.name }}: </span>
+      <Node :astNode='getNodeForAttribute(attribute)' />
     </div>
   </div>
 </template>
 
 <script>
-import Node from "./Node";
-import Store from '../store/Root';
-import Gets from '../code/Gets';
 import wu from 'wu';
-import Actions from '../code/Actions';
+import Root from '../store/Root';
+import Node from './Node';
 
 export default {
   name: 'Expressor',
@@ -23,34 +21,33 @@ export default {
   },
   data: function() {
     return {
-      store: Store,
+      // Root: Root,
+      attributeStore: Root.attributeStore,
     };
   },
   computed: {
-    properties: function() {
-      const entity = Gets.entity(this.store, 'circle');
-      const props = wu.values(Gets.editableProperties(entity));
-      return Array.from(props);
-    },
+    attributes: function() {
+      const organism = Root.organismStore.getFromName('circle');
+      return Root.attributeStore.getAttributesForOrganism(organism)
+          .filter(attr => attr.attributeType === 'Editable')
+          .toArray();
+    }
   },
   methods: {
-    propertyName: function(property) {
-      return Gets.propertyName(Store, property);
-    },
-    nodeForProperty: function(property) {
-      return property.children[0];
+    getNodeForAttribute: function(attribute) {
+      return Root.nodeStore.getChild(Root.attributeStore.getRootNode(attribute), 0);
     }
   },
   mounted() {
-    Actions.load(this.store);
+    // Actions.load(this.store);
     document.addEventListener('keydown', event => {
-      if (Store.cursorPosition === null) return;
+      if (Root.penStore.getPointedNode() === null) return;
       if (event.key === 'Enter') {
-        Actions.enterTokenPicking(Store);
-      } else if (event.key === 'ArrowLeft' && !Store.tokenPickingInProgress) {
-        Actions.moveCursorLeft(Store);
-      } else if (event.key === 'ArrowRight' && !Store.tokenPickingInProgress) {
-        Actions.moveCursorRight(Store);
+        Root.penStore.setIsQuerying(true);
+      } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorLeft();
+      } else if (event.key === 'ArrowRight' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorRight();
       }
     });
   }

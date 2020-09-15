@@ -3,10 +3,10 @@
     <span v-if='astNode.value != null' @click='click' :class='{ highlighted }'>{{ astNode.value }}</span>
     <span v-else-if='astNode.metaname === "Reference"' @click='click' :class='{ highlighted }'>{{ referenceToString(astNode) }}</span>
     <span v-else>
-      <span @click='click' :class='["function", { highlighted }]'>{{ astNode.metaname }}(</span>
-      <span v-for='(child, index) in astNode.children' :key='index'>
+      <span @click='click' :class='["function", { highlighted }]'>{{ funToString(astNode) }}(</span>
+      <span v-for='(child, index) in astNodeChildren' :key='child.id'>
         <Node :astNode='child' />
-        <span v-if='index !== astNode.children.length - 1'>, </span>
+        <span v-if='index !== astNodeChildren.length - 1'>, </span>
       </span>
       <span :class='{ highlighted }'>)</span>
     </span>
@@ -15,17 +15,14 @@
       v-if='picking'
       :nodeToReplace="astNode"
       @blur='blur'
-      @nodePicked='nodePicked'
       :class='["searcher", { "bring-to-front": picking }]'
     />
   </span>
 </template>
 
 <script>
+import Root from '../store/Root';
 import NodePicker from "./NodePicker";
-import Actions from "../code/Actions";
-import Store from '../store/Root';
-import Gets from '../code/Gets';
 
 export default {
   name: 'Node',
@@ -37,40 +34,39 @@ export default {
   },
   data: () => {
     return {
-      store: Store,
+      Root: Root,
+      nodeStore: Root.nodeStore,
     };
   },
   computed: {
     highlighted() {
-      return this.store.cursorPosition === this.astNode;
+      return Root.penStore.getPointedNode() === this.astNode;
     },
     picking() {
-      return this.highlighted && this.tokenPickingInProgress;
+      return this.highlighted && Root.penStore.getIsQuerying();
     },
-    tokenPickingInProgress() {
-      return this.store.tokenPickingInProgress;
-    }
+    astNodeChildren() {
+      return Root.nodeStore.getChildren(this.astNode).toArray();
+    },
   },
   methods: {
-    nodePicked(metanode, makeArgs) {
-      const node = Actions.replaceNode(Store, this.astNode, metanode, makeArgs);
-      Actions.exitTokenPicking(Store);
-      Actions.moveCursorToNode(Store, node);
-      Actions.save(Store);
-    },
     click() {
-      Actions.moveCursorToNode(Store, this.astNode);
-      Actions.exitTokenPicking(Store);
+      Root.penStore.setPointedNode(this.astNode);
     },
     blur() {
       // Actions.blurCursor();
     },
     referenceToString(referenceNode) {
-      return Gets.propertyName(Store, referenceNode.target) ?? Gets.computedPropertyName(Store, referenceNode.target);
+      const targetNode = Root.nodeStore.getTargetNodeForReference(referenceNode);
+      return Root.attributeStore.getAttributeForNode(targetNode).name;
+    },
+    funToString(funNode) {
+      const metafun = Root.metafunStore.getFromName(funNode.metafunName);
+      return metafun.name;
     }
   },
   watch: {
-    tokenPickingInProgress() {
+    picking() {
       if (this.picking) {
         this.$nextTick().then(() => {
           this.$refs['searcher'].focus();

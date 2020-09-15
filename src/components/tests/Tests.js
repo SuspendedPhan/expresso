@@ -1,14 +1,9 @@
 import * as chai from 'chai'
-import Node from '../../code/Node';
-import Metanodes, { MetanodesByName } from '../../code/Metanodes';
-import Actions from '../../code/Actions';
-import Gets from '../../code/Gets';
 import Functions from '../../code/Functions';
 import { RootStore }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
-import * as Organism from '../../store/Organism';
 
 function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
@@ -211,6 +206,7 @@ describe('HelloWorld.vue', () => {
     let actual;
     let suggestions;
     
+    penStore.setPointedNode(nodeStore.getChild(y, 0));
     penStore.setPointedNode(nodeStore.getChild(x, 0));
 
     // --- number ---
@@ -260,10 +256,6 @@ describe('HelloWorld.vue', () => {
     expect(penStore.pointedNode).to.equal(nodeStore.getChild(x, 0));
     expect(penStore.getIsQuerying()).to.equal(false);
 
-     // --- no pointed node ---
-    
-     penStore.setPointedNode(null);
-     expect(() => penStore.setQuery('hihi')).to.throw();
   })
 
   it('isSubsequence', () => {
@@ -365,6 +357,23 @@ describe('HelloWorld.vue', () => {
     expect(wu.some(() => true, traverse)).to.equal(false);
   })
 
+  it('assign number', () => {
+    const root = new RootStore();
+    const attributeStore = root.attributeStore;
+    const organismStore = root.organismStore;
+    const nodeStore = root.nodeStore;
+    const penStore = root.penStore;
+    const metafunStore = root.metafunStore;
+
+    const circle = organismStore.put('circle');
+    const x = attributeStore.putEditable(circle, 'x');
+    const cloneNumber = attributeStore.putEmergent(circle, 'cloneNumber');
+    attributeStore.assignNumber(x, 5);
+    attributeStore.assignNumber(cloneNumber, 10);
+    expect(attributeStore.getEvaled(x)).to.equal(5);
+    expect(attributeStore.getEvaled(cloneNumber)).to.equal(10);
+  })
+
   it('serialize', () => {
     // references
     // functions
@@ -442,6 +451,24 @@ describe('HelloWorld.vue', () => {
       b: 3,
       c: 5,
     };
+    expect(actual).to.deep.equal(expected);
+  })
+
+  it('getAttributesForOrganism', () => {
+    const root = new RootStore();
+    const attributeStore = root.attributeStore;
+    const organismStore = root.organismStore;
+    const nodeStore = root.nodeStore;
+    const penStore = root.penStore;
+    const metafunStore = root.metafunStore;
+
+    const circle = organismStore.put('circle');
+    const x = attributeStore.putEditable(circle, 'x');
+    const y = attributeStore.putEditable(circle, 'y');
+    const cloneNumber = attributeStore.putEmergent(circle, 'cloneNumber');
+
+    const actual = Array.from(attributeStore.getAttributesForOrganism(circle));
+    const expected = [x, y, cloneNumber];
     expect(actual).to.deep.equal(expected);
   })
 })

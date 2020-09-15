@@ -70,6 +70,12 @@ export default class NodeStore {
     }
   }
 
+  getTargetNodeForReference(referenceNode) {
+    const node = this.getFromId(referenceNode.targetNodeId);
+    console.assert(node);
+    return node;
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
@@ -103,6 +109,7 @@ export default class NodeStore {
     for (let i = 0; i < metafun.paramCount; i++) {
       this.putChild(answer, i, this.addNumber(0));
     }
+    answer.metafunName = metafun.name;
     answer.eval = () => metafun.eval(...this.getChildren(answer));
     return answer;
   }

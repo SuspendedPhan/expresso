@@ -34,6 +34,14 @@ export default class Pen {
     return {};
   }
 
+  getQuery() {
+    return this.query;
+  }
+
+  getPointedNode() {
+    return this.pointedNode;
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
@@ -44,19 +52,20 @@ export default class Pen {
     this.isQuerying = isQuerying;
     if (!isQuerying) {
       this.replacementSuggestions = [];
+      this.setQuery('');
     }
   }
 
   setPointedNode(node) {
-    this.setIsQuerying(false);
     this.pointedNode = node;
+    this.setIsQuerying(false);
   }
 
   setQuery(query) {
     this.query = query;
     this.replacementSuggestions = [];
 
-    if (this.pointedNode === null) throw new Error('set query with no pointed node');
+    if (this.pointedNode === null) return;
    
     // --- number ---
 
@@ -76,7 +85,8 @@ export default class Pen {
     const attributes = this.rootStore.attributeStore.getAttributesForOrganism(organism);
 
     for (const attribute of attributes) {
-      const isSubsequence = Functions.isSubsequence(query, attribute.name);
+      console.assert(attribute);
+      const isSubsequence = Functions.isSubsequence(query.toLowerCase(), attribute.name.toLowerCase());
       const ok = 
           attribute !== pointedAttribute &&
           (query === '' || isSubsequence);
@@ -92,7 +102,7 @@ export default class Pen {
     // --- functions ---
 
     for (const fun of this.rootStore.metafunStore.getFuns()) {
-      const isSubsequence = Functions.isSubsequence(query, fun.name);
+      const isSubsequence = Functions.isSubsequence(query.toLowerCase(), fun.name.toLowerCase());
       const ok = query === '' || isSubsequence;
       if (!ok) continue;
 
@@ -112,5 +122,33 @@ export default class Pen {
     this.nodeStore.putChild(parentNode, childIndex, child);
 
     this.setPointedNode(child);
+  }
+
+  moveCursorLeft() {
+    if (this.getPointedNode() === null) return;
+    
+    const nodeStore = this.rootStore.nodeStore;
+    const traverse = Functions.traverseLeft(
+        this.getPointedNode(),
+        node => this.nodeStore.getParent(node, false),
+        node => nodeStore.getChildren(node));
+    const node = traverse.next().value;
+    if (node && !this.rootStore.attributeStore.isRootNode(node)) {
+      this.setPointedNode(node);
+    }
+  }
+
+  moveCursorRight() {
+    if (this.getPointedNode() === null) return;
+
+    const nodeStore = this.rootStore.nodeStore;
+    const traverse = Functions.traverseRight(
+        this.getPointedNode(),
+        node => this.nodeStore.getParent(node, false),
+        node => nodeStore.getChildren(node));
+    const node = traverse.next().value;
+    if (node) {
+      this.setPointedNode(node);
+    }
   }
 }
