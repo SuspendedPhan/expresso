@@ -24,15 +24,17 @@ export default {
     var two = new Two(params).appendTo(elem);
 
     const storeCircle = Root.organismStore.put('circle');
-    Root.attributeStore.putEditable(storeCircle, 'clones');
-    Root.attributeStore.putEditable(storeCircle, 'x');
-    Root.attributeStore.putEditable(storeCircle, 'y');
-    Root.attributeStore.putEditable(storeCircle, 'radius');
+    const clones = Root.attributeStore.putEditable(storeCircle, 'clones');
+    const x = Root.attributeStore.putEditable(storeCircle, 'x');
+    const y = Root.attributeStore.putEditable(storeCircle, 'y');
+    const radius = Root.attributeStore.putEditable(storeCircle, 'radius');
     const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
     const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
     Root.attributeStore.assignNumber(storeWidth, two.width);
     Root.attributeStore.assignNumber(storeHeight, two.height);
     Root.attributeStore.putEmergent(storeCircle, 'cloneNumber');
+    Root.attributeStore.assignNumber(clones, 5);
+    Root.attributeStore.assignNumber(radius, 50);
 
     two.bind('update', function() {
       two.clear();

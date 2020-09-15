@@ -12,6 +12,26 @@ export default class MetafunStore {
         paramCount: 2,
         eval: (a, b) => a.eval() + b.eval(),
       },
+      {
+        name: 'Multiply',
+        paramCount: 2,
+        eval: (a, b) => a.eval() * b.eval(),
+      },
+      {
+        name: 'Divide',
+        paramCount: 2,
+        eval: (a, b) => a.eval() / b.eval(),
+      },
+      {
+        name: 'Subtract',
+        paramCount: 2,
+        eval: (a, b) => a.eval() - b.eval(),
+      },
+      {
+        name: 'Lerp',
+        paramCount: 3,
+        eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval()),
+      },
     ];
   }
 

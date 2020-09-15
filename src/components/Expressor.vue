@@ -39,15 +39,24 @@ export default {
     }
   },
   mounted() {
-    // Actions.load(this.store);
+    Root.load();
     document.addEventListener('keydown', event => {
-      if (Root.penStore.getPointedNode() === null) return;
-      if (event.key === 'Enter') {
-        Root.penStore.setIsQuerying(true);
-      } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorLeft();
-      } else if (event.key === 'ArrowRight' && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorRight();
+      if (event.key === 'ArrowUp' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorUp();
+      } else if (event.key === 'ArrowDown' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorDown();
+      }
+
+      if (Root.penStore.getPointedNode() !== null) {
+        if (event.key === 'Enter') {
+          Root.penStore.setIsQuerying(true);
+        } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {
+          Root.penStore.moveCursorLeft();
+        } else if (event.key === 'ArrowRight' && !Root.penStore.getIsQuerying()) {
+          Root.penStore.moveCursorRight();
+        } else if (event.key === 'Escape' && Root.penStore.getIsQuerying()) {
+          Root.penStore.setIsQuerying(false);
+        }
       }
     });
   }

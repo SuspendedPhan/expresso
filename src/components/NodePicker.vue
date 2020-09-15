@@ -29,8 +29,13 @@ export default {
   methods: {
     keydown(event) {
       if (event.key === 'Enter' && this.suggestions.length > 0) {
-        const result = this.suggestions[0];
-        Root.penStore.commitSuggestion(result);
+        if (Root.penStore.getQuery() === '') {
+          Root.penStore.setIsQuerying(false);
+        } else {
+          const result = this.suggestions[0];
+          Root.penStore.commitSuggestion(result);
+          Root.save();
+        }
         this.blur();
         event.stopPropagation();
       }

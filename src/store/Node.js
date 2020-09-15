@@ -80,6 +80,17 @@ export default class NodeStore {
 
   deserialize(store) {
     Object.assign(this, store);
+    for (const node of this.nodes) {
+      if (node.metaname === 'Number') {
+        node.eval = () => node.value;
+      } else if (node.metaname === 'Variable') {
+        node.eval = () => this.getChild(node, 0).eval();
+      } else if (node.metaname === 'Reference') {
+        node.eval = () => this.getFromId(node.targetNodeId).eval();
+      } else if (node.metafun === 'Function') {
+        node.eval = () => metafun.eval(...this.getChildren(node));
+      }
+    }
   }
 
   addNumber(value) {

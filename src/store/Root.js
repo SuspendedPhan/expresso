@@ -30,7 +30,8 @@ export class RootStore {
 
   * computeRenderCommands() {
     for (const organism of this.organismStore.getOrganisms()) {
-      const clones = this.attributeStore.getRootNodeFromName(organism, 'clones').eval();
+      const clonesRoot = this.attributeStore.getRootNodeFromName(organism, 'clones');
+      const clones = clonesRoot.eval();
       for (const cloneNumber of wu.count().take(clones)) {
         const cloneNumberRoot = this.attributeStore.getRootNodeFromName(organism, 'cloneNumber');
         this.nodeStore.putChild(cloneNumberRoot, 0, this.nodeStore.addNumber(cloneNumber));
@@ -54,11 +55,15 @@ export class RootStore {
   }
 
   save() {
-
+    window.localStorage.setItem('save', JSON.stringify(this.getSerialized()));
   }
 
   load() {
-
+    const text = window.localStorage.getItem('save');
+    if (text !== null) {
+      const root = JSON.parse(text);
+      this.deserialize(root);
+    }
   }
 }
 
