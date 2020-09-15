@@ -15,3 +15,5 @@
 - markdown to node tree
 
 - intrinsic
+- typescript
+- return iterables, not generators

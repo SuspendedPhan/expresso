@@ -15,9 +15,21 @@ export default class MetafunStore {
     ];
   }
 
+  getSerialized() {
+    return {};
+  }
+
   getFromName(name) {
     const answer = wu(this.metafuns).find(row => row.name === name);
     console.assert(answer, 'fun name');
     return answer;
+  }
+
+  getFuns() {
+    return this.metafuns;
+  }
+
+  deserialize() {
+    
   }
 }

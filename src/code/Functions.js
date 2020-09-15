@@ -3,6 +3,15 @@ import Gets from './Gets';
 
 export default class Functions {
 
+  static pluck(obj, properties) {
+    const answer = {};
+    for (const property of properties) {
+      if (!(property in obj)) throw new Error(`${obj} doesn't have ${property}`);
+      answer[property] = obj[property];
+    }
+    return answer;
+  }
+
   static * allNodes(store) {
     const circle = Gets.entity(store, 'circle');
     for (const property of wu.values(Gets.properties(circle))) {
@@ -101,5 +110,16 @@ export default class Functions {
 
   static deserialize(text) {
     return JSON.parse(text);
+  }
+
+  static isSubsequence(needle, haystack) {
+    let needleIndex = 0;
+    for (const haystackChar of haystack) {
+      const needleChar = needle[needleIndex];
+      if (haystackChar === needleChar) {
+        needleIndex++;
+      }
+    }
+    return needleIndex === needle.length;
   }
 }

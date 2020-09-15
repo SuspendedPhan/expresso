@@ -2,6 +2,7 @@ import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import { MetanodesByName } from '../code/Metanodes';
 import { RootStore } from './Root';
+import Functions from '../code/Functions';
 
 const makeAttribute = (name, attributeType) => ({
   name,
@@ -33,6 +34,14 @@ export default class AttributeStore {
   }
   
   // --- GETS ---
+
+  getSerialized() {
+    return Functions.pluck(this, [
+      'attributes',
+      'attributeParents',
+      'rootNodes',
+    ]);
+  }
 
   getParent(attribute) {
     const answer = wu(this.attributeParents).find(row => row.childAttributeId === attribute);
@@ -80,7 +89,35 @@ export default class AttributeStore {
     return attribute;
   }
 
+  getAttributeFromId(attributeId) {
+    return this.attributes.find(row => row.id = attributeId);
+  }
+
+  getAttributeForNode(node) {
+    let root = node;
+    while (true) {
+      const parent = this.nodeStore.getParent(root, false);
+      if (parent === undefined) break;
+      root = parent;
+    }
+    const row = this.rootNodes.find(row => row.rootNodeId === root.id);
+    const attribute = this.getAttributeFromId(row.attributeId);
+    return attribute;
+  }
+
+  getOrganismForAttribute(attribute) {
+    const row = wu(this.attributeParents).find(row => row.childAttributeId === attribute.id);
+    console.assert(row);
+    const organism = this.rootStore.organismStore.getOrganismFromId(row.parentOrganismId);
+    console.assert(organism);
+    return organism;
+  }
+
   // --- ACTIONS ---
+
+  deserialize(store) {
+    Object.assign(this, store);
+  }
 
   putEditable(organism, attributeName) {
     return this.putAttribute(organism, attributeName, 'Editable');

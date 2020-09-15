@@ -105,6 +105,7 @@ describe('HelloWorld.vue', () => {
 
     const add2 = nodeStore.addFun(metafunStore.getFromName('Add'));
     nodeStore.putChild(add, 0, add2);
+    radiusRoot.eval();
 
     expect(nodeStore.nodes.length).to.equal(6);
   })
@@ -193,114 +194,102 @@ describe('HelloWorld.vue', () => {
   })
 
   it('getReplacementSuggestions', () => {
-    return;
-    const store = StoreMaker.make();
-    Entity.addEntity(store, 'circle');
-    const circle = Gets.entity(store, 'circle');
-    const radius = Actions.addProperty(store, circle, 'radius');
-    const x = Actions.addProperty(store, circle, 'x');
-    const y = Actions.addProperty(store, circle, 'y');
-    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
+    const root = new RootStore();
+    const attributeStore = root.attributeStore;
+    const organismStore = root.organismStore;
+    const nodeStore = root.nodeStore;
+    const penStore = root.penStore;
+    const metafunStore = root.metafunStore;
 
-    var expected;
-    var actual;
+    const circle = organismStore.put('circle');
+    const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
+    const y = attributeStore.getRootNode(attributeStore.putEditable(circle, 'y'));
+    const clones = attributeStore.getRootNode(attributeStore.putEditable(circle, 'clones'));
+    const cloneNumber = attributeStore.getRootNode(attributeStore.putEmergent(circle, 'cloneNumber'));
 
-    actual = Gets.nodePicks(store, '23', Gets.property(circle, 'radius'));
-    expected = [
-      { metanode: MetanodesByName.get('Number'), args: [23], text: '23' }
-    ];
-    expect(Array.from(actual)).to.deep.equal(expected);
+    let expected;
+    let actual;
+    let suggestions;
     
-    // -- Test --
-    actual = Gets.nodePicks(store, '', Gets.property(circle, 'radius'));
-    expected = [
-      { metanode: MetanodesByName.get('Reference'), args: [x], text: 'x' },
-      { metanode: MetanodesByName.get('Reference'), args: [y], text: 'y' },
-      { metanode: MetanodesByName.get('Reference'), args: [cloneNumber], text: 'cloneNumber' },
-      { metanode: MetanodesByName.get('Add'), args: [], text: 'Add' },
-    ];
-    actual = Array.from(actual).map(result => ({
-      ...result,
-      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
-    }));
-    expected = Array.from(expected).map(result => ({
-      ...result,
-      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
-    }));
-    expect(Array.from(actual)).to.deep.equal(expected);
+    penStore.setPointedNode(nodeStore.getChild(x, 0));
 
-    // -- Test --
-    actual = Gets.nodePicks(store, 'c', Gets.property(circle, 'radius'));
-    expected = [
-      { metanode: MetanodesByName.get('Reference'), args: [cloneNumber], text: 'cloneNumber' },
-    ];
-    actual = Array.from(actual);
-    actual = actual.map(result => ({
-      ...result,
-      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
-    }));
-    expected = Array.from(expected).map(result => ({
-      ...result,
-      args: result.args.filter(arg => Functions.filterProps(arg, 'id', 'metaname'))
-    }));
-    expect(Array.from(actual)).to.deep.equal(expected);
-  })
+    // --- number ---
 
-  it('propname', () => {
-    return;
-    const store = StoreMaker.make();
-    Entity.addEntity(store, 'circle');
-    const circle = Gets.entity(store, 'circle');
-    Actions.addProperty(store, circle, 'radius');
+    penStore.setQuery('52');
+    suggestions = penStore.getReplacementSuggestions();
 
-    const name = Gets.propertyName(store, Gets.property(circle, 'radius'));
-    expect(name).to.equal('radius');
-  })
-
-  it('properties', () => {
-    return;
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    const radius = Actions.addEditableProperty(store, circle, 'radius');
-    const x = Actions.addEditableProperty(store, circle, 'x');
-    const y = Actions.addEditableProperty(store, circle, 'y');
-    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
-
-    expect(Gets.editableProperties(circle)).to.deep.equal({ radius, x, y });
-    expect(Gets.computedProperties(circle)).to.deep.equal({cloneNumber});
-    expect(Gets.properties(circle)).to.deep.equal({ radius, x, y, cloneNumber });
-  })
-
-  it('clonenumber01', () => {
-    return;
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    const clones = Actions.addProperty(store, circle, 'clones');
-    const radius = Actions.addProperty(store, circle, 'radius');
-    Actions.addComputedProperty(store, circle, 'cloneNumber');
-    const cloneNumber01 = Actions.addComputedProperty(store, circle, 'cloneNumber01');
-    Actions.assignNumberToVariable(store, clones, 1);
-    Actions.assignVariable(store, radius, MetanodesByName.get('Reference'), [cloneNumber01]);
-    
-    let actual = Array.from(Actions.computeRenderCommands(store, store.circle));
-    let expected = [
-      { radius: 0 },
-    ];
+    expected = ['52'];
+    actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
 
+    suggestions = penStore.getReplacementSuggestions();
+    penStore.commitSuggestion(suggestions.take(1).toArray()[0]);
+    expect(x.eval()).to.equal(52);
+    
+    // --- empty query ---
+    // should list all, but skip x
 
-    Actions.assignNumberToVariable(store, clones, 3);
-    actual = Array.from(Actions.computeRenderCommands(store, store.circle));
-    expected = [
-      { radius: 0 },
-      { radius: .5 },
-      { radius: 1 },
-    ];
+    penStore.setQuery('');
+    suggestions = penStore.getReplacementSuggestions();
+    expected = ['y', 'clones', 'cloneNumber', 'Add'];
+    actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
+    
+    // --- commit function ---
+
+    suggestions = penStore.getReplacementSuggestions();
+    penStore.commitSuggestion(suggestions.drop(3).toArray()[0]);
+    expect(x.eval()).to.equal(0);
+
+    // --- non empty query ---
+
+    penStore.setQuery('lon');
+    suggestions = penStore.getReplacementSuggestions();
+    expected = ['clones', 'cloneNumber'];
+    actual = suggestions.map(row => row.text).toArray();
+    expect(actual).to.deep.equal(expected);
+    
+    // --- commit reference ---
+    // --- new pointed node ---
+    // --- no more querying ---
+    
+    suggestions = penStore.getReplacementSuggestions();
+    nodeStore.putChild(clones, 0, nodeStore.addNumber(3));
+    penStore.commitSuggestion(suggestions.take(1).toArray()[0]);
+    expect(x.eval()).to.equal(3);
+    expect(penStore.pointedNode).to.equal(nodeStore.getChild(x, 0));
+    expect(penStore.getIsQuerying()).to.equal(false);
+
+     // --- no pointed node ---
+    
+     penStore.setPointedNode(null);
+     expect(() => penStore.setQuery('hihi')).to.throw();
+  })
+
+  it('isSubsequence', () => {
+    let actual;
+    
+    actual = Functions.isSubsequence('cne', 'clones');
+    expect(actual).to.equal(true);
+
+    actual = Functions.isSubsequence('cneq', 'clones');
+    expect(actual).to.equal(false);
+
+    actual = Functions.isSubsequence('clones', 'clon');
+    expect(actual).to.equal(false);
+
+    actual = Functions.isSubsequence('clones', 'clones');
+    expect(actual).to.equal(true);
+
+    actual = Functions.isSubsequence('', 'clones');
+    expect(actual).to.equal(true);
+
+    actual = Functions.isSubsequence('x', '');
+    expect(actual).to.equal(false);
   })
 
   it('traverseLeft', () => {
-    return;
+    // return;
     const tree = {
       a: {
         b: {
@@ -377,52 +366,82 @@ describe('HelloWorld.vue', () => {
   })
 
   it('serialize', () => {
-    return;
     // references
     // functions
     
     // x = add(2, add(5, 3))
     // y = x
 
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    const x = Actions.addEditableProperty(store, circle, 'x');
-    const y = Actions.addEditableProperty(store, circle, 'y');
-    const addNode = Actions.assignVariable(store, x, MetanodesByName.get('Add'), []);
-    Actions.replaceNode(store, addNode.children[0], MetanodesByName.get('Number'), [2]);
-    const addNode2 = Actions.replaceNode(store, addNode.children[1], MetanodesByName.get('Add'), []);
-    Actions.replaceNode(store, addNode2.children[0], MetanodesByName.get('Number'), [5]);
-    Actions.replaceNode(store, addNode2.children[1], MetanodesByName.get('Number'), [3]);
+    const root = new RootStore();
+    const attributeStore = root.attributeStore;
+    const organismStore = root.organismStore;
+    const nodeStore = root.nodeStore;
+    const penStore = root.penStore;
+    const metafunStore = root.metafunStore;
 
-    Actions.assignVariable(store, y, MetanodesByName.get('Reference'), [x]);
+    const circle = organismStore.put('circle');
+    const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
+    const y = attributeStore.getRootNode(attributeStore.putEditable(circle, 'y'));
 
-    expect(Actions.eval(store, Gets.editableProperty(circle, 'x'))).to.equal(10);
-    expect(Actions.eval(store, Gets.editableProperty(circle, 'y'))).to.equal(10);
+    const addNode = nodeStore.addFun(metafunStore.getFromName('Add'));
+    const addNode2 = nodeStore.addFun(metafunStore.getFromName('Add'));
+    nodeStore.putChild(x, 0, addNode);
+    nodeStore.putChild(addNode, 0, nodeStore.addNumber(2));
+    nodeStore.putChild(addNode, 1, addNode2);
+    nodeStore.putChild(addNode2, 0, nodeStore.addNumber(5));
+    nodeStore.putChild(addNode2, 1, nodeStore.addNumber(3));
+    nodeStore.putChild(y, 0, nodeStore.addReference(x));
 
-    const text = Functions.serialize(store);
-    const store2 = Functions.deserialize(text);
+    expect(x.eval()).to.equal(10);
+    expect(y.eval()).to.equal(10);
 
-    expect(Actions.eval(store2, Gets.editableProperty(circle, 'x'))).to.equal(10);
-    expect(Actions.eval(store2, Gets.editableProperty(circle, 'y'))).to.equal(10);
+    const text = root.getSerialized();
+    const store2 = root.deserialize(text);
 
-    Actions.assignVariable(store, Gets.editableProperty(circle, 'x'), MetanodesByName.get('Number'), [1]);
-    expect(Actions.eval(store2, Gets.editableProperty(circle, 'x'))).to.equal(1);
+    expect(x.eval()).to.equal(10);
+    expect(y.eval()).to.equal(10);
+
+    nodeStore.putChild(x, 0, nodeStore.addNumber(1));
+    expect(x.eval()).to.equal(1);
+  })
+
+  it('pluck', () => {
+    let actual;
+    let expected;
+
+    actual = Functions.pluck({
+      a: 2,
+      b: 3,
+      c: 5,
+    }, ['a', 'b']);
+    expected = {
+      a: 2,
+      b: 3,
+    };
+    expect(actual).to.deep.equal(expected);
+
+    expect(() => Functions.pluck({
+    }, ['a', 'b'])).to.throw();
+
+    actual = Functions.pluck({
+      a: 2,
+      b: 3,
+      c: 5,
+    }, []);
+    expected = {
+    };
+    expect(actual).to.deep.equal(expected);
+
+    actual = Functions.pluck({
+      a: 2,
+      b: 3,
+      c: 5,
+    }, ['a', 'b', 'c']);
+    expected = {
+      a: 2,
+      b: 3,
+      c: 5,
+    };
+    expect(actual).to.deep.equal(expected);
   })
 })
-
-function makeNumber(value) {
-  const num = Node.make(MetanodesByName.get('Number'));
-  num.value = value;
-  return num;
-}
-
-function makeReference(target) {
-  expect(target).to.not.equal(null);
-  const answer = Node.make(MetanodesByName.get('Reference'));
-  answer.target = target;
-  return answer;
-}
-
-function makeAdd() {
-  return Node.make(MetanodesByName.get('Add'));
-}

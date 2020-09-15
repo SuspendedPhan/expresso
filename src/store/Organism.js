@@ -17,10 +17,9 @@ export default class OrganismStore {
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.organisms = [];
-
-    /** { attributeId, parentOrganismId } */
-    this.attributeParents = [];
   }
+
+  // --- GETS ---
 
   getFromName(name) {
     return wu(this.organisms).find(organism => organism.name === name);
@@ -28,6 +27,24 @@ export default class OrganismStore {
 
   getOrganisms() {
     return this.organisms;
+  }
+
+  getOrganismFromId(organismId) {
+    const organism = wu(this.organisms).find(row => row.id === organismId);
+    console.assert(organism);
+    return organism;
+  }
+
+  getSerialized() {
+    return {
+      organisms: this.organisms,
+    };
+  }
+
+  // --- ACTIONS ---
+
+  deserialize(store) {
+    Object.assign(this, store);
   }
 
   put(name) {

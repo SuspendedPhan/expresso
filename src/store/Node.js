@@ -1,5 +1,9 @@
 import wu from "wu";
 import { v4 as uuidv4 } from 'uuid';
+import { RootStore } from './Root';
+import Functions from "../code/Functions";
+
+// interface suggestion: { text, commitFunction }
 
 export default class NodeStore {
   /**
@@ -14,11 +18,23 @@ export default class NodeStore {
   }
 
   // --- GETS ---
+  
+  getSerialized() {
+    return Functions.pluck(this, ['nodes', 'nodeParents']);
+  }
 
-  getParent(node) {
+  getParent(node, shouldAssert) {
+    if (shouldAssert === undefined) shouldAssert = true;
+
     const row = wu(this.nodeParents).find(entry => entry.childNodeId === node.id);
-    console.assert(row, 'no parent');
-    return this.getFromId(row.parentNodeId);
+    if (shouldAssert) {
+      console.assert(row, 'no parent');
+    }
+    if (row === undefined) {
+      return undefined;
+    } else {
+      return this.getFromId(row.parentNodeId);
+    }
   }
 
   getChild(node, childIndex) {
@@ -45,11 +61,20 @@ export default class NodeStore {
     return answer;
   }
 
-  getReplacementSuggestions(node, query) {
-
+  getParentRelationship(childNode) {
+    const row = wu(this.nodeParents).find(row => row.childNodeId === childNode.id);
+    console.assert(row);
+    return {
+      parentNode: this.getFromId(row.parentNodeId),
+      childIndex: row.childIndex,
+    }
   }
 
   // --- ACTIONS ---
+
+  deserialize(store) {
+    Object.assign(this, store);
+  }
 
   addNumber(value) {
     const answer = this.addNode('Number');
@@ -78,7 +103,6 @@ export default class NodeStore {
     for (let i = 0; i < metafun.paramCount; i++) {
       this.putChild(answer, i, this.addNumber(0));
     }
-    answer.funId = metafun.id;
     answer.eval = () => metafun.eval(...this.getChildren(answer));
     return answer;
   }
@@ -116,6 +140,12 @@ export default class NodeStore {
       childIndex: childIndex,
     });
     console.assert(parent.id);
+    console.assert(child.id);
+    console.assert(childIndex !== undefined);
     return child;
+  }
+
+  commitReplacementSuggestion(suggestion) {
+    suggestion.commitFunction();
   }
 }
