@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { MetanodesByName } from '../code/Metanodes';
 import { RootStore } from './Root';
 
-const makeEditableAttribute = (name) => ({
+const makeAttribute = (name, attributeType) => ({
   name,
+  attributeType,
   id: uuidv4(),
 });
 
@@ -18,11 +19,9 @@ export default class AttributeStore {
    */
   constructor(rootStore) {
     this.rootStore = rootStore;
-    this.computedAttributes = [];
-    this.editableAttributes = [];
+    this.attributes = [];
     
-    
-    /** { childAttributeId, parentEntityId } */
+    /** { childAttributeId, parentOrganismId } */
     this.attributeParents = [];
 
     /** { attributeId, rootNodeId } */
@@ -32,10 +31,12 @@ export default class AttributeStore {
   get nodeStore() {
     return this.rootStore.nodeStore;
   }
+  
+  // --- GETS ---
 
   getParent(attribute) {
     const answer = wu(this.attributeParents).find(row => row.childAttributeId === attribute);
-    console.assert(answer, 'prop has no parent entity');
+    console.assert(answer, 'prop has no parent organism');
     return answer;
   }
 
@@ -46,11 +47,54 @@ export default class AttributeStore {
     return this.rootStore.nodeStore.getFromId(row.rootNodeId);
   }
 
-  putEditable(entity, attributeName) {
-    const answer = makeEditableAttribute(attributeName);
+  getAttributesForOrganism(organism) {
+    let answer = wu(this.attributeParents)
+        .filter(row => row.parentOrganismId === organism.id);
+    answer = answer.map(row => {
+      const attr = this.attributes.find(attr => attr.id === row.childAttributeId);
+      return attr;
+    });
+    return answer;
+  }
+
+  getEditables(organism) {
+    let answer = wu(this.getAttributesForOrganism(organism));
+    answer = answer.filter(row => row.attributeType === 'Editable');
+    // console.log(answer.toArray());
+    return answer;
+  }
+  
+  getEmergents(organism) {
+    return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Editable');
+  }
+
+  getRootNodeFromName(organism, attributeName) {
+    const attribute = this.getAttributeFromName(organism, attributeName);
+    // console.assert(attribute);
+    return this.getRootNode(attribute);
+  }
+
+  getAttributeFromName(organism, attributeName) {
+    const attributes = this.getAttributesForOrganism(organism);
+    const attribute = attributes.find(attr => attr.name === attributeName);
+    return attribute;
+  }
+
+  // --- ACTIONS ---
+
+  putEditable(organism, attributeName) {
+    return this.putAttribute(organism, attributeName, 'Editable');
+  }
+
+  putEmergent(organism, attributeName) {
+    return this.putAttribute(organism, attributeName, 'Emergent');
+  }
+
+  putAttribute(organism, attributeName, attributeType) {
+    const answer = makeAttribute(attributeName, attributeType);
     const rootNode = this.nodeStore.addVariable();
-    this.editableAttributes.push(answer);
-    this.attributeParents.push({ childAttributeId: answer.id, parentEntityId: entity.id });
+    this.attributes.push(answer);
+    this.attributeParents.push({ childAttributeId: answer.id, parentOrganismId: organism.id });
     this.rootNodes.push({ attributeId: answer.id, rootNodeId: rootNode.id });
     return answer;
   }

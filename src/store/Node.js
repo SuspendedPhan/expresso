@@ -28,10 +28,25 @@ export default class NodeStore {
     return this.getFromId(row.childNodeId);
   }
 
+  getChildren(node) {
+    const rows = wu(this.nodeParents).filter(row => row.parentNodeId === node.id).toArray();
+    rows.sort((a, b) => a.childIndex - b.childIndex);
+    for (let index = 0; index < rows.length; index++) {
+      const row = rows[index];
+      console.assert(row.childIndex === index);
+    }
+    const children = wu(rows).map(row => this.getFromId(row.childNodeId));
+    return children;
+  }
+
   getFromId(nodeId) {
     const answer = wu(this.nodes).find(node => node.id === nodeId);
     console.assert(answer, 'cant find node from id');
     return answer;
+  }
+
+  getReplacementSuggestions(node, query) {
+
   }
 
   // --- ACTIONS ---

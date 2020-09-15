@@ -26,6 +26,10 @@ export default class OrganismStore {
     return wu(this.organisms).find(organism => organism.name === name);
   }
 
+  getOrganisms() {
+    return this.organisms;
+  }
+
   put(name) {
     const organism = makeOrganism({ name });
     this.organisms.push(organism);

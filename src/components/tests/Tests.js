@@ -161,24 +161,38 @@ describe('HelloWorld.vue', () => {
     expect(y.eval()).to.equal(2);
   })
 
-  it('filterprops', () => {
-    return;
-    const store = StoreMaker.make();
-    Entity.addEntity(store, 'circle');
-    const circle = Gets.entity(store, 'circle');
-    Actions.addProperty(store, circle, 'radius');
-    const radius = Gets.property(circle, 'radius');
-    const actual = Functions.filterProps(radius, 'id', 'metaname');
-    const expected = {
-      id: actual.id,
-      metaname: 'Variable',
-    };
+  it('computeRenderCommands', () => {
+    const root = new RootStore();
+    const attributeStore = root.attributeStore;
+    const organismStore = root.organismStore;
+    const nodeStore = root.nodeStore;
+    const metafunStore = root.metafunStore;
+
+    const circle = organismStore.put('circle');
+    const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
+    const clones = attributeStore.getRootNode(attributeStore.putEditable(circle, 'clones'));
+    const cloneNumber = attributeStore.getRootNode(attributeStore.putEmergent(circle, 'cloneNumber'));
+
+    nodeStore.putChild(clones, 0, nodeStore.addNumber(3));
+
+    expect(x.eval()).to.equal(0);  // addProperty
+    expect(cloneNumber.eval()).to.equal(0);  // addComputed
+    expect(clones.eval()).to.equal(3);  // assignVariable
+    
+    const add = nodeStore.putChild(x, 0, nodeStore.addFun(metafunStore.getFromName('Add')));
+    nodeStore.putChild(add, 0, nodeStore.addReference(cloneNumber));
+    nodeStore.putChild(add, 1, nodeStore.addNumber(3));
+    
+    const expected = [
+      { x: 3 },
+      { x: 4 },
+      { x: 5 },
+    ];
+    const actual = Array.from(root.computeRenderCommands());
     expect(actual).to.deep.equal(expected);
-    expect(actual.id).to.not.equal(undefined);
   })
 
-  it('nodepicks', () => {
-    return;
+  it('getReplacementSuggestions', () => {
     return;
     const store = StoreMaker.make();
     Entity.addEntity(store, 'circle');
@@ -255,46 +269,6 @@ describe('HelloWorld.vue', () => {
     expect(Gets.editableProperties(circle)).to.deep.equal({ radius, x, y });
     expect(Gets.computedProperties(circle)).to.deep.equal({cloneNumber});
     expect(Gets.properties(circle)).to.deep.equal({ radius, x, y, cloneNumber });
-  })
-
-  it('render', () => {
-    return;
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    const x = Actions.addProperty(store, circle, 'x');
-    const clones = Actions.addProperty(store, circle, 'clones');
-    const cloneNumber = Actions.addComputedProperty(store, circle, 'cloneNumber');
-    const cloneNumber01 = Actions.addComputedProperty(store, circle, 'cloneNumber01');
-    Actions.assignVariable(store, clones, MetanodesByName.get('Number'), [3]);
-
-    expect(Actions.eval(store, x)).to.equal(0);  // addProperty
-    expect(Actions.eval(store, cloneNumber)).to.equal(0);  // addComputed
-    expect(Actions.eval(store, clones)).to.equal(3);  // assignVariable
-    
-    const add = Actions.assignVariable(store, x, MetanodesByName.get('Add'), []);
-    Actions.replaceNode(store, add.children[0], MetanodesByName.get('Reference'), [cloneNumber]);
-    Actions.replaceNode(store, add.children[1], MetanodesByName.get('Number'), [3]);
-    
-    const expected = [
-      { x: 3 },
-      { x: 4 },
-      { x: 5 },
-    ];
-    const actual = Array.from(Actions.computeRenderCommands(store, circle));
-    expect(actual).to.deep.equal(expected);
-  })
-
-  it('assign variable by value', () => {
-    return;
-    expect(true).to.equal(true);
-    const store = StoreMaker.make();
-    const circle = Entity.addEntity(store, 'circle');
-    const storeWidth = Actions.addComputedProperty(store, circle, 'width');
-    const storeHeight = Actions.addComputedProperty(store, circle, 'height');
-    Actions.assignNumberToVariable(store, storeWidth, 10);
-    Actions.assignNumberToVariable(store, storeHeight, 20);
-    expect(Actions.eval(store, storeWidth)).to.equal(10);
-    expect(Actions.eval(store, storeHeight)).to.equal(20);
   })
 
   it('clonenumber01', () => {

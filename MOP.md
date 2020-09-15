@@ -13,3 +13,5 @@
 - curry all the functions // "curry all functions in module"
 
 - markdown to node tree
+
+- intrinsic
