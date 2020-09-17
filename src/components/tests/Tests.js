@@ -195,6 +195,13 @@ describe('HelloWorld.vue', () => {
     const nodeStore = root.nodeStore;
     const penStore = root.penStore;
     const metafunStore = root.metafunStore;
+    metafunStore.metafuns = [
+      {
+        name: 'Add',
+        paramCount: 2,
+        eval: (a, b) => a.eval() + b.eval(),
+      },
+    ];
 
     const circle = organismStore.put('circle');
     const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
@@ -388,9 +395,9 @@ describe('HelloWorld.vue', () => {
     const penStore = root.penStore;
     const metafunStore = root.metafunStore;
 
-    const circle = organismStore.put('circle');
-    const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
-    const y = attributeStore.getRootNode(attributeStore.putEditable(circle, 'y'));
+    const circle = organismStore.putFromMeta('circle', root.metaorganismCollection.getFromName('Circle'));
+    const x = attributeStore.getRootNodeFromName(circle, 'x');
+    const y = attributeStore.getRootNodeFromName(circle, 'y');
 
     const addNode = nodeStore.addFun(metafunStore.getFromName('Add'));
     const addNode2 = nodeStore.addFun(metafunStore.getFromName('Add'));

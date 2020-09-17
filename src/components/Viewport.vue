@@ -25,6 +25,7 @@ export default {
 
     var two = new Two(params).appendTo(elem);
 
+    // const storeCircle = organismStore.putFromMeta('circle', root.metaorganismCollection.getFromName('Circle'));
     const storeCircle = Root.organismStore.put('circle');
     const clones = Root.attributeStore.putEditable(storeCircle, 'clones');
     const x = Root.attributeStore.putEditable(storeCircle, 'x');

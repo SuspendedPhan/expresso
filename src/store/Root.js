@@ -4,11 +4,14 @@ import MetafunStore from './Metafun';
 import PenStore from './Pen';
 import wu from 'wu';
 import OrganismCollection from './OrganismCollection';
+import MetaorganismCollection from './MetaorganismCollection';
 
 export class RootStore {
   constructor() {
+    // CHECK -- does your store need to be serialized? Consider testing it later.
     this.organismStore = new OrganismCollection(this);
     this.organismCollection = this.organismStore;
+    this.metaorganismCollection = new MetaorganismCollection();
     this.attributeStore = new AttributeStore(this);
     this.nodeStore = new NodeStore(this);
     this.metafunStore = new MetafunStore(this);
