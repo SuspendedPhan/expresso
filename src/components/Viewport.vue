@@ -21,6 +21,8 @@ export default {
       width: elem.clientWidth,
       height: elem.clientHeight,
     };
+    console.log(elem.clientWidth);
+
     var two = new Two(params).appendTo(elem);
 
     const storeCircle = Root.organismStore.put('circle');
@@ -62,6 +64,7 @@ export default {
   border-color: black;
   border-style: solid;
   border-width: 1px;
-  height: 50vh;
+  /* height: 100%;
+  width: 100%; */
 }
 </style>

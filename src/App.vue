@@ -8,4 +8,7 @@
 body, input {
   font-size: 16pt;
 }
+body {
+  margin: 0;
+}
 </style>

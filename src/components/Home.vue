@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <Viewport />
-    <Expressor />
+  <div class='home'>
+    <Expressor class='expressor' />
+    <Viewport class='viewport' />
     <TestRunner class='runner'/>
   </div>
 </template>
@@ -27,5 +27,21 @@ export default {
   bottom: 0px;
   right: 0px;
   position: absolute;
+  padding: 10px;
+}
+.home {
+  display: grid;
+  position: absolute;
+  grid-template-columns: 33% 50%;
+  height: 100%;
+  width: 100%;
+}
+.viewport {
+  margin: 20px;
+}
+.expressor {
+  margin: 20px;
+  border: 1px solid black;
+  padding: 20px;
 }
 </style>

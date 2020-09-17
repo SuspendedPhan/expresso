@@ -1,13 +1,14 @@
-import OrganismStore from './Organism';
 import NodeStore from './Node';
 import AttributeStore from './Attribute';
 import MetafunStore from './Metafun';
 import PenStore from './Pen';
 import wu from 'wu';
+import OrganismCollection from './OrganismCollection';
 
 export class RootStore {
   constructor() {
-    this.organismStore = new OrganismStore(this);
+    this.organismStore = new OrganismCollection(this);
+    this.organismCollection = this.organismStore;
     this.attributeStore = new AttributeStore(this);
     this.nodeStore = new NodeStore(this);
     this.metafunStore = new MetafunStore(this);
