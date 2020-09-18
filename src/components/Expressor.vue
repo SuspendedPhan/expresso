@@ -7,6 +7,7 @@
         <Node :astNode='getNodeForAttribute(attribute)' />
       </div>
     </div>
+    <button @click='spawn'>Spawn Organism</button>
   </div>
 </template>
 
@@ -33,7 +34,10 @@ export default {
   methods: {
     getNodeForAttribute: function(attribute) {
       return Root.nodeStore.getChild(Root.attributeStore.getRootNode(attribute), 0);
-    }
+    },
+    spawn: function () {
+      this.root.organismCollection.spawn();
+    },
   },
   mounted() {
     Root.load();

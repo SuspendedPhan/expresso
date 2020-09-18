@@ -68,4 +68,10 @@ export default class OrganismCollection {
     this.organisms.push(organism);
     return organism;
   }
+
+  spawn() {
+    const metacircle = this.root.metaorganismCollection.getFromName('Circle');
+    const organism = this.putFromMeta(null, metacircle);
+    organism.name = organism.id;
+  }
 }
