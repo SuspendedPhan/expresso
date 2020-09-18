@@ -60,16 +60,25 @@ export default class OrganismCollection {
   putFromMeta(name, metaorganism) {
     const organism = makeOrganism({ name });
     organism.metaorganismId = metaorganism.id;
-    for (const attributeName of metaorganism.attributeNames) {
-      this.root.attributeStore.putEditable(organism, attributeName);
+    for (const metaattribute of metaorganism.attributes) {
+      const attribute = this.root.attributeStore.putEditable(organism, metaattribute.name);
+      if (metaattribute.default !== undefined) {
+        this.root.attributeStore.assignNumber(attribute, metaattribute.default);
+      }
     }
-    this.root.attributeStore.putEditable(organism, 'clones');
+    const clones = this.root.attributeStore.putEditable(organism, 'clones');
+    this.root.attributeStore.assignNumber(clones, 1);
+
     this.root.attributeStore.putEmergent(organism, 'cloneNumber');
     this.root.attributeStore.putEmergent(organism, 'time');
     this.root.attributeStore.putEmergent(organism, 'window.width');
     this.root.attributeStore.putEmergent(organism, 'window.height');
     this.organisms.push(organism);
     return organism;
+  }
+
+  remove(organism) {
+    this.organisms = wu(this.organisms).reject(row => row === organism).toArray();
   }
 
   spawn() {

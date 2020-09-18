@@ -11,10 +11,19 @@ export default class MetaorganismCollection {
       {
         id: uuidv4(),
         name: 'Circle',
-        attributeNames: [
-          'x',
-          'y',
-          'radius',
+        attributes: [
+          {
+            name: 'x',
+            default: 0,
+          },
+          {
+            name: 'y',
+            default: 0,
+          },
+          {
+            name: 'radius',
+            default: 50,
+          },
         ],
       }
     ];

@@ -6,6 +6,7 @@
         <span>{{ attribute.name }}: </span>
         <Node :astNode='getNodeForAttribute(attribute)' />
       </div>
+      <button @click='removeOrganism(organism)'>Remove</button>
     </div>
     <button @click='spawn'>Spawn Organism</button>
     <button @click='clearStorage'>Clear storage</button>
@@ -41,6 +42,9 @@ export default {
     },
     clearStorage: function() {
       this.root.clearStorage();
+    },
+    removeOrganism: function(organism) {
+      this.root.organismCollection.remove(organism);
     },
   },
   mounted() {
