@@ -58,7 +58,7 @@ export default class OrganismCollection {
   }
 
   putFromMeta(name, metaorganism) {
-    const organism = makeOrganism(name);
+    const organism = makeOrganism({ name });
     organism.metaorganismId = metaorganism.id;
     for (const attributeName of metaorganism.attributeNames) {
       this.root.attributeStore.putEditable(organism, attributeName);

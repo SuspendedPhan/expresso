@@ -1,8 +1,11 @@
 <template>
   <div>
-    <div v-for='attribute in attributes' :key='attribute.id'>
-      <span>{{ attribute.name }}: </span>
-      <Node :astNode='getNodeForAttribute(attribute)' />
+    <div class='organism' v-for='organism in root.organismCollection.getOrganisms()' :key='organism.id'>
+      <div>{{ organism.name }}</div>
+      <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+        <span>{{ attribute.name }}: </span>
+        <Node :astNode='getNodeForAttribute(attribute)' />
+      </div>
     </div>
   </div>
 </template>
@@ -21,17 +24,11 @@ export default {
   },
   data: function() {
     return {
-      // Root: Root,
+      root: Root,
       attributeStore: Root.attributeStore,
     };
   },
   computed: {
-    attributes: function() {
-      const organism = Root.organismStore.getFromName('circle');
-      return Root.attributeStore.getAttributesForOrganism(organism)
-          .filter(attr => attr.attributeType === 'Editable')
-          .toArray();
-    }
   },
   methods: {
     getNodeForAttribute: function(attribute) {
@@ -64,4 +61,9 @@ export default {
 </script>
 
 <style scoped>
+.organism {
+  margin-bottom: 20px;
+}
+.attribute {
+}
 </style>

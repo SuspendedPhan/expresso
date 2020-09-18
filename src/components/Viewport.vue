@@ -7,6 +7,8 @@
 import Two from 'two.js';
 import Root from '../store/Root';
 
+window.root = Root;
+
 export default {
   name: 'Viewport',
   props: {
@@ -21,23 +23,28 @@ export default {
       width: elem.clientWidth,
       height: elem.clientHeight,
     };
-    console.log(elem.clientWidth);
 
     var two = new Two(params).appendTo(elem);
+  
+    {
+      const storeCircle = Root.organismCollection.putFromMeta('circle', Root.metaorganismCollection.getFromName('Circle'));
+      const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
+      const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
+      Root.attributeStore.assignNumber(storeWidth, two.width);
+      Root.attributeStore.assignNumber(storeHeight, two.height);
+      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'clones'), 5);
+      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'radius'), 50);
+    }
 
-    // const storeCircle = organismStore.putFromMeta('circle', root.metaorganismCollection.getFromName('Circle'));
-    const storeCircle = Root.organismStore.put('circle');
-    const clones = Root.attributeStore.putEditable(storeCircle, 'clones');
-    const x = Root.attributeStore.putEditable(storeCircle, 'x');
-    const y = Root.attributeStore.putEditable(storeCircle, 'y');
-    const radius = Root.attributeStore.putEditable(storeCircle, 'radius');
-    const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
-    const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
-    Root.attributeStore.assignNumber(storeWidth, two.width);
-    Root.attributeStore.assignNumber(storeHeight, two.height);
-    Root.attributeStore.putEmergent(storeCircle, 'cloneNumber');
-    Root.attributeStore.assignNumber(clones, 5);
-    Root.attributeStore.assignNumber(radius, 50);
+    {
+      const storeCircle = Root.organismCollection.putFromMeta('holy circle', Root.metaorganismCollection.getFromName('Circle'));
+      const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
+      const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
+      Root.attributeStore.assignNumber(storeWidth, two.width);
+      Root.attributeStore.assignNumber(storeHeight, two.height);
+      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'clones'), 5);
+      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'radius'), 50);
+    }
 
     two.bind('update', function() {
       two.clear();

@@ -33,7 +33,7 @@ export default {
   display: grid;
   position: absolute;
   grid-template-columns: 33% 50%;
-  height: 100%;
+  height: 99%;
   width: 100%;
 }
 .viewport {

@@ -63,6 +63,7 @@ export class RootStore {
   }
 
   load() {
+    return;
     const text = window.localStorage.getItem('save');
     if (text !== null) {
       const root = JSON.parse(text);
