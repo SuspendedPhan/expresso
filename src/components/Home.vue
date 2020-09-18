@@ -2,7 +2,7 @@
   <div class='home'>
     <Expressor class='expressor' />
     <Viewport class='viewport' />
-    <TestRunner class='runner'/>
+    <TestRunner v-if='true' class='runner'/>
   </div>
 </template>
 

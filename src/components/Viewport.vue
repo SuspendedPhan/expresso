@@ -26,28 +26,12 @@ export default {
 
     var two = new Two(params).appendTo(elem);
   
-    {
-      const storeCircle = Root.organismCollection.putFromMeta('circle', Root.metaorganismCollection.getFromName('Circle'));
-      const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
-      const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
-      Root.attributeStore.assignNumber(storeWidth, two.width);
-      Root.attributeStore.assignNumber(storeHeight, two.height);
-      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'clones'), 5);
-      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'radius'), 50);
-    }
-
-    {
-      const storeCircle = Root.organismCollection.putFromMeta('holy circle', Root.metaorganismCollection.getFromName('Circle'));
-      const storeWidth = Root.attributeStore.putEmergent(storeCircle, 'width');
-      const storeHeight = Root.attributeStore.putEmergent(storeCircle, 'height');
-      Root.attributeStore.assignNumber(storeWidth, two.width);
-      Root.attributeStore.assignNumber(storeHeight, two.height);
-      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'clones'), 5);
-      Root.attributeStore.assignNumber(Root.attributeStore.getAttributeFromName(storeCircle, 'radius'), 50);
-    }
-
     two.bind('update', function() {
       two.clear();
+
+      two.height = elem.clientHeight - 5;
+      
+      Root.setWindowSize(two.width, two.height);
 
       const renderCommands = Root.computeRenderCommands();
       for (const renderCommand of renderCommands) {

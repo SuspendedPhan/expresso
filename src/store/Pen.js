@@ -148,19 +148,20 @@ export default class Pen {
         node => this.nodeStore.getParent(node, false),
         node => nodeStore.getChildren(node));
     const node = traverse.next().value;
-    if (node) {
+    if (node && !this.rootStore.attributeStore.isRootNode(node)) {
       this.setPointedNode(node);
     }
   }
 
   moveCursorUp() {
-    const organism = this.rootStore.organismStore.getOrganisms()[0];
     if (this.pointedNode === null) {
+      const organism = this.rootStore.organismStore.getOrganisms()[0];
       const attr = this.rootStore.attributeStore.getEditables(organism).next().value;
       const rootNode = this.rootStore.attributeStore.getRootNode(attr);
       this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
     } else {
       const attribute = this.rootStore.attributeStore.getAttributeForNode(this.getPointedNode());
+      const organism = this.rootStore.attributeStore.getOrganismForAttribute(attribute);
       const attributes = Array.from(this.rootStore.attributeStore.getEditables(organism));
       attributes.reverse();
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
@@ -170,13 +171,14 @@ export default class Pen {
   }
 
   moveCursorDown() {
-    const organism = this.rootStore.organismStore.getOrganisms()[0];
     if (this.pointedNode === null) {
+      const organism = this.rootStore.organismStore.getOrganisms()[0];
       const attr = this.rootStore.attributeStore.getEditables(organism).next().value;
       const rootNode = this.rootStore.attributeStore.getRootNode(attr);
       this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
     } else {
       const attribute = this.rootStore.attributeStore.getAttributeForNode(this.getPointedNode());
+      const organism = this.rootStore.attributeStore.getOrganismForAttribute(attribute);
       const attributes = this.rootStore.attributeStore.getEditables(organism);
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
       const node = this.nodeStore.getChild(this.rootStore.attributeStore.getRootNode(nextAttribute), 0);

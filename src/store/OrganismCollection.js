@@ -65,6 +65,9 @@ export default class OrganismCollection {
     }
     this.root.attributeStore.putEditable(organism, 'clones');
     this.root.attributeStore.putEmergent(organism, 'cloneNumber');
+    this.root.attributeStore.putEmergent(organism, 'time');
+    this.root.attributeStore.putEmergent(organism, 'window.width');
+    this.root.attributeStore.putEmergent(organism, 'window.height');
     this.organisms.push(organism);
     return organism;
   }
@@ -73,5 +76,6 @@ export default class OrganismCollection {
     const metacircle = this.root.metaorganismCollection.getFromName('Circle');
     const organism = this.putFromMeta(null, metacircle);
     organism.name = organism.id;
+    return organism;
   }
 }

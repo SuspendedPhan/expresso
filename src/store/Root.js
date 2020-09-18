@@ -5,6 +5,8 @@ import PenStore from './Pen';
 import wu from 'wu';
 import OrganismCollection from './OrganismCollection';
 import MetaorganismCollection from './MetaorganismCollection';
+import Time from "./Time";
+import { DateTime } from 'luxon';
 
 export class RootStore {
   constructor() {
@@ -16,6 +18,9 @@ export class RootStore {
     this.nodeStore = new NodeStore(this);
     this.metafunStore = new MetafunStore(this);
     this.penStore = new PenStore(this);
+    this.time = new Time();
+
+    this.windowSize = { width: 0, height: 0 };
   }
 
   // --- GETS ---
@@ -32,10 +37,25 @@ export class RootStore {
 
   // --- ACTIONS ---
 
+  setWindowSize(width, height) {
+    this.windowSize = { width, height };
+  }
+
   * computeRenderCommands() {
+    this.time.setFrameTime(DateTime.utc());
+    const universeDurationMillis = this.time.getElapsedUniverseTime().as('milliseconds');
+
     for (const organism of this.organismStore.getOrganisms()) {
+      const timeRoot = this.attributeStore.getRootNodeFromName(organism, 'time');
+      const windowHeightRoot = this.attributeStore.getRootNodeFromName(organism, 'window.height');
+      const windowWidthRoot = this.attributeStore.getRootNodeFromName(organism, 'window.width');
+      this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(universeDurationMillis));
+      this.nodeStore.putChild(windowWidthRoot, 0, this.nodeStore.addNumber(this.windowSize.width));
+      this.nodeStore.putChild(windowHeightRoot, 0, this.nodeStore.addNumber(this.windowSize.height));
+
       const clonesRoot = this.attributeStore.getRootNodeFromName(organism, 'clones');
       const clones = clonesRoot.eval();
+
       for (const cloneNumber of wu.count().take(clones)) {
         const cloneNumberRoot = this.attributeStore.getRootNodeFromName(organism, 'cloneNumber');
         this.nodeStore.putChild(cloneNumberRoot, 0, this.nodeStore.addNumber(cloneNumber));
@@ -63,12 +83,16 @@ export class RootStore {
   }
 
   load() {
-    return;
+    // return;
     const text = window.localStorage.getItem('save');
     if (text !== null) {
       const root = JSON.parse(text);
       this.deserialize(root);
     }
+  }
+
+  clearStorage() {
+    window.localStorage.clear();
   }
 }
 

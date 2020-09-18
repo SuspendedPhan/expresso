@@ -56,6 +56,7 @@ export default class AttributeStore {
   }
 
   getAttributesForOrganism(organism) {
+    console.assert(organism);
     let answer = wu(this.attributeParents)
         .filter(row => row.parentOrganismId === organism.id);
 

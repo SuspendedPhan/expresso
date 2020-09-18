@@ -8,6 +8,7 @@
       </div>
     </div>
     <button @click='spawn'>Spawn Organism</button>
+    <button @click='clearStorage'>Clear storage</button>
   </div>
 </template>
 
@@ -37,6 +38,9 @@ export default {
     },
     spawn: function () {
       this.root.organismCollection.spawn();
+    },
+    clearStorage: function() {
+      this.root.clearStorage();
     },
   },
   mounted() {
