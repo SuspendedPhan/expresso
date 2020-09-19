@@ -28,6 +28,11 @@ export default class MetafunStore {
         eval: (a, b) => a.eval() - b.eval(),
       },
       {
+        name: 'Modulus',
+        paramCount: 2,
+        eval: (a, b) => a.eval() % b.eval(),
+      },
+      {
         name: 'Abs',
         paramCount: 1,
         eval: (a) => Math.abs(a.eval()),
@@ -38,9 +43,29 @@ export default class MetafunStore {
         eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval()),
       },
       {
+        name: 'InvLerp01',
+        paramCount: 3,
+        eval: (a, b, fx) => Math.min(1, Math.max(0, (fx.eval() / (b.eval() - a.eval())))),
+      },
+      {
         name: 'Distance',
         paramCount: 2,
         eval: (a, b) => Math.abs(a.eval() - b.eval()),
+      },
+      {
+        name: 'SoloFront',
+        paramCount: 3,
+        eval: (fx, t01, twindow) => t01.eval() < twindow.eval() ? fx.eval() : 0,
+      },
+      {
+        name: 'Tri',
+        paramCount: 1,
+        eval: (a) => 1 - Math.abs(a.eval() * 2 - 1),
+      },
+      {
+        name: 'Mod1',
+        paramCount: 1,
+        eval: (a) => a.eval() % 1,
       },
       {
         name: 'CloneNumber01',

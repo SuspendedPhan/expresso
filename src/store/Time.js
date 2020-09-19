@@ -8,7 +8,7 @@ export default class Time {
   constructor(root) {
     this.root = root;
     this.frameTime = DateTime.utc();
-    this.universeLifespan = Duration.fromMillis(5000);
+    this.universeLifespan = Duration.fromMillis(1000);
   }
 
   getElapsedUniverseTime() {
