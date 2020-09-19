@@ -44,12 +44,18 @@ export class RootStore {
   * computeRenderCommands() {
     this.time.setFrameTime(DateTime.utc());
     const universeDurationMillis = this.time.getElapsedUniverseTime().as('milliseconds');
+    const time01 = universeDurationMillis / this.time.getUniverseLifespan();
 
     for (const organism of this.organismStore.getOrganisms()) {
       const timeRoot = this.attributeStore.getRootNodeFromName(organism, 'time');
+      let time01Root = this.attributeStore.getRootNodeFromName(organism, 'time01', false);
+      if (time01Root === undefined) {
+        time01Root = this.attributeStore.putEmergent(organism, 'time01');
+      }
       const windowHeightRoot = this.attributeStore.getRootNodeFromName(organism, 'window.height');
       const windowWidthRoot = this.attributeStore.getRootNodeFromName(organism, 'window.width');
       this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(universeDurationMillis));
+      this.nodeStore.putChild(time01Root, 0, this.nodeStore.addNumber(time01));
       this.nodeStore.putChild(windowWidthRoot, 0, this.nodeStore.addNumber(this.windowSize.width));
       this.nodeStore.putChild(windowHeightRoot, 0, this.nodeStore.addNumber(this.windowSize.height));
 

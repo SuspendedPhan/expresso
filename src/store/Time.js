@@ -16,6 +16,10 @@ export default class Time {
     return Duration.fromMillis(millis);
   }
 
+  getUniverseLifespan() {
+    return this.universeLifespan;
+  }
+
   setFrameTime(utcTime) {
     this.frameTime = utcTime;
   }

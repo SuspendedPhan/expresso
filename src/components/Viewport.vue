@@ -38,7 +38,7 @@ export default {
         const radius = renderCommand.radius;
         const x = renderCommand.x;
         const y = renderCommand.y;
-        if (radius <= 0 || !Number.isFinite(radius)) continue;
+        if (radius <= 1 || !Number.isFinite(radius)) continue;
         if (!Number.isFinite(x)) continue;
         if (!Number.isFinite(y)) continue;
 

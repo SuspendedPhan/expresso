@@ -81,13 +81,15 @@ export default class NodeStore {
   deserialize(store) {
     Object.assign(this, store);
     for (const node of this.nodes) {
+      if (node.id === "51707844-c7ce-4eff-abae-b02da7a2caba") console.log('hi');
       if (node.metaname === 'Number') {
         node.eval = () => node.value;
       } else if (node.metaname === 'Variable') {
         node.eval = () => this.getChild(node, 0).eval();
       } else if (node.metaname === 'Reference') {
         node.eval = () => this.getFromId(node.targetNodeId).eval();
-      } else if (node.metafun === 'Function') {
+      } else if (node.metaname === 'Function') {
+        const metafun = this.rootStore.metafunStore.getFromName(node.metafunName);
         node.eval = () => metafun.eval(...this.getChildren(node));
       }
     }

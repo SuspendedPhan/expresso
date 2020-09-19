@@ -78,9 +78,14 @@ export default class AttributeStore {
     return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Editable');
   }
 
-  getRootNodeFromName(organism, attributeName) {
+  getRootNodeFromName(organism, attributeName, shouldAssert) {
     const attribute = this.getAttributeFromName(organism, attributeName);
-    console.assert(attribute, `couldn't find ${attributeName}`);
+    if (attribute === undefined) {
+      if (shouldAssert ?? true) {
+        console.assert(attribute, `couldn't find ${attributeName}`);
+      }
+      return undefined;
+    }
     return this.getRootNode(attribute);
   }
 
