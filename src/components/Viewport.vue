@@ -1,5 +1,7 @@
 <template>
-  <div id='viewport' class='viewport'>
+  <div class='viewport' ref='viewport'>
+    <canvas :width='width' :height='height' ref='canvas'>
+    </canvas>
   </div>
 </template>
 
@@ -14,40 +16,34 @@ export default {
   props: {
   },
   data: () => {
-    return {};
-  },
-  mounted: () => {
-    var elem = document.getElementById('viewport');
-    var params = { 
-      type: Two.Types.webgl,
-      width: elem.clientWidth,
-      height: elem.clientHeight,
+    return {
+      width: 0,
+      height: 0,
     };
-
-    var two = new Two(params).appendTo(elem);
-  
-    two.bind('update', function() {
-      two.clear();
-
-      two.height = elem.clientHeight - 5;
-      
-      Root.setWindowSize(two.width, two.height);
+  },
+  mounted: function() {
+    this.update();
+  },
+  methods: {
+    update: function() {
+      const viewport = this.$refs.viewport;
+      const canvas = this.$refs.canvas;
+      this.width = viewport.clientWidth;
+      this.height = viewport.clientHeight;
+      const context = canvas.getContext('2d');
+      Root.setWindowSize(this.width, this.height);
+      context.clearRect(0, 0, this.width, this.height);
 
       const renderCommands = Root.computeRenderCommands();
       for (const renderCommand of renderCommands) {
-        const radius = renderCommand.radius;
-        const x = renderCommand.x;
-        const y = renderCommand.y;
-        if (radius <= 1 || !Number.isFinite(radius)) continue;
-        if (!Number.isFinite(x)) continue;
-        if (!Number.isFinite(y)) continue;
-
-        const circle = two.makeCircle(x, y, radius);
-        circle.fill = 'hsla(0, 50%, 50%, .5)';
-        circle.stroke = 'none';
+        context.beginPath();
+        context.arc(renderCommand.x, renderCommand.y, renderCommand.radius, 0, 2 * Math.PI);
+        context.fillStyle = 'hsla(0, 50%, 50%, .5)';
+        context.fill();
       }
-    }).play();
-  }
+      window.requestAnimationFrame(this.update);
+    },
+  },
 }
 </script>
 

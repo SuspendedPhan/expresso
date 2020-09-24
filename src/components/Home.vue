@@ -33,8 +33,11 @@ export default {
   display: grid;
   position: absolute;
   grid-template-columns: 33% 50%;
-  height: 99%;
+  grid-template-rows: 100%;
+  height: 100%;
   width: 100%;
+  overflow: hidden;
+
 }
 .viewport {
   margin: 20px;
