@@ -1,8 +1,9 @@
 <template>
   <div class='home'>
-    <Expressor class='expressor' />
-    <Viewport class='viewport' />
+    <Expressor class='expressor' v-if='showExpressor' />
+    <Viewport :class='["viewport", { fullWidth: !showExpressor }]' />
     <TestRunner v-if='false' class='runner'/>
+    <button class='flick' @click='showExpressor = !showExpressor'>Flick</button>
   </div>
 </template>
 
@@ -20,6 +21,11 @@ export default {
   },
   props: {
   },
+  data: function() {
+    return {
+      showExpressor: true,
+    };
+  },
 }
 </script>
 <style scoped>
@@ -32,7 +38,7 @@ export default {
 .home {
   display: grid;
   position: absolute;
-  grid-template-columns: 33% 1fr max-content;
+  grid-template-columns: 33% 1fr;
   grid-template-rows: 100%;
   height: 100%;
   width: 100%;
@@ -53,5 +59,13 @@ export default {
   margin-left: 40px;
   /* border: 1px solid black; */
   padding: 20px;
+}
+.flick {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+.fullWidth {
+  grid-column: 1 / -1;
 }
 </style>
