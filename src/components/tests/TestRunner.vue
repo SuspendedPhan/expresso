@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class='test-runner'>
     <div v-for='test in store.tests' :key='test.name' class='flex'>
       <span>{{ test.status }}</span>
       <span>{{ test.name }}</span>
@@ -32,5 +32,8 @@ export default {
   display: grid;
   grid-template-columns: max-content max-content;
   gap: 20px;
+}
+.test-runner {
+  background-color: white;
 }
 </style>

@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import wu from 'wu';
+import { MetaOrganism } from './MetaorganismCollection';
 import { Root } from './Root';
 
 function makeOrganism({ name }) {
@@ -53,8 +54,11 @@ export default class OrganismCollection {
     return organism;
   }
 
-  putFromMeta(name, metaorganism) {
+  putFromMeta(name, metaorganism: MetaOrganism) {
     const organism = makeOrganism({ name });
+    if (organism.name === undefined) {
+      organism.name = organism.id;
+    }
     organism.metaorganismId = metaorganism.id;
     for (const metaattribute of metaorganism.attributes) {
       const attribute = this.root.attributeStore.putEditable(organism, metaattribute.name);

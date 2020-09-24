@@ -7,7 +7,7 @@
 </template>
 
 <style>
-body, input, button {
+body, input, button, select {
   font-size: 16pt;
   font-family: 'Grandstander';
   font-weight: 200;

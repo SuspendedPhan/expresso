@@ -8,6 +8,11 @@ import MetaorganismCollection from './MetaorganismCollection';
 import Time from "./Time";
 import { DateTime } from 'luxon';
 
+export enum RenderShape {
+  Circle = 'Circle',
+  Rectangle = 'Rectangle',
+}
+
 export class Root {
 
   // CHECK -- does your store need to be serialized? Consider testing it later.
@@ -60,14 +65,19 @@ export class Root {
       const clonesRoot = this.attributeStore.getRootNodeFromName(organism, 'clones');
       const clones = clonesRoot.eval();
 
+      const metaorganism = this.metaorganismCollection.getFromId(organism.metaorganismId) as any;
+
       for (const cloneNumber of wu.count().take(clones)) {
         const cloneNumberRoot = this.attributeStore.getRootNodeFromName(organism, 'cloneNumber');
         this.nodeStore.putChild(cloneNumberRoot, 0, this.nodeStore.addNumber(cloneNumber));
         
-        const renderCommand = {};
+        const renderCommand = {} as any;
+        renderCommand.shape = metaorganism.renderShape;
         for (const attribute of this.attributeStore.getEditables(organism)) {
           if (attribute.name === 'clones') continue;
           renderCommand[attribute.name] = this.attributeStore.getRootNode(attribute).eval();
+          console.log(attribute.name);
+          console.log(renderCommand[attribute.name]);
         }
         yield renderCommand;
       }

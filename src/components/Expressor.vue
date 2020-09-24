@@ -8,8 +8,15 @@
       </div>
       <button @click='removeOrganism(organism)'>Remove</button>
     </div>
-    <button @click='spawn'>Spawn Organism</button>
-    <button @click='clearStorage'>Clear storage</button>
+    <div class='controls'>
+      <select v-model='selectedPrimitiveId'>
+        <option v-for='metaorganism in metaorganismCollection.getMetaorganisms()' :key='metaorganism.id' :value='metaorganism.id'>
+          {{ metaorganism.name }}
+        </option>
+      </select>
+      <button @click='spawn'>Spawn Organism</button>
+      <button @click='clearStorage'>Clear storage</button>
+    </div>
   </div>
 </template>
 
@@ -29,6 +36,8 @@ export default {
     return {
       root: Root,
       attributeStore: Root.attributeStore,
+      metaorganismCollection: Root.metaorganismCollection,
+      selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
     };
   },
   computed: {
@@ -38,13 +47,16 @@ export default {
       return Root.nodeStore.getChild(Root.attributeStore.getRootNode(attribute), 0);
     },
     spawn: function () {
-      this.root.organismCollection.spawn();
+      const metaorganism = this.metaorganismCollection.getFromId(this.selectedPrimitiveId);
+      this.root.organismCollection.putFromMeta(undefined, metaorganism);
+      this.root.save();
     },
     clearStorage: function() {
       this.root.clearStorage();
     },
     removeOrganism: function(organism) {
       this.root.organismCollection.remove(organism);
+      this.root.save();
     },
   },
   mounted() {
@@ -77,5 +89,10 @@ export default {
   margin-bottom: 20px;
 }
 .attribute {
+}
+.controls {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  gap: 10px;
 }
 </style>
