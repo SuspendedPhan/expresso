@@ -1,21 +1,18 @@
 import wu from "wu";
 import { v4 as uuidv4 } from 'uuid';
-import { RootStore } from './Root';
+import { Root } from './Root';
 import Functions from "../code/Functions";
 
 // interface suggestion: { text, commitFunction }
 
 export default class NodeStore {
-  /**
-   * @param {RootStore} rootStore 
-   */
-  constructor(rootStore) {
-    this.rootStore = rootStore;
-    this.nodes = [];
-    
-    /** {childNodeId, parentNodeId, childIndex} */
-    this.nodeParents = [];
-  }
+
+  nodes = [] as Array<any>;
+
+  /** {childNodeId, parentNodeId, childIndex} */
+  nodeParents = [] as Array<any>;
+  
+  constructor(private root: Root) {}
 
   // --- GETS ---
   
@@ -23,7 +20,7 @@ export default class NodeStore {
     return Functions.pluck(this, ['nodes', 'nodeParents']);
   }
 
-  getParent(node, shouldAssert) {
+  getParent(node, shouldAssert = true) {
     if (shouldAssert === undefined) shouldAssert = true;
 
     const row = wu(this.nodeParents).find(entry => entry.childNodeId === node.id);
@@ -89,21 +86,21 @@ export default class NodeStore {
       } else if (node.metaname === 'Reference') {
         node.eval = () => this.getFromId(node.targetNodeId).eval();
       } else if (node.metaname === 'Function') {
-        const metafun = this.rootStore.metafunStore.getFromName(node.metafunName);
+        const metafun = this.root.metafunStore.getFromName(node.metafunName) as any;
         node.eval = () => metafun.eval(...this.getChildren(node));
       }
     }
   }
 
   addNumber(value) {
-    const answer = this.addNode('Number');
+    const answer = this.addNode('Number') as any;
     answer.value = value;
     answer.eval = () => answer.value;
     return answer;
   }
 
   addVariable() {
-    const answer = this.addNode('Variable');
+    const answer = this.addNode('Variable') as any;
     const child = this.addNumber(0);
     this.putChild(answer, 0, child);
     answer.eval = () => this.getChild(answer, 0).eval();
@@ -111,14 +108,14 @@ export default class NodeStore {
   }
 
   addReference(targetNode) {
-    const answer = this.addNode('Reference');
+    const answer = this.addNode('Reference') as any;
     answer.targetNodeId = targetNode.id;
     answer.eval = () => this.getFromId(answer.targetNodeId).eval();
     return answer;
   }
 
   addFun(metafun) {
-    const answer = this.addNode('Function');
+    const answer = this.addNode('Function') as any;
     for (let i = 0; i < metafun.paramCount; i++) {
       this.putChild(answer, i, this.addNumber(0));
     }

@@ -1,23 +1,18 @@
 import wu from "wu";
-import { RootStore } from './Root';
+import { Root } from './Root';
 import Functions from '../code/Functions';
 
 export default class Pen {
-  /**
-   * @param {RootStore} rootStore 
-   */
-  constructor(rootStore) {
-    this.rootStore = rootStore;
-    
-    this.replacementSuggestions = [];
-    this.pointedNode = null;
-    this.query = '';
-    
-    this.isQuerying = false;
-  }
+  replacementSuggestions = [] as Array<any>;
+  pointedNode = null;
+  query = '';
+
+  isQuerying = false;
+
+  constructor(private root: Root) {}
 
   get nodeStore() {
-    return this.rootStore.nodeStore;
+    return this.root.nodeStore;
   }
 
   // --- GETS ---
@@ -80,9 +75,9 @@ export default class Pen {
 
     // --- attributes ---
 
-    const pointedAttribute = this.rootStore.attributeStore.getAttributeForNode(this.pointedNode);
-    const organism = this.rootStore.attributeStore.getOrganismForAttribute(pointedAttribute);
-    const attributes = this.rootStore.attributeStore.getAttributesForOrganism(organism);
+    const pointedAttribute = this.root.attributeStore.getAttributeForNode(this.pointedNode);
+    const organism = this.root.attributeStore.getOrganismForAttribute(pointedAttribute);
+    const attributes = this.root.attributeStore.getAttributesForOrganism(organism);
 
     for (const attribute of attributes) {
       console.assert(attribute);
@@ -92,7 +87,7 @@ export default class Pen {
           (query === '' || isSubsequence);
       if (!ok) continue;
 
-      const rootNode = this.rootStore.attributeStore.getRootNode(attribute);
+      const rootNode = this.root.attributeStore.getRootNode(attribute);
       this.replacementSuggestions.push({
         text: attribute.name,
         addNodeFunction: () => this.nodeStore.addReference(rootNode),
@@ -101,7 +96,7 @@ export default class Pen {
 
     // --- functions ---
 
-    for (const fun of this.rootStore.metafunStore.getFuns()) {
+    for (const fun of this.root.metafunStore.getFuns()) {
       const isSubsequence = Functions.isSubsequence(query.toLowerCase(), fun.name.toLowerCase());
       const ok = query === '' || isSubsequence;
       if (!ok) continue;
@@ -115,7 +110,7 @@ export default class Pen {
 
   commitSuggestion(suggestion) {
     const { parentNode, childIndex } = this.nodeStore.getParentRelationship(this.pointedNode);
-    console.assert(parentNode);
+    console.assert(parentNode !== undefined);
     console.assert(childIndex !== undefined);
 
     const child = suggestion.addNodeFunction();
@@ -128,13 +123,13 @@ export default class Pen {
   moveCursorLeft() {
     if (this.getPointedNode() === null) return;
     
-    const nodeStore = this.rootStore.nodeStore;
+    const nodeStore = this.root.nodeStore;
     const traverse = Functions.traverseLeft(
         this.getPointedNode(),
         node => this.nodeStore.getParent(node, false),
         node => nodeStore.getChildren(node));
     const node = traverse.next().value;
-    if (node && !this.rootStore.attributeStore.isRootNode(node)) {
+    if (node && !this.root.attributeStore.isRootNode(node)) {
       this.setPointedNode(node);
     }
   }
@@ -142,46 +137,46 @@ export default class Pen {
   moveCursorRight() {
     if (this.getPointedNode() === null) return;
 
-    const nodeStore = this.rootStore.nodeStore;
+    const nodeStore = this.root.nodeStore;
     const traverse = Functions.traverseRight(
         this.getPointedNode(),
         node => this.nodeStore.getParent(node, false),
         node => nodeStore.getChildren(node));
     const node = traverse.next().value;
-    if (node && !this.rootStore.attributeStore.isRootNode(node)) {
+    if (node && !this.root.attributeStore.isRootNode(node)) {
       this.setPointedNode(node);
     }
   }
 
   moveCursorUp() {
     if (this.pointedNode === null) {
-      const organism = this.rootStore.organismStore.getOrganisms()[0];
-      const attr = this.rootStore.attributeStore.getEditables(organism).next().value;
-      const rootNode = this.rootStore.attributeStore.getRootNode(attr);
+      const organism = this.root.organismStore.getOrganisms()[0];
+      const attr = this.root.attributeStore.getEditables(organism).next().value;
+      const rootNode = this.root.attributeStore.getRootNode(attr);
       this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
     } else {
-      const attribute = this.rootStore.attributeStore.getAttributeForNode(this.getPointedNode());
-      const organism = this.rootStore.attributeStore.getOrganismForAttribute(attribute);
-      const attributes = Array.from(this.rootStore.attributeStore.getEditables(organism));
+      const attribute = this.root.attributeStore.getAttributeForNode(this.getPointedNode());
+      const organism = this.root.attributeStore.getOrganismForAttribute(attribute);
+      const attributes = Array.from(this.root.attributeStore.getEditables(organism));
       attributes.reverse();
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
-      const node = this.nodeStore.getChild(this.rootStore.attributeStore.getRootNode(nextAttribute), 0);
+      const node = this.nodeStore.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
       this.setPointedNode(node);
     }
   }
 
   moveCursorDown() {
     if (this.pointedNode === null) {
-      const organism = this.rootStore.organismStore.getOrganisms()[0];
-      const attr = this.rootStore.attributeStore.getEditables(organism).next().value;
-      const rootNode = this.rootStore.attributeStore.getRootNode(attr);
+      const organism = this.root.organismStore.getOrganisms()[0];
+      const attr = this.root.attributeStore.getEditables(organism).next().value;
+      const rootNode = this.root.attributeStore.getRootNode(attr);
       this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
     } else {
-      const attribute = this.rootStore.attributeStore.getAttributeForNode(this.getPointedNode());
-      const organism = this.rootStore.attributeStore.getOrganismForAttribute(attribute);
-      const attributes = this.rootStore.attributeStore.getEditables(organism);
+      const attribute = this.root.attributeStore.getAttributeForNode(this.getPointedNode());
+      const organism = this.root.attributeStore.getOrganismForAttribute(attribute);
+      const attributes = this.root.attributeStore.getEditables(organism);
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
-      const node = this.nodeStore.getChild(this.rootStore.attributeStore.getRootNode(nextAttribute), 0);
+      const node = this.nodeStore.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
       this.setPointedNode(node);
     }
   }

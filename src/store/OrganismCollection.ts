@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import wu from 'wu';
-import { RootStore } from './Root';
+import { Root } from './Root';
 
 function makeOrganism({ name }) {
   return {
@@ -12,13 +12,9 @@ function makeOrganism({ name }) {
 }
 
 export default class OrganismCollection {
-  /**
-   * @param {RootStore} root 
-   */
-  constructor(root) {
-    this.root = root;
-    this.organisms = [];
-  }
+  organisms = [] as Array<any>;
+
+  constructor(private root: Root) {}
 
   // --- GETS ---
 

@@ -8,20 +8,18 @@ import MetaorganismCollection from './MetaorganismCollection';
 import Time from "./Time";
 import { DateTime } from 'luxon';
 
-export class RootStore {
-  constructor() {
-    // CHECK -- does your store need to be serialized? Consider testing it later.
-    this.organismStore = new OrganismCollection(this);
-    this.organismCollection = this.organismStore;
-    this.metaorganismCollection = new MetaorganismCollection();
-    this.attributeStore = new AttributeStore(this);
-    this.nodeStore = new NodeStore(this);
-    this.metafunStore = new MetafunStore(this);
-    this.penStore = new PenStore(this);
-    this.time = new Time();
+export class Root {
 
-    this.windowSize = { width: 0, height: 0 };
-  }
+  // CHECK -- does your store need to be serialized? Consider testing it later.
+  organismStore = new OrganismCollection(this);
+  organismCollection = this.organismStore;
+  metaorganismCollection = new MetaorganismCollection(this);
+  attributeStore = new AttributeStore(this);
+  nodeStore = new NodeStore(this);
+  metafunStore = new MetafunStore(this);
+  penStore = new PenStore(this);
+  time = new Time(this);
+  windowSize = { width: 0, height: 0 };
 
   // --- GETS ---
 
@@ -37,14 +35,14 @@ export class RootStore {
 
   // --- ACTIONS ---
 
-  setWindowSize(width, height) {
+  setWindowSize(width: number, height: number) {
     this.windowSize = { width, height };
   }
 
-  * computeRenderCommands() {
+  * computeRenderCommands(): Iterable<any> {
     this.time.setFrameTime(DateTime.utc());
     const universeDurationMillis = this.time.getElapsedUniverseTime().as('milliseconds');
-    const time01 = universeDurationMillis / this.time.getUniverseLifespan();
+    const time01 = universeDurationMillis / this.time.getUniverseLifespan().as('milliseconds');
 
     for (const organism of this.organismStore.getOrganisms()) {
       const timeRoot = this.attributeStore.getRootNodeFromName(organism, 'time');
@@ -80,7 +78,6 @@ export class RootStore {
     this.organismStore.deserialize(root.organismStore);
     this.attributeStore.deserialize(root.attributeStore);
     this.nodeStore.deserialize(root.nodeStore);
-    this.metafunStore.deserialize(root.metafunStore);
     this.penStore.deserialize(root.penStore);
   }
 
@@ -102,4 +99,4 @@ export class RootStore {
   }
 }
 
-export default new RootStore();
+export default new Root();

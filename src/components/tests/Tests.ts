@@ -1,6 +1,6 @@
 import * as chai from 'chai'
 import Functions from '../../code/Functions';
-import { RootStore }  from '../../store/Root';
+import { Root }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
@@ -58,7 +58,7 @@ TestRunner.clearStore();
 
 describe('HelloWorld.vue', () => {
   it('organism', () => {
-    const root = new RootStore();
+    const root = new Root();
     const organismStore = root.organismStore;
     const circle = organismStore.put('circle');
     const circle2 = organismStore.getFromName('circle');
@@ -66,7 +66,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('attribute', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const circle = organismStore.put('circle');
@@ -74,7 +74,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('nested add', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -106,7 +106,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('reassign variable', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -158,7 +158,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('computeRenderCommands', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -189,7 +189,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('getReplacementSuggestions', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -365,7 +365,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('assign number', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -388,7 +388,7 @@ describe('HelloWorld.vue', () => {
     // x = add(2, add(5, 3))
     // y = x
 
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;
@@ -462,7 +462,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('getAttributesForOrganism', () => {
-    const root = new RootStore();
+    const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
     const nodeStore = root.nodeStore;

@@ -16,7 +16,7 @@ export class AssertionError { }
 // Store
 
 const makeStore = () => ({
-  tests: [],
+  tests: [] as Array<any>,
 });
 
 const store = makeStore();

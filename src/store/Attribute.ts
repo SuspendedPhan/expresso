@@ -1,6 +1,6 @@
 import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
-import { RootStore } from './Root';
+import { Root } from './Root';
 import Functions from '../code/Functions';
 
 const makeAttribute = (name, attributeType) => ({
@@ -14,19 +14,15 @@ const makeAttribute = (name, attributeType) => ({
  * @param {RootStore} rootStore
  */
 export default class AttributeStore {
-  /**
-   * @param {RootStore} rootStore 
-   */
-  constructor(rootStore) {
-    this.rootStore = rootStore;
-    this.attributes = [];
-    
-    /** { childAttributeId, parentOrganismId } */
-    this.attributeParents = [];
+  attributes = [] as Array<any>;
 
-    /** { attributeId, rootNodeId } */
-    this.rootNodes = [];
-  }
+  /** { childAttributeId, parentOrganismId } */
+  attributeParents = [] as Array<any>;
+
+  /** { attributeId, rootNodeId } */
+  rootNodes = [] as Array<any>;
+
+  constructor(private rootStore: Root) {}
 
   get nodeStore() {
     return this.rootStore.nodeStore;
@@ -48,7 +44,7 @@ export default class AttributeStore {
     return answer;
   }
 
-  getRootNode(attribute) {
+  getRootNode(attribute): any {
     const row = wu(this.rootNodes).find(row => row.attributeId === attribute.id);
     console.assert(row, 'has root node');
     
@@ -78,7 +74,7 @@ export default class AttributeStore {
     return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Editable');
   }
 
-  getRootNodeFromName(organism, attributeName, shouldAssert) {
+  getRootNodeFromName(organism, attributeName, shouldAssert=true) {
     const attribute = this.getAttributeFromName(organism, attributeName);
     if (attribute === undefined) {
       if (shouldAssert ?? true) {
@@ -116,7 +112,7 @@ export default class AttributeStore {
     const row = wu(this.attributeParents).find(row => row.childAttributeId === attribute.id);
     console.assert(row);
     const organism = this.rootStore.organismStore.getOrganismFromId(row.parentOrganismId);
-    console.assert(organism);
+    console.assert(organism !== undefined);
     return organism;
   }
 

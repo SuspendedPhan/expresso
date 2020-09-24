@@ -8,8 +8,8 @@
 </template>
 
 <script>
-import * as TestRunner from './TestRunner.js';
-import { Store } from './TestRunner.js';
+import * as TestRunner from './TestRunner';
+import { Store } from './TestRunner';
 import './Tests';
 
 export default {

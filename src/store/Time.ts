@@ -1,15 +1,13 @@
 import wu from 'wu';
 import { DateTime, Duration } from 'luxon';
+import { Root } from './Root';
 
 export default class Time {
-  /**
-  * @param {RootStore} root 
-  */
-  constructor(root) {
-    this.root = root;
-    this.frameTime = DateTime.utc();
-    this.universeLifespan = Duration.fromMillis(1000);
-  }
+
+  frameTime = DateTime.utc();
+  universeLifespan = Duration.fromMillis(1000);
+
+  constructor(private root: Root) {}
 
   getElapsedUniverseTime() {
     const millis = this.frameTime.toMillis() % this.universeLifespan.as('millisecond');

@@ -79,7 +79,7 @@ export default class Functions {
   static * traversePreOrder(node, childrenGetter) {
     yield node;
     for (const child of childrenGetter(node)) {
-      yield * Functions.traversePreOrder(child);
+      yield * Functions.traversePreOrder(child, childrenGetter);
     }
   }
 
