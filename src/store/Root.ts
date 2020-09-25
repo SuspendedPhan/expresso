@@ -17,10 +17,12 @@ export enum RenderShape {
 export class Root {
 
   // CHECK -- does your store need to be serialized? Consider testing it later.
+  /** @deprecated */
   organismStore = new OrganismCollection(this);
   organismCollection = this.organismStore;
   metaorganismCollection = new MetaorganismCollection(this);
   attributeCollection = new AttributeCollection(this);
+  /** @deprecated */
   attributeStore = this.attributeCollection;
   nodeStore = new NodeStore(this);
   metafunStore = new MetafunStore(this);

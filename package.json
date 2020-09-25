@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"
   },
   "dependencies": {
     "core-js": "^3.6.5",

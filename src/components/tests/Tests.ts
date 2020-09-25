@@ -4,6 +4,7 @@ import { Root }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
+import threelevels from './data/threelevels.json';
 
 function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
@@ -477,5 +478,14 @@ describe('HelloWorld.vue', () => {
     const actual = Array.from(attributeStore.getAttributesForOrganism(circle));
     const expected = [x, y, cloneNumber];
     expect(actual).to.deep.equal(expected);
+  })
+  
+  it('organs', () => {
+    const root = new Root();
+    const attributeCollection = root.attributeCollection;
+    const organismCollection = root.organismCollection;
+
+    // nice, got this data now. gotta transform it to stores and back.
+    // threelevels.root.editableAttributes.
   })
 })
