@@ -75,23 +75,25 @@ export default class Pen {
 
     // --- attributes ---
 
-    const pointedAttribute = this.root.attributeStore.getAttributeForNode(this.pointedNode);
-    const organism = this.root.attributeStore.getOrganismForAttribute(pointedAttribute);
-    const attributes = this.root.attributeStore.getAttributesForOrganism(organism);
-
-    for (const attribute of attributes) {
-      console.assert(attribute);
-      const isSubsequence = Functions.isSubsequence(query.toLowerCase(), attribute.name.toLowerCase());
-      const ok = 
+    const pointedAttribute = this.root.attributeCollection.getAttributeForNode(this.pointedNode);
+    const pointedOrganism = this.root.attributeCollection.getOrganismForAttribute(pointedAttribute);
+    
+    const ancestors = this.root.organismCollection.getAncestors(pointedOrganism);
+    for (const organism of wu.chain([pointedOrganism], ancestors)) {
+      const attributes = this.root.attributeCollection.getAttributesForOrganism(organism);
+      for (const attribute of attributes) {
+        const isSubsequence = Functions.isSubsequence(query.toLowerCase(), attribute.name.toLowerCase());
+        const ok =
           attribute !== pointedAttribute &&
           (query === '' || isSubsequence);
-      if (!ok) continue;
+        if (!ok) continue;
 
-      const rootNode = this.root.attributeStore.getRootNode(attribute);
-      this.replacementSuggestions.push({
-        text: attribute.name,
-        addNodeFunction: () => this.nodeStore.addReference(rootNode),
-      });
+        const rootNode = this.root.attributeCollection.getRootNode(attribute);
+        this.replacementSuggestions.push({
+          text: attribute.name,
+          addNodeFunction: () => this.nodeStore.addReference(rootNode),
+        });
+      }
     }
 
     // --- functions ---

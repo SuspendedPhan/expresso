@@ -2,7 +2,7 @@
   <div class='home'>
     <Expressor class='expressor' v-if='showExpressor' />
     <Viewport :class='["viewport", { fullWidth: !showExpressor }]' />
-    <TestRunner v-if='true' class='runner'/>
+    <TestRunner v-if='false' class='runner'/>
     <button class='flick' @click='showExpressor = !showExpressor'>Flick</button>
   </div>
 </template>

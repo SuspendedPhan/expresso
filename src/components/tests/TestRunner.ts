@@ -29,8 +29,14 @@ export function clearStore() {
 }
 
 export function runTests() {
+  const okTests = [
+    // 'pen organs',
+    // 'getReplacementSuggestions',
+  ] as any[];
   for (const test of store.tests) {
-    if (test.name !== 'organs') continue;
+    const ok = okTests.length === 0 || wu(okTests).has(test.name);
+    if (!ok) continue;
+
     try {
       test.testFn();
       test.status = Status.Passed;

@@ -209,7 +209,8 @@ describe('HelloWorld.vue', () => {
       },
     ];
 
-    const circle = organismStore.put('circle');
+    root.organismCollection.rootOrganism = organismStore.putFromMetaWithoutAttributes('root', root.metaorganismCollection.getFromName('SuperOrganism'));
+    const circle = organismStore.addChild(organismStore.getRoot(), organismStore.putSuperOrganismWithoutAttributes('circle'));
     const x = attributeStore.getRootNode(attributeStore.putEditable(circle, 'x'));
     const y = attributeStore.getRootNode(attributeStore.putEditable(circle, 'y'));
     const clones = attributeStore.getRootNode(attributeStore.putEditable(circle, 'clones'));
@@ -590,5 +591,52 @@ describe('HelloWorld.vue', () => {
     expect(actualRoot.attributeCollection.rootNodes.length).to.equal(4);
     expect(actualRoot.nodeStore.nodes.length).to.equal(8);
     expect(actualRoot.nodeStore.nodeParents.length).to.equal(4);
+  })
+  
+  it('pen organs', () => {
+    let final = {
+      'org root': {
+        'editattr gravity': { 'Variable': 0 },
+        'editattr clones': { 'Variable': 0 },
+        'emerattr cloneNumber': { 'Variable': 0 },
+        'org tree': {
+          'editattr growth': { 'Variable': 0 },
+          'editattr har': { 'Variable': 0 },
+        },
+        'org orbit': {
+          'editattr orbitSize': { 'Variable': 0 },
+          'org moon': {
+            'editattr luminosity': { 'Variable': 0 },
+          },
+          'org earth': {
+            'editattr life': { 'Variable': 0 },
+          },
+        },
+      },
+    };
+    const root = new Root().fromTree(final);
+    const attributeCollection = root.attributeCollection;
+    const organismCollection = root.organismCollection;
+    const nodeCollection = root.nodeStore;
+    const pen = root.penStore;
+    root.metafunStore.metafuns = [];
+
+    pen.setPointedNode(nodeCollection.getFromPath(['orbit', 'earth'], 'life', [0]));
+    pen.setIsQuerying(true);
+    pen.setQuery('');
+    let suggestions = pen.getReplacementSuggestions();
+    let actual = suggestions.pluck('text').toArray();
+    let expected = ['orbitSize', 'gravity', 'clones', 'cloneNumber'];
+    expect(actual).to.deep.equal(expected);
+
+    // --- don't get the orbit ones, still get my ones ---
+
+    pen.setPointedNode(nodeCollection.getFromPath(['tree'], 'growth', [0]));
+    pen.setIsQuerying(true);
+    pen.setQuery('');
+    suggestions = pen.getReplacementSuggestions();
+    actual = suggestions.pluck('text').toArray();
+    expected = ['har', 'gravity', 'clones', 'cloneNumber'];
+    expect(actual).to.deep.equal(expected);
   })
 })

@@ -97,9 +97,14 @@ export default class NodeStore {
     return tree;
   }
 
-  getFromPath(organismPath: string[], attributeName) {
+  getFromPath(organismPath: string[], attributeName, nodePath: number[] = []) {
     const organism = this.root.organismCollection.getOrganismFromPath(...organismPath);
-    return this.root.attributeCollection.getRootNodeFromName(organism, attributeName);
+    let node = this.root.attributeCollection.getRootNodeFromName(organism, attributeName);
+    for (const childIndex of nodePath) {
+      node = this.getChild(node, childIndex);
+    }
+    console.assert(node);
+    return node;
   }
 
   // --- ACTIONS ---

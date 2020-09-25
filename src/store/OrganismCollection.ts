@@ -17,8 +17,15 @@ interface OrganEntry {
   superorganismId: string;
 }
 
+export interface Organism {
+  id: string;
+  name: string;
+  storetype: 'Organism';
+  metaorganismId: string;
+}
+
 export default class OrganismCollection {
-  organisms = [] as Array<any>;
+  organisms = [] as Organism[];
   organs = [] as OrganEntry[];
   rootOrganism = null as any;
 
@@ -34,10 +41,10 @@ export default class OrganismCollection {
     return this.organisms;
   }
 
-  getOrganismFromId(organismId) {
+  getOrganismFromId(organismId): Organism {
     const organism = wu(this.organisms).find(row => row.id === organismId);
-    console.assert(organism);
-    return organism;
+    console.assert(organism as any);
+    return organism as any;
   }
 
   getSerialized() {
@@ -50,10 +57,32 @@ export default class OrganismCollection {
     let organism = this.rootOrganism;
     for (const organismName of path) {
       const children = this.getChildren(organism);
-      organism = children.find(t => t.name === organismName);
+      organism = children.find(t => t?.name === organismName);
       console.assert(organism);
     }
     return organism;
+  }
+
+  * getAncestors(organism) {
+    console.assert(organism);
+    while (true) {
+      organism = this.getSuper(organism);
+      if (organism === undefined) return;
+      yield organism;
+    }
+  }
+
+  getSuper(organism: Organism): Organism | undefined {
+    const superorganismId = this.organs.find(t => t.organId === organism.id)?.superorganismId;
+    if (!superorganismId) {
+      console.assert(organism === this.rootOrganism);
+      return undefined;
+    }
+    return this.getOrganismFromId(superorganismId);
+  }
+  
+  getRoot() {
+    return this.rootOrganism;
   }
 
   // --- ACTIONS ---
@@ -65,8 +94,8 @@ export default class OrganismCollection {
   /**
    * @deprecated
    */
-  put(name) {
-    const organism = makeOrganism({ name });
+  put(name): Organism {
+    const organism = makeOrganism({ name }) as any;
     this.organisms.push(organism);
     return organism;
   }
@@ -115,8 +144,11 @@ export default class OrganismCollection {
   }
 
   addChild(superorganism, organ) {
+    console.assert(organ);
+    console.assert(superorganism);
     this.organs = wu(this.organs).reject(t => t.organId === organ.id).toArray();
     this.organs.push({ superorganismId: superorganism.id, organId: organ.id });
+    return organ;
   }
 
   getChildren(superorganism) {
@@ -125,7 +157,7 @@ export default class OrganismCollection {
   }
 
   putFromMetaWithoutAttributes(name, metaorganism) {
-    const organism = makeOrganism({ name });
+    const organism = makeOrganism({ name }) as any;
     if (organism.name === undefined) {
       organism.name = organism.id;
     }
@@ -133,5 +165,11 @@ export default class OrganismCollection {
     this.organisms.push(organism);
     console.assert(organism !== undefined);
     return organism;
+  }
+
+  putSuperOrganismWithoutAttributes(name: string) {
+    const answer = this.putFromMetaWithoutAttributes(name, this.root.metaorganismCollection.getFromName('SuperOrganism'));
+    console.assert(answer);
+    return answer;
   }
 }
