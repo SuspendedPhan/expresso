@@ -525,10 +525,70 @@ describe('HelloWorld.vue', () => {
         },
       },
     };
+    
+    expect(new Root().fromTree(final).toTree()).to.deep.equal(final);
 
-    let fromTree = new Root().fromTree(final);
-    let toTree = fromTree.toTree();
-    console.log(toTree);
-    expect(toTree).to.deep.equal(final);
+    // --- add organ ---
+
+    let actualRoot = new Root().fromTree(start);
+    
+    let metaorganism = actualRoot.metaorganismCollection.getFromName('SuperOrganism');
+    let earth = actualRoot.organismCollection.putFromMetaWithoutAttributes('earth', metaorganism);
+    let orbit = actualRoot.organismCollection.getOrganismFromPath('orbit');
+    actualRoot.organismCollection.addChild(orbit, earth);
+    actualRoot.attributeCollection.putEditable(earth, 'life');
+    expect(actualRoot.toTree()).to.deep.equal(final);
+    expect(actualRoot.organismCollection.organisms.length).to.equal(5);
+    expect(actualRoot.organismCollection.organs.length).to.equal(4);
+    expect(actualRoot.attributeCollection.attributes.length).to.equal(7);
+    expect(actualRoot.attributeCollection.attributeParents.length).to.equal(7);
+    expect(actualRoot.attributeCollection.rootNodes.length).to.equal(7);
+    expect(actualRoot.nodeStore.nodes.length).to.equal(14);
+    expect(actualRoot.nodeStore.nodeParents.length).to.equal(7);
+
+    // --- remove organ ---
+
+    actualRoot.organismCollection.remove(earth);
+    expect(actualRoot.toTree()).to.deep.equal(start);
+    expect(actualRoot.organismCollection.organisms.length).to.equal(4);
+    expect(actualRoot.organismCollection.organs.length).to.equal(3);
+    expect(actualRoot.attributeCollection.attributes.length).to.equal(6);
+    expect(actualRoot.attributeCollection.attributeParents.length).to.equal(6);
+    expect(actualRoot.attributeCollection.rootNodes.length).to.equal(6);
+    expect(actualRoot.nodeStore.nodes.length).to.equal(12);
+    expect(actualRoot.nodeStore.nodeParents.length).to.equal(6);
+
+    // --- remove non leaf organ ---
+
+    let expected = {
+      'org root': {
+        'editattr gravity': { 'Variable': 0 },
+        'editattr clones': { 'Variable': 0 },
+        'emerattr cloneNumber': { 'Variable': 0 },
+        'org tree': {
+          'editattr growth': { 'Variable': 0 },
+        },
+      },
+    };
+
+    actualRoot = new Root().fromTree(final);
+    orbit = actualRoot.organismCollection.getOrganismFromPath('orbit');
+    let orbitRoot = actualRoot.nodeStore.getFromPath(['orbit'], 'orbitSize');
+    let add1 = actualRoot.nodeStore.putChild(orbitRoot, 0, actualRoot.nodeStore.addFun(actualRoot.metafunStore.getFromName('Add')));
+    let add2 = actualRoot.nodeStore.putChild(add1, 0, actualRoot.nodeStore.addFun(actualRoot.metafunStore.getFromName('Add')));
+
+    expect(actualRoot.nodeStore.nodes.length).to.equal(18);
+    expect(actualRoot.nodeStore.nodeParents.length).to.equal(11);
+    
+    actualRoot.organismCollection.remove(orbit);
+
+    expect(actualRoot.toTree()).to.deep.equal(expected);
+    expect(actualRoot.organismCollection.organisms.length).to.equal(2);
+    expect(actualRoot.organismCollection.organs.length).to.equal(1);
+    expect(actualRoot.attributeCollection.attributes.length).to.equal(4);
+    expect(actualRoot.attributeCollection.attributeParents.length).to.equal(4);
+    expect(actualRoot.attributeCollection.rootNodes.length).to.equal(4);
+    expect(actualRoot.nodeStore.nodes.length).to.equal(8);
+    expect(actualRoot.nodeStore.nodeParents.length).to.equal(4);
   })
 })

@@ -46,6 +46,16 @@ export default class OrganismCollection {
     };
   }
 
+  getOrganismFromPath(...path: string[]) {
+    let organism = this.rootOrganism;
+    for (const organismName of path) {
+      const children = this.getChildren(organism);
+      organism = children.find(t => t.name === organismName);
+      console.assert(organism);
+    }
+    return organism;
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
@@ -80,6 +90,15 @@ export default class OrganismCollection {
   }
 
   remove(organism) {
+    console.assert(organism !== this.rootOrganism);
+
+    for (const attribute of this.root.attributeCollection.getAttributesForOrganism(organism)) {
+      this.root.attributeCollection.remove(attribute);
+    }
+    for (const organ of this.getChildren(organism)) {
+      this.remove(organ);
+    }
+    this.organs = wu(this.organs).reject(t => t.organId === organism.id || t.superorganismId === organism.id).toArray();
     this.organisms = wu(this.organisms).reject(row => row === organism).toArray();
   }
 

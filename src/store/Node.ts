@@ -97,6 +97,11 @@ export default class NodeStore {
     return tree;
   }
 
+  getFromPath(organismPath: string[], attributeName) {
+    const organism = this.root.organismCollection.getOrganismFromPath(...organismPath);
+    return this.root.attributeCollection.getRootNodeFromName(organism, attributeName);
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
@@ -187,5 +192,13 @@ export default class NodeStore {
 
   commitReplacementSuggestion(suggestion) {
     suggestion.commitFunction();
+  }
+
+  remove(node) {
+    for (const child of this.getChildren(node)) {
+      this.remove(child);
+    }
+    this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === node.id || t.parentNodeId === node.id).toArray();
+    this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
   }
 }

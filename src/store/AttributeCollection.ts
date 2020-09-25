@@ -151,4 +151,13 @@ export default class AttributeCollection {
     this.rootNodes.push({ attributeId: answer.id, rootNodeId: rootNode.id });
     return answer;
   }
+
+  remove(attribute) {
+    const rootNode = this.getRootNode(attribute);
+    this.rootStore.nodeStore.remove(rootNode);
+    
+    this.attributes = wu(this.attributes).reject(t => t.id === attribute.id).toArray();
+    this.attributeParents = wu(this.attributeParents).reject(t => t.childAttributeId === attribute.id).toArray();
+    this.rootNodes = wu(this.rootNodes).reject(t => t.attributeId === attribute.id).toArray();
+  }
 };
