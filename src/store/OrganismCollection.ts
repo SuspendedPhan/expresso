@@ -172,4 +172,9 @@ export default class OrganismCollection {
     console.assert(answer);
     return answer;
   }
+
+  initRootOrganism() {
+    this.rootOrganism = this.putFromMetaname('The Void', 'SuperOrganism');
+    return this.rootOrganism;
+  }
 }

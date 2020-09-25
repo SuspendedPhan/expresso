@@ -1,7 +1,21 @@
 <template>
-  <div>
-    <Organism :organism='root.organismCollection.getRoot()' />
-     <button @click='clearStorage'>Clear storage</button>
+  <div v-if='organism' class='organism'>
+    <div>{{ organism.name }}</div>
+    <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+      <span>{{ attribute.name }}: </span>
+      <Node :astNode='getNodeForAttribute(attribute)' />
+    </div>
+    <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>
+    </Organism>
+    <div class='controls'>
+      <select v-model='selectedPrimitiveId'>
+        <option v-for='metaorganism in metaorganismCollection.getMetaorganisms()' :key='metaorganism.id' :value='metaorganism.id'>
+          {{ metaorganism.name }}
+        </option>
+      </select>
+      <button @click='spawn'>Spawn Organ</button>
+      <button @click='removeOrganism(organism)'>Remove Organism</button>
+    </div>
   </div>
 </template>
 
@@ -9,15 +23,14 @@
 import wu from 'wu';
 import Root from '../store/Root';
 import Node from './Node';
-import Organism from './Organism';
 
 export default {
-  name: 'Expressor',
+  name: 'Organism',
   components: {
-    // Node,
-    Organism,
+    Node,
   },
   props: {
+    organism: null,
   },
   data: function() {
     return {
@@ -35,7 +48,8 @@ export default {
     },
     spawn: function () {
       const metaorganism = this.metaorganismCollection.getFromId(this.selectedPrimitiveId);
-      this.root.organismCollection.putFromMeta(undefined, metaorganism);
+      const organ = this.root.organismCollection.putFromMeta(undefined, metaorganism);
+      this.root.organismCollection.addChild(this.organism, organ);
       this.root.save();
     },
     clearStorage: function() {
@@ -48,7 +62,6 @@ export default {
   },
   mounted() {
     Root.load();
-    Root.organismCollection.initRootOrganism();
     document.addEventListener('keydown', event => {
       if (event.key === 'ArrowUp' && !Root.penStore.getIsQuerying()) {
         Root.penStore.moveCursorUp();
@@ -75,8 +88,11 @@ export default {
 <style scoped>
 .organism {
   margin-bottom: 20px;
+  border: 1px solid black;
+  padding: 10px;
 }
 .attribute {
+
 }
 .controls {
   display: grid;
