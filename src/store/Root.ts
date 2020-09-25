@@ -7,6 +7,7 @@ import OrganismCollection from './OrganismCollection';
 import MetaorganismCollection from './MetaorganismCollection';
 import Time from "./Time";
 import { DateTime } from 'luxon';
+import AttributeCollection from './AttributeCollection';
 
 export enum RenderShape {
   Circle = 'Circle',
@@ -19,7 +20,8 @@ export class Root {
   organismStore = new OrganismCollection(this);
   organismCollection = this.organismStore;
   metaorganismCollection = new MetaorganismCollection(this);
-  attributeStore = new AttributeStore(this);
+  attributeCollection = new AttributeCollection(this);
+  attributeStore = this.attributeCollection;
   nodeStore = new NodeStore(this);
   metafunStore = new MetafunStore(this);
   penStore = new PenStore(this);
@@ -76,8 +78,6 @@ export class Root {
         for (const attribute of this.attributeStore.getEditables(organism)) {
           if (attribute.name === 'clones') continue;
           renderCommand[attribute.name] = this.attributeStore.getRootNode(attribute).eval();
-          console.log(attribute.name);
-          console.log(renderCommand[attribute.name]);
         }
         yield renderCommand;
       }
