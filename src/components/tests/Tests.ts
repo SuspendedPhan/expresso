@@ -6,6 +6,9 @@ import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
 import threelevels from './data/threelevels.json';
 
+// npm run md -- -o C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.json C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.md
+
+
 function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
     message: error.message,
@@ -484,6 +487,46 @@ describe('HelloWorld.vue', () => {
     const root = new Root();
     const attributeCollection = root.attributeCollection;
     const organismCollection = root.organismCollection;
+    let final = {
+      'org root': {
+        'editattr gravity': { 'var': 0 },
+        'editattr clones': { 'var': 0 },
+        'emerattr cloneNumber': null,
+        'org tree': {
+          'editattr growth': { 'var': 0 },
+        },
+        'org orbit': {
+          'editattr orbitSize': { 'var': 0 },
+          'org moon': {
+            'editattr luminosity': { 'var': 0 },
+          },
+          'org earth': {
+            'editattr life': { 'var': 0 },
+          },
+        },
+      },
+    };
+
+    let start = {
+      'org root': {
+        'editattr gravity': { 'var': 0 },
+        'editattr clones': { 'var': 0 },
+        'emerattr cloneNumber': null,
+        'org tree': {
+          'editattr growth': { 'var': 0 },
+        },
+        'org orbit': {
+          'editattr orbitSize': { 'var': 0 },
+          'org moon': {
+            'editattr luminosity': { 'var': 0 },
+          },
+        },
+      },
+    };
+
+    let fromTree = Root.fromTree(final);
+    let toTree = fromTree.toTree();
+    expect(toTree).to.deep.equal(final);
 
     // nice, got this data now. gotta transform it to stores and back.
     // threelevels.root.editableAttributes.

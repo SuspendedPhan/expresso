@@ -73,12 +73,27 @@ export default class NodeStore {
     return node;
   }
 
+  toTree(node) {
+    if (node.metaname === 'Number') {
+      return node.value;
+    } else if (node.metaname === 'Reference') {
+      const target = this.getTargetNodeForReference(node);
+      const attribute = this.root.attributeCollection.getAttributeForNode(target);
+      return `Reference ${attribute.name}`;
+    }
+
+    const tree = {};
+    for (const child of this.getChildren(node)) {
+      tree[child.metaname] = this.toTree(child);
+    }
+    return tree;
+  }
+
   // --- ACTIONS ---
 
   deserialize(store) {
     Object.assign(this, store);
     for (const node of this.nodes) {
-      if (node.id === "51707844-c7ce-4eff-abae-b02da7a2caba") console.log('hi');
       if (node.metaname === 'Number') {
         node.eval = () => node.value;
       } else if (node.metaname === 'Variable') {

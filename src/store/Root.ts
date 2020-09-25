@@ -12,6 +12,7 @@ import AttributeCollection from './AttributeCollection';
 export enum RenderShape {
   Circle = 'Circle',
   Rectangle = 'Rectangle',
+  None = 'None',
 }
 
 export class Root {
@@ -108,6 +109,67 @@ export class Root {
 
   clearStorage() {
     window.localStorage.clear();
+  }
+
+  toTree(
+    organism = undefined as any,
+  ) {
+    const tree = {};
+    if (!organism) {
+      organism = this.organismCollection.rootOrganism;
+    }
+    
+    for (const attribute of this.attributeCollection.getEditables(organism)) {
+      const rootNode = this.attributeCollection.getRootNode(attribute);
+      const key = `editattr ${attribute.name}`;
+      const value = this.nodeStore.toTree(rootNode);
+      tree[key] = value;
+    }
+    for (const attribute of this.attributeCollection.getEmergents(organism)) {
+      const rootNode = this.attributeCollection.getRootNode(attribute);
+      const key = `emerattr ${attribute.name}`;
+      const value = this.nodeStore.toTree(rootNode);
+      tree[key] = value;
+    }
+
+    for (const child of this.organismCollection.getChildren(organism)) {
+      const key = `org ${organism.name}`;
+      const value = this.toTree(child);
+      tree[key] = value;
+    }
+  }
+
+  static fromTree(
+        tree,
+        root = undefined as Root | undefined,
+        organism = undefined as any,
+        attribute = undefined as any,
+  ): Root {
+    if (root === undefined) {
+      root = new Root();
+    }
+    if (tree == null) {
+      return root;
+    }
+
+    for (const [key, value] of wu.entries(tree)) {
+      const splits = key.split(' ');
+      const type = splits[0];
+      if (type === 'org') {
+        const metaorganism = root.metaorganismCollection.getFromName('SuperOrganism');
+        const superorganism = organism;
+        organism = root.organismCollection.putFromMeta(splits[1], metaorganism);
+        if (superorganism) {
+          root.organismCollection.addChild(superorganism, organism);
+        }
+      } else if (type === 'editattr') {
+        root.attributeCollection.putEditable(organism, splits[1]);
+      } else if (type === 'emerattr') {
+        root.attributeCollection.putEmergent(organism, splits[1]);
+      }
+      this.fromTree(value, root, organism);
+    }
+    return root;
   }
 }
 

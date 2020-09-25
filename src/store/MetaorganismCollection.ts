@@ -52,6 +52,13 @@ export default class MetaorganismCollection {
         },
       ],
       renderShape: RenderShape.Rectangle,
+    },
+    {
+      id: 'a0ee011c-aaae-4c4c-9514-98fcf7da5996',
+      name: 'SuperOrganism',
+      attributes: [
+      ],
+      renderShape: RenderShape.None,
     }
   ];
   constructor(private root: Root) {}

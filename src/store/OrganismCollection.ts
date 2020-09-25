@@ -14,6 +14,7 @@ function makeOrganism({ name }) {
 
 export default class OrganismCollection {
   organisms = [] as Array<any>;
+  rootOrganism = this.putFromMetaname('root', 'SuperOrganism');
 
   constructor(private root: Root) {}
 
@@ -86,5 +87,10 @@ export default class OrganismCollection {
     const organism = this.putFromMeta(null, metacircle);
     organism.name = organism.id;
     return organism;
+  }
+
+  putFromMetaname(name, metaname: string) {
+    const metaorganism = this.root.metaorganismCollection.getFromName(metaname);
+    return this.putFromMeta(name, metaorganism);
   }
 }
