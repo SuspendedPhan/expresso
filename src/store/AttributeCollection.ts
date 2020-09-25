@@ -71,7 +71,7 @@ export default class AttributeCollection {
   }
 
   getEmergents(organism) {
-    return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Editable');
+    return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Emergent');
   }
 
   getRootNodeFromName(organism, attributeName, shouldAssert = true) {

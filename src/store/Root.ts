@@ -18,14 +18,18 @@ export enum RenderShape {
 export class Root {
 
   // CHECK -- does your store need to be serialized? Consider testing it later.
-  /** @deprecated */
-  organismStore = new OrganismCollection(this);
-  organismCollection = this.organismStore;
+  nodeStore = new NodeStore(this);
+
   metaorganismCollection = new MetaorganismCollection(this);
+  
   attributeCollection = new AttributeCollection(this);
   /** @deprecated */
   attributeStore = this.attributeCollection;
-  nodeStore = new NodeStore(this);
+
+  /** @deprecated */
+  organismStore = new OrganismCollection(this);
+
+  organismCollection = this.organismStore;
   metafunStore = new MetafunStore(this);
   penStore = new PenStore(this);
   time = new Time(this);
@@ -112,64 +116,62 @@ export class Root {
   }
 
   toTree(
+    subtree = {},
     organism = undefined as any,
   ) {
-    const tree = {};
     if (!organism) {
       organism = this.organismCollection.rootOrganism;
     }
+
+    const organTree = {};
+    subtree[`org ${organism.name}`] = organTree;
     
     for (const attribute of this.attributeCollection.getEditables(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
       const key = `editattr ${attribute.name}`;
-      const value = this.nodeStore.toTree(rootNode);
-      tree[key] = value;
+      const rootNodeTree = {};
+      organTree[key] = rootNodeTree;
+      rootNodeTree['Variable'] = this.nodeStore.toTree(rootNode);
     }
     for (const attribute of this.attributeCollection.getEmergents(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
       const key = `emerattr ${attribute.name}`;
-      const value = this.nodeStore.toTree(rootNode);
-      tree[key] = value;
+      const rootNodeTree = {};
+      organTree[key] = rootNodeTree;
+      rootNodeTree['Variable'] = this.nodeStore.toTree(rootNode);
     }
 
     for (const child of this.organismCollection.getChildren(organism)) {
-      const key = `org ${organism.name}`;
-      const value = this.toTree(child);
-      tree[key] = value;
+      this.toTree(organTree, child);
     }
+    return subtree;
   }
 
-  static fromTree(
-        tree,
-        root = undefined as Root | undefined,
-        organism = undefined as any,
-        attribute = undefined as any,
-  ): Root {
-    if (root === undefined) {
-      root = new Root();
-    }
-    if (tree == null) {
-      return root;
-    }
-
-    for (const [key, value] of wu.entries(tree)) {
+  fromTree(
+    subtree,
+    superorganism = undefined as any,
+  ) {
+    for (const [key, value] of wu.entries(subtree)) {
       const splits = key.split(' ');
       const type = splits[0];
       if (type === 'org') {
-        const metaorganism = root.metaorganismCollection.getFromName('SuperOrganism');
-        const superorganism = organism;
-        organism = root.organismCollection.putFromMeta(splits[1], metaorganism);
-        if (superorganism) {
-          root.organismCollection.addChild(superorganism, organism);
+        let organism;
+        const metaorganism = this.metaorganismCollection.getFromName('SuperOrganism');
+        if (!superorganism) {
+          this.organismCollection.rootOrganism = this.organismCollection.putFromMetaWithoutAttributes('root', metaorganism);
+          organism = this.organismCollection.rootOrganism;
+        } else {
+          organism = this.organismCollection.putFromMetaWithoutAttributes(splits[1], metaorganism);
+          this.organismCollection.addChild(superorganism, organism);
         }
+        this.fromTree(value, organism);
       } else if (type === 'editattr') {
-        root.attributeCollection.putEditable(organism, splits[1]);
+        this.attributeCollection.putEditable(superorganism, splits[1]);
       } else if (type === 'emerattr') {
-        root.attributeCollection.putEmergent(organism, splits[1]);
+        this.attributeCollection.putEmergent(superorganism, splits[1]);
       }
-      this.fromTree(value, root, organism);
     }
-    return root;
+    return this;
   }
 }
 

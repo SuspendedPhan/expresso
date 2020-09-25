@@ -82,8 +82,16 @@ export default class NodeStore {
       return `Reference ${attribute.name}`;
     }
 
+    const children = this.getChildren(node).toArray();
+    if (children.length === 1) {
+      const child = children[0];
+      if (child.metaname === 'Number' || child.metaname === 'Reference') {
+        return this.toTree(child);
+      }
+    }
+
     const tree = {};
-    for (const child of this.getChildren(node)) {
+    for (const child of children) {
       tree[child.metaname] = this.toTree(child);
     }
     return tree;

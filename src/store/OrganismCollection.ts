@@ -12,9 +12,15 @@ function makeOrganism({ name }) {
   };
 }
 
+interface OrganEntry {
+  organId: string;
+  superorganismId: string;
+}
+
 export default class OrganismCollection {
   organisms = [] as Array<any>;
-  rootOrganism = this.putFromMetaname('root', 'SuperOrganism');
+  organs = [] as OrganEntry[];
+  rootOrganism = null as any;
 
   constructor(private root: Root) {}
 
@@ -56,11 +62,7 @@ export default class OrganismCollection {
   }
 
   putFromMeta(name, metaorganism: MetaOrganism) {
-    const organism = makeOrganism({ name });
-    if (organism.name === undefined) {
-      organism.name = organism.id;
-    }
-    organism.metaorganismId = metaorganism.id;
+    const organism = this.putFromMetaWithoutAttributes(name, metaorganism);
     for (const metaattribute of metaorganism.attributes) {
       const attribute = this.root.attributeStore.putEditable(organism, metaattribute.name);
       if (metaattribute.default !== undefined) {
@@ -74,7 +76,6 @@ export default class OrganismCollection {
     this.root.attributeStore.putEmergent(organism, 'time');
     this.root.attributeStore.putEmergent(organism, 'window.width');
     this.root.attributeStore.putEmergent(organism, 'window.height');
-    this.organisms.push(organism);
     return organism;
   }
 
@@ -92,5 +93,26 @@ export default class OrganismCollection {
   putFromMetaname(name, metaname: string) {
     const metaorganism = this.root.metaorganismCollection.getFromName(metaname);
     return this.putFromMeta(name, metaorganism);
+  }
+
+  addChild(superorganism, organ) {
+    this.organs = wu(this.organs).reject(t => t.organId === organ.id).toArray();
+    this.organs.push({ superorganismId: superorganism.id, organId: organ.id });
+  }
+
+  getChildren(superorganism) {
+    const organEntries = wu(this.organs).filter(t => t.superorganismId === superorganism.id);
+    return organEntries.map(t => this.getOrganismFromId(t.organId));
+  }
+
+  putFromMetaWithoutAttributes(name, metaorganism) {
+    const organism = makeOrganism({ name });
+    if (organism.name === undefined) {
+      organism.name = organism.id;
+    }
+    organism.metaorganismId = metaorganism.id;
+    this.organisms.push(organism);
+    console.assert(organism !== undefined);
+    return organism;
   }
 }

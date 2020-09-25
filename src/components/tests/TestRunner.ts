@@ -30,6 +30,7 @@ export function clearStore() {
 
 export function runTests() {
   for (const test of store.tests) {
+    if (test.name !== 'organs') continue;
     try {
       test.testFn();
       test.status = Status.Passed;
