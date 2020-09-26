@@ -59,7 +59,14 @@ export default class MetaorganismCollection {
       attributes: [
       ],
       renderShape: RenderShape.None,
-    }
+    },
+    {
+      id: '72dd804d-a9d4-4a47-b6bd-7672f39bf255',
+      name: 'TheVoid',
+      attributes: [
+      ],
+      renderShape: RenderShape.None,
+    },
   ];
   constructor(private root: Root) {}
 

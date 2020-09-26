@@ -61,6 +61,7 @@ export default class Pen {
     this.replacementSuggestions = [];
 
     if (this.pointedNode === null) return;
+    if (!this.isQuerying) return;
    
     // --- number ---
 
@@ -90,7 +91,7 @@ export default class Pen {
 
         const rootNode = this.root.attributeCollection.getRootNode(attribute);
         this.replacementSuggestions.push({
-          text: attribute.name,
+          text: `${organism.name}.${attribute.name}`,
           addNodeFunction: () => this.nodeStore.addReference(rootNode),
         });
       }

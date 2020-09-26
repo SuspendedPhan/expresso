@@ -3,11 +3,12 @@ import AttributeStore from './Attribute';
 import MetafunStore from './Metafun';
 import PenStore from './Pen';
 import wu from 'wu';
-import OrganismCollection from './OrganismCollection';
+import OrganismCollection, { Organism } from './OrganismCollection';
 import MetaorganismCollection from './MetaorganismCollection';
 import Time from "./Time";
 import { DateTime } from 'luxon';
 import AttributeCollection from './AttributeCollection';
+import WordCollection from './WordCollection';
 
 export enum RenderShape {
   Circle = 'Circle',
@@ -18,6 +19,7 @@ export enum RenderShape {
 export class Root {
 
   // CHECK -- does your store need to be serialized? Consider testing it later.
+  wordCollection = new WordCollection();
   nodeStore = new NodeStore(this);
 
   metaorganismCollection = new MetaorganismCollection(this);
@@ -57,36 +59,53 @@ export class Root {
     this.time.setFrameTime(DateTime.utc());
     const universeDurationMillis = this.time.getElapsedUniverseTime().as('milliseconds');
     const time01 = universeDurationMillis / this.time.getUniverseLifespan().as('milliseconds');
-
-    for (const organism of this.organismStore.getOrganisms()) {
-      const timeRoot = this.attributeStore.getRootNodeFromName(organism, 'time');
-      let time01Root = this.attributeStore.getRootNodeFromName(organism, 'time01', false);
-      if (time01Root === undefined) {
-        time01Root = this.attributeStore.putEmergent(organism, 'time01');
-      }
-      const windowHeightRoot = this.attributeStore.getRootNodeFromName(organism, 'window.height');
-      const windowWidthRoot = this.attributeStore.getRootNodeFromName(organism, 'window.width');
+    const organism = this.organismCollection.getRoot();
+    
+    const timeRoot = this.attributeCollection.getRootNodeFromName(organism, 'time', false);
+    let time01Root = this.attributeCollection.getRootNodeFromName(organism, 'time01', false);
+    if (time01Root === undefined) {
+      time01Root = this.attributeCollection.putEmergent(organism, 'time01');
+    }
+    const windowHeightRoot = this.attributeCollection.getRootNodeFromName(organism, 'window.height',  false);
+    const windowWidthRoot = this.attributeCollection.getRootNodeFromName(organism, 'window.width', false);
+    
+    if (timeRoot) {
       this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(universeDurationMillis));
-      this.nodeStore.putChild(time01Root, 0, this.nodeStore.addNumber(time01));
-      this.nodeStore.putChild(windowWidthRoot, 0, this.nodeStore.addNumber(this.windowSize.width));
+    }
+    if (windowHeightRoot) {
       this.nodeStore.putChild(windowHeightRoot, 0, this.nodeStore.addNumber(this.windowSize.height));
+    }
+    if (windowWidthRoot) {
+      this.nodeStore.putChild(windowWidthRoot, 0, this.nodeStore.addNumber(this.windowSize.width));
+    }
+    this.nodeStore.putChild(time01Root, 0, this.nodeStore.addNumber(time01));
+    yield * this.computeRenderCommandsForOrganism(organism);
+  }
 
-      const clonesRoot = this.attributeStore.getRootNodeFromName(organism, 'clones');
-      const clones = clonesRoot.eval();
+  private * computeRenderCommandsForOrganism(organism): Iterable<any> {
+    const clonesRoot = this.attributeCollection.getRootNodeFromName(organism, 'clones', false);
+    const clones = clonesRoot?.eval() ?? 1;
 
-      const metaorganism = this.metaorganismCollection.getFromId(organism.metaorganismId) as any;
+    const metaorganism = this.metaorganismCollection.getFromId(organism.metaorganismId) as any;
 
-      for (const cloneNumber of wu.count().take(clones)) {
-        const cloneNumberRoot = this.attributeStore.getRootNodeFromName(organism, 'cloneNumber');
+    for (const cloneNumber of wu.count().take(clones)) {
+      if (clonesRoot) {
+        const cloneNumberRoot = this.attributeCollection.getRootNodeFromName(organism, 'cloneNumber');
         this.nodeStore.putChild(cloneNumberRoot, 0, this.nodeStore.addNumber(cloneNumber));
-        
+      }
+
+      if (metaorganism.renderShape !== RenderShape.None) {
         const renderCommand = {} as any;
         renderCommand.shape = metaorganism.renderShape;
-        for (const attribute of this.attributeStore.getEditables(organism)) {
+        for (const attribute of this.attributeCollection.getEditables(organism)) {
           if (attribute.name === 'clones') continue;
-          renderCommand[attribute.name] = this.attributeStore.getRootNode(attribute).eval();
+          renderCommand[attribute.name] = this.attributeCollection.getRootNode(attribute).eval();
         }
         yield renderCommand;
+      }
+      
+      for (const organ of this.organismCollection.getChildren(organism)) {
+        yield * this.computeRenderCommandsForOrganism(organ);
       }
     }
   }
@@ -124,7 +143,8 @@ export class Root {
     }
 
     const organTree = {};
-    subtree[`org ${organism.name}`] = organTree;
+    const metaorganism = this.metaorganismCollection.getFromId(organism.metaorganismId);
+    subtree[`${metaorganism.name} ${organism.name}`] = organTree;
     
     for (const attribute of this.attributeCollection.getEditables(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
@@ -154,9 +174,13 @@ export class Root {
     for (const [key, value] of wu.entries(subtree)) {
       const splits = key.split(' ');
       const type = splits[0];
-      if (type === 'org') {
+      if (type === 'editattr') {
+        this.attributeCollection.putEditable(superorganism, splits[1]);
+      } else if (type === 'emerattr') {
+        this.attributeCollection.putEmergent(superorganism, splits[1]);
+      } else {
         let organism;
-        const metaorganism = this.metaorganismCollection.getFromName('SuperOrganism');
+        const metaorganism = this.metaorganismCollection.getFromName(type);
         if (!superorganism) {
           this.organismCollection.rootOrganism = this.organismCollection.putFromMetaWithoutAttributes('root', metaorganism);
           organism = this.organismCollection.rootOrganism;
@@ -165,10 +189,6 @@ export class Root {
           this.organismCollection.addChild(superorganism, organism);
         }
         this.fromTree(value, organism);
-      } else if (type === 'editattr') {
-        this.attributeCollection.putEditable(superorganism, splits[1]);
-      } else if (type === 'emerattr') {
-        this.attributeCollection.putEmergent(superorganism, splits[1]);
       }
     }
     return this;

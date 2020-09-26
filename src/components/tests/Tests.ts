@@ -1,6 +1,6 @@
 import * as chai from 'chai'
 import Functions from '../../code/Functions';
-import { Root }  from '../../store/Root';
+import { RenderShape, Root }  from '../../store/Root';
 import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
@@ -33,6 +33,13 @@ function expect(actual) {
         equal: function (expected) {
           try {
             chai.assert.deepStrictEqual(actual, expected);
+          } catch (error) {
+            logAndRethrow(error);
+          }
+        },
+        include: function(expected) {
+          try {
+            chai.assert.deepOwnInclude(actual, expected);
           } catch (error) {
             logAndRethrow(error);
           }
@@ -225,6 +232,7 @@ describe('HelloWorld.vue', () => {
 
     // --- number ---
 
+    penStore.setIsQuerying(true);
     penStore.setQuery('52');
     suggestions = penStore.getReplacementSuggestions();
 
@@ -239,9 +247,10 @@ describe('HelloWorld.vue', () => {
     // --- empty query ---
     // should list all, but skip x
 
+    penStore.setIsQuerying(true);
     penStore.setQuery('');
     suggestions = penStore.getReplacementSuggestions();
-    expected = ['y', 'clones', 'cloneNumber', 'Add'];
+    expected = ['circle.y', 'circle.clones', 'circle.cloneNumber', 'Add'];
     actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
     
@@ -253,9 +262,10 @@ describe('HelloWorld.vue', () => {
 
     // --- non empty query ---
 
+    penStore.setIsQuerying(true);
     penStore.setQuery('lon');
     suggestions = penStore.getReplacementSuggestions();
-    expected = ['clones', 'cloneNumber'];
+    expected = ['circle.clones', 'circle.cloneNumber'];
     actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
     
@@ -491,19 +501,19 @@ describe('HelloWorld.vue', () => {
     const attributeCollection = root.attributeCollection;
     const organismCollection = root.organismCollection;
     let final = {
-      'org root': {
+      'SuperOrganism root': {
         'editattr gravity': { 'Variable': 0 },
         'editattr clones': { 'Variable': 0 },
         'emerattr cloneNumber': { 'Variable': 0 },
-        'org tree': {
+        'SuperOrganism tree': {
           'editattr growth': { 'Variable': 0 },
         },
-        'org orbit': {
+        'SuperOrganism orbit': {
           'editattr orbitSize': { 'Variable': 0 },
-          'org moon': {
+          'SuperOrganism moon': {
             'editattr luminosity': { 'Variable': 0 },
           },
-          'org earth': {
+          'SuperOrganism earth': {
             'editattr life': { 'Variable': 0 },
           },
         },
@@ -511,16 +521,16 @@ describe('HelloWorld.vue', () => {
     };
 
     let start = {
-      'org root': {
+      'SuperOrganism root': {
         'editattr gravity': { 'Variable': 0 },
         'editattr clones': { 'Variable': 0 },
         'emerattr cloneNumber': { 'Variable': 0 },
-        'org tree': {
+        'SuperOrganism tree': {
           'editattr growth': { 'Variable': 0 },
         },
-        'org orbit': {
+        'SuperOrganism orbit': {
           'editattr orbitSize': { 'Variable': 0 },
-          'org moon': {
+          'SuperOrganism moon': {
             'editattr luminosity': { 'Variable': 0 },
           },
         },
@@ -562,11 +572,11 @@ describe('HelloWorld.vue', () => {
     // --- remove non leaf organ ---
 
     let expected = {
-      'org root': {
+      'SuperOrganism root': {
         'editattr gravity': { 'Variable': 0 },
         'editattr clones': { 'Variable': 0 },
         'emerattr cloneNumber': { 'Variable': 0 },
-        'org tree': {
+        'SuperOrganism tree': {
           'editattr growth': { 'Variable': 0 },
         },
       },
@@ -595,20 +605,20 @@ describe('HelloWorld.vue', () => {
   
   it('pen organs', () => {
     let final = {
-      'org root': {
+      'SuperOrganism root': {
         'editattr gravity': { 'Variable': 0 },
         'editattr clones': { 'Variable': 0 },
         'emerattr cloneNumber': { 'Variable': 0 },
-        'org tree': {
+        'SuperOrganism tree': {
           'editattr growth': { 'Variable': 0 },
           'editattr har': { 'Variable': 0 },
         },
-        'org orbit': {
+        'SuperOrganism orbit': {
           'editattr orbitSize': { 'Variable': 0 },
-          'org moon': {
+          'SuperOrganism moon': {
             'editattr luminosity': { 'Variable': 0 },
           },
-          'org earth': {
+          'SuperOrganism earth': {
             'editattr life': { 'Variable': 0 },
           },
         },
@@ -626,7 +636,7 @@ describe('HelloWorld.vue', () => {
     pen.setQuery('');
     let suggestions = pen.getReplacementSuggestions();
     let actual = suggestions.pluck('text').toArray();
-    let expected = ['orbitSize', 'gravity', 'clones', 'cloneNumber'];
+    let expected = ['orbit.orbitSize', 'root.gravity', 'root.clones', 'root.cloneNumber'];
     expect(actual).to.deep.equal(expected);
 
     // --- don't get the orbit ones, still get my ones ---
@@ -636,7 +646,62 @@ describe('HelloWorld.vue', () => {
     pen.setQuery('');
     suggestions = pen.getReplacementSuggestions();
     actual = suggestions.pluck('text').toArray();
-    expected = ['har', 'gravity', 'clones', 'cloneNumber'];
+    expected = ['tree.har', 'root.gravity', 'root.clones', 'root.cloneNumber'];
     expect(actual).to.deep.equal(expected);
+  })
+
+  it('organs compute', () => {
+    let final = {
+      'SuperOrganism root': {
+        'SuperOrganism grid1': {
+          'editattr clones': { 'Variable': 0 },
+          'editattr gridx': { 'Variable': 0 },
+          'emerattr cloneNumber': { 'Variable': 0 },
+          'SuperOrganism grid2': {
+            'editattr clones': { 'Variable': 0 },
+            'editattr gridy': { 'Variable': 0 },
+            'emerattr cloneNumber': { 'Variable': 0 },
+            'Rectangle square': {
+              'editattr x': { 'Variable': 0 },
+              'editattr y': { 'Variable': 0 },
+            },
+          },
+        },
+      },
+    };
+
+    const root = new Root().fromTree(final);
+    const attributeCollection = root.attributeCollection;
+    const organismCollection = root.organismCollection;
+    const nodeCollection = root.nodeStore;
+
+    organismCollection.initRootOrganism();
+    const x = nodeCollection.getFromPath(['grid1', 'grid2', 'square'], 'x');
+    const y = nodeCollection.getFromPath(['grid1', 'grid2', 'square'], 'y');
+    const gridx = nodeCollection.getFromPath(['grid1'], 'gridx');
+    const gridy = nodeCollection.getFromPath(['grid1', 'grid2'], 'gridy');
+    const grid1clones = nodeCollection.getFromPath(['grid1'], 'clones');
+    const grid2clones = nodeCollection.getFromPath(['grid1', 'grid2'], 'clones');
+    nodeCollection.putChild(x, 0, nodeCollection.addReference(gridx));
+    nodeCollection.putChild(y, 0, nodeCollection.addReference(gridy));
+    nodeCollection.putChild(grid1clones, 0, nodeCollection.addNumber(3));
+    nodeCollection.putChild(grid2clones, 0, nodeCollection.addNumber(3));
+    const actual = wu(root.computeRenderCommands()).toArray();
+    const expected = [
+      { shape: RenderShape.Rectangle, x: -1, y: -1 },
+      { shape: RenderShape.Rectangle, x: -1, y: 0 },
+      { shape: RenderShape.Rectangle, x: -1, y: 1 },
+      { shape: RenderShape.Rectangle, x: 0, y: -1 },
+      { shape: RenderShape.Rectangle, x: 0, y: 0 },
+      { shape: RenderShape.Rectangle, x: 0, y: 1 },
+      { shape: RenderShape.Rectangle, x: 1, y: -1 },
+      { shape: RenderShape.Rectangle, x: 1, y: 0 },
+      { shape: RenderShape.Rectangle, x: 1, y: 1 },
+    ];
+
+    expect(actual.length).to.equal(expected.length);
+    for (const at of actual) {
+      expect(expected).to.deep.include(at);
+    }
   })
 })

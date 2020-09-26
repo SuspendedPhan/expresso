@@ -45,7 +45,7 @@ export default {
   /* height: calc(100% - 40px);
   width: calc(100% - 40px); */
   overflow: hidden;
-  gap: 20px;
+  /* gap: 20px; */
   /* padding: 20px; */
 }
 .viewport {
@@ -55,10 +55,12 @@ export default {
   border-width: 1px; */
 }
 .expressor {
-  margin-top: 40px;
-  margin-left: 40px;
+  /* margin-top: 40px; */
+  /* margin-left: 40px; */
   /* border: 1px solid black; */
   padding: 20px;
+  overflow-x: auto;
+  overflow-y: scroll;
 }
 .flick {
   position: absolute;

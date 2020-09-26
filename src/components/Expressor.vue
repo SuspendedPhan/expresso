@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Organism :organism='root.organismCollection.getRoot()' />
+    <Organism :organism='root.organismCollection.getRoot()' :isRoot='true' />
      <button @click='clearStorage'>Clear storage</button>
   </div>
 </template>

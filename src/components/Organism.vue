@@ -1,12 +1,6 @@
 <template>
   <div v-if='organism' class='organism'>
     <div>{{ organism.name }}</div>
-    <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
-      <span>{{ attribute.name }}: </span>
-      <Node :astNode='getNodeForAttribute(attribute)' />
-    </div>
-    <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>
-    </Organism>
     <div class='controls'>
       <select v-model='selectedPrimitiveId'>
         <option v-for='metaorganism in metaorganismCollection.getMetaorganisms()' :key='metaorganism.id' :value='metaorganism.id'>
@@ -14,8 +8,16 @@
         </option>
       </select>
       <button @click='spawn'>Spawn Organ</button>
-      <button @click='removeOrganism(organism)'>Remove Organism</button>
+      <input placeholder='Attribute name' v-model='attributeName' />
+      <button @click='addAttribute'>Add Attribute</button>
+      <button @click='removeOrganism(organism)' v-if='!isRoot'>Remove Organism</button>
     </div>
+    <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+      <span>{{ attribute.name }}: </span>
+      <Node :astNode='getNodeForAttribute(attribute)' />
+    </div>
+    <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>
+    </Organism>
   </div>
 </template>
 
@@ -31,6 +33,7 @@ export default {
   },
   props: {
     organism: null,
+    isRoot: Boolean,
   },
   data: function() {
     return {
@@ -38,6 +41,7 @@ export default {
       attributeStore: Root.attributeStore,
       metaorganismCollection: Root.metaorganismCollection,
       selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
+      attributeName: '',
     };
   },
   computed: {
@@ -48,8 +52,13 @@ export default {
     },
     spawn: function () {
       const metaorganism = this.metaorganismCollection.getFromId(this.selectedPrimitiveId);
-      const organ = this.root.organismCollection.putFromMeta(undefined, metaorganism);
+      const organ = this.root.organismCollection.putFromMeta(this.root.wordCollection.getRandomWord(), metaorganism);
       this.root.organismCollection.addChild(this.organism, organ);
+      this.root.save();
+    },
+    addAttribute: function() {
+      const attributeName = this.attributeName === '' ? this.root.wordCollection.getRandomWord() : this.attributeName;
+      this.root.attributeCollection.putEditable(this.organism, attributeName);
       this.root.save();
     },
     clearStorage: function() {
@@ -61,26 +70,6 @@ export default {
     },
   },
   mounted() {
-    Root.load();
-    document.addEventListener('keydown', event => {
-      if (event.key === 'ArrowUp' && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorUp();
-      } else if (event.key === 'ArrowDown' && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorDown();
-      }
-
-      if (Root.penStore.getPointedNode() !== null) {
-        if (event.key === 'Enter') {
-          Root.penStore.setIsQuerying(true);
-        } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {
-          Root.penStore.moveCursorLeft();
-        } else if (event.key === 'ArrowRight' && !Root.penStore.getIsQuerying()) {
-          Root.penStore.moveCursorRight();
-        } else if (event.key === 'Escape' && Root.penStore.getIsQuerying()) {
-          Root.penStore.setIsQuerying(false);
-        }
-      }
-    });
   }
 }
 </script>
@@ -90,13 +79,15 @@ export default {
   margin-bottom: 20px;
   border: 1px solid black;
   padding: 10px;
+  border-radius: 2px;
+  margin: 10px;
 }
 .attribute {
 
 }
 .controls {
   display: grid;
-  grid-template-columns: max-content max-content max-content;
+  grid-template-columns: max-content max-content;
   gap: 10px;
 }
 </style>

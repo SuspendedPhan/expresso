@@ -71,7 +71,7 @@ export default class MetafunStore {
     {
       name: 'CloneNumber11',
       paramCount: 2,
-      eval: (cloneNumber, clones) => Math.abs(cloneNumber.eval() / (clones.eval() - 1) - .5) * 2,
+      eval: (cloneNumber, clones) => (cloneNumber.eval() / (clones.eval() - 1) - .5) * 2,
     },
     {
       name: 'CenterX',
@@ -86,7 +86,7 @@ export default class MetafunStore {
     {
       name: 'Time11',
       paramCount: 1,
-      eval: (time01) => Math.abs(time01.eval() - .5) * 2,
+      eval: (time01) => (time01.eval() - .5) * 2,
     },
     {
       name: 'X11',

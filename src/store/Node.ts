@@ -167,7 +167,9 @@ export default class NodeStore {
     return answer;
   }
 
-  putChild(parent, childIndex, child) {
+  putChild(parent, childIndex: number, child) {
+    console.assert(child);
+
     // check child doesn't already have parent
     if (wu(this.nodeParents)
         .find(row => row.childNodeId === child.id) !== undefined) {

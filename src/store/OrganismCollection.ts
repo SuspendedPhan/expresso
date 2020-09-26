@@ -50,6 +50,8 @@ export default class OrganismCollection {
   getSerialized() {
     return {
       organisms: this.organisms,
+      organs: this.organs,
+      rootOrganism: this.rootOrganism,
     };
   }
 
@@ -75,13 +77,13 @@ export default class OrganismCollection {
   getSuper(organism: Organism): Organism | undefined {
     const superorganismId = this.organs.find(t => t.organId === organism.id)?.superorganismId;
     if (!superorganismId) {
-      console.assert(organism === this.rootOrganism);
+      console.assert(organism.id === this.rootOrganism.id);
       return undefined;
     }
     return this.getOrganismFromId(superorganismId);
   }
   
-  getRoot() {
+  getRoot(): Organism {
     return this.rootOrganism;
   }
 
@@ -108,13 +110,13 @@ export default class OrganismCollection {
         this.root.attributeStore.assignNumber(attribute, metaattribute.default);
       }
     }
-    const clones = this.root.attributeStore.putEditable(organism, 'clones');
-    this.root.attributeStore.assignNumber(clones, 1);
 
-    this.root.attributeStore.putEmergent(organism, 'cloneNumber');
-    this.root.attributeStore.putEmergent(organism, 'time');
-    this.root.attributeStore.putEmergent(organism, 'window.width');
-    this.root.attributeStore.putEmergent(organism, 'window.height');
+    if (metaorganism.name !== 'TheVoid') {
+      const clones = this.root.attributeStore.putEditable(organism, 'clones');
+      this.root.attributeStore.putEmergent(organism, 'cloneNumber');
+      this.root.attributeStore.assignNumber(clones, 1);
+    }
+
     return organism;
   }
 
@@ -174,7 +176,13 @@ export default class OrganismCollection {
   }
 
   initRootOrganism() {
-    this.rootOrganism = this.putFromMetaname('The Void', 'SuperOrganism');
+    if (this.rootOrganism) return;
+    
+    this.rootOrganism = this.putFromMetaname('The Void', 'TheVoid');
+    this.root.attributeCollection.putEmergent(this.rootOrganism, 'time');
+    this.root.attributeCollection.putEmergent(this.rootOrganism, 'time01');
+    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.height');
+    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.width');
     return this.rootOrganism;
   }
 }

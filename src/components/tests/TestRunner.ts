@@ -32,6 +32,7 @@ export function runTests() {
   const okTests = [
     // 'pen organs',
     // 'getReplacementSuggestions',
+    // 'organs compute',
   ] as any[];
   for (const test of store.tests) {
     const ok = okTests.length === 0 || wu(okTests).has(test.name);
