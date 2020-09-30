@@ -202,7 +202,7 @@ describe('HelloWorld.vue', () => {
     expect(actual).to.deep.equal(expected);
   })
 
-  it('getReplacementSuggestions', () => {
+  it('getGhostEdits', () => {
     const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
@@ -235,14 +235,14 @@ describe('HelloWorld.vue', () => {
 
     penStore.setIsQuerying(true);
     penStore.setQuery('52');
-    suggestions = penStore.getReplacementSuggestions();
+    suggestions = penStore.getGhostEdits();
 
     expected = ['52'];
     actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
 
-    suggestions = penStore.getReplacementSuggestions();
-    penStore.commitSuggestion(suggestions.take(1).toArray()[0]);
+    suggestions = penStore.getGhostEdits();
+    penStore.commitGhostEdit(suggestions.take(1).toArray()[0]);
     expect(x.eval()).to.equal(52);
     
     // --- empty query ---
@@ -250,22 +250,22 @@ describe('HelloWorld.vue', () => {
 
     penStore.setIsQuerying(true);
     penStore.setQuery('');
-    suggestions = penStore.getReplacementSuggestions();
+    suggestions = penStore.getGhostEdits();
     expected = ['circle.y', 'circle.clones', 'circle.cloneNumber', 'Add'];
     actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
     
     // --- commit function ---
 
-    suggestions = penStore.getReplacementSuggestions();
-    penStore.commitSuggestion(suggestions.drop(3).toArray()[0]);
+    suggestions = penStore.getGhostEdits();
+    penStore.commitGhostEdit(suggestions.drop(3).toArray()[0]);
     expect(x.eval()).to.equal(0);
 
     // --- non empty query ---
 
     penStore.setIsQuerying(true);
     penStore.setQuery('lon');
-    suggestions = penStore.getReplacementSuggestions();
+    suggestions = penStore.getGhostEdits();
     expected = ['circle.clones', 'circle.cloneNumber'];
     actual = suggestions.map(row => row.text).toArray();
     expect(actual).to.deep.equal(expected);
@@ -274,9 +274,9 @@ describe('HelloWorld.vue', () => {
     // --- new pointed node ---
     // --- no more querying ---
     
-    suggestions = penStore.getReplacementSuggestions();
+    suggestions = penStore.getGhostEdits();
     const numberNode = nodeStore.putChild(clones, 0, nodeStore.addNumber(3));
-    penStore.commitSuggestion(suggestions.take(1).toArray()[0]);
+    penStore.commitGhostEdit(suggestions.take(1).toArray()[0]);
     expect(x.eval()).to.equal(3);
     // expect(penStore.pointedNode).to.equal(nodeStore.getChild(x, 0));
     expect(penStore.getIsQuerying()).to.equal(false);
@@ -635,8 +635,8 @@ describe('HelloWorld.vue', () => {
     pen.setPointedNode(nodeCollection.getFromPath(['orbit', 'earth'], 'life', [0]));
     pen.setIsQuerying(true);
     pen.setQuery('');
-    let suggestions = pen.getReplacementSuggestions();
-    let actual = suggestions.pluck('text').toArray();
+    let suggestions = pen.getGhostEdits();
+    let actual = wu(suggestions).pluck('text').toArray();
     let expected = ['orbit.orbitSize', 'root.gravity', 'root.clones', 'root.cloneNumber'];
     expect(actual).to.deep.equal(expected);
 
@@ -645,8 +645,8 @@ describe('HelloWorld.vue', () => {
     pen.setPointedNode(nodeCollection.getFromPath(['tree'], 'growth', [0]));
     pen.setIsQuerying(true);
     pen.setQuery('');
-    suggestions = pen.getReplacementSuggestions();
-    actual = suggestions.pluck('text').toArray();
+    suggestions = pen.getGhostEdits();
+    actual = wu(suggestions).pluck('text').toArray();
     expected = ['tree.har', 'root.gravity', 'root.clones', 'root.cloneNumber'];
     expect(actual).to.deep.equal(expected);
   })

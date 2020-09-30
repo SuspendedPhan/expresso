@@ -33,7 +33,7 @@ export default {
           Root.penStore.setIsQuerying(false);
         } else {
           const result = this.suggestions[0];
-          Root.penStore.commitSuggestion(result);
+          Root.penStore.commitGhostEdit(result);
           Root.save();
         }
         this.blur();
@@ -45,11 +45,11 @@ export default {
     },
     blur() {
       this.$emit('blur');
-    }
+    },
   },
   computed: {
     suggestions() {
-      return Array.from(Root.penStore.getReplacementSuggestions());
+      return Array.from(Root.penStore.getGhostEdits());
     },
     query: {
       get: function() {
@@ -58,7 +58,7 @@ export default {
       set: function(query) {
         Root.penStore.setQuery(query);
       }
-    }
+    },
   }
 }
 </script>

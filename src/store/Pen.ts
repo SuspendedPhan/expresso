@@ -21,7 +21,6 @@ export enum PenPositionRelation {
 }
 
 export default class Pen {
-  replacementSuggestions = [] as Array<any>;
   penPosition = { positionType: 'None' } as PenPosition;
   query = '';
   isQuerying = false;
@@ -34,8 +33,80 @@ export default class Pen {
 
   // --- GETS ---
 
-  getReplacementSuggestions() {
-    return wu(this.replacementSuggestions);
+  getGhostEdits() {
+    if (this.penPosition.positionType === "None") return [];
+
+    const answer = [] as any;
+    const query = this.query;
+
+    // --- number ---
+
+    const number = Number.parseFloat(this.query);
+    if (!Number.isNaN(number)) {
+      answer.push({
+        text: number.toString(),
+        addNodeFunction: () => this.nodeStore.addNumber(number),
+      });
+      return wu(answer);
+    }
+
+    // --- attributes ---
+
+    const pointedAttribute = this.root.attributeCollection.getAttributeForNode(
+      this.getPointedNode()
+    );
+    const pointedOrganism = this.root.attributeCollection.getOrganismForAttribute(
+      pointedAttribute
+    );
+
+    const ancestors = this.root.organismCollection.getAncestors(
+      pointedOrganism
+    );
+    for (const organism of wu.chain(
+      [pointedOrganism],
+      ancestors
+    )) {
+      const attributes = this.root.attributeCollection.getAttributesForOrganism(
+        organism
+      );
+      for (const attribute of attributes) {
+        const isSubsequence = Functions.isSubsequence(
+          query.toLowerCase(),
+          attribute.name.toLowerCase()
+        );
+        const ok =
+          attribute !== pointedAttribute &&
+          (query === "" || isSubsequence);
+        if (!ok) continue;
+
+        const rootNode = this.root.attributeCollection.getRootNode(
+          attribute
+        );
+        answer.push({
+          text: `${organism.name}.${attribute.name}`,
+          addNodeFunction: () =>
+            this.nodeStore.addReference(rootNode),
+        });
+      }
+    }
+
+    // --- functions ---
+
+    for (const fun of this.root.metafunStore.getFuns()) {
+      const isSubsequence = Functions.isSubsequence(
+        query.toLowerCase(),
+        fun.name.toLowerCase()
+      );
+      const ok = query === "" || isSubsequence;
+      if (!ok) continue;
+
+      answer.push({
+        text: fun.name,
+        addNodeFunction: () => this.nodeStore.addFun(fun),
+      });
+    }
+
+    return wu(answer);
   }
 
   getIsQuerying() {
@@ -71,7 +142,6 @@ export default class Pen {
   setIsQuerying(isQuerying) {
     this.isQuerying = isQuerying;
     if (!isQuerying) {
-      this.replacementSuggestions = [];
       this.setQuery('');
     }
   }
@@ -97,60 +167,9 @@ export default class Pen {
 
   setQuery(query) {
     this.query = query;
-    this.replacementSuggestions = [];
-
-    if (this.penPosition.positionType === 'None') return;
-    if (!this.isQuerying) return;
-   
-    // --- number ---
-
-    const number = Number.parseFloat(this.query);
-    if (!Number.isNaN(number)) {
-      this.replacementSuggestions.push({
-        text: number.toString(),
-        addNodeFunction: () => this.nodeStore.addNumber(number),
-      });
-      return;
-    }
-
-    // --- attributes ---
-
-    const pointedAttribute = this.root.attributeCollection.getAttributeForNode(this.getPointedNode());
-    const pointedOrganism = this.root.attributeCollection.getOrganismForAttribute(pointedAttribute);
-    
-    const ancestors = this.root.organismCollection.getAncestors(pointedOrganism);
-    for (const organism of wu.chain([pointedOrganism], ancestors)) {
-      const attributes = this.root.attributeCollection.getAttributesForOrganism(organism);
-      for (const attribute of attributes) {
-        const isSubsequence = Functions.isSubsequence(query.toLowerCase(), attribute.name.toLowerCase());
-        const ok =
-          attribute !== pointedAttribute &&
-          (query === '' || isSubsequence);
-        if (!ok) continue;
-
-        const rootNode = this.root.attributeCollection.getRootNode(attribute);
-        this.replacementSuggestions.push({
-          text: `${organism.name}.${attribute.name}`,
-          addNodeFunction: () => this.nodeStore.addReference(rootNode),
-        });
-      }
-    }
-
-    // --- functions ---
-
-    for (const fun of this.root.metafunStore.getFuns()) {
-      const isSubsequence = Functions.isSubsequence(query.toLowerCase(), fun.name.toLowerCase());
-      const ok = query === '' || isSubsequence;
-      if (!ok) continue;
-
-      this.replacementSuggestions.push({
-        text: fun.name,
-        addNodeFunction: () => this.nodeStore.addFun(fun),
-      });
-    }
   }
 
-  commitSuggestion(suggestion) {
+  commitGhostEdit(suggestion) {
     const { parentNode, childIndex } = this.nodeStore.getParentRelationship(this.getPointedNode());
     console.assert(parentNode !== undefined);
     console.assert(childIndex !== undefined);

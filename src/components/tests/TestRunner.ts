@@ -31,7 +31,7 @@ export function clearStore() {
 export function runTests() {
   const okTests = [
     // 'pen organs',
-    // 'getReplacementSuggestions',
+    // 'getGhostEdits',
     // 'organs compute',
     // 'pen test',
   ] as any[];
