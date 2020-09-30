@@ -823,4 +823,148 @@ describe('HelloWorld.vue', () => {
       relation: PenPositionRelation.Before,
     });
   });
+
+  it("insert node, replace node, from tree", () => {
+    let tree = {
+      '0 Function Add': {
+        '0 Number': 3,
+        '1 Function Multiply': {
+          '0 Number': 5,
+          '1 Number': 2,
+        }
+      }
+    };
+
+    const root = new Root();
+    const nodeCollection = root.nodeStore;
+   
+
+    {
+      const rootNode = nodeCollection.fromTree(tree);
+      expect(rootNode.eval()).to.equal(13);
+      const multiplyNode = nodeCollection.getChild(rootNode, 1);
+      const insertNode = nodeCollection.addFun(
+        root.metafunStore.getFromName("Divide")
+      );
+      nodeCollection.insertNodeAsParent(multiplyNode, insertNode);
+
+      let expected = {
+        "0 Function Add": {
+          "0 Number": 3,
+          "1 Function Divide": {
+            "0 Function Multiply": {
+              "0 Number": 5,
+              "1 Number": 2,
+            },
+            "1 Number": 0,
+          },
+        },
+      };
+
+      expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
+    }
+    
+
+    {
+      const rootNode = nodeCollection.fromTree(tree);
+      const multiplyNode = nodeCollection.getChild(rootNode, 1);
+      const replaceNode = nodeCollection.addFun(
+        root.metafunStore.getFromName("Divide")
+      );
+      nodeCollection.replaceNode(multiplyNode, replaceNode);
+
+      let expected = {
+      '0 Function Add': {
+        '0 Number': 3,
+        '1 Function Divide': {
+          '0 Number': 0,
+          '1 Number': 0,
+        }
+      }
+    };
+
+      expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
+    }
+  });
+
+  it("ghost edits", () => {
+    let tree = {
+      "SuperOrganism root": {
+        "editattr gravity": {
+          "0 Function Add": {
+            "0 Number": 3,
+            "1 Function Multiply": {
+              "0 Number": 5,
+              "1 Number": 2,
+            },
+          },
+        },
+      },
+    };
+
+    const root = new Root().fromTree(tree);
+    const pen = root.pen;
+    const nodeCollection = root.nodeCollection;
+    expect(root.toTree()).to.deep.equal(tree);
+
+    {
+      const rootNode = nodeCollection.getFromPath([], "gravity", []);
+      const addNode = nodeCollection.getFromPath([], 'gravity', [0]);
+      pen.setPenPosition({
+        positionType: 'Node',
+        referenceNodeId: addNode.id,
+        relation: PenPositionRelation.Before,
+      });
+      pen.setQuery('Lerp');
+      pen.setIsQuerying(true);
+      const ghostEdit = pen.getGhostEdits().next().value;
+      pen.commitGhostEdit(ghostEdit);
+      
+      const expected = {
+        "0 Variable": {
+          "0 Function Lerp": {
+            "0 Function Add": {
+              "0 Number": 3,
+              "1 Function Multiply": {
+                "0 Number": 5,
+                "1 Number": 2,
+              },
+            },
+            "1 Number": 0,
+            "2 Number": 0,
+          },
+        },
+      };
+      expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
+    }
+
+    {
+      root.fromTree(tree);
+      const rootNode = nodeCollection.getFromPath([], "gravity", []);
+      const addNode = nodeCollection.getFromPath([], "gravity", [0]);
+      pen.setPenPosition({
+        positionType: "Node",
+        referenceNodeId: addNode.id,
+        relation: PenPositionRelation.On,
+      });
+      pen.setQuery("Lerp");
+      pen.setIsQuerying(true);
+      const ghostEdit = pen.getGhostEdits().next().value;
+      pen.commitGhostEdit(ghostEdit);
+
+      const expected = {
+        "0 Variable": {
+          "0 Function Lerp": {
+            "0 Number": 3,
+            "1 Function Multiply": {
+              "0 Number": 5,
+              "1 Number": 2,
+            },
+            "2 Number": 0,
+          },
+        },
+      };
+      expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
+    }
+  })
 })

@@ -58,9 +58,12 @@ export default class NodeStore {
     return answer;
   }
 
-  getParentRelationship(childNode) {
+  getParentRelationship(childNode, shouldAssert = true) {
     const row = wu(this.nodeParents).find(row => row.childNodeId === childNode.id);
-    console.assert(row);
+    if (!row) {
+      if (shouldAssert) console.assert(row);
+      return null;
+    }
     return {
       parentNode: this.getFromId(row.parentNodeId),
       childIndex: row.childIndex,
@@ -207,5 +210,92 @@ export default class NodeStore {
     }
     this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === node.id || t.parentNodeId === node.id).toArray();
     this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
+  }
+
+  reparent({ child, parent, childIndex }) {
+    this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === child.id).toArray();
+    this.putChild(parent, childIndex, child);
+  }
+
+  insertNodeAsParent(subroot, node) {
+    const parentRelationship = this.getParentRelationship(subroot);
+    if (parentRelationship) {
+      const { childIndex, parentNode } = parentRelationship;
+      this.reparent({ child: subroot, parent: node, childIndex: 0 });
+      this.reparent({ child: node, parent: parentNode, childIndex: childIndex });
+    }
+  }
+
+  replaceNode(subroot, node) {
+    // memory leak here??
+    // what happens when you drop an argument?
+
+    for (const child of this.getChildren(subroot)) {
+      const { childIndex } = this.getParentRelationship(child) as any;
+      this.reparent({ child: child, parent: node, childIndex });
+    }
+
+    const parentRelationship = this.getParentRelationship(subroot);
+    if (parentRelationship) {
+      const { childIndex, parentNode } = parentRelationship;
+      this.putChild(parentNode, childIndex, node);
+    }
+  }
+
+  fromTree(subtree, parentNode = undefined): any {
+    let rootNode = null;
+
+    for (const [key, value] of wu.entries(subtree)) {
+      const parts = key.split(' ');
+      const [index, metaname] = parts;
+      if (metaname === 'Function') {
+        const funName = parts[2];
+
+        const node = this.addFun(this.root.metafunStore.getFromName(funName));
+        
+        if (parentNode) {
+          this.putChild(parentNode, Number.parseInt(index), node);
+        }
+        
+        if (!parentNode) {
+          rootNode = node;
+        }
+
+        this.fromTree(value, node);
+      } else if (metaname === 'Number') {
+
+        const node = this.addNumber(value);
+        if (parentNode) {
+          this.putChild(parentNode, Number.parseInt(index), node);
+        }
+      }
+    }
+
+    return rootNode;
+  }
+
+  toTree2(subrootNode, subtree = {}) {
+    const parentRelationship = this.getParentRelationship(subrootNode, false);
+    const childIndex = parentRelationship?.childIndex ?? 0;
+
+    if (subrootNode.metaname === 'Function') {
+      const childTree = {};
+      
+      subtree[`${childIndex} ${subrootNode.metaname} ${subrootNode.metafunName}`] = childTree;
+      for (const childNode of this.getChildren(subrootNode)) {
+        this.toTree2(childNode, childTree);
+      }
+    } else if (subrootNode.metaname === 'Number') {
+      subtree[`${childIndex} ${subrootNode.metaname}`] = subrootNode.value;
+    } else if (subrootNode.metaname === 'Variable') {
+      const childTree = {};
+      
+      subtree[`${childIndex} ${subrootNode.metaname}`] = childTree;
+      for (const childNode of this.getChildren(subrootNode)) {
+        this.toTree2(childNode, childTree);
+      }
+    }
+
+    return subtree;
   }
 }

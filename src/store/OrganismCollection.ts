@@ -130,7 +130,7 @@ export default class OrganismCollection {
       this.remove(organ);
     }
     this.organs = wu(this.organs).reject(t => t.organId === organism.id || t.superorganismId === organism.id).toArray();
-    this.organisms = wu(this.organisms).reject(row => row === organism).toArray();
+    this.organisms = wu(this.organisms).reject(t => t.id === organism.id).toArray();
   }
 
   spawn() {

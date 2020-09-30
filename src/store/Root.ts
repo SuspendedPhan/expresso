@@ -21,6 +21,7 @@ export class Root {
   // CHECK -- does your store need to be serialized? Consider testing it later.
   wordCollection = new WordCollection();
   nodeStore = new NodeStore(this);
+  nodeCollection = this.nodeStore;
 
   metaorganismCollection = new MetaorganismCollection(this);
   
@@ -149,17 +150,15 @@ export class Root {
     
     for (const attribute of this.attributeCollection.getEditables(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
+      const childRootNode = this.nodeStore.getChild(rootNode, 0);
       const key = `editattr ${attribute.name}`;
       const rootNodeTree = {};
       organTree[key] = rootNodeTree;
-      rootNodeTree['Variable'] = this.nodeStore.toTree(rootNode);
+      this.nodeStore.toTree2(childRootNode, rootNodeTree);
     }
     for (const attribute of this.attributeCollection.getEmergents(organism)) {
-      const rootNode = this.attributeCollection.getRootNode(attribute);
       const key = `emerattr ${attribute.name}`;
-      const rootNodeTree = {};
-      organTree[key] = rootNodeTree;
-      rootNodeTree['Variable'] = this.nodeStore.toTree(rootNode);
+      organTree[key] = {};
     }
 
     for (const child of this.organismCollection.getChildren(organism)) {
@@ -176,7 +175,9 @@ export class Root {
       const splits = key.split(' ');
       const type = splits[0];
       if (type === 'editattr') {
-        this.attributeCollection.putEditable(superorganism, splits[1]);
+        const attribute = this.attributeCollection.putEditable(superorganism, splits[1]);
+        const rootNode = this.attributeCollection.getRootNode(attribute);
+        this.nodeStore.fromTree(value, rootNode);
       } else if (type === 'emerattr') {
         this.attributeCollection.putEmergent(superorganism, splits[1]);
       } else {

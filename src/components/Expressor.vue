@@ -6,6 +6,7 @@
 </template>
 
 <script>
+import { PenPositionRelation } from '@/store/Pen';
 import wu from 'wu';
 import Root from '../store/Root';
 import Node from './Node';

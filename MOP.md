@@ -17,3 +17,6 @@
 - intrinsic
 - typescript
 - return iterables, not generators
+- node typings
+
+- memory leak in replace node?

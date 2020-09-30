@@ -27,14 +27,15 @@ export default class Pen {
 
   constructor(private root: Root) {}
 
-  get nodeStore() {
+  get nodeCollection() {
     return this.root.nodeStore;
   }
 
   // --- GETS ---
 
   getGhostEdits() {
-    if (this.penPosition.positionType === "None") return [];
+    if (this.penPosition.positionType === "None") return wu([]);
+    if (this.isQuerying === false) return wu([]);
 
     const answer = [] as any;
     const query = this.query;
@@ -45,7 +46,7 @@ export default class Pen {
     if (!Number.isNaN(number)) {
       answer.push({
         text: number.toString(),
-        addNodeFunction: () => this.nodeStore.addNumber(number),
+        addNodeFunction: () => this.nodeCollection.addNumber(number),
       });
       return wu(answer);
     }
@@ -85,7 +86,7 @@ export default class Pen {
         answer.push({
           text: `${organism.name}.${attribute.name}`,
           addNodeFunction: () =>
-            this.nodeStore.addReference(rootNode),
+            this.nodeCollection.addReference(rootNode),
         });
       }
     }
@@ -102,7 +103,7 @@ export default class Pen {
 
       answer.push({
         text: fun.name,
-        addNodeFunction: () => this.nodeStore.addFun(fun),
+        addNodeFunction: () => this.nodeCollection.addFun(fun),
       });
     }
 
@@ -162,23 +163,33 @@ export default class Pen {
   }
 
   setPenPosition(penPosition: PenPosition) {
-    this.penPosition = penPosition;
+    this.penPosition.positionType = penPosition.positionType;
+    this.penPosition.referenceNodeId = penPosition.referenceNodeId;
+    this.penPosition.relation = penPosition.relation;
   }
 
   setQuery(query) {
     this.query = query;
   }
 
-  commitGhostEdit(suggestion) {
-    const { parentNode, childIndex } = this.nodeStore.getParentRelationship(this.getPointedNode());
-    console.assert(parentNode !== undefined);
-    console.assert(childIndex !== undefined);
-
-    const child = suggestion.addNodeFunction();
-    this.nodeStore.putChild(parentNode, childIndex, child);
-
-    this.setPointedNode(child);
-    this.moveCursorRight();
+  commitGhostEdit(ghostEdit) {
+    if (this.penPosition.positionType === 'None') {
+      console.error('None ghost edit');
+    } else if (this.penPosition.positionType === 'Node') {
+      const node = ghostEdit.addNodeFunction();
+      const referenceNode = this.nodeCollection.getFromId(this.penPosition.referenceNodeId);
+      if (this.penPosition.relation === PenPositionRelation.On) {
+        this.nodeCollection.replaceNode(referenceNode, node);
+        this.setPointedNode(node);
+      } else if (this.penPosition.relation === PenPositionRelation.Before) {
+        this.nodeCollection.insertNodeAsParent(referenceNode, node);
+        this.setPointedNode(node);
+      } else {
+        console.error('unexpected');
+      }
+    } else {
+      console.error('unexpected');
+    }
   }
 
   moveCursorLeft() {
@@ -191,8 +202,8 @@ export default class Pen {
     } else if (this.penPosition.relation === PenPositionRelation.Before) {
       const nodeStore = this.root.nodeStore;
       const traverse = Functions.traverseLeft(
-        this.nodeStore.getFromId(this.penPosition.referenceNodeId),
-        (node) => this.nodeStore.getParent(node, false),
+        this.nodeCollection.getFromId(this.penPosition.referenceNodeId),
+        (node) => this.nodeCollection.getParent(node, false),
         (node) => nodeStore.getChildren(node)
       );
       const node = traverse.next().value;
@@ -215,7 +226,7 @@ export default class Pen {
       const nodeStore = this.root.nodeStore;
       const traverse = Functions.traverseRight(
         this.getPointedNode(),
-        (node) => this.nodeStore.getParent(node, false),
+        (node) => this.nodeCollection.getParent(node, false),
         (node) => nodeStore.getChildren(node)
       );
       const node = traverse.next().value;
@@ -234,14 +245,14 @@ export default class Pen {
       const organism = this.root.organismStore.getOrganisms()[0];
       const attr = this.root.attributeStore.getEditables(organism).next().value;
       const rootNode = this.root.attributeStore.getRootNode(attr);
-      this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
+      this.setPointedNode(this.nodeCollection.getChild(rootNode, 0));
     } else {
       const attribute = this.root.attributeStore.getAttributeForNode(this.getPointedNode());
       const organism = this.root.attributeStore.getOrganismForAttribute(attribute);
       const attributes = Array.from(this.root.attributeStore.getEditables(organism));
       attributes.reverse();
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
-      const node = this.nodeStore.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
+      const node = this.nodeCollection.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
       this.setPointedNode(node);
     }
   }
@@ -251,13 +262,13 @@ export default class Pen {
       const organism = this.root.organismStore.getOrganisms()[0];
       const attr = this.root.attributeStore.getEditables(organism).next().value;
       const rootNode = this.root.attributeStore.getRootNode(attr);
-      this.setPointedNode(this.nodeStore.getChild(rootNode, 0));
+      this.setPointedNode(this.nodeCollection.getChild(rootNode, 0));
     } else {
       const attribute = this.root.attributeStore.getAttributeForNode(this.getPointedNode());
       const organism = this.root.attributeStore.getOrganismForAttribute(attribute);
       const attributes = this.root.attributeStore.getEditables(organism);
       const nextAttribute = wu.cycle(attributes).dropWhile(attr => attr !== attribute).drop(1).next().value;
-      const node = this.nodeStore.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
+      const node = this.nodeCollection.getChild(this.root.attributeStore.getRootNode(nextAttribute), 0);
       this.setPointedNode(node);
     }
   }

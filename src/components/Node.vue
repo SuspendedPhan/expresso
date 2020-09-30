@@ -61,7 +61,9 @@ export default {
           Root.penStore.getPenPosition().relation === PenPositionRelation.After);
     },
     picking() {
-      return this.highlighted && Root.penStore.getIsQuerying();
+      return (
+          Root.pen.getPenPosition().referenceNodeId === this.astNode.id &&
+          Root.penStore.getIsQuerying());
     },
     astNodeChildren() {
       return Root.nodeStore.getChildren(this.astNode).toArray();
