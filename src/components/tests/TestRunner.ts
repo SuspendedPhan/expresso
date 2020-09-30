@@ -33,6 +33,7 @@ export function runTests() {
     // 'pen organs',
     // 'getReplacementSuggestions',
     // 'organs compute',
+    // 'pen test',
   ] as any[];
   for (const test of store.tests) {
     const ok = okTests.length === 0 || wu(okTests).has(test.name);

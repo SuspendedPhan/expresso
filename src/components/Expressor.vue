@@ -56,7 +56,7 @@ export default {
         Root.penStore.moveCursorDown();
       }
 
-      if (Root.penStore.getPointedNode() !== null) {
+      if (Root.penStore.getPenPosition().positionType === 'Node') {
         if (event.key === 'Enter') {
           Root.penStore.setIsQuerying(true);
         } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {

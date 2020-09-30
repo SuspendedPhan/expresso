@@ -1,5 +1,6 @@
 <template>
   <span class='node-root'>
+    <span v-if='isPenBeforeMe'>|</span>
     <span v-if='astNode.value != null' @click='click' :class='{ highlighted }'>{{ astNode.value }}</span>
     <span v-else-if='astNode.metaname === "Reference"' @click='click' :class='{ highlighted }'>{{ referenceToString(astNode) }}</span>
     <span v-else>
@@ -10,6 +11,7 @@
       </span>
       <span :class='{ highlighted }'>)</span>
     </span>
+    <span v-if='isPenAfterMe'>|</span>
     <NodePicker
       ref='searcher'
       v-if='picking'
@@ -21,6 +23,7 @@
 </template>
 
 <script>
+import { PenPositionRelation } from '@/store/Pen';
 import Root from '../store/Root';
 import NodePicker from "./NodePicker";
 
@@ -40,7 +43,22 @@ export default {
   },
   computed: {
     highlighted() {
-      return Root.penStore.getPointedNode() === this.astNode;
+      return (
+          Root.penStore.getPenPosition().positionType === 'Node' &&
+          Root.penStore.getPenPosition().referenceNodeId === this.astNode.id &&
+          Root.penStore.getPenPosition().relation === PenPositionRelation.On);
+    },
+    isPenBeforeMe() {
+      return (
+          Root.penStore.getPenPosition().positionType === 'Node' &&
+          Root.penStore.getPenPosition().referenceNodeId === this.astNode.id &&
+          Root.penStore.getPenPosition().relation === PenPositionRelation.Before);
+    },
+    isPenAfterMe() {
+      return (
+          Root.penStore.getPenPosition().positionType === 'Node' &&
+          Root.penStore.getPenPosition().referenceNodeId === this.astNode.id &&
+          Root.penStore.getPenPosition().relation === PenPositionRelation.After);
     },
     picking() {
       return this.highlighted && Root.penStore.getIsQuerying();

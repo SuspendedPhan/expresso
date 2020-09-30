@@ -34,6 +34,7 @@ export class Root {
   organismCollection = this.organismStore;
   metafunStore = new MetafunStore(this);
   penStore = new PenStore(this);
+  pen = this.penStore;
   time = new Time(this);
   windowSize = { width: 0, height: 0 };
 

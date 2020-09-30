@@ -5,6 +5,7 @@ import wu from 'wu';
 import { describe, it, AssertionError } from './TestRunner';
 import * as TestRunner from './TestRunner';
 import threelevels from './data/threelevels.json';
+import { PenPositionRelation } from '@/store/Pen';
 
 // npm run md -- -o C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.json C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.md
 
@@ -704,4 +705,122 @@ describe('HelloWorld.vue', () => {
       expect(expected).to.deep.include(at);
     }
   })
+
+  it("pen test", () => {
+    let final = {
+      "SuperOrganism root": {
+        "editattr clones": { Variable: 0 },
+        "editattr gridx": { Variable: 0 },
+        "emerattr cloneNumber": { Variable: 0 },
+      },
+    };
+
+    const root = new Root().fromTree(final);
+    const attributeCollection = root.attributeCollection;
+    const organismCollection = root.organismCollection;
+    const nodeCollection = root.nodeStore;
+    const pen = root.pen;
+
+    const gridx = nodeCollection.getFromPath([], "gridx");
+    const add = nodeCollection.putChild(gridx, 0, nodeCollection.addFun(root.metafunStore.getFromName('Add')));
+    const addChild0 = nodeCollection.getFromPath([], "gridx", [0, 0]);
+    const addChild1 = nodeCollection.getFromPath([], "gridx", [0, 1]);
+    
+    pen.setPenPosition({
+      positionType: 'Node',
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild0.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild0.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild1.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild1.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorRight();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild1.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild1.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild0.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: addChild0.id,
+      relation: PenPositionRelation.Before,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.On,
+    });
+
+    pen.moveCursorLeft();
+    expect(pen.penPosition).to.deep.equal({
+      positionType: "Node",
+      referenceNodeId: add.id,
+      relation: PenPositionRelation.Before,
+    });
+  });
 })
