@@ -52,8 +52,10 @@ export default {
     document.addEventListener('keydown', event => {
       if (event.key === 'ArrowUp' && !Root.penStore.getIsQuerying()) {
         Root.penStore.moveCursorUp();
+        event.preventDefault();
       } else if (event.key === 'ArrowDown' && !Root.penStore.getIsQuerying()) {
         Root.penStore.moveCursorDown();
+        event.preventDefault();
       }
 
       if (Root.penStore.getPenPosition().positionType === 'Node') {

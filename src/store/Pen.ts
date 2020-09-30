@@ -172,7 +172,7 @@ export default class Pen {
     } else if (this.penPosition.relation === PenPositionRelation.Before) {
       const nodeStore = this.root.nodeStore;
       const traverse = Functions.traverseLeft(
-        this.getPointedNode(),
+        this.nodeStore.getFromId(this.penPosition.referenceNodeId),
         (node) => this.nodeStore.getParent(node, false),
         (node) => nodeStore.getChildren(node)
       );

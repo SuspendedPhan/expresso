@@ -1,6 +1,6 @@
 <template>
   <span class='node-root'>
-    <span v-if='isPenBeforeMe'>|</span>
+    <span v-if='isPenBeforeMe'><b>|</b></span>
     <span v-if='astNode.value != null' @click='click' :class='{ highlighted }'>{{ astNode.value }}</span>
     <span v-else-if='astNode.metaname === "Reference"' @click='click' :class='{ highlighted }'>{{ referenceToString(astNode) }}</span>
     <span v-else>
@@ -11,7 +11,7 @@
       </span>
       <span :class='{ highlighted }'>)</span>
     </span>
-    <span v-if='isPenAfterMe'>|</span>
+    <span v-if='isPenAfterMe'><b>|</b></span>
     <NodePicker
       ref='searcher'
       v-if='picking'
