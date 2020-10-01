@@ -8,7 +8,7 @@ import Collection from '@/code/Collection';
 
 export default class NodeStore {
 
-  nodes = new Collection<any>(['id']);
+  nodes = new Collection<any>([], ['id']);
 
   /** {childNodeId, parentNodeId, childIndex} */
   nodeParents = [] as Array<any>;
@@ -18,7 +18,10 @@ export default class NodeStore {
   // --- GETS ---
   
   getSerialized() {
-    return Functions.pluck(this, ['nodes', 'nodeParents']);
+    return {
+      nodeParents: this.nodeParents,
+      nodes: this.nodes.serialize(),
+    };
   }
 
   getParent(node, shouldAssert = true) {
@@ -55,7 +58,7 @@ export default class NodeStore {
 
   getFromId(nodeId): any {
     // const answer = wu(this.nodes).find(node => node.id === nodeId);
-    const answer = this.nodes.getFrom('id', nodeId);
+    const answer = this.nodes.getUnique('id', nodeId);
     console.assert(answer, 'cant find node from id');
     return answer;
   }
@@ -115,8 +118,8 @@ export default class NodeStore {
   // --- ACTIONS ---
 
   deserialize(store) {
-    Object.assign(this, store);
-    this.rebuildNodeIdIndex();
+    this.nodeParents = store.nodeParents;
+    this.nodes.deserialize(store.nodes);
     for (const node of this.nodes) {
       if (node.metaname === 'Number') {
         node.eval = () => node.value;
@@ -170,7 +173,6 @@ export default class NodeStore {
       storetype: 'node',
     };
     this.nodes.add(answer);
-    this.rebuildNodeIdIndex();
     return answer;
   }
 
@@ -213,8 +215,8 @@ export default class NodeStore {
       this.remove(child);
     }
     this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === node.id || t.parentNodeId === node.id).toArray();
-    this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
-    this.rebuildNodeIdIndex();
+    // this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
+    this.nodes.delete(node);
   }
 
   reparent({ child, parent, childIndex }) {
@@ -244,13 +246,6 @@ export default class NodeStore {
     if (parentRelationship) {
       const { childIndex, parentNode } = parentRelationship;
       this.putChild(parentNode, childIndex, node);
-    }
-  }
-
-  rebuildNodeIdIndex() {
-    this.nodesById.clear();
-    for (const node of this.nodes) {
-      this.nodesById.set(node.id, node);
     }
   }
 
