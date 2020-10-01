@@ -2,16 +2,17 @@ import wu from "wu";
 import { v4 as uuidv4 } from 'uuid';
 import { Root } from './Root';
 import Functions from "../code/Functions";
+import Collection from '@/code/Collection';
 
 // interface suggestion: { text, commitFunction }
 
 export default class NodeStore {
 
-  nodes = [] as Array<any>;
+  nodes = new Collection<any>(['id']);
 
   /** {childNodeId, parentNodeId, childIndex} */
   nodeParents = [] as Array<any>;
-  
+
   constructor(private root: Root) {}
 
   // --- GETS ---
@@ -52,8 +53,9 @@ export default class NodeStore {
     return children;
   }
 
-  getFromId(nodeId) {
-    const answer = wu(this.nodes).find(node => node.id === nodeId);
+  getFromId(nodeId): any {
+    // const answer = wu(this.nodes).find(node => node.id === nodeId);
+    const answer = this.nodes.getFrom('id', nodeId);
     console.assert(answer, 'cant find node from id');
     return answer;
   }
@@ -114,6 +116,7 @@ export default class NodeStore {
 
   deserialize(store) {
     Object.assign(this, store);
+    this.rebuildNodeIdIndex();
     for (const node of this.nodes) {
       if (node.metaname === 'Number') {
         node.eval = () => node.value;
@@ -166,7 +169,8 @@ export default class NodeStore {
       id: uuidv4(),
       storetype: 'node',
     };
-    this.nodes.push(answer);
+    this.nodes.add(answer);
+    this.rebuildNodeIdIndex();
     return answer;
   }
 
@@ -183,8 +187,8 @@ export default class NodeStore {
         .find(row => row.parentNodeId === parent.id && row.childIndex === childIndex);
 
     if (oldChildRow !== undefined) {
-      this.nodes = wu(this.nodes)
-          .reject(node => node.id === oldChildRow.childNodeId).toArray();
+      const oldChild = this.getFromId(oldChildRow.childNodeId);
+      this.nodes.delete(oldChild);
       this.nodeParents = wu(this.nodeParents)
           .reject(row => row === oldChildRow).toArray();
     }
@@ -210,6 +214,7 @@ export default class NodeStore {
     }
     this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === node.id || t.parentNodeId === node.id).toArray();
     this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
+    this.rebuildNodeIdIndex();
   }
 
   reparent({ child, parent, childIndex }) {
@@ -239,6 +244,13 @@ export default class NodeStore {
     if (parentRelationship) {
       const { childIndex, parentNode } = parentRelationship;
       this.putChild(parentNode, childIndex, node);
+    }
+  }
+
+  rebuildNodeIdIndex() {
+    this.nodesById.clear();
+    for (const node of this.nodes) {
+      this.nodesById.set(node.id, node);
     }
   }
 

@@ -2,12 +2,15 @@
   <div class='viewport' ref='viewport'>
     <canvas :width='width' :height='height' ref='canvas'>
     </canvas>
+    <div class='fps'>{{ framerate }}</div>
   </div>
 </template>
 
 <script>
 import Two from 'two.js';
 import Root, { RenderShape } from '../store/Root';
+import fps from 'fps';
+import numeral from 'numeral';
 
 window.root = Root;
 
@@ -19,13 +22,20 @@ export default {
     return {
       width: 0,
       height: 0,
+      framerate: 0,
     };
+  },
+  created: function() {
+    this.ticker = fps({ every: 10 });
+    this.ticker.on('data', framerate => this.framerate = numeral(framerate).format('0'));
   },
   mounted: function() {
     this.update();
   },
   methods: {
     update: function() {
+      this.ticker.tick();
+
       const viewport = this.$refs.viewport;
       const canvas = this.$refs.canvas;
       this.width = viewport.clientWidth;
@@ -59,4 +69,13 @@ export default {
 </script>
 
 <style scoped>
+.fps {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 20px;
+  background-color: white;
+  width: 50px;
+  text-align: center;
+}
 </style>
