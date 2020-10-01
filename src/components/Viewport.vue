@@ -38,13 +38,14 @@ export default {
 
       const renderCommands = Root.computeRenderCommands();
       for (const renderCommand of renderCommands) {
+        const alpha = renderCommand.alpha ?? .5;
         if (renderCommand.shape === RenderShape.Circle) {
           context.beginPath();
           context.arc(renderCommand.x, renderCommand.y, renderCommand.radius, 0, 2 * Math.PI);
-          context.fillStyle = 'hsla(0, 0%, 100%, .5)';
+          context.fillStyle = `hsla(0, 0%, 100%, ${alpha})`;
           context.fill();
         } else if (renderCommand.shape === RenderShape.Rectangle) {
-          context.fillStyle = 'hsla(0, 0%, 100%, .5)';
+          context.fillStyle = `hsla(0, 0%, 100%, ${alpha})`;
           const centerx = renderCommand.x - renderCommand.width / 2;
           const centery = renderCommand.y - renderCommand.height / 2;
           context.fillRect(centerx, centery, renderCommand.width, renderCommand.height);

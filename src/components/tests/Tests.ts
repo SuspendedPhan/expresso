@@ -503,19 +503,19 @@ describe('HelloWorld.vue', () => {
     const organismCollection = root.organismCollection;
     let final = {
       'SuperOrganism root': {
-        'editattr gravity': { 'Variable': 0 },
-        'editattr clones': { 'Variable': 0 },
-        'emerattr cloneNumber': { 'Variable': 0 },
+        'editattr gravity': { '0 Number': 0 },
+        'editattr clones': { '0 Number': 0 },
+        'emerattr cloneNumber': { '0 Number': 0 },
         'SuperOrganism tree': {
-          'editattr growth': { 'Variable': 0 },
+          'editattr growth': { '0 Number': 0 },
         },
         'SuperOrganism orbit': {
-          'editattr orbitSize': { 'Variable': 0 },
+          'editattr orbitSize': { '0 Number': 0 },
           'SuperOrganism moon': {
-            'editattr luminosity': { 'Variable': 0 },
+            'editattr luminosity': { '0 Number': 0 },
           },
           'SuperOrganism earth': {
-            'editattr life': { 'Variable': 0 },
+            'editattr life': { '0 Number': 0 },
           },
         },
       },
@@ -523,16 +523,16 @@ describe('HelloWorld.vue', () => {
 
     let start = {
       'SuperOrganism root': {
-        'editattr gravity': { 'Variable': 0 },
-        'editattr clones': { 'Variable': 0 },
-        'emerattr cloneNumber': { 'Variable': 0 },
+        'editattr gravity': { '0 Number': 0 },
+        'editattr clones': { '0 Number': 0 },
+        'emerattr cloneNumber': { '0 Number': 0 },
         'SuperOrganism tree': {
-          'editattr growth': { 'Variable': 0 },
+          'editattr growth': { '0 Number': 0 },
         },
         'SuperOrganism orbit': {
-          'editattr orbitSize': { 'Variable': 0 },
+          'editattr orbitSize': { '0 Number': 0 },
           'SuperOrganism moon': {
-            'editattr luminosity': { 'Variable': 0 },
+            'editattr luminosity': { '0 Number': 0 },
           },
         },
       },
@@ -574,11 +574,11 @@ describe('HelloWorld.vue', () => {
 
     let expected = {
       'SuperOrganism root': {
-        'editattr gravity': { 'Variable': 0 },
-        'editattr clones': { 'Variable': 0 },
-        'emerattr cloneNumber': { 'Variable': 0 },
+        'editattr gravity': { '0 Number': 0 },
+        'editattr clones': { '0 Number': 0 },
+        'emerattr cloneNumber': { '0 Number': 0 },
         'SuperOrganism tree': {
-          'editattr growth': { 'Variable': 0 },
+          'editattr growth': { '0 Number': 0 },
         },
       },
     };
@@ -607,20 +607,20 @@ describe('HelloWorld.vue', () => {
   it('pen organs', () => {
     let final = {
       'SuperOrganism root': {
-        'editattr gravity': { 'Variable': 0 },
-        'editattr clones': { 'Variable': 0 },
-        'emerattr cloneNumber': { 'Variable': 0 },
+        'editattr gravity': { '0 Number': 0 },
+        'editattr clones': { '0 Number': 0 },
+        'emerattr cloneNumber': { '0 Number': 0 },
         'SuperOrganism tree': {
-          'editattr growth': { 'Variable': 0 },
-          'editattr har': { 'Variable': 0 },
+          'editattr growth': { '0 Number': 0 },
+          'editattr har': { '0 Number': 0 },
         },
         'SuperOrganism orbit': {
-          'editattr orbitSize': { 'Variable': 0 },
+          'editattr orbitSize': { '0 Number': 0 },
           'SuperOrganism moon': {
-            'editattr luminosity': { 'Variable': 0 },
+            'editattr luminosity': { '0 Number': 0 },
           },
           'SuperOrganism earth': {
-            'editattr life': { 'Variable': 0 },
+            'editattr life': { '0 Number': 0 },
           },
         },
       },
@@ -655,16 +655,16 @@ describe('HelloWorld.vue', () => {
     let final = {
       'SuperOrganism root': {
         'SuperOrganism grid1': {
-          'editattr clones': { 'Variable': 0 },
-          'editattr gridx': { 'Variable': 0 },
-          'emerattr cloneNumber': { 'Variable': 0 },
+          'editattr clones': { '0 Number': 0 },
+          'editattr gridx': { '0 Number': 0 },
+          'emerattr cloneNumber': { '0 Number': 0 },
           'SuperOrganism grid2': {
-            'editattr clones': { 'Variable': 0 },
-            'editattr gridy': { 'Variable': 0 },
-            'emerattr cloneNumber': { 'Variable': 0 },
+            'editattr clones': { '0 Number': 0 },
+            'editattr gridy': { '0 Number': 0 },
+            'emerattr cloneNumber': { '0 Number': 0 },
             'Rectangle square': {
-              'editattr x': { 'Variable': 0 },
-              'editattr y': { 'Variable': 0 },
+              'editattr x': { '0 Number': 0 },
+              'editattr y': { '0 Number': 0 },
             },
           },
         },
@@ -824,7 +824,7 @@ describe('HelloWorld.vue', () => {
     });
   });
 
-  it("insert node, replace node, from tree", () => {
+  it("insert node, from tree", () => {
     let tree = {
       '0 Function Add': {
         '0 Number': 3,
@@ -860,28 +860,6 @@ describe('HelloWorld.vue', () => {
           },
         },
       };
-
-      expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
-    }
-    
-
-    {
-      const rootNode = nodeCollection.fromTree(tree);
-      const multiplyNode = nodeCollection.getChild(rootNode, 1);
-      const replaceNode = nodeCollection.addFun(
-        root.metafunStore.getFromName("Divide")
-      );
-      nodeCollection.replaceNode(multiplyNode, replaceNode);
-
-      let expected = {
-      '0 Function Add': {
-        '0 Number': 3,
-        '1 Function Divide': {
-          '0 Number': 0,
-          '1 Number': 0,
-        }
-      }
-    };
 
       expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
     }

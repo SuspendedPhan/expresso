@@ -181,6 +181,8 @@ export default class Pen {
       if (this.penPosition.relation === PenPositionRelation.On) {
         this.nodeCollection.replaceNode(referenceNode, node);
         this.setPointedNode(node);
+        this.moveCursorRight();
+        this.moveCursorRight();
       } else if (this.penPosition.relation === PenPositionRelation.Before) {
         this.nodeCollection.insertNodeAsParent(referenceNode, node);
         this.setPointedNode(node);

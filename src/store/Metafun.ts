@@ -1,5 +1,6 @@
 import wu from 'wu';
 import { Root } from './Root';
+import seedrandom from 'seedrandom';
 
 export default class MetafunStore {
   metafuns = [
@@ -92,6 +93,11 @@ export default class MetafunStore {
       name: 'X11',
       paramCount: 2,
       eval: (x, windowWidth) => Math.abs(x / windowWidth - .5) * 2,
+    },
+    {
+      name: 'Random',
+      paramCount: 1,
+      eval: (seed) => seedrandom(seed.eval())(),
     },
   ];
 

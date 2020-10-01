@@ -72,7 +72,8 @@ export class Root {
     const windowWidthRoot = this.attributeCollection.getRootNodeFromName(organism, 'window.width', false);
     
     if (timeRoot) {
-      this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(universeDurationMillis));
+      this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(DateTime.utc().toMillis() / 1000));
+      // this.nodeStore.putChild(timeRoot, 0, this.nodeStore.addNumber(universeDurationMillis));
     }
     if (windowHeightRoot) {
       this.nodeStore.putChild(windowHeightRoot, 0, this.nodeStore.addNumber(this.windowSize.height));
@@ -157,8 +158,12 @@ export class Root {
       this.nodeStore.toTree2(childRootNode, rootNodeTree);
     }
     for (const attribute of this.attributeCollection.getEmergents(organism)) {
+      const rootNode = this.attributeCollection.getRootNode(attribute);
+      const childRootNode = this.nodeStore.getChild(rootNode, 0);
       const key = `emerattr ${attribute.name}`;
-      organTree[key] = {};
+      const rootNodeTree = {};
+      organTree[key] = rootNodeTree;
+      this.nodeStore.toTree2(childRootNode, rootNodeTree);
     }
 
     for (const child of this.organismCollection.getChildren(organism)) {
