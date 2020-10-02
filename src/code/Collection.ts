@@ -104,7 +104,7 @@ export default class Collection<T> {
   }
 
   public deserialize(serializedCollection) {
-    this.items = []
+    this.items = [];
     for (const index of this.indexByField.values()) {
       index.map.clear();
     }

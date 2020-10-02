@@ -121,7 +121,7 @@ export default class NodeStore {
   // --- ACTIONS ---
 
   deserialize(store) {
-    this.nodeParents = store.nodeParents;
+    this.nodeParents.deserialize(store.nodeParents);
     this.nodes.deserialize(store.nodes);
     for (const node of this.nodes) {
       if (node.metaname === 'Number') {
