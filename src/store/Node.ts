@@ -5,13 +5,16 @@ import Functions from "../code/Functions";
 import Collection from '@/code/Collection';
 
 // interface suggestion: { text, commitFunction }
+interface ParentRelationship {
+  childNodeId: string;
+  parentNodeId: string;
+  childIndex: number;
+}
 
 export default class NodeStore {
 
   nodes = new Collection<any>([], ['id']);
-
-  /** {childNodeId, parentNodeId, childIndex} */
-  nodeParents = [] as Array<any>;
+  nodeParents = new Collection<ParentRelationship>(['parentNodeId'], ['childNodeId']);
 
   constructor(private root: Root) {}
 
@@ -27,44 +30,44 @@ export default class NodeStore {
   getParent(node, shouldAssert = true) {
     if (shouldAssert === undefined) shouldAssert = true;
 
-    const row = wu(this.nodeParents).find(entry => entry.childNodeId === node.id);
+    const parentRelationship = this.nodeParents.getUnique('childNodeId', node.id, shouldAssert);
     if (shouldAssert) {
-      console.assert(row, 'no parent');
+      console.assert(parentRelationship as any, 'no parent');
     }
-    if (row === undefined) {
+    if (parentRelationship === undefined) {
       return undefined;
     } else {
-      return this.getFromId(row.parentNodeId);
+      return this.getFromId(parentRelationship.parentNodeId);
     }
   }
 
   getChild(node, childIndex) {
-    const row = wu(this.nodeParents)
-        .find(entry => entry.parentNodeId === node.id && entry.childIndex === childIndex);
-    console.assert(row, 'no child');
+    const parentRelationships = this.nodeParents.getMany('parentNodeId', node.id);
+    const row = wu(parentRelationships)
+        .find(entry => entry.childIndex === childIndex) as ParentRelationship;
+    console.assert(row as any, 'no child');
     return this.getFromId(row.childNodeId);
   }
 
   getChildren(node) {
-    const rows = wu(this.nodeParents).filter(row => row.parentNodeId === node.id).toArray();
-    rows.sort((a, b) => a.childIndex - b.childIndex);
-    for (let index = 0; index < rows.length; index++) {
-      const row = rows[index];
+    const parentRelationships = Array.from(this.nodeParents.getMany('parentNodeId', node.id));
+    parentRelationships.sort((a, b) => a.childIndex - b.childIndex);
+    for (let index = 0; index < parentRelationships.length; index++) {
+      const row = parentRelationships[index];
       console.assert(row.childIndex === index);
     }
-    const children = wu(rows).map(row => this.getFromId(row.childNodeId));
+    const children = wu(parentRelationships).map(row => this.getFromId(row.childNodeId));
     return children;
   }
 
   getFromId(nodeId): any {
-    // const answer = wu(this.nodes).find(node => node.id === nodeId);
     const answer = this.nodes.getUnique('id', nodeId);
     console.assert(answer, 'cant find node from id');
     return answer;
   }
 
   getParentRelationship(childNode, shouldAssert = true) {
-    const row = wu(this.nodeParents).find(row => row.childNodeId === childNode.id);
+    const row = this.nodeParents.getUnique('childNodeId', childNode.id, shouldAssert);
     if (!row) {
       if (shouldAssert) console.assert(row);
       return null;
@@ -185,17 +188,19 @@ export default class NodeStore {
       throw new Error();
     }
 
-    const oldChildRow = wu(this.nodeParents)
-        .find(row => row.parentNodeId === parent.id && row.childIndex === childIndex);
+    const oldChildRelationships = this.nodeParents.getMany('parentNodeId', parent.id);
+    const oldChildRelationship = oldChildRelationships.find(t => t.childIndex === childIndex);
 
-    if (oldChildRow !== undefined) {
-      const oldChild = this.getFromId(oldChildRow.childNodeId);
+    if (oldChildRelationship !== undefined) {
+      const oldChild = this.getFromId(oldChildRelationship.childNodeId);
       this.nodes.delete(oldChild);
-      this.nodeParents = wu(this.nodeParents)
-          .reject(row => row === oldChildRow).toArray();
+      this.nodeParents.delete(oldChildRelationship);
     }
 
-    this.nodeParents.push({
+    for (const parentRelationship of this.nodeParents) {
+      console.assert(!(parentRelationship.parentNodeId === parent.id && parentRelationship.childIndex === childIndex));
+    }
+    this.nodeParents.add({
       childNodeId: child.id,
       parentNodeId: parent.id,
       childIndex: childIndex,
@@ -210,26 +215,34 @@ export default class NodeStore {
     suggestion.commitFunction();
   }
 
-  remove(node) {
+  remove(node, shouldAssert = true) {
     for (const child of this.getChildren(node)) {
-      this.remove(child);
+      this.remove(child, shouldAssert);
     }
-    this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === node.id || t.parentNodeId === node.id).toArray();
-    // this.nodes = wu(this.nodes).reject(t => t.id === node.id).toArray();
+    const relation = this.nodeParents.getUnique('childNodeId', node.id, shouldAssert);
+    if (relation) {
+      this.nodeParents.delete(relation);
+    }
     this.nodes.delete(node);
   }
 
-  reparent({ child, parent, childIndex }) {
-    this.nodeParents = wu(this.nodeParents).reject(t => t.childNodeId === child.id).toArray();
+  reparent({ child, parent, childIndex }, shouldHaveOldParent = true) {
+    const relation = this.nodeParents.getUnique("childNodeId", child.id, shouldHaveOldParent);
+    if (relation !== undefined) {
+      this.nodeParents.delete(relation);
+    }
     this.putChild(parent, childIndex, child);
   }
 
-  insertNodeAsParent(subroot, node) {
-    const parentRelationship = this.getParentRelationship(subroot);
-    if (parentRelationship) {
-      const { childIndex, parentNode } = parentRelationship;
-      this.reparent({ child: subroot, parent: node, childIndex: 0 });
-      this.reparent({ child: node, parent: parentNode, childIndex: childIndex });
+  insertNodeAsParent(postChild, postParent) {
+    const priorRelation = this.getParentRelationship(postChild);
+    if (priorRelation) {
+      const { childIndex, parentNode } = priorRelation;
+      // move old under new
+      this.reparent({ child: postChild, parent: postParent, childIndex: 0 });
+      
+      // move new under old root
+      this.reparent({ child: postParent, parent: parentNode, childIndex: childIndex }, false);
     }
   }
 

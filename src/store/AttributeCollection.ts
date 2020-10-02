@@ -154,7 +154,7 @@ export default class AttributeCollection {
 
   remove(attribute) {
     const rootNode = this.getRootNode(attribute);
-    this.rootStore.nodeStore.remove(rootNode);
+    this.rootStore.nodeStore.remove(rootNode, false);
     
     this.attributes = wu(this.attributes).reject(t => t.id === attribute.id).toArray();
     this.attributeParents = wu(this.attributeParents).reject(t => t.childAttributeId === attribute.id).toArray();

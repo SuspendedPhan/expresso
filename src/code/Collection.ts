@@ -26,6 +26,7 @@ export default class Collection<T> {
 
   public *[Symbol.iterator] () {
     this.activeIterators++;
+    
     for (const item of this.items) {
       yield item;
     }
@@ -57,8 +58,16 @@ export default class Collection<T> {
       if (items === undefined) {
         index.map.set(indexKey, [item]);
       } else {
-        if (index.hasUniqueConstraint) console.assert(items.length === 1);
+        if (index.hasUniqueConstraint) console.assert(items.length === 0);
         items.push(item);
+        const childIndexes = new Set();
+        for (const item of items) {
+          if (item.childIndex !== undefined) {
+            // console.log('check');
+            console.assert(!childIndexes.has(item.childIndex));
+            childIndexes.add(item.childIndex);
+          }
+        }
       }
     }
 
@@ -68,9 +77,8 @@ export default class Collection<T> {
   public delete(item) {
     console.assert(this.activeIterators === 0);
     console.assert(this.indexByField.size > 0);
-    const indexedField = this.indexByField.keys().next().value;
     const priorItemCount = this.items.length;
-    this.items = wu(this.items).reject(t => t[indexedField] === item[indexedField]).toArray();
+    this.items = wu(this.items).reject(t => t === item).toArray();
     console.assert(this.items.length === priorItemCount - 1);
 
     for (const [field, index] of this.indexByField) {
@@ -78,11 +86,13 @@ export default class Collection<T> {
       const priorItems = index.map.get(indexKey);
       console.assert(priorItems !== undefined);
       console.assert(priorItems!.length > 0);
-      const postItems = wu(priorItems as any).reject(t => t === item).toArray();
+      const postItems = wu(priorItems as T[]).reject(t => t === item).toArray();
       console.assert(postItems.length === priorItems!.length - 1);
 
       if (postItems.length === 0) {
         index.map.delete(indexKey);
+      } else {
+        index.map.set(indexKey, postItems);
       }
     }
   }

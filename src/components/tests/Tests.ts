@@ -945,4 +945,11 @@ describe('HelloWorld.vue', () => {
       expect(nodeCollection.toTree2(rootNode)).to.deep.equal(expected);
     }
   })
+
+  it('simple integration', () => {
+    const root = new Root();
+    root.organismCollection.initRootOrganism();
+    const attribute = root.attributeCollection.putEditable(root.organismCollection.rootOrganism, 'x');
+    root.attributeCollection.getRootNode(attribute);
+  })
 })
