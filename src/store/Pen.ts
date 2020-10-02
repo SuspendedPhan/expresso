@@ -163,9 +163,7 @@ export default class Pen {
   }
 
   setPenPosition(penPosition: PenPosition) {
-    this.penPosition.positionType = penPosition.positionType;
-    this.penPosition.referenceNodeId = penPosition.referenceNodeId;
-    this.penPosition.relation = penPosition.relation;
+    this.penPosition = penPosition;
   }
 
   setQuery(query) {

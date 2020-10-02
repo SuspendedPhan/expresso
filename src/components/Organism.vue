@@ -48,6 +48,7 @@ export default {
   },
   methods: {
     getNodeForAttribute: function(attribute) {
+      Root.nodeCollection.nodeParents.length;  // trigger reactive
       return Root.nodeStore.getChild(Root.attributeStore.getRootNode(attribute), 0);
     },
     spawn: function () {
