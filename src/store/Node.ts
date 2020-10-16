@@ -47,6 +47,12 @@ export default class NodeStore {
   }
 
   getChild(node, childIndex) {
+    const ret = this.getChildMaybe(node, childIndex);
+    console.assert(ret);
+    return ret;
+  }
+
+  getChildMaybe(node, childIndex) {
     const parentRelationships = this.nodeParents.getMany(
       "parentNodeId",
       node.id
@@ -54,8 +60,12 @@ export default class NodeStore {
     const row = wu(parentRelationships).find(
       (entry) => entry.childIndex === childIndex
     ) as ParentRelationship;
-    console.assert(row as any, "no child");
-    return this.getFromId(row.childNodeId);
+
+    if (row === undefined) {
+      return undefined;
+    } else {
+      return this.getFromId(row.childNodeId);
+    }
   }
 
   getChildren(node) {
@@ -127,6 +137,9 @@ export default class NodeStore {
     return tree;
   }
 
+  /**
+   * @param nodePath [] returns the Var root
+   */
   getFromPath(organismPath: string[], attributeName, nodePath: number[] = []) {
     const organism = this.root.organismCollection.getOrganismFromPath(
       ...organismPath
@@ -268,7 +281,10 @@ export default class NodeStore {
     this.nodes.delete(node);
   }
 
-  reparent({ child, parent, childIndex }, shouldHaveOldParent = true) {
+  /**
+   * Detaches the child from its old parent, and puts it under the new parent.
+   */
+  reparent({ child, newParent, childIndex }, shouldHaveOldParent = true) {
     const relation = this.nodeParents.getUnique(
       "childNodeId",
       child.id,
@@ -277,7 +293,7 @@ export default class NodeStore {
     if (relation !== undefined) {
       this.nodeParents.delete(relation);
     }
-    this.putChild(parent, childIndex, child);
+    this.putChild(newParent, childIndex, child);
   }
 
   insertNodeAsParent(postChild, postParent) {
@@ -285,29 +301,40 @@ export default class NodeStore {
     if (priorRelation) {
       const { childIndex, parentNode } = priorRelation;
       // move old under new
-      this.reparent({ child: postChild, parent: postParent, childIndex: 0 });
+      this.reparent({ child: postChild, newParent: postParent, childIndex: 0 });
 
       // move new under old root
       this.reparent(
-        { child: postParent, parent: parentNode, childIndex: childIndex },
+        { child: postParent, newParent: parentNode, childIndex: childIndex },
         false
       );
     }
   }
 
-  replaceNode(subroot, node) {
-    // memory leak here??
-    // what happens when you drop an argument?
+  /**
+   * Plucks oldNode from the tree, putting newNode in its place.
+   * Also plucks oldNode's children and attaches them to newNode.
+   */
+  replaceNode(oldNode, newNode) {
+    const newNodeChildren = this.getChildren(newNode).toArray();
+    const newNodeChildrenCount = newNodeChildren.length;
 
-    for (const child of this.getChildren(subroot)) {
-      const { childIndex } = this.getParentRelationship(child) as any;
-      this.reparent({ child: child, parent: node, childIndex });
+    const oldNodeChildrenCount = this.getChildren(oldNode).toArray().length;
+
+    for (let i = 0; i < oldNodeChildrenCount; i++) {
+      const child = this.getChild(oldNode, i);
+      if (i < newNodeChildrenCount) {
+        this.reparent({ child: child, newParent: newNode, childIndex: i });
+      } else {
+        this.remove(child);
+      }
     }
 
-    const parentRelationship = this.getParentRelationship(subroot);
+    const parentRelationship = this.getParentRelationship(oldNode);
+    console.assert(parentRelationship !== undefined);
     if (parentRelationship) {
       const { childIndex, parentNode } = parentRelationship;
-      this.putChild(parentNode, childIndex, node);
+      this.putChild(parentNode, childIndex, newNode);
     }
   }
 

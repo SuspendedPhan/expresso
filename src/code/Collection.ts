@@ -1,5 +1,5 @@
 import wu from "wu";
-import Functions from './Functions';
+import Functions from "./Functions";
 
 interface Index<T> {
   map: Map<string, T[]>;
@@ -11,7 +11,10 @@ export default class Collection<T> {
   private indexByField = new Map<string, Index<T>>();
   private iteratorVersion = 0;
 
-  constructor(indexedFields: string[] = [], uniquelyIndexedFields: string[] = []) {
+  constructor(
+    indexedFields: string[] = [],
+    uniquelyIndexedFields: string[] = []
+  ) {
     const setup = (fields, unique) => {
       for (const field of fields) {
         this.indexByField.set(field, {
@@ -25,7 +28,7 @@ export default class Collection<T> {
     setup(uniquelyIndexedFields, true);
   }
 
-  public *[Symbol.iterator] () {
+  public *[Symbol.iterator]() {
     const iteratorVersion = this.iteratorVersion;
 
     for (const item of this.items) {
@@ -69,10 +72,12 @@ export default class Collection<T> {
 
   public delete(item) {
     console.assert(this.indexByField.size > 0);
-    
+
     this.iteratorVersion++;
     const priorItemCount = this.items.length;
-    this.items = wu(this.items).reject(t => t === item).toArray();
+    this.items = wu(this.items)
+      .reject((t) => t === item)
+      .toArray();
     console.assert(this.items.length === priorItemCount - 1);
 
     for (const [field, index] of this.indexByField) {
@@ -80,7 +85,9 @@ export default class Collection<T> {
       const priorItems = index.map.get(indexKey);
       console.assert(priorItems !== undefined);
       console.assert(priorItems!.length > 0);
-      const postItems = wu(priorItems as T[]).reject(t => t === item).toArray();
+      const postItems = wu(priorItems as T[])
+        .reject((t) => t === item)
+        .toArray();
       console.assert(postItems.length === priorItems!.length - 1);
 
       if (postItems.length === 0) {
