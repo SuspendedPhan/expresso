@@ -1,6 +1,6 @@
 <template>
   <div v-if='organism' class='organism'>
-    <div>{{ organism.name }}</div>
+    <div><u>{{ organism.name }}</u></div>
     <div class='controls'>
       <select v-model='selectedPrimitiveId'>
         <option v-for='metaorganism in metaorganismCollection.getMetaorganisms()' :key='metaorganism.id' :value='metaorganism.id'>
@@ -79,9 +79,11 @@ export default {
 .organism {
   margin-bottom: 20px;
   border: 1px solid black;
-  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 20px;
   border-radius: 2px;
-  margin: 10px;
+  margin-top: 10px;
 }
 .attribute {
 
@@ -90,5 +92,7 @@ export default {
   display: grid;
   grid-template-columns: max-content max-content;
   gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 </style>
