@@ -66,6 +66,7 @@ export default {
           Root.penStore.getIsQuerying());
     },
     astNodeChildren() {
+      Root.nodeCollection.nodeParents.length;  // trigger reactive
       return Root.nodeStore.getChildren(this.astNode).toArray();
     },
   },

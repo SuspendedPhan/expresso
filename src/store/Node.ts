@@ -4,7 +4,6 @@ import { Root } from './Root';
 import Functions from "../code/Functions";
 import Collection from '@/code/Collection';
 
-// interface suggestion: { text, commitFunction }
 interface ParentRelationship {
   childNodeId: string;
   parentNodeId: string;
