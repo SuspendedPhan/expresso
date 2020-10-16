@@ -1,4 +1,5 @@
 import wu from "wu";
+import Functions from './Functions';
 
 interface Index<T> {
   map: Map<string, T[]>;
@@ -8,7 +9,7 @@ interface Index<T> {
 export default class Collection<T> {
   private items: T[] = [];
   private indexByField = new Map<string, Index<T>>();
-  private activeIterators = 0;
+  private iteratorVersion = 0;
 
   constructor(indexedFields: string[] = [], uniquelyIndexedFields: string[] = []) {
     const setup = (fields, unique) => {
@@ -25,12 +26,12 @@ export default class Collection<T> {
   }
 
   public *[Symbol.iterator] () {
-    this.activeIterators++;
-    
+    const iteratorVersion = this.iteratorVersion;
+
     for (const item of this.items) {
+      console.assert(iteratorVersion === this.iteratorVersion);
       yield item;
     }
-    this.activeIterators--;
   }
 
   public getMany(indexedField: string, indexKey: any) {
@@ -50,7 +51,7 @@ export default class Collection<T> {
   }
 
   public add(item) {
-    console.assert(this.activeIterators === 0);
+    this.iteratorVersion++;
     this.items.push(item);
     for (const [field, index] of this.indexByField.entries()) {
       const indexKey = item[field];
@@ -60,14 +61,6 @@ export default class Collection<T> {
       } else {
         if (index.hasUniqueConstraint) console.assert(items.length === 0);
         items.push(item);
-        const childIndexes = new Set();
-        for (const item of items) {
-          if (item.childIndex !== undefined) {
-            // console.log('check');
-            console.assert(!childIndexes.has(item.childIndex));
-            childIndexes.add(item.childIndex);
-          }
-        }
       }
     }
 
@@ -75,8 +68,9 @@ export default class Collection<T> {
   }
 
   public delete(item) {
-    console.assert(this.activeIterators === 0);
     console.assert(this.indexByField.size > 0);
+    
+    this.iteratorVersion++;
     const priorItemCount = this.items.length;
     this.items = wu(this.items).reject(t => t === item).toArray();
     console.assert(this.items.length === priorItemCount - 1);

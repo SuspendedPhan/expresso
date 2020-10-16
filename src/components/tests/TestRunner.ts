@@ -36,6 +36,7 @@ export function runTests() {
     // 'pen test',
     // 'insert node, replace node, from tree'
     // 'ghost edits'
+    // 'nested add'
   ] as any[];
   for (const test of store.tests) {
     const ok = okTests.length === 0 || wu(okTests).has(test.name);

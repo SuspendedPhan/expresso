@@ -1,6 +1,10 @@
 import wu from 'wu';
+import { v4 as uuidv4 } from "uuid";
 
 export default class Functions {
+  static uuid() {
+    return uuidv4();
+  }
 
   static pluck(obj, properties) {
     const answer = {};

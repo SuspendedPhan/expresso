@@ -86,7 +86,7 @@ describe('HelloWorld.vue', () => {
   })
 
   it('nested add', () => {
-    return;
+    // return;
     const root = new Root();
     const attributeStore = root.attributeStore;
     const organismStore = root.organismStore;
@@ -952,4 +952,14 @@ describe('HelloWorld.vue', () => {
     const attribute = root.attributeCollection.putEditable(root.organismCollection.rootOrganism, 'x');
     root.attributeCollection.getRootNode(attribute);
   })
+
+  it("vector", () => {
+    const root = new Root();
+    root.organismCollection.initRootOrganism();
+    const attribute = root.attributeCollection.putEditable(
+      root.organismCollection.rootOrganism,
+      "x"
+    );
+    root.attributeCollection.getRootNode(attribute);
+  });
 })
