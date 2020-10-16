@@ -183,6 +183,10 @@ export default class NodeStore {
     return answer;
   }
 
+  addVector() {
+    
+  }
+
   addVariable() {
     const answer = this.addNode("Variable") as any;
     const child = this.addNumber(0);
@@ -301,11 +305,19 @@ export default class NodeStore {
     if (priorRelation) {
       const { childIndex, parentNode } = priorRelation;
       // move old under new
-      this.reparent({ child: postChild, newParent: postParent, childIndex: 0 });
+      this.reparent({
+        child: postChild,
+        newParent: postParent,
+        childIndex: 0,
+      });
 
       // move new under old root
       this.reparent(
-        { child: postParent, newParent: parentNode, childIndex: childIndex },
+        {
+          child: postParent,
+          newParent: parentNode,
+          childIndex: childIndex,
+        },
         false
       );
     }
@@ -324,7 +336,11 @@ export default class NodeStore {
     for (let i = 0; i < oldNodeChildrenCount; i++) {
       const child = this.getChild(oldNode, i);
       if (i < newNodeChildrenCount) {
-        this.reparent({ child: child, newParent: newNode, childIndex: i });
+        this.reparent({
+          child: child,
+          newParent: newNode,
+          childIndex: i,
+        });
       } else {
         this.remove(child);
       }

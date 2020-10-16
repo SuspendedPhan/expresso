@@ -187,6 +187,7 @@ describe("HelloWorld.vue", () => {
     const nodeStore = root.nodeStore;
     const metafunStore = root.metafunStore;
 
+
     const circle = organismStore.spawn();
     const x = attributeStore.getRootNodeFromName(circle, "x");
     const clones = attributeStore.getRootNodeFromName(circle, "clones");
@@ -1039,16 +1040,6 @@ describe("HelloWorld.vue", () => {
     root.attributeCollection.getRootNode(attribute);
   });
 
-  it("vector", () => {
-    // const root = new Root();
-    // root.organismCollection.initRootOrganism();
-    // const attribute = root.attributeCollection.putEditable(
-    //   root.organismCollection.rootOrganism,
-    //   "x"
-    // );
-    // root.attributeCollection.getRootNode(attribute);
-  });
-
   it("node drop/add argument", () => {
     let tree = {
       "SuperOrganism root": {
@@ -1118,5 +1109,24 @@ describe("HelloWorld.vue", () => {
         undefined
       );
     }
+  });
+
+  it("vector", () => {
+    let tree = {
+      "SuperOrganism root": {
+        "editattr xy": {
+          "0 Vector": {
+            "0 Number": 5,
+            "1 Number": 2,
+          },
+        },
+      },
+    };
+
+    const root = new Root().fromTree(tree);
+    const pen = root.pen;
+    const nodeCollection = root.nodeCollection;
+    console.log(Array.from(root.computeRenderCommands()));
+    
   });
 });
