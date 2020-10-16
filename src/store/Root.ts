@@ -64,10 +64,7 @@ export class Root {
     const organism = this.organismCollection.getRoot();
     
     const timeRoot = this.attributeCollection.getRootNodeFromName(organism, 'time', false);
-    let time01Root = this.attributeCollection.getRootNodeFromName(organism, 'time01', false);
-    if (time01Root === undefined) {
-      time01Root = this.attributeCollection.putEmergent(organism, 'time01');
-    }
+    const time01Root = this.attributeCollection.getRootNodeFromName(organism, 'time01', false);
     const windowHeightRoot = this.attributeCollection.getRootNodeFromName(organism, 'window.height',  false);
     const windowWidthRoot = this.attributeCollection.getRootNodeFromName(organism, 'window.width', false);
     
@@ -81,7 +78,9 @@ export class Root {
     if (windowWidthRoot) {
       this.nodeStore.putChild(windowWidthRoot, 0, this.nodeStore.addNumber(this.windowSize.width));
     }
-    this.nodeStore.putChild(time01Root, 0, this.nodeStore.addNumber(time01));
+    if (time01Root) {
+      this.nodeStore.putChild(time01Root, 0, this.nodeStore.addNumber(time01));
+    }
     yield * this.computeRenderCommandsForOrganism(organism);
   }
 
@@ -102,7 +101,14 @@ export class Root {
         renderCommand.shape = metaorganism.renderShape;
         for (const attribute of this.attributeCollection.getEditables(organism)) {
           if (attribute.name === 'clones') continue;
-          renderCommand[attribute.name] = this.attributeCollection.getRootNode(attribute).eval();
+
+          const value = this.attributeCollection.getRootNode(attribute).eval();
+          if (attribute.name === 'xy') {
+            renderCommand.x = value.x;
+            renderCommand.y = value.y;
+          } else {
+            renderCommand[attribute.name] = value;
+          }
         }
         yield renderCommand;
       }

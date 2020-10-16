@@ -1,7 +1,7 @@
-import wu from 'wu';
-import { v4 as uuidv4 } from 'uuid';
-import { Root } from './Root';
-import Functions from '../code/Functions';
+import wu from "wu";
+import { v4 as uuidv4 } from "uuid";
+import { Root } from "./Root";
+import Functions from "../code/Functions";
 
 const makeAttribute = (name, attributeType) => ({
   name,
@@ -10,7 +10,7 @@ const makeAttribute = (name, attributeType) => ({
 });
 
 /**
- * 
+ *
  * @param {RootStore} rootStore
  */
 export default class AttributeCollection {
@@ -22,7 +22,7 @@ export default class AttributeCollection {
   /** { attributeId, rootNodeId } */
   rootNodes = [] as Array<any>;
 
-  constructor(private rootStore: Root) { }
+  constructor(private rootStore: Root) {}
 
   get nodeStore() {
     return this.rootStore.nodeStore;
@@ -32,32 +32,39 @@ export default class AttributeCollection {
 
   getSerialized() {
     return Functions.pluck(this, [
-      'attributes',
-      'attributeParents',
-      'rootNodes',
+      "attributes",
+      "attributeParents",
+      "rootNodes",
     ]);
   }
 
   getParent(attribute) {
-    const answer = wu(this.attributeParents).find(row => row.childAttributeId === attribute);
-    console.assert(answer, 'prop has no parent organism');
+    const answer = wu(this.attributeParents).find(
+      (row) => row.childAttributeId === attribute
+    );
+    console.assert(answer, "prop has no parent organism");
     return answer;
   }
 
   getRootNode(attribute): any {
-    const row = wu(this.rootNodes).find(row => row.attributeId === attribute.id);
-    console.assert(row, 'has root node');
+    const row = wu(this.rootNodes).find(
+      (row) => row.attributeId === attribute.id
+    );
+    console.assert(row, "has root node");
 
     return this.rootStore.nodeStore.getFromId(row.rootNodeId);
   }
 
   getAttributesForOrganism(organism) {
     console.assert(organism);
-    let answer = wu(this.attributeParents)
-      .filter(row => row.parentOrganismId === organism.id);
+    let answer = wu(this.attributeParents).filter(
+      (row) => row.parentOrganismId === organism.id
+    );
 
-    answer = answer.map(row => {
-      const attr = this.attributes.find(attr => attr.id === row.childAttributeId);
+    answer = answer.map((row) => {
+      const attr = this.attributes.find(
+        (attr) => attr.id === row.childAttributeId
+      );
       console.assert(attr);
       return attr;
     });
@@ -66,12 +73,14 @@ export default class AttributeCollection {
 
   getEditables(organism) {
     let answer = wu(this.getAttributesForOrganism(organism));
-    answer = answer.filter(row => row.attributeType === 'Editable');
+    answer = answer.filter((row) => row.attributeType === "Editable");
     return answer;
   }
 
   getEmergents(organism) {
-    return wu(this.getAttributesForOrganism(organism)).filter(row => row.attributeType === 'Emergent');
+    return wu(this.getAttributesForOrganism(organism)).filter(
+      (row) => row.attributeType === "Emergent"
+    );
   }
 
   getRootNodeFromName(organism, attributeName, shouldAssert = true) {
@@ -87,12 +96,12 @@ export default class AttributeCollection {
 
   getAttributeFromName(organism, attributeName) {
     const attributes = this.getAttributesForOrganism(organism);
-    const attribute = attributes.find(attr => attr.name === attributeName);
+    const attribute = attributes.find((attr) => attr.name === attributeName);
     return attribute;
   }
 
   getAttributeFromId(attributeId) {
-    return this.attributes.find(row => row.id === attributeId);
+    return this.attributes.find((row) => row.id === attributeId);
   }
 
   getAttributeForNode(node) {
@@ -102,16 +111,20 @@ export default class AttributeCollection {
       if (parent === undefined) break;
       root = parent;
     }
-    const row = this.rootNodes.find(row => row.rootNodeId === root.id);
-    console.assert(row, 'no attribute for root node');
+    const row = this.rootNodes.find((row) => row.rootNodeId === root.id);
+    console.assert(row, "no attribute for root node");
     const attribute = this.getAttributeFromId(row.attributeId);
     return attribute;
   }
 
   getOrganismForAttribute(attribute) {
-    const row = wu(this.attributeParents).find(row => row.childAttributeId === attribute.id);
+    const row = wu(this.attributeParents).find(
+      (row) => row.childAttributeId === attribute.id
+    );
     console.assert(row);
-    const organism = this.rootStore.organismStore.getOrganismFromId(row.parentOrganismId);
+    const organism = this.rootStore.organismStore.getOrganismFromId(
+      row.parentOrganismId
+    );
     console.assert(organism !== undefined);
     return organism;
   }
@@ -121,7 +134,9 @@ export default class AttributeCollection {
   }
 
   isRootNode(node) {
-    const answer = wu(this.rootNodes).map(row => row.rootNodeId).has(node.id);
+    const answer = wu(this.rootNodes)
+      .map((row) => row.rootNodeId)
+      .has(node.id);
     return answer;
   }
 
@@ -132,32 +147,52 @@ export default class AttributeCollection {
   }
 
   assignNumber(attribute, value) {
-    this.nodeStore.putChild(this.getRootNode(attribute), 0, this.nodeStore.addNumber(value));
+    this.nodeStore.putChild(
+      this.getRootNode(attribute),
+      0,
+      this.nodeStore.addNumber(value)
+    );
+  }
+
+  assign(attribute, valueNode) {
+    this.nodeStore.putChild(this.getRootNode(attribute), 0, valueNode);
   }
 
   putEditable(organism, attributeName) {
-    return this.putAttribute(organism, attributeName, 'Editable');
+    return this.putAttribute(organism, attributeName, "Editable");
   }
 
   putEmergent(organism, attributeName) {
-    return this.putAttribute(organism, attributeName, 'Emergent');
+    return this.putAttribute(organism, attributeName, "Emergent");
   }
 
   putAttribute(organism, attributeName, attributeType) {
     const answer = makeAttribute(attributeName, attributeType);
     const rootNode = this.nodeStore.addVariable();
     this.attributes.push(answer);
-    this.attributeParents.push({ childAttributeId: answer.id, parentOrganismId: organism.id });
-    this.rootNodes.push({ attributeId: answer.id, rootNodeId: rootNode.id });
+    this.attributeParents.push({
+      childAttributeId: answer.id,
+      parentOrganismId: organism.id,
+    });
+    this.rootNodes.push({
+      attributeId: answer.id,
+      rootNodeId: rootNode.id,
+    });
     return answer;
   }
 
   remove(attribute) {
     const rootNode = this.getRootNode(attribute);
     this.rootStore.nodeStore.remove(rootNode, false);
-    
-    this.attributes = wu(this.attributes).reject(t => t.id === attribute.id).toArray();
-    this.attributeParents = wu(this.attributeParents).reject(t => t.childAttributeId === attribute.id).toArray();
-    this.rootNodes = wu(this.rootNodes).reject(t => t.attributeId === attribute.id).toArray();
+
+    this.attributes = wu(this.attributes)
+      .reject((t) => t.id === attribute.id)
+      .toArray();
+    this.attributeParents = wu(this.attributeParents)
+      .reject((t) => t.childAttributeId === attribute.id)
+      .toArray();
+    this.rootNodes = wu(this.rootNodes)
+      .reject((t) => t.attributeId === attribute.id)
+      .toArray();
   }
-};
+}

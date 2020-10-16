@@ -1,6 +1,7 @@
 import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import { RenderShape, Root } from './Root';
+import Types from './Types';
 
 export interface MetaOrganism {
   id,
@@ -16,12 +17,8 @@ export default class MetaorganismCollection {
       name: 'Circle',
       attributes: [
         {
-          name: 'x',
-          default: 0,
-        },
-        {
-          name: 'y',
-          default: 0,
+          name: 'xy',
+          type: Types.Vector,
         },
         {
           name: 'radius',

@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import wu from 'wu';
 import { MetaOrganism } from './MetaorganismCollection';
 import { Root } from './Root';
+import Types from './Types';
 
 function makeOrganism({ name }) {
   return {
@@ -108,6 +109,10 @@ export default class OrganismCollection {
       const attribute = this.root.attributeStore.putEditable(organism, metaattribute.name);
       if (metaattribute.default !== undefined) {
         this.root.attributeStore.assignNumber(attribute, metaattribute.default);
+      }
+
+      if (metaattribute.type === Types.Vector) {
+        this.root.attributeCollection.assign(attribute, this.root.nodeCollection.addVector());
       }
     }
 

@@ -184,7 +184,14 @@ export default class NodeStore {
   }
 
   addVector() {
-    
+    const answer = this.addNode("Vector") as any;
+    this.putChild(answer, 0, this.addNumber(0));
+    this.putChild(answer, 1, this.addNumber(0));
+    answer.eval = () => ({
+      x: this.getChild(answer, 0).eval(),
+      y: this.getChild(answer, 1).eval(),
+    });
+    return answer;
   }
 
   addVariable() {

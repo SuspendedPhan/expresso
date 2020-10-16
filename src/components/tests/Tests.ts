@@ -187,7 +187,6 @@ describe("HelloWorld.vue", () => {
     const nodeStore = root.nodeStore;
     const metafunStore = root.metafunStore;
 
-
     const circle = organismStore.spawn();
     const x = attributeStore.getRootNodeFromName(circle, "x");
     const clones = attributeStore.getRootNodeFromName(circle, "clones");
@@ -461,8 +460,13 @@ describe("HelloWorld.vue", () => {
       "circle",
       root.metaorganismCollection.getFromName("Circle")
     );
-    const x = attributeStore.getRootNodeFromName(circle, "x");
-    const y = attributeStore.getRootNodeFromName(circle, "y");
+    const x = attributeStore.getRootNode(
+      attributeStore.putEditable(circle, "xx")
+    );
+    const y = attributeStore.getRootNode(
+      attributeStore.putEditable(circle, "yy")
+    );
+    attributeStore.putEditable(circle, "yy");
 
     const addNode = nodeStore.addFun(metafunStore.getFromName("Add"));
     const addNode2 = nodeStore.addFun(metafunStore.getFromName("Add"));
@@ -1112,21 +1116,48 @@ describe("HelloWorld.vue", () => {
   });
 
   it("vector", () => {
-    let tree = {
+    const root = new Root();
+    const pen = root.pen;
+    const nodeCollection = root.nodeCollection;
+    const organismCollection = root.organismCollection;
+    const attributeCollection = root.attributeCollection;
+    const circle = organismCollection.putFromMetaname("circle", "Circle");
+    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'radius'));
+    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'clones'));
+    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'cloneNumber'));
+    // attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'time01'));
+    organismCollection.rootOrganism = circle;
+    // organismCollection.addChild(organismCollection.getRoot(), circle);
+
+    const commands = Array.from(root.computeRenderCommands());
+    expect(commands[0].x).to.equal(0);
+    expect(commands[0].y).to.equal(0);
+
+    pen.setPointedNode(nodeCollection.getFromPath([], "xy", [0]));
+    pen.setIsQuerying(true);
+    pen.setQuery("Add");
+    pen.commitFirstGhostEdit();
+
+    const expected = {
       "SuperOrganism root": {
-        "editattr xy": {
-          "0 Vector": {
-            "0 Number": 5,
-            "1 Number": 2,
+        "Circle circle": {
+          "editattr xy": {
+            "0 Add": {
+              "1 Vector": {
+                "0 Number": 0,
+                "1 Number": 0,
+              },
+              "2 Vector": {
+                "0 Number": 0,
+                "1 Number": 0,
+              },
+            },
           },
         },
       },
     };
 
-    const root = new Root().fromTree(tree);
-    const pen = root.pen;
-    const nodeCollection = root.nodeCollection;
-    console.log(Array.from(root.computeRenderCommands()));
-    
+    console.log(JSON.stringify(root.toTree()));
+    expect(root.toTree()).to.equal(expected);
   });
 });

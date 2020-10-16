@@ -187,6 +187,10 @@ export default class Pen {
     }
   }
 
+  commitFirstGhostEdit() {
+    this.commitGhostEdit(this.getGhostEdits().next().value);
+  }
+
   moveCursorLeft() {
     if (this.penPosition.positionType === "None") return;
 
