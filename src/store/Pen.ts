@@ -1,6 +1,7 @@
 import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
+import Types from './Types';
 
 interface NonePenPosition {
   positionType: "None";
@@ -41,16 +42,24 @@ export default class Pen {
     const query = this.query;
 
     const requiredType = this.getPointedNode().datatype;
-    console.log(this.getPointedNode());
 
     // --- number ---
 
     const number = Number.parseFloat(this.query);
     if (!Number.isNaN(number)) {
-      answer.push({
-        text: number.toString(),
-        addNodeFunction: () => this.nodeCollection.addNumber(number),
-      });
+      if (requiredType === Types.Number) {
+        answer.push({
+          text: number.toString(),
+          addNodeFunction: () => this.nodeCollection.addNumber(number),
+        });
+      } else if (requiredType === Types.Vector) {
+        answer.push({
+          text: number.toString(),
+          addNodeFunction: () => this.nodeCollection.addVector(number, 0),
+        });
+      } else {
+        console.assert(false);
+      }
       return wu(answer);
     }
 
@@ -96,9 +105,10 @@ export default class Pen {
         query.toLowerCase(),
         metafun.name.toLowerCase()
       );
-      const noTypeMap = metafun.inputTypesFromOutputType === undefined;
-      const inputTypes = metafun.inputTypesFromOutputType?.(requiredType);
-      const ok = (query === "" || isSubsequence) && (noTypeMap || inputTypes !== undefined);
+      const mustBeNumberType = metafun.inputTypesFromOutputType === undefined;
+      const validOutputType = metafun.inputTypesFromOutputType?.(requiredType) !== undefined;
+      const okNumberType = mustBeNumberType && requiredType === Types.Number;
+      const ok = (query === "" || isSubsequence) && (okNumberType || validOutputType);
       if (!ok) continue;
 
       answer.push({

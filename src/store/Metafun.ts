@@ -1,13 +1,23 @@
 import wu from "wu";
 import { Root } from "./Root";
 import seedrandom from "seedrandom";
+import Types from "./Types";
 
 export default class MetafunStore {
   metafuns = [
     {
       name: "Add",
       paramCount: 2,
-      eval: (a, b) => a.eval() + b.eval(),
+      eval: (a, b) => {
+        if (a.datatype === Types.Number) {
+          return a.eval() + b.eval();
+        } else if (a.datatype === Types.Vector) {
+          return {
+            x: a.eval().x + b.eval().x,
+            y: a.eval().y + b.eval().y,
+          };
+        }
+      },
       inputTypesFromOutputType: (outputType) => {
         const ret = [outputType, outputType];
         return ret;
@@ -98,7 +108,8 @@ export default class MetafunStore {
     {
       name: "X11",
       paramCount: 2,
-      eval: (x, windowWidth) => Math.abs(x.eval() / windowWidth.eval() - 0.5) * 2,
+      eval: (x, windowWidth) =>
+        Math.abs(x.eval() / windowWidth.eval() - 0.5) * 2,
     },
     {
       name: "Random",

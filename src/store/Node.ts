@@ -173,6 +173,13 @@ export default class NodeStore {
           node.metafunName
         ) as any;
         node.eval = () => metafun.eval(...this.getChildren(node));
+      } else if (node.metaname === "Vector") {
+        node.eval = () => ({
+          x: this.getChild(node, 0).eval(),
+          y: this.getChild(node, 1).eval(),
+        });
+      } else {
+        console.assert(false);
       }
     }
   }
@@ -181,15 +188,13 @@ export default class NodeStore {
     const answer = this.addNode("Number", Types.Number) as any;
     answer.value = value;
     answer.eval = () => answer.value;
-    console.log("add number " + answer.id);
     return answer;
   }
 
-  addVector() {
+  addVector(x = 0, y = 0) {
     const answer = this.addNode("Vector", Types.Vector) as any;
-    console.log("add vector " + answer.id);
-    this.putChild(answer, 0, this.addNumber(0));
-    this.putChild(answer, 1, this.addNumber(0));
+    this.putChild(answer, 0, this.addNumber(x));
+    this.putChild(answer, 1, this.addNumber(y));
     answer.eval = () => ({
       x: this.getChild(answer, 0).eval(),
       y: this.getChild(answer, 1).eval(),
@@ -212,8 +217,7 @@ export default class NodeStore {
     return answer;
   }
 
-  addFun(metafun, outputType: Types.Number) {
-    console.log("start add fun");
+  addFun(metafun, outputType = Types.Number) {
     const answer = this.addNode("Function", outputType) as any;
     const inputTypes = metafun.inputTypesFromOutputType?.(outputType);
     console.assert(metafun.inputTypesFromOutputType || inputTypes);
@@ -221,10 +225,8 @@ export default class NodeStore {
     for (let i = 0; i < metafun.paramCount; i++) {
       if (inputTypes === undefined || inputTypes[i] === Types.Number) {
         this.putChild(answer, i, this.addNumber(0));
-        console.log("add number");
       } else if (inputTypes[i] === Types.Vector) {
         this.putChild(answer, i, this.addVector());
-        console.log("add vector");
       } else {
         console.assert(false, inputTypes[i]);
       }
@@ -232,7 +234,6 @@ export default class NodeStore {
 
     answer.metafunName = metafun.name;
     answer.eval = () => metafun.eval(...this.getChildren(answer));
-    console.log("end add fun");
     return answer;
   }
 
@@ -357,7 +358,7 @@ export default class NodeStore {
     const newNodeChildrenCount = newNodeChildren.length;
 
     const oldNodeChildrenCount = this.getChildren(oldNode).toArray().length;
-    if (oldNode.metaname !== "Vector") {
+    if (oldNode.metaname !== "Vector" && newNode.metaname !== "Vector") {
       for (let i = 0; i < oldNodeChildrenCount; i++) {
         const child = this.getChild(oldNode, i);
         if (i < newNodeChildrenCount) {
