@@ -3,6 +3,7 @@
     <canvas :width='width' :height='height' ref='canvas'>
     </canvas>
     <div class='fps'>{{ framerate }}</div>
+    <div class='nodes'>nodes: {{ Root.nodeCollection.nodes.items.length }}</div>
   </div>
 </template>
 
@@ -23,6 +24,7 @@ export default {
       width: 0,
       height: 0,
       framerate: 0,
+      Root: Root,
     };
   },
   created: function() {
@@ -76,6 +78,17 @@ export default {
   margin: 20px;
   background-color: white;
   width: 50px;
+  text-align: center;
+}
+.nodes {
+  position: absolute;
+  bottom: 0;
+  right: 70px;
+  margin: 20px;
+  background-color: white;
+  /* width: 200px; */
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: center;
 }
 </style>

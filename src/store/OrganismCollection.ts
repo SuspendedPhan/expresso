@@ -189,6 +189,7 @@ export default class OrganismCollection {
     this.root.attributeCollection.putEmergent(this.rootOrganism, 'time01');
     this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.height');
     this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.width');
+    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.center', Types.Vector);
     return this.rootOrganism;
   }
 }

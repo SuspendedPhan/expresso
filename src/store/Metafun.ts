@@ -80,11 +80,6 @@ export default class MetafunStore {
       eval: (a) => a.eval() % 1,
     },
     {
-      name: "CloneNumber01",
-      paramCount: 2,
-      eval: (cloneNumber, clones) => cloneNumber.eval() / (clones.eval() - 1),
-    },
-    {
       name: "CloneNumber11",
       paramCount: 2,
       eval: (cloneNumber, clones) =>

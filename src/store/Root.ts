@@ -87,6 +87,11 @@ export class Root {
       "window.width",
       false
     );
+    const windowCenterRoot = this.attributeCollection.getRootNodeFromName(
+      organism,
+      "window.center",
+      false
+    );
 
     if (timeRoot) {
       this.nodeStore.putChild(
@@ -108,6 +113,16 @@ export class Root {
         windowWidthRoot,
         0,
         this.nodeStore.addNumber(this.windowSize.width)
+      );
+    }
+    if (windowCenterRoot) {
+      this.nodeStore.putChild(
+        windowCenterRoot,
+        0,
+        this.nodeStore.addVector(
+          this.windowSize.width / 2,
+          this.windowSize.height / 2
+        )
       );
     }
     if (time01Root) {
