@@ -75,9 +75,25 @@ export default class MetafunStore {
       eval: (a) => 1 - Math.abs(a.eval() * 2 - 1),
     },
     {
+      name: "Saw",
+      paramCount: 2,
+      eval: (t01, frequency) => {
+        const ret = (t01.eval() * frequency.eval()) % 1;
+        return ret;
+      },
+    },
+    {
       name: "Mod1",
       paramCount: 1,
       eval: (a) => a.eval() % 1,
+    },
+    {
+      name: "Mod01",
+      paramCount: 2,
+      eval: (a, divisor) => {
+        const ret = (a.eval() % divisor.eval()) / divisor.eval();
+        return ret;
+      },
     },
     {
       name: "CloneNumber11",
@@ -120,8 +136,8 @@ export default class MetafunStore {
         const angle01Val = angle01.eval();
         const radians = angle01Val * 2 * Math.PI;
         const ret = {
-          x: vectorVal.x * Math.cos(radians) -  vectorVal.y * Math.sin(radians),
-          y: vectorVal.x * Math.sin(radians) +  vectorVal.y * Math.cos(radians),
+          x: vectorVal.x * Math.cos(radians) - vectorVal.y * Math.sin(radians),
+          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians),
         };
         return ret;
       },
