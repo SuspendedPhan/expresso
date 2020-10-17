@@ -268,13 +268,9 @@ export default class NodeStore {
       (t) => t.childIndex === childIndex
     );
 
-    console.assert(oldChildRelationship !== undefined);
-
     if (oldChildRelationship !== undefined) {
       const oldChild = this.getFromId(oldChildRelationship.childNodeId);
       this.remove(oldChild);
-      // this.nodes.delete(oldChild);
-      // this.nodeParents.delete(oldChildRelationship);
     }
 
     for (const parentRelationship of this.nodeParents) {

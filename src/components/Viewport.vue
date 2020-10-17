@@ -86,7 +86,6 @@ export default {
   right: 70px;
   margin: 20px;
   background-color: white;
-  /* width: 200px; */
   padding-left: 10px;
   padding-right: 10px;
   text-align: center;

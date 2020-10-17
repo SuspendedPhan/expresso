@@ -160,7 +160,7 @@ export class Root {
           "cloneNumber01"
         );
         this.nodeStore.putChild(
-          cloneNumberRoot,
+          cloneNumber01Root,
           0,
           this.nodeStore.addNumber(cloneNumber / (clones - 1))
         );
