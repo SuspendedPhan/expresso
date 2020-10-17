@@ -117,11 +117,27 @@ export default class MetafunStore {
       eval: (seed) => seedrandom(seed.eval())(),
     },
 
-    // {
-    //   name: 'Rotate',
-    //   paramCount: 2,
-    //   eval()
-    // },
+    {
+      name: "Rotate",
+      paramCount: 2,
+      eval: (vector, angle01) => {
+        const vectorVal = vector.eval();
+        const angle01Val = angle01.eval();
+        const radians = angle01Val * 2 * Math.PI;
+        const ret = {
+          x: vectorVal.x * Math.cos(radians) -  vectorVal.y * Math.sin(radians),
+          y: vectorVal.x * Math.sin(radians) +  vectorVal.y * Math.cos(radians),
+        };
+        return ret;
+      },
+      inputTypesFromOutputType: (type) => {
+        if (type === Types.Vector) {
+          return [Types.Vector, Types.Number];
+        } else {
+          return undefined;
+        }
+      },
+    },
   ];
 
   constructor(private root: Root) {}

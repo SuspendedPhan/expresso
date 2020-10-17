@@ -119,6 +119,7 @@ export default class OrganismCollection {
     if (metaorganism.name !== 'TheVoid') {
       const clones = this.root.attributeStore.putEditable(organism, 'clones');
       this.root.attributeStore.putEmergent(organism, 'cloneNumber');
+      this.root.attributeStore.putEmergent(organism, 'cloneNumber01');
       this.root.attributeStore.assignNumber(clones, 1);
     }
 

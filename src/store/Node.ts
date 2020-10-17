@@ -220,7 +220,8 @@ export default class NodeStore {
   addFun(metafun, outputType = Types.Number) {
     const answer = this.addNode("Function", outputType) as any;
     const inputTypes = metafun.inputTypesFromOutputType?.(outputType);
-    console.assert(metafun.inputTypesFromOutputType || inputTypes);
+    const hasTypeFun = metafun.inputTypesFromOutputType !== undefined;
+    console.assert(!hasTypeFun || inputTypes !== undefined);
 
     for (let i = 0; i < metafun.paramCount; i++) {
       if (inputTypes === undefined || inputTypes[i] === Types.Number) {

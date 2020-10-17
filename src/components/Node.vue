@@ -95,8 +95,6 @@ export default {
   methods: {
     click() {
       Root.penStore.setPointedNode(this.astNode);
-      console.log("click");
-      console.log(this.astNode);
     },
     blur() {
       // Actions.blurCursor();
