@@ -1122,9 +1122,15 @@ describe("HelloWorld.vue", () => {
     const organismCollection = root.organismCollection;
     const attributeCollection = root.attributeCollection;
     const circle = organismCollection.putFromMetaname("circle", "Circle");
-    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'radius'));
-    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'clones'));
-    attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'cloneNumber'));
+    attributeCollection.remove(
+      attributeCollection.getAttributeFromName(circle, "radius")
+    );
+    attributeCollection.remove(
+      attributeCollection.getAttributeFromName(circle, "clones")
+    );
+    attributeCollection.remove(
+      attributeCollection.getAttributeFromName(circle, "cloneNumber")
+    );
     // attributeCollection.remove(attributeCollection.getAttributeFromName(circle, 'time01'));
     organismCollection.rootOrganism = circle;
     // organismCollection.addChild(organismCollection.getRoot(), circle);
@@ -1132,32 +1138,53 @@ describe("HelloWorld.vue", () => {
     const commands = Array.from(root.computeRenderCommands());
     expect(commands[0].x).to.equal(0);
     expect(commands[0].y).to.equal(0);
+  });
+
+  it("vector2", () => {
+    const tree = {
+      "SuperOrganism root": {
+        "editattr xy Vector": {},
+        "editattr radius Number": {},
+      },
+    };
+    const root = new Root().fromTree(tree);
+    const pen = root.pen;
+    const nodeCollection = root.nodeCollection;
+    const organismCollection = root.organismCollection;
+    const attributeCollection = root.attributeCollection;
+    expect(nodeCollection.getFromPath([], "xy", []).eval().x).to.equal(0);
 
     pen.setPointedNode(nodeCollection.getFromPath([], "xy", [0]));
     pen.setIsQuerying(true);
+    pen.setQuery("radius");
+    expect(pen.getGhostEdits().next().done).to.equal(true);
+
+    // --------------------------------------------------------
+
     pen.setQuery("Add");
     pen.commitFirstGhostEdit();
-
-    const expected = {
+    const ex = {
       "SuperOrganism root": {
-        "Circle circle": {
-          "editattr xy": {
-            "0 Add": {
-              "1 Vector": {
-                "0 Number": 0,
-                "1 Number": 0,
-              },
-              "2 Vector": {
-                "0 Number": 0,
-                "1 Number": 0,
-              },
+        "editattr xy Vector": {
+          "0 Function Add": {
+            "0 Vector": {
+              "0 Number": 0,
+              "1 Number": 0,
+            },
+            "1 Vector": {
+              "0 Number": 0,
+              "1 Number": 0,
             },
           },
+        },
+        "editattr radius Number": {
+          "0 Number": 0,
         },
       },
     };
 
-    console.log(JSON.stringify(root.toTree()));
-    expect(root.toTree()).to.equal(expected);
+    expect(root.toTree()).to.deep.equal(ex);
+
+    // --------------------------------------------------------
   });
 });

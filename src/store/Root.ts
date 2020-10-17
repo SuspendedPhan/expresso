@@ -9,6 +9,7 @@ import Time from "./Time";
 import { DateTime } from 'luxon';
 import AttributeCollection from './AttributeCollection';
 import WordCollection from './WordCollection';
+import Types from './Types';
 
 export enum RenderShape {
   Circle = 'Circle',
@@ -158,7 +159,7 @@ export class Root {
     for (const attribute of this.attributeCollection.getEditables(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
       const childRootNode = this.nodeStore.getChild(rootNode, 0);
-      const key = `editattr ${attribute.name}`;
+      const key = `editattr ${attribute.name} ${attribute.datatype}`;
       const rootNodeTree = {};
       organTree[key] = rootNodeTree;
       this.nodeStore.toTree2(childRootNode, rootNodeTree);
@@ -166,7 +167,7 @@ export class Root {
     for (const attribute of this.attributeCollection.getEmergents(organism)) {
       const rootNode = this.attributeCollection.getRootNode(attribute);
       const childRootNode = this.nodeStore.getChild(rootNode, 0);
-      const key = `emerattr ${attribute.name}`;
+      const key = `emerattr ${attribute.name} ${attribute.datatype}`;
       const rootNodeTree = {};
       organTree[key] = rootNodeTree;
       this.nodeStore.toTree2(childRootNode, rootNodeTree);
@@ -184,16 +185,17 @@ export class Root {
   ) {
     for (const [key, value] of wu.entries(subtree)) {
       const splits = key.split(' ');
-      const type = splits[0];
-      if (type === 'editattr') {
-        const attribute = this.attributeCollection.putEditable(superorganism, splits[1]);
+      const attributeType = splits[0];
+      if (attributeType === 'editattr') {
+        const type = splits[2] as Types;
+        const attribute = this.attributeCollection.putEditable(superorganism, splits[1], type);
         const rootNode = this.attributeCollection.getRootNode(attribute);
         this.nodeStore.fromTree(value, rootNode);
-      } else if (type === 'emerattr') {
+      } else if (attributeType === 'emerattr') {
         this.attributeCollection.putEmergent(superorganism, splits[1]);
       } else {
         let organism;
-        const metaorganism = this.metaorganismCollection.getFromName(type);
+        const metaorganism = this.metaorganismCollection.getFromName(attributeType);
         if (!superorganism) {
           this.organismCollection.rootOrganism = this.organismCollection.putFromMetaWithoutAttributes('root', metaorganism);
           organism = this.organismCollection.rootOrganism;
@@ -205,6 +207,10 @@ export class Root {
       }
     }
     return this;
+  }
+
+  toTreeJson() {
+    return JSON.stringify(this.toTree(), null, 2);
   }
 }
 

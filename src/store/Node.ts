@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
+import Types from "./Types";
 
 interface ParentRelationship {
   childNodeId: string;
@@ -177,14 +178,16 @@ export default class NodeStore {
   }
 
   addNumber(value) {
-    const answer = this.addNode("Number") as any;
+    const answer = this.addNode("Number", Types.Number) as any;
     answer.value = value;
     answer.eval = () => answer.value;
+    console.log("add number " + answer.id);
     return answer;
   }
 
   addVector() {
-    const answer = this.addNode("Vector") as any;
+    const answer = this.addNode("Vector", Types.Vector) as any;
+    console.log("add vector " + answer.id);
     this.putChild(answer, 0, this.addNumber(0));
     this.putChild(answer, 1, this.addNumber(0));
     answer.eval = () => ({
@@ -194,8 +197,8 @@ export default class NodeStore {
     return answer;
   }
 
-  addVariable() {
-    const answer = this.addNode("Variable") as any;
+  addVariable(datatype = Types.Number) {
+    const answer = this.addNode("Variable", datatype) as any;
     const child = this.addNumber(0);
     this.putChild(answer, 0, child);
     answer.eval = () => this.getChild(answer, 0).eval();
@@ -203,27 +206,42 @@ export default class NodeStore {
   }
 
   addReference(targetNode) {
-    const answer = this.addNode("Reference") as any;
+    const answer = this.addNode("Reference", targetNode.datatype) as any;
     answer.targetNodeId = targetNode.id;
     answer.eval = () => this.getFromId(answer.targetNodeId).eval();
     return answer;
   }
 
-  addFun(metafun) {
-    const answer = this.addNode("Function") as any;
+  addFun(metafun, outputType: Types.Number) {
+    console.log("start add fun");
+    const answer = this.addNode("Function", outputType) as any;
+    const inputTypes = metafun.inputTypesFromOutputType?.(outputType);
+    console.assert(metafun.inputTypesFromOutputType || inputTypes);
+
     for (let i = 0; i < metafun.paramCount; i++) {
-      this.putChild(answer, i, this.addNumber(0));
+      if (inputTypes === undefined || inputTypes[i] === Types.Number) {
+        this.putChild(answer, i, this.addNumber(0));
+        console.log("add number");
+      } else if (inputTypes[i] === Types.Vector) {
+        this.putChild(answer, i, this.addVector());
+        console.log("add vector");
+      } else {
+        console.assert(false, inputTypes[i]);
+      }
     }
+
     answer.metafunName = metafun.name;
     answer.eval = () => metafun.eval(...this.getChildren(answer));
+    console.log("end add fun");
     return answer;
   }
 
-  addNode(metaname) {
+  addNode(metaname, datatype) {
     const answer = {
       metaname,
       id: uuidv4(),
       storetype: "node",
+      datatype,
     };
     this.nodes.add(answer);
     return answer;
@@ -339,17 +357,18 @@ export default class NodeStore {
     const newNodeChildrenCount = newNodeChildren.length;
 
     const oldNodeChildrenCount = this.getChildren(oldNode).toArray().length;
-
-    for (let i = 0; i < oldNodeChildrenCount; i++) {
-      const child = this.getChild(oldNode, i);
-      if (i < newNodeChildrenCount) {
-        this.reparent({
-          child: child,
-          newParent: newNode,
-          childIndex: i,
-        });
-      } else {
-        this.remove(child);
+    if (oldNode.metaname !== "Vector") {
+      for (let i = 0; i < oldNodeChildrenCount; i++) {
+        const child = this.getChild(oldNode, i);
+        if (i < newNodeChildrenCount) {
+          this.reparent({
+            child: child,
+            newParent: newNode,
+            childIndex: i,
+          });
+        } else {
+          this.remove(child);
+        }
       }
     }
 
@@ -398,6 +417,7 @@ export default class NodeStore {
 
     if (subrootNode.metaname === "Function") {
       const childTree = {};
+      // childTree.metadata = subrootNode;
 
       subtree[
         `${childIndex} ${subrootNode.metaname} ${subrootNode.metafunName}`
@@ -406,9 +426,14 @@ export default class NodeStore {
         this.toTree2(childNode, childTree);
       }
     } else if (subrootNode.metaname === "Number") {
+      // subtree[`${childIndex} ${subrootNode.metaname}`] = subrootNode;
       subtree[`${childIndex} ${subrootNode.metaname}`] = subrootNode.value;
-    } else if (subrootNode.metaname === "Variable") {
+    } else if (
+      subrootNode.metaname === "Variable" ||
+      subrootNode.metaname === "Vector"
+    ) {
       const childTree = {};
+      // childTree.metadata = subrootNode;
 
       subtree[`${childIndex} ${subrootNode.metaname}`] = childTree;
       for (const childNode of this.getChildren(subrootNode)) {

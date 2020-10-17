@@ -38,7 +38,7 @@ export function runTests() {
     // 'ghost edits'
     // "node drop/add argument",
     // "computeRenderCommands",
-    "vector",
+    "vector2",
   ] as any[];
   for (const test of store.tests) {
     const ok = okTests.length === 0 || wu(okTests).has(test.name);

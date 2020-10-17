@@ -2,10 +2,12 @@ import wu from "wu";
 import { v4 as uuidv4 } from "uuid";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
+import Types from "./Types";
 
-const makeAttribute = (name, attributeType) => ({
+const makeAttribute = (name, attributeType, datatype) => ({
   name,
   attributeType,
+  datatype,
   id: uuidv4(),
 });
 
@@ -158,17 +160,17 @@ export default class AttributeCollection {
     this.nodeStore.putChild(this.getRootNode(attribute), 0, valueNode);
   }
 
-  putEditable(organism, attributeName) {
-    return this.putAttribute(organism, attributeName, "Editable");
+  putEditable(organism, attributeName, datatype = Types.Number) {
+    return this.putAttribute(organism, attributeName, "Editable", datatype);
   }
 
-  putEmergent(organism, attributeName) {
-    return this.putAttribute(organism, attributeName, "Emergent");
+  putEmergent(organism, attributeName, datatype = Types.Number) {
+    return this.putAttribute(organism, attributeName, "Emergent", datatype);
   }
 
-  putAttribute(organism, attributeName, attributeType) {
-    const answer = makeAttribute(attributeName, attributeType);
-    const rootNode = this.nodeStore.addVariable();
+  putAttribute(organism, attributeName, attributeType, datatype = Types.Number) {
+    const answer = makeAttribute(attributeName, attributeType, datatype);
+    const rootNode = this.nodeStore.addVariable(datatype);
     this.attributes.push(answer);
     this.attributeParents.push({
       childAttributeId: answer.id,
@@ -178,6 +180,9 @@ export default class AttributeCollection {
       attributeId: answer.id,
       rootNodeId: rootNode.id,
     });
+    if (datatype === Types.Vector) {
+      this.assign(answer, this.nodeStore.addVector());
+    }
     return answer;
   }
 

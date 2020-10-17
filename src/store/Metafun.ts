@@ -1,116 +1,127 @@
-import wu from 'wu';
-import { Root } from './Root';
-import seedrandom from 'seedrandom';
+import wu from "wu";
+import { Root } from "./Root";
+import seedrandom from "seedrandom";
 
 export default class MetafunStore {
   metafuns = [
     {
-      name: 'Add',
+      name: "Add",
       paramCount: 2,
       eval: (a, b) => a.eval() + b.eval(),
+      inputTypesFromOutputType: (outputType) => {
+        const ret = [outputType, outputType];
+        return ret;
+      },
     },
     {
-      name: 'Multiply',
+      name: "Multiply",
       paramCount: 2,
       eval: (a, b) => a.eval() * b.eval(),
     },
     {
-      name: 'Divide',
+      name: "Divide",
       paramCount: 2,
       eval: (a, b) => a.eval() / b.eval(),
     },
     {
-      name: 'Subtract',
+      name: "Subtract",
       paramCount: 2,
       eval: (a, b) => a.eval() - b.eval(),
     },
     {
-      name: 'Modulus',
+      name: "Modulus",
       paramCount: 2,
       eval: (a, b) => a.eval() % b.eval(),
     },
     {
-      name: 'Abs',
+      name: "Abs",
       paramCount: 1,
       eval: (a) => Math.abs(a.eval()),
     },
     {
-      name: 'Lerp',
+      name: "Lerp",
       paramCount: 3,
       eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval()),
     },
     {
-      name: 'InvLerp01',
+      name: "InvLerp01",
       paramCount: 3,
-      eval: (a, b, fx) => Math.min(1, Math.max(0, (fx.eval() / (b.eval() - a.eval())))),
+      eval: (a, b, fx) =>
+        Math.min(1, Math.max(0, fx.eval() / (b.eval() - a.eval()))),
     },
     {
-      name: 'Distance',
+      name: "Distance",
       paramCount: 2,
       eval: (a, b) => Math.abs(a.eval() - b.eval()),
     },
     {
-      name: 'SoloFront',
+      name: "SoloFront",
       paramCount: 3,
-      eval: (fx, t01, twindow) => t01.eval() < twindow.eval() ? fx.eval() : 0,
+      eval: (fx, t01, twindow) => (t01.eval() < twindow.eval() ? fx.eval() : 0),
     },
     {
-      name: 'Tri',
+      name: "Tri",
       paramCount: 1,
       eval: (a) => 1 - Math.abs(a.eval() * 2 - 1),
     },
     {
-      name: 'Mod1',
+      name: "Mod1",
       paramCount: 1,
       eval: (a) => a.eval() % 1,
     },
     {
-      name: 'CloneNumber01',
+      name: "CloneNumber01",
       paramCount: 2,
       eval: (cloneNumber, clones) => cloneNumber.eval() / (clones.eval() - 1),
     },
     {
-      name: 'CloneNumber11',
+      name: "CloneNumber11",
       paramCount: 2,
-      eval: (cloneNumber, clones) => (cloneNumber.eval() / (clones.eval() - 1) - .5) * 2,
+      eval: (cloneNumber, clones) =>
+        (cloneNumber.eval() / (clones.eval() - 1) - 0.5) * 2,
     },
     {
-      name: 'CenterX',
+      name: "CenterX",
       paramCount: 1,
       eval: (windowWidth) => windowWidth.eval() / 2,
     },
     {
-      name: 'CenterY',
+      name: "CenterY",
       paramCount: 1,
       eval: (windowHeight) => windowHeight.eval() / 2,
     },
     {
-      name: 'Time11',
+      name: "Time11",
       paramCount: 1,
-      eval: (time01) => (time01.eval() - .5) * 2,
+      eval: (time01) => (time01.eval() - 0.5) * 2,
     },
     {
-      name: 'X11',
+      name: "X11",
       paramCount: 2,
-      eval: (x, windowWidth) => Math.abs(x / windowWidth - .5) * 2,
+      eval: (x, windowWidth) => Math.abs(x.eval() / windowWidth.eval() - 0.5) * 2,
     },
     {
-      name: 'Random',
+      name: "Random",
       paramCount: 1,
       eval: (seed) => seedrandom(seed.eval())(),
     },
+
+    // {
+    //   name: 'Rotate',
+    //   paramCount: 2,
+    //   eval()
+    // },
   ];
 
   constructor(private root: Root) {}
-
 
   getSerialized() {
     return {};
   }
 
   getFromName(name) {
-    const answer = wu(this.metafuns).find(row => row.name === name);
-    console.assert(answer !== undefined, 'fun name');
+    const answer = wu(this.metafuns).find((row) => row.name === name);
+    console.assert(answer !== undefined, "fun name");
     return answer;
   }
 
@@ -118,7 +129,5 @@ export default class MetafunStore {
     return this.metafuns;
   }
 
-  deserialize() {
-    
-  }
+  deserialize() {}
 }

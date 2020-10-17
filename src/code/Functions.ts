@@ -6,6 +6,10 @@ export default class Functions {
     return uuidv4();
   }
 
+  static toJson(obj) {
+    return JSON.stringify(obj, null, 2);
+  }
+
   static pluck(obj, properties) {
     const answer = {};
     for (const property of properties) {

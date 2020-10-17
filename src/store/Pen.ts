@@ -40,6 +40,9 @@ export default class Pen {
     const answer = [] as any;
     const query = this.query;
 
+    const requiredType = this.getPointedNode().datatype;
+    console.log(this.getPointedNode());
+
     // --- number ---
 
     const number = Number.parseFloat(this.query);
@@ -73,7 +76,9 @@ export default class Pen {
           attribute.name.toLowerCase()
         );
         const ok =
-          attribute !== pointedAttribute && (query === "" || isSubsequence);
+          attribute !== pointedAttribute &&
+          (query === "" || isSubsequence) &&
+          attribute.datatype === requiredType;
         if (!ok) continue;
 
         const rootNode = this.root.attributeCollection.getRootNode(attribute);
@@ -86,17 +91,19 @@ export default class Pen {
 
     // --- functions ---
 
-    for (const fun of this.root.metafunStore.getFuns()) {
+    for (const metafun of this.root.metafunStore.getFuns()) {
       const isSubsequence = Functions.isSubsequence(
         query.toLowerCase(),
-        fun.name.toLowerCase()
+        metafun.name.toLowerCase()
       );
-      const ok = query === "" || isSubsequence;
+      const noTypeMap = metafun.inputTypesFromOutputType === undefined;
+      const inputTypes = metafun.inputTypesFromOutputType?.(requiredType);
+      const ok = (query === "" || isSubsequence) && (noTypeMap || inputTypes !== undefined);
       if (!ok) continue;
 
       answer.push({
-        text: fun.name,
-        addNodeFunction: () => this.nodeCollection.addFun(fun),
+        text: metafun.name,
+        addNodeFunction: () => this.nodeCollection.addFun(metafun, requiredType),
       });
     }
 
