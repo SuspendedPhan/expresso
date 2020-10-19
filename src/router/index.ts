@@ -1,21 +1,26 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../components/Home.vue'
-import TestRunner from '../components/tests/TestRunner.vue'
+import Vue from "vue";
+import VueRouter from "vue-router";
+import Home from "../components/Home.vue";
+import TestRunner from "../components/tests/TestRunner.vue";
+import Wat from "@/components/Wat.vue";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
-  const routes = [
+const routes = [
   {
-    path: '/',
-    name: 'Home',
-    component: Home
+    path: "/",
+    name: "Home",
+    component: Home,
   },
   {
-    path: '/tests',
-    name: 'TestRunner',
-    component: TestRunner
-  }
+    path: "/tests",
+    name: "TestRunner",
+    component: TestRunner,
+  },
+  {
+    path: "/wat",
+    component: Wat,
+  },
   // {
   //   path: '/about',
   //   name: 'About',
@@ -24,12 +29,12 @@ Vue.use(VueRouter)
   //   // which is lazy-loaded when the route is visited.
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // }
-]
+];
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
