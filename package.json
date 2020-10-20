@@ -10,6 +10,8 @@
     "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"
   },
   "dependencies": {
+    "@types/codemirror": "0.0.98",
+    "codemirror": "^5.58.1",
     "core-js": "^3.6.5",
     "fps": "0.0.3",
     "lodash": "^4.17.20",
