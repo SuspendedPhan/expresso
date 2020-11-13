@@ -38,6 +38,7 @@ export class Root {
   pen = this.penStore;
   time = new Time(this);
   windowSize = { width: 0, height: 0 };
+  mostRecentClickCoordinates = {x: 0, y: 0}
 
   // --- GETS ---
 
@@ -55,6 +56,10 @@ export class Root {
 
   setWindowSize(width: number, height: number) {
     this.windowSize = { width, height };
+  }
+
+  setMouseLocation(x: number, y: number) {
+    this.mostRecentClickCoordinates = { x, y };
   }
 
   *computeRenderCommands(): Iterable<any> {

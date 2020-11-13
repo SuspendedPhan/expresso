@@ -1,6 +1,6 @@
 <template>
   <div class='viewport' ref='viewport'>
-    <canvas :width='width' :height='height' ref='canvas'>
+    <canvas :width='width' :height='height' ref='canvas' @mousemove ="testMethod($event)">
     </canvas>
     <div class='fps'>{{ framerate }}</div>
     <div class='nodes'>nodes: {{ Root.nodeCollection.nodes.items.length }}</div>
@@ -25,6 +25,7 @@ export default {
       height: 0,
       framerate: 0,
       Root: Root,
+      mostRecentClickCoordinates: {x: 0, y:0}
     };
   },
   created: function() {
@@ -33,17 +34,26 @@ export default {
   },
   mounted: function() {
     this.update();
+    this.testMethod(event);
   },
   methods: {
+    testMethod(event){
+     this.mostRecentClickCoordinates = {
+       x: event.clientX,
+       y: event.clientY
+     }
+    },
     update: function() {
-      this.ticker.tick();
+    
 
+      this.ticker.tick();
       const viewport = this.$refs.viewport;
       const canvas = this.$refs.canvas;
       this.width = viewport.clientWidth;
       this.height = viewport.clientHeight;
       const context = canvas.getContext('2d');
       Root.setWindowSize(this.width, this.height);
+      Root.setMouseLocation(this.mostRecentClickCoordinates.x, this.mostRecentClickCoordinates.y);
       context.clearRect(0, 0, this.width, this.height);
       context.fillStyle = 'black';
       context.fillRect(0, 0, this.width, this.height);
