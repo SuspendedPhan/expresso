@@ -12,7 +12,7 @@ import TestRunner from "./tests/TestRunner.vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import Vue from "vue";
-import CodeMirror from 'codemirror';
+// import CodeMirror from 'codemirror';
 
 @Component({
   components: {

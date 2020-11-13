@@ -1,5 +1,5 @@
 import { Root } from './Root';
-import { Position, EditorChange } from 'codemirror';
+// import { Position, EditorChange } from 'codemirror';
 import Functions from '@/code/Functions';
 
 interface Range {
