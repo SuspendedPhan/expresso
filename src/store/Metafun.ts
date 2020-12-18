@@ -14,65 +14,73 @@ export default class MetafunStore {
         } else if (a.datatype === Types.Vector) {
           return {
             x: a.eval().x + b.eval().x,
-            y: a.eval().y + b.eval().y
+            y: a.eval().y + b.eval().y,
           };
         }
       },
-      inputTypesFromOutputType: outputType => {
+      inputTypesFromOutputType: (outputType) => {
         const ret = [outputType, outputType];
         return ret;
-      }
+      },
     },
     {
       name: "Multiply",
       paramCount: 2,
-      eval: (a, b) => a.eval() * b.eval()
+      eval: (a, b) => a.eval() * b.eval(),
     },
     {
       name: "Divide",
       paramCount: 2,
-      eval: (a, b) => a.eval() / b.eval()
+      eval: (a, b) => {
+        const ret = a.eval() / b.eval();
+
+        // super hacky fix to avoid "divide by zero" from locking up the editor
+        if (isNaN(ret) || ret == Infinity) {
+          return 0;
+        }
+        return ret;
+      },
     },
     {
       name: "Subtract",
       paramCount: 2,
-      eval: (a, b) => a.eval() - b.eval()
+      eval: (a, b) => a.eval() - b.eval(),
     },
     {
       name: "Modulus",
       paramCount: 2,
-      eval: (a, b) => a.eval() % b.eval()
+      eval: (a, b) => a.eval() % b.eval(),
     },
     {
       name: "Abs",
       paramCount: 1,
-      eval: a => Math.abs(a.eval())
+      eval: (a) => Math.abs(a.eval()),
     },
     {
       name: "Lerp",
       paramCount: 3,
-      eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval())
+      eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval()),
     },
     {
       name: "InvLerp01",
       paramCount: 3,
       eval: (a, b, fx) =>
-        Math.min(1, Math.max(0, fx.eval() / (b.eval() - a.eval())))
+        Math.min(1, Math.max(0, fx.eval() / (b.eval() - a.eval()))),
     },
     {
       name: "Distance",
       paramCount: 2,
-      eval: (a, b) => Math.abs(a.eval() - b.eval())
+      eval: (a, b) => Math.abs(a.eval() - b.eval()),
     },
     {
       name: "SoloFront",
       paramCount: 3,
-      eval: (fx, t01, twindow) => (t01.eval() < twindow.eval() ? fx.eval() : 0)
+      eval: (fx, t01, twindow) => (t01.eval() < twindow.eval() ? fx.eval() : 0),
     },
     {
       name: "Tri",
       paramCount: 1,
-      eval: a => 1 - Math.abs(a.eval() * 2 - 1)
+      eval: (a) => 1 - Math.abs(a.eval() * 2 - 1),
     },
     {
       name: "Saw",
