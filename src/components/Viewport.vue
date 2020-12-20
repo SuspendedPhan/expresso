@@ -34,7 +34,7 @@ export default {
   },
   mounted: function() {
     this.update();
-    this.testMethod(event);
+    // this.testMethod(event);
   },
   methods: {
     testMethod(event){

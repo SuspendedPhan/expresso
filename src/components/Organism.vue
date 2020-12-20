@@ -14,6 +14,7 @@
     </div>
     <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
       <span>{{ attribute.name }}: </span>
+      <Attribute :astNode='getNodeForAttribute(attribute)' />
       <Node :astNode='getNodeForAttribute(attribute)' />
     </div>
     <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>
@@ -24,12 +25,14 @@
 <script>
 import wu from 'wu';
 import Root from '../store/Root';
+import Attribute from './Attribute';
 import Node from './Node';
 
 export default {
   name: 'Organism',
   components: {
     Node,
+    Attribute,
   },
   props: {
     organism: null,
