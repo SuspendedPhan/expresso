@@ -157,7 +157,7 @@ export default class Pen {
     }
   }
 
-  setPointedNode(node) {
+  setPointedNode(node, relation = PenPositionRelation.On) {
     if (node === null) {
       this.penPosition = {
         positionType: "None",
@@ -166,7 +166,7 @@ export default class Pen {
       this.penPosition = {
         positionType: "Node",
         referenceNodeId: node.id,
-        relation: PenPositionRelation.On,
+        relation: relation,
       };
     }
     this.setIsQuerying(false);
