@@ -12,6 +12,8 @@ module.exports = {
     parser: '@typescript-eslint/parser'
   },
   "rules": {
+    "vue/no-unused-components": 1,
+
     ////////// Possible Errors //////////
 
     "no-comma-dangle": 0,         // disallow trailing commas in object literals

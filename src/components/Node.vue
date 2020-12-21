@@ -30,13 +30,13 @@
       <span :class="{ highlighted }">)</span>
     </span>
     <span v-if="isPenAfterMe"><b>|</b></span>
-    <NodePicker
+    <!-- <NodePicker
       ref="searcher"
       v-if="picking"
       :nodeToReplace="astNode"
       @blur="blur"
       :class="['searcher', { 'bring-to-front': picking }]"
-    />
+    /> -->
   </span>
 </template>
 
@@ -112,11 +112,11 @@ export default {
   },
   watch: {
     picking() {
-      if (this.picking) {
-        this.$nextTick().then(() => {
-          this.$refs["searcher"].focus();
-        });
-      }
+      // if (this.picking) {
+      //   this.$nextTick().then(() => {
+      //     this.$refs["searcher"].focus();
+      //   });
+      // }
     },
   },
 };

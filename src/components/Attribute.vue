@@ -1,5 +1,17 @@
 <template>
-  <textarea ref="textarea" style="position: absolute; height: auto"></textarea>
+  <div>
+    <textarea
+      ref="textarea"
+      style="position: absolute; height: auto"
+    ></textarea>
+    <NodePicker
+      ref="searcher"
+      v-if="picking"
+      :nodeToReplace="astNode"
+      @blur="blur"
+      :class="['searcher', { 'bring-to-front': picking }]"
+    />
+  </div>
 </template>
 
 <script>
@@ -9,15 +21,17 @@ import { Prop, Watch } from "vue-property-decorator";
 import Root from "../store/Root";
 import CodeMirror from "codemirror-minified";
 import { PenPositionRelation } from "../store/Pen";
+import NodePicker from "./NodePicker";
 
 @Component({
-  components: {},
+  components: { NodePicker },
 })
 export default class Attribute extends Vue {
   @Prop() astNode;
 
   codeMirror = null;
   pen = Root.penStore;
+  dirtyCounter = 0;
 
   mounted() {
     this.codeMirror = CodeMirror.fromTextArea(this.$refs["textarea"], {
@@ -38,20 +52,25 @@ export default class Attribute extends Vue {
         } else if (event.key === "Escape" && this.pen.getIsQuerying()) {
           this.pen.setIsQuerying(false);
         }
+        this.dirtyCounter++;
       }
     });
 
+    this.codeMirror.on("keyup", (_, event) => {
+      event.preventDefault();
+    });
+
+    this.codeMirror.on("keypress", (_, event) => {
+      event.preventDefault();
+    });
+
     this.codeMirror.on("change", () => {
-      console.log("change");
     });
     this.codeMirror.on("beforeSelectionChange", (_, { origin }) => {
-      console.log('origin');
-      console.log(origin);
       if (origin === undefined) {
         return;
       } else if (origin === "*mouse" || origin === null) {
         Vue.nextTick(() => {
-          console.log("cursor");
           const anchor = this.codeMirror.getCursor("anchor");
           const head = this.codeMirror.getCursor("head");
           const node = this.annotatedText[anchor.ch].node;
@@ -67,6 +86,31 @@ export default class Attribute extends Vue {
         console.assert(false);
       }
     });
+  }
+
+  blur() {
+    this.codeMirror.focus();
+    this.dirtyCounter++;
+    Vue.nextTick(() => {
+      this.dirtyCounter++;
+    })
+    console.log('blur');
+  }
+
+  @Watch("picking")
+  focusSearcher() {
+    if (this.picking) {
+      this.$nextTick().then(() => {
+        this.$refs["searcher"].focus();
+      });
+    }
+  }
+
+  get picking() {
+    return (
+      // Root.pen.getPenPosition().referenceNodeId === this.astNode.id &&
+      Root.penStore.getIsQuerying()
+    );
   }
 
   @Watch("astNode")
@@ -158,7 +202,10 @@ export default class Attribute extends Vue {
   }
 
   get annotatedText() {
-    return Attribute.getAnnotatedText(this.astNode, Root);
+    this.dirtyCounter;
+    console.log('annotated');
+    const qq = Attribute.getAnnotatedText(this.astNode, Root);
+    return qq;
   }
 
   get text() {
