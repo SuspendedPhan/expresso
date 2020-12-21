@@ -26,42 +26,46 @@ export default class Attribute extends Vue {
     });
     this.codeMirror.getWrapperElement().style.height = "auto";
     this.codeMirror.setValue(this.text);
-    this.codeMirror.on("beforeSelectionChange", (_, obj) => {
-      if (obj.origin === undefined) return;
-
-      console.assert(obj.ranges.length === 1);
-      
-      const { anchor, head } = obj.ranges[0];
-
-      if (obj.origin === "+move") {
-        const newAnchor = anchor.ch;
-        const newHead = head.ch;
-        const oldAnchor = this.codeMirror.getCursor("anchor").ch;
-        const oldHead = this.codeMirror.getCursor("head").ch;
-
-        const didGoLeft = newAnchor - oldAnchor < 0 || newHead - oldHead < 0;
-        const didGoRight = newAnchor - oldAnchor > 0 || newHead - oldHead > 0;
-        if (didGoLeft) {
+    this.codeMirror.on("keydown", (_, event) => {
+      event.preventDefault();
+      if (this.pen.getPenPosition().positionType === "Node") {
+        if (event.key === "Enter") {
+          this.pen.setIsQuerying(true);
+        } else if (event.key === "ArrowLeft" && !this.pen.getIsQuerying()) {
           this.pen.moveCursorLeft();
-        } else if (didGoRight) {
+        } else if (event.key === "ArrowRight" && !this.pen.getIsQuerying()) {
           this.pen.moveCursorRight();
-        } else {
-          console.assert(false);
+        } else if (event.key === "Escape" && this.pen.getIsQuerying()) {
+          this.pen.setIsQuerying(false);
         }
-      } else if (obj.origin === "*mouse") {
-        const node = this.annotatedText[anchor.ch].node;
-        const isInsideToken = this.annotatedText[anchor.ch - 1]?.node === node;
-        if (anchor.ch === head.ch && !isInsideToken) {
-          this.pen.setPointedNode(node, PenPositionRelation.Before);
-        } else {
-          this.pen.setPointedNode(node);
-        }
+      }
+    });
+
+    this.codeMirror.on("change", () => {
+      console.log("change");
+    });
+    this.codeMirror.on("beforeSelectionChange", (_, { origin }) => {
+      console.log('origin');
+      console.log(origin);
+      if (origin === undefined) {
+        return;
+      } else if (origin === "*mouse" || origin === null) {
+        Vue.nextTick(() => {
+          console.log("cursor");
+          const anchor = this.codeMirror.getCursor("anchor");
+          const head = this.codeMirror.getCursor("head");
+          const node = this.annotatedText[anchor.ch].node;
+          const isInsideToken =
+            this.annotatedText[anchor.ch - 1]?.node === node;
+          if (anchor.ch === head.ch && !isInsideToken) {
+            this.pen.setPointedNode(node, PenPositionRelation.Before);
+          } else {
+            this.pen.setPointedNode(node);
+          }
+        });
       } else {
         console.assert(false);
       }
-    });
-    this.codeMirror.on("beforeChange", (_, changeObj) => {
-      changeObj.cancel();
     });
   }
 
@@ -71,6 +75,7 @@ export default class Attribute extends Vue {
   }
 
   @Watch("pen.penPosition")
+  @Watch("pen.penPosition.relation")
   updateCursor() {
     // for (const marker of this.codeMirror.getAllMarks()) {
     //   marker.clear();
@@ -87,6 +92,8 @@ export default class Attribute extends Vue {
     //     );
     //   }
     // }
+    console.log("pen position");
+
     if (this.pen.penPosition.positionType === PenPositionRelation.None) {
       return;
     }
