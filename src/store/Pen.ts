@@ -161,7 +161,7 @@ export default class Pen {
     return this.penPosition;
   }
 
-  private getAnnotatedTextForAttribute(attribute: any) {
+  public getAnnotatedTextForAttribute(attribute: any) {
     const rootNode = this.root.attributeCollection.getRootNode(attribute);
     const node = this.root.nodeCollection.getChild(rootNode, 0);
     return this.getAnnotatedTextForNode(node);

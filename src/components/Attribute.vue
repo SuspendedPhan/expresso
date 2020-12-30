@@ -32,6 +32,8 @@ export default class Attribute extends Vue {
   pen = Root.penStore;
 
   mounted() {
+    var ColorClass = Quill.import('attributors/class/color');
+    Quill.register(ColorClass, true);
     var bindings = {
       // This will overwrite the default binding also named 'tab'
       enter: {
@@ -50,6 +52,8 @@ export default class Attribute extends Vue {
     });
 
     this.quill.setText(this.getText(), "silent");
+    // this.quill.formatText(0, 5, 'color', 'whatshot');
+    // console.log(this.quill.getFormat(0, 5));
 
     this.quill.root.addEventListener("keydown", (event) => {
       if (event.key.length === 1 && !event.ctrlKey && !event.altKey) {
@@ -70,6 +74,7 @@ export default class Attribute extends Vue {
 
     this.quill.on("text-change", (delta, oldDelta, source) => {
       Vue.nextTick(() => {
+        console.log('set text');
         this.quill.setText(oldDelta.ops[0].insert, "silent");
         this.updateCursor();
       });
@@ -112,8 +117,31 @@ export default class Attribute extends Vue {
 
   updateEditor() {
     if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
+    this.quill.removeFormat(0, this.quill.getLength());
     this.quill.setText(this.getText(), "silent");
+    const annotatedText = Root.pen.getAnnotatedTextForAttribute(
+      this.attributeModel
+    );
+    // console.log(annotatedText);
+    for (let i = 0; i < annotatedText.length; i++) {
+      const annotatedChar = annotatedText[i];
+      const node = annotatedChar.node;
+      if (node === null) continue;
+      if (node.metaname === "Function") {
+        this.quill.formatText(i, 1, 'color', 'doit', 'silent');
+        console.log(this.quill.getFormat(i, 1));
+        // this.quill.formatText(i, 1, 'color', '#3BB5DC', 'silent');
+      } else {
+        this.quill.formatText(i, 1, 'color', 'var', 'silent');
+        // this.quill.formatText(i, 1, 'color', 'rgba(113, 0, 225, 0.55)', 'silent');
+      }
+    }
+    // console.log(this.quill.getFormat(0, this.quill.getLength()));
     this.updateCursor();
+  }
+  
+  setText(quill, text) {
+    this.quill.setText(text, "silent");
   }
 
   @Watch("pen.selection")
@@ -128,6 +156,7 @@ export default class Attribute extends Vue {
         "silent"
       );
     }
+    // console.log(this.quill.getFormat(0, this.quill.getLength()));
   }
 
   getText() {
@@ -136,17 +165,5 @@ export default class Attribute extends Vue {
 }
 </script>
 
-<style>
-.marked {
-  color: red;
-}
-.ql-clipboard {
-  display: none;
-}
-.ql-editor {
-  overflow-y: auto;
-}
-p {
-  margin: 0;
-}
+<style scoped>
 </style>

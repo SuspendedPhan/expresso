@@ -26,4 +26,14 @@ button:hover {
   background-color: gray;
   color: white;
 }
+.ql-clipboard {
+  display: none;
+}
+.ql-editor {
+  overflow-y: auto;
+  word-wrap: anywhere;
+}
+p {
+  margin: 0;
+}
 </style>

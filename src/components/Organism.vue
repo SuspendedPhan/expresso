@@ -14,7 +14,7 @@
     </div>
     <div class='attribute-group'>
       <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
-        <span>{{ attribute.name }}: </span>
+        <span class='attribute-name'>{{ attribute.name }}: </span>
         <Attribute :attributeModel='attribute' />
       </div>
     </div>
@@ -103,5 +103,8 @@ export default {
   display: grid;
   grid-auto-rows: auto;
   gap: 20px;
+}
+.attribute-name {
+  color: rgba(113, 0, 225, 0.7);
 }
 </style>
