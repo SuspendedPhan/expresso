@@ -31,15 +31,17 @@ export default class Attribute extends Vue {
   @Prop() attributeModel;
 
   codeMirror = null;
+  codeMirrorWrapper = null;
   pen = Root.penStore;
   dirtyCounter = 0;
 
   mounted() {
-    this.codeMirror = CodeMirror.fromTextArea(this.$refs["textarea"], {
-      lineNumbers: true,
-      viewportMargin: Infinity,
-      readOnly: true,
-    });
+    // this.codeMirror = CodeMirror.fromTextArea(this.$refs["textarea"], {
+    //   lineNumbers: true,
+    //   viewportMargin: Infinity,
+    //   readOnly: true,
+    // });
+    this.codeMirrorWrapper = this.codeMirror.getWrapperElement();
     this.codeMirror.getWrapperElement().style.height = "auto";
     this.codeMirror.setValue(this.getText());
     this.codeMirror.on("keydown", (_, event) => {
@@ -61,8 +63,19 @@ export default class Attribute extends Vue {
     //   event.preventDefault();
     // });
 
-    this.codeMirror.on("change", () => {});
-    this.codeMirror.on("beforeSelectionChange", (_, { origin }) => {
+    this.codeMirror.on("change", () => {
+      console.log('change');
+    });
+    this.codeMirror.getDoc().on("beforeSelectionChange", (cm, { origin }) => {
+      // if (cm.getWrapperElement() !== this.codeMirrorWrapper) return;
+
+      // console.log(cm);
+      // console.assert(false);
+      // console.log(cm === this.codeMirror);
+      console.log('before');
+      console.log(cm);
+      // console.log(cm.getWrapperElement());
+      // console.log(this.codeMirrorWrapper);
       if (origin === undefined) return;
       Vue.nextTick(() => {
         const anchorIndex = this.codeMirror.getCursor("anchor").ch;
