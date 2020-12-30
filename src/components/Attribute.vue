@@ -1,9 +1,6 @@
 <template>
   <div>
-    <textarea
-      ref="textarea"
-      style="position: absolute; height: auto"
-    ></textarea>
+    <div ref="textarea"></div>
     <NodePicker
       ref="searcher"
       v-if="picking"
@@ -22,6 +19,7 @@ import CodeMirror from "codemirror-minified";
 import { PenPositionRelation } from "../store/Pen";
 import NodePicker from "./NodePicker";
 import Functions from "@/code/Functions";
+import Quill from "quill";
 
 @Component({
   components: { NodePicker },
@@ -30,69 +28,63 @@ export default class Attribute extends Vue {
   @Prop() astNode;
   @Prop() attributeModel;
 
-  codeMirror = null;
-  codeMirrorWrapper = null;
+  quill = null;
   pen = Root.penStore;
   dirtyCounter = 0;
 
   mounted() {
-    // this.codeMirror = CodeMirror.fromTextArea(this.$refs["textarea"], {
-    //   lineNumbers: true,
-    //   viewportMargin: Infinity,
-    //   readOnly: true,
-    // });
-    this.codeMirrorWrapper = this.codeMirror.getWrapperElement();
-    this.codeMirror.getWrapperElement().style.height = "auto";
-    this.codeMirror.setValue(this.getText());
-    this.codeMirror.on("keydown", (_, event) => {
-      if (event.key === "Enter") {
+    this.quill = new Quill(this.$refs["textarea"], {});
+    // this.quill = new Quill(this.$refs["textarea"], { readOnly: true });
+
+    this.quill.setText(this.getText(), "silent");
+    this.quill.setSelection(1, 1, "silent");
+    this.quill.focus();
+
+    this.quill.root.addEventListener("keydown", (event) => {
+      if (event.key.length === 1) {
         this.pen.setIsQuerying(true);
-      } else if (event.key === "Escape" && this.pen.getIsQuerying()) {
+        this.pen.setQuery(event.key);
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      console.log("keydown");
+      console.log(this.pen.selection);
+    });
+
+    this.quill.keyboard.addBinding({ key: "Escape" }, () => {
+      if (this.pen.isQuerying) {
         this.pen.setIsQuerying(false);
       }
     });
-    // this.codeMirror.on("keydown", (_, event) => {
-    //   event.preventDefault();
-    // });
 
-    // this.codeMirror.on("keyup", (_, event) => {
-    //   event.preventDefault();
-    // });
-
-    // this.codeMirror.on("keypress", (_, event) => {
-    //   event.preventDefault();
-    // });
-
-    this.codeMirror.on("change", () => {
-      console.log('change');
-    });
-    this.codeMirror.getDoc().on("beforeSelectionChange", (cm, { origin }) => {
-      // if (cm.getWrapperElement() !== this.codeMirrorWrapper) return;
-
-      // console.log(cm);
-      // console.assert(false);
-      // console.log(cm === this.codeMirror);
-      console.log('before');
-      console.log(cm);
-      // console.log(cm.getWrapperElement());
-      // console.log(this.codeMirrorWrapper);
-      if (origin === undefined) return;
+    this.quill.on("text-change", (delta, oldDelta, source) => {
+      console.log(delta);
       Vue.nextTick(() => {
-        const anchorIndex = this.codeMirror.getCursor("anchor").ch;
-        const headIndex = this.codeMirror.getCursor("head").ch;
-        this.pen.setSelection({
-          attributeId: this.attributeModel.id,
-          startIndex: anchorIndex,
-          endIndex: headIndex,
-        });
+        this.quill.setText(oldDelta.ops[0].insert, "silent");
+        this.updateCursor();
       });
     });
 
-    this.pen.events.on('afterCommitGhostEdit', () => this.updateEditor());
+    this.quill.on("selection-change", (range, oldRange, source) => {
+      if (range === null) return;
+      if (this.pen.getIsQuerying()) return;
+      if (source !== 'user') return;
+
+      console.log("setting sel " + source);
+
+      this.pen.setSelection({
+        attributeId: this.attributeModel.id,
+        startIndex: range.index,
+        endIndex: range.index + range.length,
+      });
+    });
+
+    this.pen.events.on("afterCommitGhostEdit", () => this.updateEditor());
   }
 
   blur() {
-    this.codeMirror.focus();
+    this.quill.focus();
     this.dirtyCounter++;
     Vue.nextTick(() => {
       this.dirtyCounter++;
@@ -112,39 +104,34 @@ export default class Attribute extends Vue {
   get picking() {
     return (
       // Root.pen.getPenPosition().referenceNodeId === this.astNode.id &&
-      Root.penStore.getIsQuerying()
+      Root.penStore.getIsQuerying() &&
+      Root.pen.getSelectedAttribute() === this.attributeModel
     );
   }
 
-  // get key() {
-  //   console.log('key');
-  //   const node = Root.attributeCollection.getRootNode(this.attributeModel);
-  //   const descendants = Array.from(Functions.traversePostOrder(node, t => Root.nodeCollection.getChildren(t)));
-  //   return descendants.map(t => t.id).join('|');
-  // }
-
-  // @Watch("key")
   updateEditor() {
-    console.log('asdf');
-    this.codeMirror.setValue(this.getText());
+    if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
+    console.error("updateEditor");
+    this.quill.setText(this.getText(), "silent");
+    this.updateCursor();
   }
 
   @Watch("pen.selection")
   updateCursor() {
-    this.codeMirror.setSelection(
-      {
-        line: 0,
-        ch: this.pen.getSelection().startIndex,
-      },
-      {
-        line: 0,
-        ch: this.pen.getSelection().endIndex,
-      }
-    );
+    if (this.pen.getIsQuerying()) return;
+
+    if (this.pen.getSelection()?.attributeId === this.attributeModel.id) {
+      const selection = this.pen.getSelection();
+      this.quill.setSelection(
+        selection.startIndex,
+        selection.endIndex - selection.startIndex,
+        "silent"
+      );
+      console.error(this.quill.getSelection());
+    }
   }
 
   getText() {
-    console.log('asdf23');
     return Root.pen.getTextForAttribute(this.attributeModel);
   }
 }
@@ -153,5 +140,14 @@ export default class Attribute extends Vue {
 <style>
 .marked {
   color: red;
+}
+.ql-clipboard {
+  display: none;
+}
+.ql-editor {
+  overflow-y: auto;
+}
+p {
+  margin: 0;
 }
 </style>

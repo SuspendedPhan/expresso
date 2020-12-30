@@ -487,7 +487,7 @@ export default class Pen {
     return isZeroLengthSelection;
   }
 
-  private getSelectedAttribute() {
+  public getSelectedAttribute() {
     console.assert(this.getSelection() !== null);
     return this.root.attributeCollection.getAttributeFromId(this.getSelection()!.attributeId);
   }

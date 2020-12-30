@@ -25,16 +25,20 @@ export default {
   },
   methods: {
     keydown(event) {
+      console.log(event);
       if (event.key === 'Enter' && this.suggestions.length > 0) {
         if (Root.penStore.getQuery() !== '') {
           const result = this.suggestions[0];
           Root.penStore.commitGhostEdit(result);
           Root.save();
         }
-        
+
         Root.penStore.setIsQuerying(false);
         this.blur();
         event.stopPropagation();
+      } else if (event.key === 'Escape') {
+        Root.penStore.setIsQuerying(false);
+        this.blur();
       }
     },
     focus() {
