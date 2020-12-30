@@ -1,7 +1,7 @@
 import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
-import Types from './Types';
+import Types from "./Types";
 
 interface NonePenPosition {
   positionType: "None";
@@ -21,10 +21,31 @@ export enum PenPositionRelation {
   Before = "Before",
 }
 
+export interface Selection {
+  attributeId: string;
+
+  // Character index
+  startIndex: number;
+
+  // Character index
+  endIndex: number;
+}
+
+interface AnnotatedText {
+  char: string[1];
+  node: any;
+}
+
+interface Bounds {
+  startIndex: number;
+  endIndex: number;
+}
+
 export default class Pen {
   penPosition = { positionType: "None" } as PenPosition;
   query = "";
   isQuerying = false;
+  selection = null as Selection | null;
 
   constructor(private root: Root) {}
 
@@ -106,14 +127,17 @@ export default class Pen {
         metafun.name.toLowerCase()
       );
       const mustBeNumberType = metafun.inputTypesFromOutputType === undefined;
-      const validOutputType = metafun.inputTypesFromOutputType?.(requiredType) !== undefined;
+      const validOutputType =
+        metafun.inputTypesFromOutputType?.(requiredType) !== undefined;
       const okNumberType = mustBeNumberType && requiredType === Types.Number;
-      const ok = (query === "" || isSubsequence) && (okNumberType || validOutputType);
+      const ok =
+        (query === "" || isSubsequence) && (okNumberType || validOutputType);
       if (!ok) continue;
 
       answer.push({
         text: metafun.name,
-        addNodeFunction: () => this.nodeCollection.addFun(metafun, requiredType),
+        addNodeFunction: () =>
+          this.nodeCollection.addFun(metafun, requiredType),
       });
     }
 
@@ -136,12 +160,113 @@ export default class Pen {
     return this.penPosition;
   }
 
+  private getAnnotatedTextForAttribute(attribute: any) {
+    const rootNode = this.root.attributeCollection.getRootNode(attribute);
+    const node = this.root.nodeCollection.getChild(rootNode, 0);
+    return this.getAnnotatedTextForNode(node);
+  }
+
+  getTextForAttribute(attribute: any) {
+    return this.getAnnotatedTextForAttribute(attribute)
+      .map((t) => t.char)
+      .join("");
+  }
+
+  getSelection() {
+    return this.selection;
+  }
+
+  private getAnnotatedTextForNode(astNode) {
+    const root = this.root;
+    if (astNode.metaname === "Number") {
+      // console.log("number");
+      return this.textToAnnotatedText(astNode.value.toString(), astNode);
+    } else if (astNode.metaname === "Vector") {
+      // <2321, 443>
+      console.assert(
+        root.nodeCollection.getChildren(astNode).toArray().length == 2,
+        "Attribute.vue vector"
+      );
+      const xNode = root.nodeCollection.getChild(astNode, 0);
+      const yNode = root.nodeCollection.getChild(astNode, 1);
+      let answer = [] as any;
+      answer.push({ char: "<", node: astNode });
+      answer = answer.concat(this.getAnnotatedTextForNode(xNode));
+      answer.push({ char: ",", node: astNode });
+      answer = answer.concat(this.getAnnotatedTextForNode(yNode));
+      answer.push({ char: ">", node: astNode });
+      return answer;
+    } else if (astNode.metaname === "Reference") {
+      return this.textToAnnotatedText(
+        this.referenceToString(astNode, root),
+        astNode
+      );
+    } else if (astNode.metaname === "Function") {
+      const funName = this.funToString(astNode, root);
+      const children = Array.from(root.nodeCollection.getChildren(astNode));
+      let answer = [] as any;
+      answer = answer.concat(this.textToAnnotatedText(funName, astNode));
+      answer.push({ char: "(", node: null });
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
+        if (i !== 0) {
+          answer.push({ char: ",", node: null });
+        }
+        answer = answer.concat(this.getAnnotatedTextForNode(child));
+      }
+      answer.push({ char: ")", node: null });
+      return answer;
+    } else if (astNode.metaname === "Variable") {
+      console.error("Attribute.vue not expecting Variable");
+    } else {
+      console.error("Attribute.vue Unknown metaname");
+    }
+  }
+
   private getPointedNode() {
     if (this.penPosition.positionType === "Node") {
       return this.root.nodeStore.getFromId(this.penPosition.referenceNodeId);
     } else {
       return null;
     }
+  }
+
+  private referenceToString(referenceNode, root) {
+    const targetNode = root.nodeStore.getTargetNodeForReference(referenceNode);
+    return root.attributeStore.getAttributeForNode(targetNode).name;
+  }
+
+  private funToString(funNode, root) {
+    const metafun = root.metafunStore.getFromName(funNode.metafunName);
+    return metafun.name;
+  }
+
+  private textToAnnotatedText(text, astNode) {
+    return text.split("").map((t) => ({
+      char: t,
+      node: astNode,
+    }));
+  }
+
+  private getCharBoundsForNode(astNode, annotatedText) {
+    let startIndex = null as null | number;
+    for (let i = 0; i < annotatedText.length; i++) {
+      if (annotatedText[i].node === astNode) {
+        startIndex = i;
+        break;
+      }
+    }
+
+    let endIndex = null as null | number;
+    for (let i = annotatedText.length; i > 0; i--) {
+      if (annotatedText[i - 1].node === astNode) {
+        endIndex = i;
+        break;
+      }
+    }
+    console.assert(startIndex !== null);
+    console.assert(endIndex !== null);
+    return { startIndex, endIndex } as Bounds;
   }
 
   // --- ACTIONS ---
@@ -157,23 +282,174 @@ export default class Pen {
     }
   }
 
-  setPointedNode(node, relation = PenPositionRelation.On) {
-    if (node === null) {
-      this.penPosition = {
-        positionType: "None",
-      };
-    } else {
-      this.penPosition = {
-        positionType: "Node",
-        referenceNodeId: node.id,
-        relation: relation,
-      };
-    }
-    this.setIsQuerying(false);
+  setSelection(selection: Selection | null) {
+    this.selection = this.calcSelection(selection, this.selection);
   }
 
-  setPenPosition(penPosition: PenPosition) {
-    this.penPosition = penPosition;
+  private calcSelection(
+    selection: Selection | null,
+    prevSelection: Selection | null
+  ): Selection | null {
+    if (selection === null) return null;
+
+    const attribute = this.root.attributeCollection.getAttributeFromId(
+      selection.attributeId
+    );
+    const annotatedText = this.getAnnotatedTextForAttribute(attribute);
+    console.assert(selection.startIndex >= 0);
+    console.assert(selection.endIndex <= annotatedText.length);
+
+    if (
+      this.didPassOverSingleCharNode(prevSelection, selection, annotatedText)
+    ) {
+      let node;
+      if (this.didGoLeft(prevSelection, selection)) {
+        node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
+      } else {
+        node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
+      }
+      return this.makeSelectionForNode(
+        node,
+        annotatedText,
+        selection.attributeId
+      );
+    } else {
+      const node = annotatedText[selection.startIndex]?.node ?? null;
+      if (node === null) {
+        if (this.didGoLeft(prevSelection, selection)) {
+          const leftNode = this.getNodeToLeftOfChar(
+            selection.startIndex,
+            annotatedText
+          );
+          return this.makeSelectionForNode(
+            leftNode,
+            annotatedText,
+            selection.attributeId
+          );
+        } else {
+          // Either right or new selection
+          const rightNode = this.getNodeToRightOfChar(
+            selection.startIndex,
+            annotatedText
+          );
+          if (rightNode === null) {
+            const leftNode = this.getNodeToLeftOfChar(
+              selection.startIndex,
+              annotatedText
+            );
+            return this.makeSelectionForNode(
+              leftNode,
+              annotatedText,
+              selection.attributeId
+            );
+          } else {
+            return this.makeFrontSelectionForNode(
+              rightNode,
+              annotatedText,
+              selection.attributeId
+            );
+          }
+        }
+      } else {
+        if (this.isIndexInsideNode(selection.startIndex, node, annotatedText)) {
+          return this.makeSelectionForNode(
+            node,
+            annotatedText,
+            selection.attributeId
+          );
+        } else {
+          return this.makeFrontSelectionForNode(
+            node,
+            annotatedText,
+            selection.attributeId
+          );
+        }
+      }
+    }
+  }
+
+  private didPassOverSingleCharNode(
+    prevSelection: Selection | null,
+    selection: Selection,
+    annotatedText: AnnotatedText[]
+  ) {
+    if (prevSelection === null) return false;
+
+    const frontIndex = Math.min(selection.startIndex, prevSelection.startIndex);
+    const backIndex = Math.max(selection.startIndex, prevSelection.startIndex);
+    const node = annotatedText[frontIndex].node;
+    if (node === null) return false;
+
+    const sameAttribute = prevSelection.attributeId === selection.attributeId;
+    const prevSingleChar = prevSelection.startIndex === prevSelection.endIndex;
+    const currentSingleChar = selection.startIndex === selection.endIndex;
+
+    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+    const oneCharApart =
+      charBoundsForNode.endIndex - charBoundsForNode.startIndex === 1;
+    const skippedOverNode =
+      frontIndex === charBoundsForNode.startIndex &&
+      backIndex === charBoundsForNode.endIndex;
+
+    return (
+      sameAttribute &&
+      prevSingleChar &&
+      currentSingleChar &&
+      oneCharApart &&
+      skippedOverNode
+    );
+  }
+
+  private isIndexInsideNode(charIndex, node, annotatedText) {
+    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+    return (
+      charIndex > charBoundsForNode.startIndex &&
+      charIndex < charBoundsForNode.endIndex
+    );
+  }
+
+  private didGoLeft(prevSelection, selection) {
+    if (prevSelection === null) return false;
+    console.assert(prevSelection.attributeId === selection.attributeId);
+    if (selection.startIndex < prevSelection.startIndex) return true;
+    if (selection.startIndex > prevSelection.startIndex) return false;
+    if (selection.endIndex < prevSelection.endIndex) return true;
+    return false;
+  }
+
+  private getNodeToLeftOfChar(index, annotatedText: AnnotatedText[]) {
+    let node = null;
+    for (let i = index - 1; i >= 0; i--) {
+      node = annotatedText[i].node;
+      if (node !== null) {
+        break;
+      }
+    }
+    return node;
+  }
+
+  private getNodeToRightOfChar(index, annotatedText: AnnotatedText[]) {
+    let node = null;
+    for (let i = index; i < annotatedText.length; i++) {
+      node = annotatedText[i].node;
+      if (node !== null) {
+        break;
+      }
+    }
+    return node;
+  }
+
+  private makeSelectionForNode(node, annotatedText, attributeId) {
+    return { ...this.getCharBoundsForNode(node, annotatedText), attributeId };
+  }
+
+  private makeFrontSelectionForNode(node, annotatedText, attributeId) {
+    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+    return {
+      startIndex: charBoundsForNode.startIndex,
+      endIndex: charBoundsForNode.startIndex,
+      attributeId,
+    };
   }
 
   setQuery(query) {
@@ -206,110 +482,5 @@ export default class Pen {
 
   commitFirstGhostEdit() {
     this.commitGhostEdit(this.getGhostEdits().next().value);
-  }
-
-  moveCursorLeft() {
-    if (this.penPosition.positionType === "None") return;
-
-    if (this.penPosition.relation === PenPositionRelation.On) {
-      this.penPosition.relation = PenPositionRelation.Before;
-    } else if (this.penPosition.relation === PenPositionRelation.After) {
-      this.penPosition.relation = PenPositionRelation.On;
-    } else if (this.penPosition.relation === PenPositionRelation.Before) {
-      const nodeStore = this.root.nodeStore;
-      const traverse = Functions.traverseLeft(
-        this.nodeCollection.getFromId(this.penPosition.referenceNodeId),
-        (node) => this.nodeCollection.getParent(node, false),
-        (node) => nodeStore.getChildren(node)
-      );
-      const node = traverse.next().value;
-      if (node && !this.root.attributeCollection.isRootNode(node)) {
-        this.penPosition = {
-          positionType: "Node",
-          referenceNodeId: node.id,
-          relation: PenPositionRelation.On,
-        };
-      }
-    }
-  }
-
-  moveCursorRight() {
-    if (this.penPosition.positionType === "None") return;
-
-    if (this.penPosition.relation === PenPositionRelation.Before) {
-      this.penPosition.relation = PenPositionRelation.On;
-    } else {
-      const nodeStore = this.root.nodeStore;
-      const traverse = Functions.traverseRight(
-        this.getPointedNode(),
-        (node) => this.nodeCollection.getParent(node, false),
-        (node) => nodeStore.getChildren(node)
-      );
-      const node = traverse.next().value;
-      if (node && !this.root.attributeCollection.isRootNode(node)) {
-        this.penPosition = {
-          positionType: "Node",
-          referenceNodeId: node.id,
-          relation: PenPositionRelation.Before,
-        };
-      }
-    }
-  }
-
-  moveCursorUp() {
-    if (this.getPointedNode() === null) {
-      const organism = this.root.organismStore.getOrganisms()[0];
-      const attr = this.root.attributeStore.getEditables(organism).next().value;
-      const rootNode = this.root.attributeStore.getRootNode(attr);
-      this.setPointedNode(this.nodeCollection.getChild(rootNode, 0));
-    } else {
-      const attribute = this.root.attributeStore.getAttributeForNode(
-        this.getPointedNode()
-      );
-      const organism = this.root.attributeStore.getOrganismForAttribute(
-        attribute
-      );
-      const attributes = Array.from(
-        this.root.attributeStore.getEditables(organism)
-      );
-      attributes.reverse();
-      const nextAttribute = wu
-        .cycle(attributes)
-        .dropWhile((attr) => attr !== attribute)
-        .drop(1)
-        .next().value;
-      const node = this.nodeCollection.getChild(
-        this.root.attributeStore.getRootNode(nextAttribute),
-        0
-      );
-      this.setPointedNode(node);
-    }
-  }
-
-  moveCursorDown() {
-    if (this.getPointedNode() === null) {
-      const organism = this.root.organismStore.getOrganisms()[0];
-      const attr = this.root.attributeStore.getEditables(organism).next().value;
-      const rootNode = this.root.attributeStore.getRootNode(attr);
-      this.setPointedNode(this.nodeCollection.getChild(rootNode, 0));
-    } else {
-      const attribute = this.root.attributeStore.getAttributeForNode(
-        this.getPointedNode()
-      );
-      const organism = this.root.attributeStore.getOrganismForAttribute(
-        attribute
-      );
-      const attributes = this.root.attributeStore.getEditables(organism);
-      const nextAttribute = wu
-        .cycle(attributes)
-        .dropWhile((attr) => attr !== attribute)
-        .drop(1)
-        .next().value;
-      const node = this.nodeCollection.getChild(
-        this.root.attributeStore.getRootNode(nextAttribute),
-        0
-      );
-      this.setPointedNode(node);
-    }
   }
 }
