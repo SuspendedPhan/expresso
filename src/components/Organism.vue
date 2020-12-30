@@ -15,8 +15,7 @@
     <div class='attribute-group'>
       <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
         <span>{{ attribute.name }}: </span>
-        <Attribute :astNode='getNodeForAttribute(attribute)' />
-        <Node :astNode='getNodeForAttribute(attribute)' />
+        <Attribute :attributeModel='attribute' />
       </div>
     </div>
     <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>

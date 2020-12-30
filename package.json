@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
+    "@types/events": "^3.0.0",
     "@types/luxon": "^1.25.0",
     "@types/mocha": "^5.2.4",
     "@types/wu": "^2.1.42",

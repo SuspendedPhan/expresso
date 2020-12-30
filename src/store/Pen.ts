@@ -2,6 +2,7 @@ import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
 import Types from "./Types";
+import { EventEmitter } from 'events';
 
 interface NonePenPosition {
   positionType: "None";
@@ -46,6 +47,7 @@ export default class Pen {
   query = "";
   isQuerying = false;
   selection = null as Selection | null;
+  events = new EventEmitter();
 
   constructor(private root: Root) {}
 
@@ -56,7 +58,6 @@ export default class Pen {
   // --- GETS ---
 
   getGhostEdits() {
-    if (this.penPosition.positionType === "None") return wu([]);
     if (this.isQuerying === false) return wu([]);
 
     const answer = [] as any;
@@ -224,11 +225,12 @@ export default class Pen {
   }
 
   private getPointedNode() {
-    if (this.penPosition.positionType === "Node") {
-      return this.root.nodeStore.getFromId(this.penPosition.referenceNodeId);
-    } else {
-      return null;
-    }
+    const selection = this.getSelection();
+    if (selection === null) return null;
+    
+    const attribute = this.root.attributeCollection.getAttributeFromId(selection.attributeId);
+    const annotatedText = this.getAnnotatedTextForAttribute(attribute);
+    return annotatedText[selection.startIndex].node;
   }
 
   private referenceToString(referenceNode, root) {
@@ -308,6 +310,7 @@ export default class Pen {
       } else {
         node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
       }
+      console.log('single char');
       return this.makeSelectionForNode(
         node,
         annotatedText,
@@ -321,12 +324,14 @@ export default class Pen {
             selection.startIndex,
             annotatedText
           );
+          console.log('went left, null node');
           return this.makeSelectionForNode(
             leftNode,
             annotatedText,
             selection.attributeId
           );
         } else {
+          console.log('went right, null node');
           // Either right or new selection
           const rightNode = this.getNodeToRightOfChar(
             selection.startIndex,
@@ -352,12 +357,14 @@ export default class Pen {
         }
       } else {
         if (this.isIndexInsideNode(selection.startIndex, node, annotatedText)) {
+          console.log('inside node');
           return this.makeSelectionForNode(
             node,
             annotatedText,
             selection.attributeId
           );
         } else {
+          console.log('front of node');
           return this.makeFrontSelectionForNode(
             node,
             annotatedText,
@@ -457,27 +464,32 @@ export default class Pen {
   }
 
   commitGhostEdit(ghostEdit) {
-    if (this.penPosition.positionType === "None") {
-      console.error("None ghost edit");
-    } else if (this.penPosition.positionType === "Node") {
-      const node = ghostEdit.addNodeFunction();
-      const referenceNode = this.nodeCollection.getFromId(
-        this.penPosition.referenceNodeId
-      );
-      if (this.penPosition.relation === PenPositionRelation.On) {
-        this.nodeCollection.replaceNode(referenceNode, node);
-        this.setPointedNode(node);
-        this.moveCursorRight();
-        this.moveCursorRight();
-      } else if (this.penPosition.relation === PenPositionRelation.Before) {
-        this.nodeCollection.insertNodeAsParent(referenceNode, node);
-        this.setPointedNode(node);
-      } else {
-        console.error("unexpected");
-      }
+    const node = ghostEdit.addNodeFunction();
+    const referenceNode = this.getPointedNode();
+
+    if (this.isCursorInserting()) {
+      this.nodeCollection.insertNodeAsParent(referenceNode, node);
     } else {
-      console.error("unexpected");
+      this.nodeCollection.replaceNode(referenceNode, node);
     }
+
+    const attribute = this.root.attributeCollection.getAttributeFromId(this.getSelection()!.attributeId);
+    const annotatedText = this.getAnnotatedTextForAttribute(attribute);
+    this.selection = this.makeSelectionForNode(node, annotatedText, attribute.id);
+
+    this.events.emit('afterCommitGhostEdit');
+  }
+
+  private isCursorInserting(): boolean {
+    const selection = this.getSelection() as Selection;
+    console.assert(selection !== null);
+    const isZeroLengthSelection = selection.startIndex === selection.endIndex;
+    return isZeroLengthSelection;
+  }
+
+  private getSelectedAttribute() {
+    console.assert(this.getSelection() !== null);
+    return this.root.attributeCollection.getAttributeFromId(this.getSelection()!.attributeId);
   }
 
   commitFirstGhostEdit() {
