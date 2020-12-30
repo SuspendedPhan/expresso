@@ -15,9 +15,6 @@ import Store from '../store/Root';
 
 export default {
   name: 'NodePicker',
-  props: {
-    nodeToReplace: Object,
-  },
   data: function() {
     return {
       searchText: '',
@@ -29,21 +26,24 @@ export default {
   methods: {
     keydown(event) {
       if (event.key === 'Enter' && this.suggestions.length > 0) {
-        if (Root.penStore.getQuery() === '') {
-          Root.penStore.setIsQuerying(false);
-        } else {
+        if (Root.penStore.getQuery() !== '') {
           const result = this.suggestions[0];
           Root.penStore.commitGhostEdit(result);
-          Root.save();
         }
+
+        Root.penStore.setIsQuerying(false);
         this.blur();
         event.stopPropagation();
+      } else if (event.key === 'Escape') {
+        Root.penStore.setIsQuerying(false);
+        this.blur();
       }
     },
     focus() {
       this.$refs['input'].focus();
     },
     blur() {
+      Root.pen.setIsQuerying(false);
       this.$emit('blur');
     },
   },

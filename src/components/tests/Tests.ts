@@ -1189,5 +1189,91 @@ describe("HelloWorld.vue", () => {
   });
 
   it("code mirror", () => {
+    let tree = {
+      "SuperOrganism root": {
+        "editattr gravity": {
+          "0 Function Add": {
+            "0 Number": 3,
+            "1 Function Multiply": {
+              "0 Number": 52,
+              "1 Number": 2,
+            },
+          },
+        },
+      },
+    };
+
+    const root = new Root().fromTree(tree);
+    const pen = root.pen;
+    const nodeCollection = root.nodeCollection;
+    // expect(root.toTree()).to.deep.equal(tree);
+
+    const organism = root.organismCollection.getRoot();
+    const attribute = root.attributeCollection.getAttributeFromName(
+      organism,
+      "gravity"
+    );
+
+    expect(pen.getTextForAttribute(attribute)).to.equal("Add(3,Multiply(52,2))");
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 0, endIndex: 0 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 0, endIndex: 0 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 1, endIndex: 1 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 0, endIndex: 3 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 2, endIndex: 2 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 0, endIndex: 3 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 2, endIndex: 2 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 0, endIndex: 3 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 3, endIndex: 3 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 5, endIndex: 5 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 4, endIndex: 5 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 5, endIndex: 5 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 6, endIndex: 6 });
+
+    pen.setSelection({ attributeId: attribute.id, startIndex: 6, endIndex: 6 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 6, endIndex: 6 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 7, endIndex: 7 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 6, endIndex: 14 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 14, endIndex: 14 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 15, endIndex: 15 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 16, endIndex: 16 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 15, endIndex: 17 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 19, endIndex: 19 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 18, endIndex: 19 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 20, endIndex: 20 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 18, endIndex: 19 });
+    
+    pen.setSelection({ attributeId: attribute.id, startIndex: 21, endIndex: 21 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 18, endIndex: 19 });
+
+    // add(3,multiply(52,2))
+
+    pen.setSelection(null);
+    expect(pen.getSelection()).to.deep.equal(null);
+
+    // test move left
+    pen.setSelection({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
+    pen.setSelection({ attributeId: attribute.id, startIndex: 3, endIndex: 3 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 0, endIndex: 3 });
+
+    // test select paren from no selection
+    pen.setSelection(null);
+    pen.setSelection({ attributeId: attribute.id, startIndex: 3, endIndex: 3 });
+    expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
   });
 });

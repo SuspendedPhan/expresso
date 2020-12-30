@@ -12,9 +12,11 @@
       <button @click='addAttribute'>Add Attribute</button>
       <button @click='removeOrganism(organism)' v-if='!isRoot'>Remove Organism</button>
     </div>
-    <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
-      <span>{{ attribute.name }}: </span>
-      <Node :astNode='getNodeForAttribute(attribute)' />
+    <div class='attribute-group'>
+      <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+        <span>{{ attribute.name }}: </span>
+        <Attribute :attributeModel='attribute' />
+      </div>
     </div>
     <Organism class='organ' v-for='organ in root.organismCollection.getChildren(organism)' :key='organ.id' :organism='organ'>
     </Organism>
@@ -24,12 +26,14 @@
 <script>
 import wu from 'wu';
 import Root from '../store/Root';
+import Attribute from './Attribute';
 import Node from './Node';
 
 export default {
   name: 'Organism',
   components: {
     Node,
+    Attribute,
   },
   props: {
     organism: null,
@@ -94,5 +98,10 @@ export default {
   gap: 10px;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.attribute-group {
+  display: grid;
+  grid-auto-rows: auto;
+  gap: 20px;
 }
 </style>
