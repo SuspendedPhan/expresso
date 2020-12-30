@@ -1,12 +1,12 @@
-import { v4 as uuidv4 } from 'uuid';
-import wu from 'wu';
-import { MetaOrganism } from './MetaorganismCollection';
-import { Root } from './Root';
-import Types from './Types';
+import { v4 as uuidv4 } from "uuid";
+import wu from "wu";
+import { MetaOrganism } from "./MetaorganismCollection";
+import { Root } from "./Root";
+import Types from "./Types";
 
 function makeOrganism({ name }) {
   return {
-    storetype: 'Organism',
+    storetype: "Organism",
     id: uuidv4(),
     name,
     metaorganismId: null,
@@ -21,7 +21,7 @@ interface OrganEntry {
 export interface Organism {
   id: string;
   name: string;
-  storetype: 'Organism';
+  storetype: "Organism";
   metaorganismId: string;
 }
 
@@ -35,7 +35,7 @@ export default class OrganismCollection {
   // --- GETS ---
 
   getFromName(name) {
-    return wu(this.organisms).find(organism => organism.name === name);
+    return wu(this.organisms).find((organism) => organism.name === name);
   }
 
   getOrganisms() {
@@ -43,7 +43,7 @@ export default class OrganismCollection {
   }
 
   getOrganismFromId(organismId): Organism {
-    const organism = wu(this.organisms).find(row => row.id === organismId);
+    const organism = wu(this.organisms).find((row) => row.id === organismId);
     console.assert(organism as any);
     return organism as any;
   }
@@ -60,13 +60,13 @@ export default class OrganismCollection {
     let organism = this.rootOrganism;
     for (const organismName of path) {
       const children = this.getChildren(organism);
-      organism = children.find(t => t?.name === organismName);
+      organism = children.find((t) => t?.name === organismName);
       console.assert(organism);
     }
     return organism;
   }
 
-  * getAncestors(organism) {
+  *getAncestors(organism) {
     console.assert(organism);
     while (true) {
       organism = this.getSuper(organism);
@@ -76,14 +76,15 @@ export default class OrganismCollection {
   }
 
   getSuper(organism: Organism): Organism | undefined {
-    const superorganismId = this.organs.find(t => t.organId === organism.id)?.superorganismId;
+    const superorganismId = this.organs.find((t) => t.organId === organism.id)
+      ?.superorganismId;
     if (!superorganismId) {
       console.assert(organism.id === this.rootOrganism.id);
       return undefined;
     }
     return this.getOrganismFromId(superorganismId);
   }
-  
+
   getRoot(): Organism {
     return this.rootOrganism;
   }
@@ -106,21 +107,28 @@ export default class OrganismCollection {
   putFromMeta(name, metaorganism: MetaOrganism) {
     const organism = this.putFromMetaWithoutAttributes(name, metaorganism);
     for (const metaattribute of metaorganism.attributes) {
-      const attribute = this.root.attributeStore.putEditable(organism, metaattribute.name);
+      const attribute = this.root.attributeCollection.putEditable(
+        organism,
+        metaattribute.name,
+        metaattribute.type ?? Types.Number
+      );
       if (metaattribute.default !== undefined) {
-        this.root.attributeStore.assignNumber(attribute, metaattribute.default);
+        this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
       }
 
       if (metaattribute.type === Types.Vector) {
-        this.root.attributeCollection.assign(attribute, this.root.nodeCollection.addVector());
+        this.root.attributeCollection.assign(
+          attribute,
+          this.root.nodeCollection.addVector()
+        );
       }
     }
 
-    if (metaorganism.name !== 'TheVoid') {
-      const clones = this.root.attributeStore.putEditable(organism, 'clones');
-      this.root.attributeStore.putEmergent(organism, 'cloneNumber');
-      this.root.attributeStore.putEmergent(organism, 'cloneNumber01');
-      this.root.attributeStore.assignNumber(clones, 1);
+    if (metaorganism.name !== "TheVoid") {
+      const clones = this.root.attributeCollection.putEditable(organism, "clones");
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber");
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber01");
+      this.root.attributeCollection.assignNumber(clones, 1);
     }
 
     return organism;
@@ -129,18 +137,26 @@ export default class OrganismCollection {
   remove(organism) {
     console.assert(organism !== this.rootOrganism);
 
-    for (const attribute of this.root.attributeCollection.getAttributesForOrganism(organism)) {
+    for (const attribute of this.root.attributeCollection.getAttributesForOrganism(
+      organism
+    )) {
       this.root.attributeCollection.remove(attribute);
     }
     for (const organ of this.getChildren(organism)) {
       this.remove(organ);
     }
-    this.organs = wu(this.organs).reject(t => t.organId === organism.id || t.superorganismId === organism.id).toArray();
-    this.organisms = wu(this.organisms).reject(t => t.id === organism.id).toArray();
+    this.organs = wu(this.organs)
+      .reject(
+        (t) => t.organId === organism.id || t.superorganismId === organism.id
+      )
+      .toArray();
+    this.organisms = wu(this.organisms)
+      .reject((t) => t.id === organism.id)
+      .toArray();
   }
 
   spawn() {
-    const metacircle = this.root.metaorganismCollection.getFromName('Circle');
+    const metacircle = this.root.metaorganismCollection.getFromName("Circle");
     const organism = this.putFromMeta(null, metacircle);
     organism.name = organism.id;
     return organism;
@@ -154,14 +170,18 @@ export default class OrganismCollection {
   addChild(superorganism, organ) {
     console.assert(organ);
     console.assert(superorganism);
-    this.organs = wu(this.organs).reject(t => t.organId === organ.id).toArray();
+    this.organs = wu(this.organs)
+      .reject((t) => t.organId === organ.id)
+      .toArray();
     this.organs.push({ superorganismId: superorganism.id, organId: organ.id });
     return organ;
   }
 
   getChildren(superorganism) {
-    const organEntries = wu(this.organs).filter(t => t.superorganismId === superorganism.id);
-    return organEntries.map(t => this.getOrganismFromId(t.organId));
+    const organEntries = wu(this.organs).filter(
+      (t) => t.superorganismId === superorganism.id
+    );
+    return organEntries.map((t) => this.getOrganismFromId(t.organId));
   }
 
   putFromMetaWithoutAttributes(name, metaorganism) {
@@ -176,20 +196,33 @@ export default class OrganismCollection {
   }
 
   putSuperOrganismWithoutAttributes(name: string) {
-    const answer = this.putFromMetaWithoutAttributes(name, this.root.metaorganismCollection.getFromName('SuperOrganism'));
+    const answer = this.putFromMetaWithoutAttributes(
+      name,
+      this.root.metaorganismCollection.getFromName("SuperOrganism")
+    );
     console.assert(answer);
     return answer;
   }
 
   initRootOrganism() {
     if (this.rootOrganism) return;
-    
-    this.rootOrganism = this.putFromMetaname('The Void', 'TheVoid');
-    this.root.attributeCollection.putEmergent(this.rootOrganism, 'time');
-    this.root.attributeCollection.putEmergent(this.rootOrganism, 'time01');
-    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.height');
-    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.width');
-    this.root.attributeCollection.putEmergent(this.rootOrganism, 'window.center', Types.Vector);
+
+    this.rootOrganism = this.putFromMetaname("The Void", "TheVoid");
+    this.root.attributeCollection.putEmergent(this.rootOrganism, "time");
+    this.root.attributeCollection.putEmergent(this.rootOrganism, "time01");
+    this.root.attributeCollection.putEmergent(
+      this.rootOrganism,
+      "window.height"
+    );
+    this.root.attributeCollection.putEmergent(
+      this.rootOrganism,
+      "window.width"
+    );
+    this.root.attributeCollection.putEmergent(
+      this.rootOrganism,
+      "window.center",
+      Types.Vector
+    );
     return this.rootOrganism;
   }
 }

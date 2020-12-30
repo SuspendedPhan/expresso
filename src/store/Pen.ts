@@ -222,6 +222,16 @@ export default class Pen {
     }
   }
 
+  public setPointedNode(node) {
+    const attribute = this.root.attributeCollection.getAttributeForNode(node);
+    const annotatedText = this.getAnnotatedTextForAttribute(attribute);
+    this.selection = this.makeSelectionForNode(
+      node,
+      annotatedText,
+      attribute.id
+    );
+  }
+
   private getPointedNode() {
     const selection = this.getSelection();
     if (selection === null) return null;
@@ -475,18 +485,23 @@ export default class Pen {
       annotatedText,
       attribute.id
     );
-    this.setSelection({
-      ...this.selection,
-      startIndex: this.selection.endIndex + 1,
-      endIndex: this.selection.endIndex + 1,
-    });
-    this.setSelection({
-      ...this.selection,
-      startIndex: this.selection.endIndex + 1,
-      endIndex: this.selection.endIndex + 1,
-    });
+    this.moveCursorRight();
+    this.moveCursorRight();
 
     this.events.emit("afterPenCommit");
+  }
+
+  private moveCursorRight() {
+    const selection = this.selection as Selection;
+    const annotatedText = this.getAnnotatedTextForAttribute(
+      this.getSelectedAttribute()
+    );
+    const index = Math.min(selection.endIndex, annotatedText.length);
+    this.setSelection({
+      ...selection,
+      startIndex: index,
+      endIndex: index,
+    });
   }
 
   tryPromoteSelectionToRoot() {
@@ -509,9 +524,7 @@ export default class Pen {
         attribute.id
       );
       this.events.emit("afterPenCommit");
-      console.log("success");
     }
-    console.log("anyway");
   }
 
   public isCursorInserting(): boolean {

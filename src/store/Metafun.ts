@@ -166,6 +166,25 @@ export default class MetafunStore {
           return undefined;
         }
       }
+    },
+    {
+      name: "Scale",
+      paramCount: 2,
+      eval: (vector, scalar) => {
+        const vectorVal = vector.eval();
+        const scalarVal = scalar.eval();
+        return {
+          x: vectorVal.x * scalarVal,
+          y: vectorVal.y * scalarVal
+        };
+      },
+      inputTypesFromOutputType: type => {
+        if (type === Types.Vector) {
+          return [Types.Vector, Types.Number];
+        } else {
+          return undefined;
+        }
+      }
     }
   ];
 
