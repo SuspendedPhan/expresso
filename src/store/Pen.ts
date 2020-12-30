@@ -2,7 +2,7 @@ import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
 import Types from "./Types";
-import { EventEmitter } from 'events';
+import { EventEmitter } from "events";
 
 interface NonePenPosition {
   positionType: "None";
@@ -180,10 +180,8 @@ export default class Pen {
   private getAnnotatedTextForNode(astNode) {
     const root = this.root;
     if (astNode.metaname === "Number") {
-      // console.log("number");
       return this.textToAnnotatedText(astNode.value.toString(), astNode);
     } else if (astNode.metaname === "Vector") {
-      // <2321, 443>
       console.assert(
         root.nodeCollection.getChildren(astNode).toArray().length == 2,
         "Attribute.vue vector"
@@ -193,9 +191,9 @@ export default class Pen {
       let answer = [] as any;
       answer.push({ char: "<", node: astNode });
       answer = answer.concat(this.getAnnotatedTextForNode(xNode));
-      answer.push({ char: ",", node: astNode });
+      answer.push({ char: ",", node: null });
       answer = answer.concat(this.getAnnotatedTextForNode(yNode));
-      answer.push({ char: ">", node: astNode });
+      answer.push({ char: ">", node: null });
       return answer;
     } else if (astNode.metaname === "Reference") {
       return this.textToAnnotatedText(
@@ -227,8 +225,10 @@ export default class Pen {
   private getPointedNode() {
     const selection = this.getSelection();
     if (selection === null) return null;
-    
-    const attribute = this.root.attributeCollection.getAttributeFromId(selection.attributeId);
+
+    const attribute = this.root.attributeCollection.getAttributeFromId(
+      selection.attributeId
+    );
     const annotatedText = this.getAnnotatedTextForAttribute(attribute);
     return annotatedText[selection.startIndex].node;
   }
@@ -306,11 +306,12 @@ export default class Pen {
     ) {
       let node;
       if (this.didGoLeft(prevSelection, selection)) {
-        node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
+        node = annotatedText[selection.startIndex].node;
+        node =
+          node ?? this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
       } else {
         node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
       }
-      console.log('single char');
       return this.makeSelectionForNode(
         node,
         annotatedText,
@@ -324,14 +325,12 @@ export default class Pen {
             selection.startIndex,
             annotatedText
           );
-          console.log('went left, null node');
           return this.makeSelectionForNode(
             leftNode,
             annotatedText,
             selection.attributeId
           );
         } else {
-          console.log('went right, null node');
           // Either right or new selection
           const rightNode = this.getNodeToRightOfChar(
             selection.startIndex,
@@ -357,14 +356,12 @@ export default class Pen {
         }
       } else {
         if (this.isIndexInsideNode(selection.startIndex, node, annotatedText)) {
-          console.log('inside node');
           return this.makeSelectionForNode(
             node,
             annotatedText,
             selection.attributeId
           );
         } else {
-          console.log('front of node');
           return this.makeFrontSelectionForNode(
             node,
             annotatedText,
@@ -381,13 +378,13 @@ export default class Pen {
     annotatedText: AnnotatedText[]
   ) {
     if (prevSelection === null) return false;
+    if (prevSelection.attributeId !== selection.attributeId) return false;
 
     const frontIndex = Math.min(selection.startIndex, prevSelection.startIndex);
     const backIndex = Math.max(selection.startIndex, prevSelection.startIndex);
     const node = annotatedText[frontIndex].node;
     if (node === null) return false;
 
-    const sameAttribute = prevSelection.attributeId === selection.attributeId;
     const prevSingleChar = prevSelection.startIndex === prevSelection.endIndex;
     const currentSingleChar = selection.startIndex === selection.endIndex;
 
@@ -399,11 +396,7 @@ export default class Pen {
       backIndex === charBoundsForNode.endIndex;
 
     return (
-      sameAttribute &&
-      prevSingleChar &&
-      currentSingleChar &&
-      oneCharApart &&
-      skippedOverNode
+      prevSingleChar && currentSingleChar && oneCharApart && skippedOverNode
     );
   }
 
@@ -417,7 +410,7 @@ export default class Pen {
 
   private didGoLeft(prevSelection, selection) {
     if (prevSelection === null) return false;
-    console.assert(prevSelection.attributeId === selection.attributeId);
+    if (prevSelection.attributeId !== selection.attributeId) return false;
     if (selection.startIndex < prevSelection.startIndex) return true;
     if (selection.startIndex > prevSelection.startIndex) return false;
     if (selection.endIndex < prevSelection.endIndex) return true;
@@ -473,14 +466,55 @@ export default class Pen {
       this.nodeCollection.replaceNode(referenceNode, node);
     }
 
-    const attribute = this.root.attributeCollection.getAttributeFromId(this.getSelection()!.attributeId);
+    const attribute = this.root.attributeCollection.getAttributeFromId(
+      this.getSelection()!.attributeId
+    );
     const annotatedText = this.getAnnotatedTextForAttribute(attribute);
-    this.selection = this.makeSelectionForNode(node, annotatedText, attribute.id);
+    this.selection = this.makeSelectionForNode(
+      node,
+      annotatedText,
+      attribute.id
+    );
+    this.setSelection({
+      ...this.selection,
+      startIndex: this.selection.endIndex + 1,
+      endIndex: this.selection.endIndex + 1,
+    });
+    this.setSelection({
+      ...this.selection,
+      startIndex: this.selection.endIndex + 1,
+      endIndex: this.selection.endIndex + 1,
+    });
 
-    this.events.emit('afterCommitGhostEdit');
+    this.events.emit("afterPenCommit");
   }
 
-  private isCursorInserting(): boolean {
+  tryPromoteSelectionToRoot() {
+    console.assert(!this.getIsQuerying());
+    const node = this.getPointedNode();
+    console.assert(node != null);
+
+    const attribute = this.getSelectedAttribute();
+    const rootNode = this.root.attributeCollection.getRootNode(attribute);
+    if (node.datatype === rootNode.datatype) {
+      this.nodeCollection.reparent({
+        child: node,
+        newParent: rootNode,
+        childIndex: 0,
+      });
+      const annotatedText = this.getAnnotatedTextForAttribute(attribute);
+      this.selection = this.makeSelectionForNode(
+        node,
+        annotatedText,
+        attribute.id
+      );
+      this.events.emit("afterPenCommit");
+      console.log("success");
+    }
+    console.log("anyway");
+  }
+
+  public isCursorInserting(): boolean {
     const selection = this.getSelection() as Selection;
     console.assert(selection !== null);
     const isZeroLengthSelection = selection.startIndex === selection.endIndex;
@@ -489,7 +523,9 @@ export default class Pen {
 
   public getSelectedAttribute() {
     console.assert(this.getSelection() !== null);
-    return this.root.attributeCollection.getAttributeFromId(this.getSelection()!.attributeId);
+    return this.root.attributeCollection.getAttributeFromId(
+      this.getSelection()!.attributeId
+    );
   }
 
   commitFirstGhostEdit() {

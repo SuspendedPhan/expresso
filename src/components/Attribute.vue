@@ -30,36 +30,45 @@ export default class Attribute extends Vue {
 
   quill = null;
   pen = Root.penStore;
-  dirtyCounter = 0;
 
   mounted() {
-    this.quill = new Quill(this.$refs["textarea"], {});
-    // this.quill = new Quill(this.$refs["textarea"], { readOnly: true });
+    var bindings = {
+      // This will overwrite the default binding also named 'tab'
+      enter: {
+        key: 13,
+        handler: function () {
+          // suppress
+        },
+      },
+    };
+    this.quill = new Quill(this.$refs["textarea"], {
+      modules: {
+        keyboard: {
+          bindings: bindings,
+        },
+      },
+    });
 
     this.quill.setText(this.getText(), "silent");
-    this.quill.setSelection(1, 1, "silent");
-    this.quill.focus();
 
     this.quill.root.addEventListener("keydown", (event) => {
-      if (event.key.length === 1) {
+      if (event.key.length === 1 && !event.ctrlKey && !event.altKey) {
         this.pen.setIsQuerying(true);
         this.pen.setQuery(event.key);
         event.preventDefault();
         event.stopPropagation();
-      }
-
-      console.log("keydown");
-      console.log(this.pen.selection);
-    });
-
-    this.quill.keyboard.addBinding({ key: "Escape" }, () => {
-      if (this.pen.isQuerying) {
-        this.pen.setIsQuerying(false);
+      } else if (event.key === "Enter") {
+        this.pen.setIsQuerying(true);
+        event.preventDefault();
+        event.stopPropagation();
+      } else if (event.key === "r" && event.altKey) {
+        if (!Root.pen.isCursorInserting()) {
+          Root.pen.tryPromoteSelectionToRoot();
+        }
       }
     });
 
     this.quill.on("text-change", (delta, oldDelta, source) => {
-      console.log(delta);
       Vue.nextTick(() => {
         this.quill.setText(oldDelta.ops[0].insert, "silent");
         this.updateCursor();
@@ -69,9 +78,7 @@ export default class Attribute extends Vue {
     this.quill.on("selection-change", (range, oldRange, source) => {
       if (range === null) return;
       if (this.pen.getIsQuerying()) return;
-      if (source !== 'user') return;
-
-      console.log("setting sel " + source);
+      if (source !== "user") return;
 
       this.pen.setSelection({
         attributeId: this.attributeModel.id,
@@ -80,16 +87,11 @@ export default class Attribute extends Vue {
       });
     });
 
-    this.pen.events.on("afterCommitGhostEdit", () => this.updateEditor());
+    this.pen.events.on("afterPenCommit", () => this.updateEditor());
   }
 
   blur() {
     this.quill.focus();
-    this.dirtyCounter++;
-    Vue.nextTick(() => {
-      this.dirtyCounter++;
-    });
-    console.log("blur");
   }
 
   @Watch("picking")
@@ -103,7 +105,6 @@ export default class Attribute extends Vue {
 
   get picking() {
     return (
-      // Root.pen.getPenPosition().referenceNodeId === this.astNode.id &&
       Root.penStore.getIsQuerying() &&
       Root.pen.getSelectedAttribute() === this.attributeModel
     );
@@ -111,7 +112,6 @@ export default class Attribute extends Vue {
 
   updateEditor() {
     if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
-    console.error("updateEditor");
     this.quill.setText(this.getText(), "silent");
     this.updateCursor();
   }
@@ -127,7 +127,6 @@ export default class Attribute extends Vue {
         selection.endIndex - selection.startIndex,
         "silent"
       );
-      console.error(this.quill.getSelection());
     }
   }
 

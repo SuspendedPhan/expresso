@@ -84,6 +84,10 @@ export default {
         }
       }
     });
+
+    Root.pen.events.on("afterPenCommit", () => {
+      Root.save();
+    });
   },
 };
 </script>

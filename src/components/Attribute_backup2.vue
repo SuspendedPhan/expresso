@@ -88,7 +88,7 @@ export default class Attribute extends Vue {
       });
     });
 
-    this.pen.events.on('afterCommitGhostEdit', () => this.updateEditor());
+    this.pen.events.on('afterPenCommit', () => this.updateEditor());
   }
 
   blur() {
