@@ -1,6 +1,6 @@
 <template>
   <div v-if='organism' class='organism'>
-    <div><u>{{ organism.name }}</u></div>
+    <div class='organism-name'>{{ organism.name }}</div>
     <div class='controls'>
       <select v-model='selectedPrimitiveId'>
         <option v-for='metaorganism in metaorganismCollection.getMetaorganisms()' :key='metaorganism.id' :value='metaorganism.id'>
@@ -13,7 +13,8 @@
       <button @click='removeOrganism(organism)' v-if='!isRoot'>Remove Organism</button>
     </div>
     <div class='attribute-group'>
-      <div class='attribute' v-for='attribute in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+      <div class='attribute' v-for='(attribute, index) in root.attributeStore.getEditables(organism)' :key='attribute.id'>
+        <div v-if='index !== 0' class='divider'></div>
         <span class='attribute-name'>{{ attribute.name }}: </span>
         <Attribute :attributeModel='attribute' />
       </div>
@@ -27,12 +28,10 @@
 import wu from 'wu';
 import Root from '../store/Root';
 import Attribute from './Attribute';
-import Node from './Node';
 
 export default {
   name: 'Organism',
   components: {
-    Node,
     Attribute,
   },
   props: {
@@ -89,9 +88,6 @@ export default {
   border-radius: 2px;
   margin-top: 10px;
 }
-.attribute {
-
-}
 .controls {
   display: grid;
   grid-template-columns: max-content max-content;
@@ -102,9 +98,20 @@ export default {
 .attribute-group {
   display: grid;
   grid-auto-rows: auto;
-  gap: 20px;
+  /* gap: 10px; */
 }
 .attribute-name {
   color: rgba(113, 0, 225, 0.7);
+  font-weight: 500;
+}
+.divider {
+  border-bottom: 2px solid rgba(0, 0, 0, .2);
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.organism-name {
+  color: #4DC47D;
+  font-weight: 500;
+  font-size: 24px;
 }
 </style>

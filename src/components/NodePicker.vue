@@ -1,8 +1,9 @@
 <template>
 <div class='node-picker'>
-  <input ref="input" @blur='blur' @keydown='keydown' v-model='query' />
+  <input class='input' ref="input" @blur='blur' @keydown='keydown' v-model='query' />
+  <div class='divider'></div>
   <div>
-    <div v-for='(suggestion, index) in suggestions' :key='index' class='suggestion'>
+    <div v-for='(suggestion, index) in suggestions' :key='index' class='suggestion' @mousedown='onClick(suggestion, $event)'>
       {{ suggestion.text }}
     </div>
   </div>
@@ -31,11 +32,10 @@ export default {
           Root.penStore.commitGhostEdit(result);
         }
 
-        Root.penStore.setIsQuerying(false);
         this.blur();
-        event.stopPropagation();
+        event.preventDefault();
       } else if (event.key === 'Escape') {
-        Root.penStore.setIsQuerying(false);
+        event.preventDefault();
         this.blur();
       }
     },
@@ -46,6 +46,11 @@ export default {
       Root.pen.setIsQuerying(false);
       this.$emit('blur');
     },
+    onClick(suggestion, event) {
+      Root.pen.commitGhostEdit(suggestion);
+      event.preventDefault();
+      this.blur();
+    }
   },
   computed: {
     suggestions() {
@@ -67,11 +72,27 @@ export default {
 .node-picker {
   background-color: white;
   border-color: black;
-  border-width: 2px;
+  border-width: 1px;
   border-style: solid;
-  /* padding: 2px; */
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  height: 25vh;
+  overflow-y: auto;
 }
 .suggestion {
   text-transform: lowercase;
+}
+.input {
+  width: 100%;
+  outline: none;
+  border: none;
+}
+.suggestion:hover {
+  background-color: #a8d1ff;
+}
+.divider {
+  border-bottom: 1px solid rgba(0, 0, 0, .2);
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 </style>

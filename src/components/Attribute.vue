@@ -32,8 +32,8 @@ export default class Attribute extends Vue {
   pen = Root.penStore;
 
   mounted() {
-    var ColorClass = Quill.import('attributors/class/color');
-    Quill.register(ColorClass, true);
+    Quill.register(Quill.import("attributors/class/color"), true);
+    Quill.register(Quill.import("attributors/class/background"), true);
     var bindings = {
       // This will overwrite the default binding also named 'tab'
       enter: {
@@ -50,10 +50,9 @@ export default class Attribute extends Vue {
         },
       },
     });
+    this.quill.root.setAttribute("spellcheck", false);
 
-    this.quill.setText(this.getText(), "silent");
-    // this.quill.formatText(0, 5, 'color', 'whatshot');
-    // console.log(this.quill.getFormat(0, 5));
+    this.setText(this.quill, this.getText(1));
 
     this.quill.root.addEventListener("keydown", (event) => {
       if (event.key.length === 1 && !event.ctrlKey && !event.altKey) {
@@ -73,23 +72,25 @@ export default class Attribute extends Vue {
     });
 
     this.quill.on("text-change", (delta, oldDelta, source) => {
+      if (source !== "user") return;
       Vue.nextTick(() => {
-        console.log('set text');
-        this.quill.setText(oldDelta.ops[0].insert, "silent");
-        this.updateCursor();
+        this.setText(this.quill, oldDelta.ops[0].insert);
       });
     });
 
     this.quill.on("selection-change", (range, oldRange, source) => {
-      if (range === null) return;
-      if (this.pen.getIsQuerying()) return;
       if (source !== "user") return;
+      if (this.pen.getIsQuerying()) return;
 
-      this.pen.setSelection({
-        attributeId: this.attributeModel.id,
-        startIndex: range.index,
-        endIndex: range.index + range.length,
-      });
+      if (range === null) {
+        this.pen.setSelection(null);
+      } else {
+        this.pen.setSelection({
+          attributeId: this.attributeModel.id,
+          startIndex: range.index,
+          endIndex: range.index + range.length,
+        });
+      }
     });
 
     this.pen.events.on("afterPenCommit", () => this.updateEditor());
@@ -117,36 +118,40 @@ export default class Attribute extends Vue {
 
   updateEditor() {
     if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
+    this.setText(this.quill, this.getText());
+  }
+
+  setText(quill, text) {
     this.quill.removeFormat(0, this.quill.getLength());
-    this.quill.setText(this.getText(), "silent");
+    this.quill.setText(text, "silent");
     const annotatedText = Root.pen.getAnnotatedTextForAttribute(
       this.attributeModel
     );
-    // console.log(annotatedText);
+
     for (let i = 0; i < annotatedText.length; i++) {
       const annotatedChar = annotatedText[i];
       const node = annotatedChar.node;
       if (node === null) continue;
       if (node.metaname === "Function") {
-        this.quill.formatText(i, 1, 'color', 'doit', 'silent');
-        console.log(this.quill.getFormat(i, 1));
-        // this.quill.formatText(i, 1, 'color', '#3BB5DC', 'silent');
-      } else {
-        this.quill.formatText(i, 1, 'color', 'var', 'silent');
-        // this.quill.formatText(i, 1, 'color', 'rgba(113, 0, 225, 0.55)', 'silent');
+        this.quill.formatText(i, 1, "color", "function", "silent");
+      } else if (node.metaname !== "Number" && node.metaname !== "Vector") {
+        this.quill.formatText(i, 1, "color", "variable", "silent");
       }
     }
-    // console.log(this.quill.getFormat(0, this.quill.getLength()));
     this.updateCursor();
-  }
-  
-  setText(quill, text) {
-    this.quill.setText(text, "silent");
   }
 
   @Watch("pen.selection")
   updateCursor() {
     if (this.pen.getIsQuerying()) return;
+
+    this.quill.formatText(
+      0,
+      this.quill.getLength(),
+      "background",
+      false,
+      "silent"
+    );
 
     if (this.pen.getSelection()?.attributeId === this.attributeModel.id) {
       const selection = this.pen.getSelection();
@@ -155,8 +160,16 @@ export default class Attribute extends Vue {
         selection.endIndex - selection.startIndex,
         "silent"
       );
+      const length = selection.endIndex - selection.startIndex;
+
+      this.quill.formatText(
+        selection.startIndex,
+        length,
+        "background",
+        "selected",
+        "silent"
+      );
     }
-    // console.log(this.quill.getFormat(0, this.quill.getLength()));
   }
 
   getText() {
