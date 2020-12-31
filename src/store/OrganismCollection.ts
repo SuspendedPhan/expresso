@@ -128,6 +128,7 @@ export default class OrganismCollection {
       const clones = this.root.attributeCollection.putEditable(organism, "clones");
       this.root.attributeCollection.putEmergent(organism, "cloneNumber");
       this.root.attributeCollection.putEmergent(organism, "cloneNumber01");
+      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01");
       this.root.attributeCollection.assignNumber(clones, 1);
     }
 

@@ -185,7 +185,28 @@ export default class MetafunStore {
           return undefined;
         }
       }
-    }
+    },
+    {
+      name: "RotateFromUp",
+      paramCount: 1,
+      eval: (angle01) => {
+        const vectorVal = { x: 0, y: 1 };
+        const angle01Val = angle01.eval();
+        const radians = angle01Val * 2 * Math.PI;
+        const ret = {
+          x: vectorVal.x * Math.cos(radians) - vectorVal.y * Math.sin(radians),
+          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians)
+        };
+        return ret;
+      },
+      inputTypesFromOutputType: type => {
+        if (type === Types.Vector) {
+          return [Types.Number];
+        } else {
+          return undefined;
+        }
+      }
+    },
   ];
 
   constructor(private root: Root) {}

@@ -32,6 +32,8 @@ export default class Attribute extends Vue {
   pen = Root.penStore;
 
   mounted() {
+    Quill.register(Quill.import("attributors/class/color"), true);
+    Quill.register(Quill.import("attributors/class/background"), true);
     var bindings = {
       // This will overwrite the default binding also named 'tab'
       enter: {
@@ -48,8 +50,9 @@ export default class Attribute extends Vue {
         },
       },
     });
+    this.quill.root.setAttribute("spellcheck", false);
 
-    this.quill.setText(this.getText(), "silent");
+    this.setText(this.quill, this.getText(1));
 
     this.quill.root.addEventListener("keydown", (event) => {
       if (event.key.length === 1 && !event.ctrlKey && !event.altKey) {
@@ -69,22 +72,25 @@ export default class Attribute extends Vue {
     });
 
     this.quill.on("text-change", (delta, oldDelta, source) => {
+      if (source !== "user") return;
       Vue.nextTick(() => {
-        this.quill.setText(oldDelta.ops[0].insert, "silent");
-        this.updateCursor();
+        this.setText(this.quill, oldDelta.ops[0].insert);
       });
     });
 
     this.quill.on("selection-change", (range, oldRange, source) => {
-      if (range === null) return;
-      if (this.pen.getIsQuerying()) return;
       if (source !== "user") return;
+      if (this.pen.getIsQuerying()) return;
 
-      this.pen.setSelection({
-        attributeId: this.attributeModel.id,
-        startIndex: range.index,
-        endIndex: range.index + range.length,
-      });
+      if (range === null) {
+        this.pen.setSelection(null);
+      } else {
+        this.pen.setSelection({
+          attributeId: this.attributeModel.id,
+          startIndex: range.index,
+          endIndex: range.index + range.length,
+        });
+      }
     });
 
     this.pen.events.on("afterPenCommit", () => this.updateEditor());
@@ -112,7 +118,26 @@ export default class Attribute extends Vue {
 
   updateEditor() {
     if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
-    this.quill.setText(this.getText(), "silent");
+    this.setText(this.quill, this.getText());
+  }
+
+  setText(quill, text) {
+    this.quill.removeFormat(0, this.quill.getLength());
+    this.quill.setText(text, "silent");
+    const annotatedText = Root.pen.getAnnotatedTextForAttribute(
+      this.attributeModel
+    );
+
+    for (let i = 0; i < annotatedText.length; i++) {
+      const annotatedChar = annotatedText[i];
+      const node = annotatedChar.node;
+      if (node === null) continue;
+      if (node.metaname === "Function") {
+        this.quill.formatText(i, 1, "color", "function", "silent");
+      } else if (node.metaname !== "Number" && node.metaname !== "Vector") {
+        this.quill.formatText(i, 1, "color", "variable", "silent");
+      }
+    }
     this.updateCursor();
   }
 
@@ -120,11 +145,28 @@ export default class Attribute extends Vue {
   updateCursor() {
     if (this.pen.getIsQuerying()) return;
 
+    this.quill.formatText(
+      0,
+      this.quill.getLength(),
+      "background",
+      false,
+      "silent"
+    );
+
     if (this.pen.getSelection()?.attributeId === this.attributeModel.id) {
       const selection = this.pen.getSelection();
       this.quill.setSelection(
         selection.startIndex,
         selection.endIndex - selection.startIndex,
+        "silent"
+      );
+      const length = selection.endIndex - selection.startIndex;
+
+      this.quill.formatText(
+        selection.startIndex,
+        length,
+        "background",
+        "selected",
         "silent"
       );
     }
@@ -136,17 +178,5 @@ export default class Attribute extends Vue {
 }
 </script>
 
-<style>
-.marked {
-  color: red;
-}
-.ql-clipboard {
-  display: none;
-}
-.ql-editor {
-  overflow-y: auto;
-}
-p {
-  margin: 0;
-}
+<style scoped>
 </style>

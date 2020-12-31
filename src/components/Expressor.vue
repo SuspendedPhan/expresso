@@ -1,7 +1,10 @@
 <template>
   <div>
     <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
-    <button @click="clearStorage">Clear storage</button>
+    <div class="bottom-group">
+      <button @click="clearStorage">Clear storage</button>
+      <div :class="['error-box', { error: consoleError }]">you have console errors</div>
+    </div>
   </div>
 </template>
 
@@ -11,6 +14,7 @@ import wu from "wu";
 import Root from "../store/Root";
 import Node from "./Node";
 import Organism from "./Organism";
+import Vue from "vue";
 // import CodeMirror from 'codemirror';
 
 export default {
@@ -26,6 +30,7 @@ export default {
       attributeStore: Root.attributeStore,
       metaorganismCollection: Root.metaorganismCollection,
       selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
+      consoleError: false,
     };
   },
   computed: {},
@@ -88,6 +93,16 @@ export default {
     Root.pen.events.on("afterPenCommit", () => {
       Root.save();
     });
+
+    Vue.config.errorHandler = (err, vm, info) => {
+      this.consoleError = true;
+      console.error(err);
+      console.error(info);
+    };
+
+    window.addEventListener("error", () => {
+      this.consoleError = true;
+    });
   },
 };
 </script>
@@ -102,5 +117,19 @@ export default {
   display: grid;
   grid-template-columns: max-content max-content max-content;
   gap: 10px;
+}
+.bottom-group {
+  display: flex;
+  justify-content: space-between;
+}
+.error-box {
+  padding: 5px;
+  font-size: 12px;
+  background-color: hsl(0, 100%, 67%);
+  visibility: hidden;
+  color: white;
+}
+.error-box.error {
+  visibility: visible;
 }
 </style>
