@@ -3,7 +3,7 @@
     <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
     <div class="bottom-group">
       <button @click="clearStorage">Clear storage</button>
-      <div :class="['error-box', { error: consoleError }]"></div>
+      <div :class="['error-box', { error: consoleError }]">you have console errors</div>
     </div>
   </div>
 </template>
@@ -123,10 +123,11 @@ export default {
   justify-content: space-between;
 }
 .error-box {
-  width: 20px;
-  height: 20px;
+  padding: 5px;
+  font-size: 12px;
   background-color: hsl(0, 100%, 67%);
   visibility: hidden;
+  color: white;
 }
 .error-box.error {
   visibility: visible;

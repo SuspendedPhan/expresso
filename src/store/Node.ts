@@ -350,29 +350,9 @@ export default class NodeStore {
   }
 
   /**
-   * Plucks oldNode from the tree, putting newNode in its place.
-   * Also plucks oldNode's children and attaches them to newNode.
+   * Removes oldNode and its children from the tree, putting newNode in its place.
    */
   replaceNode(oldNode, newNode) {
-    const newNodeChildren = this.getChildren(newNode).toArray();
-    const newNodeChildrenCount = newNodeChildren.length;
-
-    const oldNodeChildrenCount = this.getChildren(oldNode).toArray().length;
-    if (oldNode.metaname !== "Vector" && newNode.metaname !== "Vector") {
-      for (let i = 0; i < oldNodeChildrenCount; i++) {
-        const child = this.getChild(oldNode, i);
-        if (i < newNodeChildrenCount) {
-          this.reparent({
-            child: child,
-            newParent: newNode,
-            childIndex: i,
-          });
-        } else {
-          this.remove(child);
-        }
-      }
-    }
-
     const parentRelationship = this.getParentRelationship(oldNode);
     console.assert(parentRelationship !== undefined);
     if (parentRelationship) {

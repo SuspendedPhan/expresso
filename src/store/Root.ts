@@ -169,6 +169,16 @@ export class Root {
           0,
           this.nodeStore.addNumber(cloneNumber / (clones - 1))
         );
+
+        const radialCloneNumber01Root = this.attributeCollection.getRootNodeFromName(
+          organism,
+          "radialCloneNumber01"
+        );
+        this.nodeStore.putChild(
+          radialCloneNumber01Root,
+          0,
+          this.nodeStore.addNumber(cloneNumber / clones)
+        );
       }
 
       if (metaorganism.renderShape !== RenderShape.None) {
