@@ -4,7 +4,6 @@ import Home from "../components/Home.vue";
 import TestRunner from "../components/tests/TestRunner.vue";
 import Wat from "@/components/Wat.vue";
 import WrapTest from "@/components/WrapTest.vue";
-import D3TestPage from "@/components/D3TestPage.vue";
 
 Vue.use(VueRouter);
 
@@ -26,10 +25,6 @@ const routes = [
   {
     path: "/wrap",
     component: WrapTest,
-  },
-  {
-    path: "/d3",
-    component: D3TestPage,
   },
   // {
   //   path: '/about',

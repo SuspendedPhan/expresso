@@ -1,19 +1,22 @@
 <template>
   <div class="home">
-    <template v-if="!testingD3">
+    <template v-if="!showStoreGraph">
       <Expressor class="expressor" v-if="showExpressor" />
       <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
     </template>
-    <D3TestPage v-else></D3TestPage>
+    <StoreGraph v-else></StoreGraph>
     <TestRunner v-if="false" class="runner" />
     <button class="flick" @click="showExpressor = !showExpressor">Flick</button>
+    <button class="storeGraph" @click="showStoreGraph = !showStoreGraph">
+      Show Store Graph
+    </button>
   </div>
 </template>
 
 <script>
 import Viewport from "./Viewport";
 import Expressor from "./Expressor";
-import D3TestPage from "./D3TestPage";
+import StoreGraph from "./StoreGraph";
 import TestRunner from "./tests/TestRunner.vue";
 import Root from "../store/Root";
 import Vue from "vue";
@@ -24,17 +27,16 @@ export default {
     Viewport,
     Expressor,
     TestRunner,
-    D3TestPage,
+    StoreGraph,
   },
   props: {},
   data: function () {
     return {
       showExpressor: true,
-      testingD3: false,
+      showStoreGraph: false,
     };
   },
   mounted() {
-    this.testingD3 = true;
     Root.load();
     Root.organismCollection.initRootOrganism();
     document.addEventListener("keydown", (event) => {
@@ -120,6 +122,11 @@ export default {
   position: absolute;
   bottom: 10px;
   left: 10px;
+}
+.storeGraph {
+  position: absolute;
+  bottom: 10px;
+  left: 75px;
 }
 .fullWidth {
   grid-column: 1 / -1;

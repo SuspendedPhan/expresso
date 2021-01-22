@@ -1,5 +1,5 @@
 <template>
-  <div class="D3TestPage" ref="container">
+  <div class="StoreGraph" ref="container">
     <svg class="svg" ref="svg" :viewBox="viewBox">
       <g stroke="#FFF" stroke-width="1">
         <line
@@ -40,15 +40,20 @@ import Root from "../store/Root";
 import Functions from "@/code/Functions";
 
 @Component({})
-export default class D3TestPage extends Vue {
+export default class StoreGraph extends Vue {
   forceNodes = [];
   forceLinks = [];
   viewBox = "0 0 50 50";
+  simulation = null as any;
 
   private mounted() {
     Vue.nextTick(() => this.init());
     const container = this.$refs.container as any;
     this.viewBox = `0 0 ${container.clientWidth} ${container.clientHeight}`;
+  }
+
+  private destroyed() {
+    this.simulation.stop();
   }
 
   private init() {
@@ -60,7 +65,7 @@ export default class D3TestPage extends Vue {
       this.forceLinks
     );
 
-    const simulation = d3
+    this.simulation = d3
       .forceSimulation(this.forceNodes)
       .force(
         "link",
@@ -73,10 +78,10 @@ export default class D3TestPage extends Vue {
         "center",
         d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2)
       )
-      .force("charge", d3.forceManyBody().strength(-200))
+      .force("charge", d3.forceManyBody().strength(-300))
       .force("bound", this.boundForce);
 
-    simulation.on("tick", () => {
+    this.simulation.on("tick", () => {
       this.$forceUpdate();
     });
   }
@@ -163,7 +168,7 @@ export default class D3TestPage extends Vue {
 .svg {
   position: absolute;
 }
-.D3TestPage {
+.StoreGraph {
   position: fixed;
   top: 50px;
   bottom: 50px;
