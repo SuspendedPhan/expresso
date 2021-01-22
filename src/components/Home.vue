@@ -1,10 +1,10 @@
 <template>
   <div class='home'>
-    <!-- <Expressor class='expressor' v-if='showExpressor' /> -->
-    <!-- <Viewport :class='["viewport", { fullWidth: !showExpressor }]' /> -->
+    <Expressor class='expressor' v-if='showExpressor' />
+    <Viewport :class='["viewport", { fullWidth: !showExpressor }]' />
     <TestRunner v-if='false' class='runner'/>
     <button class='flick' @click='showExpressor = !showExpressor'>Flick</button>
-    <D3TestPage></D3TestPage>
+    <!-- <D3TestPage></D3TestPage> -->
   </div>
 </template>
 
