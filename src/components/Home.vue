@@ -1,37 +1,40 @@
 <template>
-  <div class='home'>
-    <Expressor class='expressor' v-if='showExpressor' />
-    <Viewport :class='["viewport", { fullWidth: !showExpressor }]' />
-    <TestRunner v-if='false' class='runner'/>
-    <button class='flick' @click='showExpressor = !showExpressor'>Flick</button>
-    <!-- <D3TestPage></D3TestPage> -->
+  <div class="home">
+    <template v-if="!testingD3">
+      <Expressor class="expressor" v-if="showExpressor" />
+      <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
+    </template>
+    <D3TestPage v-else></D3TestPage>
+    <TestRunner v-if="false" class="runner" />
+    <button class="flick" @click="showExpressor = !showExpressor">Flick</button>
   </div>
 </template>
 
 <script>
-import Viewport from './Viewport';
-import Expressor from './Expressor';
-import D3TestPage from './D3TestPage';
-import TestRunner from './tests/TestRunner.vue';
+import Viewport from "./Viewport";
+import Expressor from "./Expressor";
+import D3TestPage from "./D3TestPage";
+import TestRunner from "./tests/TestRunner.vue";
 import Root from "../store/Root";
 import Vue from "vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
     Viewport,
     Expressor,
     TestRunner,
-    D3TestPage
+    D3TestPage,
   },
-  props: {
-  },
-  data: function() {
+  props: {},
+  data: function () {
     return {
       showExpressor: true,
+      testingD3: false,
     };
   },
   mounted() {
+    this.testingD3 = true;
     Root.load();
     Root.organismCollection.initRootOrganism();
     document.addEventListener("keydown", (event) => {
@@ -76,8 +79,8 @@ export default {
     window.addEventListener("error", () => {
       this.consoleError = true;
     });
-  }
-}
+  },
+};
 </script>
 <style scoped>
 .runner {

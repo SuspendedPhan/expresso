@@ -1,7 +1,7 @@
 <template>
   <div class="D3TestPage" ref="container">
     <svg class="svg" ref="svg" :viewBox="viewBox">
-      <g stroke="#fff" stroke-width="1">
+      <g stroke="#FFF" stroke-width="1">
         <line
           v-for="(forceLink, index) in forceLinks"
           :key="index"
@@ -54,13 +54,11 @@ export default class D3TestPage extends Vue {
   private init() {
     const container = this.$refs.container as any;
 
-    for (const organism of Root.organismCollection.getOrganisms()) {
-      this.addNodesAndLinksForOrganism(
-        organism,
-        this.forceNodes,
-        this.forceLinks
-      );
-    }
+    this.addNodesAndLinksForOrganism(
+      Root.organismCollection.getRoot(),
+      this.forceNodes,
+      this.forceLinks
+    );
 
     const simulation = d3
       .forceSimulation(this.forceNodes)
@@ -75,7 +73,8 @@ export default class D3TestPage extends Vue {
         "center",
         d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2)
       )
-      .force("charge", d3.forceManyBody());
+      .force("charge", d3.forceManyBody().strength(-200))
+      .force("bound", this.boundForce);
 
     simulation.on("tick", () => {
       this.$forceUpdate();
@@ -105,10 +104,6 @@ export default class D3TestPage extends Vue {
   }
 
   private addNodesAndLinksForOrganism(organism, forceNodes, forceLinks) {
-    if (forceNodes.find(t => t.id === organism.id) !== undefined) {
-      console.log('Duplicate');
-      console.log(organism);
-    }
     forceNodes.push({
       id: organism.id,
       name: organism.name,
@@ -123,10 +118,6 @@ export default class D3TestPage extends Vue {
     for (const attribute of Root.attributeCollection.getAttributesForOrganism(
       organism
     )) {
-      if (forceNodes.find(t => t.id === attribute.id) !== undefined) {
-        console.log('Duplicate');
-        console.log(attribute);
-      }
       forceNodes.push({
         id: attribute.id,
         name: attribute.name,
@@ -141,10 +132,6 @@ export default class D3TestPage extends Vue {
   }
 
   private addNodesAndLinksForNode(node, forceNodes, forceLinks) {
-    if (forceNodes.find(t => t.id === node.id) !== undefined) {
-      console.log('Duplicate');
-      console.log(node);
-    }
     forceNodes.push({
       id: node.id,
       name: node.value ?? node.metafunName ?? node.metaname,
@@ -153,6 +140,16 @@ export default class D3TestPage extends Vue {
     for (const child of Root.nodeCollection.getChildren(node)) {
       forceLinks.push({ source: node.id, target: child.id });
       this.addNodesAndLinksForNode(child, forceNodes, forceLinks);
+    }
+  }
+
+  private boundForce(alpha) {
+    const ref = this.$refs.container as any;
+    for (const forceNode of this.forceNodes as any[]) {
+      forceNode.x = Math.max(0, forceNode.x);
+      forceNode.x = Math.min(ref.clientWidth, forceNode.x);
+      forceNode.y = Math.max(0, forceNode.y);
+      forceNode.y = Math.min(ref.clientHeight, forceNode.y);
     }
   }
 }
@@ -168,10 +165,10 @@ export default class D3TestPage extends Vue {
 }
 .D3TestPage {
   position: fixed;
-  top: 200px;
-  bottom: 200px;
-  left: 200px;
-  right: 200px;
+  top: 50px;
+  bottom: 50px;
+  left: 50px;
+  right: 50px;
   background: rgb(218, 218, 218);
 }
 .organism {
