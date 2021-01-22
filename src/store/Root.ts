@@ -63,6 +63,9 @@ export class Root {
   }
 
   *computeRenderCommands(): Iterable<any> {
+    const organism = this.organismCollection.getRoot();
+    if (organism === null) return;
+
     this.time.setFrameTime(DateTime.utc());
     const universeDurationMillis = this.time
       .getElapsedUniverseTime()
@@ -70,7 +73,6 @@ export class Root {
     const time01 =
       universeDurationMillis /
       this.time.getUniverseLifespan().as("milliseconds");
-    const organism = this.organismCollection.getRoot();
 
     const timeRoot = this.attributeCollection.getRootNodeFromName(
       organism,
