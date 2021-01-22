@@ -1,13 +1,5 @@
 <template>
   <div class="D3TestPage" ref="container">
-    <!-- <div
-      v-for="forceNode in forceNodes"
-      :key="forceNode.id"
-      class="forceNode"
-      ref="forceNode"
-    >
-      {{ forceNode.name }}
-    </div> -->
     <svg class="svg" ref="svg" :viewBox="viewBox">
       <g stroke="#fff" stroke-width="1">
         <line
@@ -20,6 +12,15 @@
         ></line>
       </g>
     </svg>
+    <div
+      v-for="forceNode in forceNodes"
+      :key="forceNode.id"
+      class="forceNode"
+      :style="{ left: left(forceNode), top: top(forceNode) }"
+      :ref="refNameForForceNode(forceNode)"
+    >
+      {{ forceNode.name }}
+    </div>
   </div>
 </template>
 
@@ -45,15 +46,15 @@ export default class D3TestPage extends Vue {
 
   init() {
     const container = this.$refs.container as any;
-    const organisms = Root.organismCollection.getOrganisms();
-    this.forceNodes = organisms.map((t) => ({
-      id: t.id,
-      name: t.name,
-    })) as any;
-    this.addLinksForChildren(
-      Root.organismCollection.getRoot(),
-      this.forceLinks
-    );
+
+    for (const organism of Root.organismCollection.getOrganisms()) {
+      this.addNodesAndLinksForOrganism(
+        organism,
+        this.forceNodes,
+        this.forceLinks
+      );
+    }
+
     const simulation = d3
       .forceSimulation(this.forceNodes)
       .force(
@@ -68,63 +69,77 @@ export default class D3TestPage extends Vue {
         d3.forceCenter(container.clientWidth / 2, container.clientHeight / 2)
       )
       .force("charge", d3.forceManyBody());
-    console.log(container.clientHeight);
-
-    const onFrame = () => {
-      Vue.set(this, "forceNodes", this.forceNodes);
-      Vue.set(this, "forceLinks", this.forceLinks);
-      window.requestAnimationFrame(onFrame);
-    };
-
-    const forceNodeDivs = d3
-      .select(this.$refs.container)
-      .selectAll(".forceNode")
-      .data(this.forceNodes)
-      .join("div")
-      .classed("forceNode", true)
-      .style("left", "20px")
-      .text((d) => d.name);
 
     simulation.on("tick", () => {
       this.$forceUpdate();
-
-      forceNodeDivs.style("left", (d, i, nodes) => {
-        console.log("");
-        console.log(d);
-        console.log(i);
-        console.log(nodes);
-        console.log(nodes[i]);
-        console.log(`${d.x - nodes[i].clientWidth / 2}px`);
-        console.log("");
-
-        return `${d.x - nodes[i].clientWidth / 2}px`;
-      });
-      forceNodeDivs.style(
-        "top",
-        (d, i, nodes) => `${d.y - nodes[i].clientHeight / 2}px`
-      );
     });
-
-    onFrame();
   }
 
-  // left(forceNode) {
-  //   const value = forceNode.x - ref.clientWidth / 2;
-  //   return `${value} px`;
-  // }
+  left(forceNode) {
+    const refArray = this.$refs[this.refNameForForceNode(forceNode)] as any;
+    if (refArray === undefined) return "0px";
 
-  // top(forceNode) {
-  //   const ref = this.refForForceNode(forceNode);
-  //   // console.log(ref);
-  //   if (ref === undefined) return "0px";
+    const ref = refArray[0];
+    const value = forceNode.x - ref.clientWidth / 2;
+    return `${value}px`;
+  }
 
-  //   const value = forceNode.y - ref.clientHeight / 2;
-  //   return `${value} px`;
-  // }
+  top(forceNode) {
+    const refArray = this.$refs[this.refNameForForceNode(forceNode)] as any;
+    if (refArray === undefined) return "0px";
+
+    const ref = refArray[0];
+    const value = forceNode.y - ref.clientHeight / 2;
+    return `${value}px`;
+  }
+
+  refNameForForceNode(forceNode) {
+    return `forceNode|${forceNode.id}`;
+  }
 
   private addLinksForChildren(organism, links) {
     for (const child of Root.organismCollection.getChildren(organism)) {
       links.push({ source: organism.id, target: child.id });
+    }
+  }
+
+  private addNodesAndLinksForOrganism(organism, forceNodes, forceLinks) {
+    forceNodes.push({
+      id: organism.id,
+      name: organism.name,
+      storetype: organism.storetype,
+    });
+
+    for (const child of Root.organismCollection.getChildren(organism)) {
+      forceLinks.push({ source: organism.id, target: child.id });
+      this.addNodesAndLinksForOrganism(child, forceNodes, forceLinks);
+    }
+
+    for (const attribute of Root.attributeCollection.getAttributesForOrganism(
+      organism
+    )) {
+      forceNodes.push({
+        id: attribute.id,
+        name: attribute.name,
+        storetype: attribute.storetype,
+      });
+      forceLinks.push({ source: organism.id, target: attribute.id });
+
+      const rootNode = Root.attributeCollection.getRootNode(attribute);
+      forceLinks.push({ source: attribute.id, target: rootNode.id });
+      this.addNodesAndLinksForNode(rootNode, forceNodes, forceLinks);
+    }
+  }
+
+  private addNodesAndLinksForNode(node, forceNodes, forceLinks) {
+    forceNodes.push({
+      id: node.id,
+      name: node.value ?? node.metafunName ?? node.metaname,
+      storetype: node.storetype,
+    });
+    for (const child of Root.nodeCollection.getChildren(node)) {
+      forceLinks.push({ source: node.id, target: child.id });
+      this.addNodesAndLinksForNode(child, forceNodes, forceLinks);
     }
   }
 }
