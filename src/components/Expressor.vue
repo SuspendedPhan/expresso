@@ -59,50 +59,7 @@ export default {
   mounted() {
     // var mirror = CodeMirror(document.body);
     // mirror.setValue("yoyoyo");
-    Root.load();
-    Root.organismCollection.initRootOrganism();
-    document.addEventListener("keydown", (event) => {
-      return;
-      if (event.key === "ArrowUp" && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorUp();
-        event.preventDefault();
-      } else if (event.key === "ArrowDown" && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorDown();
-        event.preventDefault();
-      }
-
-      if (Root.penStore.getPenPosition().positionType === "Node") {
-        if (event.key === "Enter") {
-          Root.penStore.setIsQuerying(true);
-        } else if (
-          event.key === "ArrowLeft" &&
-          !Root.penStore.getIsQuerying()
-        ) {
-          Root.penStore.moveCursorLeft();
-        } else if (
-          event.key === "ArrowRight" &&
-          !Root.penStore.getIsQuerying()
-        ) {
-          Root.penStore.moveCursorRight();
-        } else if (event.key === "Escape" && Root.penStore.getIsQuerying()) {
-          Root.penStore.setIsQuerying(false);
-        }
-      }
-    });
-
-    Root.pen.events.on("afterPenCommit", () => {
-      Root.save();
-    });
-
-    Vue.config.errorHandler = (err, vm, info) => {
-      this.consoleError = true;
-      console.error(err);
-      console.error(info);
-    };
-
-    window.addEventListener("error", () => {
-      this.consoleError = true;
-    });
+    
   },
 };
 </script>

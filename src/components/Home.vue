@@ -1,32 +1,88 @@
 <template>
-  <div class='home'>
-    <Expressor class='expressor' v-if='showExpressor' />
-    <Viewport :class='["viewport", { fullWidth: !showExpressor }]' />
-    <TestRunner v-if='false' class='runner'/>
-    <button class='flick' @click='showExpressor = !showExpressor'>Flick</button>
+  <div class="home">
+    <template v-if="!showStoreGraph">
+      <Expressor class="expressor" v-if="showExpressor" />
+      <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
+    </template>
+    <StoreGraph v-else></StoreGraph>
+    <TestRunner v-if="false" class="runner" />
+    <button class="flick" @click="showExpressor = !showExpressor">Flick</button>
+    <button class="storeGraph" @click="showStoreGraph = !showStoreGraph">
+      Show Store Graph
+    </button>
   </div>
 </template>
 
 <script>
-import Viewport from './Viewport';
-import Expressor from './Expressor';
-import TestRunner from './tests/TestRunner.vue';
+import Viewport from "./Viewport";
+import Expressor from "./Expressor";
+import StoreGraph from "./StoreGraph";
+import TestRunner from "./tests/TestRunner.vue";
+import Root from "../store/Root";
+import Vue from "vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
     Viewport,
     Expressor,
     TestRunner,
+    StoreGraph,
   },
-  props: {
-  },
-  data: function() {
+  props: {},
+  data: function () {
     return {
       showExpressor: true,
+      showStoreGraph: false,
     };
   },
-}
+  mounted() {
+    Root.load();
+    Root.organismCollection.initRootOrganism();
+    document.addEventListener("keydown", (event) => {
+      return;
+      if (event.key === "ArrowUp" && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorUp();
+        event.preventDefault();
+      } else if (event.key === "ArrowDown" && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorDown();
+        event.preventDefault();
+      }
+
+      if (Root.penStore.getPenPosition().positionType === "Node") {
+        if (event.key === "Enter") {
+          Root.penStore.setIsQuerying(true);
+        } else if (
+          event.key === "ArrowLeft" &&
+          !Root.penStore.getIsQuerying()
+        ) {
+          Root.penStore.moveCursorLeft();
+        } else if (
+          event.key === "ArrowRight" &&
+          !Root.penStore.getIsQuerying()
+        ) {
+          Root.penStore.moveCursorRight();
+        } else if (event.key === "Escape" && Root.penStore.getIsQuerying()) {
+          Root.penStore.setIsQuerying(false);
+        }
+      }
+    });
+
+    Root.pen.events.on("afterPenCommit", () => {
+      Root.save();
+    });
+
+    Vue.config.errorHandler = (err, vm, info) => {
+      this.consoleError = true;
+      console.error(err);
+      console.error(info);
+    };
+
+    window.addEventListener("error", () => {
+      this.consoleError = true;
+    });
+  },
+};
 </script>
 <style scoped>
 .runner {
@@ -66,6 +122,11 @@ export default {
   position: absolute;
   bottom: 10px;
   left: 10px;
+}
+.storeGraph {
+  position: absolute;
+  bottom: 10px;
+  left: 75px;
 }
 .fullWidth {
   grid-column: 1 / -1;

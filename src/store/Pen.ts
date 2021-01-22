@@ -49,7 +49,9 @@ export default class Pen {
   selection = null as Selection | null;
   events = new EventEmitter();
 
-  constructor(private root: Root) {}
+  constructor(private root: Root) {
+    this.events.setMaxListeners(1000);
+  }
 
   get nodeCollection() {
     return this.root.nodeStore;

@@ -8,6 +8,7 @@ const makeAttribute = (name, attributeType, datatype) => ({
   name,
   attributeType,
   datatype,
+  // storetype: 'Attribute',
   id: uuidv4(),
 });
 

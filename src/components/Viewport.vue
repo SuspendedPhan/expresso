@@ -44,7 +44,7 @@ export default {
      }
     },
     update: function() {
-    
+      if (this.$refs.viewport === undefined) return;
 
       this.ticker.tick();
       const viewport = this.$refs.viewport;
