@@ -54,9 +54,10 @@ export class Layout {
     // let nextLeftBound = subrootWidth / 2 - width / 2;
     for (const child of this.getChildren(subroot)) {
       const childKey = this.getKey(child);
+      const childSubtreeWidth = subtreeWidthsByKey.get(childKey) as number;
       const childWidth = this.getWidth(child);
-      const childX = nextLeftBound;
-      nextLeftBound += childWidth + this.horizontalMargin;
+      const childX = nextLeftBound + childSubtreeWidth / 2 - childWidth / 2;
+      nextLeftBound += childSubtreeWidth + this.horizontalMargin;
       const childY = subrootHeight + this.verticalMargin;
       positionsByKey.set(childKey, { left: childX, top: childY, key: childKey });
       this.calculateForChildren(child, positionsByKey, subtreeWidthsByKey);

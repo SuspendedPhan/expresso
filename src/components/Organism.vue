@@ -133,6 +133,9 @@ export default {
       this.init();
     }
   },
+  destroyed() {
+    this.root.organismLayout.recalculate();
+  }
 };
 </script>
 
