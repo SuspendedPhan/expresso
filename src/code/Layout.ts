@@ -4,7 +4,8 @@ export interface Point {
   key: any;
 }
 
-export type PositionsByKey = Map<any, Point>;
+// relative to parent
+export type LocalPositionsByKey = Map<any, Point>;
 
 // treeRoot will be positioned at 0, 0
 export class Layout {
@@ -15,7 +16,7 @@ export class Layout {
     private getKey: Function
   ) {}
 
-  calculate(treeRoot): PositionsByKey {
+  calculate(treeRoot): LocalPositionsByKey {
     const subtreeWidthsByKey = new Map<any, number>();
     this.calculateWidth(treeRoot, subtreeWidthsByKey);
 
@@ -28,25 +29,24 @@ export class Layout {
 
   private calculateForChildren(
     subroot,
-    positionsByKey: PositionsByKey,
+    positionsByKey: LocalPositionsByKey,
     subtreeWidthsByKey: Map<any, number>
   ) {
     const key = this.getKey(subroot);
-    const position = positionsByKey.get(key) as Point;
     const subrootHeight = this.getHeight(subroot);
-    console.assert(position !== undefined);
+    const subrootWidth = this.getWidth(subroot);
 
     // NOTE: trouble centering when self is wider than children? calculate sum of children width here 
     // instead of subtree width
     const width = subtreeWidthsByKey.get(key) as number;
-    let nextLeftBound = position.x - width / 2;
+    let nextLeftBound = subrootWidth / 2 - width / 2;
     for (const child of this.getChildren(subroot)) {
       const childKey = this.getKey(child);
       const childWidth = this.getWidth(child);
       const childHeight = this.getHeight(child);
-      const childX = nextLeftBound + childWidth / 2;
+      const childX = nextLeftBound;
       nextLeftBound += childWidth;
-      const childY = position.y + subrootHeight / 2 + childHeight / 2;
+      const childY = subrootHeight;
       positionsByKey.set(childKey, { x: childX, y: childY, key: childKey });
       this.calculateForChildren(child, positionsByKey, subtreeWidthsByKey);
     }
@@ -61,7 +61,7 @@ export class Layout {
     }
 
     const key = this.getKey(subroot);
-    const width = Math.max(childrenWidth, this.getWidth(key));
+    const width = Math.max(childrenWidth, this.getWidth(subroot));
     subtreeWidthsByKey.set(key, width);
   }
 }
