@@ -8,5 +8,6 @@ module.exports = {
     port: 9000,
   },
   configureWebpack: {
+    name: 'Expressionista'
   }
 };

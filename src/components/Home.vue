@@ -109,14 +109,15 @@ export default {
   /* border-color: black;
   border-style: solid;
   border-width: 1px; */
+  z-index: 1;
 }
 .expressor {
   /* margin-top: 40px; */
   /* margin-left: 40px; */
   /* border: 1px solid black; */
   padding: 20px;
-  overflow-x: auto;
-  overflow-y: scroll;
+  overflow-x: visible;
+  overflow-y: visible;
 }
 .flick {
   position: absolute;

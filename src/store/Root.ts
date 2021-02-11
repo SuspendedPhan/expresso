@@ -10,6 +10,7 @@ import { DateTime } from "luxon";
 import AttributeCollection from "./AttributeCollection";
 import WordCollection from "./WordCollection";
 import Types from "./Types";
+import { OrganismLayout } from "./OrganismLayout";
 
 export enum RenderShape {
   Circle = "Circle",
@@ -22,6 +23,7 @@ export class Root {
   wordCollection = new WordCollection();
   nodeStore = new NodeStore(this);
   nodeCollection = this.nodeStore;
+  organismLayout = new OrganismLayout(this);
 
   metaorganismCollection = new MetaorganismCollection(this);
 

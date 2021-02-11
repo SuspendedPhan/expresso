@@ -129,9 +129,10 @@ export default class Pen {
         query.toLowerCase(),
         metafun.name.toLowerCase()
       );
-      const mustBeNumberType = metafun.inputTypesFromOutputType === undefined;
+      const inputTypesFromOutputType = (metafun as any)?.inputTypesFromOutputType;
+      const mustBeNumberType = inputTypesFromOutputType === undefined;
       const validOutputType =
-        metafun.inputTypesFromOutputType?.(requiredType) !== undefined;
+        inputTypesFromOutputType?.(requiredType) !== undefined;
       const okNumberType = mustBeNumberType && requiredType === Types.Number;
       const ok =
         (query === "" || isSubsequence) && (okNumberType || validOutputType);

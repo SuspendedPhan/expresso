@@ -2,9 +2,11 @@ import wu from "wu";
 import { Root } from "./Root";
 import seedrandom from "seedrandom";
 import Types from "./Types";
+import EasingMetafuns from "./EasingMetafuns";
 
 export default class MetafunStore {
   metafuns = [
+    ...EasingMetafuns,
     {
       name: "Add",
       paramCount: 2,
@@ -88,6 +90,19 @@ export default class MetafunStore {
       eval: (t01, frequency) => {
         const ret = (t01.eval() * frequency.eval()) % 1;
         return ret;
+      }
+    },
+    {
+      name: "Square",
+      paramCount: 2,
+      eval: (t01, frequency) => {
+        const t01FreqEval = t01.eval() * frequency.eval();
+        const t01Mod = (t01FreqEval % 1 + 1) % 1;
+        if (t01Mod < .5) {
+          return 0;
+        } else {
+          return 1;
+        }
       }
     },
     {
