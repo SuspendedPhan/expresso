@@ -7,7 +7,7 @@
           {{ metaorganism.name }}
         </option>
       </select>
-      <button @click='spawn'>Spawn Organ</button>
+      <button @click='spawn'>Spawn Suborganism</button>
       <input placeholder='Attribute name' v-model='attributeName' />
       <button @click='addAttribute'>Add Attribute</button>
       <button @click='removeOrganism(organism)' v-if='!isRoot'>Remove Organism</button>
