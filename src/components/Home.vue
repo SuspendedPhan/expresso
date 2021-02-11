@@ -109,6 +109,7 @@ export default {
   /* border-color: black;
   border-style: solid;
   border-width: 1px; */
+  z-index: 1;
 }
 .expressor {
   /* margin-top: 40px; */
@@ -117,7 +118,6 @@ export default {
   padding: 20px;
   overflow-x: auto;
   overflow-y: scroll;
-  z-index: -1;
 }
 .flick {
   position: absolute;
