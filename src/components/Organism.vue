@@ -108,7 +108,6 @@ export default {
       this.root.save();
     },
     init: function () {
-      console.log('init');
       const element = this.$refs["organism"];
       new ResizeSensor(element, () => {
         this.root.organismLayout.recalculate();
@@ -121,19 +120,14 @@ export default {
       this.root.organismLayout
         .getLocalPositionObservable(this.organism.id)
         .subscribe((localPosition) => {
-          this.position.top = localPosition.y;
-          this.position.left = localPosition.x;
-          // console.log("pos");
-          // console.log(localPosition);
-          // console.log(this.organism.name);
+          this.position.top = localPosition.top;
+          this.position.left = localPosition.left;
         });
     },
   },
   mounted() {
-    console.log('mounted');
     if (this.organism == null) {
       window.setTimeout(() => this.init(), 200);
-      // Vue.nextTick(() => this.init());
       return;
     } else {
       this.init();

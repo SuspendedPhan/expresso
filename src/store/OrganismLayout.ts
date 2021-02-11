@@ -18,7 +18,6 @@ export class OrganismLayout {
   constructor(private root: Root) {}
 
   public recalculate() {
-    console.log('recalc');
     const positions = this.layout.calculate(this.root.organismCollection.getRoot());
     for (const [organismId, localPositionSubscriber] of this.onLocalPositionSubscriberByOrganismId.entries()) {
       localPositionSubscriber.next(positions.get(organismId));
