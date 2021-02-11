@@ -117,6 +117,7 @@ export default {
   padding: 20px;
   overflow-x: auto;
   overflow-y: scroll;
+  z-index: -1;
 }
 .flick {
   position: absolute;

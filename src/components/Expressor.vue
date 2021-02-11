@@ -1,9 +1,11 @@
 <template>
-  <div>
+  <div ref="expressor">
     <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
     <div class="bottom-group">
       <button @click="clearStorage">Clear storage</button>
-      <div :class="['error-box', { error: consoleError }]">you have console errors</div>
+      <div :class="['error-box', { error: consoleError }]">
+        you have console errors
+      </div>
     </div>
   </div>
 </template>
@@ -15,6 +17,7 @@ import Root from "../store/Root";
 import Node from "./Node";
 import Organism from "./Organism";
 import Vue from "vue";
+import panzoom from "panzoom";
 // import CodeMirror from 'codemirror';
 
 export default {
@@ -57,9 +60,17 @@ export default {
     },
   },
   mounted() {
-    // var mirror = CodeMirror(document.body);
-    // mirror.setValue("yoyoyo");
-    
+    const pz = panzoom(this.$refs["expressor"], {
+      beforeMouseDown: function (e) {
+        var shouldIgnore = !e.altKey;
+        return shouldIgnore;
+      },
+      filterKey: function (/* e, dx, dy, dz */) {
+        // don't let panzoom handle this event:
+        return true;
+      },
+      zoomDoubleClickSpeed: 1,
+    });
   },
 };
 </script>
