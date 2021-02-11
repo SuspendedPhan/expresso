@@ -7,7 +7,6 @@ export interface Point {
 // relative to parent
 export type LocalPositionsByKey = Map<any, Point>;
 
-// treeRoot will be positioned at 0, 0
 export class Layout {
   private horizontalMargin = 100;
   private verticalMargin = 100;
@@ -19,9 +18,10 @@ export class Layout {
     private getKey: Function
   ) {}
 
+  // treeRoot will always be positioned at <0, 0>
   calculate(treeRoot): LocalPositionsByKey {
     const subtreeWidthsByKey = new Map<any, number>();
-    this.calculateWidth(treeRoot, subtreeWidthsByKey);
+    this.calculateSubtreeWidth(treeRoot, subtreeWidthsByKey);
 
     const key = this.getKey(treeRoot);
     const positionsByKey = new Map<any, Point>();
@@ -35,23 +35,10 @@ export class Layout {
     positionsByKey: LocalPositionsByKey,
     subtreeWidthsByKey: Map<any, number>
   ) {
-    const key = this.getKey(subroot);
     const subrootHeight = this.getHeight(subroot);
     const subrootWidth = this.getWidth(subroot);
-
-    // NOTE: trouble centering when self is wider than children? calculate sum of children width here 
-    // instead of subtree width
-    const width = subtreeWidthsByKey.get(key) as number;
-    let childrenWidth = 0;
-    const children = this.getChildren(subroot).toArray();
-    for (const child of this.getChildren(subroot)) {
-      const childKey = this.getKey(child);
-      childrenWidth += subtreeWidthsByKey.get(childKey);
-    }
-    childrenWidth += (children.length - 1) * this.horizontalMargin;
-
+    const childrenWidth = this.calculateChildrenWidth(subroot, subtreeWidthsByKey);
     let nextLeftBound = subrootWidth / 2 - childrenWidth / 2;
-    // let nextLeftBound = subrootWidth / 2 - width / 2;
     for (const child of this.getChildren(subroot)) {
       const childKey = this.getKey(child);
       const childSubtreeWidth = subtreeWidthsByKey.get(childKey) as number;
@@ -64,19 +51,25 @@ export class Layout {
     }
   }
 
-  private calculateWidth(subroot, subtreeWidthsByKey: Map<any, number>) {
+  private calculateSubtreeWidth(subroot, subtreeWidthsByKey: Map<any, number>) {
+    if (subtreeWidthsByKey.has(this.getKey(subroot))) { return; }
+
+    const childrenWidth = this.calculateChildrenWidth(subroot, subtreeWidthsByKey);
+    const key = this.getKey(subroot);
+    const width = Math.max(childrenWidth, this.getWidth(subroot));
+    subtreeWidthsByKey.set(key, width);
+  }
+
+  private calculateChildrenWidth(subroot, subtreeWidthsByKey): number {
     let childrenWidth = 0;
     const children = this.getChildren(subroot).toArray();
     for (const child of children) {
-      this.calculateWidth(child, subtreeWidthsByKey);
+      this.calculateSubtreeWidth(child, subtreeWidthsByKey);
       const childKey = this.getKey(child);
       childrenWidth += subtreeWidthsByKey.get(childKey) as number;
     }
     const gaps = Math.max(children.length - 1, 0);
     childrenWidth += gaps * this.horizontalMargin;
-
-    const key = this.getKey(subroot);
-    const width = Math.max(childrenWidth, this.getWidth(subroot));
-    subtreeWidthsByKey.set(key, width);
+    return childrenWidth;
   }
 }
