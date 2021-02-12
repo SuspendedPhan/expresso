@@ -142,13 +142,14 @@ export default {
 <style scoped>
 .organism {
   position: absolute;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   border: 1px solid black;
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 20px;
   border-radius: 2px;
-  margin-top: 10px;
+  /* margin-top: 10px; */
+  background-color: white;
 }
 .controls {
   display: grid;

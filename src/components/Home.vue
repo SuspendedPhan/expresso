@@ -94,7 +94,7 @@ export default {
 .home {
   display: grid;
   position: absolute;
-  grid-template-columns: 33% 1fr;
+  grid-template-columns: 80% 1fr;
   grid-template-rows: 100%;
   height: 100%;
   width: 100%;
@@ -112,10 +112,6 @@ export default {
   z-index: 1;
 }
 .expressor {
-  /* margin-top: 40px; */
-  /* margin-left: 40px; */
-  /* border: 1px solid black; */
-  padding: 20px;
   overflow-x: visible;
   overflow-y: visible;
 }

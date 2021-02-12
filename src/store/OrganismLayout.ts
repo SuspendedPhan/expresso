@@ -1,8 +1,8 @@
-import { Layout, Point } from "@/code/Layout";
+import { Layout, Line, Point } from "@/code/Layout";
 import { Root } from "./Root";
 import * as rxjs from "rxjs";
-import { multicast } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { share } from "rxjs/operators";
+import { Observable, Subject } from "rxjs";
 
 export class OrganismLayout {
   private layout = new Layout(
@@ -12,16 +12,35 @@ export class OrganismLayout {
     this.getKey.bind(this)
   );
 
-  private onLocalPositionSubscriberByOrganismId = new Map<string, rxjs.Subscriber<Point>>();
+  public onLinesCalculated = new Observable<Line[]>(
+    (subscriber) => (this.linesCalculatedSubscriber = subscriber)
+  ).pipe(share());
+
+  private onLocalPositionSubscriberByOrganismId = new Map<
+    string,
+    rxjs.Subscriber<Point>
+  >();
   private organismElementById = new Map<string, HTMLElement>();
+  private linesCalculatedSubscriber;
 
   constructor(private root: Root) {}
 
   public recalculate() {
-    const positions = this.layout.calculate(this.root.organismCollection.getRoot());
-    for (const [organismId, localPositionSubscriber] of this.onLocalPositionSubscriberByOrganismId.entries()) {
-      localPositionSubscriber.next(positions.get(organismId));
+    const output = this.layout.calculate(
+      this.root.organismCollection.getRoot()
+    );
+    for (const [
+      organismId,
+      localPositionSubscriber,
+    ] of this.onLocalPositionSubscriberByOrganismId.entries()) {
+      localPositionSubscriber.next(output.localPositionsByKey.get(organismId));
     }
+
+    console.assert(
+      this.linesCalculatedSubscriber,
+      "Failed assertion means nobody subscribed yet."
+    );
+    this.linesCalculatedSubscriber.next(output.lines);
   }
 
   public registerOrganismElement(organismElement, organismId) {
@@ -29,7 +48,7 @@ export class OrganismLayout {
   }
 
   public getLocalPositionObservable(organismId) {
-    return new Observable<Point>(subscriber => {
+    return new Observable<Point>((subscriber) => {
       this.onLocalPositionSubscriberByOrganismId.set(organismId, subscriber);
     });
   }
