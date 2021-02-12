@@ -1,6 +1,13 @@
 <template>
   <div v-if="organism" class="organism" ref="organism" :style="style">
-    <div class="organism-name">{{ organism.name }}</div>
+    <div class="title-bar">
+      <div class="organism-name">{{ organism.name }}</div>
+      <button
+        v-if="!isRoot"
+        class="button"
+        @click="removeOrganism(organism)"
+      ></button>
+    </div>
     <div class="controls">
       <select v-model="selectedPrimitiveId">
         <option
@@ -14,9 +21,6 @@
       <button @click="spawn">Spawn Suborganism</button>
       <input placeholder="Attribute name" v-model="attributeName" />
       <button @click="addAttribute">Add Attribute</button>
-      <button @click="removeOrganism(organism)" v-if="!isRoot">
-        Remove Organism
-      </button>
     </div>
     <div class="attribute-group">
       <div
@@ -108,7 +112,6 @@ export default {
       this.root.save();
     },
     init: function () {
-      console.log('init');
       const element = this.$refs["organism"];
       new ResizeSensor(element, () => {
         this.root.organismLayout.recalculate();
@@ -121,23 +124,21 @@ export default {
       this.root.organismLayout
         .getLocalPositionObservable(this.organism.id)
         .subscribe((localPosition) => {
-          this.position.top = localPosition.y;
-          this.position.left = localPosition.x;
-          // console.log("pos");
-          // console.log(localPosition);
-          // console.log(this.organism.name);
+          this.position.top = localPosition.top;
+          this.position.left = localPosition.left;
         });
     },
   },
   mounted() {
-    console.log('mounted');
     if (this.organism == null) {
       window.setTimeout(() => this.init(), 200);
-      // Vue.nextTick(() => this.init());
       return;
     } else {
       this.init();
     }
+  },
+  destroyed() {
+    this.root.organismLayout.recalculate();
   },
 };
 </script>
@@ -145,13 +146,14 @@ export default {
 <style scoped>
 .organism {
   position: absolute;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   border: 1px solid black;
   padding-left: 20px;
   padding-right: 20px;
   padding-top: 20px;
   border-radius: 2px;
-  margin-top: 10px;
+  /* margin-top: 10px; */
+  background-color: white;
 }
 .controls {
   display: grid;
@@ -178,5 +180,18 @@ export default {
   color: #4dc47d;
   font-weight: 500;
   font-size: 24px;
+}
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+}
+.button {
+  background-image: url("/icons/remove.svg");
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+  border: none;
 }
 </style>
