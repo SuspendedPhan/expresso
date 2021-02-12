@@ -94,7 +94,7 @@ export default {
 .home {
   display: grid;
   position: absolute;
-  grid-template-columns: 80% 1fr;
+  grid-template-columns: 50% 1fr;
   grid-template-rows: 100%;
   height: 100%;
   width: 100%;

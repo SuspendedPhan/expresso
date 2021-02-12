@@ -4,8 +4,6 @@
       <div class="organism-name">{{ organism.name }}</div>
       <button
         v-if="!isRoot"
-        width="20"
-        height="20"
         class="button"
         @click="removeOrganism(organism)"
       ></button>
