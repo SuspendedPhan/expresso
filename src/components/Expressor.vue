@@ -130,6 +130,7 @@ export default {
 <style scoped>
 .expressor {
   position: relative;
+  outline: none;
 }
 .organism {
   margin-bottom: 20px;
@@ -161,5 +162,6 @@ export default {
   height: 100%;
   top: 0px;
   left: 0px;
+  border: none;
 }
 </style>

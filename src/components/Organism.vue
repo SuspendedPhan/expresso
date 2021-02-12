@@ -1,6 +1,15 @@
 <template>
   <div v-if="organism" class="organism" ref="organism" :style="style">
-    <div class="organism-name">{{ organism.name }}</div>
+    <div class="title-bar">
+      <div class="organism-name">{{ organism.name }}</div>
+      <button
+        v-if="!isRoot"
+        width="20"
+        height="20"
+        class="button"
+        @click="removeOrganism(organism)"
+      ></button>
+    </div>
     <div class="controls">
       <select v-model="selectedPrimitiveId">
         <option
@@ -14,9 +23,6 @@
       <button @click="spawn">Spawn Suborganism</button>
       <input placeholder="Attribute name" v-model="attributeName" />
       <button @click="addAttribute">Add Attribute</button>
-      <button @click="removeOrganism(organism)" v-if="!isRoot">
-        Remove Organism
-      </button>
     </div>
     <div class="attribute-group">
       <div
@@ -135,7 +141,7 @@ export default {
   },
   destroyed() {
     this.root.organismLayout.recalculate();
-  }
+  },
 };
 </script>
 
@@ -176,5 +182,18 @@ export default {
   color: #4dc47d;
   font-weight: 500;
   font-size: 24px;
+}
+.title-bar {
+  display: flex;
+  justify-content: space-between;
+}
+.button {
+  background-image: url("/icons/remove.svg");
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+  border: none;
 }
 </style>
