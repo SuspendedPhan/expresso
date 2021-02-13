@@ -15,6 +15,7 @@ import { OrganismLayout } from "./OrganismLayout";
 export enum RenderShape {
   Circle = "Circle",
   Rectangle = "Rectangle",
+  Line = "Line",
   None = "None",
 }
 

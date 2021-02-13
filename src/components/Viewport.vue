@@ -65,17 +65,23 @@ export default {
         const saturation = renderCommand.saturation ?? 0;
         const lightness = renderCommand.lightness ?? .5;
         const fillStyle = `hsla(${hue * 360}, ${saturation * 100}%, ${lightness * 100}%, ${alpha})`;
+        context.fillStyle = fillStyle;
+        context.strokeStyle = fillStyle;
         if (renderCommand.shape === RenderShape.Circle) {
           context.beginPath();
           context.arc(renderCommand.x, renderCommand.y, renderCommand.radius, 0, 2 * Math.PI);
-          context.fillStyle = fillStyle;
           context.fill();
         } else if (renderCommand.shape === RenderShape.Rectangle) {
-          context.fillStyle = fillStyle;
           const centerx = renderCommand.x - renderCommand.width / 2;
           const centery = renderCommand.y - renderCommand.height / 2;
           context.fillRect(centerx, centery, renderCommand.width, renderCommand.height);
           context.fill();
+        } else if (renderCommand.shape === RenderShape.Line) {
+          context.lineWidth = renderCommand.width;
+          context.beginPath();
+          context.moveTo(renderCommand.startX, renderCommand.startY);
+          context.lineTo(renderCommand.endX, renderCommand.endY);
+          context.stroke();
         }
       }
       window.requestAnimationFrame(this.update);
