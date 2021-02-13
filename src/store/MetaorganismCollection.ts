@@ -51,6 +51,33 @@ export default class MetaorganismCollection {
       renderShape: RenderShape.Rectangle,
     },
     {
+      id: 'd9f1360c-0944-410f-a2fb-4e7275201bd9',
+      name: 'Line',
+      attributes: [
+        {
+          name: 'startX',
+          default: 0,
+        },
+        {
+          name: 'startY',
+          default: 0,
+        },
+        {
+          name: 'endX',
+          default: 50,
+        },
+        {
+          name: 'endY',
+          default: 50,
+        },
+        {
+          name: 'width',
+          default: 1,
+        },
+      ],
+      renderShape: RenderShape.Line,
+    },
+    {
       id: 'a0ee011c-aaae-4c4c-9514-98fcf7da5996',
       name: 'SuperOrganism',
       attributes: [
