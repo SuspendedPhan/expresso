@@ -75,13 +75,20 @@ export default {
           const centerx = renderCommand.x - renderCommand.width / 2;
           const centery = renderCommand.y - renderCommand.height / 2;
           context.fillRect(centerx, centery, renderCommand.width, renderCommand.height);
-          context.fill();
         } else if (renderCommand.shape === RenderShape.Line) {
           context.lineWidth = renderCommand.width;
           context.beginPath();
           context.moveTo(renderCommand.startX, renderCommand.startY);
           context.lineTo(renderCommand.endX, renderCommand.endY);
           context.stroke();
+        } else if (renderCommand.shape === RenderShape.Square) {
+          const centerx = renderCommand.x - renderCommand.size / 2;
+          const centery = renderCommand.y - renderCommand.size / 2;
+          context.fillRect(centerx, centery, renderCommand.size, renderCommand.size);
+        } else if (renderCommand.shape === RenderShape.StrokeSquare) {
+          const centerx = renderCommand.x - renderCommand.size / 2;
+          const centery = renderCommand.y - renderCommand.size / 2;
+          context.strokeRect(centerx, centery, renderCommand.size, renderCommand.size);
         }
       }
       window.requestAnimationFrame(this.update);

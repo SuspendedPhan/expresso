@@ -16,6 +16,8 @@ export enum RenderShape {
   Circle = "Circle",
   Rectangle = "Rectangle",
   Line = "Line",
+  Square = "Square",
+  StrokeSquare = "StrokeSquare",
   None = "None",
 }
 

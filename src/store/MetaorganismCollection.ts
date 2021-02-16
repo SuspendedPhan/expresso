@@ -51,6 +51,44 @@ export default class MetaorganismCollection {
       renderShape: RenderShape.Rectangle,
     },
     {
+      id: '915c8c29-c868-4a24-b0ac-347baba4943f',
+      name: 'Square',
+      attributes: [
+        {
+          name: 'x',
+          default: 0,
+        },
+        {
+          name: 'y',
+          default: 0,
+        },
+        {
+          name: 'size',
+          default: 50,
+        },
+      ],
+      renderShape: RenderShape.Square,
+    },
+    {
+      id: '065a2fef-c74f-450d-88f1-c67bb697207f',
+      name: 'StrokeSquare',
+      attributes: [
+        {
+          name: 'x',
+          default: 0,
+        },
+        {
+          name: 'y',
+          default: 0,
+        },
+        {
+          name: 'size',
+          default: 50,
+        },
+      ],
+      renderShape: RenderShape.StrokeSquare,
+    },
+    {
       id: 'd9f1360c-0944-410f-a2fb-4e7275201bd9',
       name: 'Line',
       attributes: [

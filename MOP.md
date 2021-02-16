@@ -55,3 +55,4 @@
 - the void upgrade
   - the void attributes always have same uuid
 - the void attributes
+- solo, remap

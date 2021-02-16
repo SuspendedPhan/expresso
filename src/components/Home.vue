@@ -10,6 +10,7 @@
     <button class="storeGraph" @click="showStoreGraph = !showStoreGraph">
       Show Store Graph
     </button>
+    <button class='clearStorage' @click="clearStorage">Clear Storage</button>
   </div>
 </template>
 
@@ -35,6 +36,11 @@ export default {
       showExpressor: true,
       showStoreGraph: false,
     };
+  },
+  methods: {
+    clearStorage: function() {
+      Root.clearStorage();
+    }
   },
   mounted() {
     Root.load();
@@ -124,6 +130,11 @@ export default {
   position: absolute;
   bottom: 10px;
   left: 75px;
+}
+.clearStorage {
+  position: absolute;
+  bottom: 10px;
+  left: 255px;
 }
 .fullWidth {
   grid-column: 1 / -1;

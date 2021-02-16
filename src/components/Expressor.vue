@@ -96,7 +96,7 @@ export default {
   mounted() {
     const pz = panzoom(this.$refs["panzoom"], {
       beforeMouseDown: function (e) {
-        var shouldIgnore = !e.altKey;
+        var shouldIgnore = !e.altKey && (e.button !== 1);
         return shouldIgnore;
       },
       filterKey: function (/* e, dx, dy, dz */) {

@@ -1,7 +1,7 @@
 <template>
   <div v-if="organism" class="organism" ref="organism" :style="style">
     <div class="title-bar">
-      <div class="organism-name">{{ organism.name }}</div>
+      <div class="organism-name">{{ organism.name }} - {{ getMetaorganismName(organism) }}</div>
       <button
         v-if="!isRoot"
         class="button"
@@ -128,6 +128,9 @@ export default {
           this.position.left = localPosition.left;
         });
     },
+    getMetaorganismName: function(organism) {
+      return this.root.metaorganismCollection.getFromId(organism.metaorganismId).name;
+    }
   },
   mounted() {
     if (this.organism == null) {
