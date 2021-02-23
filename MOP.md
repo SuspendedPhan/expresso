@@ -38,12 +38,12 @@
 - create plain vector
 - clonenumber11
 - vector custom attribute
-- remove attribute+
+- remove attribute++
 - rename attribute
 - line
 - triangle
 - color attributes
-- convert to attribute+
+- convert to attribute++
 - interval
 - center.x
 - non fill shape
@@ -56,3 +56,5 @@
   - the void attributes always have same uuid
 - the void attributes
 - solo, remap
+- remap
+- functions

@@ -54,6 +54,11 @@ export default class MetafunStore {
       eval: (a, b) => a.eval() % b.eval(),
     },
     {
+      name: "Exp",
+      paramCount: 2,
+      eval: (a, b) => Math.pow(a.eval(), b.eval()),
+    },
+    {
       name: "Abs",
       paramCount: 1,
       eval: (a) => Math.abs(a.eval()),
@@ -90,25 +95,25 @@ export default class MetafunStore {
       eval: (t01, frequency) => {
         const ret = (t01.eval() * frequency.eval()) % 1;
         return ret;
-      }
+      },
     },
     {
       name: "Square",
       paramCount: 2,
       eval: (t01, frequency) => {
         const t01FreqEval = t01.eval() * frequency.eval();
-        const t01Mod = (t01FreqEval % 1 + 1) % 1;
-        if (t01Mod < .5) {
+        const t01Mod = ((t01FreqEval % 1) + 1) % 1;
+        if (t01Mod < 0.5) {
           return 0;
         } else {
           return 1;
         }
-      }
+      },
     },
     {
       name: "Mod1",
       paramCount: 1,
-      eval: a => a.eval() % 1
+      eval: (a) => a.eval() % 1,
     },
     {
       name: "Mod01",
@@ -116,51 +121,72 @@ export default class MetafunStore {
       eval: (a, divisor) => {
         const ret = (a.eval() % divisor.eval()) / divisor.eval();
         return ret;
-      }
+      },
     },
     {
       name: "CloneNumber11",
       paramCount: 2,
       eval: (cloneNumber, clones) =>
-        (cloneNumber.eval() / (clones.eval() - 1) - 0.5) * 2
+        (cloneNumber.eval() / (clones.eval() - 1) - 0.5) * 2,
+    },
+    {
+      name: "SpaceEvenly",
+      paramCount: 3,
+      eval: (cloneNumber, clones, width) => {
+        const cloneNumberEval = cloneNumber.eval();
+        const clonesEval = clones.eval();
+        const widthEval = width.eval();
+        const cloneNumber01 = cloneNumberEval / clonesEval;
+        const space = widthEval / (clonesEval + 1);
+        return cloneNumber01 * (space * clonesEval) + space;
+      },
     },
     {
       name: "CenterX",
       paramCount: 1,
-      eval: windowWidth => windowWidth.eval() / 2
+      eval: (windowWidth) => windowWidth.eval() / 2,
     },
     {
       name: "CenterY",
       paramCount: 1,
-      eval: windowHeight => windowHeight.eval() / 2
+      eval: (windowHeight) => windowHeight.eval() / 2,
     },
     {
       name: "Time11",
       paramCount: 1,
-      eval: time01 => (time01.eval() - 0.5) * 2
+      eval: (time01) => (time01.eval() - 0.5) * 2,
     },
     {
       name: "X11",
       paramCount: 2,
       eval: (x, windowWidth) =>
-        Math.abs(x.eval() / windowWidth.eval() - 0.5) * 2
+        Math.abs(x.eval() / windowWidth.eval() - 0.5) * 2,
     },
     {
       name: "Mousex",
       paramCount: 0,
-      eval: () => this.root.mostRecentClickCoordinates.x
+      eval: () => this.root.mostRecentClickCoordinates.x,
     },
     {
       name: "Mousey",
       paramCount: 0,
-      eval: () => this.root.mostRecentClickCoordinates.y
+      eval: () => this.root.mostRecentClickCoordinates.y,
     },
     {
       name: "Random",
       paramCount: 1,
-      eval: seed => seedrandom(seed.eval())()
+      eval: (seed) => seedrandom(seed.eval())(),
     },
-
+    {
+      name: "Random11",
+      paramCount: 1,
+      eval: (seed) => seedrandom(seed.eval())() * 2 - 1,
+    },
+    {
+      name: "Step11",
+      paramCount: 2,
+      eval: (x, threshold) => x < threshold ? -1 : 1
+    },
     {
       name: "Rotate",
       paramCount: 2,
@@ -170,17 +196,17 @@ export default class MetafunStore {
         const radians = angle01Val * 2 * Math.PI;
         const ret = {
           x: vectorVal.x * Math.cos(radians) - vectorVal.y * Math.sin(radians),
-          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians)
+          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians),
         };
         return ret;
       },
-      inputTypesFromOutputType: type => {
+      inputTypesFromOutputType: (type) => {
         if (type === Types.Vector) {
           return [Types.Vector, Types.Number];
         } else {
           return undefined;
         }
-      }
+      },
     },
     {
       name: "Scale",
@@ -190,16 +216,16 @@ export default class MetafunStore {
         const scalarVal = scalar.eval();
         return {
           x: vectorVal.x * scalarVal,
-          y: vectorVal.y * scalarVal
+          y: vectorVal.y * scalarVal,
         };
       },
-      inputTypesFromOutputType: type => {
+      inputTypesFromOutputType: (type) => {
         if (type === Types.Vector) {
           return [Types.Vector, Types.Number];
         } else {
           return undefined;
         }
-      }
+      },
     },
     {
       name: "RotateFromUp",
@@ -210,17 +236,17 @@ export default class MetafunStore {
         const radians = angle01Val * 2 * Math.PI;
         const ret = {
           x: vectorVal.x * Math.cos(radians) - vectorVal.y * Math.sin(radians),
-          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians)
+          y: vectorVal.x * Math.sin(radians) + vectorVal.y * Math.cos(radians),
         };
         return ret;
       },
-      inputTypesFromOutputType: type => {
+      inputTypesFromOutputType: (type) => {
         if (type === Types.Vector) {
           return [Types.Number];
         } else {
           return undefined;
         }
-      }
+      },
     },
   ];
 
@@ -231,7 +257,7 @@ export default class MetafunStore {
   }
 
   getFromName(name) {
-    const answer = wu(this.metafuns).find(row => row.name === name);
+    const answer = wu(this.metafuns).find((row) => row.name === name);
     console.assert(answer !== undefined, "fun name");
     return answer;
   }
