@@ -114,6 +114,10 @@ export default class Collection<T> {
     }
   }
 
+  public clear() {
+    throw new Error('not implemented');
+  }
+
   public get length() {
     return this.items.length;
   }
