@@ -10,7 +10,7 @@
     <div ref="panzoom">
       <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
       <div class="bottom-group">
-        <button @click="clearStorage">Clear storage</button>
+        <button @click="clearStorage" class='clearStorage'>Clear storage</button>
         <div :class="['error-box', { error: consoleError }]">
           you have console errors
         </div>
@@ -163,5 +163,11 @@ export default {
   top: 0px;
   left: 0px;
   border: none;
+}
+.clearStorage {
+  position: fixed;
+  top: 10px;
+  left: 200px;
+  z-index: 2;
 }
 </style>
