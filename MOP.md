@@ -1,3 +1,14 @@
+# TODO NEXT
+static attributes = [] as Array<any>; <--- change this to Attribute
+
+try converting some methods to instance methods
+
+
+
+
+
+
+
 # Things to mop
 
 - Property
