@@ -1,22 +1,28 @@
 import wu from "wu";
 import { v4 as uuidv4 } from "uuid";
-import Root from "../store/root";
+import Root from "../store/Root";
 import Functions from "../code/Functions";
 import Types from "./Types";
 
-const makeAttribute = (name, attributeType, datatype) => ({
-  name,
-  attributeType,
-  datatype,
-  // storetype: 'Attribute',
-  id: uuidv4(),
-});
+const makeAttribute = (name, attributeType, datatype) => {
+  const ret = new Attribute();
+  ret.name = name;
+  ret.attributeType = attributeType;
+  ret.datatype = datatype;
+  return ret;
+};
 
 /**
  *
  * @param {RootStore} rootStore
  */
 export default class Attribute {
+  public name!: string;
+  public attributeType!: any;
+  public datatype!: any;
+  public storetype = 'Attribute';
+  public id = uuidv4();
+
   static attributes = [] as Array<any>;
 
   /** { childAttributeId, parentOrganismId } */

@@ -1,5 +1,4 @@
 import NodeStore from "./Node";
-import AttributeStore from "./Attribute";
 import MetafunStore from "./Metafun";
 import PenStore from "./Pen";
 import wu from "wu";
@@ -7,10 +6,10 @@ import OrganismCollection, { Organism } from "./OrganismCollection";
 import MetaorganismCollection from "./MetaorganismCollection";
 import Time from "./Time";
 import { DateTime } from "luxon";
-import AttributeCollection from "./AttributeCollection";
 import WordCollection from "./WordCollection";
 import Types from "./Types";
 import { OrganismLayout } from "./OrganismLayout";
+import Attribute from "@/models/Attribute";
 
 export enum RenderShape {
   Circle = "Circle",
@@ -28,7 +27,7 @@ export class Root {
 
   metaorganismCollection = new MetaorganismCollection(this);
 
-  attributeCollection = new AttributeCollection(this);
+  attributeCollection = Attribute;
   /** @deprecated */
   attributeStore = this.attributeCollection;
 
@@ -42,6 +41,11 @@ export class Root {
   time = new Time(this);
   windowSize = { width: 0, height: 0 };
   mostRecentClickCoordinates = {x: 0, y: 0}
+
+  constructor() {
+    // hack
+    this.attributeCollection.rootStore = this;
+  }
 
   // --- GETS ---
 
