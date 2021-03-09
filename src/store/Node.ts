@@ -120,7 +120,7 @@ export default class NodeStore {
       const attribute = this.root.attributeCollection.getAttributeForNode(
         target
       );
-      return `Reference ${attribute.name}`;
+      return `Reference ${attribute!.name}`;
     }
 
     const children = this.getChildren(node).toArray();

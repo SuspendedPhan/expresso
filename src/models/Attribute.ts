@@ -23,7 +23,7 @@ export default class Attribute {
   public storetype = 'Attribute';
   public id = uuidv4();
 
-  static attributes = [] as Array<any>;
+  static attributes = [] as Array<Attribute>;
 
   /** { childAttributeId, parentOrganismId } */
   static attributeParents = [] as Array<any>;
@@ -74,7 +74,7 @@ export default class Attribute {
       const attr = this.attributes.find(
         (attr) => attr.id === row.childAttributeId
       );
-      console.assert(attr);
+      console.assert(attr as any);
       return attr;
     });
     return answer;
