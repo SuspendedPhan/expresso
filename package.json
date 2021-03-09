@@ -27,6 +27,7 @@
     "seedrandom": "^3.0.5",
     "sourcemapped-stacktrace": "^1.1.11",
     "stacktrace-js": "^2.0.2",
+    "ste-signals": "^2.0.9",
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.0",
     "vue": "^2.6.12",

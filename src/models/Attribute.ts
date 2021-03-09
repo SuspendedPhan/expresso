@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import Root from "../store/Root";
 import Functions from "../code/Functions";
 import Types from "./Types";
+import { SignalDispatcher } from "ste-signals";
 
 const makeAttribute = (name, attributeType, datatype) => {
   const ret = new Attribute();
@@ -20,20 +21,22 @@ export default class Attribute {
   public name!: string;
   public attributeType!: any;
   public datatype!: Types;
-  public storetype = 'Attribute';
+  public storetype = "Attribute";
   public id = uuidv4();
 
-  static attributes = [] as Array<Attribute>;
+  public static attributes = [] as Array<Attribute>;
 
   /** { childAttributeId, parentOrganismId } */
-  static attributeParents = [] as Array<any>;
+  public static attributeParents = [] as Array<any>;
 
   /** { attributeId, rootNodeId } */
-  static rootNodes = [] as Array<any>;
+  public static rootNodes = [] as Array<any>;
 
-  static rootStore = Root;
+  public static rootStore = Root;
 
-  static get nodeStore() {
+  public static onAttributeCountChanged = new SignalDispatcher();
+
+  private static get nodeStore() {
     return this.rootStore.nodeStore;
   }
 
@@ -192,7 +195,12 @@ export default class Attribute {
     return this.putAttribute(organism, attributeName, "Emergent", datatype);
   }
 
-  static putAttribute(organism, attributeName, attributeType, datatype = Types.Number) {
+  static putAttribute(
+    organism,
+    attributeName,
+    attributeType,
+    datatype = Types.Number
+  ) {
     const answer = makeAttribute(attributeName, attributeType, datatype);
     const rootNode = this.nodeStore.addVariable(datatype);
     this.attributes.push(answer);
@@ -207,6 +215,9 @@ export default class Attribute {
     if (datatype === Types.Vector) {
       this.assign(answer, this.nodeStore.addVector());
     }
+    
+    // NOTE: can make this faster by dispatching per organism
+    this.onAttributeCountChanged.dispatch();
     return answer;
   }
 

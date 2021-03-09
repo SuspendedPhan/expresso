@@ -25,7 +25,7 @@
     <div class="attribute-group">
       <div
         class="attribute"
-        v-for="(attribute, index) in root.attributeStore.getEditables(organism)"
+        v-for="(attribute, index) in editableAttributes"
         :key="attribute.id"
       >
         <div v-if="index !== 0" class="divider"></div>
@@ -46,14 +46,15 @@
 <script>
 import wu from "wu";
 import Root from "../store/Root";
-import Attribute from "./Attribute";
+import AttributeComponent from "./Attribute";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import Vue from "vue";
+import Attribute from "@/models/Attribute";
 
 export default {
   name: "Organism",
   components: {
-    Attribute,
+    Attribute: AttributeComponent,
   },
   props: {
     organism: null,
@@ -66,6 +67,7 @@ export default {
       metaorganismCollection: Root.metaorganismCollection,
       selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
       attributeName: "",
+      editableAttributes: [],
       position: {
         top: 0,
         left: 0,
@@ -127,6 +129,14 @@ export default {
           this.position.top = localPosition.top;
           this.position.left = localPosition.left;
         });
+
+      Attribute.onAttributeCountChanged.sub(() => {
+        Vue.set(this, "editableAttributes", this.getEditableAttributes());
+      });
+      this.editableAttributes = this.getEditableAttributes();
+    },
+    getEditableAttributes: function () {
+      return Array.from(root.attributeStore.getEditables(this.organism));
     },
   },
   mounted() {

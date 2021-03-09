@@ -11,9 +11,7 @@ try converting some methods to instance methods
 
 # Things to mop
 
-- Property
-- EditableProperty
-- ComputedProperty
+- convert vue files to classes
 
 - make testing faster
   - get rid of stack traces in asserts
