@@ -151,10 +151,10 @@ export default class StoreGraph extends Vue {
   private boundForce(alpha) {
     const ref = this.$refs.container as any;
     for (const forceNode of this.forceNodes as any[]) {
-      forceNode.x = Math.max(0, forceNode.x);
-      forceNode.x = Math.min(ref.clientWidth, forceNode.x);
-      forceNode.y = Math.max(0, forceNode.y);
-      forceNode.y = Math.min(ref.clientHeight, forceNode.y);
+      forceNode.x = Math.max(5, forceNode.x);
+      forceNode.x = Math.min(ref.clientWidth - 5, forceNode.x);
+      forceNode.y = Math.max(5, forceNode.y);
+      forceNode.y = Math.min(ref.clientHeight - 5, forceNode.y);
     }
   }
 }

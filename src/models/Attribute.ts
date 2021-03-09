@@ -19,7 +19,7 @@ const makeAttribute = (name, attributeType, datatype) => {
 export default class Attribute {
   public name!: string;
   public attributeType!: any;
-  public datatype!: any;
+  public datatype!: Types;
   public storetype = 'Attribute';
   public id = uuidv4();
 
@@ -35,6 +35,16 @@ export default class Attribute {
 
   static get nodeStore() {
     return this.rootStore.nodeStore;
+  }
+
+  // private constructor() {}
+
+  getRootNode() {
+    return Attribute.getRootNode(this);
+  }
+
+  getOrganism() {
+    return Attribute.getOrganismForAttribute(this);
   }
 
   // --- GETS ---
@@ -113,7 +123,7 @@ export default class Attribute {
     return this.attributes.find((row) => row.id === attributeId);
   }
 
-  static getAttributeForNode(node) {
+  static getAttributeForNode(node): Attribute {
     let root = node;
     while (true) {
       const parent = this.nodeStore.getParent(root, false);
@@ -123,7 +133,7 @@ export default class Attribute {
     const row = this.rootNodes.find((row) => row.rootNodeId === root.id);
     console.assert(row, "no attribute for root node");
     const attribute = this.getAttributeFromId(row.attributeId);
-    return attribute;
+    return attribute as any;
   }
 
   static getOrganismForAttribute(attribute) {
@@ -153,6 +163,13 @@ export default class Attribute {
 
   static deserialize(store) {
     Object.assign(this, store);
+
+    this.attributes = [];
+    for (const storeAttribute of store.attributes) {
+      const attribute = new Attribute();
+      Object.assign(attribute, storeAttribute);
+      this.attributes.push(attribute);
+    }
   }
 
   static assignNumber(attribute, value) {

@@ -4,6 +4,7 @@ import { Root } from "./Root";
 import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
 import Types from "./Types";
+import Attribute from "@/models/Attribute";
 
 interface ParentRelationship {
   childNodeId: string;
@@ -359,6 +360,25 @@ export default class NodeStore {
       const { childIndex, parentNode } = parentRelationship;
       this.putChild(parentNode, childIndex, newNode);
     }
+  }
+
+  convertToAttribute(node) {
+    if (node === null) return;
+
+    const oldAttribute = Attribute.getAttributeForNode(node);
+    const organism = oldAttribute.getOrganism();
+    const newAttribute = Attribute.putEditable(
+      organism,
+      Attribute.rootStore.wordCollection.getRandomWord(),
+      node.datatype
+    );
+    
+    const parentNode = this.getParent(node);
+    const variableNode = newAttribute.getRootNode();
+    const referenceNode = this.addReference(variableNode);
+    this.reparent({ child: node, newParent: variableNode, childIndex: 0 });
+    this.putChild(parentNode, 0, referenceNode);
+    console.log('done');
   }
 
   fromTree(subtree, parentNode = undefined): any {

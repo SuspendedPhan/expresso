@@ -235,7 +235,7 @@ export default class Pen {
     );
   }
 
-  private getPointedNode() {
+  public getPointedNode() {
     const selection = this.getSelection();
     if (selection === null) return null;
 
