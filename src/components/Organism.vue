@@ -43,102 +43,98 @@
   </div>
 </template>
 
-<script>
+<script lang='ts'>
 import wu from "wu";
 import Root from "../store/Root";
-import AttributeComponent from "./Attribute";
+import AttributeComponent from "./Attribute.vue";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import Vue from "vue";
+import Component from "vue-class-component";
+import { Prop } from "vue-property-decorator";
 import Attribute from "@/models/Attribute";
 
-export default {
-  name: "Organism",
-  components: {
-    Attribute: AttributeComponent,
-  },
-  props: {
-    organism: null,
-    isRoot: Boolean,
-  },
-  data: function () {
-    return {
-      root: Root,
-      attributeStore: Root.attributeStore,
-      metaorganismCollection: Root.metaorganismCollection,
-      selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
-      attributeName: "",
-      editableAttributes: [],
-      position: {
-        top: 0,
-        left: 0,
-      },
-    };
-  },
-  computed: {
-    style: function () {
-      return `left: ${this.position.left}px; top: ${this.position.top}px;`;
-    },
-  },
-  methods: {
-    getNodeForAttribute: function (attribute) {
-      Root.nodeCollection.nodeParents.length; // trigger reactive
-      return Root.nodeStore.getChild(
-        Root.attributeStore.getRootNode(attribute),
-        0
-      );
-    },
-    spawn: function () {
-      const metaorganism = this.metaorganismCollection.getFromId(
-        this.selectedPrimitiveId
-      );
-      const organ = this.root.organismCollection.putFromMeta(
-        this.root.wordCollection.getRandomWord(),
-        metaorganism
-      );
-      this.root.organismCollection.addChild(this.organism, organ);
-      this.root.save();
-    },
-    addAttribute: function () {
-      const attributeName =
-        this.attributeName === ""
-          ? this.root.wordCollection.getRandomWord()
-          : this.attributeName;
-      this.root.attributeCollection.putEditable(this.organism, attributeName);
-      this.root.save();
-    },
-    clearStorage: function () {
-      this.root.clearStorage();
-    },
-    removeOrganism: function (organism) {
-      this.root.organismCollection.remove(organism);
-      this.root.save();
-    },
-    init: function () {
-      const element = this.$refs["organism"];
-      new ResizeSensor(element, () => {
-        this.root.organismLayout.recalculate();
+@Component({ components: { Attribute: AttributeComponent } })
+export default class Organism extends Vue {
+  @Prop() organism!: any;
+  @Prop() isRoot!: boolean;
+
+  root = Root;
+  attributeStore = Root.attributeStore;
+  metaorganismCollection = Root.metaorganismCollection;
+  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id;
+  attributeName = "";
+  editableAttributes = [] as any[];
+  position = {
+    top: 0,
+    left: 0,
+  };
+
+  get style() {
+    return `left: ${this.position.left}px; top: ${this.position.top}px;`;
+  }
+
+  getNodeForAttribute(attribute) {
+    Root.nodeCollection.nodeParents.length; // trigger reactive
+    return Root.nodeStore.getChild(
+      Root.attributeStore.getRootNode(attribute),
+      0
+    );
+  }
+
+  spawn() {
+    const metaorganism = this.metaorganismCollection.getFromId(
+      this.selectedPrimitiveId
+    );
+    const organ = this.root.organismCollection.putFromMeta(
+      this.root.wordCollection.getRandomWord(),
+      metaorganism
+    );
+    this.root.organismCollection.addChild(this.organism, organ);
+    this.root.save();
+  }
+
+  addAttribute() {
+    const attributeName =
+      this.attributeName === ""
+        ? this.root.wordCollection.getRandomWord()
+        : this.attributeName;
+    this.root.attributeCollection.putEditable(this.organism, attributeName);
+    this.root.save();
+  }
+
+  clearStorage() {
+    this.root.clearStorage();
+  }
+
+  removeOrganism(organism) {
+    this.root.organismCollection.remove(organism);
+    this.root.save();
+  }
+
+  init() {
+    const element = this.$refs["organism"] as any;
+    new ResizeSensor(element, () => {
+      this.root.organismLayout.recalculate();
+    });
+
+    this.root.organismLayout.registerOrganismElement(element, this.organism.id);
+    this.root.organismLayout
+      .getLocalPositionObservable(this.organism.id)
+      .subscribe((localPosition) => {
+        this.position.top = localPosition.top;
+        this.position.left = localPosition.left;
       });
 
-      this.root.organismLayout.registerOrganismElement(
-        element,
-        this.organism.id
-      );
-      this.root.organismLayout
-        .getLocalPositionObservable(this.organism.id)
-        .subscribe((localPosition) => {
-          this.position.top = localPosition.top;
-          this.position.left = localPosition.left;
-        });
+    Attribute.onAttributeCountChanged.sub(() => {
+      Vue.set(this, "editableAttributes", this.getEditableAttributes());
+    });
+    this.editableAttributes = this.getEditableAttributes();
+  }
 
-      Attribute.onAttributeCountChanged.sub(() => {
-        Vue.set(this, "editableAttributes", this.getEditableAttributes());
-      });
-      this.editableAttributes = this.getEditableAttributes();
-    },
-    getEditableAttributes: function () {
-      return Array.from(root.attributeStore.getEditables(this.organism));
-    },
-  },
+  getEditableAttributes() {
+    return Array.from(Attribute.getEditables(this.organism));
+  }
+
   mounted() {
     if (this.organism == null) {
       window.setTimeout(() => this.init(), 200);
@@ -146,11 +142,12 @@ export default {
     } else {
       this.init();
     }
-  },
+  }
+
   destroyed() {
     this.root.organismLayout.recalculate();
-  },
-};
+  }
+}
 </script>
 
 <style scoped>
