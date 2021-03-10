@@ -10,7 +10,9 @@
     <div ref="panzoom">
       <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
       <div class="bottom-group">
-        <button @click="clearStorage" class='clearStorage'>Clear storage</button>
+        <button @click="clearStorage" class="clearStorage">
+          Clear storage
+        </button>
         <div :class="['error-box', { error: consoleError }]">
           you have console errors
         </div>
@@ -27,72 +29,73 @@ import Node from "./Node";
 import Organism from "./Organism";
 import Vue from "vue";
 import panzoom from "panzoom";
+import Component from "vue-class-component";
+import { Prop } from "vue-property-decorator";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 
-export default {
-  name: "Expressor",
+@Component({
   components: {
     // Node,
     Organism,
   },
-  props: {},
-  data: function () {
-    return {
-      root: Root,
-      attributeStore: Root.attributeStore,
-      metaorganismCollection: Root.metaorganismCollection,
-      selectedPrimitiveId: Root.metaorganismCollection.getMetaorganisms()[0].id,
-      consoleError: false,
-      canvasWidth: 0,
-      canvasHeight: 0,
-      panzoomTransform: {},
-      lines: [],
-    };
-  },
-  computed: {},
-  methods: {
-    getNodeForAttribute: function (attribute) {
-      return Root.nodeStore.getChild(
-        Root.attributeStore.getRootNode(attribute),
-        0
-      );
-    },
-    spawn: function () {
-      const metaorganism = this.metaorganismCollection.getFromId(
-        this.selectedPrimitiveId
-      );
-      this.root.organismCollection.putFromMeta(undefined, metaorganism);
-      this.root.save();
-    },
-    clearStorage: function () {
-      this.root.clearStorage();
-    },
-    removeOrganism: function (organism) {
-      this.root.organismCollection.remove(organism);
-      this.root.save();
-    },
-    drawLines: function () {
-      const context = this.$refs["canvas"].getContext("2d");
-      context.resetTransform();
-      context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-      const transform = this.panzoomTransform;
-      context.setTransform(
-        transform.scale,
-        0,
-        0,
-        transform.scale,
-        transform.x,
-        transform.y
-      );
-      context.strokeStyle = "gray";
-      for (const line of this.lines) {
-        context.beginPath();
-        context.moveTo(line.startX, line.startY);
-        context.lineTo(line.endX, line.endY);
-        context.stroke();
-      }
-    },
-  },
+})
+export default class Expressor {
+  root = Root;
+  attributeStore = Root.attributeStore;
+  metaorganismCollection = Root.metaorganismCollection;
+  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id;
+  consoleError = false;
+  canvasWidth = 0;
+  canvasHeight = 0;
+  panzoomTransform = {};
+  lines = [];
+
+  getNodeForAttribute(attribute) {
+    return Root.nodeStore.getChild(
+      Root.attributeStore.getRootNode(attribute),
+      0
+    );
+  }
+
+  spawn() {
+    const metaorganism = this.metaorganismCollection.getFromId(
+      this.selectedPrimitiveId
+    );
+    this.root.organismCollection.putFromMeta(undefined, metaorganism);
+    this.root.save();
+  }
+
+  clearStorage() {
+    this.root.clearStorage();
+  }
+
+  removeOrganism(organism) {
+    this.root.organismCollection.remove(organism);
+    this.root.save();
+  }
+
+  drawLines() {
+    const context = this.$refs["canvas"].getContext("2d");
+    context.resetTransform();
+    context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+    const transform = this.panzoomTransform;
+    context.setTransform(
+      transform.scale,
+      0,
+      0,
+      transform.scale,
+      transform.x,
+      transform.y
+    );
+    context.strokeStyle = "gray";
+    for (const line of this.lines) {
+      context.beginPath();
+      context.moveTo(line.startX, line.startY);
+      context.lineTo(line.endX, line.endY);
+      context.stroke();
+    }
+  }
+
   mounted() {
     const pz = panzoom(this.$refs["panzoom"], {
       beforeMouseDown: function (e) {
@@ -123,8 +126,8 @@ export default {
       this.lines = lines;
       this.drawLines();
     });
-  },
-};
+  }
+}
 </script>
 
 <style scoped>
