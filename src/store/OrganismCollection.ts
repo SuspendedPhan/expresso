@@ -110,7 +110,8 @@ export default class OrganismCollection {
       const attribute = this.root.attributeCollection.putEditable(
         organism,
         metaattribute.name,
-        metaattribute.type ?? Types.Number
+        metaattribute.type ?? Types.Number,
+        true
       );
       if (metaattribute.default !== undefined) {
         this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
