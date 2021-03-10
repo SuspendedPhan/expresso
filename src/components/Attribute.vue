@@ -1,6 +1,12 @@
 <template>
   <div>
-    <div ref="textarea"></div>
+    <div class="flex flex-col space-y-2">
+      <div class="flex justify-between">
+        <span class="text-attribute">{{ attributeModel.name }}</span
+        ><button v-if='!attributeModel.isFrozen' @click="remove">Remove</button>
+      </div>
+      <div ref="textarea"></div>
+    </div>
     <NodePicker
       ref="searcher"
       v-if="picking"
@@ -15,11 +21,9 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Root from "../store/Root";
-import CodeMirror from "codemirror-minified";
-import { PenPositionRelation } from "../store/Pen";
 import NodePicker from "./NodePicker";
-import Functions from "@/code/Functions";
 import Quill from "quill";
+import AttributeModel from "@/models/Attribute";
 
 @Component({
   components: { NodePicker },
@@ -102,6 +106,11 @@ export default class Attribute extends Vue {
 
   blur() {
     this.quill.focus();
+  }
+
+  remove() {
+    AttributeModel.remove(this.attributeModel);
+    Root.save();
   }
 
   @Watch("picking")

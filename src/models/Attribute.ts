@@ -5,14 +5,6 @@ import Functions from "../code/Functions";
 import Types from "./Types";
 import { SignalDispatcher } from "ste-signals";
 
-const makeAttribute = (name, attributeType, datatype) => {
-  const ret = new Attribute();
-  ret.name = name;
-  ret.attributeType = attributeType;
-  ret.datatype = datatype;
-  return ret;
-};
-
 /**
  *
  * @param {RootStore} rootStore
@@ -23,6 +15,7 @@ export default class Attribute {
   public datatype!: Types;
   public storetype = "Attribute";
   public id = uuidv4();
+  public isFrozen!: boolean;
 
   public static attributes = [] as Array<Attribute>;
 
@@ -187,8 +180,8 @@ export default class Attribute {
     this.nodeStore.putChild(this.getRootNode(attribute), 0, valueNode);
   }
 
-  static putEditable(organism, attributeName, datatype = Types.Number) {
-    return this.putAttribute(organism, attributeName, "Editable", datatype);
+  static putEditable(organism, attributeName, datatype = Types.Number, isFrozen = false) {
+    return this.putAttribute(organism, attributeName, "Editable", datatype, isFrozen);
   }
 
   static putEmergent(organism, attributeName, datatype = Types.Number) {
@@ -199,9 +192,14 @@ export default class Attribute {
     organism,
     attributeName,
     attributeType,
-    datatype = Types.Number
+    datatype = Types.Number,
+    isFrozen = false
   ) {
-    const answer = makeAttribute(attributeName, attributeType, datatype);
+    const answer = new Attribute();
+    answer.name = attributeName;
+    answer.attributeType = attributeType;
+    answer.datatype = datatype;
+    answer.isFrozen = isFrozen;
     const rootNode = this.nodeStore.addVariable(datatype);
     this.attributes.push(answer);
     this.attributeParents.push({
@@ -234,5 +232,7 @@ export default class Attribute {
     this.rootNodes = wu(this.rootNodes)
       .reject((t) => t.attributeId === attribute.id)
       .toArray();
+
+    this.onAttributeCountChanged.dispatch();
   }
 }
