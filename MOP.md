@@ -10,7 +10,7 @@ try converting some methods to instance methods
 
 
 # Things to mop
-
+- tailwind
 - convert vue files to classes
 
 - make testing faster
