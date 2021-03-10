@@ -231,11 +231,11 @@ export default class Pen {
     this.selection = this.makeSelectionForNode(
       node,
       annotatedText,
-      attribute.id
+      attribute!.id
     );
   }
 
-  private getPointedNode() {
+  public getPointedNode() {
     const selection = this.getSelection();
     if (selection === null) return null;
 
@@ -486,7 +486,7 @@ export default class Pen {
     this.selection = this.makeSelectionForNode(
       node,
       annotatedText,
-      attribute.id
+      attribute!.id
     );
     this.moveCursorRight();
     this.moveCursorRight();
@@ -524,7 +524,7 @@ export default class Pen {
       this.selection = this.makeSelectionForNode(
         node,
         annotatedText,
-        attribute.id
+        attribute!.id
       );
       this.events.emit("afterPenCommit");
     }

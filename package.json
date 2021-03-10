@@ -27,6 +27,7 @@
     "seedrandom": "^3.0.5",
     "sourcemapped-stacktrace": "^1.1.11",
     "stacktrace-js": "^2.0.2",
+    "ste-signals": "^2.0.9",
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.0",
     "vue": "^2.6.12",
@@ -36,6 +37,7 @@
     "wu": "^2.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/postcss7-compat": "^2.0.3",
     "@types/chai": "^4.2.11",
     "@types/events": "^3.0.0",
     "@types/luxon": "^1.25.0",
@@ -51,10 +53,13 @@
     "@vue/cli-service": "~4.4.0",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^1.0.3",
+    "autoprefixer": "^9.8.6",
     "babel-eslint": "^10.1.0",
     "chai": "^4.1.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "postcss": "^7.0.35",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3",
     "typescript": "~3.9.3",
     "vue-cli-plugin-vuetify": "~2.0.7",
     "vue-template-compiler": "^2.6.12"

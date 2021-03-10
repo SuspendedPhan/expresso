@@ -68,6 +68,10 @@ export default class Attribute extends Vue {
         if (!Root.pen.isCursorInserting()) {
           Root.pen.tryPromoteSelectionToRoot();
         }
+      } else if (event.key === "a" && event.altKey) {
+        Root.nodeCollection.convertToAttribute(Root.pen.getPointedNode());
+        Root.save();
+        this.updateEditor();
       }
     });
 

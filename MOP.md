@@ -1,8 +1,17 @@
-# Things to mop
+# TODO NEXT
+static attributes = [] as Array<any>; <--- change this to Attribute
 
-- Property
-- EditableProperty
-- ComputedProperty
+try converting some methods to instance methods
+
+
+
+
+
+
+
+# Things to mop
+- tailwind
+- convert vue files to classes
 
 - make testing faster
   - get rid of stack traces in asserts
