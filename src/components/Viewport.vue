@@ -50,7 +50,7 @@ export default class Viewport extends Vue {
       antialias: true,
     });
     this.circlePool = deePool.create(this.makeCircle);
-    this.circlePool.grow(10);
+    this.circlePool.grow(100);
     this.update();
   }
 
@@ -97,7 +97,6 @@ export default class Viewport extends Vue {
         circle.scale.x = renderCommand.radius;
         circle.scale.y = renderCommand.radius;
         // circle.tint = ''
-        console.log(circle);
         doneRenderingSignal.sub(() => this.circlePool.recycle(circle));
       } else if (renderCommand.shape === RenderShape.Rectangle) {
         const centerx = renderCommand.x - renderCommand.width / 2;
@@ -113,11 +112,12 @@ export default class Viewport extends Vue {
 
   makeCircle() {
     const ret = new PIXI.Graphics();
-    ret.beginFill(0x9966FF);
+    ret.beginFill(0x9966ff);
     ret.drawCircle(0, 0, 1);
     ret.endFill();
     this.circles.push(ret);
     this.app.stage.addChild(ret);
+    console.log("made");
     return ret;
   }
 }
