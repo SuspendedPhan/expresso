@@ -39,7 +39,7 @@ import ResizeSensor from "css-element-queries/src/ResizeSensor";
     Organism,
   },
 })
-export default class Expressor {
+export default class Expressor extends Vue {
   root = Root;
   attributeStore = Root.attributeStore;
   metaorganismCollection = Root.metaorganismCollection;
