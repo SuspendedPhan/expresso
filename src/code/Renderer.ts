@@ -104,31 +104,35 @@ export default class Renderer {
           organism,
           "cloneNumber"
         );
-        this.nodeStore.putChild(
-          cloneNumberRoot,
-          0,
-          this.nodeStore.addNumber(cloneNumber)
-        );
+        this.nodeStore.getChild(cloneNumberRoot, 0).value = cloneNumber;
+        // this.nodeStore.putChild(
+        //   cloneNumberRoot,
+        //   0,
+        //   this.nodeStore.addNumber(cloneNumber)
+        // );
 
         const cloneNumber01Root = this.attributeCollection.getRootNodeFromName(
           organism,
           "cloneNumber01"
         );
-        this.nodeStore.putChild(
-          cloneNumber01Root,
-          0,
-          this.nodeStore.addNumber(cloneNumber / (clones - 1))
-        );
+        this.nodeStore.getChild(cloneNumber01Root, 0).value = cloneNumber / (clones - 1);
+        // this.nodeStore.putChild(
+        //   cloneNumber01Root,
+        //   0,
+        //   this.nodeStore.addNumber(cloneNumber / (clones - 1))
+        // );
 
         const radialCloneNumber01Root = this.attributeCollection.getRootNodeFromName(
           organism,
           "radialCloneNumber01"
         );
-        this.nodeStore.putChild(
-          radialCloneNumber01Root,
-          0,
-          this.nodeStore.addNumber(cloneNumber / clones)
-        );
+        this.nodeStore.getChild(radialCloneNumber01Root, 0).value = cloneNumber / clones;
+
+        // this.nodeStore.putChild(
+        //   radialCloneNumber01Root,
+        //   0,
+        //   this.nodeStore.addNumber(cloneNumber / clones)
+        // );
       }
 
       if (metaorganism.renderShape !== RenderShape.None) {
