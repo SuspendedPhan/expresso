@@ -1,6 +1,18 @@
 <template>
   <div>
-    <div ref="textarea"></div>
+    <div class="flex flex-col space-y-2">
+      <div class="flex justify-between">
+        <InlineInput
+          :value='attributeModel.name'
+          @input='onNameChange'
+          :readonly="attributeModel.isFrozen"
+        >
+          <span class="text-attribute">{{ attributeModel.name }}</span>
+        </InlineInput>
+        <button v-if="!attributeModel.isFrozen" @click="remove">Remove</button>
+      </div>
+      <div ref="textarea"></div>
+    </div>
     <NodePicker
       ref="searcher"
       v-if="picking"
@@ -15,14 +27,13 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Root from "../store/Root";
-import CodeMirror from "codemirror-minified";
-import { PenPositionRelation } from "../store/Pen";
 import NodePicker from "./NodePicker";
-import Functions from "@/code/Functions";
+import InlineInput from "./InlineInput";
 import Quill from "quill";
+import AttributeModel from "@/models/Attribute";
 
 @Component({
-  components: { NodePicker },
+  components: { NodePicker, InlineInput },
 })
 export default class Attribute extends Vue {
   @Prop() astNode;
@@ -71,7 +82,7 @@ export default class Attribute extends Vue {
       } else if (event.key === "a" && event.altKey) {
         Root.nodeCollection.convertToAttribute(Root.pen.getPointedNode());
         Root.save();
-        this.updateEditor();
+        this.updateEditorIfSelected();
       }
     });
 
@@ -97,11 +108,46 @@ export default class Attribute extends Vue {
       }
     });
 
-    this.pen.events.on("afterPenCommit", () => this.updateEditor());
+    this.pen.events.on("afterPenCommit", () => this.updateEditorIfSelected());
+
+    AttributeModel.onSomeAttributeChanged.sub(() => this.updateEditor());
   }
 
   blur() {
     this.quill.focus();
+  }
+
+  remove() {
+    this.attributeModel.inlineWithDefaults();
+    Root.save();
+  }
+
+  startEditingName() {
+    if (!this.attributeModel.isFrozen) {
+      this.inputName = this.attributeModel.name;
+      this.isEditingName = true;
+      Vue.nextTick(() => this.$refs["nameInput"].focus());
+    }
+  }
+
+  commitName() {
+    this.attributeModel.name = this.inputName;
+    this.isEditingName = false;
+  }
+
+  onInputKeypress(event) {
+    if (event.key === "Enter") {
+      this.commitName();
+    }
+  }
+
+  onInputBlur() {
+    this.isEditingName = false;
+  }
+
+  onNameChange(value) {
+    this.attributeModel.name = value;
+    Root.save();
   }
 
   @Watch("picking")
@@ -121,8 +167,14 @@ export default class Attribute extends Vue {
   }
 
   updateEditor() {
+    if (AttributeModel.attributes.indexOf(this.attributeModel) !== -1) {
+      this.setText(this.quill, this.getText());
+    }
+  }
+
+  updateEditorIfSelected() {
     if (this.pen.getSelectedAttribute() !== this.attributeModel) return;
-    this.setText(this.quill, this.getText());
+    this.updateEditor();
   }
 
   setText(quill, text) {

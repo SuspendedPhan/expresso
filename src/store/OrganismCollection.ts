@@ -110,7 +110,8 @@ export default class OrganismCollection {
       const attribute = this.root.attributeCollection.putEditable(
         organism,
         metaattribute.name,
-        metaattribute.type ?? Types.Number
+        metaattribute.type ?? Types.Number,
+        true
       );
       if (metaattribute.default !== undefined) {
         this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
@@ -125,10 +126,10 @@ export default class OrganismCollection {
     }
 
     if (metaorganism.name !== "TheVoid") {
-      const clones = this.root.attributeCollection.putEditable(organism, "clones");
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber");
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber01");
-      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01");
+      const clones = this.root.attributeCollection.putEditable(organism, "clones", Types.Number, true);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber", Types.Number);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber01", Types.Number);
+      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01", Types.Number);
       this.root.attributeCollection.assignNumber(clones, 1);
     }
 

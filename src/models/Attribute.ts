@@ -5,14 +5,6 @@ import Functions from "../code/Functions";
 import Types from "./Types";
 import { SignalDispatcher } from "ste-signals";
 
-const makeAttribute = (name, attributeType, datatype) => {
-  const ret = new Attribute();
-  ret.name = name;
-  ret.attributeType = attributeType;
-  ret.datatype = datatype;
-  return ret;
-};
-
 /**
  *
  * @param {RootStore} rootStore
@@ -23,6 +15,7 @@ export default class Attribute {
   public datatype!: Types;
   public storetype = "Attribute";
   public id = uuidv4();
+  public isFrozen!: boolean;
 
   public static attributes = [] as Array<Attribute>;
 
@@ -35,6 +28,7 @@ export default class Attribute {
   public static rootStore = Root;
 
   public static onAttributeCountChanged = new SignalDispatcher();
+  public static onSomeAttributeChanged = new SignalDispatcher();
 
   private static get nodeStore() {
     return this.rootStore.nodeStore;
@@ -48,6 +42,28 @@ export default class Attribute {
 
   getOrganism() {
     return Attribute.getOrganismForAttribute(this);
+  }
+
+  inlineWithDefaults() {
+    const Node = Attribute.rootStore.nodeCollection;
+    const rootNode = this.getRootNode();
+    const nodes = wu(Node.nodes).filter(
+      (node) =>
+        node.metaname === "Reference" && node.targetNodeId === rootNode.id
+    ).toArray();
+
+    for (const node of nodes) {
+      if (this.datatype === Types.Number) {
+        Node.replaceNode(node, Node.addNumber(0));
+      } else if (this.datatype === Types.Vector) {
+        Node.replaceNode(node, Node.addVector());
+      } else {
+        console.assert(false);
+      }
+    }
+
+    Attribute.remove(this);
+    Attribute.onSomeAttributeChanged.dispatch();
   }
 
   // --- GETS ---
@@ -187,8 +203,19 @@ export default class Attribute {
     this.nodeStore.putChild(this.getRootNode(attribute), 0, valueNode);
   }
 
-  static putEditable(organism, attributeName, datatype = Types.Number) {
-    return this.putAttribute(organism, attributeName, "Editable", datatype);
+  static putEditable(
+    organism,
+    attributeName,
+    datatype = Types.Number,
+    isFrozen = false
+  ) {
+    return this.putAttribute(
+      organism,
+      attributeName,
+      "Editable",
+      datatype,
+      isFrozen
+    );
   }
 
   static putEmergent(organism, attributeName, datatype = Types.Number) {
@@ -199,9 +226,14 @@ export default class Attribute {
     organism,
     attributeName,
     attributeType,
-    datatype = Types.Number
+    datatype = Types.Number,
+    isFrozen = false
   ) {
-    const answer = makeAttribute(attributeName, attributeType, datatype);
+    const answer = new Attribute();
+    answer.name = attributeName;
+    answer.attributeType = attributeType;
+    answer.datatype = datatype;
+    answer.isFrozen = isFrozen;
     const rootNode = this.nodeStore.addVariable(datatype);
     this.attributes.push(answer);
     this.attributeParents.push({
@@ -215,7 +247,7 @@ export default class Attribute {
     if (datatype === Types.Vector) {
       this.assign(answer, this.nodeStore.addVector());
     }
-    
+
     // NOTE: can make this faster by dispatching per organism
     this.onAttributeCountChanged.dispatch();
     return answer;
@@ -234,5 +266,7 @@ export default class Attribute {
     this.rootNodes = wu(this.rootNodes)
       .reject((t) => t.attributeId === attribute.id)
       .toArray();
+
+    this.onAttributeCountChanged.dispatch();
   }
 }

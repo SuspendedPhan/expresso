@@ -1,7 +1,9 @@
 <template>
   <div v-if="organism" class="organism" ref="organism" :style="style">
     <div class="title-bar">
-      <div class="organism-name">{{ organism.name }}</div>
+      <div class="organism-name">
+        {{ organism.name }} ({{ getMetaname(organism) }})
+      </div>
       <button
         v-if="!isRoot"
         class="button"
@@ -29,7 +31,6 @@
         :key="attribute.id"
       >
         <div v-if="index !== 0" class="divider"></div>
-        <span class="attribute-name">{{ attribute.name }}: </span>
         <Attribute :attributeModel="attribute" />
       </div>
     </div>
@@ -135,6 +136,10 @@ export default class Organism extends Vue {
     return Array.from(Attribute.getEditables(this.organism));
   }
 
+  getMetaname(organism) {
+    return this.root.metaorganismCollection.getFromId(organism.metaorganismId).name;
+  }
+
   mounted() {
     if (this.organism == null) {
       window.setTimeout(() => this.init(), 200);
@@ -173,10 +178,6 @@ export default class Organism extends Vue {
   display: grid;
   grid-auto-rows: auto;
   /* gap: 10px; */
-}
-.attribute-name {
-  color: rgba(113, 0, 225, 0.7);
-  font-weight: 500;
 }
 .divider {
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
