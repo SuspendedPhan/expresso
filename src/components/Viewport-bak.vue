@@ -12,31 +12,27 @@
   </div>
 </template>
 
-<script lang='ts'>
+<script>
 import Root, { RenderShape } from "../store/Root";
 import fps from "fps";
 import numeral from "numeral";
 import Component from "vue-class-component";
 import Vue from "vue";
-import * as PIXI from "pixi.js";
-import deePool from "deepool";
-import { SignalDispatcher } from "ste-signals";
+import * as PIXI from "pixi";
 
-(window as any).root = Root;
+window.root = Root;
 
-@Component({})
+@Component()
 export default class Viewport extends Vue {
   width = 0;
   height = 0;
   framerate = 0;
   Root = Root;
   mostRecentClickCoordinates = { x: 0, y: 0 };
-  app = null as any;
-  circlePool = null as any;
-  circles = [] as any[];
-  ticker = fps({ every: 10 });
+  app = null;
 
   created() {
+    this.ticker = fps({ every: 10 });
     this.ticker.on(
       "data",
       (framerate) => (this.framerate = numeral(framerate).format("0"))
@@ -45,12 +41,10 @@ export default class Viewport extends Vue {
 
   mounted() {
     this.app = new PIXI.Application({
-      resizeTo: this.$refs["viewport"] as any,
-      view: this.$refs["canvas"] as any,
-      antialias: true,
+      resizeTo: this.$refs["viewport"],
+      view: this.$refs["canvas"],
+      antialias: true
     });
-    this.circlePool = deePool.create(this.makeCircle);
-    this.circlePool.grow(10);
     this.update();
   }
 
@@ -65,21 +59,20 @@ export default class Viewport extends Vue {
     if (this.$refs.viewport === undefined) return;
 
     this.ticker.tick();
-    const viewport = this.$refs.viewport as any;
+    const viewport = this.$refs.viewport;
     const canvas = this.$refs.canvas;
     this.width = viewport.clientWidth;
     this.height = viewport.clientHeight;
+    const context = canvas.getContext("2d");
     Root.setWindowSize(this.width, this.height);
     Root.setMouseLocation(
       this.mostRecentClickCoordinates.x,
       this.mostRecentClickCoordinates.y
     );
+    context.clearRect(0, 0, this.width, this.height);
+    context.fillStyle = "black";
+    context.fillRect(0, 0, this.width, this.height);
 
-    for (const circle of this.circles) {
-      circle.visible = false;
-    }
-
-    const doneRenderingSignal = new SignalDispatcher();
     const renderCommands = Root.computeRenderCommands();
     for (const renderCommand of renderCommands) {
       const alpha = renderCommand.alpha ?? 0.5;
@@ -89,36 +82,37 @@ export default class Viewport extends Vue {
       const fillStyle = `hsla(${hue * 360}, ${saturation * 100}%, ${
         lightness * 100
       }%, ${alpha})`;
+      context.fillStyle = fillStyle;
+      context.strokeStyle = fillStyle;
       if (renderCommand.shape === RenderShape.Circle) {
-        const circle = this.circlePool.use();
-        circle.visible = true;
-        circle.x = renderCommand.x;
-        circle.y = renderCommand.y;
-        circle.scale.x = renderCommand.radius;
-        circle.scale.y = renderCommand.radius;
-        // circle.tint = ''
-        console.log(circle);
-        doneRenderingSignal.sub(() => this.circlePool.recycle(circle));
+        context.beginPath();
+        context.arc(
+          renderCommand.x,
+          renderCommand.y,
+          renderCommand.radius,
+          0,
+          2 * Math.PI
+        );
+        context.fill();
       } else if (renderCommand.shape === RenderShape.Rectangle) {
         const centerx = renderCommand.x - renderCommand.width / 2;
         const centery = renderCommand.y - renderCommand.height / 2;
+        context.fillRect(
+          centerx,
+          centery,
+          renderCommand.width,
+          renderCommand.height
+        );
+        context.fill();
       } else if (renderCommand.shape === RenderShape.Line) {
+        context.lineWidth = renderCommand.width;
+        context.beginPath();
+        context.moveTo(renderCommand.startX, renderCommand.startY);
+        context.lineTo(renderCommand.endX, renderCommand.endY);
+        context.stroke();
       }
     }
-
-    doneRenderingSignal.dispatch();
-
     window.requestAnimationFrame(this.update);
-  }
-
-  makeCircle() {
-    const ret = new PIXI.Graphics();
-    ret.beginFill(0x9966FF);
-    ret.drawCircle(0, 0, 1);
-    ret.endFill();
-    this.circles.push(ret);
-    this.app.stage.addChild(ret);
-    return ret;
   }
 }
 </script>

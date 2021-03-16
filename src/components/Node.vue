@@ -48,7 +48,6 @@ import NodePicker from "./NodePicker";
 export default {
   name: "Node",
   components: {
-    NodePicker,
   },
   props: {
     astNode: { value: 0 },
