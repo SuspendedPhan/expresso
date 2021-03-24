@@ -1,6 +1,3 @@
-enum Types {
-  Vector = 'Vector',
-  Number = 'Number',
-}
+import Types from '@/models/Types';
 
 export default Types;

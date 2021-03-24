@@ -1,9 +1,9 @@
 # TODO NEXT
-static attributes = [] as Array<any>; <--- change this to Attribute
+Perf notes.
 
-try converting some methods to instance methods
-
-
+Try implementing this program from scratch. Profile it.
+Then profile computeRenderCommands on its own (ignore rendering and framework, etc).
+Think about implementing computeRenderCommands from scratch.
 
 
 

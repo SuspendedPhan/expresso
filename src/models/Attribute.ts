@@ -93,7 +93,7 @@ export default class Attribute {
     return this.rootStore.nodeStore.getFromId(row.rootNodeId);
   }
 
-  static getAttributesForOrganism(organism) {
+  static getAttributesForOrganism(organism): wu.WuIterable<Attribute> {
     console.assert(organism);
     let answer = wu(this.attributeParents).filter(
       (row) => row.parentOrganismId === organism.id
