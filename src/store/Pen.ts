@@ -1,8 +1,9 @@
 import wu from "wu";
-import { Root } from "./Root";
+import {Root} from "./Root";
 import Functions from "../code/Functions";
-import Types from "./Types";
-import { EventEmitter } from "events";
+import {EventEmitter} from "events";
+import Types from "@/models/Types";
+import Attribute from "@/models/Attribute";
 
 interface NonePenPosition {
   positionType: "None";
@@ -60,7 +61,7 @@ export default class Pen {
   // --- GETS ---
 
   getGhostEdits() {
-    if (this.isQuerying === false) return wu([]);
+    if (!this.isQuerying) return wu([]);
 
     const answer = [] as any;
     const query = this.query;
@@ -103,22 +104,11 @@ export default class Pen {
       const attributes = this.root.attributeCollection.getAttributesForOrganism(
         organism
       );
-      for (const attribute of attributes) {
-        const isSubsequence = Functions.isSubsequence(
-          query.toLowerCase(),
-          attribute.name.toLowerCase()
-        );
-        const ok =
-          attribute !== pointedAttribute &&
-          (query === "" || isSubsequence) &&
-          attribute.datatype === requiredType;
-        if (!ok) continue;
-
-        const rootNode = this.root.attributeCollection.getRootNode(attribute);
-        answer.push({
-          text: `${organism.name}.${attribute.name}`,
-          addNodeFunction: () => this.nodeCollection.addReference(rootNode),
-        });
+      for (const attribute of attributes.filter(attribute => attribute !== pointedAttribute)) {
+        const ghostEdits = this.getGhostEditsForAttribute(query, organism, attribute, requiredType);
+        for (const ghostEdit of ghostEdits) {
+          answer.push(ghostEdit);
+        }
       }
     }
 
@@ -146,6 +136,23 @@ export default class Pen {
     }
 
     return wu(answer);
+  }
+
+  private * getGhostEditsForAttribute(query: string, organism, attribute: Attribute, requiredType) {
+    const isSubsequence = Functions.isSubsequence(
+        query.toLowerCase(),
+        attribute.name.toLowerCase()
+    );
+    const ok =
+        (query === "" || isSubsequence) &&
+        attribute.datatype === requiredType;
+    if (!ok) return;
+
+    const rootNode = this.root.attributeCollection.getRootNode(attribute);
+    yield {
+      text: `${organism.name}.${attribute.name}`,
+      addNodeFunction: () => this.nodeCollection.addReference(rootNode),
+    };
   }
 
   getIsQuerying() {
