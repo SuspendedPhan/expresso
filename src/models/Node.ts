@@ -19,7 +19,7 @@ export default class Node {
     ["childNodeId"]
   );
 
-  private static root = Root;
+  public static root = Root;
 
   // --- GETS ---
 
