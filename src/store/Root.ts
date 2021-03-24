@@ -11,6 +11,7 @@ import Types from "./Types";
 import { OrganismLayout } from "./OrganismLayout";
 import Attribute from "@/models/Attribute";
 import Renderer from "@/code/Renderer";
+import Node from "@/models/Node";
 
 export enum RenderShape {
   Circle = "Circle",
@@ -23,7 +24,7 @@ export class Root {
   // CHECK -- does your store need to be serialized? Consider testing it later.
   wordCollection = new WordCollection();
   nodeStore = new NodeStore(this);
-  nodeCollection = this.nodeStore;
+  nodeCollection = Node;
   organismLayout = new OrganismLayout(this);
 
   metaorganismCollection = new MetaorganismCollection(this);
