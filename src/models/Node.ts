@@ -13,6 +13,11 @@ interface ParentRelationship {
 }
 
 export default class Node {
+  public id = uuidv4();
+  public metaname!: string;
+  public storetype = 'node';
+  public datatype!: Types;
+
   static nodes = new Collection<any>([], ["id"]);
   static nodeParents = new Collection<ParentRelationship>(
     ["parentNodeId"],
@@ -20,6 +25,8 @@ export default class Node {
   );
 
   public static root = Root;
+
+  private constructor() {}
 
   // --- GETS ---
 
@@ -240,12 +247,9 @@ export default class Node {
   }
 
   static addNode(metaname, datatype) {
-    const answer = {
-      metaname,
-      id: uuidv4(),
-      storetype: "node",
-      datatype,
-    };
+    const answer = new Node();
+    answer.metaname = metaname;
+    answer.datatype = datatype;
     this.nodes.add(answer);
     return answer;
   }
