@@ -34,6 +34,8 @@ export default class Viewport extends Vue {
   app = null as any;
   circlePool = null as any;
   circles = [] as any[];
+  rectanglePool = null as any;
+  rectangles = [] as any[];
   ticker = fps({ every: 10 });
 
   created() {
@@ -51,6 +53,8 @@ export default class Viewport extends Vue {
     });
     this.circlePool = deePool.create(this.makeCircle);
     this.circlePool.grow(100);
+    this.rectanglePool = deePool.create(this.makeRectangle);
+    this.rectanglePool.grow(100);
     this.update();
   }
 
@@ -79,6 +83,10 @@ export default class Viewport extends Vue {
       circle.visible = false;
     }
 
+    for (const rectangle of this.rectangles) {
+      rectangle.visible = false;
+    }
+
     const doneRenderingSignal = new SignalDispatcher();
     const renderCommands = Root.computeRenderCommands();
     for (const renderCommand of renderCommands) {
@@ -101,6 +109,12 @@ export default class Viewport extends Vue {
       } else if (renderCommand.shape === RenderShape.Rectangle) {
         const centerx = renderCommand.x - renderCommand.width / 2;
         const centery = renderCommand.y - renderCommand.height / 2;
+        const rectangle = this.rectanglePool.use();
+        rectangle.visible = true;
+        rectangle.x = centerx;
+        rectangle.y = centery;
+        rectangle.scale.x = renderCommand.width;
+        rectangle.scale.y = renderCommand.height;
       } else if (renderCommand.shape === RenderShape.Line) {
       }
     }
@@ -117,7 +131,16 @@ export default class Viewport extends Vue {
     ret.endFill();
     this.circles.push(ret);
     this.app.stage.addChild(ret);
-    console.log("made");
+    return ret;
+  }
+
+  makeRectangle() {
+    const ret = new PIXI.Graphics();
+    ret.beginFill(0x9966ff);
+    ret.drawRect(0, 0, 1, 1);
+    ret.endFill();
+    this.rectangles.push(ret);
+    this.app.stage.addChild(ret);
     return ret;
   }
 }
