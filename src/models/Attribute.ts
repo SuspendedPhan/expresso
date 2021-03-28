@@ -4,6 +4,7 @@ import Root from "../store/Root";
 import Functions from "../code/Functions";
 import Types from "./Types";
 import { SignalDispatcher } from "ste-signals";
+import Metastruct from "@/models/Metastruct";
 
 /**
  *
@@ -12,7 +13,7 @@ import { SignalDispatcher } from "ste-signals";
 export default class Attribute {
   public name!: string;
   public attributeType!: any;
-  public datatype!: Types;
+  public datatype!: Types | Metastruct;
   public storetype = "Attribute";
   public id = uuidv4();
   public isFrozen!: boolean;
@@ -55,8 +56,8 @@ export default class Attribute {
     for (const node of nodes) {
       if (this.datatype === Types.Number) {
         Node.replaceNode(node, Node.addNumber(0));
-      } else if (this.datatype === Types.Vector) {
-        Node.replaceNode(node, Node.addVector());
+      } else if (this.datatype instanceof Metastruct) {
+        Node.replaceNode(node, Node.addStruct(this.datatype));
       } else {
         console.assert(false);
       }
@@ -244,9 +245,6 @@ export default class Attribute {
       attributeId: answer.id,
       rootNodeId: rootNode.id,
     });
-    if (datatype === Types.Vector) {
-      this.assign(answer, this.nodeStore.addVector());
-    }
 
     // NOTE: can make this faster by dispatching per organism
     this.onAttributeCountChanged.dispatch();

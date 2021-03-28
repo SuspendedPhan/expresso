@@ -2,7 +2,7 @@ import Types from "@/models/Types";
 
 export interface Member {
   name: string;
-  type: Types;
+  type: Types | Metastruct;
 }
 
 export default class Metastruct {
@@ -19,6 +19,10 @@ export default class Metastruct {
       { name: "t2", type: Types.Number }
     ])
   };
+
+  static fromId(metastructId: string): Metastruct {
+
+  }
 }
 
 //

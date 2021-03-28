@@ -4,6 +4,7 @@ import Functions from "../code/Functions";
 import {EventEmitter} from "events";
 import Types from "@/models/Types";
 import Attribute from "@/models/Attribute";
+import Metastruct from "@/models/Metastruct";
 
 interface NonePenPosition {
   positionType: "None";
@@ -77,11 +78,8 @@ export default class Pen {
           text: number.toString(),
           addNodeFunction: () => this.nodeCollection.addNumber(number),
         });
-      } else if (requiredType === Types.Vector) {
-        answer.push({
-          text: number.toString(),
-          addNodeFunction: () => this.nodeCollection.addVector(number, 0),
-        });
+      } else if (requiredType instanceof Metastruct) {
+        console.log('dunno what to do with structs');
       } else {
         console.assert(false);
       }

@@ -5,6 +5,7 @@ import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
 import Types from "./Types";
 import Attribute from "@/models/Attribute";
+import Metastruct from "@/models/Metastruct";
 
 interface ParentRelationship {
   childNodeId: string;
@@ -16,7 +17,7 @@ export default class Node {
   public id = uuidv4();
   public metaname!: string;
   public storetype = 'node';
-  public datatype!: Types;
+  public datatype!: Types | Metastruct;
 
   static nodes = new Collection<any>([], ["id"]);
   static nodeParents = new Collection<ParentRelationship>(
@@ -181,11 +182,8 @@ export default class Node {
           node.metafunName
         ) as any;
         node.eval = () => metafun.eval(...this.getChildren(node));
-      } else if (node.metaname === "Vector") {
-        node.eval = () => ({
-          x: this.getChild(node, 0).eval(),
-          y: this.getChild(node, 1).eval(),
-        });
+      } else if (node.metaname === "Struct") {
+        node.eval = this.evalStruct;
       } else {
         console.assert(false);
       }
@@ -199,21 +197,15 @@ export default class Node {
     return answer;
   }
 
-  static addVector(x = 0, y = 0) {
-    const answer = this.addNode("Vector", Types.Vector) as any;
-    this.putChild(answer, 0, this.addNumber(x));
-    this.putChild(answer, 1, this.addNumber(y));
-    answer.eval = () => ({
-      x: this.getChild(answer, 0).eval(),
-      y: this.getChild(answer, 1).eval(),
-    });
-    return answer;
-  }
-
-  static addVariable(datatype = Types.Number) {
+  static addVariable(datatype = Types.Number as Types | Metastruct) {
     const answer = this.addNode("Variable", datatype) as any;
-    const child = this.addNumber(0);
-    this.putChild(answer, 0, child);
+    if (datatype === Types.Number) {
+      this.putChild(answer, 0, this.addNumber(0));
+    } else if (datatype instanceof Metastruct) {
+      this.putChild(answer, 0, this.addStruct(datatype));
+    } else {
+      console.assert(false);
+    }
     answer.eval = () => this.getChild(answer, 0).eval();
     return answer;
   }
@@ -234,8 +226,8 @@ export default class Node {
     for (let i = 0; i < metafun.paramCount; i++) {
       if (inputTypes === undefined || inputTypes[i] === Types.Number) {
         this.putChild(answer, i, this.addNumber(0));
-      } else if (inputTypes[i] === Types.Vector) {
-        this.putChild(answer, i, this.addVector());
+      } else if (inputTypes[i] instanceof Metastruct) {
+        this.putChild(answer, i, this.addStruct(inputTypes[i]));
       } else {
         console.assert(false, inputTypes[i]);
       }
@@ -246,12 +238,38 @@ export default class Node {
     return answer;
   }
 
+  static addStruct(metastruct: Metastruct) {
+    const answer = this.addNode("Struct", metastruct) as any;
+    for (let i = 0; i < metastruct.members.length; i++) {
+      const member = metastruct.members[i];
+      if (member.type === Types.Number) {
+        this.putChild(answer, i, this.addNumber(0));
+      } else if (member.type instanceof Metastruct) {
+        this.putChild(answer, i, this.addStruct(member.type));
+      } else {
+        console.assert(false);
+      }
+    }
+    answer.eval = this.evalStruct;
+  }
+
   static addNode(metaname, datatype) {
     const answer = new Node();
     answer.metaname = metaname;
     answer.datatype = datatype;
     this.nodes.add(answer);
     return answer;
+  }
+
+  private static evalStruct(node) {
+    const metastruct = Metastruct.fromId(node.metastructId);
+    const ret = {};
+    for (let i = 0; i < metastruct.members.length; i++) {
+      const member = metastruct.members[i];
+      ret[member.name] = node.getChild(i).eval();
+    }
+    console.log('hi, testing' + ret);
+    return ret;
   }
 
   static putChild(parent, childIndex: number, child) {
@@ -435,7 +453,7 @@ export default class Node {
       subtree[`${childIndex} ${subrootNode.metaname}`] = subrootNode.value;
     } else if (
       subrootNode.metaname === "Variable" ||
-      subrootNode.metaname === "Vector"
+      subrootNode.metaname === "Struct"
     ) {
       const childTree = {};
       // childTree.metadata = subrootNode;
