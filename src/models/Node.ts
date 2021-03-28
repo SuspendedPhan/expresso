@@ -1,6 +1,6 @@
 import wu from "wu";
 import { v4 as uuidv4 } from "uuid";
-import { Root } from "./Root";
+import Root from "@/store/Root";
 import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
 import Types from "./Types";
@@ -12,25 +12,32 @@ interface ParentRelationship {
   childIndex: number;
 }
 
-export default class NodeStore {
-  nodes = new Collection<any>([], ["id"]);
-  nodeParents = new Collection<ParentRelationship>(
+export default class Node {
+  public id = uuidv4();
+  public metaname!: string;
+  public storetype = 'node';
+  public datatype!: Types;
+
+  static nodes = new Collection<any>([], ["id"]);
+  static nodeParents = new Collection<ParentRelationship>(
     ["parentNodeId"],
     ["childNodeId"]
   );
 
-  constructor(private root: Root) {}
+  public static root = Root;
+
+  private constructor() {}
 
   // --- GETS ---
 
-  getSerialized() {
+  static getSerialized() {
     return {
       nodeParents: this.nodeParents.serialize(),
       nodes: this.nodes.serialize(),
     };
   }
 
-  getParent(node, shouldAssert = true) {
+  static getParent(node, shouldAssert = true) {
     if (shouldAssert === undefined) shouldAssert = true;
 
     const parentRelationship = this.nodeParents.getUnique(
@@ -48,13 +55,13 @@ export default class NodeStore {
     }
   }
 
-  getChild(node, childIndex) {
+  static getChild(node, childIndex) {
     const ret = this.getChildMaybe(node, childIndex);
     console.assert(ret);
     return ret;
   }
 
-  getChildMaybe(node, childIndex) {
+  static getChildMaybe(node, childIndex) {
     const parentRelationships = this.nodeParents.getMany(
       "parentNodeId",
       node.id
@@ -70,7 +77,7 @@ export default class NodeStore {
     }
   }
 
-  getChildren(node) {
+  static getChildren(node) {
     const parentRelationships = Array.from(
       this.nodeParents.getMany("parentNodeId", node.id)
     );
@@ -85,13 +92,13 @@ export default class NodeStore {
     return children;
   }
 
-  getFromId(nodeId): any {
+  static getFromId(nodeId): any {
     const answer = this.nodes.getUnique("id", nodeId);
     console.assert(answer, "cant find node from id");
     return answer;
   }
 
-  getParentRelationship(childNode, shouldAssert = true) {
+  static getParentRelationship(childNode, shouldAssert = true) {
     const row = this.nodeParents.getUnique(
       "childNodeId",
       childNode.id,
@@ -107,13 +114,13 @@ export default class NodeStore {
     };
   }
 
-  getTargetNodeForReference(referenceNode) {
+  static getTargetNodeForReference(referenceNode) {
     const node = this.getFromId(referenceNode.targetNodeId);
     console.assert(node);
     return node;
   }
 
-  toTree(node) {
+  static toTree(node) {
     if (node.metaname === "Number") {
       return node.value;
     } else if (node.metaname === "Reference") {
@@ -142,7 +149,7 @@ export default class NodeStore {
   /**
    * @param nodePath [] returns the Var root
    */
-  getFromPath(organismPath: string[], attributeName, nodePath: number[] = []) {
+  static getFromPath(organismPath: string[], attributeName, nodePath: number[] = []) {
     const organism = this.root.organismCollection.getOrganismFromPath(
       ...organismPath
     );
@@ -159,7 +166,7 @@ export default class NodeStore {
 
   // --- ACTIONS ---
 
-  deserialize(store) {
+  static deserialize(store) {
     this.nodeParents.deserialize(store.nodeParents);
     this.nodes.deserialize(store.nodes);
     for (const node of this.nodes) {
@@ -185,14 +192,14 @@ export default class NodeStore {
     }
   }
 
-  addNumber(value) {
+  static addNumber(value) {
     const answer = this.addNode("Number", Types.Number) as any;
     answer.value = value;
     answer.eval = () => answer.value;
     return answer;
   }
 
-  addVector(x = 0, y = 0) {
+  static addVector(x = 0, y = 0) {
     const answer = this.addNode("Vector", Types.Vector) as any;
     this.putChild(answer, 0, this.addNumber(x));
     this.putChild(answer, 1, this.addNumber(y));
@@ -203,7 +210,7 @@ export default class NodeStore {
     return answer;
   }
 
-  addVariable(datatype = Types.Number) {
+  static addVariable(datatype = Types.Number) {
     const answer = this.addNode("Variable", datatype) as any;
     const child = this.addNumber(0);
     this.putChild(answer, 0, child);
@@ -211,14 +218,14 @@ export default class NodeStore {
     return answer;
   }
 
-  addReference(targetNode) {
+  static addReference(targetNode) {
     const answer = this.addNode("Reference", targetNode.datatype) as any;
     answer.targetNodeId = targetNode.id;
     answer.eval = () => this.getFromId(answer.targetNodeId).eval();
     return answer;
   }
 
-  addFun(metafun, outputType = Types.Number) {
+  static addFun(metafun, outputType = Types.Number) {
     const answer = this.addNode("Function", outputType) as any;
     const inputTypes = metafun.inputTypesFromOutputType?.(outputType);
     const hasTypeFun = metafun.inputTypesFromOutputType !== undefined;
@@ -239,18 +246,15 @@ export default class NodeStore {
     return answer;
   }
 
-  addNode(metaname, datatype) {
-    const answer = {
-      metaname,
-      id: uuidv4(),
-      storetype: "node",
-      datatype,
-    };
+  static addNode(metaname, datatype) {
+    const answer = new Node();
+    answer.metaname = metaname;
+    answer.datatype = datatype;
     this.nodes.add(answer);
     return answer;
   }
 
-  putChild(parent, childIndex: number, child) {
+  static putChild(parent, childIndex: number, child) {
     console.assert(child);
 
     // check child doesn't already have parent
@@ -293,11 +297,11 @@ export default class NodeStore {
     return child;
   }
 
-  commitReplacementSuggestion(suggestion) {
+  static commitReplacementSuggestion(suggestion) {
     suggestion.commitFunction();
   }
 
-  remove(node, shouldAssert = true) {
+  static remove(node, shouldAssert = true) {
     for (const child of this.getChildren(node)) {
       this.remove(child, shouldAssert);
     }
@@ -315,7 +319,7 @@ export default class NodeStore {
   /**
    * Detaches the child from its old parent, and puts it under the new parent.
    */
-  reparent({ child, newParent, childIndex }, shouldHaveOldParent = true) {
+  static reparent({ child, newParent, childIndex }, shouldHaveOldParent = true) {
     const relation = this.nodeParents.getUnique(
       "childNodeId",
       child.id,
@@ -327,7 +331,7 @@ export default class NodeStore {
     this.putChild(newParent, childIndex, child);
   }
 
-  insertNodeAsParent(postChild, postParent) {
+  static insertNodeAsParent(postChild, postParent) {
     const priorRelation = this.getParentRelationship(postChild);
     if (priorRelation) {
       const { childIndex, parentNode } = priorRelation;
@@ -353,7 +357,7 @@ export default class NodeStore {
   /**
    * Removes oldNode and its children from the tree, putting newNode in its place.
    */
-  replaceNode(oldNode, newNode) {
+  static replaceNode(oldNode, newNode) {
     const parentRelationship = this.getParentRelationship(oldNode);
     console.assert(parentRelationship !== undefined);
     if (parentRelationship) {
@@ -362,7 +366,7 @@ export default class NodeStore {
     }
   }
 
-  convertToAttribute(node) {
+  static convertToAttribute(node) {
     if (node === null) return;
 
     const oldAttribute = Attribute.getAttributeForNode(node);
@@ -381,7 +385,7 @@ export default class NodeStore {
     console.log('done');
   }
 
-  fromTree(subtree, parentNode = undefined): any {
+  static fromTree(subtree, parentNode = undefined): any {
     let rootNode = null;
 
     for (const [key, value] of wu.entries(subtree)) {
@@ -412,7 +416,7 @@ export default class NodeStore {
     return rootNode;
   }
 
-  toTree2(subrootNode, subtree = {}) {
+  static toTree2(subrootNode, subtree = {}) {
     const parentRelationship = this.getParentRelationship(subrootNode, false);
     const childIndex = parentRelationship?.childIndex ?? 0;
 

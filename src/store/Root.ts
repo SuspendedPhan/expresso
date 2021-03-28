@@ -1,4 +1,3 @@
-import NodeStore from "./Node";
 import MetafunStore from "./Metafun";
 import PenStore from "./Pen";
 import wu from "wu";
@@ -11,6 +10,7 @@ import Types from "./Types";
 import { OrganismLayout } from "./OrganismLayout";
 import Attribute from "@/models/Attribute";
 import Renderer from "@/code/Renderer";
+import Node from "@/models/Node";
 
 export enum RenderShape {
   Circle = "Circle",
@@ -22,8 +22,8 @@ export enum RenderShape {
 export class Root {
   // CHECK -- does your store need to be serialized? Consider testing it later.
   wordCollection = new WordCollection();
-  nodeStore = new NodeStore(this);
-  nodeCollection = this.nodeStore;
+  nodeCollection = Node;
+  nodeStore = this.nodeCollection;
   organismLayout = new OrganismLayout(this);
 
   metaorganismCollection = new MetaorganismCollection(this);
@@ -46,6 +46,7 @@ export class Root {
   constructor() {
     // hack
     this.attributeCollection.rootStore = this;
+    this.nodeCollection.root = this;
   }
 
   // --- GETS ---
