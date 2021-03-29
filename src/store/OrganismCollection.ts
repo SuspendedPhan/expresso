@@ -3,6 +3,7 @@ import wu from "wu";
 import { MetaOrganism } from "./MetaorganismCollection";
 import { Root } from "./Root";
 import Types from "./Types";
+import Metastruct from "@/models/Metastruct";
 
 function makeOrganism({ name }) {
   return {
@@ -114,14 +115,8 @@ export default class OrganismCollection {
         true
       );
       if (metaattribute.default !== undefined) {
+        console.assert(metaattribute.type === Types.Number);
         this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
-      }
-
-      if (metaattribute.type === Types.Vector) {
-        this.root.attributeCollection.assign(
-          attribute,
-          this.root.nodeCollection.addVector()
-        );
       }
     }
 
@@ -223,7 +218,7 @@ export default class OrganismCollection {
     this.root.attributeCollection.putEmergent(
       this.rootOrganism,
       "window.center",
-      Types.Vector
+      Metastruct.builtinMetastructs.Vector
     );
     return this.rootOrganism;
   }

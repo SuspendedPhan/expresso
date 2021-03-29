@@ -5,6 +5,7 @@ import Functions from "../code/Functions";
 import Types from "./Types";
 import { SignalDispatcher } from "ste-signals";
 import Metastruct from "@/models/Metastruct";
+import Node from "@/models/Node";
 
 /**
  *
@@ -219,7 +220,7 @@ export default class Attribute {
     );
   }
 
-  static putEmergent(organism, attributeName, datatype = Types.Number) {
+  static putEmergent(organism, attributeName, datatype = Types.Number as Types | Metastruct) {
     return this.putAttribute(organism, attributeName, "Emergent", datatype);
   }
 
@@ -227,7 +228,7 @@ export default class Attribute {
     organism,
     attributeName,
     attributeType,
-    datatype = Types.Number,
+    datatype = Types.Number as Types | Metastruct,
     isFrozen = false
   ) {
     const answer = new Attribute();
@@ -266,5 +267,12 @@ export default class Attribute {
       .toArray();
 
     this.onAttributeCountChanged.dispatch();
+  }
+
+  public assignVector(x: number, y: number) {
+    const rootNode = Attribute.getRootNode(this);
+    const vector = Node.getChild(rootNode, 0);
+    Node.putChild(vector, 0, Node.addNumber(x));
+    Node.putChild(vector, 1, Node.addNumber(y));
   }
 }

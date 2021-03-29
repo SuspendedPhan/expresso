@@ -1,15 +1,33 @@
 import wu from "wu";
 import Root, { RenderShape } from "@/store/Root";
 import { DateTime } from "luxon";
+import Attribute from "@/models/Attribute";
 
 export default class Renderer {
-  private static get attributeCollection() { return Root.attributeCollection; }
-  private static get organismCollection() { return Root.organismCollection; }
-  private static get nodeStore() { return Root.nodeStore; }
-  private static get time() { return Root.time; }
-  private static get windowSize() { return Root.windowSize; }
-  private static get metaorganismCollection() { return Root.metaorganismCollection; }
-  
+  private static get attributeCollection() {
+    return Root.attributeCollection;
+  }
+
+  private static get organismCollection() {
+    return Root.organismCollection;
+  }
+
+  private static get nodeStore() {
+    return Root.nodeStore;
+  }
+
+  private static get time() {
+    return Root.time;
+  }
+
+  private static get windowSize() {
+    return Root.windowSize;
+  }
+
+  private static get metaorganismCollection() {
+    return Root.metaorganismCollection;
+  }
+
   public static *computeRenderCommands(): Iterable<any> {
     const organism = this.organismCollection.getRoot();
     if (organism === null) return;
@@ -48,6 +66,11 @@ export default class Renderer {
       false
     );
 
+    const windowCenterAttribute = Attribute.getAttributeFromName(
+      organism,
+      "window.center"
+    );
+
     if (timeRoot) {
       this.nodeStore.putChild(
         timeRoot,
@@ -70,14 +93,10 @@ export default class Renderer {
         this.nodeStore.addNumber(this.windowSize.width)
       );
     }
-    if (windowCenterRoot) {
-      this.nodeStore.putChild(
-        windowCenterRoot,
-        0,
-        this.nodeStore.addVector(
-          this.windowSize.width / 2,
-          this.windowSize.height / 2
-        )
+    if (windowCenterAttribute) {
+      windowCenterAttribute.assignVector(
+        this.windowSize.width / 2,
+        this.windowSize.height / 2
       );
     }
     if (time01Root) {
@@ -115,7 +134,8 @@ export default class Renderer {
           organism,
           "cloneNumber01"
         );
-        this.nodeStore.getChild(cloneNumber01Root, 0).value = cloneNumber / (clones - 1);
+        this.nodeStore.getChild(cloneNumber01Root, 0).value =
+          cloneNumber / (clones - 1);
         // this.nodeStore.putChild(
         //   cloneNumber01Root,
         //   0,
@@ -126,7 +146,8 @@ export default class Renderer {
           organism,
           "radialCloneNumber01"
         );
-        this.nodeStore.getChild(radialCloneNumber01Root, 0).value = cloneNumber / clones;
+        this.nodeStore.getChild(radialCloneNumber01Root, 0).value =
+          cloneNumber / clones;
 
         // this.nodeStore.putChild(
         //   radialCloneNumber01Root,

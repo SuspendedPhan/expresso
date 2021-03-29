@@ -1,7 +1,7 @@
 import wu from "wu";
-import {Root} from "./Root";
+import { Root } from "./Root";
 import Functions from "../code/Functions";
-import {EventEmitter} from "events";
+import { EventEmitter } from "events";
 import Types from "@/models/Types";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
@@ -21,7 +21,7 @@ type PenPosition = NonePenPosition | NodePenPosition;
 export enum PenPositionRelation {
   On = "On",
   After = "After",
-  Before = "Before",
+  Before = "Before"
 }
 
 export interface Selection {
@@ -76,10 +76,10 @@ export default class Pen {
       if (requiredType === Types.Number) {
         answer.push({
           text: number.toString(),
-          addNodeFunction: () => this.nodeCollection.addNumber(number),
+          addNodeFunction: () => this.nodeCollection.addNumber(number)
         });
       } else if (requiredType instanceof Metastruct) {
-        console.log('dunno what to do with structs');
+        console.log("dunno what to do with structs");
       } else {
         console.assert(false);
       }
@@ -117,7 +117,8 @@ export default class Pen {
         query.toLowerCase(),
         metafun.name.toLowerCase()
       );
-      const inputTypesFromOutputType = (metafun as any)?.inputTypesFromOutputType;
+      const inputTypesFromOutputType = (metafun as any)
+        ?.inputTypesFromOutputType;
       const mustBeNumberType = inputTypesFromOutputType === undefined;
       const validOutputType =
         inputTypesFromOutputType?.(requiredType) !== undefined;
@@ -128,8 +129,7 @@ export default class Pen {
 
       answer.push({
         text: metafun.name,
-        addNodeFunction: () =>
-          this.nodeCollection.addFun(metafun, requiredType),
+        addNodeFunction: () => this.nodeCollection.addFun(metafun, requiredType)
       });
     }
 
@@ -138,18 +138,17 @@ export default class Pen {
 
   private * getNodeChoicesForAttribute(query: string, organism, attribute: Attribute, requiredType) {
     const isSubsequence = Functions.isSubsequence(
-        query.toLowerCase(),
-        attribute.name.toLowerCase()
+      query.toLowerCase(),
+      attribute.name.toLowerCase()
     );
     const ok =
-        (query === "" || isSubsequence) &&
-        attribute.datatype === requiredType;
+      (query === "" || isSubsequence) && attribute.datatype === requiredType;
     if (!ok) return;
 
     const rootNode = this.root.attributeCollection.getRootNode(attribute);
     yield {
       text: `${organism.name}.${attribute.name}`,
-      addNodeFunction: () => this.nodeCollection.addReference(rootNode),
+      addNodeFunction: () => this.nodeCollection.addReference(rootNode)
     };
   }
 
@@ -177,7 +176,7 @@ export default class Pen {
 
   getTextForAttribute(attribute: any) {
     return this.getAnnotatedTextForAttribute(attribute)
-      .map((t) => t.char)
+      .map(t => t.char)
       .join("");
   }
 
@@ -189,11 +188,16 @@ export default class Pen {
     const root = this.root;
     if (astNode.metaname === "Number") {
       return this.textToAnnotatedText(astNode.value.toString(), astNode);
-    } else if (astNode.metaname === "Vector") {
+    } else if (astNode.metaname === "Struct") {
+      console.assert(
+        astNode.datatype === Metastruct.builtinMetastructs.Vector,
+        'haven"t implemented anything else yet'
+      );
       console.assert(
         root.nodeCollection.getChildren(astNode).toArray().length == 2,
         "Attribute.vue vector"
       );
+      console.assert(astNode);
       const xNode = root.nodeCollection.getChild(astNode, 0);
       const yNode = root.nodeCollection.getChild(astNode, 1);
       let answer = [] as any;
@@ -262,9 +266,9 @@ export default class Pen {
   }
 
   private textToAnnotatedText(text, astNode) {
-    return text.split("").map((t) => ({
+    return text.split("").map(t => ({
       char: t,
-      node: astNode,
+      node: astNode
     }));
   }
 
@@ -466,7 +470,7 @@ export default class Pen {
     return {
       startIndex: charBoundsForNode.startIndex,
       endIndex: charBoundsForNode.startIndex,
-      attributeId,
+      attributeId
     };
   }
 
@@ -508,7 +512,7 @@ export default class Pen {
     this.setSelection({
       ...selection,
       startIndex: index,
-      endIndex: index,
+      endIndex: index
     });
   }
 
@@ -523,7 +527,7 @@ export default class Pen {
       this.nodeCollection.reparent({
         child: node,
         newParent: rootNode,
-        childIndex: 0,
+        childIndex: 0
       });
       const annotatedText = this.getAnnotatedTextForAttribute(attribute);
       this.selection = this.makeSelectionForNode(
