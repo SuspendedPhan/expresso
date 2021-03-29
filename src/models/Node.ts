@@ -183,7 +183,7 @@ export default class Node {
         ) as any;
         node.eval = () => metafun.eval(...this.getChildren(node));
       } else if (node.metaname === "Struct") {
-        node.eval = this.evalStruct;
+        node.eval = () => this.evalStruct(node);
       } else {
         console.assert(false);
       }
@@ -240,6 +240,7 @@ export default class Node {
 
   static addStruct(metastruct: Metastruct) {
     const answer = this.addNode("Struct", metastruct) as any;
+    answer.metastructId = metastruct.id;
     for (let i = 0; i < metastruct.members.length; i++) {
       const member = metastruct.members[i];
       if (member.type === Types.Number) {
@@ -250,7 +251,8 @@ export default class Node {
         console.assert(false);
       }
     }
-    answer.eval = this.evalStruct;
+    answer.eval = () => this.evalStruct(answer);
+    return answer;
   }
 
   static addNode(metaname, datatype) {
@@ -266,7 +268,7 @@ export default class Node {
     const ret = {};
     for (let i = 0; i < metastruct.members.length; i++) {
       const member = metastruct.members[i];
-      ret[member.name] = node.getChild(i).eval();
+      ret[member.name] = this.getChild(node, i).eval();
     }
     console.log('hi, testing' + ret);
     return ret;
