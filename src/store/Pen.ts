@@ -61,7 +61,7 @@ export default class Pen {
 
   // --- GETS ---
 
-  getNodeChoices() {
+  getGhostEdits() {
     if (!this.isQuerying) return wu([]);
 
     const answer = [] as any;
@@ -478,8 +478,8 @@ export default class Pen {
     this.query = query;
   }
 
-  commitNodeChoice(nodeChoice) {
-    const node = nodeChoice.addNodeFunction();
+  commitGhostEdit(ghostEdit) {
+    const node = ghostEdit.addNodeFunction();
     const referenceNode = this.getPointedNode();
 
     if (this.isCursorInserting()) {
@@ -553,7 +553,7 @@ export default class Pen {
     );
   }
 
-  commitFirstNodeChoice() {
-    this.commitNodeChoice(this.getNodeChoices().next().value);
+  commitFirstGhostEdit() {
+    this.commitGhostEdit(this.getGhostEdits().next().value);
   }
 }
