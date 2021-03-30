@@ -216,7 +216,7 @@ describe("HelloWorld.vue", () => {
   //   expect(actual).to.deep.equal(expected);
   // });
   //
-  // it("getGhostEdits", () => {
+  // it("getNodeChoices", () => {
   //   return;
   //   const root = new Root();
   //   const attributeStore = root.attributeStore;
@@ -264,14 +264,14 @@ describe("HelloWorld.vue", () => {
   //
   //   penStore.setIsQuerying(true);
   //   penStore.setQuery("52");
-  //   suggestions = penStore.getGhostEdits();
+  //   suggestions = penStore.getNodeChoices();
   //
   //   expected = ["52"];
   //   actual = suggestions.map((row) => row.text).toArray();
   //   expect(actual).to.deep.equal(expected);
   //
-  //   suggestions = penStore.getGhostEdits();
-  //   penStore.commitGhostEdit(suggestions.take(1).toArray()[0]);
+  //   suggestions = penStore.getNodeChoices();
+  //   penStore.commitNodeChoice(suggestions.take(1).toArray()[0]);
   //   expect(x.eval()).to.equal(52);
   //
   //   // --- empty query ---
@@ -279,22 +279,22 @@ describe("HelloWorld.vue", () => {
   //
   //   penStore.setIsQuerying(true);
   //   penStore.setQuery("");
-  //   suggestions = penStore.getGhostEdits();
+  //   suggestions = penStore.getNodeChoices();
   //   expected = ["circle.y", "circle.clones", "circle.cloneNumber", "Add"];
   //   actual = suggestions.map((row) => row.text).toArray();
   //   expect(actual).to.deep.equal(expected);
   //
   //   // --- commit function ---
   //
-  //   suggestions = penStore.getGhostEdits();
-  //   penStore.commitGhostEdit(suggestions.drop(3).toArray()[0]);
+  //   suggestions = penStore.getNodeChoices();
+  //   penStore.commitNodeChoice(suggestions.drop(3).toArray()[0]);
   //   expect(x.eval()).to.equal(0);
   //
   //   // --- non empty query ---
   //
   //   penStore.setIsQuerying(true);
   //   penStore.setQuery("lon");
-  //   suggestions = penStore.getGhostEdits();
+  //   suggestions = penStore.getNodeChoices();
   //   expected = ["circle.clones", "circle.cloneNumber"];
   //   actual = suggestions.map((row) => row.text).toArray();
   //   expect(actual).to.deep.equal(expected);
@@ -303,9 +303,9 @@ describe("HelloWorld.vue", () => {
   //   // --- new pointed node ---
   //   // --- no more querying ---
   //
-  //   suggestions = penStore.getGhostEdits();
+  //   suggestions = penStore.getNodeChoices();
   //   const numberNode = nodeStore.putChild(clones, 0, nodeStore.addNumber(3));
-  //   penStore.commitGhostEdit(suggestions.take(1).toArray()[0]);
+  //   penStore.commitNodeChoice(suggestions.take(1).toArray()[0]);
   //   expect(x.eval()).to.equal(3);
   //   // expect(penStore.pointedNode).to.equal(nodeStore.getChild(x, 0));
   //   expect(penStore.getIsQuerying()).to.equal(false);
@@ -710,7 +710,7 @@ describe("HelloWorld.vue", () => {
   //   );
   //   pen.setIsQuerying(true);
   //   pen.setQuery("");
-  //   let suggestions = pen.getGhostEdits();
+  //   let suggestions = pen.getNodeChoices();
   //   let actual = wu(suggestions)
   //     .pluck("text")
   //     .toArray();
@@ -727,7 +727,7 @@ describe("HelloWorld.vue", () => {
   //   pen.setPointedNode(nodeCollection.getFromPath(["tree"], "growth", [0]));
   //   pen.setIsQuerying(true);
   //   pen.setQuery("");
-  //   suggestions = pen.getGhostEdits();
+  //   suggestions = pen.getNodeChoices();
   //   actual = wu(suggestions)
   //     .pluck("text")
   //     .toArray();
@@ -864,8 +864,8 @@ describe("HelloWorld.vue", () => {
   // //     });
   // //     pen.setQuery("Lerp");
   // //     pen.setIsQuerying(true);
-  // //     const ghostEdit = pen.getGhostEdits().next().value;
-  // //     pen.commitGhostEdit(ghostEdit);
+  // //     const ghostEdit = pen.getNodeChoices().next().value;
+  // //     pen.commitNodeChoice(ghostEdit);
   //
   // //     const expected = {
   // //       "0 Variable": {
@@ -896,8 +896,8 @@ describe("HelloWorld.vue", () => {
   // //     });
   // //     pen.setQuery("Lerp");
   // //     pen.setIsQuerying(true);
-  // //     const ghostEdit = pen.getGhostEdits().next().value;
-  // //     pen.commitGhostEdit(ghostEdit);
+  // //     const ghostEdit = pen.getNodeChoices().next().value;
+  // //     pen.commitNodeChoice(ghostEdit);
   //
   // //     const expected = {
   // //       "0 Variable": {
@@ -953,9 +953,9 @@ describe("HelloWorld.vue", () => {
   //     pen.setPointedNode(lerpNode);
   //     pen.setIsQuerying(true);
   //     pen.setQuery("Add");
-  //     const edit = pen.getGhostEdits().next().value;
+  //     const edit = pen.getNodeChoices().next().value;
   //     expect(edit).to.not.equal(undefined);
-  //     pen.commitGhostEdit(edit);
+  //     pen.commitNodeChoice(edit);
   //
   //     const expected = {
   //       "SuperOrganism root": {
@@ -984,8 +984,8 @@ describe("HelloWorld.vue", () => {
   //     };
   //     pen.setIsQuerying(true);
   //     pen.setQuery("3");
-  //     const edit = pen.getGhostEdits().next().value;
-  //     pen.commitGhostEdit(edit);
+  //     const edit = pen.getNodeChoices().next().value;
+  //     pen.commitNodeChoice(edit);
   //
   //     // expect(root.toTree()).to.deep.equal(expected);
   //     expect(nodeCollection.nodes.getUnique("id", node1.id, false)).to.equal(
@@ -1039,12 +1039,12 @@ describe("HelloWorld.vue", () => {
   //   pen.setPointedNode(nodeCollection.getFromPath([], "xy", [0]));
   //   pen.setIsQuerying(true);
   //   pen.setQuery("radius");
-  //   expect(pen.getGhostEdits().next().done).to.equal(true);
+  //   expect(pen.getNodeChoices().next().done).to.equal(true);
   //
   //   // --------------------------------------------------------
   //
   //   pen.setQuery("Add");
-  //   pen.commitFirstGhostEdit();
+  //   pen.commitFirstNodeChoice();
   //   const ex = {
   //     "SuperOrganism root": {
   //       "editattr xy Vector": {

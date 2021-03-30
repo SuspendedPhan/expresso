@@ -31,7 +31,7 @@ export function clearStore() {
 export function runTests() {
   const okTests = [
     // 'pen organs',
-    // 'getGhostEdits',
+    // 'getNodeChoices',
     // 'organs compute',
     // 'pen test',
     // 'insert node, replace node, from tree'
