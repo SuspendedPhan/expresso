@@ -29,7 +29,7 @@ export default {
       if (event.key === 'Enter' && this.suggestions.length > 0) {
         if (Root.penStore.getQuery() !== '') {
           const result = this.suggestions[0];
-          Root.penStore.commitGhostEdit(result);
+          Root.penStore.commitNodeChoice(result);
         }
 
         this.blur();
@@ -47,14 +47,14 @@ export default {
       this.$emit('blur');
     },
     onClick(suggestion, event) {
-      Root.pen.commitGhostEdit(suggestion);
+      Root.pen.commitNodeChoice(suggestion);
       event.preventDefault();
       this.blur();
     }
   },
   computed: {
     suggestions() {
-      return Array.from(Root.penStore.getGhostEdits());
+      return Array.from(Root.penStore.getNodeChoices());
     },
     query: {
       get: function() {

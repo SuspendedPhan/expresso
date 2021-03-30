@@ -60,7 +60,7 @@ export default class Pen {
 
   // --- GETS ---
 
-  getGhostEdits() {
+  getNodeChoices() {
     if (!this.isQuerying) return wu([]);
 
     const answer = [] as any;
@@ -105,9 +105,9 @@ export default class Pen {
         organism
       );
       for (const attribute of attributes.filter(attribute => attribute !== pointedAttribute)) {
-        const ghostEdits = this.getGhostEditsForAttribute(query, organism, attribute, requiredType);
-        for (const ghostEdit of ghostEdits) {
-          answer.push(ghostEdit);
+        const nodeChoices = this.getNodeChoicesForAttribute(query, organism, attribute, requiredType);
+        for (const nodeChoice of nodeChoices) {
+          answer.push(nodeChoice);
         }
       }
     }
@@ -138,7 +138,7 @@ export default class Pen {
     return wu(answer);
   }
 
-  private * getGhostEditsForAttribute(query: string, organism, attribute: Attribute, requiredType) {
+  private * getNodeChoicesForAttribute(query: string, organism, attribute: Attribute, requiredType) {
     const isSubsequence = Functions.isSubsequence(
         query.toLowerCase(),
         attribute.name.toLowerCase()
@@ -476,8 +476,8 @@ export default class Pen {
     this.query = query;
   }
 
-  commitGhostEdit(ghostEdit) {
-    const node = ghostEdit.addNodeFunction();
+  commitNodeChoice(nodeChoice) {
+    const node = nodeChoice.addNodeFunction();
     const referenceNode = this.getPointedNode();
 
     if (this.isCursorInserting()) {
@@ -551,7 +551,7 @@ export default class Pen {
     );
   }
 
-  commitFirstGhostEdit() {
-    this.commitGhostEdit(this.getGhostEdits().next().value);
+  commitFirstNodeChoice() {
+    this.commitNodeChoice(this.getNodeChoices().next().value);
   }
 }
