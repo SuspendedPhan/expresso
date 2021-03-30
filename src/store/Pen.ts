@@ -5,6 +5,7 @@ import { EventEmitter } from "events";
 import Types from "@/models/Types";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
+import Node from "@/models/Node";
 
 interface NonePenPosition {
   positionType: "None";
@@ -61,7 +62,7 @@ export default class Pen {
 
   // --- GETS ---
 
-  getGhostEdits() {
+  getNodeChoices() {
     if (!this.isQuerying) return wu([]);
 
     const answer = [] as any;
@@ -188,11 +189,7 @@ export default class Pen {
     const root = this.root;
     if (astNode.metaname === "Number") {
       return this.textToAnnotatedText(astNode.value.toString(), astNode);
-    } else if (astNode.metaname === "Struct") {
-      console.assert(
-        astNode.datatype === Metastruct.builtinMetastructs.Vector,
-        'haven"t implemented anything else yet'
-      );
+    } else if (astNode.metaname === "Struct" && astNode.datatype.id === Metastruct.builtinMetastructs.Vector.id) {
       console.assert(
         root.nodeCollection.getChildren(astNode).toArray().length == 2,
         "Attribute.vue vector"
@@ -478,8 +475,8 @@ export default class Pen {
     this.query = query;
   }
 
-  commitGhostEdit(ghostEdit) {
-    const node = ghostEdit.addNodeFunction();
+  commitNodeChoice(nodeChoice) {
+    const node = nodeChoice.addNodeFunction();
     const referenceNode = this.getPointedNode();
 
     if (this.isCursorInserting()) {
@@ -553,7 +550,7 @@ export default class Pen {
     );
   }
 
-  commitFirstGhostEdit() {
-    this.commitGhostEdit(this.getGhostEdits().next().value);
+  commitFirstNodeChoice() {
+    this.commitNodeChoice(this.getNodeChoices().next().value);
   }
 }

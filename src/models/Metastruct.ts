@@ -28,5 +28,3 @@ export default class Metastruct {
     return undefined as any;
   }
 }
-
-//
