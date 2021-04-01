@@ -2,7 +2,7 @@ import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
 import { EventEmitter } from "events";
-import Types from "@/models/Types";
+import Type, {Primitive} from "@/models/Type";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
 import Node from "@/models/Node";
@@ -74,7 +74,7 @@ export default class Pen {
 
     const number = Number.parseFloat(this.query);
     if (!Number.isNaN(number)) {
-      if (requiredType === Types.Number) {
+      if (requiredType === Primitive.Number) {
         answer.push({
           text: number.toString(),
           addNodeFunction: () => this.nodeCollection.addNumber(number)
@@ -82,7 +82,7 @@ export default class Pen {
       } else if (requiredType instanceof Metastruct) {
         console.log("dunno what to do with structs");
       } else {
-        console.assert(false);
+        console.assert(false, requiredType);
       }
       return wu(answer);
     }
@@ -123,7 +123,7 @@ export default class Pen {
       const mustBeNumberType = inputTypesFromOutputType === undefined;
       const validOutputType =
         inputTypesFromOutputType?.(requiredType) !== undefined;
-      const okNumberType = mustBeNumberType && requiredType === Types.Number;
+      const okNumberType = mustBeNumberType && requiredType === Primitive.Number;
       const ok =
         (query === "" || isSubsequence) && (okNumberType || validOutputType);
       if (!ok) continue;

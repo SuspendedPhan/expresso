@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import Root from "@/store/Root";
 import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
-import Types from "./Types";
+import Type, {Primitive} from "./Type";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
 
@@ -17,7 +17,9 @@ export default class Node {
   public id = uuidv4();
   public metaname!: string;
   public storetype = 'node';
-  public datatype!: Types | Metastruct;
+  public datatypeId!: string;
+
+  public get datatype() { return Type.fromId(this.datatypeId); }
 
   static nodes = new Collection<any>([], ["id"]);
   static nodeParents = new Collection<ParentRelationship>(
@@ -169,7 +171,8 @@ export default class Node {
 
   static deserialize(store) {
     this.nodeParents.deserialize(store.nodeParents);
-    this.nodes.deserialize(store.nodes);
+    this.nodes.deserialize(store.nodes, Node);
+
     for (const node of this.nodes) {
       if (node.metaname === "Number") {
         node.eval = () => node.value;
@@ -191,15 +194,15 @@ export default class Node {
   }
 
   static addNumber(value) {
-    const answer = this.addNode("Number", Types.Number) as any;
+    const answer = this.addNode("Number", Primitive.Number) as any;
     answer.value = value;
     answer.eval = () => answer.value;
     return answer;
   }
 
-  static addVariable(datatype = Types.Number as Types | Metastruct) {
+  static addVariable(datatype = Primitive.Number as Type) {
     const answer = this.addNode("Variable", datatype) as any;
-    if (datatype === Types.Number) {
+    if (datatype === Primitive.Number) {
       this.putChild(answer, 0, this.addNumber(0));
     } else if (datatype instanceof Metastruct) {
       this.putChild(answer, 0, this.addStruct(datatype));
@@ -217,14 +220,14 @@ export default class Node {
     return answer;
   }
 
-  static addFun(metafun, outputType = Types.Number) {
+  static addFun(metafun, outputType = Primitive.Number) {
     const answer = this.addNode("Function", outputType) as any;
     const inputTypes = metafun.inputTypesFromOutputType?.(outputType);
     const hasTypeFun = metafun.inputTypesFromOutputType !== undefined;
     console.assert(!hasTypeFun || inputTypes !== undefined);
 
     for (let i = 0; i < metafun.paramCount; i++) {
-      if (inputTypes === undefined || inputTypes[i] === Types.Number) {
+      if (inputTypes === undefined || inputTypes[i] === Primitive.Number) {
         this.putChild(answer, i, this.addNumber(0));
       } else if (inputTypes[i] instanceof Metastruct) {
         this.putChild(answer, i, this.addStruct(inputTypes[i]));
@@ -243,7 +246,7 @@ export default class Node {
     answer.metastructId = metastruct.id;
     for (let i = 0; i < metastruct.members.length; i++) {
       const member = metastruct.members[i];
-      if (member.type === Types.Number) {
+      if (member.type === Primitive.Number) {
         this.putChild(answer, i, this.addNumber(0));
       } else if (member.type instanceof Metastruct) {
         this.putChild(answer, i, this.addStruct(member.type));
@@ -255,10 +258,10 @@ export default class Node {
     return answer;
   }
 
-  static addNode(metaname, datatype) {
+  static addNode(metaname, datatype: Type) {
     const answer = new Node();
     answer.metaname = metaname;
-    answer.datatype = datatype;
+    answer.datatypeId = datatype.id;
     this.nodes.add(answer);
     return answer;
   }
@@ -270,7 +273,6 @@ export default class Node {
       const member = metastruct.members[i];
       ret[member.name] = this.getChild(node, i).eval();
     }
-    console.log('hi, testing' + ret);
     return ret;
   }
 

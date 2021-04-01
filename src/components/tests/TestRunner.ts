@@ -3,7 +3,7 @@ import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import StackTrace from 'stacktrace-js';
 
-// Types
+// Type
 
 export const Status = {
   'Passed': 'Passed',

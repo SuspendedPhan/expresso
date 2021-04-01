@@ -104,13 +104,19 @@ export default class Collection<T> {
     };
   }
 
-  public deserialize(serializedCollection) {
+  public deserialize(serializedCollection, itemClass = undefined as any) {
     this.items = [];
     for (const index of this.indexByField.values()) {
       index.map.clear();
     }
     for (const item of serializedCollection.items) {
-      this.add(item);
+      if (itemClass !== undefined) {
+        const deserializedItem = new itemClass();
+        Object.assign(deserializedItem, item);
+        this.add(deserializedItem);
+      } else {
+        this.add(item);
+      }
     }
   }
 

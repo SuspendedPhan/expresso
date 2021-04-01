@@ -4,6 +4,7 @@ import { MetaOrganism } from "./MetaorganismCollection";
 import { Root } from "./Root";
 import Types from "./Types";
 import Metastruct from "@/models/Metastruct";
+import {Primitive} from "@/models/Type";
 
 function makeOrganism({ name }) {
   return {
@@ -108,7 +109,7 @@ export default class OrganismCollection {
   putFromMeta(name, metaorganism: MetaOrganism) {
     const organism = this.putFromMetaWithoutAttributes(name, metaorganism);
     for (const metaattribute of metaorganism.attributes) {
-      const datatype = metaattribute.type ?? Types.Number;
+      const datatype = metaattribute.type ?? Primitive.Number;
       const attribute = this.root.attributeCollection.putEditable(
         organism,
         metaattribute.name,
@@ -116,16 +117,16 @@ export default class OrganismCollection {
         true
       );
       if (metaattribute.default !== undefined) {
-        console.assert(datatype === Types.Number);
+        console.assert(datatype === Primitive.Number);
         this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
       }
     }
 
     if (metaorganism.name !== "TheVoid") {
-      const clones = this.root.attributeCollection.putEditable(organism, "clones", Types.Number, true);
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber", Types.Number);
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber01", Types.Number);
-      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01", Types.Number);
+      const clones = this.root.attributeCollection.putEditable(organism, "clones", Primitive.Number, true);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber", Primitive.Number);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber01", Primitive.Number);
+      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01", Primitive.Number);
       this.root.attributeCollection.assignNumber(clones, 1);
     }
 

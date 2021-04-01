@@ -2,7 +2,7 @@ import wu from "wu";
 import { v4 as uuidv4 } from "uuid";
 import Root from "../store/Root";
 import Functions from "../code/Functions";
-import Types from "./Types";
+import Type, {Primitive} from "./Type";
 import { SignalDispatcher } from "ste-signals";
 import Metastruct from "@/models/Metastruct";
 import Node from "@/models/Node";
@@ -14,10 +14,12 @@ import Node from "@/models/Node";
 export default class Attribute {
   public name!: string;
   public attributeType!: any;
-  public datatype!: Types | Metastruct;
+  public datatypeId!: string;
   public storetype = "Attribute";
   public id = uuidv4();
   public isFrozen!: boolean;
+
+  public get datatype() { return Type.fromId(this.datatypeId); }
 
   public static attributes = [] as Array<Attribute>;
 
@@ -55,7 +57,7 @@ export default class Attribute {
     ).toArray();
 
     for (const node of nodes) {
-      if (this.datatype === Types.Number) {
+      if (this.datatype.id === Primitive.Number.id) {
         Node.replaceNode(node, Node.addNumber(0));
       } else if (this.datatype instanceof Metastruct) {
         Node.replaceNode(node, Node.addStruct(this.datatype));
@@ -208,7 +210,7 @@ export default class Attribute {
   static putEditable(
     organism,
     attributeName,
-    datatype = Types.Number,
+    datatype = Primitive.Number,
     isFrozen = false
   ) {
     return this.putAttribute(
@@ -220,7 +222,7 @@ export default class Attribute {
     );
   }
 
-  static putEmergent(organism, attributeName, datatype = Types.Number as Types | Metastruct) {
+  static putEmergent(organism, attributeName, datatype = Primitive.Number as Type) {
     return this.putAttribute(organism, attributeName, "Emergent", datatype);
   }
 
@@ -228,13 +230,13 @@ export default class Attribute {
     organism,
     attributeName,
     attributeType,
-    datatype = Types.Number as Types | Metastruct,
+    datatype = Primitive.Number as Type,
     isFrozen = false
   ) {
     const answer = new Attribute();
     answer.name = attributeName;
     answer.attributeType = attributeType;
-    answer.datatype = datatype;
+    answer.datatypeId = datatype.id;
     answer.isFrozen = isFrozen;
     const rootNode = this.nodeStore.addVariable(datatype);
     this.attributes.push(answer);

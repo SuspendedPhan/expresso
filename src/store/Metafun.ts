@@ -4,6 +4,7 @@ import seedrandom from "seedrandom";
 import Types from "./Types";
 import EasingMetafuns from "./EasingMetafuns";
 import Metastruct from "@/models/Metastruct";
+import {Primitive} from "@/models/Type";
 
 const Vector = Metastruct.builtinMetastructs.Vector;
 
@@ -14,7 +15,7 @@ export default class MetafunStore {
       name: "Add",
       paramCount: 2,
       eval: (a, b) => {
-        if (a.datatype === Types.Number) {
+        if (a.datatype === Primitive.Number) {
           return a.eval() + b.eval();
         } else if (a.datatype === Vector) {
           return {
@@ -179,7 +180,7 @@ export default class MetafunStore {
       },
       inputTypesFromOutputType: type => {
         if (type === Vector) {
-          return [Vector, Types.Number];
+          return [Vector, Primitive.Number];
         } else {
           return undefined;
         }
@@ -198,7 +199,7 @@ export default class MetafunStore {
       },
       inputTypesFromOutputType: type => {
         if (type === Vector) {
-          return [Vector, Types.Number];
+          return [Vector, Primitive.Number];
         } else {
           return undefined;
         }
@@ -219,7 +220,7 @@ export default class MetafunStore {
       },
       inputTypesFromOutputType: type => {
         if (type === Vector) {
-          return [Types.Number];
+          return [Primitive.Number];
         } else {
           return undefined;
         }
