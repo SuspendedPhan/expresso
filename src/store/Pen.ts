@@ -2,7 +2,7 @@ import wu from "wu";
 import { Root } from "./Root";
 import Functions from "../code/Functions";
 import { EventEmitter } from "events";
-import Type, {Primitive} from "@/models/Type";
+import Type, { Primitive } from "@/models/Type";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
 import Node from "@/models/Node";
@@ -74,7 +74,10 @@ export default class Pen {
 
     const number = Number.parseFloat(this.query);
     if (!Number.isNaN(number)) {
-      if (requiredType === Primitive.Number) {
+      if (
+        requiredType === Primitive.Number ||
+        requiredType === Primitive.Undetermined
+      ) {
         answer.push({
           text: number.toString(),
           addNodeFunction: () => this.nodeCollection.addNumber(number)
@@ -103,8 +106,15 @@ export default class Pen {
       const attributes = this.root.attributeCollection.getAttributesForOrganism(
         organism
       );
-      for (const attribute of attributes.filter(attribute => attribute !== pointedAttribute)) {
-        const nodeChoices = this.getNodeChoicesForAttribute(query, organism, attribute, requiredType);
+      for (const attribute of attributes.filter(
+        attribute => attribute !== pointedAttribute
+      )) {
+        const nodeChoices = this.getNodeChoicesForAttribute(
+          query,
+          organism,
+          attribute,
+          requiredType
+        );
         for (const nodeChoice of nodeChoices) {
           answer.push(nodeChoice);
         }
@@ -123,27 +133,48 @@ export default class Pen {
       const mustBeNumberType = inputTypesFromOutputType === undefined;
       const validOutputType =
         inputTypesFromOutputType?.(requiredType) !== undefined;
-      const okNumberType = mustBeNumberType && requiredType === Primitive.Number;
+      const okNumberType =
+        mustBeNumberType && requiredType === Primitive.Number;
+      const isUndetermined = requiredType === Primitive.Undetermined;
       const ok =
-        (query === "" || isSubsequence) && (okNumberType || validOutputType);
+        (query === "" || isSubsequence) &&
+        (okNumberType || validOutputType || isUndetermined);
       if (!ok) continue;
 
+      let outputType = requiredType;
+      if (outputType === Primitive.Undetermined) {
+        if (mustBeNumberType) {
+          outputType = Primitive.Number;
+        } else if ("defaultOutputType" in metafun) {
+          outputType = metafun.defaultOutputType;
+        } else {
+          console.assert(false, metafun);
+        }
+      }
       answer.push({
         text: metafun.name,
-        addNodeFunction: () => this.nodeCollection.addFun(metafun, requiredType)
+        addNodeFunction: () => this.nodeCollection.addFun(metafun, outputType)
       });
     }
 
     return wu(answer);
   }
 
-  private * getNodeChoicesForAttribute(query: string, organism, attribute: Attribute, requiredType) {
+  private *getNodeChoicesForAttribute(
+    query: string,
+    organism,
+    attribute: Attribute,
+    requiredType
+  ) {
     const isSubsequence = Functions.isSubsequence(
       query.toLowerCase(),
       attribute.name.toLowerCase()
     );
     const ok =
-      (query === "" || isSubsequence) && attribute.datatype === requiredType;
+      (query === "" || isSubsequence) &&
+      (attribute.datatype === requiredType ||
+        requiredType === Primitive.Undetermined) &&
+      attribute.datatype !== Primitive.Undetermined;
     if (!ok) return;
 
     const rootNode = this.root.attributeCollection.getRootNode(attribute);
@@ -189,7 +220,10 @@ export default class Pen {
     const root = this.root;
     if (astNode.metaname === "Number") {
       return this.textToAnnotatedText(astNode.value.toString(), astNode);
-    } else if (astNode.metaname === "Struct" && astNode.datatype.id === Metastruct.builtinMetastructs.Vector.id) {
+    } else if (
+      astNode.metaname === "Struct" &&
+      astNode.datatype.id === Metastruct.builtinMetastructs.Vector.id
+    ) {
       console.assert(
         root.nodeCollection.getChildren(astNode).toArray().length == 2,
         "Attribute.vue vector"
@@ -226,6 +260,8 @@ export default class Pen {
       return answer;
     } else if (astNode.metaname === "Variable") {
       console.error("Attribute.vue not expecting Variable");
+    } else if (astNode.metaname === "Void") {
+      return this.textToAnnotatedText("None", astNode);
     } else {
       console.error("Attribute.vue Unknown metaname");
     }
@@ -478,16 +514,27 @@ export default class Pen {
   commitNodeChoice(nodeChoice) {
     const node = nodeChoice.addNodeFunction();
     const referenceNode = this.getPointedNode();
+    const attribute = this.root.attributeCollection.getAttributeFromId(
+      this.getSelection()!.attributeId
+    ) as Attribute;
 
-    if (this.isCursorInserting()) {
+    const isUndeterminedAttribute = attribute.datatype === Primitive.Undetermined;
+    if (isUndeterminedAttribute) {
+      console.assert(Node.getChild(attribute.getRootNode(),0).id === referenceNode.id);
+      console.assert(referenceNode.datatype === Primitive.Undetermined, referenceNode);
+    }
+
+    if (this.isCursorInserting() && !isUndeterminedAttribute) {
       this.nodeCollection.insertNodeAsParent(referenceNode, node);
     } else {
       this.nodeCollection.replaceNode(referenceNode, node);
     }
 
-    const attribute = this.root.attributeCollection.getAttributeFromId(
-      this.getSelection()!.attributeId
-    );
+    if (isUndeterminedAttribute) {
+      attribute.datatype = node.datatype;
+      attribute.getRootNode().datatype = node.datatype;
+    }
+
     const annotatedText = this.getAnnotatedTextForAttribute(attribute);
     this.selection = this.makeSelectionForNode(
       node,

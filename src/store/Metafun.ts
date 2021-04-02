@@ -28,6 +28,7 @@ export default class MetafunStore {
         const ret = [outputType, outputType];
         return ret;
       },
+      defaultOutputType: Primitive.Number
     },
     {
       name: "Multiply",
@@ -184,7 +185,8 @@ export default class MetafunStore {
         } else {
           return undefined;
         }
-      }
+      },
+      defaultOutputType: Vector
     },
     {
       name: "Scale",
@@ -203,13 +205,14 @@ export default class MetafunStore {
         } else {
           return undefined;
         }
-      }
+      },
+      defaultOutputType: Vector
     },
     {
       name: "RotateFromUp",
       paramCount: 1,
       eval: (angle01) => {
-        const vectorVal = { x: 0, y: 1 };
+        const vectorVal = { x: 0, y: -1 };
         const angle01Val = angle01.eval();
         const radians = angle01Val * 2 * Math.PI;
         const ret = {
@@ -224,7 +227,8 @@ export default class MetafunStore {
         } else {
           return undefined;
         }
-      }
+      },
+      defaultOutputType: Vector
     },
   ];
 

@@ -53,6 +53,7 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import Attribute from "@/models/Attribute";
+import {Primitive} from "@/models/Type";
 
 @Component({ components: { Attribute: AttributeComponent } })
 export default class Organism extends Vue {
@@ -99,7 +100,7 @@ export default class Organism extends Vue {
       this.attributeName === ""
         ? this.root.wordCollection.getRandomWord()
         : this.attributeName;
-    this.root.attributeCollection.putEditable(this.organism, attributeName);
+    this.root.attributeCollection.putEditable(this.organism, attributeName, Primitive.Undetermined);
     this.root.save();
   }
 
