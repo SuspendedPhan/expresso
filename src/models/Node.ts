@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import Root from "@/store/Root";
 import Functions from "../code/Functions";
 import Collection from "@/code/Collection";
-import Type, {Primitive} from "./Type";
+import Type, { Primitive } from "./Type";
 import Attribute from "@/models/Attribute";
 import Metastruct from "@/models/Metastruct";
 
@@ -16,10 +16,16 @@ interface ParentRelationship {
 export default class Node {
   public id = uuidv4();
   public metaname!: string;
-  public storetype = 'node';
+  public storetype = "node";
   public datatypeId!: string;
 
-  public get datatype() { return Type.fromId(this.datatypeId); }
+  public get datatype() {
+    return Type.fromId(this.datatypeId);
+  }
+
+  public set datatype(value) {
+    this.datatypeId = value.id;
+  }
 
   static nodes = new Collection<any>([], ["id"]);
   static nodeParents = new Collection<ParentRelationship>(
@@ -36,7 +42,7 @@ export default class Node {
   static getSerialized() {
     return {
       nodeParents: this.nodeParents.serialize(),
-      nodes: this.nodes.serialize(),
+      nodes: this.nodes.serialize()
     };
   }
 
@@ -70,7 +76,7 @@ export default class Node {
       node.id
     );
     const row = wu(parentRelationships).find(
-      (entry) => entry.childIndex === childIndex
+      entry => entry.childIndex === childIndex
     ) as ParentRelationship;
 
     if (row === undefined) {
@@ -89,7 +95,7 @@ export default class Node {
       const row = parentRelationships[index];
       console.assert(row.childIndex === index);
     }
-    const children = wu(parentRelationships).map((row) =>
+    const children = wu(parentRelationships).map(row =>
       this.getFromId(row.childNodeId)
     );
     return children;
@@ -113,7 +119,7 @@ export default class Node {
     }
     return {
       parentNode: this.getFromId(row.parentNodeId),
-      childIndex: row.childIndex,
+      childIndex: row.childIndex
     };
   }
 
@@ -152,7 +158,11 @@ export default class Node {
   /**
    * @param nodePath [] returns the Var root
    */
-  static getFromPath(organismPath: string[], attributeName, nodePath: number[] = []) {
+  static getFromPath(
+    organismPath: string[],
+    attributeName,
+    nodePath: number[] = []
+  ) {
     const organism = this.root.organismCollection.getOrganismFromPath(
       ...organismPath
     );
@@ -187,6 +197,8 @@ export default class Node {
         node.eval = () => metafun.eval(...this.getChildren(node));
       } else if (node.metaname === "Struct") {
         node.eval = () => this.evalStruct(node);
+      } else if (node.metaname === "Void") {
+        node.eval = () => undefined;
       } else {
         console.assert(false);
       }
@@ -206,6 +218,8 @@ export default class Node {
       this.putChild(answer, 0, this.addNumber(0));
     } else if (datatype instanceof Metastruct) {
       this.putChild(answer, 0, this.addStruct(datatype));
+    } else if (datatype === Primitive.Undetermined) {
+      this.putChild(answer, 0, this.addVoid());
     } else {
       console.assert(false);
     }
@@ -214,6 +228,7 @@ export default class Node {
   }
 
   static addReference(targetNode) {
+    console.assert(targetNode.datatype !== Primitive.Undetermined);
     const answer = this.addNode("Reference", targetNode.datatype) as any;
     answer.targetNodeId = targetNode.id;
     answer.eval = () => this.getFromId(answer.targetNodeId).eval();
@@ -258,6 +273,12 @@ export default class Node {
     return answer;
   }
 
+  private static addVoid() {
+    const ret = this.addNode("Void", Primitive.Undetermined) as any;
+    ret.eval = () => undefined;
+    return ret;
+  }
+
   static addNode(metaname, datatype: Type) {
     const answer = new Node();
     answer.metaname = metaname;
@@ -281,7 +302,7 @@ export default class Node {
 
     // check child doesn't already have parent
     if (
-      wu(this.nodeParents).find((row) => row.childNodeId === child.id) !==
+      wu(this.nodeParents).find(row => row.childNodeId === child.id) !==
       undefined
     ) {
       throw new Error();
@@ -292,7 +313,7 @@ export default class Node {
       parent.id
     );
     const oldChildRelationship = oldChildRelationships.find(
-      (t) => t.childIndex === childIndex
+      t => t.childIndex === childIndex
     );
 
     if (oldChildRelationship !== undefined) {
@@ -311,7 +332,7 @@ export default class Node {
     this.nodeParents.add({
       childNodeId: child.id,
       parentNodeId: parent.id,
-      childIndex: childIndex,
+      childIndex: childIndex
     });
     console.assert(parent.id);
     console.assert(child.id);
@@ -341,7 +362,10 @@ export default class Node {
   /**
    * Detaches the child from its old parent, and puts it under the new parent.
    */
-  static reparent({ child, newParent, childIndex }, shouldHaveOldParent = true) {
+  static reparent(
+    { child, newParent, childIndex },
+    shouldHaveOldParent = true
+  ) {
     const relation = this.nodeParents.getUnique(
       "childNodeId",
       child.id,
@@ -361,7 +385,7 @@ export default class Node {
       this.reparent({
         child: postChild,
         newParent: postParent,
-        childIndex: 0,
+        childIndex: 0
       });
 
       // move new under old root
@@ -369,7 +393,7 @@ export default class Node {
         {
           child: postParent,
           newParent: parentNode,
-          childIndex: childIndex,
+          childIndex: childIndex
         },
         false
       );
@@ -398,13 +422,13 @@ export default class Node {
       Attribute.rootStore.wordCollection.getRandomWord(),
       node.datatype
     );
-    
+
     const parentNode = this.getParent(node);
     const variableNode = newAttribute.getRootNode();
     const referenceNode = this.addReference(variableNode);
     this.reparent({ child: node, newParent: variableNode, childIndex: 0 });
     this.putChild(parentNode, 0, referenceNode);
-    console.log('done');
+    console.log("done");
   }
 
   static fromTree(subtree, parentNode = undefined): any {

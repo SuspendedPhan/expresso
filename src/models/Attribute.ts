@@ -20,6 +20,7 @@ export default class Attribute {
   public isFrozen!: boolean;
 
   public get datatype() { return Type.fromId(this.datatypeId); }
+  public set datatype(value) { this.datatypeId = value.id; }
 
   public static attributes = [] as Array<Attribute>;
 
