@@ -138,7 +138,10 @@ export class Root {
       const splits = key.split(" ");
       const attributeType = splits[0];
       if (attributeType === "editattr") {
-        const type = splits[2] as Types;
+        // broken?
+        // const type = splits[2] as Types;
+        const type = splits[2] as any;
+
         const attribute = this.attributeCollection.putEditable(
           superorganism,
           splits[1],

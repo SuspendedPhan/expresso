@@ -3,6 +3,8 @@ import wu from "wu";
 import { MetaOrganism } from "./MetaorganismCollection";
 import { Root } from "./Root";
 import Types from "./Types";
+import Metastruct from "@/models/Metastruct";
+import {Primitive} from "@/models/Type";
 
 function makeOrganism({ name }) {
   return {
@@ -107,29 +109,24 @@ export default class OrganismCollection {
   putFromMeta(name, metaorganism: MetaOrganism) {
     const organism = this.putFromMetaWithoutAttributes(name, metaorganism);
     for (const metaattribute of metaorganism.attributes) {
+      const datatype = metaattribute.type ?? Primitive.Number;
       const attribute = this.root.attributeCollection.putEditable(
         organism,
         metaattribute.name,
-        metaattribute.type ?? Types.Number,
+        datatype,
         true
       );
       if (metaattribute.default !== undefined) {
+        console.assert(datatype === Primitive.Number);
         this.root.attributeCollection.assignNumber(attribute, metaattribute.default);
-      }
-
-      if (metaattribute.type === Types.Vector) {
-        this.root.attributeCollection.assign(
-          attribute,
-          this.root.nodeCollection.addVector()
-        );
       }
     }
 
     if (metaorganism.name !== "TheVoid") {
-      const clones = this.root.attributeCollection.putEditable(organism, "clones", Types.Number, true);
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber", Types.Number);
-      this.root.attributeCollection.putEmergent(organism, "cloneNumber01", Types.Number);
-      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01", Types.Number);
+      const clones = this.root.attributeCollection.putEditable(organism, "clones", Primitive.Number, true);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber", Primitive.Number);
+      this.root.attributeCollection.putEmergent(organism, "cloneNumber01", Primitive.Number);
+      this.root.attributeCollection.putEmergent(organism, "radialCloneNumber01", Primitive.Number);
       this.root.attributeCollection.assignNumber(clones, 1);
     }
 
@@ -223,7 +220,7 @@ export default class OrganismCollection {
     this.root.attributeCollection.putEmergent(
       this.rootOrganism,
       "window.center",
-      Types.Vector
+      Metastruct.builtinMetastructs.Vector
     );
     return this.rootOrganism;
   }

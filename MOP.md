@@ -1,4 +1,6 @@
 # TODO NEXT
+yay.need to work on metafun next. then organismcollection,metaorganismcollection,renderer,types,and metastructs
+
 Perf notes.
 
 Try implementing this program from scratch. Profile it.

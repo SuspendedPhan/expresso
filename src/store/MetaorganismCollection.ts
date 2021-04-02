@@ -2,6 +2,7 @@ import wu from 'wu';
 import { v4 as uuidv4 } from 'uuid';
 import { RenderShape, Root } from './Root';
 import Types from './Types';
+import Metastruct from "@/models/Metastruct";
 
 export interface MetaOrganism {
   id,
@@ -18,7 +19,7 @@ export default class MetaorganismCollection {
       attributes: [
         {
           name: 'xy',
-          type: Types.Vector,
+          type: Metastruct.builtinMetastructs.Vector,
         },
         {
           name: 'radius',

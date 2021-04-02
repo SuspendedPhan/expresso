@@ -1,3 +1,3 @@
-import Types from '@/models/Types';
+import Type from '@/models/Type';
 
-export default Types;
+export default Type;

@@ -3,6 +3,10 @@ import { Root } from "./Root";
 import seedrandom from "seedrandom";
 import Types from "./Types";
 import EasingMetafuns from "./EasingMetafuns";
+import Metastruct from "@/models/Metastruct";
+import {Primitive} from "@/models/Type";
+
+const Vector = Metastruct.builtinMetastructs.Vector;
 
 export default class MetafunStore {
   metafuns = [
@@ -11,9 +15,9 @@ export default class MetafunStore {
       name: "Add",
       paramCount: 2,
       eval: (a, b) => {
-        if (a.datatype === Types.Number) {
+        if (a.datatype === Primitive.Number) {
           return a.eval() + b.eval();
-        } else if (a.datatype === Types.Vector) {
+        } else if (a.datatype === Vector) {
           return {
             x: a.eval().x + b.eval().x,
             y: a.eval().y + b.eval().y,
@@ -175,8 +179,8 @@ export default class MetafunStore {
         return ret;
       },
       inputTypesFromOutputType: type => {
-        if (type === Types.Vector) {
-          return [Types.Vector, Types.Number];
+        if (type === Vector) {
+          return [Vector, Primitive.Number];
         } else {
           return undefined;
         }
@@ -194,8 +198,8 @@ export default class MetafunStore {
         };
       },
       inputTypesFromOutputType: type => {
-        if (type === Types.Vector) {
-          return [Types.Vector, Types.Number];
+        if (type === Vector) {
+          return [Vector, Primitive.Number];
         } else {
           return undefined;
         }
@@ -215,8 +219,8 @@ export default class MetafunStore {
         return ret;
       },
       inputTypesFromOutputType: type => {
-        if (type === Types.Vector) {
-          return [Types.Number];
+        if (type === Vector) {
+          return [Primitive.Number];
         } else {
           return undefined;
         }
