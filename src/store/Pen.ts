@@ -170,6 +170,7 @@ export default class Pen {
       query.toLowerCase(),
       attribute.name.toLowerCase()
     );
+
     const ok =
       (query === "" || isSubsequence) &&
       (attribute.datatype === requiredType ||
