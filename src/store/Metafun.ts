@@ -4,9 +4,19 @@ import seedrandom from "seedrandom";
 import Types from "./Types";
 import EasingMetafuns from "./EasingMetafuns";
 import Metastruct from "@/models/Metastruct";
-import {Primitive} from "@/models/Type";
+import { Primitive } from "@/models/Type";
 
 const Vector = Metastruct.builtinMetastructs.Vector;
+
+function invlerp(start, end, x) {
+  return (x - start) / (end - start);
+}
+
+function clamp01(t) {
+  if (t < 0) return 0;
+  if (t > 1) return 1;
+  return t;
+}
 
 export default class MetafunStore {
   metafuns = [
@@ -20,11 +30,11 @@ export default class MetafunStore {
         } else if (a.datatype === Vector) {
           return {
             x: a.eval().x + b.eval().x,
-            y: a.eval().y + b.eval().y,
+            y: a.eval().y + b.eval().y
           };
         }
       },
-      inputTypesFromOutputType: (outputType) => {
+      inputTypesFromOutputType: outputType => {
         const ret = [outputType, outputType];
         return ret;
       },
@@ -33,7 +43,7 @@ export default class MetafunStore {
     {
       name: "Multiply",
       paramCount: 2,
-      eval: (a, b) => a.eval() * b.eval(),
+      eval: (a, b) => a.eval() * b.eval()
     },
     {
       name: "Divide",
@@ -46,48 +56,48 @@ export default class MetafunStore {
           return 0;
         }
         return ret;
-      },
+      }
     },
     {
       name: "Subtract",
       paramCount: 2,
-      eval: (a, b) => a.eval() - b.eval(),
+      eval: (a, b) => a.eval() - b.eval()
     },
     {
       name: "Modulus",
       paramCount: 2,
-      eval: (a, b) => a.eval() % b.eval(),
+      eval: (a, b) => a.eval() % b.eval()
     },
     {
       name: "Abs",
       paramCount: 1,
-      eval: (a) => Math.abs(a.eval()),
+      eval: a => Math.abs(a.eval())
     },
     {
       name: "Lerp",
       paramCount: 3,
-      eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval()),
+      eval: (a, b, t) => a.eval() + t.eval() * (b.eval() - a.eval())
     },
     {
       name: "InvLerp01",
       paramCount: 3,
       eval: (a, b, fx) =>
-        Math.min(1, Math.max(0, fx.eval() / (b.eval() - a.eval()))),
+        Math.min(1, Math.max(0, fx.eval() / (b.eval() - a.eval())))
     },
     {
       name: "Distance",
       paramCount: 2,
-      eval: (a, b) => Math.abs(a.eval() - b.eval()),
+      eval: (a, b) => Math.abs(a.eval() - b.eval())
     },
     {
       name: "SoloFront",
       paramCount: 3,
-      eval: (fx, t01, twindow) => (t01.eval() < twindow.eval() ? fx.eval() : 0),
+      eval: (fx, t01, twindow) => (t01.eval() < twindow.eval() ? fx.eval() : 0)
     },
     {
       name: "Tri",
       paramCount: 1,
-      eval: (a) => 1 - Math.abs(a.eval() * 2 - 1),
+      eval: a => 1 - Math.abs(a.eval() * 2 - 1)
     },
     {
       name: "Saw",
@@ -102,8 +112,8 @@ export default class MetafunStore {
       paramCount: 2,
       eval: (t01, frequency) => {
         const t01FreqEval = t01.eval() * frequency.eval();
-        const t01Mod = (t01FreqEval % 1 + 1) % 1;
-        if (t01Mod < .5) {
+        const t01Mod = ((t01FreqEval % 1) + 1) % 1;
+        if (t01Mod < 0.5) {
           return 0;
         } else {
           return 1;
@@ -211,7 +221,7 @@ export default class MetafunStore {
     {
       name: "RotateFromUp",
       paramCount: 1,
-      eval: (angle01) => {
+      eval: angle01 => {
         const vectorVal = { x: 0, y: -1 };
         const angle01Val = angle01.eval();
         const radians = angle01Val * 2 * Math.PI;
@@ -230,6 +240,68 @@ export default class MetafunStore {
       },
       defaultOutputType: Vector
     },
+    {
+      name: "Sequence3",
+      paramCount: 4,
+      eval: (duration0, duration1, duration2, time) => {
+        const duration0Eval = duration0.eval();
+        const duration1Eval = duration1.eval();
+        const duration2Eval = duration2.eval();
+        const timeEval = time.eval();
+        const totalDuration = duration0Eval + duration1Eval + duration2Eval;
+        const windowTime = timeEval % totalDuration;
+        const ret = {
+          t0: clamp01(invlerp(0, duration0Eval, windowTime)) || 0,
+          t1:
+            clamp01(
+              invlerp(duration0Eval, duration0Eval + duration1Eval, windowTime)
+            ) || 0,
+          t2:
+            clamp01(
+              invlerp(
+                duration0Eval + duration1Eval,
+                duration0Eval + duration1Eval + duration2Eval,
+                windowTime
+              )
+            ) || 0
+        };
+        return ret;
+      },
+      inputTypesFromOutputType: type => {
+        if (type === Metastruct.builtinMetastructs.SequenceOutput) {
+          return [
+            Primitive.Number,
+            Primitive.Number,
+            Primitive.Number,
+            Primitive.Number
+          ];
+        } else {
+          return undefined;
+        }
+      },
+      defaultOutputType: Metastruct.builtinMetastructs.SequenceOutput
+    },
+    {
+      name: "MapSequence3",
+      paramCount: 6,
+      eval: (value0, t0, value1, t1, value2, t2) => {
+        const value0Eval = value0.eval();
+        const t0Eval = t0.eval();
+        const value1Eval = value1.eval();
+        const t1Eval = t1.eval();
+        const value2Eval = value2.eval();
+        const t2Eval = t2.eval();
+        if (t0Eval > 0 && t0Eval < 1) {
+          return value0Eval;
+        } else if (t1Eval > 0 && t1Eval < 1) {
+          return value1Eval;
+        } else if (t2Eval > 0 && t2Eval < 1) {
+          return value2Eval;
+        } else {
+          return value0Eval;
+        }
+      },
+    }
   ];
 
   constructor(private root: Root) {}

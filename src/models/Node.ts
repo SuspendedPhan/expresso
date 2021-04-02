@@ -93,7 +93,8 @@ export default class Node {
     parentRelationships.sort((a, b) => a.childIndex - b.childIndex);
     for (let index = 0; index < parentRelationships.length; index++) {
       const row = parentRelationships[index];
-      console.assert(row.childIndex === index);
+      // if(row.childIndex !== index) debugger;
+      console.assert(row.childIndex === index, row);
     }
     const children = wu(parentRelationships).map(row =>
       this.getFromId(row.childNodeId)
@@ -199,6 +200,8 @@ export default class Node {
         node.eval = () => this.evalStruct(node);
       } else if (node.metaname === "Void") {
         node.eval = () => undefined;
+      } else if (node.metaname === "StructMemberReference") {
+        node.eval = () => this.evalStructMemberReference(node);
       } else {
         console.assert(false);
       }
@@ -233,6 +236,36 @@ export default class Node {
     answer.targetNodeId = targetNode.id;
     answer.eval = () => this.getFromId(answer.targetNodeId).eval();
     return answer;
+  }
+
+  static addStructMemberReference(targetVariableNode, memberIndex) {
+    // attribute -> variable -> struct -> member
+
+    const metastruct = targetVariableNode.datatype;
+    const datatype = metastruct.members[memberIndex].type;
+
+    console.assert(targetVariableNode.datatype !== Primitive.Undetermined);
+    const answer = this.addNode("StructMemberReference", datatype) as any;
+    answer.targetVariableNodeId = targetVariableNode.id;
+    answer.memberIndex = memberIndex;
+    answer.eval = () => this.evalStructMemberReference(answer);
+    return answer;
+  }
+
+  static evalStructMemberReference(node) {
+    const targetVariableNode = this.getFromId(node.targetVariableNodeId);
+    const childNode = this.getChild(targetVariableNode, 0);
+    if (childNode.metaname === "Struct") {
+      const memberNode = this.getChild(childNode, node.memberIndex);
+      return memberNode.eval();
+    } else if (childNode.metaname === "Function") {
+      const datatype = targetVariableNode.datatype;
+      const memberName = datatype.members[node.memberIndex].name;
+      return childNode.eval()[memberName];
+    } else {
+      console.assert(false, childNode);
+      return undefined;
+    }
   }
 
   static addFun(metafun, outputType = Primitive.Number) {
