@@ -456,11 +456,12 @@ export default class Node {
       node.datatype
     );
 
-    const parentNode = this.getParent(node);
+    const parentRelationship = this.getParentRelationship(node);
+    const parentNode = parentRelationship!.parentNode;
     const variableNode = newAttribute.getRootNode();
     const referenceNode = this.addReference(variableNode);
     this.reparent({ child: node, newParent: variableNode, childIndex: 0 });
-    this.putChild(parentNode, 0, referenceNode);
+    this.putChild(parentNode, parentRelationship!.childIndex, referenceNode);
     console.log("done");
   }
 
