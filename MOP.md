@@ -1,6 +1,30 @@
 # TODO NEXT
 yay.need to work on metafun next. then organismcollection,metaorganismcollection,renderer,types,and metastructs
 
+
+if (attribute.datatype instanceof Metastruct) {
+      for (let i = 0; i < attribute.datatype.members.length; i++) {
+        const member = attribute.datatype.members[i];
+        console.assert(member.type === Primitive.Number, member);
+
+        const requiredType = member.type;
+        const path = `${organism.name}.${attribute.name}.${member.name}`;
+        const isSubsequence = Functions.isSubsequence(
+          query.toLowerCase(),
+          path.toLowerCase()
+        );
+        const ok =
+          (query === "" || isSubsequence) && attribute.datatype === requiredType;
+        if (ok) {
+          yield {
+            text: path,
+            addNodeFunction: () => this.nodeCollection.addReference(rootNode)
+          };
+        }
+      }
+    }
+
+
 Perf notes.
 
 Try implementing this program from scratch. Profile it.

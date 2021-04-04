@@ -170,6 +170,28 @@ export default class Pen {
       query.toLowerCase(),
       attribute.name.toLowerCase()
     );
+
+    if (attribute.datatype instanceof Metastruct) {
+      for (let i = 0; i < attribute.datatype.members.length; i++) {
+        const member = attribute.datatype.members[i];
+        console.assert(member.type === Primitive.Number, member);
+
+        const path = `${organism.name}.${attribute.name}.${member.name}`;
+        const isSubsequence = Functions.isSubsequence(
+          query.toLowerCase(),
+          path.toLowerCase()
+        );
+        const ok =
+          (query === "" || isSubsequence) && member.type === requiredType;
+        if (ok) {
+          yield {
+            text: path,
+            addNodeFunction: () => this.nodeCollection.addStructMemberReference(attribute.getRootNode(), i)
+          };
+        }
+      }
+    }
+
     const ok =
       (query === "" || isSubsequence) &&
       (attribute.datatype === requiredType ||
@@ -262,6 +284,8 @@ export default class Pen {
       console.error("Attribute.vue not expecting Variable");
     } else if (astNode.metaname === "Void") {
       return this.textToAnnotatedText("None", astNode);
+    } else if(astNode.metaname==="StructMemberReference"){
+      return this.textToAnnotatedText(this.structMemberReferenceToString(astNode), astNode);
     } else {
       console.error("Attribute.vue Unknown metaname");
     }
@@ -291,6 +315,13 @@ export default class Pen {
   private referenceToString(referenceNode, root) {
     const targetNode = root.nodeStore.getTargetNodeForReference(referenceNode);
     return root.attributeStore.getAttributeForNode(targetNode).name;
+  }
+
+  private structMemberReferenceToString(node) {
+    const targetNode = Node.getFromId(node.targetVariableNodeId);
+    const memberName = targetNode.datatype.members[node.memberIndex].name;
+    const attributeName = Attribute.getAttributeForNode(targetNode).name;
+    return`${attributeName}.${memberName}`;
   }
 
   private funToString(funNode, root) {

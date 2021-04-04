@@ -25,6 +25,7 @@
       ]"
       :style="{ left: left(forceNode), top: top(forceNode) }"
       :ref="refNameForForceNode(forceNode)"
+      @click="nodeClicked(forceNode)"
     >
       {{ forceNode.name }}
     </div>
@@ -141,6 +142,7 @@ export default class StoreGraph extends Vue {
       id: node.id,
       name: node.value ?? node.metafunName ?? node.metaname,
       storetype: node.storetype,
+      node: node
     });
     for (const child of Root.nodeCollection.getChildren(node)) {
       forceLinks.push({ source: node.id, target: child.id });
@@ -156,6 +158,10 @@ export default class StoreGraph extends Vue {
       forceNode.y = Math.max(5, forceNode.y);
       forceNode.y = Math.min(ref.clientHeight - 5, forceNode.y);
     }
+  }
+
+  private nodeClicked(forceNode) {
+    console.log(forceNode);
   }
 }
 </script>
