@@ -9,7 +9,7 @@ import WordCollection from "./WordCollection";
 import Types from "./Types";
 import { OrganismLayout } from "./OrganismLayout";
 import Attribute from "@/models/Attribute";
-import Renderer from "@/code/Renderer";
+import Evaluator from "@/code/Evaluator";
 import Node from "@/models/Node";
 
 export enum RenderShape {
@@ -72,7 +72,7 @@ export class Root {
   }
 
   *computeRenderCommands(): Iterable<any> {
-    yield* Renderer.computeRenderCommands();
+    yield* Evaluator.computeRenderCommands();
   }
 
   deserialize(root) {

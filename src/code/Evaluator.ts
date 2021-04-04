@@ -3,7 +3,7 @@ import Root, { RenderShape } from "@/store/Root";
 import { DateTime } from "luxon";
 import Attribute from "@/models/Attribute";
 
-export default class Renderer {
+export default class Evaluator {
   private static get attributeCollection() {
     return Root.attributeCollection;
   }
