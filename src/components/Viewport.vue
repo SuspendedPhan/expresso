@@ -115,6 +115,7 @@ export default class Viewport extends Vue {
         rectangle.y = centery;
         rectangle.scale.x = renderCommand.width;
         rectangle.scale.y = renderCommand.height;
+        doneRenderingSignal.sub(() => this.rectanglePool.recycle(rectangle));
       } else if (renderCommand.shape === RenderShape.Line) {
       }
     }

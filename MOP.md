@@ -1,3 +1,9 @@
+# Perf log
+starts off at 60fps
+memory leak to 30fps
+huge garbage collection spike
+
+
 # TODO NEXT
 Perf notes.
 
@@ -10,25 +16,9 @@ Think about implementing computeRenderCommands from scratch.
 
 
 # Things to mop
-- tailwind
 - convert vue files to classes
-
-- make testing faster
-  - get rid of stack traces in asserts
-
 - use hygen to make vue components
-
-- TRANSFER YOUR VSCODE PREFERENCES
-- curry all the functions // "curry all functions in module"
-
-- markdown to node tree
-
-- intrinsic
-- typescript
 - return iterables, not generators
-- node typings
-
-- memory leak in replace node?
 
 
 # BUGS
@@ -38,7 +28,6 @@ Think about implementing computeRenderCommands from scratch.
 - sometimes inserting kills existing expression (esp. with tri/ease)
 
 # TODO
-- access vector components in expressions
 - be able to change metaorganism+
   - this will take some thought
   - save old attributes, what if new required has different type?
@@ -47,20 +36,15 @@ Think about implementing computeRenderCommands from scratch.
 - create plain vector
 - clonenumber11
 - vector custom attribute
-- remove attribute+
-- rename attribute
+- rename attribute+
 - line
 - triangle
-- color attributes
-- convert to attribute+
 - interval
-- center.x
 - non fill shape
-- pixi
-- flick
 - WSYWIG
 - sliders
 - projects
 - the void upgrade
   - the void attributes always have same uuid
 - the void attributes
+- prettier 100 ch width
