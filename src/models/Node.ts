@@ -183,35 +183,11 @@ export default class Node {
   static deserialize(store) {
     this.nodeParents.deserialize(store.nodeParents);
     this.nodes.deserialize(store.nodes, Node);
-
-    for (const node of this.nodes) {
-      if (node.metaname === "Number") {
-        node.eval = () => node.value;
-      } else if (node.metaname === "Variable") {
-        node.eval = () => this.getChild(node, 0).eval();
-      } else if (node.metaname === "Reference") {
-        node.eval = () => this.getFromId(node.targetNodeId).eval();
-      } else if (node.metaname === "Function") {
-        const metafun = this.root.metafunStore.getFromName(
-          node.metafunName
-        ) as any;
-        node.eval = () => metafun.eval(...this.getChildren(node));
-      } else if (node.metaname === "Struct") {
-        node.eval = () => this.evalStruct(node);
-      } else if (node.metaname === "Void") {
-        node.eval = () => undefined;
-      } else if (node.metaname === "StructMemberReference") {
-        node.eval = () => this.evalStructMemberReference(node);
-      } else {
-        console.assert(false);
-      }
-    }
   }
 
   static addNumber(value) {
     const answer = this.addNode("Number", Primitive.Number) as any;
     answer.value = value;
-    answer.eval = () => answer.value;
     return answer;
   }
 
@@ -226,7 +202,6 @@ export default class Node {
     } else {
       console.assert(false);
     }
-    answer.eval = () => this.getChild(answer, 0).eval();
     return answer;
   }
 
@@ -234,7 +209,6 @@ export default class Node {
     console.assert(targetNode.datatype !== Primitive.Undetermined);
     const answer = this.addNode("Reference", targetNode.datatype) as any;
     answer.targetNodeId = targetNode.id;
-    answer.eval = () => this.getFromId(answer.targetNodeId).eval();
     return answer;
   }
 
@@ -248,24 +222,7 @@ export default class Node {
     const answer = this.addNode("StructMemberReference", datatype) as any;
     answer.targetVariableNodeId = targetVariableNode.id;
     answer.memberIndex = memberIndex;
-    answer.eval = () => this.evalStructMemberReference(answer);
     return answer;
-  }
-
-  static evalStructMemberReference(node) {
-    const targetVariableNode = this.getFromId(node.targetVariableNodeId);
-    const childNode = this.getChild(targetVariableNode, 0);
-    if (childNode.metaname === "Struct") {
-      const memberNode = this.getChild(childNode, node.memberIndex);
-      return memberNode.eval();
-    } else if (childNode.metaname === "Function") {
-      const datatype = targetVariableNode.datatype;
-      const memberName = datatype.members[node.memberIndex].name;
-      return childNode.eval()[memberName];
-    } else {
-      console.assert(false, childNode);
-      return undefined;
-    }
   }
 
   static addFun(metafun, outputType = Primitive.Number) {
@@ -285,7 +242,6 @@ export default class Node {
     }
 
     answer.metafunName = metafun.name;
-    answer.eval = () => metafun.eval(...this.getChildren(answer));
     return answer;
   }
 
@@ -302,7 +258,6 @@ export default class Node {
         console.assert(false);
       }
     }
-    answer.eval = () => this.evalStruct(answer);
     return answer;
   }
 
@@ -318,16 +273,6 @@ export default class Node {
     answer.datatypeId = datatype.id;
     this.nodes.add(answer);
     return answer;
-  }
-
-  private static evalStruct(node) {
-    const metastruct = Metastruct.fromId(node.metastructId);
-    const ret = {};
-    for (let i = 0; i < metastruct.members.length; i++) {
-      const member = metastruct.members[i];
-      ret[member.name] = this.getChild(node, i).eval();
-    }
-    return ret;
   }
 
   static putChild(parent, childIndex: number, child) {
@@ -371,10 +316,6 @@ export default class Node {
     console.assert(child.id);
     console.assert(childIndex !== undefined);
     return child;
-  }
-
-  static commitReplacementSuggestion(suggestion) {
-    suggestion.commitFunction();
   }
 
   static remove(node, shouldAssert = true) {

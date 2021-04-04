@@ -1,7 +1,8 @@
-import wu from "wu";
 import Root, { RenderShape } from "@/store/Root";
 import { DateTime } from "luxon";
 import Attribute from "@/models/Attribute";
+import Node from "@/models/Node";
+import Metastruct from "@/models/Metastruct";
 
 export default class Evaluator {
   private static get attributeCollection() {
@@ -111,49 +112,25 @@ export default class Evaluator {
       "clones",
       false
     );
-    const clones = clonesRoot?.eval() ?? 1;
+    const clones = clonesRoot === undefined ? 1 : this.evalNode(clonesRoot);
 
     const metaorganism = this.metaorganismCollection.getFromId(
       organism.metaorganismId
     ) as any;
 
-    for (const cloneNumber of wu.count().take(clones)) {
+    for (let cloneNumber = 0; cloneNumber < clones; cloneNumber++) {
       if (clonesRoot) {
-        const cloneNumberRoot = this.attributeCollection.getRootNodeFromName(
+        Evaluator.assignAttribute(organism, "cloneNumber", cloneNumber);
+        Evaluator.assignAttribute(
           organism,
-          "cloneNumber"
+          "cloneNumber01",
+          cloneNumber / (clones - 1)
         );
-        this.nodeStore.getChild(cloneNumberRoot, 0).value = cloneNumber;
-        // this.nodeStore.putChild(
-        //   cloneNumberRoot,
-        //   0,
-        //   this.nodeStore.addNumber(cloneNumber)
-        // );
-
-        const cloneNumber01Root = this.attributeCollection.getRootNodeFromName(
+        Evaluator.assignAttribute(
           organism,
-          "cloneNumber01"
+          "radialCloneNumber01",
+          cloneNumber / clones
         );
-        this.nodeStore.getChild(cloneNumber01Root, 0).value =
-          cloneNumber / (clones - 1);
-        // this.nodeStore.putChild(
-        //   cloneNumber01Root,
-        //   0,
-        //   this.nodeStore.addNumber(cloneNumber / (clones - 1))
-        // );
-
-        const radialCloneNumber01Root = this.attributeCollection.getRootNodeFromName(
-          organism,
-          "radialCloneNumber01"
-        );
-        this.nodeStore.getChild(radialCloneNumber01Root, 0).value =
-          cloneNumber / clones;
-
-        // this.nodeStore.putChild(
-        //   radialCloneNumber01Root,
-        //   0,
-        //   this.nodeStore.addNumber(cloneNumber / clones)
-        // );
       }
 
       if (metaorganism.renderShape !== RenderShape.None) {
@@ -164,7 +141,10 @@ export default class Evaluator {
         )) {
           if (attribute.name === "clones") continue;
 
-          const value = this.attributeCollection.getRootNode(attribute).eval();
+          const value = this.evalNode(
+            this.attributeCollection.getRootNode(attribute)
+          );
+          // const value = this.attributeCollection.getRootNode(attribute).eval();
           if (attribute.name === "xy") {
             renderCommand.x = value.x;
             renderCommand.y = value.y;
@@ -179,5 +159,66 @@ export default class Evaluator {
         yield* this.computeRenderCommandsForOrganism(organ);
       }
     }
+  }
+
+  private static evalNode(node) {
+    if (node.metaname === "Number") {
+      return node.value;
+    } else if (node.metaname === "Variable") {
+      return this.evalNode(Node.getChild(node, 0));
+    } else if (node.metaname === "Reference") {
+      return this.evalNode(Node.getFromId(node.targetNodeId));
+    } else if (node.metaname === "Function") {
+      const metafun = Root.metafunStore.getFromName(node.metafunName) as any;
+      const children = Array.from(Node.getChildren(node));
+      const args = children.map(n => this.evalNode(n));
+      if ("evalTypedArgs" in metafun) {
+        const typedArgs = [] as any;
+        for (let i = 0; i < children.length; i++) {
+          typedArgs.push({ datatype: children[i].datatype, value: args[i] });
+        }
+        return metafun.evalTypedArgs(...typedArgs);
+      } else {
+        return metafun.eval(...args);
+      }
+    } else if (node.metaname === "Struct") {
+      const metastruct = Metastruct.fromId(node.metastructId);
+      const ret = {};
+      for (let i = 0; i < metastruct.members.length; i++) {
+        const member = metastruct.members[i];
+        ret[member.name] = this.evalNode(Node.getChild(node, i));
+      }
+      return ret;
+    } else if (node.metaname === "Void") {
+      return undefined;
+    } else if (node.metaname === "StructMemberReference") {
+      const targetVariableNode = Node.getFromId(node.targetVariableNodeId);
+      const childNode = Node.getChild(targetVariableNode, 0);
+      if (childNode.metaname === "Struct") {
+        const memberNode = Node.getChild(childNode, node.memberIndex);
+        return this.evalNode(memberNode);
+      } else if (childNode.metaname === "Function") {
+        const datatype = targetVariableNode.datatype;
+        const memberName = datatype.members[node.memberIndex].name;
+        return this.evalNode(childNode)[memberName];
+      } else {
+        console.assert(false, childNode);
+        return undefined;
+      }
+    } else {
+      console.assert(false);
+    }
+  }
+
+  private static assignAttribute(
+    organism,
+    attributeName: string,
+    attributeValue: number
+  ) {
+    const rootNode = this.attributeCollection.getRootNodeFromName(
+      organism,
+      attributeName
+    );
+    this.nodeStore.getChild(rootNode, 0).value = attributeValue;
   }
 }

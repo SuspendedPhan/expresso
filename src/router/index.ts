@@ -4,6 +4,7 @@ import Home from "../components/Home.vue";
 import TestRunner from "../components/tests/TestRunner.vue";
 import Wat from "@/components/Wat.vue";
 import WrapTest from "@/components/WrapTest.vue";
+import EvalRenderTest from "@/components/EvalRenderTest.vue"
 
 Vue.use(VueRouter);
 
@@ -25,6 +26,10 @@ const routes = [
   {
     path: "/wrap",
     component: WrapTest,
+  },
+  {
+    path: "/eval",
+    component: EvalRenderTest,
   },
   // {
   //   path: '/about',
