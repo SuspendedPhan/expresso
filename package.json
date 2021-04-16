@@ -7,11 +7,15 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"
+    "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py",
+    "asbuild:untouched": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts src/assembly/index.ts --target debug",
+    "asbuild:optimized": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts src/assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "dependencies": {
     "@assemblyscript/loader": "^0.18.23",
     "@types/codemirror": "0.0.98",
+    "as-bind": "^0.6.1",
     "codemirror-minified": "^5.58.3",
     "core-js": "^3.6.5",
     "css-element-queries": "^1.2.3",

@@ -4,7 +4,8 @@ import Home from "../components/Home.vue";
 import TestRunner from "../components/tests/TestRunner.vue";
 import Wat from "@/components/Wat.vue";
 import WrapTest from "@/components/WrapTest.vue";
-import EvalRenderTest from "@/components/EvalRenderTest.vue"
+import EvalRenderTest from "@/components/EvalRenderTest.vue";
+import WasmTest from "@/components/WasmTest.vue";
 
 Vue.use(VueRouter);
 
@@ -12,25 +13,29 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home,
+    component: Home
   },
   {
     path: "/tests",
     name: "TestRunner",
-    component: TestRunner,
+    component: TestRunner
   },
   {
     path: "/wat",
-    component: Wat,
+    component: Wat
   },
   {
     path: "/wrap",
-    component: WrapTest,
+    component: WrapTest
   },
   {
     path: "/eval",
-    component: EvalRenderTest,
+    component: EvalRenderTest
   },
+  {
+    path: "/wasm2",
+    component: WasmTest
+  }
   // {
   //   path: '/about',
   //   name: 'About',
@@ -44,7 +49,7 @@ const routes = [
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
-  routes,
+  routes
 });
 
 export default router;
