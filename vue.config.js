@@ -1,14 +1,21 @@
-const webpack = require('webpack');
+const webpack = require("webpack");
 
 module.exports = {
   devServer: {
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      mimeTypes: { 'application/wasm': ['wasm'] },
+      "Access-Control-Allow-Origin": "*",
     },
-    port: 9000,
+    port: 9000
   },
   configureWebpack: {
-    name: 'Expressionista',
+    name: "Expressionista",
+    module: {
+      rules: [
+        {
+          test: /\.worker\.js$/,
+          use: { loader: "worker-loader" }
+        }
+      ]
+    }
   }
 };

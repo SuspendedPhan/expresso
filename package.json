@@ -8,8 +8,8 @@
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py",
-    "asbuild:untouched": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts src/assembly/index.ts --target debug",
-    "asbuild:optimized": "asc ./node_modules/as-bind/lib/assembly/as-bind.ts src/assembly/index.ts --target release",
+    "asbuild:untouched": "asc src/assembly/index.ts --target debug --importMemory --sharedMemory --maximumMemory 100 --enable threads",
+    "asbuild:optimized": "asc src/assembly/index.ts --target release --importMemory --sharedMemory --maximumMemory 100 --enable threads",
     "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "dependencies": {
@@ -35,6 +35,7 @@
     "sourcemapped-stacktrace": "^1.1.11",
     "stacktrace-js": "^2.0.2",
     "ste-signals": "^2.0.9",
+    "strongly-typed-events": "^2.1.7",
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.0",
     "vue": "^2.6.12",
@@ -70,6 +71,7 @@
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3",
     "typescript": "~3.9.3",
     "vue-cli-plugin-vuetify": "~2.0.7",
-    "vue-template-compiler": "^2.6.12"
+    "vue-template-compiler": "^2.6.12",
+    "worker-loader": "^3.0.8"
   }
 }
