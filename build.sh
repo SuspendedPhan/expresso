@@ -11,6 +11,7 @@ export CPPFLAGS="${OPTIMIZE}"
 echo "============================================="
 echo "Compiling wasm bindings"
 echo "============================================="
+
 (
   # Compile C/C++ code
   emcc \

@@ -17,32 +17,19 @@ import Wasm from "@/../public/WasmModule.wasm";
 })
 export default class WasmTest extends Vue {
   async mounted() {
-    const module = WasmModule({
-      locateFile(path) {
+    const module = await WasmModule({
+      locateFile: (path) => {
+        console.log(module);
+        console.log("lcoateFile");
         if (path.endsWith('.wasm')) {
           return Wasm;
         }
         return path;
-      }
+      },
     });
-
-    // module.onRuntimeInitialized = () => {
-    //   // console.log(module.sayHello());
-    // };
+    module.sayHello();
   }
 }
-
-// class EvalResult {
-//   resultArrayBufferFloat32: ArrayBuffer;
-//
-//   getResult(organism, cloneNumber, attribute) {
-//
-//   }
-//
-//   setResult(organism, cloneNumber, attribute) {
-//
-//   }
-// }
 
 </script>
 <style scoped>
