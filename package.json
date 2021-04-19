@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "build:emscripten": "docker run --rm -v %cd%:/src emscripten/emsdk ./build.sh",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"
@@ -60,6 +61,7 @@
     "chai": "^4.1.2",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "exports-loader": "^1.1.1",
     "postcss": "^7.0.35",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3",
     "typescript": "~3.9.3",

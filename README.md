@@ -1,8 +1,10 @@
 # expresso
 
 ## Project setup
+Install docker.
 ```
 npm install
+docker pull emscripten/emsdk
 ```
 
 ### Compiles and hot-reloads for development
