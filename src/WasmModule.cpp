@@ -8,23 +8,55 @@ class Attribute;
 class Organism;
 class Node;
 
-class EvalOutput {
+class AttributeOutput {
     public:
-        std::shared_ptr<OrganismOutput> rootOrganism;
+        float value;
+        float getValue() {
+            return this->value;
+        }
 };
 
 class OrganismOutput {
     public:
-        std::vector<std::shared_ptr<AttributeOutput>> attributes;
-        std::vector<std::shared_ptr<OrganismOutput>> organisms;
+        std::vector<AttributeOutput> attributes;
+        std::vector<OrganismOutput> organisms;
+
+        std::vector<AttributeOutput> getAttributes() {
+            return this->attributes;
+        }
+
+        std::vector<OrganismOutput> getOrganisms() {
+            return this->organisms;
+        }
 };
 
-class AttributeOutput {
+class EvalOutput {
     public:
-        float value;
+        OrganismOutput rootOrganism;
+        OrganismOutput* getRootOrganism() {
+            return &this->rootOrganism;
+        }
 };
+
 
 class Node {
+    public:
+        virtual float eval() = 0;
+};
+
+class FunctionNode : Node {
+};
+
+class NumberNode : public Node {
+public:
+    float value;
+    float eval() override {
+        printf("number eval\n");
+        return this->value;
+    }
+};
+
+class AttributeReferenceNode : Node {
 };
 
 class Attribute {
@@ -52,42 +84,30 @@ class Organism {
 };
 
 
-class FunctionNode : Node {
-};
-
-class NumberNode : Node {
-public:
-    float value;
-    float eval() {
-        return this->value;
-    }
-};
-
-class AttributeReferenceNode : Node {
-};
-
 class ExpressorTree {
     public:
         EvalOutput* eval() {
+            printf("expressor eval\n");
             auto evalOutput = new EvalOutput();
-            auto rootOrganismOutput = new OrganismOutput(this->rootOrganism->eval());
-            evalOutput->rootOrganism = std::make_shared<OrganismOutput>(std::move(rootOrganismOutput));
+            evalOutput->rootOrganism = this->rootOrganism->eval();
             return evalOutput;
         }
 
-        static EvalOutput test() {
+        static EvalOutput* test() {
+            printf("static eval\n");
             ExpressorTree tree;
-            tree.rootOrganism = std::make_shared<Organism>(new Organism());
+            tree.rootOrganism = std::make_shared<Organism>();
             Attribute attribute;
-            attribute.rootNode = make_shared<NumberNode>(new NumberNode());
-            attribute.rootNode->value = 15;
-            Attribute cloneCountAttribute;
-            cloneCountAttribute.rootNode = NumberNode();
-            cloneCountAttribute.rootNode->value = 3;
-            tree.rootOrganism->attributes.emplace_back(attribute);
-            tree.rootOrganism->attributes.emplace_back(cloneCountAttribute);
-            tree.rootOrganism->cloneCountAttribute = std::make_weak(tree.rootOrganism->attributes.back());
+            NumberNode numberNode;
+            numberNode.value = 15;
+            attribute.rootNode = std::make_shared<NumberNode>(numberNode);
+            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(attribute));
             return tree.eval();
+            return new EvalOutput();
+        }
+
+        static void hi() {
+            printf("hi\n");
         }
 
     private:
@@ -100,18 +120,31 @@ int say_hello() {
   return 0;
 }
 
+int yoyo() {
+  printf("Hello from your wasm module\n");
+  return 0;
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
   function("sayHello", &say_hello);
+  function("yoyo", &yoyo);
 
   class_<ExpressorTree>("ExpressorTree")
     .constructor<>()
-    .function("setClones", &ExpressorTree::setClones)
-    .function("eval", &ExpressorTree::eval, allow_raw_pointers())
+    .class_function("test", &ExpressorTree::test, allow_raw_pointers())
+    .class_function("hi", &ExpressorTree::hi)
   ;
 
   class_<EvalOutput>("EvalOutput")
     .constructor<>()
-    .function("getRadius", &EvalOutput::getRadius)
-    .function("getCloneCount", &EvalOutput::getCloneCount)
+    .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers())
+  ;
+
+  class_<OrganismOutput>("OrganismOutput")
+    .constructor<>()
+  ;
+
+  class_<AttributeOutput>("AttributeOutput")
+    .constructor<>()
   ;
 }

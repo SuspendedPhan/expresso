@@ -29,14 +29,10 @@ export default class WasmTest extends Vue {
     });
     module.sayHello();
 
-    const ast = new module.ExpressorTree();
-    ast.setClones(10);
-
-    const evalOutput = ast.eval();
-    for (let i = 0; i < evalOutput.getCloneCount(); i++) {
-      console.log(evalOutput.getRadius(i));
-    }
-    evalOutput.delete();
+    // const ast = new module.ExpressorTree();
+    const evalOutput = module.ExpressorTree.test();
+    const organismOutput = evalOutput.getRootOrganism();
+    console.log(organismOutput);
   }
 }
 
