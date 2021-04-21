@@ -136,15 +136,12 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<EvalOutput>("EvalOutput")
-    .constructor<>()
     .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers())
   ;
 
   class_<OrganismOutput>("OrganismOutput")
-    .constructor<>()
   ;
 
   class_<AttributeOutput>("AttributeOutput")
-    .constructor<>()
   ;
 }
