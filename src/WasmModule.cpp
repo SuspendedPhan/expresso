@@ -11,8 +11,14 @@ class Node;
 class AttributeOutput {
     public:
         float value;
+        std::string name;
+
         float getValue() {
             return this->value;
+        }
+
+        std::string getName() {
+            return this->name;
         }
 };
 
@@ -61,13 +67,25 @@ class AttributeReferenceNode : Node {
 
 class Attribute {
     public:
+        std::shared_ptr<Node> rootNode;
+        std::string name;
+
+        static Attribute makeNumber(std::string name, float value) {
+            Attribute attribute;
+            NumberNode numberNode;
+            numberNode.value = value;
+            attribute.rootNode = std::make_shared<NumberNode>(numberNode);
+            attribute.name = name;
+            return attribute;
+        }
+
         AttributeOutput eval() {
             AttributeOutput output;
             float value = this->rootNode->eval();
             output.value = value;
+            output.name = this->name;
             return output;
         }
-        std::shared_ptr<Node> rootNode;
 };
 
 class Organism {
@@ -97,11 +115,12 @@ class ExpressorTree {
             printf("static eval\n");
             ExpressorTree tree;
             tree.rootOrganism = std::make_shared<Organism>();
-            Attribute attribute;
-            NumberNode numberNode;
-            numberNode.value = 15;
-            attribute.rootNode = std::make_shared<NumberNode>(numberNode);
-            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(attribute));
+            Attribute xAttribute = Attribute::makeNumber("x", 15);
+            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(xAttribute));
+
+            Attribute yAttribute = Attribute::makeNumber("y", 15);
+            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(yAttribute));
+
             return tree.eval();
             return new EvalOutput();
         }
@@ -146,6 +165,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
   class_<AttributeOutput>("AttributeOutput")
       .function("getValue", &AttributeOutput::getValue)
+      .function("getName", &AttributeOutput::getName)
   ;
 
   register_vector<OrganismOutput>("OrganismOutputVector");

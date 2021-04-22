@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div ref="viewport" class="w-full h-full">
+    <canvas ref="canvas"></canvas>
   </div>
 </template>
 
@@ -11,6 +12,7 @@ import Vue from "vue";
 
 import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
+import PixiRenderer from "@/code/PixiRenderer";
 
 @Component({
   components: {},
@@ -19,8 +21,6 @@ export default class WasmTest extends Vue {
   async mounted() {
     const module = await WasmModule({
       locateFile: (path) => {
-        console.log(module);
-        console.log("lcoateFile");
         if (path.endsWith('.wasm')) {
           return Wasm;
         }
@@ -29,10 +29,9 @@ export default class WasmTest extends Vue {
     });
     module.sayHello();
 
-    // const ast = new module.ExpressorTree();
     const evalOutput = module.ExpressorTree.test();
-    const organismOutput = evalOutput.getRootOrganism();
-    console.log(organismOutput.getAttributes().get(0).getValue());
+    const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
+    renderer.render(evalOutput);
   }
 }
 
