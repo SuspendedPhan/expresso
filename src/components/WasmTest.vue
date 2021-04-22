@@ -32,7 +32,7 @@ export default class WasmTest extends Vue {
     // const ast = new module.ExpressorTree();
     const evalOutput = module.ExpressorTree.test();
     const organismOutput = evalOutput.getRootOrganism();
-    console.log(organismOutput);
+    console.log(organismOutput.getAttributes().get(0).getValue());
   }
 }
 

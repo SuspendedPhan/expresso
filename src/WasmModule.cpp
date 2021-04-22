@@ -19,14 +19,14 @@ class AttributeOutput {
 class OrganismOutput {
     public:
         std::vector<AttributeOutput> attributes;
-        std::vector<OrganismOutput> organisms;
+        std::vector<OrganismOutput> suborganisms;
 
         std::vector<AttributeOutput> getAttributes() {
             return this->attributes;
         }
 
-        std::vector<OrganismOutput> getOrganisms() {
-            return this->organisms;
+        std::vector<OrganismOutput> getSuborganisms() {
+            return this->suborganisms;
         }
 };
 
@@ -140,8 +140,14 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<OrganismOutput>("OrganismOutput")
+    .function("getAttributes", &OrganismOutput::getAttributes)
+    .function("getSuborganisms", &OrganismOutput::getSuborganisms)
   ;
 
   class_<AttributeOutput>("AttributeOutput")
+      .function("getValue", &AttributeOutput::getValue)
   ;
+
+  register_vector<OrganismOutput>("OrganismOutputVector");
+  register_vector<AttributeOutput>("AttributeOutputVector");
 }
