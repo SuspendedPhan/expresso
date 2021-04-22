@@ -21,7 +21,8 @@ export default class PixiRenderer {
 
   private renderOrganism(organismOutput) {
     const circle = this.circlePool.use();
-    const attributes = organismOutput.getAttributes();
+    const cloneOutput = organismOutput.getCloneOutputByCloneNumber().get(0);
+    const attributes = cloneOutput.getAttributes();
     let x, y;
     for (let i = 0; i < attributes.size(); i++) {
       const attribute = attributes.get(i);

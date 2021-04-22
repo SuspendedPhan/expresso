@@ -22,7 +22,7 @@ class AttributeOutput {
         }
 };
 
-class OrganismOutput {
+class OrganismCloneOutput {
     public:
         std::vector<AttributeOutput> attributes;
         std::vector<OrganismOutput> suborganisms;
@@ -36,6 +36,16 @@ class OrganismOutput {
         }
 };
 
+
+class OrganismOutput {
+    public:
+        std::vector<OrganismCloneOutput> cloneOutputByCloneNumber;
+        std::vector<OrganismCloneOutput> getCloneOutputByCloneNumber() {
+            return this->cloneOutputByCloneNumber;
+        }
+};
+
+
 class EvalOutput {
     public:
         OrganismOutput rootOrganism;
@@ -48,6 +58,7 @@ class EvalOutput {
 class Node {
     public:
         virtual float eval() = 0;
+        virtual ~Node() = default;
 };
 
 class FunctionNode : Node {
@@ -56,14 +67,16 @@ class FunctionNode : Node {
 class NumberNode : public Node {
 public:
     float value;
+
+    NumberNode(float value) { this->value = value; }
+
     float eval() override {
         printf("number eval\n");
         return this->value;
     }
 };
 
-class AttributeReferenceNode : Node {
-};
+
 
 class Attribute {
     public:
@@ -72,10 +85,16 @@ class Attribute {
 
         static Attribute makeNumber(std::string name, float value) {
             Attribute attribute;
-            NumberNode numberNode;
-            numberNode.value = value;
+            NumberNode numberNode(value);
             attribute.rootNode = std::make_shared<NumberNode>(numberNode);
             attribute.name = name;
+            return attribute;
+        }
+
+        static Attribute make(std::string name, std::unique_ptr<Node> rootNode) {
+            Attribute attribute;
+            attribute.name = name;
+            attribute.rootNode = std::move(rootNode);
             return attribute;
         }
 
@@ -88,13 +107,25 @@ class Attribute {
         }
 };
 
+class AttributeReferenceNode : public Node {
+    public:
+        std::weak_ptr<Attribute> attribute;
+        AttributeReferenceNode(std::weak_ptr<Attribute> attribute) { this->attribute = attribute; }
+
+        float eval() {
+            return attribute.lock()->eval().value;
+        }
+};
+
 class Organism {
     public:
         OrganismOutput eval() {
             OrganismOutput output;
+            OrganismCloneOutput cloneOutput;
             for (const auto &attribute : this->attributes) {
-                output.attributes.emplace_back(attribute->eval());
+                cloneOutput.attributes.emplace_back(attribute->eval());
             }
+            output.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
             return output;
         }
         std::vector<std::shared_ptr<Attribute>> attributes;
@@ -115,10 +146,11 @@ class ExpressorTree {
             printf("static eval\n");
             ExpressorTree tree;
             tree.rootOrganism = std::make_shared<Organism>();
-            Attribute xAttribute = Attribute::makeNumber("x", 15);
+            Attribute xAttribute = Attribute::make("x", std::make_unique<NumberNode>(15));
             tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(xAttribute));
 
-            Attribute yAttribute = Attribute::makeNumber("y", 15);
+            const auto xAttributePtr = std::weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+            Attribute yAttribute = Attribute::make("y", std::make_unique<AttributeReferenceNode>(xAttributePtr));
             tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(yAttribute));
 
             return tree.eval();
@@ -159,8 +191,12 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<OrganismOutput>("OrganismOutput")
-    .function("getAttributes", &OrganismOutput::getAttributes)
-    .function("getSuborganisms", &OrganismOutput::getSuborganisms)
+    .function("getCloneOutputByCloneNumber", &OrganismOutput::getCloneOutputByCloneNumber)
+  ;
+
+  class_<OrganismCloneOutput>("OrganismCloneOutput")
+    .function("getAttributes", &OrganismCloneOutput::getAttributes)
+    .function("getSuborganisms", &OrganismCloneOutput::getSuborganisms)
   ;
 
   class_<AttributeOutput>("AttributeOutput")
@@ -169,5 +205,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   register_vector<OrganismOutput>("OrganismOutputVector");
+  register_vector<OrganismCloneOutput>("OrganismCloneOutputVector");
   register_vector<AttributeOutput>("AttributeOutputVector");
 }
