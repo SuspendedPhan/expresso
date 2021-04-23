@@ -18,6 +18,8 @@ class AttributeOutput;
 class Attribute;
 class Organism;
 class Node;
+class FunctionNode;
+class ParameterNode;
 
 class AttributeOutput {
     public:
@@ -72,11 +74,11 @@ public:
     int currentCloneNumber;
 };
 
+
 class EvalContext {
 public:
     std::map<weak_ptr<Organism>, std::shared_ptr<OrganismEvalContext>, std::owner_less<std::weak_ptr<Organism>>> organismEvalContextByOrganism;
 };
-
 
 
 class Node {
@@ -97,8 +99,103 @@ public:
     }
 };
 
+class BinaryOpNode: public Node {
+public:
+    shared_ptr<Node> a;
+    shared_ptr<Node> b;
+
+    BinaryOpNode(shared_ptr<Node> a, shared_ptr<Node> b) {
+        this->a = a;
+        this->b = b;
+    }
+};
 
 
+class AddOpNode: public BinaryOpNode {
+public:
+    AddOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    float eval(const EvalContext& evalContext) override {
+        return this->a->eval(evalContext) + this->b->eval(evalContext);
+    }
+};
+
+class SubOpNode: public BinaryOpNode {
+public:
+    SubOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    float eval(const EvalContext& evalContext) override {
+        return this->a->eval(evalContext) - this->b->eval(evalContext);
+    }
+};
+
+class DivOpNode: public BinaryOpNode {
+public:
+    DivOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    float eval(const EvalContext& evalContext) override {
+        return this->a->eval(evalContext) / this->b->eval(evalContext);
+    }
+};
+
+
+
+
+class FunctionNode: public Node {
+    public:
+        vector<shared_ptr<Node>> arguments;
+        shared_ptr<Node> rootNode;
+
+        float eval(const EvalContext& evalContext) override {
+            printf("function eval\n");
+            return this->rootNode->eval(evalContext);
+        }
+
+        static shared_ptr<FunctionNode> makeAverage() {
+            shared_ptr<FunctionNode> node = std::make_shared<FunctionNode>();
+            auto aNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 0);
+            auto bNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 1);
+            auto addNode = std::make_shared<AddOpNode>(aNode, bNode);
+            auto twoNode = std::make_shared<NumberNode>(2);
+            auto divNode = std::make_shared<DivOpNode>(addNode, twoNode);
+            node->rootNode = divNode;
+            return node;
+        }
+};
+
+class ParameterNode: public Node {
+    public:
+        weak_ptr<FunctionNode> fun;
+        int parameterIndex;
+
+        ParameterNode(weak_ptr<FunctionNode> fun,
+        int parameterIndex) {
+            this->fun = fun;
+            this->parameterIndex = parameterIndex;
+        }
+
+        float eval(const EvalContext& evalContext) override {
+            return this->fun.lock()->arguments[this->parameterIndex]->eval(evalContext);
+        }
+};
+
+
+
+//class LerpNode: public FunctionNode {
+//    public:
+//        LerpNode() {
+//            // a + t * (b - a)
+//            this->rootNode = Add(Param(0), Mul((Param(2), Sub(Param(1), Param(0)))));
+//        }
+//
+//        static test() {
+//            LerpNode lerpNode;
+//            lerpNode.arguments.push_back(Num(5));
+//            lerpNode.arguments.push_back(Num(10));
+//            lerpNode.arguments.push_back(Num(.5));
+//        }
+//    }
+//}
 
 
 class Attribute {
@@ -194,9 +291,10 @@ class ExpressorTree {
             ExpressorTree tree;
             tree.rootOrganism = std::make_shared<Organism>();
             auto rootOrganism = tree.rootOrganism;
+            auto addNode = std::make_shared<AddOpNode>(std::make_shared<NumberNode>(0), std::make_shared<NumberNode>(500));
             tree.rootOrganism->attributes.emplace_back(
                 std::make_shared<EditableAttribute>(
-                    EditableAttribute("x", std::make_unique<NumberNode>(15), weak_ptr<Organism>(rootOrganism))));
+                    EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism))));
 
             EditableAttribute cloneCountAttribute = EditableAttribute("clones", std::make_unique<NumberNode>(3), weak_ptr<Organism>(rootOrganism));
             tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(cloneCountAttribute));
