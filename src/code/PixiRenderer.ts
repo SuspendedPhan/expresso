@@ -10,7 +10,7 @@ export default class PixiRenderer {
     this.app = new PIXI.Application({
       resizeTo: viewportElement,
       view: canvasElement,
-      antialias: true,
+      antialias: true
     });
     this.circlePool.grow(10);
   }
@@ -20,24 +20,34 @@ export default class PixiRenderer {
   }
 
   private renderOrganism(organismOutput) {
-    const circle = this.circlePool.use();
-    const cloneOutput = organismOutput.getCloneOutputByCloneNumber().get(0);
-    const attributes = cloneOutput.getAttributes();
-    let x, y;
-    for (let i = 0; i < attributes.size(); i++) {
-      const attribute = attributes.get(i);
-      console.log(attribute.getName());
-      if (attribute.getName() === 'x') {
-        x = attribute.getValue();
-      } else if (attribute.getName() === 'y') {
-        y = attribute.getValue();
+    const cloneOutputByCloneNumber = organismOutput.getCloneOutputByCloneNumber();
+    const usedCircles: any = [];
+    for (let i = 0; i < cloneOutputByCloneNumber.size(); i++) {
+      const circle = this.circlePool.use();
+      usedCircles.push(circle);
+
+      const cloneOutput = cloneOutputByCloneNumber.get(i);
+      const attributes = cloneOutput.getAttributes();
+      let x, y;
+      for (let i = 0; i < attributes.size(); i++) {
+        const attribute = attributes.get(i);
+        console.log(attribute.getName());
+        if (attribute.getName() === "x") {
+          x = attribute.getValue();
+        } else if (attribute.getName() === "y") {
+          y = attribute.getValue();
+        }
       }
+      circle.x = x;
+      circle.y = y;
+      console.log(y);
+      circle.scale.x = 50;
+      circle.scale.y = 50;
     }
-    circle.x = x;
-    circle.y = y;
-    circle.scale.x = 50;
-    circle.scale.y = 50;
-    this.circlePool.recycle(circle);
+
+    for (const usedCircle of usedCircles) {
+      this.circlePool.recycle(usedCircle);
+    }
   }
 
   private makeCircle() {

@@ -1,6 +1,17 @@
 #include <emscripten/bind.h>
 
 using namespace emscripten;
+template <typename T>
+using vector = std::vector<T>;
+template <typename T, typename V>
+using map = std::map<T, V>;
+template <typename T>
+using weak_ptr = std::weak_ptr<T>;
+template <typename T>
+using shared_ptr = std::shared_ptr<T>;
+template <typename T>
+using unique_ptr = std::unique_ptr<T>;
+
 
 class OrganismOutput;
 class AttributeOutput;
@@ -24,14 +35,14 @@ class AttributeOutput {
 
 class OrganismCloneOutput {
     public:
-        std::vector<AttributeOutput> attributes;
-        std::vector<OrganismOutput> suborganisms;
+        vector<AttributeOutput> attributes;
+        vector<OrganismOutput> suborganisms;
 
-        std::vector<AttributeOutput> getAttributes() {
+        vector<AttributeOutput> getAttributes() {
             return this->attributes;
         }
 
-        std::vector<OrganismOutput> getSuborganisms() {
+        vector<OrganismOutput> getSuborganisms() {
             return this->suborganisms;
         }
 };
@@ -39,8 +50,8 @@ class OrganismCloneOutput {
 
 class OrganismOutput {
     public:
-        std::vector<OrganismCloneOutput> cloneOutputByCloneNumber;
-        std::vector<OrganismCloneOutput> getCloneOutputByCloneNumber() {
+        vector<OrganismCloneOutput> cloneOutputByCloneNumber;
+        vector<OrganismCloneOutput> getCloneOutputByCloneNumber() {
             return this->cloneOutputByCloneNumber;
         }
 };
@@ -48,20 +59,30 @@ class OrganismOutput {
 
 class EvalOutput {
     public:
-        OrganismOutput rootOrganism;
+        std::shared_ptr<OrganismOutput> rootOrganism;
         OrganismOutput* getRootOrganism() {
-            return &this->rootOrganism;
+            return this->rootOrganism.get();
         }
 };
 
 
-class Node {
-    public:
-        virtual float eval() = 0;
-        virtual ~Node() = default;
+class OrganismEvalContext {
+public:
+    weak_ptr<OrganismOutput> organismOutput;
+    int currentCloneNumber;
 };
 
-class FunctionNode : Node {
+class EvalContext {
+public:
+    std::map<weak_ptr<Organism>, std::shared_ptr<OrganismEvalContext>, std::owner_less<std::weak_ptr<Organism>>> organismEvalContextByOrganism;
+};
+
+
+
+class Node {
+    public:
+        virtual float eval(const EvalContext& evalContext) = 0;
+        virtual ~Node() = default;
 };
 
 class NumberNode : public Node {
@@ -70,7 +91,7 @@ public:
 
     NumberNode(float value) { this->value = value; }
 
-    float eval() override {
+    float eval(const EvalContext& evalContext) override {
         printf("number eval\n");
         return this->value;
     }
@@ -78,83 +99,118 @@ public:
 
 
 
+
+
 class Attribute {
     public:
-        std::shared_ptr<Node> rootNode;
         std::string name;
+        weak_ptr<Organism> organism;
 
-        static Attribute makeNumber(std::string name, float value) {
-            Attribute attribute;
-            NumberNode numberNode(value);
-            attribute.rootNode = std::make_shared<NumberNode>(numberNode);
-            attribute.name = name;
-            return attribute;
+        Attribute(std::string name, weak_ptr<Organism> organism) {
+            this->name = name;
+            this->organism = organism;
         }
 
-        static Attribute make(std::string name, std::unique_ptr<Node> rootNode) {
-            Attribute attribute;
-            attribute.name = name;
-            attribute.rootNode = std::move(rootNode);
-            return attribute;
+        virtual AttributeOutput eval(const EvalContext& evalContext) = 0;
+        virtual ~Attribute() {}
+};
+
+class EditableAttribute : public Attribute {
+    public:
+        shared_ptr<Node> rootNode;
+
+        EditableAttribute(std::string name, shared_ptr<Node> rootNode, weak_ptr<Organism> organism) : Attribute(name, organism) {
+            this->rootNode = rootNode;
         }
 
-        AttributeOutput eval() {
+        AttributeOutput eval(const EvalContext& evalContext) override {
             AttributeOutput output;
-            float value = this->rootNode->eval();
+            float value = this->rootNode->eval(evalContext);
             output.value = value;
             output.name = this->name;
             return output;
         }
 };
 
-class AttributeReferenceNode : public Node {
+class CloneNumberAttribute : public Attribute {
     public:
-        std::weak_ptr<Attribute> attribute;
-        AttributeReferenceNode(std::weak_ptr<Attribute> attribute) { this->attribute = attribute; }
+        CloneNumberAttribute(weak_ptr<Organism> organism) : Attribute("cloneNumber", organism) {}
 
-        float eval() {
-            return attribute.lock()->eval().value;
+        AttributeOutput eval(const EvalContext& evalContext) {
+            AttributeOutput output;
+            output.name = this->name;
+            output.value = evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
+            return output;
         }
 };
 
+
+class AttributeReferenceNode : public Node {
+    public:
+        weak_ptr<Attribute> attribute;
+        AttributeReferenceNode(weak_ptr<Attribute> attribute) { this->attribute = attribute; }
+
+        float eval(const EvalContext& evalContext) {
+            return attribute.lock()->eval(evalContext).value;
+        }
+};
+
+
 class Organism {
     public:
-        OrganismOutput eval() {
-            OrganismOutput output;
-            OrganismCloneOutput cloneOutput;
-            for (const auto &attribute : this->attributes) {
-                cloneOutput.attributes.emplace_back(attribute->eval());
+        static shared_ptr<OrganismOutput> eval(shared_ptr<Organism> organism, EvalContext* evalContext) {
+            auto organismOutput = std::make_shared<OrganismOutput>();
+            auto organismEvalContext = std::make_shared<OrganismEvalContext>();
+            evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(organism), organismEvalContext);
+
+            float cloneCount = organism->cloneCountAttribute.lock()->eval(*evalContext).value;
+            for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
+                organismEvalContext->currentCloneNumber = cloneNumber;
+                OrganismCloneOutput cloneOutput;
+                for (const auto &attribute : organism->attributes) {
+                    cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
+                }
+                organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
             }
-            output.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
-            return output;
+            return organismOutput;
         }
-        std::vector<std::shared_ptr<Attribute>> attributes;
-        std::vector<std::shared_ptr<Organism>> suborganisms;
+
+        vector<shared_ptr<Attribute>> attributes;
+        vector<shared_ptr<Organism>> suborganisms;
+        weak_ptr<Attribute> cloneCountAttribute;
 };
 
 
 class ExpressorTree {
     public:
         EvalOutput* eval() {
-            printf("expressor eval\n");
             auto evalOutput = new EvalOutput();
-            evalOutput->rootOrganism = this->rootOrganism->eval();
+            EvalContext evalContext;
+            evalOutput->rootOrganism = Organism::eval(this->rootOrganism, &evalContext);
             return evalOutput;
         }
 
         static EvalOutput* test() {
-            printf("static eval\n");
             ExpressorTree tree;
             tree.rootOrganism = std::make_shared<Organism>();
-            Attribute xAttribute = Attribute::make("x", std::make_unique<NumberNode>(15));
-            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(xAttribute));
+            auto rootOrganism = tree.rootOrganism;
+            tree.rootOrganism->attributes.emplace_back(
+                std::make_shared<EditableAttribute>(
+                    EditableAttribute("x", std::make_unique<NumberNode>(15), weak_ptr<Organism>(rootOrganism))));
 
-            const auto xAttributePtr = std::weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-            Attribute yAttribute = Attribute::make("y", std::make_unique<AttributeReferenceNode>(xAttributePtr));
-            tree.rootOrganism->attributes.emplace_back(std::make_shared<Attribute>(yAttribute));
+            EditableAttribute cloneCountAttribute = EditableAttribute("clones", std::make_unique<NumberNode>(3), weak_ptr<Organism>(rootOrganism));
+            tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(cloneCountAttribute));
+            tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+
+            tree.rootOrganism->attributes.emplace_back(
+                std::make_shared<CloneNumberAttribute>(
+                    CloneNumberAttribute(weak_ptr<Organism>(rootOrganism))));
+
+            const auto attributePtr = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+            EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<AttributeReferenceNode>(attributePtr), weak_ptr<Organism>(rootOrganism));
+            tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(yAttribute));
 
             return tree.eval();
-            return new EvalOutput();
         }
 
         static void hi() {
@@ -163,7 +219,7 @@ class ExpressorTree {
 
     private:
         int clones;
-        std::shared_ptr<Organism> rootOrganism;
+        shared_ptr<Organism> rootOrganism;
 };
 
 int say_hello() {
