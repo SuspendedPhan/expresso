@@ -1,4 +1,5 @@
 #include <emscripten/bind.h>
+#include <string>
 
 using namespace emscripten;
 template <typename T>

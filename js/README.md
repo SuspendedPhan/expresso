@@ -2,6 +2,9 @@
 
 ## Project setup
 Install docker.
+Install emsdk, run emsdk's activate script to get the emscripten compiler.
+Then, the includes will be located in somewhere like
+C:\Users\Dylan\Documents\GitHub\emsdk\upstream\emscripten\system\include
 ```
 npm install
 docker pull emscripten/emsdk
