@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:emscripten": "docker run --rm -v %cd%:/src trzeci/emscripten ./build.sh",
+    "build:emscripten": "docker run --rm -v %cd%\\..:/src trzeci/emscripten ./cpp/build.sh",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"

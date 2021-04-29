@@ -1,6 +1,7 @@
 <template>
   <div ref="viewport" class="w-full h-full">
     <canvas ref="canvas"></canvas>
+    <FakeBook v-if='fake' :fake="fake" />
   </div>
 </template>
 
@@ -13,11 +14,14 @@ import Vue from "vue";
 import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
 import PixiRenderer from "@/code/PixiRenderer";
+import FakeBook from './FakeBook';
 
 @Component({
-  components: {},
+  components: {FakeBook},
 })
 export default class WasmTest extends Vue {
+  fake = null;
+
   async mounted() {
     const module = await WasmModule({
       locateFile: (path) => {
@@ -28,10 +32,20 @@ export default class WasmTest extends Vue {
       },
     });
     module.sayHello();
+    window.wasmModule = module;
+    console.log("before fake");
 
-    const evalOutput = module.ExpressorTree.test();
-    const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
-    renderer.render(evalOutput);
+    this.fake = module.FakeBook.make(() => {
+      console.log("deleted");
+    });
+    this.fake.setValue("yoyo");
+    console.log(this.fake);
+
+    console.log("after fake");
+
+    // const evalOutput = module.ExpressorTree.test();
+    // const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
+    // renderer.render(evalOutput);
   }
 }
 

@@ -14,6 +14,6 @@ set(CMAKE_CXX_STANDARD 14)
 #endif()
 
 
-add_executable(expresso main.cpp)
-add_library(WasmModule WasmModule.cpp Attribute.cpp EditableAttribute.cpp Organism.h)
+add_executable(expresso src/main.cpp src/WasmModule.cpp src/Attribute.cpp src/Node.cpp src/FakeBook.h)
+add_library(WasmModule src/WasmModule.cpp src/Organism.h src/Node.h src/EvalOutput.h src/EvalContext.h src/Node.cpp src/Attribute.cpp src/WasmModule.h src/FakeBook.h)
 include_directories("C:\\Users\\Dylan\\Documents\\GitHub\\emsdk\\upstream\\emscripten\\system\\include")

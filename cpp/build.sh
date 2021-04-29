@@ -27,13 +27,13 @@ echo "============================================="
     -o ./WasmModule.js \
     --no-entry \
     -s ENVIRONMENT=web \
-    ./src/WasmModule.cpp
+    ./cpp/src/WasmModule.cpp
 
   # Create output folder
 #  mkdir -p dist
 
   # Move artifacts
-  mv WasmModule.{js,wasm} public
+  mv WasmModule.{js,wasm} js/public
 )
 echo "============================================="
 echo "Compiling wasm bindings done"
