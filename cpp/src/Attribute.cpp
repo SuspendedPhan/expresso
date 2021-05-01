@@ -11,3 +11,7 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) {
     output.name = this->name;
     return output;
 }
+
+void EditableAttribute2::eval() {
+
+}

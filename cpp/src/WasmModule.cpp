@@ -8,24 +8,28 @@
 #include "EvalOutput.h"
 #include "WasmModule.h"
 
-template <typename T>
+template<typename T>
 using vector = std::vector<T>;
-template <typename T, typename V>
+template<typename T, typename V>
 using map = std::map<T, V>;
-template <typename T>
+template<typename T>
 using weak_ptr = std::weak_ptr<T>;
-template <typename T>
+template<typename T>
 using shared_ptr = std::shared_ptr<T>;
-template <typename T>
+template<typename T>
 using unique_ptr = std::unique_ptr<T>;
 
 
 class OrganismOutput;
+
 class AttributeOutput;
 
 class Organism;
+
 class Node;
+
 class FunctionNode;
+
 class ParameterNode;
 
 
@@ -48,7 +52,8 @@ EvalOutput *ExpressorTree::test() {
     ExpressorTree tree;
     tree.rootOrganism = std::make_shared<Organism>();
     auto rootOrganism = tree.rootOrganism;
-    auto addNode = std::make_shared<AddOpNode>(std::make_shared<NumberNode>(0.0f), std::make_shared<NumberNode>(500.0f));
+    auto addNode = std::make_shared<AddOpNode>(std::make_shared<NumberNode>(0.0f),
+                                               std::make_shared<NumberNode>(500.0f));
 
     const EditableAttribute &xAttribute = EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
     EditableAttribute test2 = xAttribute;
@@ -76,15 +81,19 @@ EvalOutput *ExpressorTree::test() {
 }
 
 
-
 int say_hello() {
-  printf("Hello from your wasm module\n");
-  return 0;
+    printf("Hello from your wasm module\n");
+
+    auto ww = new EditableAttribute2();
+    delete ww;
+
+    printf("after\n");
+    return 0;
 }
 
 int yoyo() {
-  printf("Hello from your wasm module\n");
-  return 0;
+    printf("Hello from your wasm module\n");
+    return 0;
 }
 
 #include "FakeBook.h"

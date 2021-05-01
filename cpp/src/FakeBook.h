@@ -87,5 +87,7 @@ public:
     }
 };
 
+shared_ptr<FakeBook> FakeBook::fake;
+
 
 #endif //EXPRESSO_FAKEBOOK_H

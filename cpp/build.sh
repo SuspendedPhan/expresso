@@ -2,7 +2,7 @@
 
 set -e
 
-export OPTIMIZE=""
+export OPTIMIZE="--profiling -s LLD_REPORT_UNDEFINED -s ASSERTIONS=1"
 #export OPTIMIZE="-Os"
 export LDFLAGS="${OPTIMIZE}"
 export CFLAGS="${OPTIMIZE}"
@@ -11,6 +11,8 @@ export CPPFLAGS="${OPTIMIZE}"
 echo "============================================="
 echo "Compiling wasm bindings"
 echo "============================================="
+
+emcc -v
 
 (
   # Compile C/C++ code
@@ -27,7 +29,7 @@ echo "============================================="
     -o ./WasmModule.js \
     --no-entry \
     -s ENVIRONMENT=web \
-    ./cpp/src/WasmModule.cpp
+    ./cpp/src/WasmModule.cpp ./cpp/src/Attribute.cpp ./cpp/src/Node.cpp
 
   # Create output folder
 #  mkdir -p dist

@@ -10,23 +10,24 @@
 #include "Organism.h"
 
 class ExpressorTree {
-    public:
-        EvalOutput* eval() {
-            auto evalOutput = new EvalOutput();
-            EvalContext evalContext;
-            evalOutput->rootOrganism = Organism::eval(this->rootOrganism, &evalContext);
-            return evalOutput;
-        }
+public:
+    EvalOutput *eval() {
+        auto evalOutput = new EvalOutput();
+        EvalContext evalContext;
+        evalOutput->rootOrganism = Organism::eval(this->rootOrganism, &evalContext);
+        return evalOutput;
+    }
 
-        static EvalOutput* test();
+    static EvalOutput *test();
 
-        static void hi() {
-            printf("hi\n");
-        }
+    static void hi() {
+        printf("hi\n");
+    }
 
-    private:
-        int clones;
-        std::shared_ptr<Organism> rootOrganism;
+    std::shared_ptr<Organism> rootOrganism;
+
+private:
+    int clones;
 };
 
 #endif //EXPRESSO_WASMMODULE_H

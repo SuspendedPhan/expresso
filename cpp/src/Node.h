@@ -29,10 +29,7 @@ public:
 
     NumberNode(float value) { this->value = value; }
 
-    float eval(const EvalContext& evalContext) override {
-        printf("number eval\n");
-        return this->value;
-    }
+    float eval(const EvalContext& evalContext) override;
 };
 
 class BinaryOpNode: public Node {

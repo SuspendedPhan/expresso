@@ -26,16 +26,28 @@ class Attribute {
         virtual ~Attribute() {}
 };
 
+class Attribute2 {
+public:
+    virtual void eval() = 0;
+    virtual ~Attribute2() = default;
+};
+
+
+class EditableAttribute2 : public Attribute2 {
+    public:
+        void eval() override;
+        virtual ~EditableAttribute2() = default;
+};
 
 class EditableAttribute : public Attribute {
-    public:
-        std::shared_ptr<Node> rootNode;
+public:
+    std::shared_ptr<Node> rootNode;
 
-        EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(name, organism) {
-            this->rootNode = rootNode;
-        }
+    EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(name, organism) {
+        this->rootNode = rootNode;
+    }
 
-        AttributeOutput eval(const EvalContext& evalContext) override;
+    AttributeOutput eval(const EvalContext& evalContext) override;
 };
 
 class CloneNumberAttribute : public Attribute {

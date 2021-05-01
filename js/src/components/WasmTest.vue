@@ -33,15 +33,15 @@ export default class WasmTest extends Vue {
     });
     module.sayHello();
     window.wasmModule = module;
-    console.log("before fake");
-
-    this.fake = module.FakeBook.make(() => {
-      console.log("deleted");
-    });
-    this.fake.setValue("yoyo");
-    console.log(this.fake);
-
-    console.log("after fake");
+    // console.log("before fake");
+    //
+    // this.fake = module.FakeBook.make(() => {
+    //   console.log("deleted");
+    // });
+    // this.fake.setValue("yoyo");
+    // console.log(this.fake);
+    //
+    // console.log("after fake");
 
     // const evalOutput = module.ExpressorTree.test();
     // const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);

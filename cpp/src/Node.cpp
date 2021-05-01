@@ -7,3 +7,8 @@
 float AttributeReferenceNode::eval(const EvalContext &evalContext) {
     return attribute.lock()->eval(evalContext).value;
 }
+
+float NumberNode::eval(const EvalContext &evalContext) {
+    printf("number eval\n");
+    return this->value;
+}
