@@ -55,26 +55,28 @@ EvalOutput *ExpressorTree::test() {
     auto addNode = std::make_shared<AddOpNode>(std::make_shared<NumberNode>(0.0f),
                                                std::make_shared<NumberNode>(500.0f));
 
-    const EditableAttribute &xAttribute = EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
-    EditableAttribute test2 = xAttribute;
-    EditableAttribute *px = new EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
-    std::shared_ptr<EditableAttribute> a(px);
+//    const EditableAttribute &xAttribute = EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
+//    EditableAttribute test2 = xAttribute;
+//    EditableAttribute *px = new EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
+//    std::shared_ptr<EditableAttribute> a(px);
 
-//    tree.rootOrganism->attributes.emplace_back(
-//            std::make_shared<EditableAttribute>(
-//                    EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism))));
+    tree.rootOrganism->attributes.emplace_back(
+            std::make_shared<EditableAttribute>(
+                    EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism))));
 
-//            EditableAttribute cloneCountAttribute = EditableAttribute("clones", std::make_unique<NumberNode>(3.0f), weak_ptr<Organism>(rootOrganism));
-//            tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(cloneCountAttribute));
-//            tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-//
-//            tree.rootOrganism->attributes.emplace_back(
-//                std::make_shared<CloneNumberAttribute>(
-//                    CloneNumberAttribute(weak_ptr<Organism>(rootOrganism))));
-//
-//            const auto attributePtr = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-//            EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<AttributeReferenceNode>(attributePtr), weak_ptr<Organism>(rootOrganism));
-//            tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(yAttribute));
+    EditableAttribute cloneCountAttribute = EditableAttribute("clones", std::make_unique<NumberNode>(3.0f),
+                                                              weak_ptr<Organism>(rootOrganism));
+    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(cloneCountAttribute));
+    tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+
+    tree.rootOrganism->attributes.emplace_back(
+            std::make_shared<CloneNumberAttribute>(
+                    CloneNumberAttribute(weak_ptr<Organism>(rootOrganism))));
+
+    const auto attributePtr = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+    EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<AttributeReferenceNode>(attributePtr),
+                                                     weak_ptr<Organism>(rootOrganism));
+    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(yAttribute));
 
     return new EvalOutput();
 //            return tree.eval();
