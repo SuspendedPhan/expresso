@@ -1,3 +1,5 @@
+#include <ctime>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -32,68 +34,37 @@ class FunctionNode;
 
 class ParameterNode;
 
-
-//class LerpNode: public FunctionNode {
-//    public:
-//        LerpNode() {
-//            // a + t * (b - a)
-//            this->rootNode = Add(Param(0), Mul((Param(2), Sub(Param(1), Param(0)))));
-//        }
-//
-//        static test() {
-//            LerpNode lerpNode;
-//            lerpNode.arguments.push_back(Num(5));
-//            lerpNode.arguments.push_back(Num(10));
-//            lerpNode.arguments.push_back(Num(.5));
-//        }
-//    }
-//}
-EvalOutput *ExpressorTree::test() {
-    ExpressorTree tree;
-    tree.rootOrganism = std::make_shared<Organism>();
+void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     auto rootOrganism = tree.rootOrganism;
-    auto addNode = std::make_shared<AddOpNode>(std::make_shared<NumberNode>(0.0f),
-                                               std::make_shared<NumberNode>(500.0f));
 
-//    const EditableAttribute &xAttribute = EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
-//    EditableAttribute test2 = xAttribute;
-//    EditableAttribute *px = new EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism));
-//    std::shared_ptr<EditableAttribute> a(px);
+    const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones",
+            std::make_unique<NumberNode>(1000.0f),
+            rootOrganism);
+    tree.rootOrganism->attributes.emplace_back(cloneCountAttribute);
+
+    tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
+
+    const shared_ptr<CloneNumberAttribute> cloneNumberAttribute = std::make_shared<CloneNumberAttribute>(
+            CloneNumberAttribute(rootOrganism));
+    tree.rootOrganism->attributes.push_back(
+            cloneNumberAttribute);
+    
+    auto mulNode = std::make_shared<MulOpNode>(std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(cloneNumberAttribute), std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
+            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
+                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
+                            std::make_shared<NumberNode>(1.0f))));
 
     tree.rootOrganism->attributes.emplace_back(
             std::make_shared<EditableAttribute>(
-                    EditableAttribute("x", addNode, weak_ptr<Organism>(rootOrganism))));
+                    EditableAttribute("x", mulNode, rootOrganism)));
 
-    EditableAttribute cloneCountAttribute = EditableAttribute("clones", std::make_unique<NumberNode>(3.0f),
-                                                              weak_ptr<Organism>(rootOrganism));
-    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(cloneCountAttribute));
-    tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-
-    tree.rootOrganism->attributes.emplace_back(
-            std::make_shared<CloneNumberAttribute>(
-                    CloneNumberAttribute(weak_ptr<Organism>(rootOrganism))));
-
-    const auto attributePtr = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-    EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<AttributeReferenceNode>(attributePtr),
-                                                     weak_ptr<Organism>(rootOrganism));
+    EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<NumberNode>(100.0f),
+            rootOrganism);
     tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(yAttribute));
-
-    return new EvalOutput();
-//            return tree.eval();
 }
 
 
 int say_hello() {
-    printf("Hello from your wasm module\n");
-
-    auto ww = new EditableAttribute2();
-    delete ww;
-
-    printf("after\n");
-    return 0;
-}
-
-int yoyo() {
     printf("Hello from your wasm module\n");
     return 0;
 }
@@ -106,12 +77,11 @@ using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(my_module) {
   function("sayHello", &say_hello);
-  function("yoyo", &yoyo);
 
   class_<ExpressorTree>("ExpressorTree")
     .constructor<>()
-    .class_function("test", &ExpressorTree::test, allow_raw_pointers())
-    .class_function("hi", &ExpressorTree::hi)
+    .function("eval", &ExpressorTree::eval, allow_raw_pointers())
+    .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
   ;
 
   class_<EvalOutput>("EvalOutput")

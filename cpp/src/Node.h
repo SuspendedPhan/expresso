@@ -2,6 +2,7 @@
 #define EXPRESSO_NODE_H
 
 #include "Attribute.h"
+#include <iostream>
 
 template <typename T>
 using vector = std::vector<T>;
@@ -31,6 +32,14 @@ public:
 
     float eval(const EvalContext& evalContext) override;
 };
+
+class UnaryOpNode: public Node {
+public:
+    shared_ptr<Node> a;
+
+    UnaryOpNode(shared_ptr<Node> a) : a(a) {}
+};
+
 
 class BinaryOpNode: public Node {
 public:
@@ -62,12 +71,33 @@ public:
     }
 };
 
+class MulOpNode: public BinaryOpNode {
+public:
+    MulOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    float eval(const EvalContext& evalContext) override {
+        return this->a->eval(evalContext) * this->b->eval(evalContext);
+    }
+};
+
 class DivOpNode: public BinaryOpNode {
 public:
     DivOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
     float eval(const EvalContext& evalContext) override {
         return this->a->eval(evalContext) / this->b->eval(evalContext);
+    }
+};
+
+class ModOpNode: public BinaryOpNode {
+public:
+    ModOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    float eval(const EvalContext& evalContext) override {
+        float aEval = this->a->eval(evalContext);
+        float bEval = this->b->eval(evalContext);
+        float answer = fmod(aEval, bEval);
+        return answer;
     }
 };
 

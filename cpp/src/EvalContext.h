@@ -4,6 +4,7 @@
 #include <map>
 
 class Organism;
+class IntrinsicAttribute;
 
 class OrganismEvalContext {
 public:
@@ -15,6 +16,7 @@ public:
 class EvalContext {
 public:
     std::map<std::weak_ptr<Organism>, std::shared_ptr<OrganismEvalContext>, std::owner_less<std::weak_ptr<Organism>>> organismEvalContextByOrganism;
+    std::map<std::weak_ptr<const IntrinsicAttribute>, float, std::owner_less<std::weak_ptr<const IntrinsicAttribute>>> valueByIntrinsicAttribute;
 };
 
 #endif //EXPRESSO_EVALCONTEXT_H

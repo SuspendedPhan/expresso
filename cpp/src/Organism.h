@@ -10,15 +10,15 @@ class Organism {
             auto organismEvalContext = std::make_shared<OrganismEvalContext>();
             evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(organism), organismEvalContext);
 
-//            float cloneCount = organism->cloneCountAttribute.lock()->eval(*evalContext).value;
-//            for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
-//                organismEvalContext->currentCloneNumber = cloneNumber;
-//                OrganismCloneOutput cloneOutput;
-//                for (const auto &attribute : organism->attributes) {
-//                    cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
-//                }
-//                organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
-//            }
+            float cloneCount = organism->cloneCountAttribute.lock()->eval(*evalContext).value;
+            for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
+                organismEvalContext->currentCloneNumber = cloneNumber;
+                OrganismCloneOutput cloneOutput;
+                for (const auto &attribute : organism->attributes) {
+                    cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
+                }
+                organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
+            }
             return organismOutput;
         }
 

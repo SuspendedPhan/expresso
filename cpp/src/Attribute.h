@@ -12,7 +12,7 @@
 class Organism;
 class Node;
 
-class Attribute {
+class Attribute : public std::enable_shared_from_this<Attribute> {
     public:
         std::string name;
         std::weak_ptr<Organism> organism;
@@ -22,21 +22,8 @@ class Attribute {
             this->organism = organism;
         }
 
-        virtual AttributeOutput eval(const EvalContext& evalContext) = 0;
+        virtual AttributeOutput eval(const EvalContext& evalContext) const = 0;
         virtual ~Attribute() {}
-};
-
-class Attribute2 {
-public:
-    virtual void eval() = 0;
-    virtual ~Attribute2() = default;
-};
-
-
-class EditableAttribute2 : public Attribute2 {
-    public:
-        void eval() override;
-        virtual ~EditableAttribute2() = default;
 };
 
 class EditableAttribute : public Attribute {
@@ -47,19 +34,26 @@ public:
         this->rootNode = rootNode;
     }
 
-    AttributeOutput eval(const EvalContext& evalContext) override;
+    AttributeOutput eval(const EvalContext& evalContext) const override;
 };
 
 class CloneNumberAttribute : public Attribute {
     public:
         CloneNumberAttribute(std::weak_ptr<Organism> organism) : Attribute("cloneNumber", organism) {}
 
-        AttributeOutput eval(const EvalContext& evalContext) {
+        AttributeOutput eval(const EvalContext& evalContext) const {
             AttributeOutput output;
             output.name = this->name;
             output.value = evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
             return output;
         }
+};
+
+class IntrinsicAttribute : public Attribute {
+public:
+    IntrinsicAttribute(const std::string &name, const std::weak_ptr<Organism> &organism);
+
+    AttributeOutput eval(const EvalContext &evalContext) const override;
 };
 
 
