@@ -38,13 +38,13 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     auto rootOrganism = tree.rootOrganism;
 
 
-    auto qq = rootOrganism->cloneNumberAttribute;
-    auto context = EvalContext();
-    context.organismEvalContextByOrganism[rootOrganism]->currentCloneNumber = 0;
-    std::make_shared<AttributeReferenceNode>(qq)->eval(context);
+//    auto qq = rootOrganism->cloneNumberAttribute;
+//    auto context = EvalContext();
+//    context.organismEvalContextByOrganism[rootOrganism]->currentCloneNumber = 0;
+//    std::make_shared<AttributeReferenceNode>(qq)->eval(context);
     
-
-//    const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
+//
+    const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
 //    auto xAttribute = std::make_shared<EditableAttribute>("x", std::make_shared<NumberNode>(0.0f), rootOrganism);
 //    tree.rootOrganism->attributes.emplace_back(xAttribute);
 //    const auto &cloneNumberAttribute = rootOrganism->cloneNumberAttribute;
@@ -53,23 +53,23 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
 
 
 
+    rootOrganism->cloneCountAttribute.lock()->rootNode = std::make_shared<NumberNode>(10.0f);
 
+    auto mulNode = std::make_shared<MulOpNode>(
+            std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
+                    std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
+            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
+                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
+                            std::make_shared<NumberNode>(1.0f))));
 
-//    auto mulNode = std::make_shared<MulOpNode>(
-//            std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
-//                    std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
-//            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
-//                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
-//                            std::make_shared<NumberNode>(1.0f))));
-//
-//    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>(
-//            EditableAttribute("x", mulNode, rootOrganism));
-//    tree.rootOrganism->attributes.emplace_back(
-//            xAttribute);
-//
-//    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y",
-//            std::make_unique<NumberNode>(100.0f), rootOrganism);
-//    tree.rootOrganism->attributes.emplace_back(yAttribute);
+    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>(
+            EditableAttribute("x", mulNode, rootOrganism));
+    tree.rootOrganism->attributes.emplace_back(
+            xAttribute);
+
+    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y",
+            std::make_unique<NumberNode>(100.0f), rootOrganism);
+    tree.rootOrganism->attributes.emplace_back(yAttribute);
 
 //    rootOrganism->addSuborganism();
 //    const auto &suborganism = rootOrganism->suborganisms.back();

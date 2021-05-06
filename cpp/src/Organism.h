@@ -40,13 +40,13 @@ public:
         return organismOutput;
     }
 
-//    void addSuborganism() {
-//        this->suborganisms.emplace_back(std::make_shared<Organism>());
-//    }
+    void addSuborganism() {
+        this->suborganisms.emplace_back(std::make_shared<Organism>());
+    }
 
     vector<shared_ptr<Attribute>> attributes;
     vector<shared_ptr<Organism>> suborganisms;
-    weak_ptr<Attribute> cloneCountAttribute;
+    weak_ptr<EditableAttribute> cloneCountAttribute;
     weak_ptr<Attribute> cloneNumberAttribute;
 };
 
