@@ -31,7 +31,6 @@ export default class PixiRenderer {
       let x, y;
       for (let i = 0; i < attributes.size(); i++) {
         const attribute = attributes.get(i);
-        console.log(attribute.getName());
         if (attribute.getName() === "x") {
           x = attribute.getValue();
         } else if (attribute.getName() === "y") {
@@ -40,9 +39,8 @@ export default class PixiRenderer {
       }
       circle.x = x;
       circle.y = y;
-      console.log(y);
-      circle.scale.x = 50;
-      circle.scale.y = 50;
+      circle.scale.x = 2;
+      circle.scale.y = 2;
     }
 
     for (const usedCircle of usedCircles) {

@@ -37,30 +37,52 @@ class ParameterNode;
 void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     auto rootOrganism = tree.rootOrganism;
 
-    const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones",
-            std::make_unique<NumberNode>(1000.0f),
-            rootOrganism);
-    tree.rootOrganism->attributes.emplace_back(cloneCountAttribute);
 
-    tree.rootOrganism->cloneCountAttribute = weak_ptr<Attribute>(tree.rootOrganism->attributes.back());
-
-    const shared_ptr<CloneNumberAttribute> cloneNumberAttribute = std::make_shared<CloneNumberAttribute>(
-            CloneNumberAttribute(rootOrganism));
-    tree.rootOrganism->attributes.push_back(
-            cloneNumberAttribute);
+    auto qq = rootOrganism->cloneNumberAttribute;
+    auto context = EvalContext();
+    context.organismEvalContextByOrganism[rootOrganism]->currentCloneNumber = 0;
+    std::make_shared<AttributeReferenceNode>(qq)->eval(context);
     
-    auto mulNode = std::make_shared<MulOpNode>(std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(cloneNumberAttribute), std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
-            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
-                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
-                            std::make_shared<NumberNode>(1.0f))));
 
-    tree.rootOrganism->attributes.emplace_back(
-            std::make_shared<EditableAttribute>(
-                    EditableAttribute("x", mulNode, rootOrganism)));
+//    const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
+//    auto xAttribute = std::make_shared<EditableAttribute>("x", std::make_shared<NumberNode>(0.0f), rootOrganism);
+//    tree.rootOrganism->attributes.emplace_back(xAttribute);
+//    const auto &cloneNumberAttribute = rootOrganism->cloneNumberAttribute;
+//    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>("y", std::make_shared<AttributeReferenceNode>(
+//            xAttribute), rootOrganism));
 
-    EditableAttribute yAttribute = EditableAttribute("y", std::make_unique<NumberNode>(100.0f),
-            rootOrganism);
-    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>(yAttribute));
+
+
+
+
+//    auto mulNode = std::make_shared<MulOpNode>(
+//            std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
+//                    std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
+//            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
+//                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
+//                            std::make_shared<NumberNode>(1.0f))));
+//
+//    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>(
+//            EditableAttribute("x", mulNode, rootOrganism));
+//    tree.rootOrganism->attributes.emplace_back(
+//            xAttribute);
+//
+//    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y",
+//            std::make_unique<NumberNode>(100.0f), rootOrganism);
+//    tree.rootOrganism->attributes.emplace_back(yAttribute);
+
+//    rootOrganism->addSuborganism();
+//    const auto &suborganism = rootOrganism->suborganisms.back();
+//    suborganism->attributes.emplace_back(
+//            std::make_shared<EditableAttribute>("x", std::make_shared<AttributeReferenceNode>(xAttribute),
+//                    suborganism));
+//    suborganism->attributes.emplace_back(
+//            std::make_shared<EditableAttribute>("y",
+//                    std::make_shared<AddOpNode>(std::make_shared<AttributeReferenceNode>(yAttribute),
+//                            std::make_shared<MulOpNode>(
+//                                    std::make_shared<AttributeReferenceNode>(suborganism->cloneCountAttribute),
+//                                    std::make_shared<NumberNode>(100.0f))), suborganism));
+
 }
 
 

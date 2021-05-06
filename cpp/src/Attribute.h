@@ -41,12 +41,24 @@ class CloneNumberAttribute : public Attribute {
     public:
         CloneNumberAttribute(std::weak_ptr<Organism> organism) : Attribute("cloneNumber", organism) {}
 
-        AttributeOutput eval(const EvalContext& evalContext) const {
+        AttributeOutput eval(const EvalContext& evalContext) const override {
             AttributeOutput output;
             output.name = this->name;
             output.value = evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
             return output;
         }
+};
+
+class TestAttribute : public Attribute {
+public:
+    TestAttribute(std::weak_ptr<Organism> organism) : Attribute("testo", organism) {}
+
+    AttributeOutput eval(const EvalContext& evalContext) const override {
+        AttributeOutput output;
+        output.name = this->name;
+        output.value = evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
+        return output;
+    }
 };
 
 class IntrinsicAttribute : public Attribute {

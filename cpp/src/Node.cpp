@@ -9,6 +9,5 @@ float AttributeReferenceNode::eval(const EvalContext &evalContext) {
 }
 
 float NumberNode::eval(const EvalContext &evalContext) {
-    printf("number eval\n");
     return this->value;
 }

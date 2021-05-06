@@ -31,7 +31,7 @@ export default class WasmTest extends Vue {
         return path;
       },
     });
-    // module.sayHello();
+    module.sayHello();
     window.wasmModule = module;
 
     // console.log("before fake");
@@ -44,9 +44,17 @@ export default class WasmTest extends Vue {
     //
     // console.log("after fake");
 
-    const evalOutput = module.ExpressorTree.test();
+    function render(tree, renderer) {
+      const evalOutput = tree.eval();
+      renderer.render(evalOutput);
+      evalOutput.delete();
+      window.requestAnimationFrame(() => render(tree, renderer));
+    }
+
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
-    renderer.render(evalOutput);
+    const tree = new module.ExpressorTree();
+    module.ExpressorTree.populateTestTree(tree);
+    render(tree, renderer);
   }
 }
 

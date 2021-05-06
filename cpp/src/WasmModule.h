@@ -12,7 +12,7 @@
 
 class ExpressorTree {
 public:
-    std::shared_ptr<Organism> rootOrganism = std::make_shared<Organism>();
+    std::shared_ptr<Organism> rootOrganism = Organism::make();
     std::shared_ptr<IntrinsicAttribute> timeAttribute;
     std::chrono::time_point<std::chrono::system_clock> epoch = std::chrono::system_clock::now();
 
