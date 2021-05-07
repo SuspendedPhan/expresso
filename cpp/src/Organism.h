@@ -23,8 +23,8 @@ public:
         return organism;
     }
 
-    static std::shared_ptr<OrganismOutput> eval(const shared_ptr<Organism> &organism, EvalContext *evalContext) {
-        auto organismOutput = std::make_shared<OrganismOutput>();
+    static OrganismOutput eval(const shared_ptr<Organism> &organism, EvalContext *evalContext) {
+        OrganismOutput organismOutput;
         auto organismEvalContext = std::make_shared<OrganismEvalContext>();
         evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(organism), organismEvalContext);
 
@@ -35,13 +35,16 @@ public:
             for (const auto &attribute : organism->attributes) {
                 cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
             }
-            organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
+            for (const auto &suborganism : organism->suborganisms) {
+                cloneOutput.suborganisms.emplace_back(Organism::eval(suborganism, evalContext));
+            }
+            organismOutput.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
         }
         return organismOutput;
     }
 
     void addSuborganism() {
-        this->suborganisms.emplace_back(std::make_shared<Organism>());
+        this->suborganisms.emplace_back(Organism::make());
     }
 
     vector<shared_ptr<Attribute>> attributes;
