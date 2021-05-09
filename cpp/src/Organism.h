@@ -3,6 +3,7 @@
 
 #include "Attribute.h"
 #include "Code.h"
+#include <cassert>
 
 class Organism {
 private:
@@ -51,6 +52,7 @@ public:
     }
     
     static void remove(const shared_ptr<Organism> organism) {
+        assert(!organism->superorganism.expired());
         Code::vecremove(organism->superorganism.lock()->suborganisms, organism);
     }
 
