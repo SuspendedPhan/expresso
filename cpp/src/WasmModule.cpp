@@ -71,7 +71,7 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
             std::make_unique<NumberNode>(100.0f), rootOrganism);
     tree.rootOrganism->attributes.emplace_back(yAttribute);
 
-    rootOrganism->addSuborganism();
+    Organism::addSuborganism(rootOrganism);
     const auto &suborganism = rootOrganism->suborganisms.back();
     suborganism->attributes.emplace_back(
             std::make_shared<EditableAttribute>("x", std::make_shared<AttributeReferenceNode>(xAttribute),
@@ -82,6 +82,7 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
                             std::make_shared<MulOpNode>(
                                     std::make_shared<AttributeReferenceNode>(suborganism->cloneCountAttribute),
                                     std::make_shared<NumberNode>(100.0f))), suborganism));
+    Organism::remove(suborganism);
 
 }
 

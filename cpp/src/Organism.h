@@ -2,6 +2,7 @@
 #define EXPRESSO_ORGANISM_H
 
 #include "Attribute.h"
+#include "Code.h"
 
 class Organism {
 private:
@@ -43,14 +44,21 @@ public:
         return organismOutput;
     }
 
-    void addSuborganism() {
-        this->suborganisms.emplace_back(Organism::make());
+    static void addSuborganism(const shared_ptr<Organism> organism) {
+        const shared_ptr<Organism> &suborganism = Organism::make();
+        suborganism->superorganism = organism;
+        organism->suborganisms.emplace_back(suborganism);
+    }
+    
+    static void remove(const shared_ptr<Organism> organism) {
+        Code::vecremove(organism->superorganism.lock()->suborganisms, organism);
     }
 
     vector<shared_ptr<Attribute>> attributes;
     vector<shared_ptr<Organism>> suborganisms;
     weak_ptr<EditableAttribute> cloneCountAttribute;
     weak_ptr<Attribute> cloneNumberAttribute;
+    weak_ptr<Organism> superorganism;
 };
 
 #endif //EXPRESSO_ORGANISM_H
