@@ -5,7 +5,7 @@
 #include "Code.h"
 #include <cassert>
 
-class Organism {
+class Organism : public std::enable_shared_from_this<Organism> {
 private:
     Organism() {}
 
@@ -25,33 +25,37 @@ public:
         return organism;
     }
 
-    static OrganismOutput eval(const shared_ptr<Organism> &organism, EvalContext *evalContext) {
+    OrganismOutput eval(EvalContext *evalContext) {
+        const auto &shared_this = shared_from_this();
+
         OrganismOutput organismOutput;
         auto organismEvalContext = std::make_shared<OrganismEvalContext>();
-        evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(organism), organismEvalContext);
+        evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(shared_this), organismEvalContext);
 
-        float cloneCount = organism->cloneCountAttribute.lock()->eval(*evalContext).value;
+        float cloneCount = shared_this->cloneCountAttribute.lock()->eval(*evalContext).value;
         for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
             organismEvalContext->currentCloneNumber = cloneNumber;
             OrganismCloneOutput cloneOutput;
-            for (const auto &attribute : organism->attributes) {
+            for (const auto &attribute : shared_this->attributes) {
                 cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
             }
-            for (const auto &suborganism : organism->suborganisms) {
-                cloneOutput.suborganisms.emplace_back(Organism::eval(suborganism, evalContext));
+            for (const auto &suborganism : shared_this->suborganisms) {
+                cloneOutput.suborganisms.emplace_back(suborganism->eval(evalContext));
             }
             organismOutput.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
         }
         return organismOutput;
     }
 
-    static void addSuborganism(const shared_ptr<Organism> organism) {
+    void addSuborganism() {
         const shared_ptr<Organism> &suborganism = Organism::make();
-        suborganism->superorganism = organism;
-        organism->suborganisms.emplace_back(suborganism);
+        const shared_ptr<Organism> &shared_this = shared_from_this();
+        suborganism->superorganism = shared_this;
+        shared_this->suborganisms.emplace_back(suborganism);
     }
     
-    static void remove(const shared_ptr<Organism> organism) {
+    void remove() {
+        const auto &organism = shared_from_this();
         assert(!organism->superorganism.expired());
         Code::vecremove(organism->superorganism.lock()->suborganisms, organism);
     }

@@ -31,7 +31,7 @@ public:
         const float elapsedSeconds = elapsedFloat.count();
 
         evalContext.valueByIntrinsicAttribute[this->timeAttribute] = elapsedSeconds;
-        evalOutput->rootOrganism = std::make_shared<OrganismOutput>(Organism::eval(this->rootOrganism, &evalContext));
+        evalOutput->rootOrganism = std::make_shared<OrganismOutput>(this->rootOrganism->eval(&evalContext));
         return evalOutput;
     }
 
