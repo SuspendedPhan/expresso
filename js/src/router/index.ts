@@ -13,7 +13,8 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: Home
+    component: WasmTest
+    // component: Home
   },
   {
     path: "/tests",
