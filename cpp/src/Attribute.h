@@ -22,6 +22,8 @@ class Attribute : public std::enable_shared_from_this<Attribute> {
             this->organism = organism;
         }
 
+        std::string getName() { return this->name; }
+
         virtual AttributeOutput eval(const EvalContext& evalContext) const = 0;
         virtual ~Attribute() {}
 };
@@ -37,6 +39,7 @@ public:
     AttributeOutput eval(const EvalContext& evalContext) const override;
 
     void setRootNode(const std::shared_ptr<Node>& rootNode);
+    Node* getRootNode();
 };
 
 class CloneNumberAttribute : public Attribute {

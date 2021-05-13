@@ -91,7 +91,21 @@ EMSCRIPTEN_BINDINGS(my_module) {
   class_<ExpressorTree>("ExpressorTree")
     .constructor<>()
     .function("eval", &ExpressorTree::eval, allow_raw_pointers())
+    .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
     .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
+  ;
+
+  class_<Organism>("Organism")
+    .function("getSuborganisms", &Organism::getSuborganisms)
+    .function("getAttributes", &Organism::getAttributes)
+  ;
+
+  class_<Attribute>("Attribute")
+    .function("getName", &Attribute::getName)
+  ;
+
+  class_<EditableAttribute>("EditableAttribute")
+    .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
   ;
 
   class_<EvalOutput>("EvalOutput")
@@ -125,6 +139,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
       .class_function("make", &FakeBook::make, allow_raw_pointers())
   ;
 
+  register_vector<Organism*>("OrganismVector");
+  register_vector<Attribute*>("AttributeVector");
   register_vector<OrganismOutput>("OrganismOutputVector");
   register_vector<OrganismCloneOutput>("OrganismCloneOutputVector");
   register_vector<AttributeOutput>("AttributeOutputVector");

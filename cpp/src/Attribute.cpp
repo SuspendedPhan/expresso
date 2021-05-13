@@ -21,6 +21,10 @@ void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
     });
 }
 
+Node *EditableAttribute::getRootNode() {
+    return this->rootNode.get();
+}
+
 IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism) : Attribute(name,
         organism) {}
 

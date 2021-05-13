@@ -35,6 +35,9 @@ public:
         return evalOutput;
     }
 
+    Organism* getRootOrganism() {
+        return this->rootOrganism.get();
+    }
 };
 
 #endif //EXPRESSO_WASMMODULE_H

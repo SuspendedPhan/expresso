@@ -10,6 +10,12 @@ private:
     Organism() {}
 
 public:
+    vector<shared_ptr<Attribute>> attributes;
+    vector<shared_ptr<Organism>> suborganisms;
+    weak_ptr<EditableAttribute> cloneCountAttribute;
+    weak_ptr<Attribute> cloneNumberAttribute;
+    weak_ptr<Organism> superorganism;
+
     static std::shared_ptr<Organism> make() {
         auto organism = std::shared_ptr<Organism>(new Organism());
         const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones",
@@ -60,11 +66,21 @@ public:
         Code::vecremove(organism->superorganism.lock()->suborganisms, organism);
     }
 
-    vector<shared_ptr<Attribute>> attributes;
-    vector<shared_ptr<Organism>> suborganisms;
-    weak_ptr<EditableAttribute> cloneCountAttribute;
-    weak_ptr<Attribute> cloneNumberAttribute;
-    weak_ptr<Organism> superorganism;
+    std::vector<Organism*> getSuborganisms() {
+        std::vector<Organism*> suborganisms;
+        for (const auto &suborganism : this->suborganisms) {
+            suborganisms.emplace_back(suborganism.get());
+        }
+        return suborganisms;
+    }
+
+    std::vector<Attribute*> getAttributes() {
+        std::vector<Attribute*> attributes;
+        for (const auto &attribute : this->attributes) {
+            attributes.emplace_back(attribute.get());
+        }
+        return attributes;
+    }
 };
 
 #endif //EXPRESSO_ORGANISM_H
