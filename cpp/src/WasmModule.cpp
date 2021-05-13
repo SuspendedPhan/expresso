@@ -21,7 +21,6 @@ using shared_ptr = std::shared_ptr<T>;
 template<typename T>
 using unique_ptr = std::unique_ptr<T>;
 
-
 class OrganismOutput;
 
 class AttributeOutput;
@@ -37,22 +36,7 @@ class ParameterNode;
 void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     auto rootOrganism = tree.rootOrganism;
 
-
-//    auto qq = rootOrganism->cloneNumberAttribute;
-//    auto context = EvalContext();
-//    context.organismEvalContextByOrganism[rootOrganism]->currentCloneNumber = 0;
-//    std::make_shared<AttributeReferenceNode>(qq)->eval(context);
-    
-//
     const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
-//    auto xAttribute = std::make_shared<EditableAttribute>("x", std::make_shared<NumberNode>(0.0f), rootOrganism);
-//    tree.rootOrganism->attributes.emplace_back(xAttribute);
-//    const auto &cloneNumberAttribute = rootOrganism->cloneNumberAttribute;
-//    tree.rootOrganism->attributes.emplace_back(std::make_shared<EditableAttribute>("y", std::make_shared<AttributeReferenceNode>(
-//            xAttribute), rootOrganism));
-
-
-
     rootOrganism->cloneCountAttribute.lock()->rootNode = std::make_shared<NumberNode>(10.0f);
 
     auto mulNode = std::make_shared<MulOpNode>(
@@ -67,8 +51,11 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     tree.rootOrganism->attributes.emplace_back(
             xAttribute);
 
-    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y",
-            std::make_unique<NumberNode>(100.0f), rootOrganism);
+    const shared_ptr<NumberNode> &yA = std::make_shared<NumberNode>(10.0f);
+    const auto &yNode = std::make_shared<AddOpNode>(yA, std::make_shared<NumberNode>(0.0f));
+    yA->replace(std::make_shared<NumberNode>(100.0f));
+
+    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", yNode, rootOrganism);
     tree.rootOrganism->attributes.emplace_back(yAttribute);
 
     rootOrganism->addSuborganism();
@@ -90,8 +77,6 @@ int say_hello() {
     printf("Hello from your wasm module\n");
     return 0;
 }
-
-#include "FakeBook.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/bind.h>

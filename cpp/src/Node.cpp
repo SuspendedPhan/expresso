@@ -4,9 +4,9 @@
 
 #include "Node.h"
 
-float AttributeReferenceNode::eval(const EvalContext &evalContext) {
-    return attribute.lock()->eval(evalContext).value;
-}
+//float AttributeReferenceNode::eval(const EvalContext &evalContext) {
+//    return attribute.lock()->eval(evalContext).value;
+//}
 
 float NumberNode::eval(const EvalContext &evalContext) {
     return this->value;

@@ -5,6 +5,8 @@
 #ifndef EXPRESSO_CODE_H
 #define EXPRESSO_CODE_H
 
+#include <algorithm>
+
 class Code {
 public:
     template<typename T>
