@@ -4,6 +4,8 @@
 
 #include "Attribute.h"
 
+#include <utility>
+
 AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
     float value = this->rootNode->eval(evalContext);
@@ -12,8 +14,15 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
     return output;
 }
 
+void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
+    this->rootNode = rootNode;
+    rootNode->setReplaceFun([this](const std::shared_ptr<Node>& node) {
+        this->setRootNode(node);
+    });
+}
+
 IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism) : Attribute(name,
-                                                                                                                organism) {}
+        organism) {}
 
 AttributeOutput IntrinsicAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;

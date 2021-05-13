@@ -27,14 +27,16 @@ class Attribute : public std::enable_shared_from_this<Attribute> {
 };
 
 class EditableAttribute : public Attribute {
-public:
+private:
     std::shared_ptr<Node> rootNode;
-
+public:
     EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(name, organism) {
-        this->rootNode = rootNode;
+        this->setRootNode(rootNode);
     }
 
     AttributeOutput eval(const EvalContext& evalContext) const override;
+
+    void setRootNode(const std::shared_ptr<Node>& rootNode);
 };
 
 class CloneNumberAttribute : public Attribute {

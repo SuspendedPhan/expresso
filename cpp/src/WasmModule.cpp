@@ -37,7 +37,9 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     auto rootOrganism = tree.rootOrganism;
 
     const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
-    rootOrganism->cloneCountAttribute.lock()->rootNode = std::make_shared<NumberNode>(10.0f);
+    const shared_ptr<NumberNode> &tempCloneCountNode = std::make_shared<NumberNode>(10.0f);
+    rootOrganism->cloneCountAttribute.lock()->setRootNode(tempCloneCountNode);
+    tempCloneCountNode->replace(std::make_shared<NumberNode>(20.0f));
 
     auto mulNode = std::make_shared<MulOpNode>(
             std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
@@ -79,6 +81,7 @@ int say_hello() {
 }
 
 #ifdef __EMSCRIPTEN__
+#include "Fakebook.h"
 #include <emscripten/bind.h>
 using namespace emscripten;
 
