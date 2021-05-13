@@ -7,7 +7,9 @@
 
 class Organism : public std::enable_shared_from_this<Organism> {
 private:
-    Organism() {}
+    std::string name;
+
+    Organism(std::string name) : name(name) {}
 
 public:
     vector<shared_ptr<Attribute>> attributes;
@@ -16,8 +18,8 @@ public:
     weak_ptr<Attribute> cloneNumberAttribute;
     weak_ptr<Organism> superorganism;
 
-    static std::shared_ptr<Organism> make() {
-        auto organism = std::shared_ptr<Organism>(new Organism());
+    static std::shared_ptr<Organism> make(std::string name) {
+        auto organism = std::shared_ptr<Organism>(new Organism(name));
         const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones",
                 std::make_unique<NumberNode>(1.0f),
                 organism);
@@ -53,8 +55,8 @@ public:
         return organismOutput;
     }
 
-    void addSuborganism() {
-        const shared_ptr<Organism> &suborganism = Organism::make();
+    void addSuborganism(std::string name) {
+        const shared_ptr<Organism> &suborganism = Organism::make(name);
         const shared_ptr<Organism> &shared_this = shared_from_this();
         suborganism->superorganism = shared_this;
         shared_this->suborganisms.emplace_back(suborganism);
@@ -80,6 +82,10 @@ public:
             attributes.emplace_back(attribute.get());
         }
         return attributes;
+    }
+
+    std::string getName() {
+        return this->name;
     }
 };
 

@@ -12,6 +12,10 @@ float NumberNode::eval(const EvalContext &evalContext) {
     return this->value;
 }
 
+float NumberNode::getValue() const {
+    return value;
+}
+
 void Node::replace(shared_ptr<Node> node) {
     this->replaceFun(std::move(node));
 }

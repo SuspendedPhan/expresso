@@ -60,18 +60,18 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", yNode, rootOrganism);
     tree.rootOrganism->attributes.emplace_back(yAttribute);
 
-    rootOrganism->addSuborganism();
+    rootOrganism->addSuborganism("sub");
+
     const auto &suborganism = rootOrganism->suborganisms.back();
+//    suborganism->cloneCountAttribute.lock()->setRootNode(std::make_shared<NumberNode>(5.0f));
     suborganism->attributes.emplace_back(
             std::make_shared<EditableAttribute>("x", std::make_shared<AttributeReferenceNode>(xAttribute),
                     suborganism));
     suborganism->attributes.emplace_back(
             std::make_shared<EditableAttribute>("y",
                     std::make_shared<AddOpNode>(std::make_shared<AttributeReferenceNode>(yAttribute),
-                            std::make_shared<MulOpNode>(
-                                    std::make_shared<AttributeReferenceNode>(suborganism->cloneCountAttribute),
-                                    std::make_shared<NumberNode>(100.0f))), suborganism));
-    suborganism->remove();
+                            std::make_shared<NumberNode>(100.0f)), suborganism));
+//    suborganism->remove();
 }
 
 
@@ -98,14 +98,44 @@ EMSCRIPTEN_BINDINGS(my_module) {
   class_<Organism>("Organism")
     .function("getSuborganisms", &Organism::getSuborganisms)
     .function("getAttributes", &Organism::getAttributes)
+    .function("getName", &Organism::getName)
   ;
 
   class_<Attribute>("Attribute")
     .function("getName", &Attribute::getName)
   ;
 
-  class_<EditableAttribute>("EditableAttribute")
+  class_<EditableAttribute, base<Attribute>>("EditableAttribute")
     .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
+  ;
+
+  class_<Node>("Node")
+//    .function("getValue", &NumberNode::getValue)
+  ;
+
+  class_<BinaryOpNode, base<Node>>("BinaryOpNode")
+    .function("getA", &BinaryOpNode::getA, allow_raw_pointers())
+    .function("getB", &BinaryOpNode::getB, allow_raw_pointers())
+  ;
+
+  class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
+    .function("getAttribute", &AttributeReferenceNode::getAttribute, allow_raw_pointers())
+  ;
+
+  class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
+  ;
+
+  class_<SubOpNode, base<BinaryOpNode>>("SubOpNode")
+  ;
+
+  class_<MulOpNode, base<BinaryOpNode>>("MulOpNode")
+  ;
+
+  class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
+  ;
+
+  class_<NumberNode, base<Node>>("NumberNode")
+    .function("getValue", &NumberNode::getValue)
   ;
 
   class_<EvalOutput>("EvalOutput")

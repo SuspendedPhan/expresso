@@ -35,6 +35,8 @@ class NumberNode : public Node {
 public:
     float value;
 
+    float getValue() const;
+
     NumberNode(float value) { this->value = value; }
 
     float eval(const EvalContext &evalContext) override;
@@ -56,6 +58,14 @@ public:
     BinaryOpNode(shared_ptr<Node> a, shared_ptr<Node> b) {
         this->replaceA(a);
         this->replaceB(b);
+    }
+
+    Node* getA() {
+        return a.get();
+    }
+
+    Node* getB() {
+        return b.get();
     }
 
     void replaceA(shared_ptr<Node> a) {
@@ -160,6 +170,10 @@ public:
 class AttributeReferenceNode : public Node {
 public:
     weak_ptr<Attribute> attribute;
+
+    Attribute* getAttribute() {
+        return attribute.lock().get();
+    }
 
     AttributeReferenceNode(weak_ptr<Attribute> attribute) { this->attribute = attribute; }
 
