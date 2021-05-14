@@ -1,7 +1,8 @@
 <template>
-  <div ref="viewport" class="w-full h-full">
+  <div ref="viewport" class="w-full h-1/2">
     <canvas ref="canvas"></canvas>
     <FakeBook v-if='fake' :fake="fake" />
+    <WasmExpressor v-if="tree" :tree="tree"></WasmExpressor>
   </div>
 </template>
 
@@ -15,12 +16,14 @@ import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
 import PixiRenderer from "@/code/PixiRenderer";
 import FakeBook from './FakeBook';
+import WasmExpressor from "@/components/WasmExpressor.vue";
 
 @Component({
-  components: {FakeBook},
+  components: {WasmExpressor, FakeBook},
 })
 export default class WasmTest extends Vue {
   fake = null;
+  tree = null;
 
   async mounted() {
     const module = await WasmModule({
@@ -53,6 +56,7 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
     const tree = new module.ExpressorTree();
+    this.tree = tree;
     module.ExpressorTree.populateTestTree(tree);
     render(tree, renderer);
   }

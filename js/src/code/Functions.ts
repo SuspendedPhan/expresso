@@ -2,6 +2,14 @@ import wu from 'wu';
 import { v4 as uuidv4 } from "uuid";
 
 export default class Functions {
+  static vectorToArray(vector) {
+    const answer = [] as any;
+    for (let i = 0; i < vector.size(); i++) {
+      answer.push(vector.get(i));
+    }
+    return answer;
+  }
+
   static uuid() {
     return uuidv4();
   }
