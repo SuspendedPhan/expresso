@@ -262,11 +262,11 @@ export default class Pen {
       return answer;
     } else if (astNode.metaname === "Reference") {
       return this.textToAnnotatedText(
-        this.referenceToString(astNode, root),
+        Pen.referenceToString(astNode, root),
         astNode
       );
     } else if (astNode.metaname === "Function") {
-      const funName = this.funToString(astNode, root);
+      const funName = Pen.funToString(astNode, root);
       const children = Array.from(root.nodeCollection.getChildren(astNode));
       let answer = [] as any;
       answer = answer.concat(this.textToAnnotatedText(funName, astNode));
@@ -285,7 +285,7 @@ export default class Pen {
     } else if (astNode.metaname === "Void") {
       return this.textToAnnotatedText("None", astNode);
     } else if(astNode.metaname==="StructMemberReference"){
-      return this.textToAnnotatedText(this.structMemberReferenceToString(astNode), astNode);
+      return this.textToAnnotatedText(Pen.structMemberReferenceToString(astNode), astNode);
     } else {
       console.error("Attribute.vue Unknown metaname");
     }
@@ -294,7 +294,7 @@ export default class Pen {
   public setPointedNode(node) {
     const attribute = this.root.attributeCollection.getAttributeForNode(node);
     const annotatedText = this.getAnnotatedTextForAttribute(attribute);
-    this.selection = this.makeSelectionForNode(
+    this.selection = Pen.makeSelectionForNode(
       node,
       annotatedText,
       attribute!.id
@@ -312,19 +312,19 @@ export default class Pen {
     return annotatedText[selection.startIndex].node;
   }
 
-  private referenceToString(referenceNode, root) {
+  private static referenceToString(referenceNode, root) {
     const targetNode = root.nodeStore.getTargetNodeForReference(referenceNode);
     return root.attributeStore.getAttributeForNode(targetNode).name;
   }
 
-  private structMemberReferenceToString(node) {
+  private static structMemberReferenceToString(node) {
     const targetNode = Node.getFromId(node.targetVariableNodeId);
     const memberName = targetNode.datatype.members[node.memberIndex].name;
     const attributeName = Attribute.getAttributeForNode(targetNode).name;
     return`${attributeName}.${memberName}`;
   }
 
-  private funToString(funNode, root) {
+  private static funToString(funNode, root) {
     const metafun = root.metafunStore.getFromName(funNode.metafunName);
     return metafun.name;
   }
@@ -336,7 +336,7 @@ export default class Pen {
     }));
   }
 
-  private getCharBoundsForNode(astNode, annotatedText) {
+  private static getCharBoundsForNode(astNode, annotatedText) {
     let startIndex = null as null | number;
     for (let i = 0; i < annotatedText.length; i++) {
       if (annotatedText[i].node === astNode) {
@@ -388,17 +388,17 @@ export default class Pen {
     console.assert(selection.endIndex <= annotatedText.length);
 
     if (
-      this.didPassOverSingleCharNode(prevSelection, selection, annotatedText)
+      Pen.didPassOverSingleCharNode(prevSelection, selection, annotatedText)
     ) {
       let node;
-      if (this.didGoLeft(prevSelection, selection)) {
+      if (Pen.didGoLeft(prevSelection, selection)) {
         node = annotatedText[selection.startIndex].node;
         node =
-          node ?? this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
+          node ?? Pen.getNodeToLeftOfChar(selection.startIndex, annotatedText);
       } else {
-        node = this.getNodeToLeftOfChar(selection.startIndex, annotatedText);
+        node = Pen.getNodeToLeftOfChar(selection.startIndex, annotatedText);
       }
-      return this.makeSelectionForNode(
+      return Pen.makeSelectionForNode(
         node,
         annotatedText,
         selection.attributeId
@@ -406,34 +406,34 @@ export default class Pen {
     } else {
       const node = annotatedText[selection.startIndex]?.node ?? null;
       if (node === null) {
-        if (this.didGoLeft(prevSelection, selection)) {
-          const leftNode = this.getNodeToLeftOfChar(
+        if (Pen.didGoLeft(prevSelection, selection)) {
+          const leftNode = Pen.getNodeToLeftOfChar(
             selection.startIndex,
             annotatedText
           );
-          return this.makeSelectionForNode(
+          return Pen.makeSelectionForNode(
             leftNode,
             annotatedText,
             selection.attributeId
           );
         } else {
           // Either right or new selection
-          const rightNode = this.getNodeToRightOfChar(
+          const rightNode = Pen.getNodeToRightOfChar(
             selection.startIndex,
             annotatedText
           );
           if (rightNode === null) {
-            const leftNode = this.getNodeToLeftOfChar(
+            const leftNode = Pen.getNodeToLeftOfChar(
               selection.startIndex,
               annotatedText
             );
-            return this.makeSelectionForNode(
+            return Pen.makeSelectionForNode(
               leftNode,
               annotatedText,
               selection.attributeId
             );
           } else {
-            return this.makeFrontSelectionForNode(
+            return Pen.makeFrontSelectionForNode(
               rightNode,
               annotatedText,
               selection.attributeId
@@ -441,14 +441,14 @@ export default class Pen {
           }
         }
       } else {
-        if (this.isIndexInsideNode(selection.startIndex, node, annotatedText)) {
-          return this.makeSelectionForNode(
+        if (Pen.isIndexInsideNode(selection.startIndex, node, annotatedText)) {
+          return Pen.makeSelectionForNode(
             node,
             annotatedText,
             selection.attributeId
           );
         } else {
-          return this.makeFrontSelectionForNode(
+          return Pen.makeFrontSelectionForNode(
             node,
             annotatedText,
             selection.attributeId
@@ -458,7 +458,7 @@ export default class Pen {
     }
   }
 
-  private didPassOverSingleCharNode(
+  private static didPassOverSingleCharNode(
     prevSelection: Selection | null,
     selection: Selection,
     annotatedText: AnnotatedText[]
@@ -474,7 +474,7 @@ export default class Pen {
     const prevSingleChar = prevSelection.startIndex === prevSelection.endIndex;
     const currentSingleChar = selection.startIndex === selection.endIndex;
 
-    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+    const charBoundsForNode = Pen.getCharBoundsForNode(node, annotatedText);
     const oneCharApart =
       charBoundsForNode.endIndex - charBoundsForNode.startIndex === 1;
     const skippedOverNode =
@@ -486,15 +486,15 @@ export default class Pen {
     );
   }
 
-  private isIndexInsideNode(charIndex, node, annotatedText) {
-    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+  private static isIndexInsideNode(charIndex, node, annotatedText) {
+    const charBoundsForNode = Pen.getCharBoundsForNode(node, annotatedText);
     return (
       charIndex > charBoundsForNode.startIndex &&
       charIndex < charBoundsForNode.endIndex
     );
   }
 
-  private didGoLeft(prevSelection, selection) {
+  private static didGoLeft(prevSelection, selection) {
     if (prevSelection === null) return false;
     if (prevSelection.attributeId !== selection.attributeId) return false;
     if (selection.startIndex < prevSelection.startIndex) return true;
@@ -503,7 +503,7 @@ export default class Pen {
     return false;
   }
 
-  private getNodeToLeftOfChar(index, annotatedText: AnnotatedText[]) {
+  private static getNodeToLeftOfChar(index, annotatedText: AnnotatedText[]) {
     let node = null;
     for (let i = index - 1; i >= 0; i--) {
       node = annotatedText[i].node;
@@ -514,7 +514,7 @@ export default class Pen {
     return node;
   }
 
-  private getNodeToRightOfChar(index, annotatedText: AnnotatedText[]) {
+  private static getNodeToRightOfChar(index, annotatedText: AnnotatedText[]) {
     let node = null;
     for (let i = index; i < annotatedText.length; i++) {
       node = annotatedText[i].node;
@@ -525,12 +525,12 @@ export default class Pen {
     return node;
   }
 
-  private makeSelectionForNode(node, annotatedText, attributeId) {
-    return { ...this.getCharBoundsForNode(node, annotatedText), attributeId };
+  private static makeSelectionForNode(node, annotatedText, attributeId) {
+    return { ...Pen.getCharBoundsForNode(node, annotatedText), attributeId };
   }
 
-  private makeFrontSelectionForNode(node, annotatedText, attributeId) {
-    const charBoundsForNode = this.getCharBoundsForNode(node, annotatedText);
+  private static makeFrontSelectionForNode(node, annotatedText, attributeId) {
+    const charBoundsForNode = Pen.getCharBoundsForNode(node, annotatedText);
     return {
       startIndex: charBoundsForNode.startIndex,
       endIndex: charBoundsForNode.startIndex,
@@ -567,7 +567,7 @@ export default class Pen {
     }
 
     const annotatedText = this.getAnnotatedTextForAttribute(attribute);
-    this.selection = this.makeSelectionForNode(
+    this.selection = Pen.makeSelectionForNode(
       node,
       annotatedText,
       attribute!.id
@@ -605,7 +605,7 @@ export default class Pen {
         childIndex: 0
       });
       const annotatedText = this.getAnnotatedTextForAttribute(attribute);
-      this.selection = this.makeSelectionForNode(
+      this.selection = Pen.makeSelectionForNode(
         node,
         annotatedText,
         attribute!.id

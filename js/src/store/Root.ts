@@ -85,7 +85,9 @@ export class Root {
   }
 
   save() {
-    window.localStorage.setItem("save", JSON.stringify(this.getSerialized()));
+    const serialized = JSON.stringify(this.getSerialized());
+    // console.log(serialized);
+    window.localStorage.setItem("save", serialized);
   }
 
   load() {
