@@ -20,7 +20,7 @@ export class OrganismLayout {
   private organismElementById = new Map<string, HTMLElement>();
   private linesCalculatedSubscriber;
 
-  constructor(getChildren, getRootOrganism, getKey = null) {
+  constructor(getChildren, getRootOrganism, getKey: any = null) {
     this.layout = new Layout(
         this.getWidth.bind(this),
         this.getHeight.bind(this),

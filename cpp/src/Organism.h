@@ -8,6 +8,7 @@
 class Organism : public std::enable_shared_from_this<Organism> {
 private:
     std::string name;
+    std::string id = Code::generateUuidV4();
 
     Organism(std::string name) : name(name) {}
 
@@ -86,6 +87,10 @@ public:
 
     std::string getName() {
         return this->name;
+    }
+
+    std::string getId() {
+        return this->id;
     }
 };
 

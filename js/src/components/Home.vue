@@ -1,7 +1,10 @@
 <template>
   <div class="home">
     <template v-if="!showStoreGraph">
-      <Expressor class="expressor" v-if="showExpressor" />
+      <div class="expressor" v-if="showExpressor">
+        <Expressor v-if="oldExpressor" />
+        <WasmExpressor v-else-if="tree" :tree="tree" />
+      </div>
       <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
     </template>
     <StoreGraph v-else></StoreGraph>
@@ -20,10 +23,14 @@ import StoreGraph from "./StoreGraph";
 import TestRunner from "./tests/TestRunner.vue";
 import Root from "../store/Root";
 import Vue from "vue";
+import WasmExpressor from "@/components/WasmExpressor";
+import WasmModule from "../../public/WasmModule";
+import Wasm from "../../public/WasmModule.wasm";
 
 export default {
   name: "Home",
   components: {
+    WasmExpressor,
     Viewport,
     Expressor,
     TestRunner,
@@ -34,9 +41,11 @@ export default {
     return {
       showExpressor: true,
       showStoreGraph: false,
+      oldExpressor: false,
+      tree: null
     };
   },
-  mounted() {
+  async mounted() {
     Root.load();
     Root.organismCollection.initRootOrganism();
     document.addEventListener("keydown", (event) => {
@@ -81,6 +90,21 @@ export default {
     window.addEventListener("error", () => {
       this.consoleError = true;
     });
+
+    // --- new stuff ---
+
+    const module = await WasmModule({
+      locateFile: (path) => {
+        if (path.endsWith('.wasm')) {
+          return Wasm;
+        }
+        return path;
+      },
+    });
+
+    const tree = new module.ExpressorTree();
+    module.ExpressorTree.populateTestTree(tree);
+    this.tree = tree;
   },
 };
 </script>

@@ -45,6 +45,7 @@
     "@types/events": "^3.0.0",
     "@types/luxon": "^1.25.0",
     "@types/mocha": "^5.2.4",
+    "@types/quill": "^2.0.6",
     "@types/wu": "^2.1.42",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",

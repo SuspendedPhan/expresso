@@ -25,16 +25,16 @@
 <!--      <input placeholder="Attribute name" v-model="attributeName" />-->
 <!--      <button @click="addAttribute">Add Attribute</button>-->
 <!--    </div>-->
-<!--    <div class="attribute-group">-->
-<!--      <div-->
-<!--          class="attribute"-->
-<!--          v-for="(attribute, index) in editableAttributes"-->
-<!--          :key="attribute.id"-->
-<!--      >-->
-<!--        <div v-if="index !== 0" class="divider"></div>-->
-<!--        <Attribute :attributeModel="attribute" />-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="attribute-group">
+      <div
+          class="attribute"
+          v-for="(attribute, index) in editableAttributes"
+          :key="attribute.getId()"
+      >
+        <div v-if="index !== 0" class="divider"></div>
+        <WasmAttribute :attribute="attribute" />
+      </div>
+    </div>
     <WasmOrganism
         class="organ"
         v-for="suborganism in suborganisms"
@@ -56,8 +56,9 @@ import Vue from "vue";
 import Component from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import {Primitive} from "@/models/Type";
+import Functions from "@/code/Functions";
 
-@Component({ components: { Attribute: WasmAttribute } })
+@Component({ components: { WasmAttribute: WasmAttribute } })
 export default class WasmOrganism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;
@@ -129,9 +130,9 @@ export default class WasmOrganism extends Vue {
       this.organismLayout.recalculate();
     });
 
-    this.organismLayout.registerOrganismElement(element, this.organism.id);
+    this.organismLayout.registerOrganismElement(element, this.organism.getId());
     this.organismLayout
-        .getLocalPositionObservable(this.organism.id)
+        .getLocalPositionObservable(this.organism.getId())
         .subscribe((localPosition) => {
           this.position.top = localPosition.top;
           this.position.left = localPosition.left;
@@ -141,10 +142,9 @@ export default class WasmOrganism extends Vue {
     //   Vue.set(this, "editableAttributes", this.getEditableAttributes());
     // });
     // this.editableAttributes = this.getEditableAttributes();
-  }
 
-  getEditableAttributes() {
-    return Array.from(Attribute.getEditables(this.organism));
+    this.name = this.organism.getName();
+    this.editableAttributes = Functions.vectorToArray(this.organism.getAttributes());
   }
 
   getMetaname(organism) {

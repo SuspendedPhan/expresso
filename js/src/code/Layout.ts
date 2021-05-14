@@ -100,7 +100,7 @@ export class Layout {
 
   private calculateChildrenWidth(subroot, subtreeWidthsByKey): number {
     let childrenWidth = 0;
-    const children = this.getChildren(subroot).toArray();
+    const children = Array.from(this.getChildren(subroot));
     for (const child of children) {
       this.calculateSubtreeWidth(child, subtreeWidthsByKey);
       const childKey = this.getKey(child);

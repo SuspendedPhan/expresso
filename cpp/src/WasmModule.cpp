@@ -99,10 +99,12 @@ EMSCRIPTEN_BINDINGS(my_module) {
     .function("getSuborganisms", &Organism::getSuborganisms)
     .function("getAttributes", &Organism::getAttributes)
     .function("getName", &Organism::getName)
+    .function("getId", &Organism::getId)
   ;
 
   class_<Attribute>("Attribute")
     .function("getName", &Attribute::getName)
+    .function("getId", &Attribute::getId)
   ;
 
   class_<EditableAttribute, base<Attribute>>("EditableAttribute")
