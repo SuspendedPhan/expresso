@@ -23,7 +23,14 @@ export class OrganismLayout {
   private organismElementById = new Map<string, HTMLElement>();
   private linesCalculatedSubscriber;
 
-  constructor(private root: Root) {}
+  constructor(private root: Root, getChildren = null, getKey = null) {
+    this.layout = new Layout(
+        this.getWidth.bind(this),
+        this.getHeight.bind(this),
+        getChildren ?? this.getChildren.bind(this),
+        getKey ?? this.getKey.bind(this)
+    );
+  }
 
   public recalculate() {
     const output = this.layout.calculate(
