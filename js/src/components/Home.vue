@@ -1,10 +1,10 @@
 <template>
   <div class="home">
     <template v-if="!showStoreGraph">
-      <div class="expressor" v-if="showExpressor">
-        <Expressor v-if="oldExpressor" />
-        <WasmExpressor v-else-if="tree" :tree="tree" />
-      </div>
+      <template v-if="showExpressor">
+        <Expressor class="expressor" v-if="oldExpressor"/>
+        <WasmExpressor class="expressor" v-else-if="tree" :tree="tree"/>
+      </template>
       <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
     </template>
     <StoreGraph v-else></StoreGraph>
@@ -41,7 +41,7 @@ export default {
     return {
       showExpressor: true,
       showStoreGraph: false,
-      oldExpressor: false,
+      oldExpressor: true,
       tree: null
     };
   },
