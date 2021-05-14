@@ -1,13 +1,13 @@
 import MetafunStore from "./Metafun";
 import PenStore from "./Pen";
 import wu from "wu";
-import OrganismCollection, { Organism } from "./OrganismCollection";
+import OrganismCollection, {Organism} from "./OrganismCollection";
 import MetaorganismCollection from "./MetaorganismCollection";
 import Time from "./Time";
-import { DateTime } from "luxon";
+import {DateTime} from "luxon";
 import WordCollection from "./WordCollection";
 import Types from "./Types";
-import { OrganismLayout } from "./OrganismLayout";
+import {OrganismLayout} from "./OrganismLayout";
 import Attribute from "@/models/Attribute";
 import Evaluator from "@/code/Evaluator";
 import Node from "@/models/Node";
@@ -24,7 +24,9 @@ export class Root {
   wordCollection = new WordCollection();
   nodeCollection = Node;
   nodeStore = this.nodeCollection;
-  organismLayout = new OrganismLayout(this);
+  organismLayout = new OrganismLayout(
+      (organism) => this.organismCollection.getChildren(organism),
+      () => this.organismCollection.getRoot());
 
   metaorganismCollection = new MetaorganismCollection(this);
 
@@ -40,7 +42,7 @@ export class Root {
   penStore = new PenStore(this);
   pen = this.penStore;
   time = new Time(this);
-  windowSize = { width: 0, height: 0 };
+  windowSize = {width: 0, height: 0};
   mostRecentClickCoordinates = {x: 0, y: 0}
 
   constructor() {
@@ -64,14 +66,14 @@ export class Root {
   // --- ACTIONS ---
 
   setWindowSize(width: number, height: number) {
-    this.windowSize = { width, height };
+    this.windowSize = {width, height};
   }
 
   setMouseLocation(x: number, y: number) {
-    this.mostRecentClickCoordinates = { x, y };
+    this.mostRecentClickCoordinates = {x, y};
   }
 
-  *computeRenderCommands(): Iterable<any> {
+  * computeRenderCommands(): Iterable<any> {
     yield* Evaluator.computeRenderCommands();
   }
 
@@ -106,7 +108,7 @@ export class Root {
 
     const organTree = {};
     const metaorganism = this.metaorganismCollection.getFromId(
-      organism.metaorganismId
+        organism.metaorganismId
     );
     subtree[`${metaorganism.name} ${organism.name}`] = organTree;
 
@@ -143,9 +145,9 @@ export class Root {
         const type = splits[2] as any;
 
         const attribute = this.attributeCollection.putEditable(
-          superorganism,
-          splits[1],
-          type
+            superorganism,
+            splits[1],
+            type
         );
         const rootNode = this.attributeCollection.getRootNode(attribute);
         this.nodeStore.fromTree(value, rootNode);
@@ -154,18 +156,18 @@ export class Root {
       } else {
         let organism;
         const metaorganism = this.metaorganismCollection.getFromName(
-          attributeType
+            attributeType
         );
         if (!superorganism) {
           this.organismCollection.rootOrganism = this.organismCollection.putFromMetaWithoutAttributes(
-            "root",
-            metaorganism
+              "root",
+              metaorganism
           );
           organism = this.organismCollection.rootOrganism;
         } else {
           organism = this.organismCollection.putFromMetaWithoutAttributes(
-            splits[1],
-            metaorganism
+              splits[1],
+              metaorganism
           );
           this.organismCollection.addChild(superorganism, organism);
         }

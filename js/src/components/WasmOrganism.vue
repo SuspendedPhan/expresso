@@ -40,6 +40,8 @@
         v-for="suborganism in suborganisms"
         :key="suborganism"
         :organism="suborganism"
+        :isRoot="false"
+        :organismLayout="organismLayout"
     >
     </WasmOrganism>
   </div>
@@ -59,8 +61,8 @@ import {Primitive} from "@/models/Type";
 export default class WasmOrganism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;
+  @Prop() organismLayout;
 
-  root = Root;
   attributeStore = Root.attributeStore;
   metaorganismCollection = Root.metaorganismCollection;
   selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id;
@@ -84,7 +86,7 @@ export default class WasmOrganism extends Vue {
   }
 
   destroyed() {
-    this.root.organismLayout.recalculate();
+    this.organismLayout.recalculate();
   }
 
   get style() {
@@ -95,40 +97,40 @@ export default class WasmOrganism extends Vue {
     const metaorganism = this.metaorganismCollection.getFromId(
         this.selectedPrimitiveId
     );
-    const organ = this.root.organismCollection.putFromMeta(
-        this.root.wordCollection.getRandomWord(),
-        metaorganism
-    );
-    this.root.organismCollection.addChild(this.organism, organ);
-    this.root.save();
+    // const organ = this.root.organismCollection.putFromMeta(
+    //     this.root.wordCollection.getRandomWord(),
+    //     metaorganism
+    // );
+    // this.root.organismCollection.addChild(this.organism, organ);
+    // this.root.save();
   }
 
   addAttribute() {
-    const attributeName =
-        this.attributeName === ""
-            ? this.root.wordCollection.getRandomWord()
-            : this.attributeName;
-    this.root.attributeCollection.putEditable(this.organism, attributeName, Primitive.Undetermined);
-    this.root.save();
+    // const attributeName =
+    //     this.attributeName === ""
+    //         ? this.root.wordCollection.getRandomWord()
+    //         : this.attributeName;
+    // this.root.attributeCollection.putEditable(this.organism, attributeName, Primitive.Undetermined);
+    // this.root.save();
   }
 
   clearStorage() {
-    this.root.clearStorage();
+    // this.root.clearStorage();
   }
 
   removeOrganism(organism) {
-    this.root.organismCollection.remove(organism);
-    this.root.save();
+    // this.root.organismCollection.remove(organism);
+    // this.root.save();
   }
 
   init() {
     const element = this.$refs["organism"] as any;
     new ResizeSensor(element, () => {
-      this.root.organismLayout.recalculate();
+      this.organismLayout.recalculate();
     });
 
-    this.root.organismLayout.registerOrganismElement(element, this.organism.id);
-    this.root.organismLayout
+    this.organismLayout.registerOrganismElement(element, this.organism.id);
+    this.organismLayout
         .getLocalPositionObservable(this.organism.id)
         .subscribe((localPosition) => {
           this.position.top = localPosition.top;

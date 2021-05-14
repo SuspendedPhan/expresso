@@ -5,12 +5,9 @@ import { share } from "rxjs/operators";
 import { Observable, Subject } from "rxjs";
 
 export class OrganismLayout {
-  private layout = new Layout(
-    this.getWidth.bind(this),
-    this.getHeight.bind(this),
-    this.getChildren.bind(this),
-    this.getKey.bind(this)
-  );
+  private layout;
+
+  private getRootOrganism;
 
   public onLinesCalculated = new Observable<Line[]>(
     (subscriber) => (this.linesCalculatedSubscriber = subscriber)
@@ -23,19 +20,18 @@ export class OrganismLayout {
   private organismElementById = new Map<string, HTMLElement>();
   private linesCalculatedSubscriber;
 
-  constructor(private root: Root, getChildren = null, getKey = null) {
+  constructor(getChildren, getRootOrganism, getKey = null) {
     this.layout = new Layout(
         this.getWidth.bind(this),
         this.getHeight.bind(this),
-        getChildren ?? this.getChildren.bind(this),
+        getChildren,
         getKey ?? this.getKey.bind(this)
     );
+    this.getRootOrganism = getRootOrganism;
   }
 
   public recalculate() {
-    const output = this.layout.calculate(
-      this.root.organismCollection.getRoot()
-    );
+    const output = this.layout.calculate(this.getRootOrganism());
     for (const [
       organismId,
       localPositionSubscriber,
@@ -72,9 +68,5 @@ export class OrganismLayout {
 
   private getKey(organism) {
     return organism.id;
-  }
-
-  private getChildren(organism) {
-    return this.root.organismCollection.getChildren(organism);
   }
 }
