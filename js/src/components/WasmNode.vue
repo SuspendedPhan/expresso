@@ -2,7 +2,7 @@
   <div>
     <div>{{text}}</div>
     <div class="pl-8">
-      <WasmNode v-for="child of children" :key='child' :node="child"></WasmNode>
+      <WasmNode v-for="child of children" :key='child.getId()' :node="child"></WasmNode>
     </div>
   </div>
 </template>
@@ -19,28 +19,36 @@ import Vue from "vue";
 export default class WasmNode extends Vue {
   @Prop() node;
 
-  children = [];
+  inject = [];
+  children = [] as any;
   text = ''
 
   async mounted() {
-    if (this.node.getA) {
-      const a = this.node.getA();
-      const b = this.node.getB();
-      this.children = [a, b];
-    }
+    const node = this.node;
+    this.children = WasmNode.getChildren(node);
 
-    if (this.node.constructor.name === 'AddOpNode') {
+    if (node.constructor.name === 'AddOpNode') {
       this.text = 'Add';
-    } else if (this.node.constructor.name === 'SubOpNode') {
+    } else if (node.constructor.name === 'SubOpNode') {
       this.text = 'Sub';
-    } else if (this.node.constructor.name === 'MulOpNode') {
+    } else if (node.constructor.name === 'MulOpNode') {
       this.text = 'Mul';
-    } else if (this.node.constructor.name === 'DivOpNode') {
+    } else if (node.constructor.name === 'DivOpNode') {
       this.text = 'Div';
-    } else if (this.node.constructor.name === 'NumberNode') {
-      this.text = this.node.getValue();
-    } else if (this.node.constructor.name === 'AttributeReferenceNode') {
-      this.text = this.node.getAttribute().getName();
+    } else if (node.constructor.name === 'NumberNode') {
+      this.text = node.getValue();
+    } else if (node.constructor.name === 'AttributeReferenceNode') {
+      this.text = node.getAttribute().getName();
+    }
+  }
+
+  private static getChildren(node) {
+    if (node.getA) {
+      const a = node.getA();
+      const b = node.getB();
+      return [a, b];
+    } else {
+      return [];
     }
   }
 }

@@ -119,7 +119,7 @@ export default class Organism extends Vue {
       this.root.organismLayout.recalculate();
     });
 
-    this.root.organismLayout.registerOrganismElement(element, this.organism.id);
+    this.root.organismLayout.registerElement(element, this.organism.id);
     this.root.organismLayout
       .getLocalPositionObservable(this.organism.id)
       .subscribe((localPosition) => {

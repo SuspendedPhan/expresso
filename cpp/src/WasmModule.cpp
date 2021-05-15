@@ -112,7 +112,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<Node>("Node")
-//    .function("getValue", &NumberNode::getValue)
+    .function("getId", &Node::getId)
   ;
 
   class_<BinaryOpNode, base<Node>>("BinaryOpNode")

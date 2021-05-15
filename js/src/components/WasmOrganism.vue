@@ -130,7 +130,7 @@ export default class WasmOrganism extends Vue {
       this.organismLayout.recalculate();
     });
 
-    this.organismLayout.registerOrganismElement(element, this.organism.getId());
+    this.organismLayout.registerElement(element, this.organism.getId());
     this.organismLayout
         .getLocalPositionObservable(this.organism.getId())
         .subscribe((localPosition) => {

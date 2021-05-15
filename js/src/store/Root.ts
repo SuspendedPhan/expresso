@@ -7,7 +7,7 @@ import Time from "./Time";
 import {DateTime} from "luxon";
 import WordCollection from "./WordCollection";
 import Types from "./Types";
-import {OrganismLayout} from "./OrganismLayout";
+import {ElementLayout} from "../code/ElementLayout";
 import Attribute from "@/models/Attribute";
 import Evaluator from "@/code/Evaluator";
 import Node from "@/models/Node";
@@ -24,9 +24,7 @@ export class Root {
   wordCollection = new WordCollection();
   nodeCollection = Node;
   nodeStore = this.nodeCollection;
-  organismLayout = new OrganismLayout(
-      (organism) => this.organismCollection.getChildren(organism),
-      () => this.organismCollection.getRoot());
+  organismLayout = new ElementLayout(() => this.organismCollection.getRoot(), (organism) => this.organismCollection.getChildren(organism));
 
   metaorganismCollection = new MetaorganismCollection(this);
 

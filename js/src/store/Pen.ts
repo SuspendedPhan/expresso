@@ -241,7 +241,7 @@ export default class Pen {
   private getAnnotatedTextForNode(astNode) {
     const root = this.root;
     if (astNode.metaname === "Number") {
-      return this.textToAnnotatedText(astNode.value.toString(), astNode);
+      return Pen.textToAnnotatedText(astNode.value.toString(), astNode);
     } else if (
       astNode.metaname === "Struct" &&
       astNode.datatype.id === Metastruct.builtinMetastructs.Vector.id
@@ -261,7 +261,7 @@ export default class Pen {
       answer.push({ char: ">", node: null });
       return answer;
     } else if (astNode.metaname === "Reference") {
-      return this.textToAnnotatedText(
+      return Pen.textToAnnotatedText(
         Pen.referenceToString(astNode, root),
         astNode
       );
@@ -269,7 +269,7 @@ export default class Pen {
       const funName = Pen.funToString(astNode, root);
       const children = Array.from(root.nodeCollection.getChildren(astNode));
       let answer = [] as any;
-      answer = answer.concat(this.textToAnnotatedText(funName, astNode));
+      answer = answer.concat(Pen.textToAnnotatedText(funName, astNode));
       answer.push({ char: "(", node: null });
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
@@ -283,9 +283,9 @@ export default class Pen {
     } else if (astNode.metaname === "Variable") {
       console.error("Attribute.vue not expecting Variable");
     } else if (astNode.metaname === "Void") {
-      return this.textToAnnotatedText("None", astNode);
+      return Pen.textToAnnotatedText("None", astNode);
     } else if(astNode.metaname==="StructMemberReference"){
-      return this.textToAnnotatedText(Pen.structMemberReferenceToString(astNode), astNode);
+      return Pen.textToAnnotatedText(Pen.structMemberReferenceToString(astNode), astNode);
     } else {
       console.error("Attribute.vue Unknown metaname");
     }
@@ -329,7 +329,7 @@ export default class Pen {
     return metafun.name;
   }
 
-  private textToAnnotatedText(text, astNode) {
+  private static textToAnnotatedText(text, astNode) {
     return text.split("").map(t => ({
       char: t,
       node: astNode

@@ -2,6 +2,7 @@
 #define EXPRESSO_NODE_H
 
 #include "Attribute.h"
+#include "Code.h"
 #include <iostream>
 #include <functional>
 
@@ -22,9 +23,11 @@ class Attribute;
 
 class Node {
 private:
+    std::string id = Code::generateUuidV4();
     std::function<void(shared_ptr<Node>)> replaceFun;
 public:
     virtual float eval(const EvalContext &evalContext) = 0;
+    std::string getId() { return this->id; }
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
 

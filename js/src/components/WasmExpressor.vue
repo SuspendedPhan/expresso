@@ -27,7 +27,7 @@ import Component from "vue-class-component";
 import {Prop} from "vue-property-decorator";
 import Vue from "vue";
 import WasmOrganism from "@/components/WasmOrganism.vue";
-import {OrganismLayout} from "@/store/OrganismLayout";
+import {ElementLayout} from "@/code/ElementLayout";
 import Functions from "@/code/Functions";
 
 import panzoom from "panzoom";
@@ -51,10 +51,7 @@ export default class WasmExpressor extends Vue {
 
   async mounted() {
     this.rootOrganism = this.tree.getRootOrganism();
-    this.organismLayout = new OrganismLayout(
-        WasmExpressor.getChildren,
-        () => this.rootOrganism,
-        WasmExpressor.getKey);
+    this.organismLayout = new ElementLayout(() => this.rootOrganism, WasmExpressor.getChildren, WasmExpressor.getKey);
     this.oldMounted();
   }
 
