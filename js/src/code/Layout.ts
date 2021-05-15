@@ -17,6 +17,8 @@ export type LocalPositionsByKey = Map<any, Point>;
 export interface Output {
   localPositionsByKey: LocalPositionsByKey;
   lines: Line[];
+  totalWidth: number;
+  totalHeight: number;
 }
 
 export class Layout {
@@ -33,7 +35,9 @@ export class Layout {
   // treeRoot will always be positioned at <0, 0>
   calculate(treeRoot): Output {
     const subtreeWidthsByKey = new Map<any, number>();
+    const subtreeHeightsByKey = new Map<any, number>();
     this.calculateSubtreeWidth(treeRoot, subtreeWidthsByKey);
+    this.calculateSubtreeHeight(treeRoot, subtreeHeightsByKey);
 
     const key = this.getKey(treeRoot);
     const localPositionsByKey = new Map<any, Point>();
@@ -50,16 +54,23 @@ export class Layout {
       localPositionsByKey,
       lines
     );
+    const totalWidth = subtreeWidthsByKey.get(this.getKey(treeRoot)) as number;
+    const totalHeight = subtreeHeightsByKey.get(this.getKey(treeRoot)) as number;
     return {
       localPositionsByKey,
       lines,
+      totalWidth,
+      totalHeight
     };
   }
 
+  /**
+   * Local positions, subtree widths, and subtree heights.
+   */
   private calculateForChildren(
     subroot,
     localPositionsByKey: LocalPositionsByKey,
-    subtreeWidthsByKey: Map<any, number>
+    subtreeWidthsByKey: Map<any, number>,
   ) {
     const subrootHeight = this.getHeight(subroot);
     const subrootWidth = this.getWidth(subroot);
@@ -96,6 +107,28 @@ export class Layout {
     const key = this.getKey(subroot);
     const width = Math.max(childrenWidth, this.getWidth(subroot));
     subtreeWidthsByKey.set(key, width);
+  }
+
+  private calculateSubtreeHeight(subroot, subtreeHeightsByKey: Map<any, number>) {
+    if (subtreeHeightsByKey.has(this.getKey(subroot))) {
+      return;
+    }
+
+    const children = Array.from(this.getChildren(subroot));
+    if (children.length === 0) {
+      subtreeHeightsByKey.set(this.getKey(subroot), this.getHeight(subroot));
+      return;
+    }
+
+    let maxHeight = 0;
+    for (const child of children) {
+      this.calculateSubtreeHeight(child, subtreeHeightsByKey);
+      const childHeight = subtreeHeightsByKey.get(this.getKey(child)) as number;
+      maxHeight = Math.max(maxHeight, childHeight);
+    }
+
+    const subtreeHeight = this.getHeight(subroot) + this.verticalMargin + maxHeight;
+    subtreeHeightsByKey.set(this.getKey(subroot), subtreeHeight);
   }
 
   private calculateChildrenWidth(subroot, subtreeWidthsByKey): number {

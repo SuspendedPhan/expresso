@@ -1,7 +1,9 @@
 <template>
   <div>
     <div>{{name}}</div>
-    <WasmNode v-if="rootNode" :node="rootNode"></WasmNode>
+    <div class="relative">
+      <WasmNode v-if="rootNode" :node="rootNode"></WasmNode>
+    </div>
   </div>
 </template>
 
@@ -20,7 +22,11 @@ import Functions from "@/code/Functions";
 export default class WasmAttribute extends Vue {
   @Prop() attribute;
 
-  @Provide() nodeLayout = new ElementLayout(() => this.rootNode, WasmNode.getChildren, WasmAttribute.getKey);
+  @Provide() nodeLayout = new ElementLayout(() => this.getRootNode(), WasmNode.getChildren, WasmAttribute.getKey);
+
+  private getRootNode() {
+    return this.rootNode;
+  }
 
   name = null;
   rootNode = null;
@@ -31,6 +37,9 @@ export default class WasmAttribute extends Vue {
     if (this.attribute.constructor.name === 'EditableAttribute') {
       this.rootNode = this.attribute.getRootNode();
     }
+    // Vue.nextTick(() => {
+    //   this.nodeLayout.recalculate();
+    // });
   }
 
   static getKey(node) {

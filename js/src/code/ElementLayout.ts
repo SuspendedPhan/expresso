@@ -1,4 +1,4 @@
-import { Layout, Line, Point } from "@/code/Layout";
+import {Layout, Line, Output, Point} from "@/code/Layout";
 import { Root } from "../store/Root";
 import * as rxjs from "rxjs";
 import { share } from "rxjs/operators";
@@ -9,16 +9,18 @@ export class ElementLayout {
 
   private getRootNode;
 
-  public onLinesCalculated = new Observable<Line[]>(
-    (subscriber) => (this.linesCalculatedSubscriber = subscriber)
+  public onCalculated = new Observable<Output>(
+    (subscriber) => (this.onCalculatedSubscriber = subscriber)
   ).pipe(share());
+
+
+  private onCalculatedSubscriber;
 
   private onLocalPositionSubscriberByElementId = new Map<
     string,
     rxjs.Subscriber<Point>
   >();
   private elementByKey = new Map<string, HTMLElement>();
-  private linesCalculatedSubscriber;
 
   constructor(getRootNode, getChildren, getKey: any = null) {
     this.layout = new Layout(
@@ -40,10 +42,10 @@ export class ElementLayout {
     }
 
     console.assert(
-      this.linesCalculatedSubscriber,
+      this.onCalculatedSubscriber,
       "Failed assertion means nobody subscribed yet."
     );
-    this.linesCalculatedSubscriber.next(output.lines);
+    this.onCalculatedSubscriber.next(output);
   }
 
   public registerElement(element, elementKey) {

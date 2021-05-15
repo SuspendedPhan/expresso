@@ -9,6 +9,7 @@
     ></canvas>
     <div ref="panzoom">
       <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
+      <div class="absolute border-solid border-2" :style="boxStyle"></div>
       <div class="bottom-group">
         <button @click="clearStorage" class="clearStorage">
           Clear storage
@@ -49,6 +50,17 @@ export default class Expressor extends Vue {
   canvasHeight = 0;
   panzoomTransform = {};
   lines = [];
+
+  box = {
+    width: 0,
+    height: 0
+  }
+
+  get boxStyle() {
+    console.log("get style");
+    console.log(this.box.width);
+    return `left: 0px; width: ${this.box.width}px; height: ${this.box.height}px`;
+  }
 
   getNodeForAttribute(attribute) {
     return Root.nodeStore.getChild(
@@ -122,8 +134,10 @@ export default class Expressor extends Vue {
       this.canvasHeight = this.$refs["expressor"].clientHeight;
     });
 
-    this.root.organismLayout.onLinesCalculated.subscribe((lines) => {
-      this.lines = lines;
+    this.root.organismLayout.onCalculated.subscribe((output) => {
+      this.lines = output.lines;
+      this.box.width = output.totalWidth;
+      this.box.height = output.totalHeight;
       this.drawLines();
     });
   }

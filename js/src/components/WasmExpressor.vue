@@ -91,8 +91,8 @@ export default class WasmExpressor extends Vue {
       this.canvasHeight = this.$refs["expressor"].clientHeight;
     });
 
-    this.organismLayout.onLinesCalculated.subscribe((lines) => {
-      this.lines = lines;
+    this.organismLayout.onCalculated.subscribe((output) => {
+      this.lines = output.lines;
       this.drawLines();
     });
   }
