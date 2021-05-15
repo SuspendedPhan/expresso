@@ -41,10 +41,14 @@ export default class WasmNode extends Vue {
       this.text = 'Mul';
     } else if (node.constructor.name === 'DivOpNode') {
       this.text = 'Div';
+    } else if (node.constructor.name === 'ModOpNode') {
+      this.text = 'Mod';
     } else if (node.constructor.name === 'NumberNode') {
       this.text = node.getValue();
     } else if (node.constructor.name === 'AttributeReferenceNode') {
       this.text = node.getAttribute().getName();
+    } else {
+      console.error(node.constructor.name);
     }
 
     this.nodeLayout.registerElement(this.$refs['node'], this.node.getId());

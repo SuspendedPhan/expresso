@@ -39,23 +39,32 @@ export class Layout {
     this.calculateSubtreeWidth(treeRoot, subtreeWidthsByKey);
     this.calculateSubtreeHeight(treeRoot, subtreeHeightsByKey);
 
-    const key = this.getKey(treeRoot);
+    const treeRootKey = this.getKey(treeRoot);
+
+    const totalWidth = subtreeWidthsByKey.get(treeRootKey) as number;
+    const totalHeight = subtreeHeightsByKey.get(treeRootKey) as number;
+
+    const rootWorldLeft = totalWidth / 2 - this.getWidth(treeRoot) / 2;
+    const rootWorldTop = 0;
+
     const localPositionsByKey = new Map<any, Point>();
-    localPositionsByKey.set(key, { left: 0, top: 0, key });
+    localPositionsByKey.set(treeRootKey, { left: rootWorldLeft, top: rootWorldTop, key: treeRootKey });
     this.calculateForChildren(
       treeRoot,
       localPositionsByKey,
       subtreeWidthsByKey
     );
     const lines = [];
+
+
+
     this.calculateLinesFromParentToChildren(
       treeRoot,
-      { left: 0, top: 0 },
+      { left: rootWorldLeft, top: rootWorldTop },
       localPositionsByKey,
       lines
     );
-    const totalWidth = subtreeWidthsByKey.get(this.getKey(treeRoot)) as number;
-    const totalHeight = subtreeHeightsByKey.get(this.getKey(treeRoot)) as number;
+
     return {
       localPositionsByKey,
       lines,
@@ -116,7 +125,8 @@ export class Layout {
 
     const children = Array.from(this.getChildren(subroot));
     if (children.length === 0) {
-      subtreeHeightsByKey.set(this.getKey(subroot), this.getHeight(subroot));
+      const subrootHeight = this.getHeight(subroot);
+      subtreeHeightsByKey.set(this.getKey(subroot), subrootHeight);
       return;
     }
 

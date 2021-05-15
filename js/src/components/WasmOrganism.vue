@@ -3,7 +3,7 @@
     <div class="title-bar">
       <div class="organism-name">
         {{ name }}
-<!--        ({{ getMetaname(organism) }})-->
+        <!--        ({{ getMetaname(organism) }})-->
       </div>
       <button
           v-if="!isRoot"
@@ -11,20 +11,20 @@
           @click="removeOrganism(organism)"
       ></button>
     </div>
-<!--    <div class="controls">-->
-<!--      <select v-model="selectedPrimitiveId">-->
-<!--        <option-->
-<!--            v-for="metaorganism in metaorganismCollection.getMetaorganisms()"-->
-<!--            :key="metaorganism.id"-->
-<!--            :value="metaorganism.id"-->
-<!--        >-->
-<!--          {{ metaorganism.name }}-->
-<!--        </option>-->
-<!--      </select>-->
-<!--      <button @click="spawn">Spawn Suborganism</button>-->
-<!--      <input placeholder="Attribute name" v-model="attributeName" />-->
-<!--      <button @click="addAttribute">Add Attribute</button>-->
-<!--    </div>-->
+    <!--    <div class="controls">-->
+    <!--      <select v-model="selectedPrimitiveId">-->
+    <!--        <option-->
+    <!--            v-for="metaorganism in metaorganismCollection.getMetaorganisms()"-->
+    <!--            :key="metaorganism.id"-->
+    <!--            :value="metaorganism.id"-->
+    <!--        >-->
+    <!--          {{ metaorganism.name }}-->
+    <!--        </option>-->
+    <!--      </select>-->
+    <!--      <button @click="spawn">Spawn Suborganism</button>-->
+    <!--      <input placeholder="Attribute name" v-model="attributeName" />-->
+    <!--      <button @click="addAttribute">Add Attribute</button>-->
+    <!--    </div>-->
     <div class="attribute-group">
       <div
           class="attribute"
@@ -32,7 +32,7 @@
           :key="attribute.getId()"
       >
         <div v-if="index !== 0" class="divider"></div>
-        <WasmAttribute :attribute="attribute" />
+        <WasmAttribute :attribute="attribute"/>
       </div>
     </div>
     <WasmOrganism
@@ -54,11 +54,11 @@ import WasmAttribute from "./WasmAttribute.vue";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import Vue from "vue";
 import Component from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import {Prop} from "vue-property-decorator";
 import {Primitive} from "@/models/Type";
 import Functions from "@/code/Functions";
 
-@Component({ components: { WasmAttribute: WasmAttribute } })
+@Component({components: {WasmAttribute: WasmAttribute}})
 export default class WasmOrganism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;
@@ -144,7 +144,9 @@ export default class WasmOrganism extends Vue {
     // this.editableAttributes = this.getEditableAttributes();
 
     this.name = this.organism.getName();
-    this.editableAttributes = Functions.vectorToArray(this.organism.getAttributes());
+    const attributes = Functions.vectorToArray(this.organism.getAttributes())
+        .filter(attribute => attribute.constructor.name === "EditableAttribute");
+    this.editableAttributes = attributes;
   }
 
   getMetaname(organism) {
@@ -165,6 +167,7 @@ export default class WasmOrganism extends Vue {
   /* margin-top: 10px; */
   background-color: white;
 }
+
 .controls {
   display: grid;
   grid-template-columns: max-content max-content;
@@ -172,25 +175,30 @@ export default class WasmOrganism extends Vue {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
 .attribute-group {
   display: grid;
   grid-auto-rows: auto;
   /* gap: 10px; */
 }
+
 .divider {
   border-bottom: 2px solid rgba(0, 0, 0, 0.2);
   margin-bottom: 20px;
   margin-top: 10px;
 }
+
 .organism-name {
   color: #4dc47d;
   font-weight: 500;
   font-size: 24px;
 }
+
 .title-bar {
   display: flex;
   justify-content: space-between;
 }
+
 .button {
   background-image: url("/icons/remove.svg");
   background-size: 16px 16px;

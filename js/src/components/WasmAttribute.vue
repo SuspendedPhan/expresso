@@ -1,9 +1,17 @@
 <template>
   <div>
     <div>{{name}}</div>
-    <div class="relative">
+    <div class="relative border-solid border-2 box-content" :style="nodeTreeContainerStyle">
       <WasmNode v-if="rootNode" :node="rootNode"></WasmNode>
     </div>
+
+<!--    <canvas-->
+<!--        ref="canvas"-->
+<!--        type="2d"-->
+<!--        :width="canvasWidth"-->
+<!--        :height="canvasHeight"-->
+<!--        class="canvas"-->
+<!--    ></canvas>-->
   </div>
 </template>
 
@@ -24,8 +32,15 @@ export default class WasmAttribute extends Vue {
 
   @Provide() nodeLayout = new ElementLayout(() => this.getRootNode(), WasmNode.getChildren, WasmAttribute.getKey);
 
+  nodeTreeContainerWidth = 0;
+  nodeTreeContainerHeight = 0;
+
   private getRootNode() {
     return this.rootNode;
+  }
+
+  private get nodeTreeContainerStyle() {
+    return `left: 0px; width: ${this.nodeTreeContainerWidth}px; height: ${this.nodeTreeContainerHeight}px`;
   }
 
   name = null;
@@ -37,9 +52,13 @@ export default class WasmAttribute extends Vue {
     if (this.attribute.constructor.name === 'EditableAttribute') {
       this.rootNode = this.attribute.getRootNode();
     }
-    // Vue.nextTick(() => {
-    //   this.nodeLayout.recalculate();
-    // });
+    this.nodeLayout.onCalculated.subscribe(output => {
+      this.nodeTreeContainerWidth = output.totalWidth;
+      this.nodeTreeContainerHeight = output.totalHeight;
+    });
+    Vue.nextTick(() => {
+      this.nodeLayout.recalculate();
+    });
   }
 
   static getKey(node) {

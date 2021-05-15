@@ -136,6 +136,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
   class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
   ;
 
+  class_<ModOpNode, base<BinaryOpNode>>("ModOpNode")
+  ;
+
   class_<NumberNode, base<Node>>("NumberNode")
     .function("getValue", &NumberNode::getValue)
   ;

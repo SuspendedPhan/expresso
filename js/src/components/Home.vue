@@ -41,7 +41,7 @@ export default {
     return {
       showExpressor: true,
       showStoreGraph: false,
-      oldExpressor: true,
+      oldExpressor: false,
       tree: null
     };
   },

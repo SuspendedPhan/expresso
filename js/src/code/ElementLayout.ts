@@ -22,12 +22,16 @@ export class ElementLayout {
   >();
   private elementByKey = new Map<string, HTMLElement>();
 
+  private getKey;
+
   constructor(getRootNode, getChildren, getKey: any = null) {
+    this.getKey = getKey ?? (node => node.id);
+
     this.layout = new Layout(
         this.getWidth.bind(this),
         this.getHeight.bind(this),
         getChildren,
-        getKey ?? this.getKey.bind(this)
+        this.getKey
     );
     this.getRootNode = getRootNode;
   }
@@ -59,16 +63,14 @@ export class ElementLayout {
   }
 
   private getWidth(node) {
-    const element = this.elementByKey.get(node.id);
+    const key = this.getKey(node);
+    const element = this.elementByKey.get(key);
     return element?.clientWidth ?? 0;
   }
 
   private getHeight(node) {
-    const element = this.elementByKey.get(node.id);
+    const key = this.getKey(node);
+    const element = this.elementByKey.get(key);
     return element?.clientHeight ?? 0;
-  }
-
-  private getKey(node) {
-    return node.id;
   }
 }
