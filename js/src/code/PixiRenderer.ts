@@ -25,7 +25,8 @@ export default class PixiRenderer {
   private renderOrganism(organismOutput) {
     const cloneOutputByCloneNumber = organismOutput.getCloneOutputByCloneNumber();
     let usedCircles: any = [];
-    for (let i = 0; i < cloneOutputByCloneNumber.size(); i++) {
+    const size = cloneOutputByCloneNumber.size();
+    for (let i = 0; i < size; i++) {
       const circle = this.circlePool.use();
       usedCircles.push(circle);
 

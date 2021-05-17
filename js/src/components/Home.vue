@@ -26,6 +26,7 @@ import Vue from "vue";
 import WasmExpressor from "@/components/WasmExpressor";
 import WasmModule from "../../public/WasmModule";
 import Wasm from "../../public/WasmModule.wasm";
+import Functions from "@/code/Functions";
 
 export default {
   name: "Home",
@@ -104,6 +105,22 @@ export default {
 
     const tree = new module.ExpressorTree();
     module.ExpressorTree.populateTestTree(tree);
+    const attributeVector = tree.getRootOrganism().getAttributes();
+    const attributes = Functions.vectorToArray(attributeVector);
+    const numberNode = module.NumberNode.make(5);
+    console.log(numberNode);
+    window.numberNode = numberNode;
+    // console.log('hi');
+    // for (const attribute of attributes) {
+    //   console.log(attribute.getName());
+    // }
+    attributes[0].getRootNode().replace(numberNode);
+
+    {
+      const attributeVector = tree.getRootOrganism().getAttributes();
+      const attributes = Functions.vectorToArray(attributeVector);
+      console.log(attributes.get(0).getRootNode().getValue());
+    }
     this.tree = tree;
   },
 };

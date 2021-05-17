@@ -17,6 +17,7 @@ import Wasm from "@/../public/WasmModule.wasm";
 import PixiRenderer from "@/code/PixiRenderer";
 import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
+import Functions from "@/code/Functions";
 
 @Component({
   components: {WasmExpressor, FakeBook},
@@ -56,8 +57,15 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
     const tree = new module.ExpressorTree();
-    this.tree = tree;
     module.ExpressorTree.populateTestTree(tree);
+
+    const attributeVector = tree.getRootOrganism().getAttributes();
+    const attributes = Functions.vectorToArray(attributeVector);
+    const numberNode = module.NumberNode.make(20);
+    const rootNode = attributes[0].getRootNode();
+    rootNode.replace(numberNode);
+    this.tree = tree;
+
     render(tree, renderer);
   }
 }

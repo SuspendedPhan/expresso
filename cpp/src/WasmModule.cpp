@@ -39,7 +39,9 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
     const shared_ptr<NumberNode> &tempCloneCountNode = std::make_shared<NumberNode>(10.0f);
     rootOrganism->cloneCountAttribute.lock()->setRootNode(tempCloneCountNode);
-    tempCloneCountNode->replace(std::make_shared<NumberNode>(20.0f));
+    const shared_ptr<NumberNode> &temp2 = std::make_shared<NumberNode>(20.0f);
+    tempCloneCountNode->replace(temp2);
+    temp2->replace(std::make_shared<NumberNode>(5.0f));
 
     auto mulNode = std::make_shared<MulOpNode>(
             std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
@@ -112,7 +114,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<Node>("Node")
+    .smart_ptr<std::shared_ptr<Node>>("Node")
     .function("getId", &Node::getId)
+    .function("replace", &Node::replace)
   ;
 
   class_<BinaryOpNode, base<Node>>("BinaryOpNode")
@@ -140,7 +144,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
   ;
 
   class_<NumberNode, base<Node>>("NumberNode")
+    .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
     .function("getValue", &NumberNode::getValue)
+    .class_function("make", &NumberNode::make)
   ;
 
   class_<EvalOutput>("EvalOutput")

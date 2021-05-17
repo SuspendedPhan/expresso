@@ -42,6 +42,8 @@ public:
 
     NumberNode(float value) { this->value = value; }
 
+    static shared_ptr<NumberNode> make(float value);
+
     float eval(const EvalContext &evalContext) override;
 };
 

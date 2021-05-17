@@ -16,6 +16,10 @@ float NumberNode::getValue() const {
     return value;
 }
 
+shared_ptr<NumberNode> NumberNode::make(float value) {
+    return std::make_shared<NumberNode>(value);
+}
+
 void Node::replace(shared_ptr<Node> node) {
     this->replaceFun(std::move(node));
 }
