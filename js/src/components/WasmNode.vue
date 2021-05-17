@@ -1,8 +1,8 @@
 <template>
-  <div class="absolute" ref="node" :style="style" @keydown="onKeydown">
+  <div class="absolute" ref="node" :style="style">
     <div :class="{ border: selected }">
-      <div @click="onClick" @keydown="onKeydown">{{ text }}</div>
-      <Searchbox v-if="searchboxActive" :choices="nodeChoices" @blur="onSearchboxBlur"></Searchbox>
+      <div @click="onClick">{{ text }}</div>
+      <Searchbox v-if="searchboxActive" :choices="nodeChoices" :query='searchboxQuery' @blur="onSearchboxBlur" @queryInput="onSearchboxQueryInput" @choiceCommitted="onSearchboxChoiceCommitted"></Searchbox>
     </div>
     <WasmNode v-for="child of children" :key='child.getId()' :node="child"></WasmNode>
   </div>
@@ -15,6 +15,7 @@ import {Inject, Prop} from "vue-property-decorator";
 import Vue from "vue";
 import Searchbox from "@/components/Searchbox.vue";
 import doc = Mocha.reporters.doc;
+import WasmPen from "@/code/WasmPen";
 
 @Component({
   components: {Searchbox}
@@ -34,6 +35,7 @@ export default class WasmNode extends Vue {
   searchboxActive = false;
   selected = false;
   onKeydown;
+  searchboxQuery = '';
 
   get style() {
     return `left: ${this.position.left}px; top: ${this.position.top}px;`;
@@ -87,16 +89,28 @@ export default class WasmNode extends Vue {
   private onClick() {
     this.pen.setSelectedNode(this.node);
     this.selected = true;
+    this.nodeChoices = WasmPen.getNodeChoices(this.node, this.searchboxQuery);
+  }
+
+  private onSearchboxQueryInput(query) {
+    console.log(this.searchboxQuery);
+    this.searchboxQuery = query;
+    this.nodeChoices = WasmPen.getNodeChoices(this.node, this.searchboxQuery);
   }
 
   private onSearchboxBlur() {
     this.searchboxActive = false;
   }
 
+  private onSearchboxChoiceCommitted(choice) {
+    this.node.replace(choice.nodeMakerFunction());
+  }
+
   private onSelectedNodeChanged() {
     if (this.pen.selectedNode !== this.node) {
       this.selected = false;
       this.searchboxActive = false;
+      this.nodeChoices = [];
     }
   }
 

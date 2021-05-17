@@ -14,6 +14,8 @@ export default class WasmPen {
   }
 
   static getNodeChoices(selectedNode, query) {
-
+    return [
+      {text: 'Ten', nodeMakerFunction: () => window.wasmModule.NumberNode.make(10) }
+    ]
   }
 }
