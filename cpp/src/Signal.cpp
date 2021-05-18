@@ -9,3 +9,9 @@ void Signal::setListener(std::function<void()> listener) {
     std::cout << "set listener" << std::endl;
     this->listener = listener;
 }
+
+void Signal::dispatch() {
+    if (this->listener) {
+        this->listener();
+    }
+}

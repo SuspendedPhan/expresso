@@ -39,14 +39,12 @@ private:
     std::shared_ptr<Node> rootNode;
     Signal onChangedSignal;
 public:
-    Signal* getOnChangedSignal();
-
-public:
-
     EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(
             name, organism) {
         this->setRootNode(rootNode);
     }
+
+    Signal* getOnChangedSignal();
 
     AttributeOutput eval(const EvalContext &evalContext) const override;
 

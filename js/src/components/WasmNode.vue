@@ -14,8 +14,8 @@ import Component from "vue-class-component";
 import {Inject, Prop} from "vue-property-decorator";
 import Vue from "vue";
 import Searchbox from "@/components/Searchbox.vue";
-import doc = Mocha.reporters.doc;
 import WasmPen from "@/code/WasmPen";
+import {Subscription} from "rxjs";
 
 @Component({
   components: {Searchbox}
@@ -36,13 +36,13 @@ export default class WasmNode extends Vue {
   selected = false;
   onKeydown;
   searchboxQuery = '';
+  localLayoutPositionSubscription!: Subscription;
 
   get style() {
     return `left: ${this.position.left}px; top: ${this.position.top}px;`;
   }
 
   async mounted() {
-    console.log("mounted");
     const node = this.node;
     this.children = WasmNode.getChildren(node);
 
@@ -64,10 +64,13 @@ export default class WasmNode extends Vue {
       console.error(node.constructor.name);
     }
 
+    window.wasmModule.EmbindUtil.setSignalListener(node.getOnChangedSignal(), () => this.onNodeChanged());
+
     this.nodeLayout.registerElement(this.$refs['node'], this.node.getId());
-    this.nodeLayout
+    this.localLayoutPositionSubscription = this.nodeLayout
         .getLocalPositionObservable(this.node.getId())
         .subscribe((localPosition) => {
+          if (localPosition === undefined) return;
           this.position.top = localPosition.top;
           this.position.left = localPosition.left;
         });
@@ -85,6 +88,8 @@ export default class WasmNode extends Vue {
 
   destroyed() {
     document.removeEventListener('keydown', this.onKeydown);
+    this.localLayoutPositionSubscription.unsubscribe();
+    console.log("destroyed");
   }
 
   private onClick() {
@@ -113,6 +118,11 @@ export default class WasmNode extends Vue {
       this.searchboxActive = false;
       this.nodeChoices = [];
     }
+  }
+
+  private onNodeChanged() {
+    this.children = WasmNode.getChildren(this.node);
+    this.$nextTick(() => this.nodeLayout.recalculate());
   }
 
   private static getChildren(node) {

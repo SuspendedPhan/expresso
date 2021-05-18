@@ -3,6 +3,7 @@
 
 #include "Attribute.h"
 #include "Code.h"
+#include "Signal.h"
 #include <iostream>
 #include <functional>
 
@@ -26,13 +27,13 @@ private:
     std::string id = Code::generateUuidV4();
     std::function<void(shared_ptr<Node>)> replaceFun;
 protected:
-    std::function<void()> onChanged;
+    Signal onChangedSignal;
 public:
     virtual float eval(const EvalContext &evalContext) = 0;
     std::string getId() { return this->id; }
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
-    void setOnChanged(const std::function<void()> &onChanged);
+    Signal* getOnChangedSignal();
 
     virtual ~Node() = default;
 };
@@ -48,13 +49,6 @@ public:
     static shared_ptr<NumberNode> make(float value);
 
     float eval(const EvalContext &evalContext) override;
-};
-
-class UnaryOpNode : public Node {
-public:
-    shared_ptr<Node> a;
-
-    UnaryOpNode(shared_ptr<Node> a) : a(a) {}
 };
 
 
@@ -79,13 +73,13 @@ public:
     void replaceA(shared_ptr<Node> a) {
         a->setReplaceFun(std::bind(&BinaryOpNode::replaceA, this, std::placeholders::_1));
         this->a = a;
-//        this->onChanged();
+        this->onChangedSignal.dispatch();
     }
 
     void replaceB(shared_ptr<Node> b) {
         b->setReplaceFun(std::bind(&BinaryOpNode::replaceB, this, std::placeholders::_1));
         this->b = b;
-//        this->onChanged();
+        this->onChangedSignal.dispatch();
     }
 };
 

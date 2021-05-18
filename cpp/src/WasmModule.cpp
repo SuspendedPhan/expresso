@@ -121,6 +121,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     .smart_ptr<std::shared_ptr<Node>>("Node")
     .function("getId", &Node::getId)
     .function("replace", &Node::replace)
+    .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
   ;
 
   class_<BinaryOpNode, base<Node>>("BinaryOpNode")

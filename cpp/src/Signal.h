@@ -12,6 +12,7 @@ class Signal {
 public:
     std::function<void()> listener;
     void setListener(std::function<void()> listener);
+    void dispatch();
 };
 
 
