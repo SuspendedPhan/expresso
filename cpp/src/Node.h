@@ -25,11 +25,14 @@ class Node {
 private:
     std::string id = Code::generateUuidV4();
     std::function<void(shared_ptr<Node>)> replaceFun;
+protected:
+    std::function<void()> onChanged;
 public:
     virtual float eval(const EvalContext &evalContext) = 0;
     std::string getId() { return this->id; }
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
+    void setOnChanged(const std::function<void()> &onChanged);
 
     virtual ~Node() = default;
 };
@@ -76,11 +79,13 @@ public:
     void replaceA(shared_ptr<Node> a) {
         a->setReplaceFun(std::bind(&BinaryOpNode::replaceA, this, std::placeholders::_1));
         this->a = a;
+//        this->onChanged();
     }
 
     void replaceB(shared_ptr<Node> b) {
         b->setReplaceFun(std::bind(&BinaryOpNode::replaceB, this, std::placeholders::_1));
         this->b = b;
+//        this->onChanged();
     }
 };
 

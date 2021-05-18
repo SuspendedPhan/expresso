@@ -9,6 +9,7 @@
 #include "EvalContext.h"
 #include "Node.h"
 #include "Code.h"
+#include "Signal.h"
 
 class Organism;
 
@@ -36,7 +37,12 @@ public:
 class EditableAttribute : public Attribute {
 private:
     std::shared_ptr<Node> rootNode;
+    Signal onChangedSignal;
 public:
+    Signal* getOnChangedSignal();
+
+public:
+
     EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(
             name, organism) {
         this->setRootNode(rootNode);

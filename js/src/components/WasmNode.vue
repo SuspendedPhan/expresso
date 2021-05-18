@@ -42,6 +42,7 @@ export default class WasmNode extends Vue {
   }
 
   async mounted() {
+    console.log("mounted");
     const node = this.node;
     this.children = WasmNode.getChildren(node);
 

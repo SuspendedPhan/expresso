@@ -2,7 +2,7 @@
   <div>
     <div>{{name}}</div>
     <div class="relative border-solid border-2 box-content" :style="nodeTreeContainerStyle">
-      <WasmNode v-if="rootNode" :node="rootNode"></WasmNode>
+      <WasmNode v-if="rootNode" :node="rootNode" :key="rootNodeId"></WasmNode>
     </div>
 
 <!--    <canvas-->
@@ -34,6 +34,25 @@ export default class WasmAttribute extends Vue {
 
   nodeTreeContainerWidth = 0;
   nodeTreeContainerHeight = 0;
+  name = null;
+  rootNode = null;
+  rootNodeId = null;
+  quill = null as any;
+
+  async mounted() {
+    this.name = this.attribute.getName();
+    if (this.attribute.constructor.name === 'EditableAttribute') {
+      this.rootNode = this.attribute.getRootNode();
+      window.wasmModule.EmbindUtil.setSignalListener(this.attribute.getOnChangedSignal(), () => this.onRootNodeChanged());
+    }
+    this.nodeLayout.onCalculated.subscribe(output => {
+      this.nodeTreeContainerWidth = output.totalWidth;
+      this.nodeTreeContainerHeight = output.totalHeight;
+    });
+    Vue.nextTick(() => {
+      this.nodeLayout.recalculate();
+    });
+  }
 
   private getRootNode() {
     return this.rootNode;
@@ -43,22 +62,11 @@ export default class WasmAttribute extends Vue {
     return `left: 0px; width: ${this.nodeTreeContainerWidth}px; height: ${this.nodeTreeContainerHeight}px`;
   }
 
-  name = null;
-  rootNode = null;
-  quill = null as any;
-
-  async mounted() {
-    this.name = this.attribute.getName();
-    if (this.attribute.constructor.name === 'EditableAttribute') {
-      this.rootNode = this.attribute.getRootNode();
-    }
-    this.nodeLayout.onCalculated.subscribe(output => {
-      this.nodeTreeContainerWidth = output.totalWidth;
-      this.nodeTreeContainerHeight = output.totalHeight;
-    });
-    Vue.nextTick(() => {
-      this.nodeLayout.recalculate();
-    });
+  private onRootNodeChanged() {
+    console.log("on changed");
+    const rootNode = this.attribute.getRootNode();
+    this.rootNode = rootNode;
+    this.rootNodeId = rootNode.getId();
   }
 
   static getKey(node) {

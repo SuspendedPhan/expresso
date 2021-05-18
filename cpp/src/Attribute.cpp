@@ -18,11 +18,19 @@ void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
     this->rootNode = rootNode;
     rootNode->setReplaceFun([this](const std::shared_ptr<Node>& node) {
         this->setRootNode(node);
+        if (this->onChangedSignal.listener) {
+            std::cout << "set root node: on change" << std::endl;
+            this->onChangedSignal.listener();
+        }
     });
 }
 
 Node *EditableAttribute::getRootNode() {
     return this->rootNode.get();
+}
+
+Signal *EditableAttribute::getOnChangedSignal() {
+    return &this->onChangedSignal;
 }
 
 IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism) : Attribute(name,

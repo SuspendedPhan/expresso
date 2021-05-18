@@ -1,0 +1,11 @@
+//
+// Created by Dylan on 5/17/2021.
+//
+
+#include <iostream>
+#include "Signal.h"
+
+void Signal::setListener(std::function<void()> listener) {
+    std::cout << "set listener" << std::endl;
+    this->listener = listener;
+}

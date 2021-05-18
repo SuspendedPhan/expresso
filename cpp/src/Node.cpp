@@ -27,3 +27,7 @@ void Node::replace(shared_ptr<Node> node) {
 void Node::setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun) {
     this->replaceFun = replaceFun;
 }
+
+void Node::setOnChanged(const std::function<void()> &onChanged) {
+    this->onChanged = onChanged;
+}

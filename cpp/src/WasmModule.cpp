@@ -74,6 +74,8 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
                     std::make_shared<AddOpNode>(std::make_shared<AttributeReferenceNode>(yAttribute),
                             std::make_shared<NumberNode>(100.0f)), suborganism));
 //    suborganism->remove();
+
+    mulNode->replace(std::make_shared<NumberNode>(10.0f));
 }
 
 
@@ -84,6 +86,7 @@ int say_hello() {
 
 #ifdef __EMSCRIPTEN__
 #include "Fakebook.h"
+#include "EmbindUtil.h"
 #include <emscripten/bind.h>
 using namespace emscripten;
 
@@ -111,6 +114,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
   class_<EditableAttribute, base<Attribute>>("EditableAttribute")
     .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
+    .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers())
   ;
 
   class_<Node>("Node")
@@ -167,6 +171,14 @@ EMSCRIPTEN_BINDINGS(my_module) {
       .function("getName", &AttributeOutput::getName)
   ;
 
+  class_<Signal>("Signal")
+  ;
+
+  class_<EmbindUtil>("EmbindUtil")
+        .class_function("setSignalListener", &EmbindUtil::setSignalListener, allow_raw_pointers())
+  ;
+
+
   class_<FakeBook>("FakeBook")
       .constructor<>()
       .function("getValue", &FakeBook::getValue)
@@ -179,6 +191,11 @@ EMSCRIPTEN_BINDINGS(my_module) {
       .function("getChildren", &FakeBook::getChildren, allow_raw_pointers())
       .class_function("make", &FakeBook::make, allow_raw_pointers())
   ;
+
+  class_<std::function<void()>>("FunctionVoid")
+        .constructor<>()
+        .function("opcall", &std::function<void()>::operator())
+        ;
 
   register_vector<Organism*>("OrganismVector");
   register_vector<Attribute*>("AttributeVector");
