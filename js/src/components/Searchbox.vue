@@ -13,7 +13,7 @@
 <script lang="ts">
 
 import Component from "vue-class-component";
-import {Inject, Prop} from "vue-property-decorator";
+import {Prop} from "vue-property-decorator";
 import Vue from "vue";
 
 @Component({
@@ -27,14 +27,25 @@ export default class Searchbox extends Vue {
   }
 
   onClick(choice, event) {
-    this.$emit('choiceCommitted', choice);
+    this.emitChoiceCommitted(choice);
   }
 
   onInput(event) {
     this.$emit('queryInput', event.target.value);
   }
 
-  keydown() {
+  keydown(event) {
+    if (event.key === 'Enter' && this.choices.length > 0) {
+      this.emitChoiceCommitted(this.choices[0]);
+    }
+  }
+
+  private emitChoiceCommitted(choice) {
+    this.$emit('choiceCommitted', choice);
+  }
+
+  focus() {
+    (this.$refs['input'] as any).focus();
   }
 
   blur() {

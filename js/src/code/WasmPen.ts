@@ -39,7 +39,7 @@ export default class WasmPen {
       {text: 'Div', nodeMakerFunction: () => window.wasmModule.DivOpNode.make(this.makeZero(), this.makeZero())},
       {text: 'Mod', nodeMakerFunction: () => window.wasmModule.ModOpNode.make(this.makeZero(), this.makeZero())},
     ];
-    return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) > 0);
+    return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
   private static makeZero() {

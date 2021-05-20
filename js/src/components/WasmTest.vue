@@ -1,8 +1,9 @@
 <template>
-  <div ref="viewport" class="w-full h-1/2">
-    <canvas ref="canvas"></canvas>
-    <FakeBook v-if='fake' :fake="fake" />
-    <WasmExpressor v-if="tree" :tree="tree"></WasmExpressor>
+  <div class="flex">
+    <WasmExpressor class="w-1/2 h-full" v-if="tree" :tree="tree"></WasmExpressor>
+    <div ref="viewport" class="h-full w-1/2">
+      <canvas ref="canvas"></canvas>
+    </div>
   </div>
 </template>
 

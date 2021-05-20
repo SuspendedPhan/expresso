@@ -84,126 +84,121 @@ int say_hello() {
     return 0;
 }
 
+#ifndef __EMSCRIPTEN__
+#define __EMSCRIPTEN__
+#endif
+
 #ifdef __EMSCRIPTEN__
+
 #include "Fakebook.h"
 #include "EmbindUtil.h"
 #include <emscripten/bind.h>
+
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(my_module) {
-  function("sayHello", &say_hello);
+    function("sayHello", &say_hello);
 
-  class_<ExpressorTree>("ExpressorTree")
-    .constructor<>()
-    .function("eval", &ExpressorTree::eval, allow_raw_pointers())
-    .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
-    .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
-  ;
+    class_<ExpressorTree>("ExpressorTree")
+            .constructor<>()
+            .function("eval", &ExpressorTree::eval, allow_raw_pointers())
+            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
+            .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers());
 
-  class_<Organism>("Organism")
-    .function("getSuborganisms", &Organism::getSuborganisms)
-    .function("getAttributes", &Organism::getAttributes)
-    .function("getName", &Organism::getName)
-    .function("getId", &Organism::getId)
-  ;
+    class_<Organism>("Organism")
+            .function("getSuborganisms", &Organism::getSuborganisms)
+            .function("getAttributes", &Organism::getAttributes)
+            .function("getName", &Organism::getName)
+            .function("getId", &Organism::getId);
 
-  class_<Attribute>("Attribute")
-    .function("getName", &Attribute::getName)
-    .function("getId", &Attribute::getId)
-  ;
+    class_<Attribute>("Attribute")
+            .function("getName", &Attribute::getName)
+            .function("getId", &Attribute::getId);
 
-  class_<EditableAttribute, base<Attribute>>("EditableAttribute")
-    .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
-    .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers())
-  ;
+    class_<EditableAttribute, base<Attribute>>("EditableAttribute")
+            .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
+            .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers());
 
-  class_<Node>("Node")
-    .smart_ptr<std::shared_ptr<Node>>("Node")
-    .function("getId", &Node::getId)
-    .function("replace", &Node::replace)
-    .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
-  ;
+    class_<Node>("Node")
+            .smart_ptr<std::shared_ptr<Node>>("Node")
+            .function("getId", &Node::getId)
+            .function("replace", &Node::replace)
+            .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers());
 
-  class_<BinaryOpNode, base<Node>>("BinaryOpNode")
-    .function("getA", &BinaryOpNode::getA, allow_raw_pointers())
-    .function("getB", &BinaryOpNode::getB, allow_raw_pointers())
-  ;
+    class_<BinaryOpNode, base<Node>>("BinaryOpNode")
+            .function("getA", &BinaryOpNode::getA, allow_raw_pointers())
+            .function("getB", &BinaryOpNode::getB, allow_raw_pointers());
 
-  class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
-    .function("getAttribute", &AttributeReferenceNode::getAttribute, allow_raw_pointers())
-  ;
+    class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
+            .function("getAttribute", &AttributeReferenceNode::getAttribute, allow_raw_pointers());
 
-  class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
-  ;
+    class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
+            .smart_ptr<std::shared_ptr<AddOpNode>>("AddOpNode")
+            .class_function("make", &AddOpNode::make);
 
-  class_<SubOpNode, base<BinaryOpNode>>("SubOpNode")
-  ;
+    class_<SubOpNode, base<BinaryOpNode>>("SubOpNode")
+            .smart_ptr<std::shared_ptr<SubOpNode>>("SubOpNode")
+            .class_function("make", &SubOpNode::make);
 
-  class_<MulOpNode, base<BinaryOpNode>>("MulOpNode")
-  ;
+    class_<MulOpNode, base<BinaryOpNode>>("MulOpNode")
+            .smart_ptr<std::shared_ptr<MulOpNode>>("MulOpNode")
+            .class_function("make", &MulOpNode::make);
 
-  class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
-  ;
+    class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
+            .smart_ptr<std::shared_ptr<DivOpNode>>("DivOpNode")
+            .class_function("make", &DivOpNode::make);
 
-  class_<ModOpNode, base<BinaryOpNode>>("ModOpNode")
-  ;
+    class_<ModOpNode, base<BinaryOpNode>>("ModOpNode")
+            .smart_ptr<std::shared_ptr<ModOpNode>>("ModOpNode")
+            .class_function("make", &ModOpNode::make);
 
-  class_<NumberNode, base<Node>>("NumberNode")
-    .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
-    .function("getValue", &NumberNode::getValue)
-    .class_function("make", &NumberNode::make)
-  ;
+    class_<NumberNode, base<Node>>("NumberNode")
+            .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
+            .function("getValue", &NumberNode::getValue)
+            .class_function("make", &NumberNode::make);
 
-  class_<EvalOutput>("EvalOutput")
-    .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers())
-  ;
+    class_<EvalOutput>("EvalOutput")
+            .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());
 
-  class_<OrganismOutput>("OrganismOutput")
-    .function("getCloneOutputByCloneNumber", &OrganismOutput::getCloneOutputByCloneNumber)
-  ;
+    class_<OrganismOutput>("OrganismOutput")
+            .function("getCloneOutputByCloneNumber", &OrganismOutput::getCloneOutputByCloneNumber);
 
-  class_<OrganismCloneOutput>("OrganismCloneOutput")
-    .function("getAttributes", &OrganismCloneOutput::getAttributes)
-    .function("getSuborganisms", &OrganismCloneOutput::getSuborganisms)
-  ;
+    class_<OrganismCloneOutput>("OrganismCloneOutput")
+            .function("getAttributes", &OrganismCloneOutput::getAttributes)
+            .function("getSuborganisms", &OrganismCloneOutput::getSuborganisms);
 
-  class_<AttributeOutput>("AttributeOutput")
-      .function("getValue", &AttributeOutput::getValue)
-      .function("getName", &AttributeOutput::getName)
-  ;
+    class_<AttributeOutput>("AttributeOutput")
+            .function("getValue", &AttributeOutput::getValue)
+            .function("getName", &AttributeOutput::getName);
 
-  class_<Signal>("Signal")
-  ;
+    class_<Signal>("Signal");
 
-  class_<EmbindUtil>("EmbindUtil")
-        .class_function("setSignalListener", &EmbindUtil::setSignalListener, allow_raw_pointers())
-  ;
+    class_<EmbindUtil>("EmbindUtil")
+            .class_function("setSignalListener", &EmbindUtil::setSignalListener, allow_raw_pointers());
 
 
-  class_<FakeBook>("FakeBook")
-      .constructor<>()
-      .function("getValue", &FakeBook::getValue)
-      .function("setValue", &FakeBook::setValue)
-      .function("subscribeOnValueChanged", &FakeBook::subscribeOnValueChanged)
-      .function("subscribeOnChildrenChanged", &FakeBook::subscribeOnChildrenChanged)
-      .function("addChild", &FakeBook::addChild)
-      .function("remove", &FakeBook::remove)
-      .function("getId", &FakeBook::getId)
-      .function("getChildren", &FakeBook::getChildren, allow_raw_pointers())
-      .class_function("make", &FakeBook::make, allow_raw_pointers())
-  ;
+    class_<FakeBook>("FakeBook")
+            .constructor<>()
+            .function("getValue", &FakeBook::getValue)
+            .function("setValue", &FakeBook::setValue)
+            .function("subscribeOnValueChanged", &FakeBook::subscribeOnValueChanged)
+            .function("subscribeOnChildrenChanged", &FakeBook::subscribeOnChildrenChanged)
+            .function("addChild", &FakeBook::addChild)
+            .function("remove", &FakeBook::remove)
+            .function("getId", &FakeBook::getId)
+            .function("getChildren", &FakeBook::getChildren, allow_raw_pointers())
+            .class_function("make", &FakeBook::make, allow_raw_pointers());
 
-  class_<std::function<void()>>("FunctionVoid")
-        .constructor<>()
-        .function("opcall", &std::function<void()>::operator())
-        ;
+    class_<std::function<void()>>("FunctionVoid")
+            .constructor<>()
+            .function("opcall", &std::function<void()>::operator());
 
-  register_vector<Organism*>("OrganismVector");
-  register_vector<Attribute*>("AttributeVector");
-  register_vector<OrganismOutput>("OrganismOutputVector");
-  register_vector<OrganismCloneOutput>("OrganismCloneOutputVector");
-  register_vector<AttributeOutput>("AttributeOutputVector");
-  register_vector<FakeBook*>("FakeBookVector");
+    register_vector<Organism *>("OrganismVector");
+    register_vector<Attribute *>("AttributeVector");
+    register_vector<OrganismOutput>("OrganismOutputVector");
+    register_vector<OrganismCloneOutput>("OrganismCloneOutputVector");
+    register_vector<AttributeOutput>("AttributeOutputVector");
+    register_vector<FakeBook *>("FakeBookVector");
 }
 
 #endif

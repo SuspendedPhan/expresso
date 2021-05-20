@@ -16,6 +16,26 @@ float NumberNode::getValue() const {
     return value;
 }
 
+shared_ptr<AddOpNode> AddOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
+    return std::make_shared<AddOpNode>(a, b);
+}
+
+shared_ptr<SubOpNode> SubOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
+    return std::make_shared<SubOpNode>(a, b);
+}
+
+shared_ptr<MulOpNode> MulOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
+    return std::make_shared<MulOpNode>(a, b);
+}
+
+shared_ptr<DivOpNode> DivOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
+    return std::make_shared<DivOpNode>(a, b);
+}
+
+shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
+    return std::make_shared<ModOpNode>(a, b);
+}
+
 shared_ptr<NumberNode> NumberNode::make(float value) {
     return std::make_shared<NumberNode>(value);
 }

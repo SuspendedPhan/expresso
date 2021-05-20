@@ -2,7 +2,9 @@
   <div class="absolute" ref="node" :style="style">
     <div :class="{ border: selected }">
       <div @click="onClick">{{ text }}</div>
-      <Searchbox v-if="searchboxActive" :choices="nodeChoices" :query='searchboxQuery' @blur="onSearchboxBlur" @queryInput="onSearchboxQueryInput" @choiceCommitted="onSearchboxChoiceCommitted"></Searchbox>
+      <Searchbox v-if="searchboxActive" ref='searchbox' :choices="nodeChoices" :query='searchboxQuery'
+                 @blur="onSearchboxBlur" @queryInput="onSearchboxQueryInput"
+                 @choiceCommitted="onSearchboxChoiceCommitted"></Searchbox>
     </div>
     <WasmNode v-for="child of children" :key='child.getId()' :node="child"></WasmNode>
   </div>
@@ -81,6 +83,9 @@ export default class WasmNode extends Vue {
 
       if (event.key === 'Enter') {
         this.searchboxActive = true;
+        this.$nextTick(() => {
+          (this.$refs['searchbox'] as any).focus();
+        });
       }
     };
     document.addEventListener('keydown', this.onKeydown);

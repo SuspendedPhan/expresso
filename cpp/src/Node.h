@@ -88,6 +88,8 @@ class AddOpNode : public BinaryOpNode {
 public:
     AddOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
+    static shared_ptr<AddOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) + this->b->eval(evalContext);
     }
@@ -96,6 +98,8 @@ public:
 class SubOpNode : public BinaryOpNode {
 public:
     SubOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    static shared_ptr<SubOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) - this->b->eval(evalContext);
@@ -106,6 +110,8 @@ class MulOpNode : public BinaryOpNode {
 public:
     MulOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
+    static shared_ptr<MulOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) * this->b->eval(evalContext);
     }
@@ -115,6 +121,8 @@ class DivOpNode : public BinaryOpNode {
 public:
     DivOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
+    static shared_ptr<DivOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) / this->b->eval(evalContext);
     }
@@ -123,6 +131,8 @@ public:
 class ModOpNode : public BinaryOpNode {
 public:
     ModOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
+
+    static shared_ptr<ModOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
         float aEval = this->a->eval(evalContext);
