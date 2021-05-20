@@ -26,6 +26,7 @@ class Node {
 private:
     std::string id = Code::generateUuidV4();
     std::function<void(shared_ptr<Node>)> replaceFun;
+    weak_ptr<Attribute> attribute;
 protected:
     Signal onChangedSignal;
 public:
@@ -33,7 +34,11 @@ public:
     std::string getId() { return this->id; }
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
+    void setAttribute(const std::weak_ptr<Attribute>& attribute);
+
     Signal* getOnChangedSignal();
+    weak_ptr<Attribute> getAttribute();
+    Organism* getOrganismRaw();
 
     virtual ~Node() = default;
 };
@@ -72,12 +77,14 @@ public:
 
     void replaceA(shared_ptr<Node> a) {
         a->setReplaceFun(std::bind(&BinaryOpNode::replaceA, this, std::placeholders::_1));
+        a->setAttribute(this->getAttribute());
         this->a = a;
         this->onChangedSignal.dispatch();
     }
 
     void replaceB(shared_ptr<Node> b) {
         b->setReplaceFun(std::bind(&BinaryOpNode::replaceB, this, std::placeholders::_1));
+        b->setAttribute(this->getAttribute());
         this->b = b;
         this->onChangedSignal.dispatch();
     }
@@ -183,13 +190,13 @@ public:
 
 class AttributeReferenceNode : public Node {
 public:
-    weak_ptr<Attribute> attribute;
+    weak_ptr<Attribute> reference;
 
-    Attribute* getAttribute() {
-        return attribute.lock().get();
+    Attribute* getReferenceRaw() {
+        return reference.lock().get();
     }
 
-    AttributeReferenceNode(weak_ptr<Attribute> attribute) { this->attribute = attribute; }
+    AttributeReferenceNode(weak_ptr<Attribute> reference) { this->reference = reference; }
 
     float eval(const EvalContext &evalContext);
 };

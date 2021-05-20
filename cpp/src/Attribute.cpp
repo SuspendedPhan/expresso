@@ -16,6 +16,7 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
 
 void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
     this->rootNode = rootNode;
+    rootNode->setAttribute(shared_from_this());
     rootNode->setReplaceFun([this](const std::shared_ptr<Node>& node) {
         this->setRootNode(node);
         if (this->onChangedSignal.listener) {

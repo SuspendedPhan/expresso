@@ -5,7 +5,7 @@
 #include "Node.h"
 
 float AttributeReferenceNode::eval(const EvalContext &evalContext) {
-    return attribute.lock()->eval(evalContext).value;
+    return reference.lock()->eval(evalContext).value;
 }
 
 float NumberNode::eval(const EvalContext &evalContext) {
@@ -51,3 +51,16 @@ void Node::setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun
 Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
+
+void Node::setAttribute(const std::weak_ptr<Attribute>& attribute) {
+    this->attribute = attribute;
+}
+
+weak_ptr<Attribute> Node::getAttribute() {
+    return this->attribute;
+}
+
+Organism* Node::getOrganismRaw() {
+    return this->attribute.lock()->organism.lock().get();
+}
+

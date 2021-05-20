@@ -22,6 +22,7 @@ public:
     }
 
     static void populateTestTree(ExpressorTree &tree);
+    static void populateTestTree2(ExpressorTree &tree);
 
     EvalOutput *eval() {
         auto evalOutput = new EvalOutput();

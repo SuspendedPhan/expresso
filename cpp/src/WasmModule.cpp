@@ -51,7 +51,8 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
                             std::make_shared<NumberNode>(1.0f))));
 
     const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>(
-            EditableAttribute("x", mulNode, rootOrganism));
+            EditableAttribute("x", rootOrganism));
+    xAttribute->setRootNode(mulNode);
     tree.rootOrganism->attributes.emplace_back(
             xAttribute);
 
@@ -59,23 +60,40 @@ void ExpressorTree::populateTestTree(ExpressorTree &tree) {
     const auto &yNode = std::make_shared<AddOpNode>(yA, std::make_shared<NumberNode>(0.0f));
     yA->replace(std::make_shared<NumberNode>(100.0f));
 
-    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", yNode, rootOrganism);
+    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", rootOrganism);
+    yAttribute->setRootNode(yNode);
     tree.rootOrganism->attributes.emplace_back(yAttribute);
 
     rootOrganism->addSuborganism("sub");
 
     const auto &suborganism = rootOrganism->suborganisms.back();
 //    suborganism->cloneCountAttribute.lock()->setRootNode(std::make_shared<NumberNode>(5.0f));
-    suborganism->attributes.emplace_back(
-            std::make_shared<EditableAttribute>("x", std::make_shared<AttributeReferenceNode>(xAttribute),
-                    suborganism));
-    suborganism->attributes.emplace_back(
-            std::make_shared<EditableAttribute>("y",
-                    std::make_shared<AddOpNode>(std::make_shared<AttributeReferenceNode>(yAttribute),
-                            std::make_shared<NumberNode>(100.0f)), suborganism));
+    
+    const shared_ptr<AttributeReferenceNode> &xChildNode = std::make_shared<AttributeReferenceNode>(xAttribute);
+    const shared_ptr<EditableAttribute> &xChildAttribute = std::make_shared<EditableAttribute>("x", suborganism);
+    xChildAttribute->setRootNode(xChildNode);
+    suborganism->attributes.emplace_back(xChildAttribute);
+    
+    const shared_ptr<AddOpNode> &yChildNode = std::make_shared<AddOpNode>(
+            std::make_shared<AttributeReferenceNode>(yAttribute),
+            std::make_shared<NumberNode>(100.0f));
+    const shared_ptr<EditableAttribute> &yChildAttribute = std::make_shared<EditableAttribute>("y", suborganism);
+    yChildAttribute->setRootNode(yChildNode);
+    suborganism->attributes.emplace_back(yChildAttribute);
 //    suborganism->remove();
 
     mulNode->replace(std::make_shared<NumberNode>(10.0f));
+}
+
+void ExpressorTree::populateTestTree2(ExpressorTree &tree) {
+    auto rootOrganism = tree.rootOrganism;
+
+    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>("x", rootOrganism);
+    xAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
+    rootOrganism->attributes.emplace_back(xAttribute);
+    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", rootOrganism);
+    yAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
+    rootOrganism->attributes.emplace_back(yAttribute);
 }
 
 
@@ -103,7 +121,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .constructor<>()
             .function("eval", &ExpressorTree::eval, allow_raw_pointers())
             .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
-            .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers());
+            .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
+            .class_function("populateTestTree2", &ExpressorTree::populateTestTree2, allow_raw_pointers());
 
     class_<Organism>("Organism")
             .function("getSuborganisms", &Organism::getSuborganisms)
@@ -123,14 +142,15 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .smart_ptr<std::shared_ptr<Node>>("Node")
             .function("getId", &Node::getId)
             .function("replace", &Node::replace)
-            .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers());
+            .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
+            .function("getOrganismRaw", &Node::getOrganismRaw, allow_raw_pointers());
 
     class_<BinaryOpNode, base<Node>>("BinaryOpNode")
             .function("getA", &BinaryOpNode::getA, allow_raw_pointers())
             .function("getB", &BinaryOpNode::getB, allow_raw_pointers());
 
     class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
-            .function("getAttribute", &AttributeReferenceNode::getAttribute, allow_raw_pointers());
+            .function("getReferenceRaw", &AttributeReferenceNode::getReferenceRaw, allow_raw_pointers());
 
     class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
             .smart_ptr<std::shared_ptr<AddOpNode>>("AddOpNode")

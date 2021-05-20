@@ -1,4 +1,5 @@
 import {SignalDispatcher} from "ste-signals";
+import Functions from "@/code/Functions";
 
 'ste-signals';
 
@@ -40,6 +41,18 @@ export default class WasmPen {
       {text: 'Mod', nodeMakerFunction: () => window.wasmModule.ModOpNode.make(this.makeZero(), this.makeZero())},
     ];
     return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+  }
+
+  private static getAttributeNodeChoices(query, selectedNode) {
+    const organism = selectedNode.getOrganism();
+    const attributes = Functions.vectorToArray(organism.getAttributes());
+
+    // We're returning a raw attribute pointer here.... could be messy
+
+    return attributes.map(attribute => ({
+      text: organism.getName() + "." + attribute.getName(),
+      nodeMakerFunction: () => window.wasmModule.AttributeReferenceNode.make(attribute)
+    }));
   }
 
   private static makeZero() {

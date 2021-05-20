@@ -21,9 +21,9 @@ public:
 
     static std::shared_ptr<Organism> make(std::string name) {
         auto organism = std::shared_ptr<Organism>(new Organism(name));
-        const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones",
-                std::make_unique<NumberNode>(1.0f),
-                organism);
+
+        const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones", organism);
+        cloneCountAttribute->setRootNode(std::make_unique<NumberNode>(1.0f));
         organism->cloneCountAttribute = cloneCountAttribute;
         organism->attributes.push_back(cloneCountAttribute);
 

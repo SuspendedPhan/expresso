@@ -39,10 +39,8 @@ private:
     std::shared_ptr<Node> rootNode;
     Signal onChangedSignal;
 public:
-    EditableAttribute(std::string name, std::shared_ptr<Node> rootNode, std::weak_ptr<Organism> organism) : Attribute(
-            name, organism) {
-        this->setRootNode(rootNode);
-    }
+    EditableAttribute(std::string name, std::weak_ptr<Organism> organism) : Attribute(
+            name, organism) {}
 
     Signal* getOnChangedSignal();
 
