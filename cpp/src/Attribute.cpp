@@ -19,7 +19,6 @@ void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
     rootNode->setReplaceFun([this](const std::shared_ptr<Node>& node) {
         this->setRootNode(node);
         if (this->onChangedSignal.listener) {
-            std::cout << "set root node: on change" << std::endl;
             this->onChangedSignal.listener();
         }
     });

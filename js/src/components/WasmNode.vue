@@ -1,7 +1,7 @@
 <template>
   <div class="absolute" ref="node" :style="style">
-    <div :class="{ border: selected }">
-      <div @click="onClick">{{ text }}</div>
+    <div :class="['border', 'border-black', {'border-opacity-0': !selected}]">
+      <div class='bg-white' @click="onClick">{{ text }}</div>
       <Searchbox v-if="searchboxActive" ref='searchbox' :choices="nodeChoices" :query='searchboxQuery'
                  @blur="onSearchboxBlur" @queryInput="onSearchboxQueryInput"
                  @choiceCommitted="onSearchboxChoiceCommitted"></Searchbox>

@@ -1,4 +1,4 @@
-<template>
+w<template>
   <span class="node-root">
     <span v-if="isPenBeforeMe"><b>|</b></span>
     <span
