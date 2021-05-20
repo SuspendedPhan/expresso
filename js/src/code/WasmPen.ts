@@ -20,6 +20,7 @@ export default class WasmPen {
     let answer = [] as any;
     answer = answer.concat(this.getNumberNodeChoices(query));
     answer = answer.concat(this.getOpNodeChoices(query));
+    answer = answer.concat(this.getAttributeNodeChoices(selectedNode, query));
     return answer;
   }
 
@@ -43,8 +44,8 @@ export default class WasmPen {
     return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
-  private static getAttributeNodeChoices(query, selectedNode) {
-    const organism = selectedNode.getOrganism();
+  private static getAttributeNodeChoices(selectedNode, query) {
+    const organism = selectedNode.getOrganismRaw();
     const attributes = Functions.vectorToArray(organism.getAttributes());
 
     // We're returning a raw attribute pointer here.... could be messy

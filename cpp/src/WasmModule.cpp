@@ -150,7 +150,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getB", &BinaryOpNode::getB, allow_raw_pointers());
 
     class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
-            .function("getReferenceRaw", &AttributeReferenceNode::getReferenceRaw, allow_raw_pointers());
+            .smart_ptr<std::shared_ptr<AttributeReferenceNode>>("AttributeReferenceNode")
+            .function("getReferenceRaw", &AttributeReferenceNode::getReferenceRaw, allow_raw_pointers())
+            .class_function("make", &AttributeReferenceNode::make);
 
     class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
             .smart_ptr<std::shared_ptr<AddOpNode>>("AddOpNode")

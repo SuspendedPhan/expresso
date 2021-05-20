@@ -16,6 +16,10 @@ float NumberNode::getValue() const {
     return value;
 }
 
+shared_ptr<NumberNode> NumberNode::make(float value) {
+    return std::make_shared<NumberNode>(value);
+}
+
 shared_ptr<AddOpNode> AddOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
     return std::make_shared<AddOpNode>(a, b);
 }
@@ -36,8 +40,8 @@ shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_pt
     return std::make_shared<ModOpNode>(a, b);
 }
 
-shared_ptr<NumberNode> NumberNode::make(float value) {
-    return std::make_shared<NumberNode>(value);
+shared_ptr<AttributeReferenceNode> AttributeReferenceNode::make(const weak_ptr<Attribute> &reference) {
+    return std::make_shared<AttributeReferenceNode>(reference);
 }
 
 void Node::replace(shared_ptr<Node> node) {
