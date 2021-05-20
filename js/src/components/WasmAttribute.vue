@@ -63,7 +63,6 @@ export default class WasmAttribute extends Vue {
   }
 
   private onRootNodeChanged() {
-    console.log("on changed");
     const rootNode = this.attribute.getRootNode();
     this.rootNode = rootNode;
     this.rootNodeId = rootNode.getId();

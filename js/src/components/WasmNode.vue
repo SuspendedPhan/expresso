@@ -89,7 +89,6 @@ export default class WasmNode extends Vue {
   destroyed() {
     document.removeEventListener('keydown', this.onKeydown);
     this.localLayoutPositionSubscription.unsubscribe();
-    console.log("destroyed");
   }
 
   private onClick() {
@@ -99,7 +98,6 @@ export default class WasmNode extends Vue {
   }
 
   private onSearchboxQueryInput(query) {
-    console.log(this.searchboxQuery);
     this.searchboxQuery = query;
     this.nodeChoices = WasmPen.getNodeChoices(this.node, this.searchboxQuery);
   }

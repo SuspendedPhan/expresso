@@ -64,9 +64,6 @@ export default class WasmTest extends Vue {
     const numberNode = module.NumberNode.make(20);
     const attribute = attributes[0];
     const rootNode = attribute.getRootNode();
-    module.EmbindUtil.setSignalListener(attribute.getOnChangedSignal(), () => {
-      console.log("yay!");
-    });
     rootNode.replace(numberNode);
     this.tree = tree;
 
