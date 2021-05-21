@@ -36,7 +36,7 @@ export default class WasmNode extends Vue {
   nodeChoices = [];
   searchboxActive = false;
   selected = false;
-  onKeydown;
+  onKeydownFunction;
   searchboxQuery = '';
   localLayoutPositionSubscription!: Subscription;
 
@@ -78,20 +78,11 @@ export default class WasmNode extends Vue {
         });
     this.pen.onSelectedNodeChanged.sub(() => this.onSelectedNodeChanged());
 
-    this.onKeydown = event => {
-      if (!this.selected) return;
-
-      if (event.key === 'Enter') {
-        this.searchboxActive = true;
-        this.$nextTick(() => {
-          (this.$refs['searchbox'] as any).focus();
-        });
-      }
-    };
+    this.onKeydownFunction = event => this.onKeydown(event);
 
     // Set timeout, otherwise node replacement will get the enter key right away.
     window.setTimeout(() => {
-      document.addEventListener('keydown', this.onKeydown);
+      document.addEventListener('keydown', this.onKeydownFunction);
     }, 50);
 
     // We expect the node we replaced to set the pen's selected node to be our node
@@ -101,8 +92,19 @@ export default class WasmNode extends Vue {
     }
   }
 
+  private onKeydown(event) {
+    if (!this.selected) return;
+
+    if (event.key === 'Enter') {
+      this.searchboxActive = true;
+      this.$nextTick(() => {
+        (this.$refs['searchbox'] as any).focus();
+      });
+    }
+  }
+
   destroyed() {
-    document.removeEventListener('keydown', this.onKeydown);
+    document.removeEventListener('keydown', this.onKeydownFunction);
     this.localLayoutPositionSubscription.unsubscribe();
   }
 
