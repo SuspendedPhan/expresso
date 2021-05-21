@@ -166,8 +166,8 @@ export default class WasmNode extends Vue {
   }
 
   private static getChildren(node) {
-    if (node.isBinaryOpNode) {
-      const a = node.isBinaryOpNode();
+    if (WasmNode.isBinaryOpNode(node)) {
+      const a = node.getA();
       const b = node.getB();
       return [a, b];
     } else {
