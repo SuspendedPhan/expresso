@@ -83,7 +83,7 @@ export default class WasmNode extends Vue {
     // Set timeout, otherwise node replacement will get the enter key right away.
     window.setTimeout(() => {
       document.addEventListener('keydown', this.onKeydownFunction);
-    }, 50);
+    }, 0);
 
     // We expect the node we replaced to set the pen's selected node to be our node
     const selected = this.node.getId() === this.pen.getSelectedNode()?.getId();
@@ -103,22 +103,22 @@ export default class WasmNode extends Vue {
     } else if (event.key === 'ArrowUp') {
       const parentRaw = this.node.getParentRaw();
       if (parentRaw !== null) {
-        this.pen.setSelectedNode(parentRaw);
+        window.setTimeout(() => this.pen.setSelectedNode(parentRaw), 0);
       }
     } else if (event.key === 'ArrowDown') {
       const children = WasmNode.getChildren(this.node);
       if (children.length > 0) {
-        this.pen.setSelectedNode(children[0]);
+        window.setTimeout(() => this.pen.setSelectedNode(children[0]), 0);
       }
     } else if (event.key === 'ArrowLeft') {
       const parentRaw = this.node.getParentRaw();
       if (WasmNode.isBinaryOpNode(parentRaw)) {
-        this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node));
+        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node)), 0);
       }
     } else if (event.key === 'ArrowRight') {
       const parentRaw = this.node.getParentRaw();
       if (WasmNode.isBinaryOpNode(parentRaw)) {
-        this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node));
+        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node)), 0);
       }
     }
   }
@@ -160,7 +160,6 @@ export default class WasmNode extends Vue {
   }
 
   private onNodeChanged() {
-    console.log("chagned");
     this.children = WasmNode.getChildren(this.node);
     this.$nextTick(() => this.nodeLayout.recalculate());
   }
@@ -176,10 +175,7 @@ export default class WasmNode extends Vue {
   }
 
   private static isBinaryOpNode(parentRaw) {
-    const answer = parentRaw.getA !== undefined;
-    console.log(parentRaw.getA);
-    console.log(answer);
-    return answer;
+    return parentRaw?.getA !== undefined;
   }
 
   private static getOtherBinaryOpSibling(binaryOpParent, node) {
