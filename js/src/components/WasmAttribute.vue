@@ -51,6 +51,7 @@ export default class WasmAttribute extends Vue {
       window.wasmModule.EmbindUtil.setSignalListener(this.attribute.getOnChangedSignal(), () => this.onRootNodeChanged());
     }
     this.nodeLayout.onCalculated.subscribe(output => {
+      console.log(output.totalHeight);
       this.nodeTreeContainerWidth = output.totalWidth;
       this.nodeTreeContainerHeight = output.totalHeight;
       this.lines = output.lines;
@@ -81,6 +82,9 @@ export default class WasmAttribute extends Vue {
     const rootNode = this.attribute.getRootNode();
     this.rootNode = rootNode;
     this.rootNodeId = rootNode.getId();
+    this.$nextTick(() => {
+      this.nodeLayout.recalculate();
+    });
   }
 
   static getKey(node) {

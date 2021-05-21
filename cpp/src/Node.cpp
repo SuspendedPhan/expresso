@@ -58,6 +58,7 @@ Signal *Node::getOnChangedSignal() {
 
 void Node::setAttribute(const std::weak_ptr<Attribute>& attribute) {
     this->attribute = attribute;
+    this->setAttributeForChildren(attribute);
 }
 
 weak_ptr<Attribute> Node::getAttribute() {
@@ -65,6 +66,17 @@ weak_ptr<Attribute> Node::getAttribute() {
 }
 
 Organism* Node::getOrganismRaw() {
-    return this->attribute.lock()->organism.lock().get();
+    const shared_ptr<Attribute> &attribute = this->attribute.lock();
+    std::cout << "attribute " << attribute.use_count() << std::endl;
+    std::cout << "attribute " << attribute->getName() << std::endl;
+    return attribute->organism.lock().get();
 }
 
+void BinaryOpNode::setAttributeForChildren(weak_ptr<Attribute> attribute) {
+    this->a->setAttribute(attribute);
+    this->b->setAttribute(attribute);
+}
+
+void FunctionNode::setAttributeForChildren(weak_ptr<Attribute> attribute) {
+    std::cout << "need to implement this" << std::endl;
+}

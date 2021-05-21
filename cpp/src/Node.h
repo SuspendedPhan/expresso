@@ -29,6 +29,7 @@ private:
     weak_ptr<Attribute> attribute;
 protected:
     Signal onChangedSignal;
+    virtual void setAttributeForChildren(weak_ptr<Attribute> attribute) = 0;
 public:
     virtual float eval(const EvalContext &evalContext) = 0;
     std::string getId() { return this->id; }
@@ -54,6 +55,7 @@ public:
     static shared_ptr<NumberNode> make(float value);
 
     float eval(const EvalContext &evalContext) override;
+    void setAttributeForChildren(weak_ptr<Attribute> attribute) override {}
 };
 
 
@@ -88,6 +90,8 @@ public:
         this->b = b;
         this->onChangedSignal.dispatch();
     }
+
+    void setAttributeForChildren(weak_ptr<Attribute> attribute) override;
 };
 
 
@@ -169,6 +173,8 @@ public:
         node->rootNode = divNode;
         return node;
     }
+
+    void setAttributeForChildren(weak_ptr<Attribute> attribute) override;
 };
 
 class ParameterNode : public Node {
@@ -185,6 +191,8 @@ public:
     float eval(const EvalContext &evalContext) override {
         return this->fun.lock()->arguments[this->parameterIndex]->eval(evalContext);
     }
+
+    void setAttributeForChildren(weak_ptr<Attribute> attribute) override {}
 };
 
 
@@ -200,7 +208,8 @@ public:
         return reference.lock().get();
     }
 
-    float eval(const EvalContext &evalContext);
+    float eval(const EvalContext &evalContext) override;
+    void setAttributeForChildren(weak_ptr<Attribute> attribute) override {}
 };
 
 
