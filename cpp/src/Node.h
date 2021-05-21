@@ -194,7 +194,7 @@ public:
 
     AttributeReferenceNode(weak_ptr<Attribute> reference) { this->reference = reference; }
 
-    static shared_ptr<AttributeReferenceNode> make(const weak_ptr<Attribute>& reference);
+    static shared_ptr<AttributeReferenceNode> make(Attribute* reference);
 
     Attribute* getReferenceRaw() {
         return reference.lock().get();

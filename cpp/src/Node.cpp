@@ -40,8 +40,8 @@ shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_pt
     return std::make_shared<ModOpNode>(a, b);
 }
 
-shared_ptr<AttributeReferenceNode> AttributeReferenceNode::make(const weak_ptr<Attribute> &reference) {
-    return std::make_shared<AttributeReferenceNode>(reference);
+shared_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute* reference) {
+    return std::make_shared<AttributeReferenceNode>(reference->shared_from_this());
 }
 
 void Node::replace(shared_ptr<Node> node) {
