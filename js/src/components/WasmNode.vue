@@ -100,6 +100,10 @@ export default class WasmNode extends Vue {
       this.$nextTick(() => {
         (this.$refs['searchbox'] as any).focus();
       });
+    } else if (event.key === 'ArrowUp') {
+      // this.pen.setSelectedNode(this.node.getParentNode());
+    } else if (event.key === 'ArrowDown') {
+      // this.pen.setSelectedNode(this.node.getChild)
     }
   }
 

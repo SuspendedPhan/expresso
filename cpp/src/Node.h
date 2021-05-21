@@ -27,6 +27,7 @@ private:
     std::string id = Code::generateUuidV4();
     std::function<void(shared_ptr<Node>)> replaceFun;
     weak_ptr<Attribute> attribute;
+    weak_ptr<Node> parent;
 protected:
     Signal onChangedSignal;
     virtual void setAttributeForChildren(weak_ptr<Attribute> attribute) = 0;
@@ -37,9 +38,13 @@ public:
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
     void setAttribute(const std::weak_ptr<Attribute>& attribute);
 
+    // TODO NEXT: Who needs to call setParent???
+    void setParent(const std::weak_ptr<Node>& parent);
+
     Signal* getOnChangedSignal();
     weak_ptr<Attribute> getAttribute();
     Organism* getOrganismRaw();
+    Node* getParentRaw();
 
     virtual ~Node() = default;
 };
@@ -61,13 +66,13 @@ public:
 
 class BinaryOpNode : public Node {
 public:
+    // public READONLY
     shared_ptr<Node> a;
     shared_ptr<Node> b;
 
-    BinaryOpNode(shared_ptr<Node> a, shared_ptr<Node> b) {
-        this->replaceA(a);
-        this->replaceB(b);
-    }
+    static void setA(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a);
+    static void setB(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a);
+    static void set(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     Node* getA() {
         return a.get();
@@ -77,28 +82,12 @@ public:
         return b.get();
     }
 
-    void replaceA(shared_ptr<Node> a) {
-        a->setReplaceFun(std::bind(&BinaryOpNode::replaceA, this, std::placeholders::_1));
-        a->setAttribute(this->getAttribute());
-        this->a = a;
-        this->onChangedSignal.dispatch();
-    }
-
-    void replaceB(shared_ptr<Node> b) {
-        b->setReplaceFun(std::bind(&BinaryOpNode::replaceB, this, std::placeholders::_1));
-        b->setAttribute(this->getAttribute());
-        this->b = b;
-        this->onChangedSignal.dispatch();
-    }
-
     void setAttributeForChildren(weak_ptr<Attribute> attribute) override;
 };
 
 
 class AddOpNode : public BinaryOpNode {
 public:
-    AddOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
-
     static shared_ptr<AddOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
@@ -108,8 +97,6 @@ public:
 
 class SubOpNode : public BinaryOpNode {
 public:
-    SubOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
-
     static shared_ptr<SubOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
@@ -119,8 +106,6 @@ public:
 
 class MulOpNode : public BinaryOpNode {
 public:
-    MulOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
-
     static shared_ptr<MulOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
@@ -130,8 +115,6 @@ public:
 
 class DivOpNode : public BinaryOpNode {
 public:
-    DivOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
-
     static shared_ptr<DivOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
@@ -141,8 +124,6 @@ public:
 
 class ModOpNode : public BinaryOpNode {
 public:
-    ModOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
-
     static shared_ptr<ModOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
 
     float eval(const EvalContext &evalContext) override {
@@ -165,12 +146,12 @@ public:
 
     static shared_ptr<FunctionNode> makeAverage() {
         shared_ptr<FunctionNode> node = std::make_shared<FunctionNode>();
-        auto aNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 0);
-        auto bNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 1);
-        auto addNode = std::make_shared<AddOpNode>(aNode, bNode);
-        auto twoNode = std::make_shared<NumberNode>(2.0f);
-        auto divNode = std::make_shared<DivOpNode>(addNode, twoNode);
-        node->rootNode = divNode;
+//        auto aNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 0);
+//        auto bNode = std::make_shared<ParameterNode>(std::weak_ptr<FunctionNode>(node), 1);
+//        auto addNode = std::make_shared<AddOpNode>(aNode, bNode);
+//        auto twoNode = std::make_shared<NumberNode>(2.0f);
+//        auto divNode = std::make_shared<DivOpNode>(addNode, twoNode);
+//        node->rootNode = divNode;
         return node;
     }
 
