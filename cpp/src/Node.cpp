@@ -67,8 +67,6 @@ weak_ptr<Attribute> Node::getAttribute() {
 
 Organism* Node::getOrganismRaw() {
     const shared_ptr<Attribute> &attribute = this->attribute.lock();
-    std::cout << "attribute " << attribute.use_count() << std::endl;
-    std::cout << "attribute " << attribute->getName() << std::endl;
     return attribute->organism.lock().get();
 }
 

@@ -51,7 +51,6 @@ export default class WasmAttribute extends Vue {
       window.wasmModule.EmbindUtil.setSignalListener(this.attribute.getOnChangedSignal(), () => this.onRootNodeChanged());
     }
     this.nodeLayout.onCalculated.subscribe(output => {
-      console.log(output.totalHeight);
       this.nodeTreeContainerWidth = output.totalWidth;
       this.nodeTreeContainerHeight = output.totalHeight;
       this.lines = output.lines;

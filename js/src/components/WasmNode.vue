@@ -33,7 +33,7 @@ export default class WasmNode extends Vue {
     top: 0,
     left: 0,
   };
-  nodeChoices = [{text: 'sdf'}];
+  nodeChoices = [];
   searchboxActive = false;
   selected = false;
   onKeydown;
@@ -88,7 +88,17 @@ export default class WasmNode extends Vue {
         });
       }
     };
-    document.addEventListener('keydown', this.onKeydown);
+
+    // Set timeout, otherwise node replacement will get the enter key right away.
+    window.setTimeout(() => {
+      document.addEventListener('keydown', this.onKeydown);
+    }, 50);
+
+    // We expect the node we replaced to set the pen's selected node to be our node
+    const selected = this.node.$$.ptr === this.pen.getSelectedNode()?.$$?.ptr;
+    if (selected) {
+        this.selected = true;
+    }
   }
 
   destroyed() {
@@ -112,7 +122,9 @@ export default class WasmNode extends Vue {
   }
 
   private onSearchboxChoiceCommitted(choice) {
-    this.node.replace(choice.nodeMakerFunction());
+    const newNode = choice.nodeMakerFunction();
+    this.node.replace(newNode);
+    this.pen.setSelectedNode(newNode);
   }
 
   private onSelectedNodeChanged() {
