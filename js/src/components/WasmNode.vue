@@ -86,7 +86,7 @@ export default class WasmNode extends Vue {
     }, 50);
 
     // We expect the node we replaced to set the pen's selected node to be our node
-    const selected = this.node.$$.ptr === this.pen.getSelectedNode()?.$$?.ptr;
+    const selected = this.node.getId() === this.pen.getSelectedNode()?.getId();
     if (selected) {
         this.selected = true;
     }
@@ -101,9 +101,25 @@ export default class WasmNode extends Vue {
         (this.$refs['searchbox'] as any).focus();
       });
     } else if (event.key === 'ArrowUp') {
-      // this.pen.setSelectedNode(this.node.getParentNode());
+      const parentRaw = this.node.getParentRaw();
+      if (parentRaw !== null) {
+        this.pen.setSelectedNode(parentRaw);
+      }
     } else if (event.key === 'ArrowDown') {
-      // this.pen.setSelectedNode(this.node.getChild)
+      const children = WasmNode.getChildren(this.node);
+      if (children.length > 0) {
+        this.pen.setSelectedNode(children[0]);
+      }
+    } else if (event.key === 'ArrowLeft') {
+      const parentRaw = this.node.getParentRaw();
+      if (WasmNode.isBinaryOpNode(parentRaw)) {
+        this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node));
+      }
+    } else if (event.key === 'ArrowRight') {
+      const parentRaw = this.node.getParentRaw();
+      if (WasmNode.isBinaryOpNode(parentRaw)) {
+        this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node));
+      }
     }
   }
 
@@ -134,7 +150,9 @@ export default class WasmNode extends Vue {
   }
 
   private onSelectedNodeChanged() {
-    if (this.pen.selectedNode !== this.node) {
+    if (this.pen.selectedNode?.getId() === this.node.getId()) {
+      this.selected = true;
+    } else {
       this.selected = false;
       this.searchboxActive = false;
       this.nodeChoices = [];
@@ -142,17 +160,35 @@ export default class WasmNode extends Vue {
   }
 
   private onNodeChanged() {
+    console.log("chagned");
     this.children = WasmNode.getChildren(this.node);
     this.$nextTick(() => this.nodeLayout.recalculate());
   }
 
   private static getChildren(node) {
-    if (node.getA) {
-      const a = node.getA();
+    if (node.isBinaryOpNode) {
+      const a = node.isBinaryOpNode();
       const b = node.getB();
       return [a, b];
     } else {
       return [];
+    }
+  }
+
+  private static isBinaryOpNode(parentRaw) {
+    const answer = parentRaw.getA !== undefined;
+    console.log(parentRaw.getA);
+    console.log(answer);
+    return answer;
+  }
+
+  private static getOtherBinaryOpSibling(binaryOpParent, node) {
+    const rawA = binaryOpParent.getA();
+    const rawB = binaryOpParent.getB();
+    if (node.getId() === rawA.getId()) {
+      return rawB;
+    } else {
+      return rawA;
     }
   }
 }

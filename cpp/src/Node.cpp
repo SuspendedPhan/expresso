@@ -106,15 +106,17 @@ void BinaryOpNode::setA(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Nod
     a->setAttribute(op->getAttribute());
     a->setParent(op);
     op->a = a;
+    op->onChangedSignal.dispatch();
 }
 
 void BinaryOpNode::setB(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& b) {
     b->setReplaceFun([op](auto node) {
-        setA(op, node);
+        setB(op, node);
     });
     b->setAttribute(op->getAttribute());
     b->setParent(op);
     op->b = b;
+    op->onChangedSignal.dispatch();
 }
 
 void BinaryOpNode::set(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
