@@ -16,6 +16,10 @@ export default class PixiRenderer {
   }
 
   public render(evalOutput) {
+    for (const circle of this.circles) {
+      circle.visible = false;
+    }
+
     const usedCircles = this.renderOrganism(evalOutput.getRootOrganism());
     for (const usedCircle of usedCircles) {
       this.circlePool.recycle(usedCircle);
@@ -45,6 +49,7 @@ export default class PixiRenderer {
       circle.y = y;
       circle.scale.x = 2;
       circle.scale.y = 2;
+      circle.visible = true;
 
       const suborganismOutputs = cloneOutput.getSuborganisms();
       for (let j = 0; j < suborganismOutputs.size(); j++) {

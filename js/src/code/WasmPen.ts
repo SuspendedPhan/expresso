@@ -4,8 +4,8 @@ import Functions from "@/code/Functions";
 'ste-signals';
 
 export default class WasmPen {
-  selectedNode = null;
-  onSelectedNodeChanged = new SignalDispatcher();
+  private selectedNode = null;
+  public onSelectedNodeChanged = new SignalDispatcher();
 
   getSelectedNode() {
     return this.selectedNode;
@@ -53,7 +53,7 @@ export default class WasmPen {
     return attributes.map(attribute => ({
       text: organism.getName() + "." + attribute.getName(),
       nodeMakerFunction: () => window.wasmModule.AttributeReferenceNode.make(attribute)
-    }));
+    })).filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
   private static makeZero() {

@@ -8,7 +8,7 @@
         class="canvas"
     ></canvas>
     <div ref="panzoom">
-      <WasmOrganism v-if="rootOrganism" :organism="rootOrganism" :organismLayout="organismLayout" :isRoot="true" ></WasmOrganism>
+      <WasmOrganism v-if="rootOrganism" :organism="rootOrganism" :organismLayout="organismLayout" :isRoot="true"></WasmOrganism>
 <!--      <div class="bottom-group">-->
 <!--        <button @click="clearStorage" class="clearStorage">-->
 <!--          Clear storage-->
