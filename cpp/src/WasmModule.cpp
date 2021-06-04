@@ -110,6 +110,7 @@ int say_hello() {
 
 #include "Fakebook.h"
 #include "EmbindUtil.h"
+#include "Project.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -123,6 +124,12 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
             .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
             .class_function("populateTestTree2", &ExpressorTree::populateTestTree2, allow_raw_pointers());
+
+    class_<Project>("Project")
+            .constructor<>()
+            .function("evalOrganismTree", &Project::evalOrganismTree, allow_raw_pointers())
+            .function("getRootOrganism", &Project::getRootOrganism, allow_raw_pointers())
+            ;
 
     class_<Organism>("Organism")
             .function("getSuborganisms", &Organism::getSuborganisms)

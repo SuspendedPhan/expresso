@@ -19,11 +19,12 @@ import PixiRenderer from "@/code/PixiRenderer";
 import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
+import Store from "../models/Store";
 
 @Component({
   components: {WasmExpressor, FakeBook},
 })
-export default class WasmTest extends Vue {
+export default class WasmTest2 extends Vue {
   fake = null;
   tree = null;
 
@@ -39,26 +40,11 @@ export default class WasmTest extends Vue {
     module.sayHello();
     window.wasmModule = module;
 
-    function render(tree, renderer) {
-      const evalOutput = tree.eval();
-      renderer.render(evalOutput);
-      evalOutput.delete();
-      window.requestAnimationFrame(() => render(tree, renderer));
-    }
-
-    const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
-    const tree = new module.ExpressorTree();
-    module.ExpressorTree.populateTestTree2(tree);
-
-    const attributeVector = tree.getRootOrganism().getAttributes();
-    const attributes = Functions.vectorToArray(attributeVector);
-    const numberNode = module.NumberNode.make(20);
-    const attribute = attributes[0];
-    const rootNode = attribute.getRootNode();
-    rootNode.replace(numberNode);
-    this.tree = tree;
-
-    render(tree, renderer);
+    const store = new Store(module);
+    const project = store.addProject();
+    console.log(project.getRootOrganism().getName());
+    const evalOutput = project.evalOrganismTree();
+    console.log(PixiRenderer.jsifyEvalOutput(evalOutput));
   }
 }
 

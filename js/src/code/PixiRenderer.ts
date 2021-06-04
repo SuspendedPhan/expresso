@@ -61,11 +61,11 @@ export default class PixiRenderer {
     return usedCircles;
   }
 
-  public jsifyEvalOutput(evalOutput) {
+  public static jsifyEvalOutput(evalOutput) {
     return this.jsifyOrganismOutput(evalOutput.getRootOrganism());
   }
 
-  private jsifyOrganismOutput(organismOutput) {
+  private static jsifyOrganismOutput(organismOutput) {
     const cloneOutputByCloneNumber = organismOutput.getCloneOutputByCloneNumber();
     const result = [] as any;
     for (let i = 0; i < cloneOutputByCloneNumber.size(); i++) {
@@ -75,7 +75,7 @@ export default class PixiRenderer {
     return result;
   }
 
-  private jsifyCloneOutput(cloneOutput) {
+  private static jsifyCloneOutput(cloneOutput) {
     const result = {
       attributes: [] as any,
       suborganisms: [] as any,
@@ -91,7 +91,7 @@ export default class PixiRenderer {
     return result;
   }
 
-  private jsifyAttribute(attribute) {
+  private static jsifyAttribute(attribute) {
     return attribute.getName() + " | " + attribute.getValue();
   }
 

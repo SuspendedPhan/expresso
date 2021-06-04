@@ -6,6 +6,7 @@ import Wat from "@/components/Wat.vue";
 import WrapTest from "@/components/WrapTest.vue";
 import EvalRenderTest from "@/components/EvalRenderTest.vue";
 import WasmTest from "@/components/WasmTest.vue";
+import WasmTest2 from "@/components/WasmTest2.vue";
 
 Vue.use(VueRouter);
 
@@ -13,7 +14,7 @@ const routes = [
   {
     path: "/",
     name: "Home",
-    component: WasmTest
+    component: WasmTest2
     // component: Home
   },
   {
