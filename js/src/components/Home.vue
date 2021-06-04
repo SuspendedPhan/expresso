@@ -3,7 +3,7 @@
     <template v-if="!showStoreGraph">
       <template v-if="showExpressor">
         <Expressor class="expressor" v-if="oldExpressor"/>
-        <WasmExpressor class="expressor" v-else-if="tree" :tree="tree"/>
+        <WasmExpressor class="expressor" v-else-if="tree" project="tree"/>
       </template>
       <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
     </template>

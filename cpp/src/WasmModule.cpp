@@ -46,7 +46,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .constructor<>()
             .function("eval", &ExpressorTree::eval, allow_raw_pointers())
             .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers());
-    
+
     class_<Project>("Project")
             .constructor<>()
             .function("evalOrganismTree", &Project::evalOrganismTree, allow_raw_pointers())

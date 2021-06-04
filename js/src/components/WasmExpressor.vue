@@ -39,7 +39,7 @@ import WasmPen from "@/code/WasmPen";
 })
 export default class WasmExpressor extends Vue {
   @Prop()
-  tree;
+  project;
 
   @Provide()
   pen = new WasmPen();
@@ -54,7 +54,7 @@ export default class WasmExpressor extends Vue {
   lines = [];
 
   async mounted() {
-    this.rootOrganism = this.tree.getRootOrganism();
+    this.rootOrganism = this.project.getRootOrganism();
     this.organismLayout = new ElementLayout(() => this.rootOrganism, WasmExpressor.getChildren, WasmExpressor.getKey);
     this.oldMounted();
   }

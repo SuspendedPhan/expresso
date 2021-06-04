@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <WasmExpressor class="w-1/2 h-full" v-if="tree" :tree="tree"></WasmExpressor>
+    <WasmExpressor class="w-1/2 h-full" v-if="project" :project="project"></WasmExpressor>
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>
@@ -19,13 +19,14 @@ import PixiRenderer from "@/code/PixiRenderer";
 import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
+import Store from "@/models/Store";
 
 @Component({
   components: {WasmExpressor, FakeBook},
 })
 export default class WasmTest extends Vue {
   fake = null;
-  tree = null;
+  project = null;
 
   async mounted() {
     const module = await WasmModule({
@@ -36,28 +37,28 @@ export default class WasmTest extends Vue {
         return path;
       },
     });
-    module.sayHello();
     window.wasmModule = module;
 
-    function render(tree, renderer) {
-      const evalOutput = tree.eval();
+    function render(project, renderer) {
+      const evalOutput = project.evalOrganismTree();
       renderer.render(evalOutput);
       evalOutput.delete();
-      window.requestAnimationFrame(() => render(tree, renderer));
+      window.requestAnimationFrame(() => render(project, renderer));
     }
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
-    const tree = new module.ExpressorTree();
 
-    const attributeVector = tree.getRootOrganism().getAttributes();
+    const store = new Store(module);
+    const project = store.addProject();
+    const attributeVector = project.getRootOrganism().getAttributes();
     const attributes = Functions.vectorToArray(attributeVector);
     const numberNode = module.NumberNode.make(20);
     const attribute = attributes[0];
     const rootNode = attribute.getRootNode();
     rootNode.replace(numberNode);
-    this.tree = tree;
+    this.project = project;
 
-    render(tree, renderer);
+    render(project, renderer);
   }
 }
 

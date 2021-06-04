@@ -1,6 +1,6 @@
 <template>
   <div class="flex">
-    <WasmExpressor class="w-1/2 h-full" v-if="tree" :tree="tree"></WasmExpressor>
+    <WasmExpressor class="w-1/2 h-full" v-if="tree" project="tree"></WasmExpressor>
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>

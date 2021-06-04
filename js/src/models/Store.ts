@@ -17,4 +17,12 @@ export default class Store {
   getProjects() {
     return this.projects;
   }
+
+  save() {
+
+  }
+
+  load() {
+
+  }
 }
