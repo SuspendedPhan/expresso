@@ -20,87 +20,13 @@ template<typename T>
 using shared_ptr = std::shared_ptr<T>;
 template<typename T>
 using unique_ptr = std::unique_ptr<T>;
-
 class OrganismOutput;
-
 class AttributeOutput;
-
 class Organism;
-
 class Node;
-
 class FunctionNode;
-
 class ParameterNode;
 
-void ExpressorTree::populateTestTree(ExpressorTree &tree) {
-//    auto rootOrganism = tree.rootOrganism;
-//
-//    const auto &cloneCountAttribute = rootOrganism->cloneCountAttribute;
-//    const shared_ptr<NumberNode> &tempCloneCountNode = std::make_shared<NumberNode>(10.0f);
-//    rootOrganism->cloneCountAttribute.lock()->setRootNode(tempCloneCountNode);
-//    const shared_ptr<NumberNode> &temp2 = std::make_shared<NumberNode>(20.0f);
-//    tempCloneCountNode->replace(temp2);
-//    temp2->replace(std::make_shared<NumberNode>(5.0f));
-//
-//    auto mulNode = std::make_shared<MulOpNode>(
-//            std::make_shared<DivOpNode>(std::make_shared<AttributeReferenceNode>(rootOrganism->cloneNumberAttribute),
-//                    std::make_shared<AttributeReferenceNode>(cloneCountAttribute)),
-//            std::make_shared<MulOpNode>(std::make_shared<NumberNode>(3000.0f),
-//                    std::make_shared<ModOpNode>(std::make_shared<AttributeReferenceNode>(tree.timeAttribute),
-//                            std::make_shared<NumberNode>(1.0f))));
-//
-//    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>(
-//            EditableAttribute("x", rootOrganism));
-//    xAttribute->setRootNode(mulNode);
-//    tree.rootOrganism->attributes.emplace_back(
-//            xAttribute);
-//
-//    const shared_ptr<NumberNode> &yA = std::make_shared<NumberNode>(10.0f);
-//    const auto &yNode = std::make_shared<AddOpNode>(yA, std::make_shared<NumberNode>(0.0f));
-//    yA->replace(std::make_shared<NumberNode>(100.0f));
-//
-//    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", rootOrganism);
-//    yAttribute->setRootNode(yNode);
-//    tree.rootOrganism->attributes.emplace_back(yAttribute);
-//
-//    rootOrganism->addSuborganism("sub");
-//
-//    const auto &suborganism = rootOrganism->suborganisms.back();
-////    suborganism->cloneCountAttribute.lock()->setRootNode(std::make_shared<NumberNode>(5.0f));
-//
-//    const shared_ptr<AttributeReferenceNode> &xChildNode = std::make_shared<AttributeReferenceNode>(xAttribute);
-//    const shared_ptr<EditableAttribute> &xChildAttribute = std::make_shared<EditableAttribute>("x", suborganism);
-//    xChildAttribute->setRootNode(xChildNode);
-//    suborganism->attributes.emplace_back(xChildAttribute);
-//
-//    const shared_ptr<AddOpNode> &yChildNode = std::make_shared<AddOpNode>(
-//            std::make_shared<AttributeReferenceNode>(yAttribute),
-//            std::make_shared<NumberNode>(100.0f));
-//    const shared_ptr<EditableAttribute> &yChildAttribute = std::make_shared<EditableAttribute>("y", suborganism);
-//    yChildAttribute->setRootNode(yChildNode);
-//    suborganism->attributes.emplace_back(yChildAttribute);
-////    suborganism->remove();
-//
-//    mulNode->replace(std::make_shared<NumberNode>(10.0f));
-}
-
-void ExpressorTree::populateTestTree2(ExpressorTree &tree) {
-    auto rootOrganism = tree.rootOrganism;
-
-    const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>("x", rootOrganism);
-    xAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
-    rootOrganism->attributes.emplace_back(xAttribute);
-    const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", rootOrganism);
-    yAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
-    rootOrganism->attributes.emplace_back(yAttribute);
-}
-
-
-int say_hello() {
-    printf("Hello from your wasm module\n");
-    return 0;
-}
 
 #ifndef __EMSCRIPTEN__
 #define __EMSCRIPTEN__
@@ -116,15 +42,11 @@ int say_hello() {
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(my_module) {
-    function("sayHello", &say_hello);
-
     class_<ExpressorTree>("ExpressorTree")
             .constructor<>()
             .function("eval", &ExpressorTree::eval, allow_raw_pointers())
-            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers())
-            .class_function("populateTestTree", &ExpressorTree::populateTestTree, allow_raw_pointers())
-            .class_function("populateTestTree2", &ExpressorTree::populateTestTree2, allow_raw_pointers());
-
+            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers());
+    
     class_<Project>("Project")
             .constructor<>()
             .function("evalOrganismTree", &Project::evalOrganismTree, allow_raw_pointers())

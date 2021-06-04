@@ -48,7 +48,6 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
     const tree = new module.ExpressorTree();
-    module.ExpressorTree.populateTestTree2(tree);
 
     const attributeVector = tree.getRootOrganism().getAttributes();
     const attributes = Functions.vectorToArray(attributeVector);

@@ -29,7 +29,7 @@ emcc -v
     -o ./WasmModule.js \
     --no-entry \
     -s ENVIRONMENT=web \
-    ./cpp/src/WasmModule.cpp ./cpp/src/Attribute.cpp ./cpp/src/Node.cpp ./cpp/src/Signal.cpp
+    ./cpp/src/WasmModule.cpp ./cpp/src/Attribute.cpp ./cpp/src/Node.cpp ./cpp/src/Signal.cpp ./cpp/src/Project.cpp ./cpp/src/Function.cpp ./cpp/src/FunctionParameter.cpp
 
   # Create output folder
 #  mkdir -p dist

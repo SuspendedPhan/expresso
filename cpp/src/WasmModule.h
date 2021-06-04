@@ -21,10 +21,7 @@ public:
         this->rootOrganism->attributes.emplace_back(this->timeAttribute);
     }
 
-    static void populateTestTree(ExpressorTree &tree);
-    static void populateTestTree2(ExpressorTree &tree);
-
-    EvalOutput *eval() {
+    EvalOutput *eval() const {
         auto evalOutput = new EvalOutput();
         EvalContext evalContext;
         const auto elapsed = std::chrono::system_clock::now() - this->epoch;

@@ -4,13 +4,14 @@
 #include "Attribute.h"
 #include "Code.h"
 #include <cassert>
+#include <utility>
 
 class Organism : public std::enable_shared_from_this<Organism> {
 private:
     std::string name;
     std::string id = Code::generateUuidV4();
 
-    Organism(std::string name) : name(name) {}
+    explicit Organism(std::string name) : name(std::move(name)) {}
 
 public:
     vector<shared_ptr<Attribute>> attributes;
@@ -20,7 +21,7 @@ public:
     weak_ptr<Organism> superorganism;
 
     static std::shared_ptr<Organism> make(std::string name) {
-        auto organism = std::shared_ptr<Organism>(new Organism(name));
+        auto organism = std::shared_ptr<Organism>(new Organism(std::move(name)));
 
         const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones", organism);
         cloneCountAttribute->setRootNode(std::make_unique<NumberNode>(1.0f));
@@ -30,6 +31,13 @@ public:
         const shared_ptr<CloneNumberAttribute> &cloneNumberAttribute = std::make_shared<CloneNumberAttribute>(organism);
         organism->cloneNumberAttribute = cloneNumberAttribute;
         organism->attributes.push_back(cloneNumberAttribute);
+
+        const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>("x", organism);
+        xAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
+        organism->attributes.emplace_back(xAttribute);
+        const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", organism);
+        yAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
+        organism->attributes.emplace_back(yAttribute);
 
         return organism;
     }
