@@ -5,13 +5,14 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:emscripten": "docker run --rm -v %cd%\\..:/src emscripten/emsdk:2.0.0 ./cpp/build.sh",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
+    "build:emscripten": "docker run --rm -v %cd%\\..:/src emscripten/emsdk:2.0.0 ./cpp/build.sh",
     "md": "C:\\python38\\lib\\site-packages\\markdown_to_json\\scripts\\md_to_json.py"
   },
   "dependencies": {
     "@types/codemirror": "0.0.98",
+    "@vue/compat": "^3.1",
     "codemirror-minified": "^5.58.3",
     "core-js": "^3.6.5",
     "css-element-queries": "^1.2.3",
@@ -34,7 +35,6 @@
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.0",
     "vue": "^3.1",
-    "@vue/compat": "^3.1",
     "vue-class-component": "^7.2.6",
     "vue-property-decorator": "^8.4.2",
     "vue-router": "^3.2.0",
@@ -50,12 +50,12 @@
     "@types/wu": "^2.1.42",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
     "@typescript-eslint/parser": "^4.26.1",
-    "@vue/cli-plugin-babel": "~4.4.0",
-    "@vue/cli-plugin-eslint": "~4.4.0",
-    "@vue/cli-plugin-router": "^4.5.4",
-    "@vue/cli-plugin-typescript": "^4.5.6",
-    "@vue/cli-plugin-unit-mocha": "~4.4.0",
-    "@vue/cli-service": "~4.4.0",
+    "@vue/cli-plugin-babel": "^4.5.13",
+    "@vue/cli-plugin-eslint": "^4.5.13",
+    "@vue/cli-plugin-router": "^4.5.13",
+    "@vue/cli-plugin-typescript": "^4.5.13",
+    "@vue/cli-plugin-unit-mocha": "^4.5.13",
+    "@vue/cli-service": "^4.5.13",
     "@vue/eslint-config-typescript": "^5.0.2",
     "@vue/test-utils": "^1.0.3",
     "@wasm-tool/emscripten": "^1.0.0",
@@ -67,8 +67,8 @@
     "exports-loader": "^1.1.1",
     "postcss": "^7.0.35",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3",
-    "typescript": "~3.9.3",
-    "vue-cli-plugin-vuetify": "~2.0.7",
+    "typescript": "~4.1.5",
+    "vue-cli-plugin-vuetify": "^2.4.1",
     "vue-template-compiler": "^2.6.12"
   }
 }
