@@ -20,6 +20,7 @@ import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "@/models/Store";
+import DeadStore from "@/models/DeadStore";
 
 @Component({
   components: {WasmExpressor, FakeBook},
@@ -57,6 +58,7 @@ export default class WasmTest extends Vue {
     const rootNode = attribute.getRootNode();
     rootNode.replace(numberNode);
     this.project = project;
+    console.log(DeadStore.fromLiveStore(store));
 
     render(project, renderer);
   }

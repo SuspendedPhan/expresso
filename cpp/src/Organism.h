@@ -53,7 +53,7 @@ public:
         for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
             organismEvalContext->currentCloneNumber = cloneNumber;
             OrganismCloneOutput cloneOutput;
-            for (const auto &attribute : shared_this->attributes) {
+            for (const auto &attribute : shared_this->getAttributes()) {
                 cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
             }
             for (const auto &suborganism : shared_this->suborganisms) {

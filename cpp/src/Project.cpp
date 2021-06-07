@@ -14,3 +14,7 @@ EvalOutput* Project::evalOrganismTree() {
 Organism *Project::getRootOrganism() {
     return this->rootOrganism.get();
 }
+
+const std::string &Project::getId() const {
+    return id;
+}

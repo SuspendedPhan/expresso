@@ -14,6 +14,10 @@
 class Project {
     std::vector<std::shared_ptr<Function>> functions;
     std::shared_ptr<Organism> rootOrganism = Organism::make("the void");
+    std::string id = Code::generateUuidV4();
+public:
+    const std::string &getId() const;
+
 public:
     EvalOutput * evalOrganismTree();
     Organism* getRootOrganism();
