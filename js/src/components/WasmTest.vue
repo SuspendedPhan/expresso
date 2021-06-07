@@ -16,14 +16,13 @@ import Vue from "vue";
 import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
 import PixiRenderer from "@/code/PixiRenderer";
-import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "@/models/Store";
 import DeadStore from "@/models/DeadStore";
 
 @Component({
-  components: {WasmExpressor, FakeBook},
+  components: {WasmExpressor},
 })
 export default class WasmTest extends Vue {
   fake = null;
@@ -38,7 +37,7 @@ export default class WasmTest extends Vue {
         return path;
       },
     });
-    window.wasmModule = module;
+    (window as any).wasmModule = module;
 
     function render(project, renderer) {
       const evalOutput = project.evalOrganismTree();
@@ -58,7 +57,7 @@ export default class WasmTest extends Vue {
     const rootNode = attribute.getRootNode();
     rootNode.replace(numberNode);
     this.project = project;
-    console.log(DeadStore.fromLiveStore(store));
+    // console.log(DeadStore.fromLiveStore(store));
 
     render(project, renderer);
   }

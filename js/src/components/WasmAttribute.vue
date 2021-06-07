@@ -48,7 +48,7 @@ export default class WasmAttribute extends Vue {
     this.name = this.attribute.getName();
     if (this.attribute.constructor.name === 'EditableAttribute') {
       this.rootNode = this.attribute.getRootNode();
-      window.wasmModule.EmbindUtil.setSignalListener(this.attribute.getOnChangedSignal(), () => this.onRootNodeChanged());
+      (window as any).wasmModule.EmbindUtil.setSignalListener(this.attribute.getOnChangedSignal(), () => this.onRootNodeChanged());
     }
     this.nodeLayout.onCalculated.subscribe(output => {
       this.nodeTreeContainerWidth = output.totalWidth;

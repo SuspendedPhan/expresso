@@ -87,12 +87,13 @@ export default class WasmExpressor extends Vue {
     });
 
     // NOTE: maybe can remove?
-    this.canvasWidth = this.$refs["expressor"].clientWidth;
-    this.canvasHeight = this.$refs["expressor"].clientHeight;
+    const expressorElement = this.$refs["expressor"] as any;
+    this.canvasWidth = expressorElement.clientWidth;
+    this.canvasHeight = expressorElement.clientHeight;
 
-    new ResizeSensor(this.$refs["expressor"] as any, () => {
-      this.canvasWidth = this.$refs["expressor"].clientWidth;
-      this.canvasHeight = this.$refs["expressor"].clientHeight;
+    new ResizeSensor(expressorElement as any, () => {
+      this.canvasWidth = expressorElement.clientWidth;
+      this.canvasHeight = expressorElement.clientHeight;
     });
 
     this.organismLayout.onCalculated.subscribe((output) => {
@@ -106,7 +107,8 @@ export default class WasmExpressor extends Vue {
   // }
 
   drawLines() {
-    const context = this.$refs["canvas"].getContext("2d");
+    const canvasElement = this.$refs["canvas"] as any;
+    const context = canvasElement.getContext("2d");
     context.resetTransform();
     context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
     const transform = this.panzoomTransform as any;

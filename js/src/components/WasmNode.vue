@@ -66,7 +66,7 @@ export default class WasmNode extends Vue {
       console.error(node.constructor.name);
     }
 
-    window.wasmModule.EmbindUtil.setSignalListener(node.getOnChangedSignal(), () => this.onNodeChanged());
+    (window as any).wasmModule.EmbindUtil.setSignalListener(node.getOnChangedSignal(), () => this.onNodeChanged());
 
     this.nodeLayout.registerElement(this.$refs['node'], this.node.getId());
     this.localLayoutPositionSubscription = this.nodeLayout
@@ -164,7 +164,7 @@ export default class WasmNode extends Vue {
     this.$nextTick(() => this.nodeLayout.recalculate());
   }
 
-  private static getChildren(node) {
+  public static getChildren(node) {
     if (WasmNode.isBinaryOpNode(node)) {
       const a = node.getA();
       const b = node.getB();

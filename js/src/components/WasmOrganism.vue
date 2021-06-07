@@ -150,7 +150,8 @@ export default class WasmOrganism extends Vue {
   }
 
   getMetaname(organism) {
-    return this.root.metaorganismCollection.getFromId(organism.metaorganismId).name;
+    return 'not implemented';
+    // return this.root.metaorganismCollection.getFromId(organism.metaorganismId).name;
   }
 }
 </script>

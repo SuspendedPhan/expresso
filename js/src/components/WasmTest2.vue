@@ -16,13 +16,12 @@ import Vue from "vue";
 import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
 import PixiRenderer from "@/code/PixiRenderer";
-import FakeBook from './FakeBook';
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "../models/Store";
 
 @Component({
-  components: {WasmExpressor, FakeBook},
+  components: {WasmExpressor},
 })
 export default class WasmTest2 extends Vue {
   fake = null;
@@ -38,7 +37,7 @@ export default class WasmTest2 extends Vue {
       },
     });
     module.sayHello();
-    window.wasmModule = module;
+    (window as any).wasmModule = module;
 
     const store = new Store(module);
     const project = store.addProject();

@@ -1,8 +1,6 @@
 import {SignalDispatcher} from "ste-signals";
 import Functions from "@/code/Functions";
 
-'ste-signals';
-
 export default class WasmPen {
   private selectedNode = null;
   public onSelectedNodeChanged = new SignalDispatcher();
@@ -27,7 +25,7 @@ export default class WasmPen {
   private static getNumberNodeChoices(query) {
     const number = Number.parseFloat(query);
     if (!Number.isNaN(number)) {
-      return [{text: number, nodeMakerFunction: () => window.wasmModule.NumberNode.make(number)}];
+      return [{text: number, nodeMakerFunction: () => this.getModule().NumberNode.make(number)}];
     } else {
       return [];
     }
@@ -35,11 +33,11 @@ export default class WasmPen {
 
   private static getOpNodeChoices(query) {
     const choices = [
-      {text: 'Add', nodeMakerFunction: () => window.wasmModule.AddOpNode.make(this.makeZero(), this.makeZero())},
-      {text: 'Sub', nodeMakerFunction: () => window.wasmModule.SubOpNode.make(this.makeZero(), this.makeZero())},
-      {text: 'Mul', nodeMakerFunction: () => window.wasmModule.MulOpNode.make(this.makeZero(), this.makeZero())},
-      {text: 'Div', nodeMakerFunction: () => window.wasmModule.DivOpNode.make(this.makeZero(), this.makeZero())},
-      {text: 'Mod', nodeMakerFunction: () => window.wasmModule.ModOpNode.make(this.makeZero(), this.makeZero())},
+      {text: 'Add', nodeMakerFunction: () => this.getModule().AddOpNode.make(this.makeZero(), this.makeZero())},
+      {text: 'Sub', nodeMakerFunction: () => this.getModule().SubOpNode.make(this.makeZero(), this.makeZero())},
+      {text: 'Mul', nodeMakerFunction: () => this.getModule().MulOpNode.make(this.makeZero(), this.makeZero())},
+      {text: 'Div', nodeMakerFunction: () => this.getModule().DivOpNode.make(this.makeZero(), this.makeZero())},
+      {text: 'Mod', nodeMakerFunction: () => this.getModule().ModOpNode.make(this.makeZero(), this.makeZero())},
     ];
     return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
@@ -52,11 +50,15 @@ export default class WasmPen {
 
     return attributes.map(attribute => ({
       text: organism.getName() + "." + attribute.getName(),
-      nodeMakerFunction: () => window.wasmModule.AttributeReferenceNode.make(attribute)
+      nodeMakerFunction: () => this.getModule().AttributeReferenceNode.make(attribute)
     })).filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
   private static makeZero() {
-    return window.wasmModule.NumberNode.make(0);
+    return this.getModule().NumberNode.make(0);
+  }
+
+  private static getModule() {
+    return (<any>window).wasmModule;
   }
 }
