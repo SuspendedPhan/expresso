@@ -16,15 +16,14 @@
 import Root, { RenderShape } from "../store/Root";
 import fps from "fps";
 import numeral from "numeral";
-import Component from "vue-class-component";
-import Vue from "vue";
+import Component, {Options, Vue} from "vue-class-component";
 import * as PIXI from "pixi.js";
 import deePool from "deepool";
 import { SignalDispatcher } from "ste-signals";
 
 (window as any).root = Root;
 
-@Component({})
+@Options({})
 export default class Viewport extends Vue {
   width = 0;
   height = 0;

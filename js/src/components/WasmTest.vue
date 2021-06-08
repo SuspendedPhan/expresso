@@ -9,9 +9,8 @@
 
 <script lang="ts">
 
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Prop} from "vue-property-decorator";
-import Vue from "vue";
 
 import WasmModule from '@/../public/WasmModule.js';
 import Wasm from "@/../public/WasmModule.wasm";
@@ -21,7 +20,7 @@ import Functions from "@/code/Functions";
 import Store from "@/models/Store";
 import DeadStore from "@/models/DeadStore";
 
-@Component({
+@Options({
   components: {WasmExpressor},
 })
 export default class WasmTest extends Vue {

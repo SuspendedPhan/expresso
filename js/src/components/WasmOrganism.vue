@@ -52,13 +52,12 @@ import wu from "wu";
 import Root from "../store/Root";
 import WasmAttribute from "./WasmAttribute.vue";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
-import Vue from "vue";
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Prop} from "vue-property-decorator";
 import {Primitive} from "@/models/Type";
 import Functions from "@/code/Functions";
 
-@Component({components: {WasmAttribute: WasmAttribute}})
+@Options({components: {WasmAttribute: WasmAttribute}})
 export default class WasmOrganism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;

@@ -33,14 +33,13 @@
 </template>
 
 <script lang='ts'>
-import Vue from "vue";
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import * as d3 from "d3";
 import Root from "../store/Root";
 import Functions from "@/code/Functions";
 
-@Component({})
+@Options({})
 export default class StoreGraph extends Vue {
   forceNodes = [];
   forceLinks = [];

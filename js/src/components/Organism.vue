@@ -49,13 +49,12 @@ import wu from "wu";
 import Root from "../store/Root";
 import AttributeComponent from "./Attribute.vue";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
-import Vue from "vue";
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 import Attribute from "@/models/Attribute";
 import {Primitive} from "@/models/Type";
 
-@Component({ components: { Attribute: AttributeComponent } })
+@Options({ components: { Attribute: AttributeComponent } })
 export default class Organism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;

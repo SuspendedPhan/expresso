@@ -12,11 +12,10 @@
 
 <script lang="ts">
 
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Prop} from "vue-property-decorator";
-import Vue from "vue";
 
-@Component({
+@Options({
 
 })
 export default class Searchbox extends Vue {

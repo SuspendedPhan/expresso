@@ -16,15 +16,14 @@
 
 <script lang="ts">
 
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Prop, Provide, Watch} from "vue-property-decorator";
-import Vue from "vue";
 import WasmNode from "@/components/WasmNode.vue";
 import {ElementLayout} from "@/code/ElementLayout";
 import Functions from "@/code/Functions";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 
-@Component({
+@Options({
   components: {WasmNode}
 })
 export default class WasmAttribute extends Vue {

@@ -12,14 +12,13 @@
 
 <script lang="ts">
 
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Inject, Prop} from "vue-property-decorator";
-import Vue from "vue";
 import Searchbox from "@/components/Searchbox.vue";
 import WasmPen from "@/code/WasmPen";
 import {Subscription} from "rxjs";
 
-@Component({
+@Options({
   components: {Searchbox}
 })
 export default class WasmNode extends Vue {

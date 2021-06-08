@@ -23,9 +23,8 @@
 
 <script lang="ts">
 
-import Component from "vue-class-component";
+import Component, {Options, Vue} from "vue-class-component";
 import {Prop, Provide} from "vue-property-decorator";
-import Vue from "vue";
 import WasmOrganism from "@/components/WasmOrganism.vue";
 import {ElementLayout} from "@/code/ElementLayout";
 import Functions from "@/code/Functions";
@@ -34,7 +33,7 @@ import panzoom from "panzoom";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import WasmPen from "@/code/WasmPen";
 
-@Component({
+@Options({
   components: {WasmOrganism}
 })
 export default class WasmExpressor extends Vue {
