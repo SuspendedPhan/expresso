@@ -54,7 +54,7 @@ import { Prop } from "vue-property-decorator";
 import Attribute from "@/models/Attribute";
 import {Primitive} from "@/models/Type";
 
-@Options({ components: { Attribute: AttributeComponent } })
+@Options({ components: { Attribute: AttributeComponent as any } })
 export default class Organism extends Vue {
   @Prop() organism!: any;
   @Prop() isRoot!: boolean;

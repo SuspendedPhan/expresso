@@ -15,32 +15,32 @@ const routes = [
     component: WasmTest
     // component: Home
   },
-  {
-    path: "/old",
-    name: "OldHome",
-    component: Home
-  },
-  {
-    path: "/tests",
-    name: "TestRunner",
-    component: TestRunner
-  },
-  {
-    path: "/wat",
-    component: Wat
-  },
-  {
-    path: "/wrap",
-    component: WrapTest
-  },
-  {
-    path: "/eval",
-    component: EvalRenderTest
-  },
-  {
-    path: "/wasm2",
-    component: WasmTest
-  }
+  // {
+  //   path: "/old",
+  //   name: "OldHome",
+  //   component: Home
+  // },
+  // {
+  //   path: "/tests",
+  //   name: "TestRunner",
+  //   component: TestRunner
+  // },
+  // {
+  //   path: "/wat",
+  //   component: Wat
+  // },
+  // {
+  //   path: "/wrap",
+  //   component: WrapTest
+  // },
+  // {
+  //   path: "/eval",
+  //   component: EvalRenderTest
+  // },
+  // {
+  //   path: "/wasm2",
+  //   component: WasmTest
+  // }
   // {
   //   path: '/about',
   //   name: 'About',

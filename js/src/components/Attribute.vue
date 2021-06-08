@@ -22,8 +22,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import Component, {Vue} from "vue-class-component";
+<script>
+import Component, {Options, Vue} from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Root from "../store/Root";
 import NodePicker from "./NodePicker";
@@ -31,7 +31,7 @@ import InlineInput from "./InlineInput";
 import Quill from "quill";
 import AttributeModel from "@/models/Attribute";
 
-@Component({
+@Options({
   components: { NodePicker, InlineInput },
 })
 export default class Attribute extends Vue {

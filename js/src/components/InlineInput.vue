@@ -11,7 +11,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import Component, {Options, Vue} from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 
