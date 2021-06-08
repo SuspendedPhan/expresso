@@ -46,13 +46,13 @@ export default class StoreGraph extends Vue {
   viewBox = "0 0 50 50";
   simulation = null as any;
 
-  private mounted() {
-    Vue.nextTick(() => this.init());
+  mounted() {
+    this.$nextTick(() => this.init());
     const container = this.$refs.container as any;
     this.viewBox = `0 0 ${container.clientWidth} ${container.clientHeight}`;
   }
 
-  private destroyed() {
+  destroyed() {
     this.simulation.stop();
   }
 

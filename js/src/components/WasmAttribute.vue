@@ -55,7 +55,7 @@ export default class WasmAttribute extends Vue {
       this.lines = output.lines;
       this.drawLines(output.lines);
     });
-    Vue.nextTick(() => {
+    this.$nextTick(() => {
       this.nodeLayout.recalculate();
     });
 

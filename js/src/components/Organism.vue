@@ -127,7 +127,8 @@ export default class Organism extends Vue {
       });
 
     Attribute.onAttributeCountChanged.sub(() => {
-      Vue.set(this, "editableAttributes", this.getEditableAttributes());
+      this.editableAttributes = this.getEditableAttributes();
+      // Vue.set(this, "editableAttributes", this.getEditableAttributes());
     });
     this.editableAttributes = this.getEditableAttributes();
   }

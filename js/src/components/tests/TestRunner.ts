@@ -25,7 +25,8 @@ export const Store = store;
 // Actions
 
 export function clearStore() {
-  Vue.set(store, 'tests', []);
+  // Vue.set(store, 'tests', []);
+  store.tests = [];
 }
 
 export function runTests() {
