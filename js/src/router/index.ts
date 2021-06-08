@@ -1,5 +1,5 @@
 import Vue from "vue";
-import VueRouter from "vue-router";
+import VueRouter, {createRouter, createWebHistory} from "vue-router";
 import Home from "../components/Home.vue";
 import TestRunner from "../components/tests/TestRunner.vue";
 import Wat from "@/components/Wat.vue";
@@ -7,8 +7,6 @@ import WrapTest from "@/components/WrapTest.vue";
 import EvalRenderTest from "@/components/EvalRenderTest.vue";
 import WasmTest from "@/components/WasmTest.vue";
 import WasmTest2 from "@/components/WasmTest2.vue";
-
-Vue.use(VueRouter);
 
 const routes = [
   {
@@ -53,9 +51,8 @@ const routes = [
   // }
 ];
 
-const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(process.env.BASE_URL),
   routes
 });
 

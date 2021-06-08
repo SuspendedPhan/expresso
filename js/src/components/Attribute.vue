@@ -22,9 +22,8 @@
   </div>
 </template>
 
-<script>
-import Vue from "vue";
-import Component from "vue-class-component";
+<script lang="ts">
+import Component, {Vue} from "vue-class-component";
 import { Prop, Watch } from "vue-property-decorator";
 import Root from "../store/Root";
 import NodePicker from "./NodePicker";

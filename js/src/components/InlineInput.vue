@@ -11,12 +11,11 @@
   </div>
 </template>
 
-<script>
-import Vue from "vue";
-import Component from "vue-class-component";
+<script lang="ts">
+import Component, {Options, Vue} from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 
-@Component({})
+@Options({})
 export default class InlineInput extends Vue {
   @Prop() value;
   @Prop() readonly;
