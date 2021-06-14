@@ -47,8 +47,8 @@ export default class PixiRenderer {
       }
       circle.x = x;
       circle.y = y;
-      circle.scale.x = 2;
-      circle.scale.y = 2;
+      circle.scale.x = 20;
+      circle.scale.y = 20;
       circle.visible = true;
 
       const suborganismOutputs = cloneOutput.getSuborganisms();

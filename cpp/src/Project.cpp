@@ -4,6 +4,8 @@
 
 #include "Project.h"
 
+#include <utility>
+
 EvalOutput* Project::evalOrganismTree() {
     EvalContext evalContext;
     auto* evalOutput = new EvalOutput();
@@ -17,4 +19,12 @@ Organism *Project::getRootOrganism() {
 
 const std::string &Project::getId() const {
     return id;
+}
+
+void Project::setRootOrganism(std::shared_ptr<Organism> rootOrganism) {
+    this->rootOrganism = std::move(rootOrganism);
+}
+
+std::shared_ptr<Organism> Project::makeRootOrganism() {
+    return Organism::make("the void");
 }

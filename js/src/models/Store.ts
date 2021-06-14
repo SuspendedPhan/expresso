@@ -25,4 +25,18 @@ export default class Store {
   load() {
 
   }
+
+  public static getChildren(node) {
+    if (this.isBinaryOpNode(node)) {
+      const a = node.getA();
+      const b = node.getB();
+      return [a, b];
+    } else {
+      return [];
+    }
+  }
+
+  public static isBinaryOpNode(parentRaw) {
+    return parentRaw?.getA !== undefined;
+  }
 }

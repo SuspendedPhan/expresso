@@ -22,32 +22,32 @@ shared_ptr<NumberNode> NumberNode::make(float value) {
     return std::make_shared<NumberNode>(value);
 }
 
-shared_ptr<AddOpNode> AddOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    const auto &op = std::make_shared<AddOpNode>();
+shared_ptr<AddOpNode> AddOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
+    const auto &op = std::make_shared<AddOpNode>(id);
     BinaryOpNode::set(op, a, b);
     return op;
 }
 
-shared_ptr<SubOpNode> SubOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    const auto &op = std::make_shared<SubOpNode>();
+shared_ptr<SubOpNode> SubOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
+    const auto &op = std::make_shared<SubOpNode>(id);
     BinaryOpNode::set(op, a, b);
     return op;
 }
 
-shared_ptr<MulOpNode> MulOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    const auto &op = std::make_shared<MulOpNode>();
+shared_ptr<MulOpNode> MulOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
+    const auto &op = std::make_shared<MulOpNode>(id);
     BinaryOpNode::set(op, a, b);
     return op;
 }
 
-shared_ptr<DivOpNode> DivOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    const auto &op = std::make_shared<DivOpNode>();
+shared_ptr<DivOpNode> DivOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
+    const auto &op = std::make_shared<DivOpNode>(id);
     BinaryOpNode::set(op, a, b);
     return op;
 }
 
-shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    const auto &op = std::make_shared<ModOpNode>();
+shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
+    const auto &op = std::make_shared<ModOpNode>(id);
     BinaryOpNode::set(op, a, b);
     return op;
 }

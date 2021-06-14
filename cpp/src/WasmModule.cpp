@@ -37,6 +37,7 @@ class ParameterNode;
 #include "Fakebook.h"
 #include "EmbindUtil.h"
 #include "Project.h"
+#include "Car.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -52,6 +53,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("evalOrganismTree", &Project::evalOrganismTree, allow_raw_pointers())
             .function("getRootOrganism", &Project::getRootOrganism, allow_raw_pointers())
             .function("getId", &Project::getId)
+            .function("setRootOrganism", &Project::setRootOrganism)
+            .class_function("makeRootOrganism", &Project::makeRootOrganism)
             ;
 
     class_<Organism>("Organism")
@@ -62,11 +65,17 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     class_<Attribute>("Attribute")
             .function("getName", &Attribute::getName)
-            .function("getId", &Attribute::getId);
+            .function("getId", &Attribute::getId)
+            .function("getIsCloneNumberAttribute", &Attribute::getIsCloneNumberAttribute)
+            .function("getIsEditableAttribute", &Attribute::getIsEditableAttribute)
+            .function("getIsIntrinsicAttribute", &Attribute::getIsIntrinsicAttribute)
+            ;
 
     class_<EditableAttribute, base<Attribute>>("EditableAttribute")
             .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
             .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers());
+
+    class_<CloneNumberAttribute, base<Attribute>>("CloneNumberAttribute");
 
     class_<Node>("Node")
             .smart_ptr<std::shared_ptr<Node>>("Node")
@@ -145,6 +154,15 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<std::function<void()>>("FunctionVoid")
             .constructor<>()
             .function("opcall", &std::function<void()>::operator());
+
+    class_<Car>("Car")
+            .function("getId", &Car::getId)
+            .function("setId", &Car::setId)
+            .class_function("make", &std::make_unique<Car, int>)
+            .class_function("make", &std::make_unique<Car>)
+            .function("setChild", &Car::setChild)
+            .function("getChild", &Car::getChild, allow_raw_pointers())
+            ;
 
     register_vector<Organism *>("OrganismVector");
     register_vector<Attribute *>("AttributeVector");

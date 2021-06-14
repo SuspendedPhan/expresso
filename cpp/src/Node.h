@@ -24,7 +24,7 @@ class Attribute;
 
 class Node {
 private:
-    std::string id = Code::generateUuidV4();
+    std::string id;
     std::function<void(shared_ptr<Node>)> replaceFun;
     weak_ptr<Attribute> attribute;
     weak_ptr<Node> parent;
@@ -32,13 +32,15 @@ protected:
     Signal onChangedSignal;
     virtual void setAttributeForChildren(weak_ptr<Attribute> attribute) = 0;
 public:
+    Node() : id(Code::generateUuidV4()) {}
+    explicit Node(std::string id) : id(std::move(id)) {}
+
     virtual float eval(const EvalContext &evalContext) = 0;
     std::string getId() { return this->id; }
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
     void setAttribute(const std::weak_ptr<Attribute>& attribute);
 
-    // TODO NEXT: Who needs to call setParent???
     void setParent(const std::weak_ptr<Node>& parent);
 
     Signal* getOnChangedSignal();
@@ -51,6 +53,9 @@ public:
 
 class NumberNode : public Node {
 public:
+    NumberNode() {}
+    explicit NumberNode(std::string id) : Node(std::move(id)) {}
+
     float value;
 
     float getValue() const;
@@ -70,6 +75,8 @@ public:
     shared_ptr<Node> a;
     shared_ptr<Node> b;
 
+    explicit BinaryOpNode(std::string id) : Node(std::move(id)) {}
+
     static void setA(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a);
     static void setB(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a);
     static void set(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a, const shared_ptr<Node>& b);
@@ -88,7 +95,9 @@ public:
 
 class AddOpNode : public BinaryOpNode {
 public:
-    static shared_ptr<AddOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+    explicit AddOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
+
+    static shared_ptr<AddOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id = Code::generateUuidV4());
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) + this->b->eval(evalContext);
@@ -97,7 +106,9 @@ public:
 
 class SubOpNode : public BinaryOpNode {
 public:
-    static shared_ptr<SubOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+    explicit SubOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
+
+    static shared_ptr<SubOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id = Code::generateUuidV4());
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) - this->b->eval(evalContext);
@@ -106,7 +117,9 @@ public:
 
 class MulOpNode : public BinaryOpNode {
 public:
-    static shared_ptr<MulOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+    explicit MulOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
+
+    static shared_ptr<MulOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id = Code::generateUuidV4());
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) * this->b->eval(evalContext);
@@ -115,7 +128,9 @@ public:
 
 class DivOpNode : public BinaryOpNode {
 public:
-    static shared_ptr<DivOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+    explicit DivOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
+
+    static shared_ptr<DivOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id = Code::generateUuidV4());
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) / this->b->eval(evalContext);
@@ -124,7 +139,9 @@ public:
 
 class ModOpNode : public BinaryOpNode {
 public:
-    static shared_ptr<ModOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b);
+    explicit ModOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
+
+    static shared_ptr<ModOpNode> make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id = Code::generateUuidV4());
 
     float eval(const EvalContext &evalContext) override {
         float aEval = this->a->eval(evalContext);
@@ -181,7 +198,8 @@ class AttributeReferenceNode : public Node {
 public:
     weak_ptr<Attribute> reference;
 
-    AttributeReferenceNode(weak_ptr<Attribute> reference) { this->reference = reference; }
+    explicit AttributeReferenceNode(weak_ptr<Attribute> reference) { this->reference = reference; }
+    explicit AttributeReferenceNode(weak_ptr<Attribute> reference, std::string id) : Node(std::move(id)) { this->reference = reference; }
 
     static shared_ptr<AttributeReferenceNode> make(Attribute* reference);
 

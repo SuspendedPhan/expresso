@@ -12,9 +12,12 @@ export default class DeadStore {
     return deadStore;
   }
 
-  public toLiveStore() {
-
+  public static toLiveStore(deadStore, emModule) {
+    return {
+      projects: deadStore.projects.map(deadProject => this.toLiveProject(deadProject, emModule))
+    };
   }
+
 
   private static toDeadProject(liveProject) {
     return {
@@ -23,8 +26,11 @@ export default class DeadStore {
     };
   }
 
-  private static toLiveProject(deadProject) {
-
+  private static toLiveProject(deadProject, emModule) {
+    const liveProject = new emModule.Project();
+    const liveRootOrganism = this.toLiveOrganism(deadProject.rootOrganism, emModule);
+    liveProject.setRootOrganism(liveRootOrganism);
+    return liveProject;
   }
 
   private static toDeadOrganism(liveOrganism) {
@@ -35,16 +41,24 @@ export default class DeadStore {
     }
   }
 
-  private static toLiveOrganism(deadOrganism) {
+  private static toLiveOrganism(deadOrganism, emModule) {
+    const liveOrganism = emModule.Organism.make(deadOrganism.name, deadOrganism.id);
 
   }
 
+
   private static toDeadAttribute(liveAttribute) {
-    return {
+    const answer = {
       id: liveAttribute.getId(),
       name: liveAttribute.getName(),
-      rootNode: this.toDeadNode(liveAttribute.getRootNode())
+      type: liveAttribute.constructor.name,
+    } as any;
+
+    if (liveAttribute.getIsEditableAttribute()) {
+      answer.rootNode = this.toDeadNode(liveAttribute.getRootNode());
     }
+
+    return answer;
   }
 
   private static toLiveAttribute(deadAttribute) {
@@ -52,7 +66,21 @@ export default class DeadStore {
   }
 
   private static toDeadNode(liveNode) {
+    const deadNode = {} as any;
+    deadNode.id = liveNode.getId();
+    deadNode.nodeType = liveNode.constructor.name;
 
+    if (liveNode.constructor.name === 'NumberNode') {
+      deadNode.value = liveNode.getValue();
+    } else if (Store.isBinaryOpNode(liveNode)) {
+      deadNode.a = liveNode.getA();
+      deadNode.b = liveNode.getB();
+    } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
+      deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
+    } else {
+      console.error('toDeadNode: unknown node type');
+    }
+    return deadNode;
   }
 
   private static toLiveNode(deadNode) {

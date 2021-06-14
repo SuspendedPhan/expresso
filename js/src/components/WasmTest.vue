@@ -57,9 +57,15 @@ export default class WasmTest extends Vue {
     const rootNode = attribute.getRootNode();
     rootNode.replace(numberNode);
     this.project = project;
-    // console.log(DeadStore.fromLiveStore(store));
 
-    render(project, renderer);
+    const deadStore = DeadStore.fromLiveStore(store);
+    console.log(JSON.stringify(deadStore));
+    const liveStore = DeadStore.toLiveStore(deadStore, module);
+    const liveProject = liveStore.projects[0];
+    this.project = liveProject;
+
+    render(liveProject, renderer);
+    // render(project, renderer);
   }
 }
 

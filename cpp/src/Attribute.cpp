@@ -36,6 +36,9 @@ Signal *EditableAttribute::getOnChangedSignal() {
 IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism) : Attribute(name,
         organism) {}
 
+IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism, const std::string& id) : Attribute(name,
+        organism, id) {}
+
 AttributeOutput IntrinsicAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
     output.name = this->name;

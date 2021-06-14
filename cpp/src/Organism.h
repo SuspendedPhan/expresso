@@ -9,9 +9,10 @@
 class Organism : public std::enable_shared_from_this<Organism> {
 private:
     std::string name;
-    std::string id = Code::generateUuidV4();
+    std::string id;
 
     explicit Organism(std::string name) : name(std::move(name)) {}
+    Organism(std::string name, std::string id) : name(std::move(name)), id(std::move(id)) {}
 
 public:
     vector<shared_ptr<Attribute>> attributes;
@@ -20,8 +21,8 @@ public:
     weak_ptr<Attribute> cloneNumberAttribute;
     weak_ptr<Organism> superorganism;
 
-    static std::shared_ptr<Organism> make(std::string name) {
-        auto organism = std::shared_ptr<Organism>(new Organism(std::move(name)));
+    static std::shared_ptr<Organism> makeWithStandardAttributes(std::string name, const std::string& id = Code::generateUuidV4()) {
+        auto organism = std::shared_ptr<Organism>(new Organism(std::move(name), id));
 
         const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones", organism);
         cloneCountAttribute->setRootNode(std::make_unique<NumberNode>(1.0f));

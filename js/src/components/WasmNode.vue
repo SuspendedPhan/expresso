@@ -18,6 +18,7 @@ import Vue from "vue";
 import Searchbox from "@/components/Searchbox.vue";
 import WasmPen from "@/code/WasmPen";
 import {Subscription} from "rxjs";
+import Store from "@/models/Store";
 
 @Component({
   components: {Searchbox}
@@ -165,17 +166,11 @@ export default class WasmNode extends Vue {
   }
 
   public static getChildren(node) {
-    if (WasmNode.isBinaryOpNode(node)) {
-      const a = node.getA();
-      const b = node.getB();
-      return [a, b];
-    } else {
-      return [];
-    }
+    return Store.getChildren(node);
   }
 
   private static isBinaryOpNode(parentRaw) {
-    return parentRaw?.getA !== undefined;
+    return Store.isBinaryOpNode(parentRaw);
   }
 
   private static getOtherBinaryOpSibling(binaryOpParent, node) {
