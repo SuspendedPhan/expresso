@@ -43,10 +43,10 @@ class ParameterNode;
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(my_module) {
-    class_<ExpressorTree>("ExpressorTree")
-            .constructor<>()
-            .function("eval", &ExpressorTree::eval, allow_raw_pointers())
-            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers());
+//    class_<ExpressorTree>("ExpressorTree")
+//            .constructor<>()
+//            .function("eval", &ExpressorTree::eval, allow_raw_pointers())
+//            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers());
 
     class_<Project>("Project")
             .constructor<>()
@@ -166,9 +166,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     register_vector<Organism *>("OrganismVector");
     register_vector<Attribute *>("AttributeVector");
-    register_vector<OrganismOutput>("OrganismOutputVector");
-    register_vector<OrganismCloneOutput>("OrganismCloneOutputVector");
-    register_vector<AttributeOutput>("AttributeOutputVector");
+    register_vector<OrganismOutput *>("OrganismOutputVector");
+    register_vector<OrganismCloneOutput *>("OrganismCloneOutputVector");
+    register_vector<AttributeOutput *>("AttributeOutputVector");
     register_vector<FakeBook *>("FakeBookVector");
 }
 

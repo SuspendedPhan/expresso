@@ -54,6 +54,7 @@ public:
         auto it = find_if(v.begin(), v.end(), predicate);
         if (it == v.end()) {
             std::cerr << "Error in Code::remove" << std::endl;
+            return {};
         } else {
             auto answer = std::move(*it);
             v.erase(it);
