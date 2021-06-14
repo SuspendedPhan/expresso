@@ -9,7 +9,7 @@
 EvalOutput* Project::evalOrganismTree() {
     EvalContext evalContext;
     auto* evalOutput = new EvalOutput();
-    evalOutput->rootOrganism = std::make_shared<OrganismOutput>(this->getRootOrganism()->eval(&evalContext));
+    evalOutput->rootOrganism = this->getRootOrganism()->eval(&evalContext);
     return evalOutput;
 }
 
@@ -21,10 +21,10 @@ const std::string &Project::getId() const {
     return id;
 }
 
-void Project::setRootOrganism(std::shared_ptr<Organism> rootOrganism) {
+void Project::setRootOrganism(std::unique_ptr<Organism> rootOrganism) {
     this->rootOrganism = std::move(rootOrganism);
 }
 
-std::shared_ptr<Organism> Project::makeRootOrganism() {
-    return Organism::make("the void");
+std::unique_ptr<Organism> Project::makeRootOrganism() {
+    return Organism::makeWithStandardAttributes("the void");
 }

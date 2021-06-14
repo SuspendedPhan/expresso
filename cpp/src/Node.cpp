@@ -7,7 +7,7 @@
 #include <utility>
 
 float AttributeReferenceNode::eval(const EvalContext &evalContext) {
-    return reference.lock()->eval(evalContext).value;
+    return reference->eval(evalContext).value;
 }
 
 float NumberNode::eval(const EvalContext &evalContext) {
@@ -18,49 +18,49 @@ float NumberNode::getValue() const {
     return value;
 }
 
-shared_ptr<NumberNode> NumberNode::make(float value) {
-    return std::make_shared<NumberNode>(value);
+std::unique_ptr<NumberNode> NumberNode::make(float value) {
+    return std::make_unique<NumberNode>(value);
 }
 
-shared_ptr<AddOpNode> AddOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
-    const auto &op = std::make_shared<AddOpNode>(id);
-    BinaryOpNode::set(op, a, b);
+std::unique_ptr<AddOpNode> AddOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
+    auto op = std::make_unique<AddOpNode>(id);
+    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
     return op;
 }
 
-shared_ptr<SubOpNode> SubOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
-    const auto &op = std::make_shared<SubOpNode>(id);
-    BinaryOpNode::set(op, a, b);
+std::unique_ptr<SubOpNode> SubOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
+    auto op = std::make_unique<SubOpNode>(id);
+    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
     return op;
 }
 
-shared_ptr<MulOpNode> MulOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
-    const auto &op = std::make_shared<MulOpNode>(id);
-    BinaryOpNode::set(op, a, b);
+std::unique_ptr<MulOpNode> MulOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
+    auto op = std::make_unique<MulOpNode>(id);
+    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
     return op;
 }
 
-shared_ptr<DivOpNode> DivOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
-    const auto &op = std::make_shared<DivOpNode>(id);
-    BinaryOpNode::set(op, a, b);
+std::unique_ptr<DivOpNode> DivOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
+    auto op = std::make_unique<DivOpNode>(id);
+    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
     return op;
 }
 
-shared_ptr<ModOpNode> ModOpNode::make(const shared_ptr<Node>& a, const shared_ptr<Node>& b, const std::string& id) {
-    const auto &op = std::make_shared<ModOpNode>(id);
-    BinaryOpNode::set(op, a, b);
+std::unique_ptr<ModOpNode> ModOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
+    auto op = std::make_unique<ModOpNode>(id);
+    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
     return op;
 }
 
-shared_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute* reference) {
-    return std::make_shared<AttributeReferenceNode>(reference->shared_from_this());
+std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute* reference) {
+    return std::make_unique<AttributeReferenceNode>(reference);
 }
 
-void Node::replace(shared_ptr<Node> node) {
+void Node::replace(std::unique_ptr<Node> node) {
     this->replaceFun(std::move(node));
 }
 
-void Node::setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun) {
+void Node::setReplaceFun(const std::function<void(std::unique_ptr<Node>)> &replaceFun) {
     this->replaceFun = replaceFun;
 }
 
@@ -68,62 +68,57 @@ Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
 
-void Node::setAttribute(const std::weak_ptr<Attribute>& attribute) {
+void Node::setAttribute(Attribute* attribute) {
     this->attribute = attribute;
     this->setAttributeForChildren(attribute);
 }
 
-weak_ptr<Attribute> Node::getAttribute() {
+Attribute* Node::getAttribute() {
     return this->attribute;
 }
 
 Organism* Node::getOrganismRaw() {
-    const shared_ptr<Attribute> &attribute = this->attribute.lock();
-    return attribute->organism.lock().get();
+    return this->attribute->organism;
 }
 
 Node *Node::getParentRaw() {
-    if (this->parent.expired()) {
-        return nullptr;
-    } else {
-        return this->parent.lock().get();
-    }
+    return this->parent;
 }
 
-void Node::setParent(const weak_ptr<Node> &parent) {
+void Node::setParent(Node* parent) {
     this->parent = parent;
 }
 
-void BinaryOpNode::setAttributeForChildren(weak_ptr<Attribute> attribute) {
+void BinaryOpNode::setAttributeForChildren(Attribute* attribute) {
     this->a->setAttribute(attribute);
     this->b->setAttribute(attribute);
 }
 
-void BinaryOpNode::setA(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a) {
-    a->setReplaceFun([op](auto node) {
-        setA(op, node);
+void BinaryOpNode::setA(BinaryOpNode * op, std::unique_ptr<Node> a) {
+    a->setReplaceFun([&](auto node) {
+        setA(op, std::move(node));
     });
     a->setAttribute(op->getAttribute());
     a->setParent(op);
-    op->a = a;
+    op->a = std::move(a);
     op->onChangedSignal.dispatch();
 }
 
-void BinaryOpNode::setB(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& b) {
-    b->setReplaceFun([op](auto node) {
-        setB(op, node);
+void BinaryOpNode::setB(BinaryOpNode * op, std::unique_ptr<Node> b) {
+    b->setReplaceFun([&](auto node) {
+        setB(op, std::move(node));
     });
     b->setAttribute(op->getAttribute());
     b->setParent(op);
-    op->b = b;
+    op->b = std::move(b);
     op->onChangedSignal.dispatch();
 }
 
-void BinaryOpNode::set(const shared_ptr<BinaryOpNode>& op, const shared_ptr<Node>& a, const shared_ptr<Node>& b) {
-    BinaryOpNode::setA(op, a);
-    BinaryOpNode::setB(op, b);
+void BinaryOpNode::set(BinaryOpNode * op, std::unique_ptr<Node> a, std::unique_ptr<Node> b) {
+    BinaryOpNode::setA(op, std::move(a));
+    BinaryOpNode::setB(op, std::move(b));
 }
 
-void FunctionNode::setAttributeForChildren(weak_ptr<Attribute> attribute) {
+void FunctionNode::setAttributeForChildren(Attribute* attribute) {
     std::cout << "need to implement this" << std::endl;
 }

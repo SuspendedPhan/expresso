@@ -19,12 +19,12 @@ public:
     Project() : id(Code::generateUuidV4()) {}
     explicit Project(std::string id) : id(std::move(id)) {}
 
-    static std::shared_ptr<Organism> makeRootOrganism();
+    static unique_ptr<Organism> makeRootOrganism();
 
     const std::string &getId() const;
     EvalOutput * evalOrganismTree();
     Organism* getRootOrganism();
-    void setRootOrganism(std::shared_ptr<Organism> rootOrganism);
+    void setRootOrganism(std::unique_ptr<Organism> rootOrganism);
 };
 
 

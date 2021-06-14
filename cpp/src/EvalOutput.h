@@ -1,6 +1,7 @@
 #ifndef EXPRESSO_EVALOUTPUT_H
 #define EXPRESSO_EVALOUTPUT_H
 #include <vector>
+#include "Code.h"
 
 class OrganismOutput;
 
@@ -20,32 +21,32 @@ class AttributeOutput {
 
 class OrganismCloneOutput {
     public:
-        std::vector<AttributeOutput> attributes;
-        std::vector<OrganismOutput> suborganisms;
+        std::vector<std::unique_ptr<AttributeOutput>> attributes;
+        std::vector<std::unique_ptr<OrganismOutput>> suborganisms;
 
-        std::vector<AttributeOutput> getAttributes() {
-            return this->attributes;
+        std::vector<AttributeOutput*> getAttributes() const {
+            return Code::map<std::unique_ptr<AttributeOutput>, AttributeOutput*>(this->attributes, [&](const auto & attribute) { return attribute.get(); });
         }
 
-        std::vector<OrganismOutput> getSuborganisms() {
-            return this->suborganisms;
+        std::vector<OrganismOutput*> getSuborganisms() const {
+            return Code::map<std::unique_ptr<OrganismOutput>, OrganismOutput*>(this->suborganisms, [&](const auto & suborganism) { return suborganism.get(); });
         }
 };
 
 
 class OrganismOutput {
     public:
-        std::vector<OrganismCloneOutput> cloneOutputByCloneNumber;
-        std::vector<OrganismCloneOutput> getCloneOutputByCloneNumber() {
-            return this->cloneOutputByCloneNumber;
+        std::vector<std::unique_ptr<OrganismCloneOutput>> cloneOutputByCloneNumber;
+        std::vector<OrganismCloneOutput*> getCloneOutputByCloneNumber() const {
+            return Code::map<std::unique_ptr<OrganismCloneOutput>, OrganismCloneOutput*>(this->cloneOutputByCloneNumber, [&](const auto & output) { return output.get(); });
         }
 };
 
 
 class EvalOutput {
     public:
-        std::shared_ptr<OrganismOutput> rootOrganism;
-        OrganismOutput* getRootOrganism() {
+        std::unique_ptr<OrganismOutput> rootOrganism;
+        OrganismOutput* getRootOrganism() const {
             return this->rootOrganism.get();
         }
 };

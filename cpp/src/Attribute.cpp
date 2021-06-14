@@ -14,11 +14,11 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
     return output;
 }
 
-void EditableAttribute::setRootNode(const std::shared_ptr<Node>& rootNode) {
-    this->rootNode = rootNode;
-    rootNode->setAttribute(shared_from_this());
-    rootNode->setReplaceFun([this](const std::shared_ptr<Node>& node) {
-        this->setRootNode(node);
+void EditableAttribute::setRootNode(std::unique_ptr<Node> rootNode) {
+    this->rootNode = std::move(rootNode);
+    rootNode->setAttribute(this);
+    rootNode->setReplaceFun([this](std::unique_ptr<Node> node) {
+        this->setRootNode(std::move(node));
         if (this->onChangedSignal.listener) {
             this->onChangedSignal.listener();
         }
@@ -33,17 +33,9 @@ Signal *EditableAttribute::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
 
-IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism) : Attribute(name,
-        organism) {}
-
-IntrinsicAttribute::IntrinsicAttribute(const std::string &name, const weak_ptr<Organism> &organism, const std::string& id) : Attribute(name,
-        organism, id) {}
-
 AttributeOutput IntrinsicAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
     output.name = this->name;
-    const std::weak_ptr<const IntrinsicAttribute> &shared_this = std::static_pointer_cast<const IntrinsicAttribute>(
-            shared_from_this());
-    output.value = evalContext.valueByIntrinsicAttribute.find(shared_this)->second;
+    output.value = evalContext.valueByIntrinsicAttribute.find(this)->second;
     return output;
 }

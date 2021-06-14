@@ -7,11 +7,13 @@
 
 
 #include <memory>
+#include "vector"
 
 class Car {
 public:
     int id;
     std::unique_ptr<Car> child;
+    std::vector<std::unique_ptr<Car>> children;
 
     Car(int id) : id(id) {}
     Car() : id(-1) {}

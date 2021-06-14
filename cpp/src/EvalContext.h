@@ -8,15 +8,19 @@ class IntrinsicAttribute;
 
 class OrganismEvalContext {
 public:
-    std::weak_ptr<OrganismOutput> organismOutput;
-    int currentCloneNumber;
+    OrganismOutput* organismOutput;
+
+    explicit OrganismEvalContext(OrganismOutput *organismOutput) : organismOutput(organismOutput) {}
+
+    int currentCloneNumber = 0;
 };
 
 
 class EvalContext {
 public:
-    std::map<std::weak_ptr<Organism>, std::shared_ptr<OrganismEvalContext>, std::owner_less<std::weak_ptr<Organism>>> organismEvalContextByOrganism;
-    std::map<std::weak_ptr<const IntrinsicAttribute>, float, std::owner_less<std::weak_ptr<const IntrinsicAttribute>>> valueByIntrinsicAttribute;
+    std::map<Organism*, std::unique_ptr<OrganismEvalContext>> organismEvalContextByOrganism;
+    std::map<Organism*, OrganismEvalContext*> acc;
+    std::map<const IntrinsicAttribute*, float> valueByIntrinsicAttribute;
 };
 
 #endif //EXPRESSO_EVALCONTEXT_H

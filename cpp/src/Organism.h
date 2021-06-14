@@ -4,78 +4,76 @@
 #include "Attribute.h"
 #include "Code.h"
 #include <cassert>
+#include <memory>
 #include <utility>
 
-class Organism : public std::enable_shared_from_this<Organism> {
+class Organism {
 private:
     std::string name;
     std::string id;
 
-    explicit Organism(std::string name) : name(std::move(name)) {}
+public:
+    vector<std::unique_ptr<Attribute>> attributes;
+    vector<std::unique_ptr<Organism>> suborganisms;
+    EditableAttribute* cloneCountAttribute = nullptr;
+    Attribute* cloneNumberAttribute = nullptr;
+    Organism* superorganism = nullptr;
+
+    explicit Organism(std::string name) : name(std::move(name)), id(Code::generateUuidV4()) {}
     Organism(std::string name, std::string id) : name(std::move(name)), id(std::move(id)) {}
 
-public:
-    vector<shared_ptr<Attribute>> attributes;
-    vector<shared_ptr<Organism>> suborganisms;
-    weak_ptr<EditableAttribute> cloneCountAttribute;
-    weak_ptr<Attribute> cloneNumberAttribute;
-    weak_ptr<Organism> superorganism;
+    static std::unique_ptr<Organism> makeWithStandardAttributes(std::string name, const std::string& id = Code::generateUuidV4()) {
+        auto organism = std::make_unique<Organism>(std::move(name), id);
 
-    static std::shared_ptr<Organism> makeWithStandardAttributes(std::string name, const std::string& id = Code::generateUuidV4()) {
-        auto organism = std::shared_ptr<Organism>(new Organism(std::move(name), id));
-
-        const shared_ptr<EditableAttribute> &cloneCountAttribute = std::make_shared<EditableAttribute>("clones", organism);
+        std::unique_ptr<EditableAttribute> cloneCountAttribute = std::make_unique<EditableAttribute>("clones", organism.get());
         cloneCountAttribute->setRootNode(std::make_unique<NumberNode>(1.0f));
-        organism->cloneCountAttribute = cloneCountAttribute;
-        organism->attributes.push_back(cloneCountAttribute);
+        organism->cloneCountAttribute = cloneCountAttribute.get();
+        organism->attributes.emplace_back(std::move(cloneCountAttribute));
 
-        const shared_ptr<CloneNumberAttribute> &cloneNumberAttribute = std::make_shared<CloneNumberAttribute>(organism);
-        organism->cloneNumberAttribute = cloneNumberAttribute;
-        organism->attributes.push_back(cloneNumberAttribute);
+        std::unique_ptr<CloneNumberAttribute> cloneNumberAttribute = std::make_unique<CloneNumberAttribute>(organism.get());
+        organism->cloneNumberAttribute = cloneNumberAttribute.get();
+        organism->attributes.emplace_back(std::move(cloneNumberAttribute));
 
-        const shared_ptr<EditableAttribute> &xAttribute = std::make_shared<EditableAttribute>("x", organism);
-        xAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
-        organism->attributes.emplace_back(xAttribute);
-        const shared_ptr<EditableAttribute> &yAttribute = std::make_shared<EditableAttribute>("y", organism);
-        yAttribute->setRootNode(std::make_shared<NumberNode>(0.0f));
-        organism->attributes.emplace_back(yAttribute);
+        std::unique_ptr<EditableAttribute> xAttribute = std::make_unique<EditableAttribute>("x", organism.get());
+        xAttribute->setRootNode(std::make_unique<NumberNode>(0.0f));
+        organism->attributes.emplace_back(std::move(xAttribute));
+        std::unique_ptr<EditableAttribute> yAttribute = std::make_unique<EditableAttribute>("y", organism.get());
+        yAttribute->setRootNode(std::make_unique<NumberNode>(0.0f));
+        organism->attributes.emplace_back(std::move(yAttribute));
 
         return organism;
     }
 
-    OrganismOutput eval(EvalContext *evalContext) {
-        const auto &shared_this = shared_from_this();
+    std::unique_ptr<OrganismOutput> eval(EvalContext *evalContext) {
+        auto organismOutput = std::make_unique<OrganismOutput>();
+        auto uniqueOrganismEvalContext = std::make_unique<OrganismEvalContext>(organismOutput.get());
+        evalContext->organismEvalContextByOrganism.emplace(this, std::move(uniqueOrganismEvalContext));
+        auto &organismEvalContext = evalContext->organismEvalContextByOrganism.at(this);
 
-        OrganismOutput organismOutput;
-        auto organismEvalContext = std::make_shared<OrganismEvalContext>();
-        evalContext->organismEvalContextByOrganism.emplace(weak_ptr<Organism>(shared_this), organismEvalContext);
-
-        float cloneCount = shared_this->cloneCountAttribute.lock()->eval(*evalContext).value;
-        for (int cloneNumber = 0; cloneNumber < cloneCount; cloneNumber++) {
+        float cloneCount = this->cloneCountAttribute->eval(*evalContext).value;
+        for (int cloneNumber = 0; cloneNumber < (int) cloneCount; cloneNumber++) {
             organismEvalContext->currentCloneNumber = cloneNumber;
-            OrganismCloneOutput cloneOutput;
-            for (const auto &attribute : shared_this->getAttributes()) {
-                cloneOutput.attributes.emplace_back(attribute->eval(*evalContext));
+            auto cloneOutput = std::make_unique<OrganismCloneOutput>();
+            for (const auto &attribute : this->getAttributes()) {
+                auto attributeOutput = std::make_unique<AttributeOutput>(attribute->eval(*evalContext));
+                cloneOutput->attributes.emplace_back(std::move(attributeOutput));
             }
-            for (const auto &suborganism : shared_this->suborganisms) {
-                cloneOutput.suborganisms.emplace_back(suborganism->eval(evalContext));
+            for (const auto &suborganism : this->suborganisms) {
+                cloneOutput->suborganisms.emplace_back(suborganism->eval(evalContext));
             }
-            organismOutput.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
+            organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
         }
         return organismOutput;
     }
 
-    void addSuborganism(std::string name) {
-        const shared_ptr<Organism> &suborganism = Organism::make(name);
-        const shared_ptr<Organism> &shared_this = shared_from_this();
-        suborganism->superorganism = shared_this;
-        shared_this->suborganisms.emplace_back(suborganism);
+    void addSuborganism(std::unique_ptr<Organism> suborganism) {
+        suborganism->superorganism = this;
+        this->suborganisms.emplace_back(std::move(suborganism));
     }
     
     void remove() {
-        const auto &organism = shared_from_this();
-        assert(!organism->superorganism.expired());
-        Code::vecremove(organism->superorganism.lock()->suborganisms, organism);
+        auto superorganism = this->superorganism;
+        Code::remove<Organism>(superorganism->suborganisms, [&](const auto &organism) { return organism.get() == this; });
     }
 
     std::vector<Organism*> getSuborganisms() {

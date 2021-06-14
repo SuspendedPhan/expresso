@@ -19,14 +19,14 @@ class Attribute : public std::enable_shared_from_this<Attribute> {
 public:
     std::string name;
     std::string id = Code::generateUuidV4();
-    std::weak_ptr<Organism> organism;
+    Organism* organism;
 
-    Attribute(std::string name, std::weak_ptr<Organism> organism) {
+    Attribute(std::string name, Organism* organism) {
         this->name = name;
         this->organism = organism;
     }
 
-    Attribute(std::string name, std::weak_ptr<Organism> organism, std::string id) : name(name), organism(organism), id(id) {}
+    Attribute(std::string name, Organism* organism, std::string id) : name(name), organism(organism), id(id) {}
 
     std::string getName() { return this->name; }
     std::string getId() { return this->id; }
@@ -41,13 +41,13 @@ public:
 
 class EditableAttribute : public Attribute {
 private:
-    std::shared_ptr<Node> rootNode;
+    std::unique_ptr<Node> rootNode;
     Signal onChangedSignal;
 public:
-    EditableAttribute(std::string name, std::weak_ptr<Organism> organism) : Attribute(
+    EditableAttribute(std::string name, Organism* organism) : Attribute(
             name, organism) {}
 
-    EditableAttribute(std::string name, std::weak_ptr<Organism> organism, const std::string& id) : Attribute(
+    EditableAttribute(std::string name, Organism* organism, const std::string& id) : Attribute(
             name, organism, id) {}
 
     Signal* getOnChangedSignal();
@@ -55,15 +55,15 @@ public:
     AttributeOutput eval(const EvalContext &evalContext) const override;
     bool getIsEditableAttribute() override { return true; }
 
-    void setRootNode(const std::shared_ptr<Node> &rootNode);
+    void setRootNode(std::unique_ptr<Node> rootNode);
 
     Node *getRootNode();
 };
 
 class CloneNumberAttribute : public Attribute {
 public:
-    CloneNumberAttribute(std::weak_ptr<Organism> organism) : Attribute("cloneNumber", organism) {}
-    CloneNumberAttribute(std::weak_ptr<Organism> organism, const std::string& id) : Attribute("cloneNumber", organism, id) {}
+    CloneNumberAttribute(Organism* organism) : Attribute("cloneNumber", organism) {}
+    CloneNumberAttribute(Organism* organism, const std::string& id) : Attribute("cloneNumber", organism, id) {}
 
     bool getIsCloneNumberAttribute() override { return true; }
 
@@ -77,8 +77,8 @@ public:
 
 class IntrinsicAttribute : public Attribute {
 public:
-    IntrinsicAttribute(const std::string &name, const std::weak_ptr<Organism> &organism);
-    IntrinsicAttribute(const std::string &name, const std::weak_ptr<Organism> &organism, const std::string& id);
+    IntrinsicAttribute(const std::string &name, Organism* &organism) : Attribute(name, organism) {}
+    IntrinsicAttribute(const std::string &name, Organism* &organism, const std::string& id) : Attribute(name, organism, id) {}
 
     bool getIsIntrinsicAttribute() override { return true; }
 
