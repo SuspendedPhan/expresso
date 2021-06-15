@@ -44,25 +44,25 @@ public:
         return organism;
     }
 
-    std::unique_ptr<OrganismOutput> eval(EvalContext *evalContext) {
-        auto organismOutput = std::make_unique<OrganismOutput>();
-        auto uniqueOrganismEvalContext = std::make_unique<OrganismEvalContext>(organismOutput.get());
-        evalContext->organismEvalContextByOrganism.emplace(this, std::move(uniqueOrganismEvalContext));
-        auto &organismEvalContext = evalContext->organismEvalContextByOrganism.at(this);
+    OrganismOutput eval(EvalContext *evalContext) {
+        OrganismOutput organismOutput;
+        OrganismEvalContext organismEvalContext(&organismOutput);
+        evalContext->organismEvalContextByOrganism.emplace(this, &organismEvalContext);
 
         float cloneCount = this->cloneCountAttribute->eval(*evalContext).value;
         for (int cloneNumber = 0; cloneNumber < (int) cloneCount; cloneNumber++) {
-            organismEvalContext->currentCloneNumber = cloneNumber;
+            organismEvalContext.currentCloneNumber = cloneNumber;
             auto cloneOutput = std::make_unique<OrganismCloneOutput>();
             for (const auto &attribute : this->getAttributes()) {
                 auto attributeOutput = std::make_unique<AttributeOutput>(attribute->eval(*evalContext));
                 cloneOutput->attributes.emplace_back(std::move(attributeOutput));
             }
             for (const auto &suborganism : this->suborganisms) {
-                cloneOutput->suborganisms.emplace_back(suborganism->eval(evalContext));
+                cloneOutput->suborganisms.emplace_back(std::make_unique<OrganismOutput>(suborganism->eval(evalContext)));
             }
-            organismOutput->cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
+            organismOutput.cloneOutputByCloneNumber.emplace_back(std::move(cloneOutput));
         }
+        evalContext->organismEvalContextByOrganism.erase(this);
         return organismOutput;
     }
 

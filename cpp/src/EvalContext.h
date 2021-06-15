@@ -18,8 +18,7 @@ public:
 
 class EvalContext {
 public:
-    std::map<Organism*, std::unique_ptr<OrganismEvalContext>> organismEvalContextByOrganism;
-    std::map<Organism*, OrganismEvalContext*> acc;
+    std::map<Organism*, OrganismEvalContext*> organismEvalContextByOrganism;
     std::map<const IntrinsicAttribute*, float> valueByIntrinsicAttribute;
 };
 

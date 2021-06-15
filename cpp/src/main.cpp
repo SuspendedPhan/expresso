@@ -4,35 +4,31 @@
 #include "Attribute.h"
 #include "Node.h"
 #include "Car.h"
-
-std::pair<int, int> wer() {
-    return std::make_pair(20, 20);
-}
+#include "Project.h"
 
 int main() {
     std::cout << "Hello, World!" << std::endl;
-    std::cout << wer().first << std::endl;
+    Project project(Project::makeRootOrganism());
 
-//    Car car;
-//    car.children.emplace_back(std::make_unique<Car>());
-//    std::cout << car.children.back()->getId() << std::endl;
+    auto rootOrganism = project.getRootOrganism();
+    const auto & xAttr = Code::find<std::unique_ptr<Attribute>>(rootOrganism->attributes, [&](const auto &attribute) { return attribute->name == "x"; });
+    const auto & yAttr = Code::find<std::unique_ptr<Attribute>>(rootOrganism->attributes, [&](const auto &attribute) { return attribute->name == "y"; });
 
-//    const auto node = std::make_shared<NumberNode>(0.0f);
-//    const auto &attribute = std::make_shared<EditableAttribute>("attr", weak_ptr<Organism>());
-//    attribute->setRootNode(node);
-//
-//    const shared_ptr<NumberNode> &left = std::make_shared<NumberNode>(0.0f);
-//    const auto &node0 = AddOpNode::make(left, std::make_shared<NumberNode>(10.0f));
-//    node->replace(node0);
-//
-//
-//    std::cout << left->getParentRaw()->eval(EvalContext()) << std::endl;
-//
-//    std::cout << left->getAttribute().lock()->getName() << std::endl;
-//    std::cout << left->getAttribute().lock()->eval(EvalContext()).getValue() << std::endl;
+    auto xRef = std::make_unique<AttributeReferenceNode>(xAttr.get());
+    auto two = std::make_unique<NumberNode>(2.0f);
+    auto add = AddOpNode::make(std::move(xRef), std::move(two));
 
-//    attribute->setRootNode(node0);
-//    node0->replace(std::make_shared<NumberNode>(0.0f));
+    auto three = std::make_unique<NumberNode>(3.0f);
+    dynamic_cast<EditableAttribute *>(xAttr.get())->setRootNode(std::move(three));
+    dynamic_cast<EditableAttribute *>(yAttr.get())->setRootNode(std::move(add));
+
+    const auto evalOutput = project.evalOrganismTree();
+    OrganismOutput &output = evalOutput->rootOrganism;
+    for (const auto & attribute : output.cloneOutputByCloneNumber[0]->attributes) {
+        std::cout << attribute->name << std::endl;
+        std::cout << attribute->value << std::endl;
+        std::cout << std::endl;
+    }
 
     return 0;
 }

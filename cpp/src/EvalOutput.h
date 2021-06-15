@@ -45,9 +45,9 @@ class OrganismOutput {
 
 class EvalOutput {
     public:
-        std::unique_ptr<OrganismOutput> rootOrganism;
-        OrganismOutput* getRootOrganism() const {
-            return this->rootOrganism.get();
+        OrganismOutput rootOrganism;
+        const OrganismOutput* getRootOrganism() const {
+            return &this->rootOrganism;
         }
 };
 

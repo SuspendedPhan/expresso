@@ -25,6 +25,11 @@ public:
     }
 
     template<typename T>
+    static const T & find(const std::vector<T> & v, std::function<bool(const T &)> predicate) {
+        return *std::find_if(v.begin(), v.end(), predicate);
+    }
+
+    template<typename T>
     static std::vector<T> filter(const std::vector<T> & v, std::function<bool(const T &)> predicate) {
         std::vector<T> answer;
         for (const auto &item : v) {

@@ -6,23 +6,19 @@
 
 #include <utility>
 
-EvalOutput* Project::evalOrganismTree() {
+unique_ptr<EvalOutput> Project::evalOrganismTree() const {
     EvalContext evalContext;
-    auto* evalOutput = new EvalOutput();
+    auto evalOutput = std::make_unique<EvalOutput>();
     evalOutput->rootOrganism = this->getRootOrganism()->eval(&evalContext);
-    return evalOutput;
+    return std::move(evalOutput);
 }
 
-Organism *Project::getRootOrganism() {
+Organism *Project::getRootOrganism() const {
     return this->rootOrganism.get();
 }
 
 const std::string &Project::getId() const {
     return id;
-}
-
-void Project::setRootOrganism(std::unique_ptr<Organism> rootOrganism) {
-    this->rootOrganism = std::move(rootOrganism);
 }
 
 std::unique_ptr<Organism> Project::makeRootOrganism() {
