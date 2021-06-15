@@ -77,8 +77,8 @@ public:
 
 class IntrinsicAttribute : public Attribute {
 public:
-    IntrinsicAttribute(const std::string &name, Organism* &organism) : Attribute(name, organism) {}
-    IntrinsicAttribute(const std::string &name, Organism* &organism, const std::string& id) : Attribute(name, organism, id) {}
+    IntrinsicAttribute(const std::string &name, Organism* organism) : Attribute(name, organism) {}
+    IntrinsicAttribute(const std::string &name, Organism* organism, const std::string& id) : Attribute(name, organism, id) {}
 
     bool getIsIntrinsicAttribute() override { return true; }
 

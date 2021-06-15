@@ -23,8 +23,8 @@ int main() {
     dynamic_cast<EditableAttribute *>(yAttr.get())->setRootNode(std::move(add));
 
     const auto evalOutput = project.evalOrganismTree();
-    OrganismOutput &output = evalOutput->rootOrganism;
-    for (const auto & attribute : output.cloneOutputByCloneNumber[0]->attributes) {
+    const auto output = evalOutput->getRootOrganism();
+    for (const auto & attribute : output->cloneOutputByCloneNumber[0]->attributes) {
         std::cout << attribute->name << std::endl;
         std::cout << attribute->value << std::endl;
         std::cout << std::endl;

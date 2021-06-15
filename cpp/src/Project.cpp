@@ -9,7 +9,7 @@
 unique_ptr<EvalOutput> Project::evalOrganismTree() const {
     EvalContext evalContext;
     auto evalOutput = std::make_unique<EvalOutput>();
-    evalOutput->rootOrganism = this->getRootOrganism()->eval(&evalContext);
+    evalOutput->rootOrganism = std::make_unique<OrganismOutput>(this->getRootOrganism()->eval(&evalContext));
     return std::move(evalOutput);
 }
 
