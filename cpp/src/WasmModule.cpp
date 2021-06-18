@@ -80,7 +80,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<Organism>("Organism")
             .class_function("makeUnique", &make<Organism, std::string, std::string>)
             .function("getSuborganisms", &Organism::getSuborganisms)
+            .function("addSuborganism", &Organism::addSuborganism)
             .function("getAttributes", &Organism::getAttributes)
+            .function("addAttribute", &Organism::addAttribute)
             .function("getName", &Organism::getName)
             .function("getId", &Organism::getId);
 
@@ -93,10 +95,16 @@ EMSCRIPTEN_BINDINGS(my_module) {
             ;
 
     class_<EditableAttribute, base<Attribute>>("EditableAttribute")
+            .class_function("makeUnique", &make<EditableAttribute, std::string, Organism*, std::string>, allow_raw_pointers())
             .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
+            .function("setRootNode", &EditableAttribute::setRootNode, allow_raw_pointers())
             .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers());
 
-    class_<CloneNumberAttribute, base<Attribute>>("CloneNumberAttribute");
+    class_<CloneNumberAttribute, base<Attribute>>("CloneNumberAttribute")
+            .class_function("makeUnique", &make<CloneNumberAttribute, Organism*, std::string>, allow_raw_pointers());
+
+    class_<IntrinsicAttribute, base<Attribute>>("IntrinsicAttribute")
+            .class_function("makeUnique", &make<IntrinsicAttribute, std::string, Organism*, std::string>, allow_raw_pointers());
 
     class_<Node>("Node")
             .smart_ptr<std::shared_ptr<Node>>("Node")
@@ -113,32 +121,40 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
             .smart_ptr<std::shared_ptr<AttributeReferenceNode>>("AttributeReferenceNode")
             .function("getReferenceRaw", &AttributeReferenceNode::getReferenceRaw, allow_raw_pointers())
-            .class_function("make", &AttributeReferenceNode::make, allow_raw_pointers());
+            .class_function("make", &AttributeReferenceNode::make, allow_raw_pointers())
+            .class_function("makeUnique", &make<AttributeReferenceNode, Attribute*, std::string>, allow_raw_pointers())
+            .class_function("makeUnique", &make<AttributeReferenceNode, Attribute*>, allow_raw_pointers());
 
     class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
             .smart_ptr<std::shared_ptr<AddOpNode>>("AddOpNode")
-            .class_function("make", &AddOpNode::make);
+            .class_function("make", &AddOpNode::make)
+            .class_function("makeUnique", &AddOpNode::make);
 
     class_<SubOpNode, base<BinaryOpNode>>("SubOpNode")
             .smart_ptr<std::shared_ptr<SubOpNode>>("SubOpNode")
-            .class_function("make", &SubOpNode::make);
+            .class_function("make", &SubOpNode::make)
+            .class_function("makeUnique", &SubOpNode::make);
 
     class_<MulOpNode, base<BinaryOpNode>>("MulOpNode")
             .smart_ptr<std::shared_ptr<MulOpNode>>("MulOpNode")
-            .class_function("make", &MulOpNode::make);
+            .class_function("make", &MulOpNode::make)
+            .class_function("makeUnique", &MulOpNode::make);
 
     class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
             .smart_ptr<std::shared_ptr<DivOpNode>>("DivOpNode")
-            .class_function("make", &DivOpNode::make);
+            .class_function("make", &DivOpNode::make)
+            .class_function("makeUnique", &DivOpNode::make);
 
     class_<ModOpNode, base<BinaryOpNode>>("ModOpNode")
             .smart_ptr<std::shared_ptr<ModOpNode>>("ModOpNode")
-            .class_function("make", &ModOpNode::make);
+            .class_function("make", &ModOpNode::make)
+            .class_function("makeUnique", &ModOpNode::make);
 
     class_<NumberNode, base<Node>>("NumberNode")
             .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
             .function("getValue", &NumberNode::getValue)
-            .class_function("make", &NumberNode::make);
+            .class_function("make", &NumberNode::make)
+            .class_function("makeUnique", &make<NumberNode, float, std::string>);
 
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());

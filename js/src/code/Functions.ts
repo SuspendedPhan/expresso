@@ -3,11 +3,13 @@ import { v4 as uuidv4 } from "uuid";
 
 export default class Functions {
   static vectorToArray(vector) {
-    const answer = [] as any;
+    return Array.from(this.vectorToIterable(vector));
+  }
+
+  static * vectorToIterable(vector) {
     for (let i = 0; i < vector.size(); i++) {
-      answer.push(vector.get(i));
+      yield vector.get(i);
     }
-    return answer;
   }
 
   static uuid() {

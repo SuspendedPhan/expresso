@@ -1,7 +1,5 @@
 export default class Store {
-  private projects: any[] = [];
-
-  constructor(private wasmModule) {}
+  constructor(private wasmModule, private projects: any[] = []) {}
 
   addProject() {
     const organism = this.wasmModule.Project.makeRootOrganism();

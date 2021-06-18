@@ -13,9 +13,7 @@ export default class DeadStore {
   }
 
   public static toLiveStore(deadStore, emModule) {
-    return {
-      projects: deadStore.projects.map(deadProject => this.toLiveProject(deadProject, emModule))
-    };
+    return new Store(null, deadStore.projects.map(deadProject => this.toLiveProject(deadProject, emModule)));
   }
 
 
@@ -28,6 +26,23 @@ export default class DeadStore {
 
   private static toLiveProject(deadProject, emModule) {
     const liveRootOrganism = this.toLiveOrganism(deadProject.rootOrganism, emModule);
+    const liveAttributeById = new Map<string, any>();
+    const deadAttributeById = new Map<string, any>();
+    const liveAttributes: any = Array.from(this.getLiveAttributesDeep(liveRootOrganism));
+    const deadAttributes: any = this.getDeadAttributesDeep(deadProject.rootOrganism);
+    for (const liveAttribute of liveAttributes) {
+      liveAttributeById.set(liveAttribute.getId(), liveAttribute);
+    }
+    for (const deadAttribute of deadAttributes) {
+      deadAttributeById.set(deadAttribute.id, deadAttribute);
+    }
+
+    const liveEditableAttributes = liveAttributes.filter(attribute => attribute.constructor.name === 'EditableAttribute');
+    for (const liveEditableAttribute of liveEditableAttributes) {
+      const deadEditableAttribute = deadAttributeById.get(liveEditableAttribute.getId());
+      const liveRootNode = this.toLiveNode(deadEditableAttribute.rootNode, emModule, liveAttributeById);
+      liveEditableAttribute.setRootNode(liveRootNode);
+    }
     return emModule.Project.makeUnique(liveRootOrganism);
   }
 
@@ -35,13 +50,20 @@ export default class DeadStore {
     return {
       id: liveOrganism.getId(),
       name: liveOrganism.getName(),
-      attributes: Functions.vectorToArray(liveOrganism.getAttributes()).map(attribute => this.toDeadAttribute(attribute))
+      attributes: Functions.vectorToArray(liveOrganism.getAttributes()).map(attribute => this.toDeadAttribute(attribute)),
+      suborganisms: Functions.vectorToArray(liveOrganism.getSuborganisms()).map(liveSuborganism => this.toDeadOrganism(liveSuborganism))
     }
   }
 
   private static toLiveOrganism(deadOrganism, emModule) {
     const liveOrganism = emModule.Organism.makeUnique(deadOrganism.name, deadOrganism.id);
-
+    for (const deadAttribute of deadOrganism.attributes) {
+      const liveAttribute = this.toLiveAttribute(deadAttribute, liveOrganism, emModule);
+      liveOrganism.addAttribute(liveAttribute);
+    }
+    for (const deadSuborganism of deadOrganism.suborganisms) {
+      liveOrganism.addSuborganism(this.toLiveOrganism(deadSuborganism, emModule));
+    }
     return liveOrganism;
   }
 
@@ -60,8 +82,14 @@ export default class DeadStore {
     return answer;
   }
 
-  private static toLiveAttribute(deadAttribute) {
-
+  private static toLiveAttribute(deadAttribute, liveOrganism, emModule) {
+    if (deadAttribute.type == "EditableAttribute") {
+      return emModule.EditableAttribute.makeUnique(deadAttribute.name, liveOrganism, deadAttribute.id);
+    } else if (deadAttribute.type == "CloneNumberAttribute") {
+      return emModule.CloneNumberAttribute.makeUnique(liveOrganism, deadAttribute.id);
+    } else if (deadAttribute.type == "IntrinsicAttribute") {
+      return emModule.IntrinsicAttribute.makeUnique(deadAttribute.name, liveOrganism, deadAttribute.id);
+    }
   }
 
   private static toDeadNode(liveNode) {
@@ -82,7 +110,44 @@ export default class DeadStore {
     return deadNode;
   }
 
-  private static toLiveNode(deadNode) {
+  private static toLiveNode(deadNode, emModule, liveAttributeById) {
+    if (deadNode.nodeType === 'AddOpNode') {
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.AddOpNode, emModule, liveAttributeById);
+    } else if (deadNode.nodeType === 'SubOpNode') {
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.SubOpNode, emModule, liveAttributeById);
+    } else if (deadNode.nodeType === 'MulOpNode') {
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.MulOpNode, emModule, liveAttributeById);
+    } else if (deadNode.nodeType === 'DivOpNode') {
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.DivOpNode, emModule, liveAttributeById);
+    } else if (deadNode.nodeType === 'ModOpNode') {
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.ModOpNode, emModule, liveAttributeById);
+    } else if (deadNode.nodeType === 'NumberNode') {
+      return emModule.NumberNode.makeUnique(deadNode.value, deadNode.id);
+    } else if (deadNode.nodeType === 'AttributeReferenceNode') {
+      // what to do here?
+      return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
+    } else {
+      console.error(deadNode.nodeType);
+    }
+  }
 
+  private static toLiveBinaryOpNode(deadBinaryOpNode, BinaryOpNodeClass: any, emModule, liveAttributeById) {
+    const liveA = this.toLiveNode(deadBinaryOpNode.a, emModule, liveAttributeById);
+    const liveB = this.toLiveNode(deadBinaryOpNode.b, emModule, liveAttributeById);
+    return BinaryOpNodeClass.makeUnique(liveA, liveB, deadBinaryOpNode.id);
+  }
+
+  private static * getLiveAttributesDeep(liveOrganism: any) {
+    yield * Functions.vectorToIterable(liveOrganism.getAttributes());
+    for (const suborganism of Functions.vectorToIterable(liveOrganism.getSuborganisms())) {
+      yield * this.getLiveAttributesDeep(suborganism);
+    }
+  }
+
+  private static * getDeadAttributesDeep(deadOrganism: any) {
+    yield * deadOrganism.attributes;
+    for (const deadSuborganism of deadOrganism.suborganisms) {
+      yield * this.getDeadAttributesDeep(deadSuborganism);
+    }
   }
 }

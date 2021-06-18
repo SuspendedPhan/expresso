@@ -53,19 +53,24 @@ export default class WasmTest extends Vue {
     const attributeVector = project.getRootOrganism().getAttributes();
     const attributes = Functions.vectorToArray(attributeVector);
     const numberNode = module.NumberNode.make(20);
-    const attribute = attributes[0];
-    const rootNode = attribute.getRootNode();
-    rootNode.replace(numberNode);
+    const xAttribute = attributes[2];
+    const xRootNode = xAttribute.getRootNode();
+    xRootNode.replace(numberNode);
+    const yAttribute = attributes[3];
+    const yRootNode = yAttribute.getRootNode();
+    const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
+    yRootNode.replace(refNode);
     this.project = project;
     // render(project, renderer);
 
 
     const deadStore = DeadStore.fromLiveStore(store);
-    // console.log(JSON.stringify(deadStore));
     const liveStore = DeadStore.toLiveStore(deadStore, module);
+    const dead2 = DeadStore.fromLiveStore(liveStore);
+    console.log(JSON.stringify(dead2));
     const liveProject = liveStore.projects[0];
     this.project = liveProject;
-    // render(liveProject, renderer);
+    render(liveProject, renderer);
   }
 }
 

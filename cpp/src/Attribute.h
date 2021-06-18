@@ -2,6 +2,7 @@
 #define EXPRESSO_ATTRIBUTE_H
 
 #include <map>
+#include <utility>
 #include <vector>
 #include <string>
 
@@ -15,28 +16,28 @@ class Organism;
 
 class Node;
 
-class Attribute : public std::enable_shared_from_this<Attribute> {
+class Attribute {
 public:
     std::string name;
     std::string id = Code::generateUuidV4();
     Organism* organism;
 
     Attribute(std::string name, Organism* organism) {
-        this->name = name;
+        this->name = std::move(name);
         this->organism = organism;
     }
 
-    Attribute(std::string name, Organism* organism, std::string id) : name(name), organism(organism), id(id) {}
+    Attribute(std::string name, Organism* organism, std::string id) : name(std::move(name)), organism(organism), id(std::move(id)) {}
 
-    std::string getName() { return this->name; }
-    std::string getId() { return this->id; }
+    std::string getName() const { return this->name; }
+    std::string getId() const { return this->id; }
 
     virtual AttributeOutput eval(const EvalContext &evalContext) const = 0;
     virtual bool getIsCloneNumberAttribute() { return false; }
     virtual bool getIsEditableAttribute() { return false; }
     virtual bool getIsIntrinsicAttribute() { return false; }
 
-    virtual ~Attribute() {}
+    virtual ~Attribute() = default;
 };
 
 class EditableAttribute : public Attribute {
@@ -45,10 +46,10 @@ private:
     Signal onChangedSignal;
 public:
     EditableAttribute(std::string name, Organism* organism) : Attribute(
-            name, organism) {}
+            std::move(name), organism) {}
 
     EditableAttribute(std::string name, Organism* organism, const std::string& id) : Attribute(
-            name, organism, id) {}
+            std::move(name), organism, id) {}
 
     Signal* getOnChangedSignal();
 
@@ -62,7 +63,7 @@ public:
 
 class CloneNumberAttribute : public Attribute {
 public:
-    CloneNumberAttribute(Organism* organism) : Attribute("cloneNumber", organism) {}
+    explicit CloneNumberAttribute(Organism* organism) : Attribute("cloneNumber", organism) {}
     CloneNumberAttribute(Organism* organism, const std::string& id) : Attribute("cloneNumber", organism, id) {}
 
     bool getIsCloneNumberAttribute() override { return true; }
@@ -70,7 +71,7 @@ public:
     AttributeOutput eval(const EvalContext &evalContext) const override {
         AttributeOutput output;
         output.name = this->name;
-        output.value = evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
+        output.value = (float) evalContext.organismEvalContextByOrganism.at(this->organism)->currentCloneNumber;
         return output;
     }
 };
