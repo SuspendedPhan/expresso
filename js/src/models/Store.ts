@@ -4,7 +4,10 @@ export default class Store {
   constructor(private wasmModule) {}
 
   addProject() {
-    const project = new this.wasmModule.Project();
+    const organism = this.wasmModule.Project.makeRootOrganism();
+    const project = this.wasmModule.Project.makeUnique();
+    project.setRootOrganism(organism);
+    // const project = this.wasmModule.Project.makeUnique(organism);
     this.projects.push(project);
     return project;
   }

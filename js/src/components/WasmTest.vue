@@ -48,24 +48,24 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
 
-    const store = new Store(module);
-    const project = store.addProject();
-    const attributeVector = project.getRootOrganism().getAttributes();
-    const attributes = Functions.vectorToArray(attributeVector);
-    const numberNode = module.NumberNode.make(20);
-    const attribute = attributes[0];
-    const rootNode = attribute.getRootNode();
-    rootNode.replace(numberNode);
-    this.project = project;
-
-    const deadStore = DeadStore.fromLiveStore(store);
-    console.log(JSON.stringify(deadStore));
-    const liveStore = DeadStore.toLiveStore(deadStore, module);
-    const liveProject = liveStore.projects[0];
-    this.project = liveProject;
-
-    render(liveProject, renderer);
+    // const store = new Store(module);
+    // const project = store.addProject();
+    // const attributeVector = project.getRootOrganism().getAttributes();
+    // const attributes = Functions.vectorToArray(attributeVector);
+    // const numberNode = module.NumberNode.make(20);
+    // const attribute = attributes[0];
+    // const rootNode = attribute.getRootNode();
+    // rootNode.replace(numberNode);
+    // this.project = project;
     // render(project, renderer);
+
+
+    // const deadStore = DeadStore.fromLiveStore(store);
+    // console.log(JSON.stringify(deadStore));
+    // const liveStore = DeadStore.toLiveStore(deadStore, module);
+    // const liveProject = liveStore.projects[0];
+    // this.project = liveProject;
+    // render(liveProject, renderer);
   }
 }
 

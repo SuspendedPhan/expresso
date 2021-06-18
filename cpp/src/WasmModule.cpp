@@ -42,19 +42,39 @@ class ParameterNode;
 
 using namespace emscripten;
 
-EMSCRIPTEN_BINDINGS(my_module) {
-//    class_<ExpressorTree>("ExpressorTree")
-//            .constructor<>()
-//            .function("eval", &ExpressorTree::eval, allow_raw_pointers())
-//            .function("getRootOrganism", &ExpressorTree::getRootOrganism, allow_raw_pointers());
+template<class Out>
+std::unique_ptr<Out> make()
+{
+    return std::make_unique<Out>();
+}
 
+template<class Out, class In0>
+std::unique_ptr<Out> make(In0 arg)
+{
+    return std::make_unique<Out>(std::move(arg));
+}
+
+template<class Out, class In0, class In1>
+std::unique_ptr<Out> make(In0 arg0, In1 arg1)
+{
+    return std::make_unique<Out>(std::move(arg0), std::move(arg1));
+}
+
+template<class Out, class In0, class In1, class In2>
+std::unique_ptr<Out> make(In0 arg0, In1 arg1, In2 arg2)
+{
+    return std::make_unique<Out>(std::move(arg0), std::move(arg1), std::move(arg2));
+}
+
+EMSCRIPTEN_BINDINGS(my_module) {
     class_<Project>("Project")
-            .constructor<>()
-            .function("evalOrganismTree", &Project::evalOrganismTree, allow_raw_pointers())
+            .class_function("makeUnique", &make<Project, std::unique_ptr<Organism>>)
+            .class_function("makeUnique", &make<Project, std::unique_ptr<Organism>, std::string>)
+            .class_function("makeRootOrganism", &Project::makeRootOrganism)
+            .function("evalOrganismTree", &Project::evalOrganismTree)
             .function("getRootOrganism", &Project::getRootOrganism, allow_raw_pointers())
             .function("getId", &Project::getId)
-            .function("setRootOrganism", &Project::setRootOrganism)
-            .class_function("makeRootOrganism", &Project::makeRootOrganism)
+            .function("setRootOrganism", &Project::setRootOrganism, allow_raw_pointers())
             ;
 
     class_<Organism>("Organism")
@@ -158,11 +178,13 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<Car>("Car")
             .function("getId", &Car::getId)
             .function("setId", &Car::setId)
-            .class_function("make", &std::make_unique<Car, int>)
-            .class_function("make", &std::make_unique<Car>)
+            .class_function("make", &make<Car, std::unique_ptr<Driver>>)
             .function("setChild", &Car::setChild)
             .function("getChild", &Car::getChild, allow_raw_pointers())
             ;
+
+    class_<Driver>("Driver")
+            .class_function("make", &std::make_unique<Driver>);
 
     register_vector<Organism *>("OrganismVector");
     register_vector<Attribute *>("AttributeVector");

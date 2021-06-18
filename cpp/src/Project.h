@@ -28,6 +28,8 @@ public:
     const std::string &getId() const;
     std::unique_ptr<EvalOutput> evalOrganismTree() const;
     Organism* getRootOrganism() const;
+
+    void setRootOrganism(std::unique_ptr<Organism> organism) { this->rootOrganism = std::move(organism); }
 };
 
 

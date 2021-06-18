@@ -8,15 +8,21 @@
 
 #include <memory>
 #include "vector"
+#include "Driver.h"
 
 class Car {
 public:
     int id;
     std::unique_ptr<Car> child;
     std::vector<std::unique_ptr<Car>> children;
+    std::unique_ptr<Driver> driver;
 
-    Car(int id) : id(id) {}
     Car() : id(-1) {}
+    Car(std::unique_ptr<Driver> driver) : driver(std::move(driver)) {}
+
+    static std::unique_ptr<Car> make(std::unique_ptr<Driver> driver) {
+        return std::make_unique<Car>(std::move(driver));
+    }
 
     void setChild(std::unique_ptr<Car> child) {
         this->child = std::move(child);
