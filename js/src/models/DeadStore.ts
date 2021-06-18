@@ -27,10 +27,8 @@ export default class DeadStore {
   }
 
   private static toLiveProject(deadProject, emModule) {
-    const liveProject = new emModule.Project();
     const liveRootOrganism = this.toLiveOrganism(deadProject.rootOrganism, emModule);
-    liveProject.setRootOrganism(liveRootOrganism);
-    return liveProject;
+    return emModule.Project.makeUnique(liveRootOrganism);
   }
 
   private static toDeadOrganism(liveOrganism) {
@@ -42,8 +40,9 @@ export default class DeadStore {
   }
 
   private static toLiveOrganism(deadOrganism, emModule) {
-    const liveOrganism = emModule.Organism.make(deadOrganism.name, deadOrganism.id);
+    const liveOrganism = emModule.Organism.makeUnique(deadOrganism.name, deadOrganism.id);
 
+    return liveOrganism;
   }
 
 

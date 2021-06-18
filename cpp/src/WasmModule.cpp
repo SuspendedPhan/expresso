@@ -78,6 +78,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             ;
 
     class_<Organism>("Organism")
+            .class_function("makeUnique", &make<Organism, std::string, std::string>)
             .function("getSuborganisms", &Organism::getSuborganisms)
             .function("getAttributes", &Organism::getAttributes)
             .function("getName", &Organism::getName)
