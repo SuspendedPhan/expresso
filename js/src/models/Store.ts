@@ -1,3 +1,5 @@
+import DeadStore from "@/models/DeadStore";
+
 export default class Store {
   constructor(private wasmModule, private projects: any[] = []) {}
 
@@ -18,11 +20,19 @@ export default class Store {
   }
 
   save() {
-
+    const jsonDeadStore = JSON.stringify(DeadStore.fromLiveStore(this));
+    window.localStorage.setItem("emcc-evolved", jsonDeadStore);
   }
 
-  load() {
-
+  static loadOrMake(emModule: any): Store {
+    const jsonDeadStore = window.localStorage.getItem("emcc-evolved");
+    if (jsonDeadStore === null) {
+      const store = new Store(emModule);
+      store.addProject();
+      return store;
+    }
+    const deadStore = JSON.parse(jsonDeadStore);
+    return DeadStore.toLiveStore(deadStore, emModule);
   }
 
   public static getChildren(node) {

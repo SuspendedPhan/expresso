@@ -124,7 +124,6 @@ export default class DeadStore {
     } else if (deadNode.nodeType === 'NumberNode') {
       return emModule.NumberNode.makeUnique(deadNode.value, deadNode.id);
     } else if (deadNode.nodeType === 'AttributeReferenceNode') {
-      // what to do here?
       return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
     } else {
       console.error(deadNode.nodeType);

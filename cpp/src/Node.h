@@ -44,22 +44,19 @@ public:
     Organism* getOrganismRaw();
     Node* getParentRaw();
 
-    virtual ~Node() = default;
+    virtual ~Node() {
+//        std::cout << "destructing " << typeid(this).name() << std::endl;
+    }
 };
 
 class NumberNode : public Node {
 public:
-    NumberNode() {}
-    explicit NumberNode(std::string id) : Node(std::move(id)) {}
-
     float value;
 
+    explicit NumberNode(float value) { this->value = value; }
+    NumberNode(float value, std::string id) : value(value), Node(std::move(id)) {}
+
     float getValue() const;
-
-    NumberNode(float value) { this->value = value; }
-
-    static std::unique_ptr<NumberNode> make(float value);
-
     float eval(const EvalContext &evalContext) override;
     void setAttributeForChildren(Attribute* attribute) override {}
 };
@@ -73,15 +70,23 @@ public:
 
     explicit BinaryOpNode(std::string id) : Node(std::move(id)) {}
 
+    BinaryOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) {
+        set(this, std::move(a), std::move(b));
+    }
+
+    BinaryOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : Node(std::move(id)) {
+        set(this, std::move(a), std::move(b));
+    }
+
     static void setA(BinaryOpNode * op, std::unique_ptr<Node> a);
     static void setB(BinaryOpNode * op, std::unique_ptr<Node> a);
     static void set(BinaryOpNode * op, std::unique_ptr<Node> a, std::unique_ptr<Node> b);
 
-    Node* getA() {
+    Node* getA() const {
         return a.get();
     }
 
-    Node* getB() {
+    Node* getB() const {
         return b.get();
     }
 
@@ -91,9 +96,8 @@ public:
 
 class AddOpNode : public BinaryOpNode {
 public:
-    explicit AddOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
-
-    static std::unique_ptr<AddOpNode> make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id = Code::generateUuidV4());
+    AddOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
+    AddOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) + this->b->eval(evalContext);
@@ -102,9 +106,8 @@ public:
 
 class SubOpNode : public BinaryOpNode {
 public:
-    explicit SubOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
-
-    static std::unique_ptr<SubOpNode> make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id = Code::generateUuidV4());
+    SubOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
+    SubOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) - this->b->eval(evalContext);
@@ -113,9 +116,8 @@ public:
 
 class MulOpNode : public BinaryOpNode {
 public:
-    explicit MulOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
-
-    static std::unique_ptr<MulOpNode> make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id = Code::generateUuidV4());
+    MulOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
+    MulOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) * this->b->eval(evalContext);
@@ -124,9 +126,8 @@ public:
 
 class DivOpNode : public BinaryOpNode {
 public:
-    explicit DivOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
-
-    static std::unique_ptr<DivOpNode> make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id = Code::generateUuidV4());
+    DivOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
+    DivOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
     float eval(const EvalContext &evalContext) override {
         return this->a->eval(evalContext) / this->b->eval(evalContext);
@@ -135,9 +136,8 @@ public:
 
 class ModOpNode : public BinaryOpNode {
 public:
-    explicit ModOpNode(std::string id) : BinaryOpNode(std::move(id)) {}
-
-    static std::unique_ptr<ModOpNode> make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id = Code::generateUuidV4());
+    ModOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
+    ModOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
     float eval(const EvalContext &evalContext) override {
         float aEval = this->a->eval(evalContext);

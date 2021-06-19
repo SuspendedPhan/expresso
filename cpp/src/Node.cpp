@@ -18,46 +18,28 @@ float NumberNode::getValue() const {
     return value;
 }
 
-std::unique_ptr<NumberNode> NumberNode::make(float value) {
-    return std::make_unique<NumberNode>(value);
-}
-
-std::unique_ptr<AddOpNode> AddOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
-    auto op = std::make_unique<AddOpNode>(id);
-    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
-    return op;
-}
-
-std::unique_ptr<SubOpNode> SubOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
-    auto op = std::make_unique<SubOpNode>(id);
-    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
-    return op;
-}
-
-std::unique_ptr<MulOpNode> MulOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
-    auto op = std::make_unique<MulOpNode>(id);
-    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
-    return op;
-}
-
-std::unique_ptr<DivOpNode> DivOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
-    auto op = std::make_unique<DivOpNode>(id);
-    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
-    return op;
-}
-
-std::unique_ptr<ModOpNode> ModOpNode::make(std::unique_ptr<Node> a, std::unique_ptr<Node> b, const std::string& id) {
-    auto op = std::make_unique<ModOpNode>(id);
-    BinaryOpNode::set(op.get(), std::move(a), std::move(b));
-    return op;
-}
-
 std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute* reference) {
     return std::make_unique<AttributeReferenceNode>(reference);
 }
 
 void Node::replace(std::unique_ptr<Node> node) {
-    this->replaceFun(std::move(node));
+    if (this->parent == nullptr) {
+        if (auto * editableAttribute = dynamic_cast<EditableAttribute *>(this->getAttribute())) {
+            editableAttribute->setRootNode(std::move(node));
+        } else {
+            std::cerr << "replace; editable attribute" << std::endl;
+        }
+    } else if (auto * binaryOpNode = dynamic_cast<BinaryOpNode *>(this->parent)) {
+        if (binaryOpNode->getA() == this) {
+            BinaryOpNode::setA(binaryOpNode, std::move(node));
+        } else if (binaryOpNode->getB() == this) {
+            BinaryOpNode::setB(binaryOpNode, std::move(node));
+        } else {
+            std::cerr << "replace; binaryopnode" << std::endl;
+        }
+    } else {
+        std::cerr << "replace; dunno" << std::endl;
+    }
 }
 
 void Node::setReplaceFun(const std::function<void(std::unique_ptr<Node>)> &replaceFun) {

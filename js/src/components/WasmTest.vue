@@ -48,29 +48,40 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
 
-    const store = new Store(module);
-    const project = store.addProject();
-    const attributeVector = project.getRootOrganism().getAttributes();
-    const attributes = Functions.vectorToArray(attributeVector);
-    const numberNode = module.NumberNode.make(20);
-    const xAttribute = attributes[2];
-    const xRootNode = xAttribute.getRootNode();
-    xRootNode.replace(numberNode);
-    const yAttribute = attributes[3];
-    const yRootNode = yAttribute.getRootNode();
-    const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
-    yRootNode.replace(refNode);
-    this.project = project;
-    // render(project, renderer);
+    // const store = new Store(module);
+    // const project = store.addProject();
+    // const attributeVector = project.getRootOrganism().getAttributes();
+    // const attributes = Functions.vectorToArray(attributeVector);
+    // const numberNode = module.NumberNode.make(20);
+    // const xAttribute = attributes[2];
+    // const xRootNode = xAttribute.getRootNode();
+    // xRootNode.replace(numberNode);
+    // const yAttribute = attributes[3];
+    // const yRootNode = yAttribute.getRootNode();
+    // const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
+    // yRootNode.replace(refNode);
+    //
+    // const deadStore = DeadStore.fromLiveStore(store);
+    // const liveStore = DeadStore.toLiveStore(deadStore, module);
+    // const dead2 = DeadStore.fromLiveStore(liveStore);
+    // console.log(JSON.stringify(dead2));
+    // const liveProject = liveStore.projects[0];
+    // this.project = liveProject;
 
+    const store = Store.loadOrMake(module);
+    this.project = store.getProjects()[0];
+    const project = this.project;
+    const rootOrganism = project.getRootOrganism();
+    const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
+    const attribute = attributes[2];
+    const twoNode = module.NumberNode.makeUnique(2);
+    const threeNode = module.NumberNode.makeUnique(3);
+    const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
+    const oneNode = module.NumberNode.makeUnique(1);
+    twoNode.replace(oneNode);
+    attribute.setRootNode(addNode);
 
-    const deadStore = DeadStore.fromLiveStore(store);
-    const liveStore = DeadStore.toLiveStore(deadStore, module);
-    const dead2 = DeadStore.fromLiveStore(liveStore);
-    console.log(JSON.stringify(dead2));
-    const liveProject = liveStore.projects[0];
-    this.project = liveProject;
-    render(liveProject, renderer);
+    render(this.project, renderer);
   }
 }
 

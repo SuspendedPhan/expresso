@@ -115,45 +115,40 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getParentRaw", &Node::getParentRaw, allow_raw_pointers());
 
     class_<BinaryOpNode, base<Node>>("BinaryOpNode")
+            .class_function("setA", &BinaryOpNode::setA, allow_raw_pointers())
             .function("getA", &BinaryOpNode::getA, allow_raw_pointers())
             .function("getB", &BinaryOpNode::getB, allow_raw_pointers());
 
     class_<AttributeReferenceNode, base<Node>>("AttributeReferenceNode")
             .smart_ptr<std::shared_ptr<AttributeReferenceNode>>("AttributeReferenceNode")
             .function("getReferenceRaw", &AttributeReferenceNode::getReferenceRaw, allow_raw_pointers())
-            .class_function("make", &AttributeReferenceNode::make, allow_raw_pointers())
             .class_function("makeUnique", &make<AttributeReferenceNode, Attribute*, std::string>, allow_raw_pointers())
             .class_function("makeUnique", &make<AttributeReferenceNode, Attribute*>, allow_raw_pointers());
 
     class_<AddOpNode, base<BinaryOpNode>>("AddOpNode")
-            .smart_ptr<std::shared_ptr<AddOpNode>>("AddOpNode")
-            .class_function("make", &AddOpNode::make)
-            .class_function("makeUnique", &AddOpNode::make);
+            .class_function("makeUnique", &make<AddOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<AddOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<SubOpNode, base<BinaryOpNode>>("SubOpNode")
-            .smart_ptr<std::shared_ptr<SubOpNode>>("SubOpNode")
-            .class_function("make", &SubOpNode::make)
-            .class_function("makeUnique", &SubOpNode::make);
+            .class_function("makeUnique", &make<SubOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<SubOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<MulOpNode, base<BinaryOpNode>>("MulOpNode")
-            .smart_ptr<std::shared_ptr<MulOpNode>>("MulOpNode")
-            .class_function("make", &MulOpNode::make)
-            .class_function("makeUnique", &MulOpNode::make);
+            .class_function("makeUnique", &make<MulOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<MulOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<DivOpNode, base<BinaryOpNode>>("DivOpNode")
-            .smart_ptr<std::shared_ptr<DivOpNode>>("DivOpNode")
-            .class_function("make", &DivOpNode::make)
-            .class_function("makeUnique", &DivOpNode::make);
+            .class_function("makeUnique", &make<DivOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<DivOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<ModOpNode, base<BinaryOpNode>>("ModOpNode")
-            .smart_ptr<std::shared_ptr<ModOpNode>>("ModOpNode")
-            .class_function("make", &ModOpNode::make)
-            .class_function("makeUnique", &ModOpNode::make);
+            .class_function("makeUnique", &make<ModOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<ModOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<NumberNode, base<Node>>("NumberNode")
             .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
             .function("getValue", &NumberNode::getValue)
-            .class_function("make", &NumberNode::make)
+            .class_function("makeUnique", &make<NumberNode, float>)
             .class_function("makeUnique", &make<NumberNode, float, std::string>);
 
     class_<EvalOutput>("EvalOutput")

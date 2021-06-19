@@ -70,6 +70,16 @@ public:
         suborganism->superorganism = this;
         this->suborganisms.emplace_back(std::move(suborganism));
     }
+
+    void addAttribute(std::unique_ptr<Attribute> attribute) {
+        attribute->organism = this;
+        if (attribute->name == "clones") {
+            this->cloneCountAttribute = dynamic_cast<EditableAttribute*>(attribute.get());
+        } else if (auto* cloneNumberAttribute = dynamic_cast<CloneNumberAttribute*>(attribute.get())) {
+            this->cloneNumberAttribute = cloneNumberAttribute;
+        }
+        this->attributes.push_back(std::move(attribute));
+    }
     
     void remove() {
         auto superorganism = this->superorganism;
