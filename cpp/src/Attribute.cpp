@@ -16,13 +16,10 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
 
 void EditableAttribute::setRootNode(std::unique_ptr<Node> rootNode) {
     rootNode->setAttribute(this);
-    rootNode->setReplaceFun([this](std::unique_ptr<Node> node) {
-        this->setRootNode(std::move(node));
-        if (this->onChangedSignal.listener) {
-            this->onChangedSignal.listener();
-        }
-    });
     this->rootNode = std::move(rootNode);
+    if (this->onChangedSignal.listener) {
+        this->onChangedSignal.listener();
+    }
 }
 
 Node *EditableAttribute::getRootNode() {

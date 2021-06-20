@@ -27,6 +27,7 @@ export default class WasmNode extends Vue {
   @Prop() node;
   @Inject() nodeLayout;
   @Inject() pen;
+  @Inject() saveStoreFunctor;
 
   children = [] as any;
   text = ''
@@ -148,6 +149,7 @@ export default class WasmNode extends Vue {
     const newNode = choice.nodeMakerFunction();
     this.node.replace(newNode);
     this.pen.setSelectedNode(newNode);
+    this.saveStoreFunctor();
   }
 
   private onSelectedNodeChanged() {

@@ -10,7 +10,7 @@
 <script lang="ts">
 
 import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
+import {Prop, Provide} from "vue-property-decorator";
 import Vue from "vue";
 
 import WasmModule from '@/../public/WasmModule.js';
@@ -27,6 +27,10 @@ import DeadStore from "@/models/DeadStore";
 export default class WasmTest extends Vue {
   fake = null;
   project = null;
+  store: any = null;
+
+  @Provide()
+  saveStoreFunctor = () => this.saveStore();
 
   async mounted() {
     const module = await WasmModule({
@@ -69,19 +73,24 @@ export default class WasmTest extends Vue {
     // this.project = liveProject;
 
     const store = Store.loadOrMake(module);
+    this.store = store;
     this.project = store.getProjects()[0];
-    const project = this.project;
-    const rootOrganism = project.getRootOrganism();
-    const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
-    const attribute = attributes[2];
-    const twoNode = module.NumberNode.makeUnique(2);
-    const threeNode = module.NumberNode.makeUnique(3);
-    const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
-    const oneNode = module.NumberNode.makeUnique(1);
-    twoNode.replace(oneNode);
-    attribute.setRootNode(addNode);
+    const project: any = this.project;
+    // const rootOrganism = project.getRootOrganism();
+    // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
+    // const attribute = attributes[2];
+    // const twoNode = module.NumberNode.makeUnique(2);
+    // const threeNode = module.NumberNode.makeUnique(3);
+    // const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
+    // const oneNode = module.NumberNode.makeUnique(1);
+    // twoNode.replace(oneNode);
+    // attribute.setRootNode(addNode);
 
     render(this.project, renderer);
+  }
+
+  private saveStore() {
+    this.store.save();
   }
 }
 

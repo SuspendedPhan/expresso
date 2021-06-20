@@ -100,8 +100,8 @@ export default class DeadStore {
     if (liveNode.constructor.name === 'NumberNode') {
       deadNode.value = liveNode.getValue();
     } else if (Store.isBinaryOpNode(liveNode)) {
-      deadNode.a = liveNode.getA();
-      deadNode.b = liveNode.getB();
+      deadNode.a = this.toDeadNode(liveNode.getA());
+      deadNode.b = this.toDeadNode(liveNode.getB());
     } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
     } else {

@@ -21,9 +21,8 @@ class Attribute;
 class Node {
 private:
     std::string id;
-    std::function<void(std::unique_ptr<Node>)> replaceFun;
-    Attribute* attribute;
-    Node* parent;
+    Attribute* attribute = nullptr;
+    Node* parent = nullptr;
 protected:
     Signal onChangedSignal;
     virtual void setAttributeForChildren(Attribute* attribute) = 0;
@@ -34,7 +33,6 @@ public:
     virtual float eval(const EvalContext &evalContext) = 0;
     std::string getId() { return this->id; }
     void replace(std::unique_ptr<Node> node);
-    void setReplaceFun(const std::function<void(std::unique_ptr<Node>)> &replaceFun);
     void setAttribute(Attribute* attribute);
 
     void setParent(Node* parent);
@@ -44,9 +42,7 @@ public:
     Organism* getOrganismRaw();
     Node* getParentRaw();
 
-    virtual ~Node() {
-//        std::cout << "destructing " << typeid(this).name() << std::endl;
-    }
+    virtual ~Node() = default;
 };
 
 class NumberNode : public Node {

@@ -42,10 +42,6 @@ void Node::replace(std::unique_ptr<Node> node) {
     }
 }
 
-void Node::setReplaceFun(const std::function<void(std::unique_ptr<Node>)> &replaceFun) {
-    this->replaceFun = replaceFun;
-}
-
 Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
@@ -77,9 +73,6 @@ void BinaryOpNode::setAttributeForChildren(Attribute* attribute) {
 }
 
 void BinaryOpNode::setA(BinaryOpNode * op, std::unique_ptr<Node> a) {
-    a->setReplaceFun([&](auto node) {
-        setA(op, std::move(node));
-    });
     a->setAttribute(op->getAttribute());
     a->setParent(op);
     op->a = std::move(a);
@@ -87,9 +80,6 @@ void BinaryOpNode::setA(BinaryOpNode * op, std::unique_ptr<Node> a) {
 }
 
 void BinaryOpNode::setB(BinaryOpNode * op, std::unique_ptr<Node> b) {
-    b->setReplaceFun([&](auto node) {
-        setB(op, std::move(node));
-    });
     b->setAttribute(op->getAttribute());
     b->setParent(op);
     op->b = std::move(b);
