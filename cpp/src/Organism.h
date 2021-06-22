@@ -25,7 +25,8 @@ public:
     static std::unique_ptr<Organism> makeWithStandardAttributes(std::string name, const std::string& id = Code::generateUuidV4()) {
         auto organism = std::make_unique<Organism>(std::move(name), id);
 
-        std::unique_ptr<EditableAttribute> cloneCountAttribute = std::make_unique<EditableAttribute>("clones", organism.get(), std::make_unique<NumberNode>(1.0f));
+        std::unique_ptr<EditableAttribute> cloneCountAttribute = std::make_unique<EditableAttribute>("clones", organism.get());
+        cloneCountAttribute->setRootNode(std::make_unique<NumberNode>(1.0f));
         organism->cloneCountAttribute = cloneCountAttribute.get();
         organism->attributes.emplace_back(std::move(cloneCountAttribute));
 
@@ -33,15 +34,17 @@ public:
         organism->cloneNumberAttribute = cloneNumberAttribute.get();
         organism->attributes.emplace_back(std::move(cloneNumberAttribute));
 
-        std::unique_ptr<EditableAttribute> xAttribute = std::make_unique<EditableAttribute>("x", organism.get(), std::make_unique<NumberNode>(0.0f));
+        std::unique_ptr<EditableAttribute> xAttribute = std::make_unique<EditableAttribute>("x", organism.get());
+        xAttribute->setRootNode(std::make_unique<NumberNode>(0.0f));
         organism->attributes.emplace_back(std::move(xAttribute));
-        std::unique_ptr<EditableAttribute> yAttribute = std::make_unique<EditableAttribute>("y", organism.get(), std::make_unique<NumberNode>(0.0f));
+        std::unique_ptr<EditableAttribute> yAttribute = std::make_unique<EditableAttribute>("y", organism.get());
+        yAttribute->setRootNode(std::make_unique<NumberNode>(0.0f));
         organism->attributes.emplace_back(std::move(yAttribute));
 
         return organism;
     }
 
-    OrganismOutput eval(EvalContext *evalContext) { // NOLINT(misc-no-recursion)
+    OrganismOutput eval(EvalContext *evalContext) {
         OrganismOutput organismOutput;
         OrganismEvalContext organismEvalContext(&organismOutput);
         evalContext->organismEvalContextByOrganism.emplace(this, &organismEvalContext);

@@ -19,6 +19,7 @@ import PixiRenderer from "@/code/PixiRenderer";
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "@/models/Store";
+import DeadStore from "@/models/DeadStore";
 
 @Component({
   components: {WasmExpressor},
@@ -51,56 +52,57 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
 
-    // const store = new Store(module);
-    // const project = store.addProject();
-    // const attributeVector = project.getRootOrganism().getAttributes();
-    // const attributes = Functions.vectorToArray(attributeVector);
-    // const numberNode = module.NumberNode.make(20);
-    // const xAttribute = attributes[2];
-    // const xRootNode = xAttribute.getRootNode();
+    const store = new Store(module);
+    const project = store.addProject();
+    const attributeVector = project.getRootOrganism().getAttributes();
+    const attributes = Functions.vectorToArray(attributeVector);
+    const numberNode = module.NumberNode.makeUnique(20);
+    const xAttribute = attributes[2];
+    const xRootNode = xAttribute.getRootNode();
     // xRootNode.replace(numberNode);
-    // const yAttribute = attributes[3];
-    // const yRootNode = yAttribute.getRootNode();
-    // const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
+    const yAttribute = attributes[3];
+    const yRootNode = yAttribute.getRootNode();
+    const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
     // yRootNode.replace(refNode);
-    //
-    // const deadStore = DeadStore.fromLiveStore(store);
-    // const liveStore = DeadStore.toLiveStore(deadStore, module);
-    // const dead2 = DeadStore.fromLiveStore(liveStore);
+
+    const deadStore = DeadStore.fromLiveStore(store);
+    // console.log(JSON.stringify(deadStore));
+    const liveStore = DeadStore.toLiveStore(deadStore, module);
+    const dead2 = DeadStore.fromLiveStore(liveStore);
     // console.log(JSON.stringify(dead2));
-    // const liveProject = liveStore.projects[0];
-    // this.project = liveProject;
+    const liveProject = liveStore.projects[0];
+    this.project = liveProject;
 
     // const store = Store.loadOrMake(module);
-    const store = Store.makeDefault(module);
-    this.store = store;
-    this.project = store.getProjects()[0];
-    const project: any = this.project;
-    const rootOrganism = project.getRootOrganism();
-    const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
-    const xAttribute = attributes[2];
-    const yAttribute = attributes[3];
+    // const store = Store.makeDefault(module);
+    // this.store = store;
+    // this.project = store.getProjects()[0];
+    // const project: any = this.project;
+    // const rootOrganism = project.getRootOrganism();
+    // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
+    // const xAttribute = attributes[2];
+    // const yAttribute = attributes[3];
 
-    const aParameter = module.FunctionParameter.makeUnique("a");
-    const bParameter = module.FunctionParameter.makeUnique("b");
-    const aParameterNode = module.ParameterNode.makeUnique(aParameter);
-    const bParameterNode = module.ParameterNode.makeUnique(bParameter);
-    const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
-    const twoNode = module.NumberNode.makeUnique(2);
-    const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
-    const fun = module.Function.makeUnique("Average", divNode);
-    fun.addParameter(aParameter);
-    fun.addParameter(bParameter);
-    // project.addFunction(fun);
-
-    const aArgNode = module.NumberNode.makeUnique(25);
-    const bArgNode = module.NumberNode.makeUnique(75);
-    const callNode = module.FunctionCallNode.makeUnique(fun);
-    callNode.setArgument(aParameter, aArgNode);
-    callNode.setArgument(bParameter, bArgNode);
-    xAttribute.setRootNode(callNode);
-
-    yAttribute.setRootNode(module.NumberNode.makeUnique(50));
+    // const aParameter = module.FunctionParameter.makeUnique("a");
+    // const bParameter = module.FunctionParameter.makeUnique("b");
+    // const aParameterNode = module.ParameterNode.makeUnique(aParameter);
+    // const bParameterNode = module.ParameterNode.makeUnique(bParameter);
+    // const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
+    // const twoNode = module.NumberNode.makeUnique(2);
+    // const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
+    // const fun = module.Function.makeUnique("Average", divNode);
+    // fun.addParameter(aParameter);
+    // fun.addParameter(bParameter);
+    // // project.addFunction(fun);
+    //
+    // const aArgNode = module.NumberNode.makeUnique(25);
+    // const bArgNode = module.NumberNode.makeUnique(75);
+    // const callNode = module.FunctionCallNode.makeUnique(fun);
+    // callNode.setArgument(aParameter, aArgNode);
+    // callNode.setArgument(bParameter, bArgNode);
+    // xAttribute.setRootNode(callNode);
+    //
+    // yAttribute.setRootNode(module.NumberNode.makeUnique(50));
 
     // const threeNode = module.NumberNode.makeUnique(3);
     // const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);

@@ -18,18 +18,12 @@ float NumberNode::getValue() const {
     return value;
 }
 
-std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute* reference) {
+std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute *reference) {
     return std::make_unique<AttributeReferenceNode>(reference);
 }
 
 void Node::replace(std::unique_ptr<Node> node) {
-    if (this->parent == nullptr) {
-        if (auto * editableAttribute = dynamic_cast<EditableAttribute *>(this->getAttribute())) {
-            editableAttribute->setRootNode(std::move(node));
-        } else {
-            std::cerr << "replace; editable attribute" << std::endl;
-        }
-    } else if (auto * binaryOpNode = dynamic_cast<BinaryOpNode *>(this->parent)) {
+    if (auto *binaryOpNode = dynamic_cast<BinaryOpNode *>(this->parent)) {
         if (binaryOpNode->getA() == this) {
             BinaryOpNode::setA(binaryOpNode, std::move(node));
         } else if (binaryOpNode->getB() == this) {
@@ -37,8 +31,12 @@ void Node::replace(std::unique_ptr<Node> node) {
         } else {
             std::cerr << "replace; binaryopnode" << std::endl;
         }
+    } else if (auto *attributeNode = dynamic_cast<AttributeNode *>(this->parent)) {
+        attributeNode->setRootNode(std::move(node));
+    } else if (dynamic_cast<AttributeNode *>(this)) {
+        std::cerr << "can't replace attribute node" << std::endl;
     } else {
-        std::cerr << "replace; dunno" << std::endl;
+        std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
     }
 }
 
@@ -46,11 +44,11 @@ Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
 
-Attribute* Node::getAttribute() {
+Attribute *Node::getAttribute() {
     return this->parent->getAttribute();
 }
 
-Organism* Node::getOrganismRaw() {
+Organism *Node::getOrganismRaw() {
     return this->getAttribute()->organism;
 }
 
@@ -58,36 +56,36 @@ Node *Node::getParentRaw() {
     return this->parent;
 }
 
-void Node::setParent(Node* parent) {
+void Node::setParent(Node *parent) {
     this->parent = parent;
 }
 
-void BinaryOpNode::setA(BinaryOpNode * op, std::unique_ptr<Node> a) {
+void BinaryOpNode::setA(BinaryOpNode *op, std::unique_ptr<Node> a) {
     a->setParent(op);
     op->a = std::move(a);
     op->onChangedSignal.dispatch();
 }
 
-void BinaryOpNode::setB(BinaryOpNode * op, std::unique_ptr<Node> b) {
+void BinaryOpNode::setB(BinaryOpNode *op, std::unique_ptr<Node> b) {
     b->setParent(op);
     op->b = std::move(b);
     op->onChangedSignal.dispatch();
 }
 
-void BinaryOpNode::set(BinaryOpNode * op, std::unique_ptr<Node> a, std::unique_ptr<Node> b) {
+void BinaryOpNode::set(BinaryOpNode *op, std::unique_ptr<Node> a, std::unique_ptr<Node> b) {
     BinaryOpNode::setA(op, std::move(a));
     BinaryOpNode::setB(op, std::move(b));
 }
 
 float FunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
-    for (const auto & entries : this->argumentByParameter) {
-        const auto & parameter = entries.first;
-        const auto & argumentRootNode = entries.second;
+    for (const auto &entries : this->argumentByParameter) {
+        const auto &parameter = entries.first;
+        const auto &argumentRootNode = entries.second;
         const auto argumentValue = argumentRootNode->eval(evalContext, nodeEvalContext);
         nodeEvalContext.valueByParameter[parameter] = argumentValue;
     }
     const auto answer = this->function->rootNode->eval(evalContext, nodeEvalContext);
-    for (const auto & entries : this->argumentByParameter) {
+    for (const auto &entries : this->argumentByParameter) {
         // Recursive functions are not implemented yet.
         nodeEvalContext.valueByParameter.erase(entries.first);
     }
@@ -129,8 +127,8 @@ float AttributeNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeE
     return this->rootNode->eval(evalContext, nodeEvalContext);
 }
 
-const unique_ptr<Node> &AttributeNode::getRootNode() const {
-    return this->rootNode;
+Node *AttributeNode::getRootNode() const {
+    return this->rootNode.get();
 }
 
 void AttributeNode::setRootNode(unique_ptr<Node> rootNode) {
@@ -140,7 +138,7 @@ void AttributeNode::setRootNode(unique_ptr<Node> rootNode) {
 
 std::map<const FunctionParameter *, Node *> FunctionCallNode::getArgumentByParameterMap() {
     std::map<const FunctionParameter *, Node *> answer;
-    for (const auto & entry : this->argumentByParameter) {
+    for (const auto &entry : this->argumentByParameter) {
         answer.insert({entry.first, entry.second.get()});
     }
     return answer;

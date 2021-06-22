@@ -23,11 +23,19 @@ void EditableAttribute::setRootNode(std::unique_ptr<Node> rootNode) {
 }
 
 Node *EditableAttribute::getRootNode() {
-    return this->attributeNode->getRootNode().get();
+    return this->attributeNode->getRootNode();
 }
 
 Signal *EditableAttribute::getOnChangedSignal() {
     return &this->onChangedSignal;
+}
+
+void EditableAttribute::setAttributeNode(std::unique_ptr<AttributeNode> attributeNode) {
+    this->attributeNode = std::move(attributeNode);
+}
+
+AttributeNode *EditableAttribute::getAttributeNode() {
+    return this->attributeNode.get();
 }
 
 AttributeOutput IntrinsicAttribute::eval(const EvalContext &evalContext) const {

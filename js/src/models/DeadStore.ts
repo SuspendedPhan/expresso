@@ -40,8 +40,11 @@ export default class DeadStore {
     const liveEditableAttributes = liveAttributes.filter(attribute => attribute.constructor.name === 'EditableAttribute');
     for (const liveEditableAttribute of liveEditableAttributes) {
       const deadEditableAttribute = deadAttributeById.get(liveEditableAttribute.getId());
-      const liveRootNode = this.toLiveNode(deadEditableAttribute.rootNode, emModule, liveAttributeById);
-      liveEditableAttribute.setRootNode(liveRootNode);
+      const deadAttributeNode = deadEditableAttribute.attributeNode;
+      const deadRootNode = deadAttributeNode.rootNode;
+      const liveRootNode = this.toLiveNode(deadRootNode, emModule, liveAttributeById);
+      const liveAttributeNode = emModule.AttributeNode.makeUnique(liveEditableAttribute, liveRootNode, deadAttributeNode.id);
+      liveEditableAttribute.setAttributeNode(liveAttributeNode);
     }
     return emModule.Project.makeUnique(liveRootOrganism);
   }
@@ -76,7 +79,7 @@ export default class DeadStore {
     } as any;
 
     if (liveAttribute.getIsEditableAttribute()) {
-      answer.rootNode = this.toDeadNode(liveAttribute.getRootNode());
+      answer.attributeNode = this.toDeadNode(liveAttribute.getAttributeNode());
     }
 
     return answer;
@@ -105,7 +108,7 @@ export default class DeadStore {
     } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
     } else if (liveNode.constructor.name === 'AttributeNode') {
-      console.error('not implemented');
+      deadNode.rootNode = this.toDeadNode(liveNode.getRootNode());
     } else if (liveNode.constructor.name === 'FunctionCallNode') {
       console.error('not implemented');
     } else {
@@ -130,7 +133,7 @@ export default class DeadStore {
     } else if (deadNode.nodeType === 'AttributeReferenceNode') {
       return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
     } else if (deadNode.nodeType === 'AttributeNode') {
-      console.error('not implemented');
+      console.error('cant make an AttributeNode here');
     } else if (deadNode.nodeType === 'FunctionCallNode') {
       console.error('not implemented');
     } else {

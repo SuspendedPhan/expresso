@@ -24,7 +24,10 @@ class Function;
 class Node {
 private:
     std::string id;
+
+    // TODO: make this a variant of <Node, Function, Attribute> and get rid of AttributeNode
     Node* parent = nullptr;
+
 protected:
     Signal onChangedSignal;
 public:
@@ -197,7 +200,7 @@ public:
     AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode);
     AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id);
 
-    const unique_ptr<Node> &getRootNode() const;
+    Node * getRootNode() const;
     void setRootNode(unique_ptr<Node> rootNode);
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;

@@ -16,6 +16,7 @@ class Organism;
 
 class Node;
 class AttributeNode;
+class NumberNode;
 
 class Attribute {
 public:
@@ -43,14 +44,11 @@ public:
 
 class EditableAttribute : public Attribute {
 private:
-    std::unique_ptr<AttributeNode> attributeNode;
+    std::unique_ptr<AttributeNode> attributeNode = std::make_unique<AttributeNode>(this, std::make_unique<NumberNode>(0.0f));
     Signal onChangedSignal;
 public:
-    EditableAttribute(std::string name, Organism* organism, std::unique_ptr<Node> rootNode) : attributeNode(std::make_unique<AttributeNode>(this, std::move(rootNode))), Attribute(
-            std::move(name), organism) {}
-
-    EditableAttribute(std::string name, Organism* organism, std::unique_ptr<Node> rootNode, std::string id) : attributeNode(std::make_unique<AttributeNode>(this, std::move(rootNode))), Attribute(
-            std::move(name), organism, std::move(id)) {}
+    EditableAttribute(std::string name, Organism* organism) : Attribute(std::move(name), organism) {}
+    EditableAttribute(std::string name, Organism* organism, std::string id) : Attribute(std::move(name), organism, std::move(id)) {}
 
     Signal* getOnChangedSignal();
 
@@ -58,6 +56,8 @@ public:
     bool getIsEditableAttribute() override { return true; }
 
     void setRootNode(std::unique_ptr<Node> rootNode);
+    void setAttributeNode(std::unique_ptr<AttributeNode> attributeNode);
+    AttributeNode * getAttributeNode();
 
     Node *getRootNode();
 };
