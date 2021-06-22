@@ -6,8 +6,15 @@
 #define EXPRESSO_FUNCTIONPARAMETER_H
 
 
-class FunctionParameter {
+#include <string>
 
+class FunctionParameter {
+public:
+    std::string id;
+    std::string name;
+
+    explicit FunctionParameter(std::string name);
+    FunctionParameter(std::string id, std::string name);
 };
 
 
