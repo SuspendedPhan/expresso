@@ -66,6 +66,12 @@ std::unique_ptr<Out> make(In0 arg0, In1 arg1, In2 arg2)
     return std::make_unique<Out>(std::move(arg0), std::move(arg1), std::move(arg2));
 }
 
+template<class Out, class In0, class In1, class In2, class In3>
+std::unique_ptr<Out> make(In0 arg0, In1 arg1, In2 arg2, In3 arg3)
+{
+    return std::make_unique<Out>(std::move(arg0), std::move(arg1), std::move(arg2), std::move(arg3));
+}
+
 EMSCRIPTEN_BINDINGS(my_module) {
     class_<Project>("Project")
             .class_function("makeUnique", &make<Project, std::unique_ptr<Organism>>)
@@ -95,7 +101,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             ;
 
     class_<EditableAttribute, base<Attribute>>("EditableAttribute")
-            .class_function("makeUnique", &make<EditableAttribute, std::string, Organism*, std::string>, allow_raw_pointers())
+            .class_function("makeUnique", &make<EditableAttribute, std::string, Organism*, std::unique_ptr<Node>>, allow_raw_pointers())
+            .class_function("makeUnique", &make<EditableAttribute, std::string, Organism*, std::unique_ptr<Node>, std::string>, allow_raw_pointers())
             .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
             .function("setRootNode", &EditableAttribute::setRootNode, allow_raw_pointers())
             .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers());
@@ -151,9 +158,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .class_function("makeUnique", &make<NumberNode, float, std::string>);
 
     class_<FunctionCallNode, base<Node>>("FunctionCallNode")
-//            .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
-            .class_function("makeUnique", &make<Function *,
-                    map<const FunctionParameter *, std::unique_ptr<Node>> &&, std::string>, allow_raw_pointers());
+            .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<FunctionCallNode, Function *, std::string>, allow_raw_pointers())
+            .function("setArgument", &FunctionCallNode::setArgument, allow_raw_pointers());
 
     class_<ParameterNode, base<Node>>("ParameterNode")
             .class_function("makeUnique", &make<ParameterNode, FunctionParameter *>, allow_raw_pointers())

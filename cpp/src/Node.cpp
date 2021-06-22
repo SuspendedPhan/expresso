@@ -46,17 +46,12 @@ Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
 
-void Node::setAttribute(Attribute* attribute) {
-    this->attribute = attribute;
-    this->setAttributeForChildren(attribute);
-}
-
 Attribute* Node::getAttribute() {
-    return this->attribute;
+    return this->parent->getAttribute();
 }
 
 Organism* Node::getOrganismRaw() {
-    return this->attribute->organism;
+    return this->getAttribute()->organism;
 }
 
 Node *Node::getParentRaw() {
@@ -67,20 +62,13 @@ void Node::setParent(Node* parent) {
     this->parent = parent;
 }
 
-void BinaryOpNode::setAttributeForChildren(Attribute* attribute) {
-    this->a->setAttribute(attribute);
-    this->b->setAttribute(attribute);
-}
-
 void BinaryOpNode::setA(BinaryOpNode * op, std::unique_ptr<Node> a) {
-    a->setAttribute(op->getAttribute());
     a->setParent(op);
     op->a = std::move(a);
     op->onChangedSignal.dispatch();
 }
 
 void BinaryOpNode::setB(BinaryOpNode * op, std::unique_ptr<Node> b) {
-    b->setAttribute(op->getAttribute());
     b->setParent(op);
     op->b = std::move(b);
     op->onChangedSignal.dispatch();
@@ -106,17 +94,28 @@ float FunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &no
     return answer;
 }
 
-FunctionCallNode::FunctionCallNode(Function *function,
-        map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter) : function(function), argumentByParameter(
-        std::move(argumentByParameter)) {
-}
+FunctionCallNode::FunctionCallNode(Function *function) : function(function) {}
 
-FunctionCallNode::FunctionCallNode(Function *function,
-        map<const FunctionParameter *, unique_ptr<Node>> argumentByParameter, std::string id) : function(function), argumentByParameter(
-        std::move(argumentByParameter)), Node(
-        std::move(id)) {
+FunctionCallNode::FunctionCallNode(Function *function, std::string id) : function(function), Node(std::move(id)) {}
+
+void FunctionCallNode::setArgument(const FunctionParameter *parameter, std::unique_ptr<Node> argumentRootNode) {
+    this->argumentByParameter[parameter] = std::move(argumentRootNode);
 }
 
 float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
     return nodeEvalContext.valueByParameter.at(this->functionParameter);
+}
+
+Attribute *AttributeNode::getAttribute() {
+    return this->attribute;
+}
+
+AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode) : attribute(attribute),
+        rootNode(std::move(rootNode)) {}
+
+AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id) : attribute(attribute),
+        rootNode(std::move(rootNode)), Node(std::move(id)) {}
+
+float AttributeNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
+    return this->rootNode->eval(evalContext, nodeEvalContext);
 }

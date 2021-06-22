@@ -9,22 +9,21 @@
 AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
     NodeEvalContext nodeEvalContext;
-    float value = this->rootNode->eval(evalContext, nodeEvalContext);
+    float value = this->attributeNode->rootNode->eval(evalContext, nodeEvalContext);
     output.value = value;
     output.name = this->name;
     return output;
 }
 
 void EditableAttribute::setRootNode(std::unique_ptr<Node> rootNode) {
-    rootNode->setAttribute(this);
-    this->rootNode = std::move(rootNode);
+    this->attributeNode->rootNode = std::move(rootNode);
     if (this->onChangedSignal.listener) {
         this->onChangedSignal.listener();
     }
 }
 
 Node *EditableAttribute::getRootNode() {
-    return this->rootNode.get();
+    return this->attributeNode->rootNode.get();
 }
 
 Signal *EditableAttribute::getOnChangedSignal() {

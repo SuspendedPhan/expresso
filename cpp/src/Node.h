@@ -23,11 +23,9 @@ class Attribute;
 class Node {
 private:
     std::string id;
-    Attribute* attribute = nullptr;
     Node* parent = nullptr;
 protected:
     Signal onChangedSignal;
-    virtual void setAttributeForChildren(Attribute* attribute) = 0;
 public:
     Node() : id(Code::generateUuidV4()) {}
     explicit Node(std::string id) : id(std::move(id)) {}
@@ -35,12 +33,11 @@ public:
     virtual float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) = 0;
     std::string getId() { return this->id; }
     void replace(std::unique_ptr<Node> node);
-    void setAttribute(Attribute* attribute);
 
     void setParent(Node* parent);
 
     Signal* getOnChangedSignal();
-    Attribute* getAttribute();
+    virtual Attribute* getAttribute();
     Organism* getOrganismRaw();
     Node* getParentRaw();
 
@@ -56,7 +53,6 @@ public:
 
     float getValue() const;
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
-    void setAttributeForChildren(Attribute* attribute) override {}
 };
 
 
@@ -87,8 +83,6 @@ public:
     Node* getB() const {
         return b.get();
     }
-
-    void setAttributeForChildren(Attribute* attribute) override;
 };
 
 
@@ -151,24 +145,22 @@ public:
 
     explicit ParameterNode(FunctionParameter *functionParameter) : functionParameter(functionParameter) {}
 
-    ParameterNode(const std::string &id, FunctionParameter *functionParameter) : Node(id),
+    ParameterNode(FunctionParameter *functionParameter, std::string id) : Node(id),
             functionParameter(functionParameter) {}
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
-
-    void setAttributeForChildren(Attribute* attribute) override {}
 };
 
 class FunctionCallNode : public Node {
 public:
-    FunctionCallNode(Function *function,
-            map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter);
-
-    FunctionCallNode(Function *function,
-            map<const FunctionParameter *, std::unique_ptr<Node>> &&argumentByParameter, std::string id);
-
     Function * function;
     std::map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter;
+
+    explicit FunctionCallNode(Function *function);
+    FunctionCallNode(Function *function, std::string id);
+
+    // Use only during construction
+    void setArgument(const FunctionParameter * parameter, std::unique_ptr<Node> argumentRootNode);
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 };
@@ -188,7 +180,19 @@ public:
     }
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
-    void setAttributeForChildren(Attribute* attribute) override {}
+};
+
+class AttributeNode : public Node {
+public:
+    Attribute * attribute;
+    std::unique_ptr<Node> rootNode;
+
+    AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode);
+    AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id);
+
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
+
+    Attribute *getAttribute() override;
 };
 
 
