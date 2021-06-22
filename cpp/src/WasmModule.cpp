@@ -146,10 +146,18 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .class_function("makeUnique", &make<ModOpNode, std::unique_ptr<Node>, std::unique_ptr<Node>, std::string>);
 
     class_<NumberNode, base<Node>>("NumberNode")
-            .smart_ptr<std::shared_ptr<NumberNode>>("NumberNode")
             .function("getValue", &NumberNode::getValue)
             .class_function("makeUnique", &make<NumberNode, float>)
             .class_function("makeUnique", &make<NumberNode, float, std::string>);
+
+    class_<FunctionCallNode, base<Node>>("FunctionCallNode")
+//            .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<Function *,
+                    map<const FunctionParameter *, std::unique_ptr<Node>> &&, std::string>, allow_raw_pointers());
+
+    class_<ParameterNode, base<Node>>("ParameterNode")
+            .class_function("makeUnique", &make<ParameterNode, FunctionParameter *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<ParameterNode, FunctionParameter *, std::string>, allow_raw_pointers());
 
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());

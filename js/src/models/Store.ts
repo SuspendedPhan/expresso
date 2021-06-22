@@ -24,12 +24,16 @@ export default class Store {
     window.localStorage.setItem("emcc-evolved", jsonDeadStore);
   }
 
+  static makeDefault(emModule: any) {
+    const store = new Store(emModule);
+    store.addProject();
+    return store;
+  }
+
   static loadOrMake(emModule: any): Store {
     const jsonDeadStore = window.localStorage.getItem("emcc-evolved");
     if (jsonDeadStore === null) {
-      const store = new Store(emModule);
-      store.addProject();
-      return store;
+      return Store.makeDefault(emModule);
     }
     const deadStore = JSON.parse(jsonDeadStore);
     return DeadStore.toLiveStore(deadStore, emModule);

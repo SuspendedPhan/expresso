@@ -4,6 +4,8 @@
 #include "Attribute.h"
 #include "Code.h"
 #include "Signal.h"
+#include "Function.h"
+#include "FunctionParameter.h"
 #include <iostream>
 #include <functional>
 
@@ -30,7 +32,7 @@ public:
     Node() : id(Code::generateUuidV4()) {}
     explicit Node(std::string id) : id(std::move(id)) {}
 
-    virtual float eval(const EvalContext &evalContext) = 0;
+    virtual float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) = 0;
     std::string getId() { return this->id; }
     void replace(std::unique_ptr<Node> node);
     void setAttribute(Attribute* attribute);
@@ -53,7 +55,7 @@ public:
     NumberNode(float value, std::string id) : value(value), Node(std::move(id)) {}
 
     float getValue() const;
-    float eval(const EvalContext &evalContext) override;
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
     void setAttributeForChildren(Attribute* attribute) override {}
 };
 
@@ -95,8 +97,8 @@ public:
     AddOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
     AddOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
-    float eval(const EvalContext &evalContext) override {
-        return this->a->eval(evalContext) + this->b->eval(evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
+        return this->a->eval(evalContext, nodeEvalContext) + this->b->eval(evalContext, nodeEvalContext);
     }
 };
 
@@ -105,8 +107,8 @@ public:
     SubOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
     SubOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
-    float eval(const EvalContext &evalContext) override {
-        return this->a->eval(evalContext) - this->b->eval(evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
+        return this->a->eval(evalContext, nodeEvalContext) - this->b->eval(evalContext, nodeEvalContext);
     }
 };
 
@@ -115,8 +117,8 @@ public:
     MulOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
     MulOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
-    float eval(const EvalContext &evalContext) override {
-        return this->a->eval(evalContext) * this->b->eval(evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
+        return this->a->eval(evalContext, nodeEvalContext) * this->b->eval(evalContext, nodeEvalContext);
     }
 };
 
@@ -125,8 +127,8 @@ public:
     DivOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
     DivOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
-    float eval(const EvalContext &evalContext) override {
-        return this->a->eval(evalContext) / this->b->eval(evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
+        return this->a->eval(evalContext, nodeEvalContext) / this->b->eval(evalContext, nodeEvalContext);
     }
 };
 
@@ -135,54 +137,40 @@ public:
     ModOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b) : BinaryOpNode(std::move(a), std::move(b)) {}
     ModOpNode(std::unique_ptr<Node> a, std::unique_ptr<Node> b, std::string id) : BinaryOpNode(std::move(a), std::move(b), std::move(id)) {}
 
-    float eval(const EvalContext &evalContext) override {
-        float aEval = this->a->eval(evalContext);
-        float bEval = this->b->eval(evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
+        float aEval = this->a->eval(evalContext, nodeEvalContext);
+        float bEval = this->b->eval(evalContext, nodeEvalContext);
         float answer = fmod(aEval, bEval);
         return answer;
     }
 };
 
-class FunctionNode : public Node {
-public:
-    vector<std::unique_ptr<Node>> arguments;
-    std::unique_ptr<Node> rootNode;
-
-    float eval(const EvalContext &evalContext) override {
-        printf("function eval\n");
-        return this->rootNode->eval(evalContext);
-    }
-
-    static std::unique_ptr<FunctionNode> makeAverage() {
-        std::unique_ptr<FunctionNode> node = std::make_unique<FunctionNode>();
-//        auto aNode = std::make_unique<ParameterNode>(std::FunctionNode*(node), 0);
-//        auto bNode = std::make_unique<ParameterNode>(std::FunctionNode*(node), 1);
-//        auto addNode = std::make_unique<AddOpNode>(aNode, bNode);
-//        auto twoNode = std::make_unique<NumberNode>(2.0f);
-//        auto divNode = std::make_unique<DivOpNode>(addNode, twoNode);
-//        node->rootNode = divNode;
-        return node;
-    }
-
-    void setAttributeForChildren(Attribute* attribute) override;
-};
-
 class ParameterNode : public Node {
 public:
-    FunctionNode* fun;
-    int parameterIndex;
+    FunctionParameter * functionParameter;
 
-    ParameterNode(FunctionNode* fun,
-            int parameterIndex) {
-        this->fun = fun;
-        this->parameterIndex = parameterIndex;
-    }
+    explicit ParameterNode(FunctionParameter *functionParameter) : functionParameter(functionParameter) {}
 
-    float eval(const EvalContext &evalContext) override {
-        return this->fun->arguments[this->parameterIndex]->eval(evalContext);
-    }
+    ParameterNode(const std::string &id, FunctionParameter *functionParameter) : Node(id),
+            functionParameter(functionParameter) {}
+
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 
     void setAttributeForChildren(Attribute* attribute) override {}
+};
+
+class FunctionCallNode : public Node {
+public:
+    FunctionCallNode(Function *function,
+            map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter);
+
+    FunctionCallNode(Function *function,
+            map<const FunctionParameter *, std::unique_ptr<Node>> &&argumentByParameter, std::string id);
+
+    Function * function;
+    std::map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter;
+
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 };
 
 
@@ -199,7 +187,7 @@ public:
         return reference;
     }
 
-    float eval(const EvalContext &evalContext) override;
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
     void setAttributeForChildren(Attribute* attribute) override {}
 };
 

@@ -10,7 +10,7 @@
 <script lang="ts">
 
 import Component from "vue-class-component";
-import {Prop, Provide} from "vue-property-decorator";
+import {Provide} from "vue-property-decorator";
 import Vue from "vue";
 
 import WasmModule from '@/../public/WasmModule.js';
@@ -19,7 +19,6 @@ import PixiRenderer from "@/code/PixiRenderer";
 import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "@/models/Store";
-import DeadStore from "@/models/DeadStore";
 
 @Component({
   components: {WasmExpressor},
@@ -72,14 +71,30 @@ export default class WasmTest extends Vue {
     // const liveProject = liveStore.projects[0];
     // this.project = liveProject;
 
-    const store = Store.loadOrMake(module);
+    // const store = Store.loadOrMake(module);
+    const store = Store.makeDefault(module);
     this.store = store;
     this.project = store.getProjects()[0];
     const project: any = this.project;
-    // const rootOrganism = project.getRootOrganism();
-    // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
-    // const attribute = attributes[2];
-    // const twoNode = module.NumberNode.makeUnique(2);
+    const rootOrganism = project.getRootOrganism();
+    const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
+    const attribute = attributes[2];
+
+    const fun = module.Function.makeUnique("Average", ["a", "b"]);
+    const aParameter = fun.getParameter("a");
+    const bParameter = fun.getParameter("b");
+    const aParameterNode = module.ParameterNode.makeUnique(aParameter);
+    const bParameterNode = module.ParameterNode.makeUnique(bParameter);
+    const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
+    const twoNode = module.NumberNode.makeUnique(2);
+    fun.rootNode = module.DivNode.makeUnique(addNode, twoNode);
+    project.addFunction(fun);
+
+    const aArgNode = module.NumberNode.makeUnique(25);
+    const bArgNode = module.NumberNode.makeUnique(75);
+    const callNode = module.FunctionCallNode.makeUnique(fun, aArgNode, bArgNode);
+    attribute.setRootNode(callNode);
+
     // const threeNode = module.NumberNode.makeUnique(3);
     // const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
     // const oneNode = module.NumberNode.makeUnique(1);

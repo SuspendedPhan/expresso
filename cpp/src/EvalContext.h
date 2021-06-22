@@ -2,13 +2,15 @@
 #define EXPRESSO_EVALCONTEXT_H
 
 #include <map>
+#include "FunctionParameter.h"
 
 class Organism;
+
 class IntrinsicAttribute;
 
 class OrganismEvalContext {
 public:
-    OrganismOutput* organismOutput;
+    OrganismOutput *organismOutput;
 
     explicit OrganismEvalContext(OrganismOutput *organismOutput) : organismOutput(organismOutput) {}
 
@@ -18,8 +20,13 @@ public:
 
 class EvalContext {
 public:
-    std::map<Organism*, OrganismEvalContext*> organismEvalContextByOrganism;
-    std::map<const IntrinsicAttribute*, float> valueByIntrinsicAttribute;
+    std::map<Organism *, OrganismEvalContext *> organismEvalContextByOrganism;
+    std::map<const IntrinsicAttribute *, float> valueByIntrinsicAttribute;
+};
+
+class NodeEvalContext {
+public:
+    std::map<const FunctionParameter *, float> valueByParameter;
 };
 
 #endif //EXPRESSO_EVALCONTEXT_H

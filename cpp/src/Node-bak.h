@@ -24,7 +24,7 @@ class Node {
 private:
     std::function<void(shared_ptr<Node>)> replaceFun;
 public:
-    virtual float eval(const EvalContext &evalContext) = 0;
+    virtual float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) = 0;
     void replace(shared_ptr<Node> node);
     void setReplaceFun(const std::function<void(shared_ptr<Node>)> &replaceFun);
 
@@ -37,7 +37,7 @@ public:
 
     NumberNode(float value) { this->value = value; }
 
-    float eval(const EvalContext &evalContext) override;
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 };
 
 class UnaryOpNode : public Node {
@@ -74,7 +74,7 @@ class AddOpNode : public BinaryOpNode {
 public:
     AddOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         return this->a->eval(evalContext) + this->b->eval(evalContext);
     }
 };
@@ -83,7 +83,7 @@ class SubOpNode : public BinaryOpNode {
 public:
     SubOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         return this->a->eval(evalContext) - this->b->eval(evalContext);
     }
 };
@@ -92,7 +92,7 @@ class MulOpNode : public BinaryOpNode {
 public:
     MulOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         return this->a->eval(evalContext) * this->b->eval(evalContext);
     }
 };
@@ -101,7 +101,7 @@ class DivOpNode : public BinaryOpNode {
 public:
     DivOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         return this->a->eval(evalContext) / this->b->eval(evalContext);
     }
 };
@@ -110,7 +110,7 @@ class ModOpNode : public BinaryOpNode {
 public:
     ModOpNode(shared_ptr<Node> a, shared_ptr<Node> b) : BinaryOpNode(a, b) {}
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         float aEval = this->a->eval(evalContext);
         float bEval = this->b->eval(evalContext);
         float answer = fmod(aEval, bEval);
@@ -123,7 +123,7 @@ public:
     vector<shared_ptr<Node>> arguments;
     shared_ptr<Node> rootNode;
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         printf("function eval\n");
         return this->rootNode->eval(evalContext);
     }
@@ -151,7 +151,7 @@ public:
         this->parameterIndex = parameterIndex;
     }
 
-    float eval(const EvalContext &evalContext) override {
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override {
         return this->fun.lock()->arguments[this->parameterIndex]->eval(evalContext);
     }
 };
@@ -163,7 +163,7 @@ public:
 
     AttributeReferenceNode(weak_ptr<Attribute> attribute) { this->attribute = attribute; }
 
-    float eval(const EvalContext &evalContext);
+    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext);
 };
 
 

@@ -8,7 +8,8 @@
 
 AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
-    float value = this->rootNode->eval(evalContext);
+    NodeEvalContext nodeEvalContext;
+    float value = this->rootNode->eval(evalContext, nodeEvalContext);
     output.value = value;
     output.name = this->name;
     return output;

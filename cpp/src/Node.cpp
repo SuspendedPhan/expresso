@@ -6,11 +6,11 @@
 
 #include <utility>
 
-float AttributeReferenceNode::eval(const EvalContext &evalContext) {
+float AttributeReferenceNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
     return reference->eval(evalContext).value;
 }
 
-float NumberNode::eval(const EvalContext &evalContext) {
+float NumberNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
     return this->value;
 }
 
@@ -91,6 +91,32 @@ void BinaryOpNode::set(BinaryOpNode * op, std::unique_ptr<Node> a, std::unique_p
     BinaryOpNode::setB(op, std::move(b));
 }
 
-void FunctionNode::setAttributeForChildren(Attribute* attribute) {
-    std::cout << "need to implement this" << std::endl;
+float FunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
+    for (const auto & entries : this->argumentByParameter) {
+        const auto & parameter = entries.first;
+        const auto & argumentRootNode = entries.second;
+        const auto argumentValue = argumentRootNode->eval(evalContext, nodeEvalContext);
+        nodeEvalContext.valueByParameter[parameter] = argumentValue;
+    }
+    const auto answer = this->function->rootNode->eval(evalContext, nodeEvalContext);
+    for (const auto & entries : this->argumentByParameter) {
+        // Recursive functions are not implemented yet.
+        nodeEvalContext.valueByParameter.erase(entries.first);
+    }
+    return answer;
+}
+
+FunctionCallNode::FunctionCallNode(Function *function,
+        map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter) : function(function), argumentByParameter(
+        std::move(argumentByParameter)) {
+}
+
+FunctionCallNode::FunctionCallNode(Function *function,
+        map<const FunctionParameter *, unique_ptr<Node>> argumentByParameter, std::string id) : function(function), argumentByParameter(
+        std::move(argumentByParameter)), Node(
+        std::move(id)) {
+}
+
+float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
+    return nodeEvalContext.valueByParameter.at(this->functionParameter);
 }

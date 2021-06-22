@@ -7,12 +7,15 @@
 
 
 #include <memory>
-#include "Node.h"
+#include <vector>
 #include "FunctionParameter.h"
 
+class Node;
+
 class Function {
-    std::shared_ptr<Node> rootNode;
-    std::vector<std::shared_ptr<FunctionParameter>> parameters;
+public:
+    std::unique_ptr<Node> rootNode;
+    std::vector<std::unique_ptr<FunctionParameter>> parameters;
 };
 
 
