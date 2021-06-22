@@ -19,6 +19,7 @@ using unique_ptr = std::unique_ptr<T>;
 class ParameterNode;
 
 class Attribute;
+class Function;
 
 class Node {
 private:
@@ -152,17 +153,23 @@ public:
 };
 
 class FunctionCallNode : public Node {
+private:
+    std::map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter;
 public:
     Function * function;
-    std::map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter;
 
     explicit FunctionCallNode(Function *function);
     FunctionCallNode(Function *function, std::string id);
 
     // Use only during construction
     void setArgument(const FunctionParameter * parameter, std::unique_ptr<Node> argumentRootNode);
+    std::map<const FunctionParameter *, Node *> getArgumentByParameterMap();
+
+    Function *getFunction() const;
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
+
+    const std::string & getName() const;
 };
 
 
@@ -183,12 +190,15 @@ public:
 };
 
 class AttributeNode : public Node {
-public:
-    Attribute * attribute;
+private:
     std::unique_ptr<Node> rootNode;
-
+    Attribute * attribute;
+public:
     AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode);
     AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id);
+
+    const unique_ptr<Node> &getRootNode() const;
+    void setRootNode(unique_ptr<Node> rootNode);
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 

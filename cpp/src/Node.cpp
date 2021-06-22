@@ -99,7 +99,12 @@ FunctionCallNode::FunctionCallNode(Function *function) : function(function) {}
 FunctionCallNode::FunctionCallNode(Function *function, std::string id) : function(function), Node(std::move(id)) {}
 
 void FunctionCallNode::setArgument(const FunctionParameter *parameter, std::unique_ptr<Node> argumentRootNode) {
+    argumentRootNode->setParent(this);
     this->argumentByParameter[parameter] = std::move(argumentRootNode);
+}
+
+const std::string &FunctionCallNode::getName() const {
+    return this->function->getName();
 }
 
 float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
@@ -111,11 +116,36 @@ Attribute *AttributeNode::getAttribute() {
 }
 
 AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode) : attribute(attribute),
-        rootNode(std::move(rootNode)) {}
+        rootNode(std::move(rootNode)) {
+    rootNode->setParent(this);
+}
 
 AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id) : attribute(attribute),
-        rootNode(std::move(rootNode)), Node(std::move(id)) {}
+        rootNode(std::move(rootNode)), Node(std::move(id)) {
+    rootNode->setParent(this);
+}
 
 float AttributeNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
     return this->rootNode->eval(evalContext, nodeEvalContext);
+}
+
+const unique_ptr<Node> &AttributeNode::getRootNode() const {
+    return this->rootNode;
+}
+
+void AttributeNode::setRootNode(unique_ptr<Node> rootNode) {
+    rootNode->setParent(this);
+    this->rootNode = std::move(rootNode);
+}
+
+std::map<const FunctionParameter *, Node *> FunctionCallNode::getArgumentByParameterMap() {
+    std::map<const FunctionParameter *, Node *> answer;
+    for (const auto & entry : this->argumentByParameter) {
+        answer.insert({entry.first, entry.second.get()});
+    }
+    return answer;
+}
+
+Function *FunctionCallNode::getFunction() const {
+    return function;
 }

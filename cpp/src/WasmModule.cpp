@@ -160,11 +160,26 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<FunctionCallNode, base<Node>>("FunctionCallNode")
             .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
             .class_function("makeUnique", &make<FunctionCallNode, Function *, std::string>, allow_raw_pointers())
-            .function("setArgument", &FunctionCallNode::setArgument, allow_raw_pointers());
+            .function("setArgument", &FunctionCallNode::setArgument, allow_raw_pointers())
+            .function("getName", &FunctionCallNode::getName)
+            .function("getArgumentByParameterMap", &FunctionCallNode::getArgumentByParameterMap, allow_raw_pointers())
+            .function("getFunction", &FunctionCallNode::getFunction, allow_raw_pointers())
+            ;
 
     class_<ParameterNode, base<Node>>("ParameterNode")
             .class_function("makeUnique", &make<ParameterNode, FunctionParameter *>, allow_raw_pointers())
             .class_function("makeUnique", &make<ParameterNode, FunctionParameter *, std::string>, allow_raw_pointers());
+
+    class_<Function>("Function")
+            .class_function("makeUnique", &make<Function, std::string, std::unique_ptr<Node>>)
+            .class_function("makeUnique", &make<Function, std::string, std::unique_ptr<Node>, std::string>)
+            .function("addParameter", &Function::addParameter)
+            .function("getParameters", &Function::getParameters);
+
+    class_<FunctionParameter>("FunctionParameter")
+            .class_function("makeUnique", &make<FunctionParameter, std::string>)
+            .class_function("makeUnique", &make<FunctionParameter, std::string, std::string>)
+            .function("getName", &FunctionParameter::getName);
 
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());
@@ -218,7 +233,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<OrganismOutput *>("OrganismOutputVector");
     register_vector<OrganismCloneOutput *>("OrganismCloneOutputVector");
     register_vector<AttributeOutput *>("AttributeOutputVector");
+    register_vector<FunctionParameter *>("FunctionParameterVector");
     register_vector<FakeBook *>("FakeBookVector");
+    register_map<const FunctionParameter *, Node *>("FunctionParameterToNode");
 }
 
 #endif

@@ -41,7 +41,7 @@ public:
         return organism;
     }
 
-    OrganismOutput eval(EvalContext *evalContext) {
+    OrganismOutput eval(EvalContext *evalContext) { // NOLINT(misc-no-recursion)
         OrganismOutput organismOutput;
         OrganismEvalContext organismEvalContext(&organismOutput);
         evalContext->organismEvalContextByOrganism.emplace(this, &organismEvalContext);

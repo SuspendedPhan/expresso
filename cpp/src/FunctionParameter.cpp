@@ -10,3 +10,7 @@
 FunctionParameter::FunctionParameter(std::string id, std::string name) : id(std::move(id)), name(std::move(name)) {}
 
 FunctionParameter::FunctionParameter(std::string name) : name(std::move(name)), id(Code::generateUuidV4()) {}
+
+const std::string &FunctionParameter::getName() const {
+    return name;
+}

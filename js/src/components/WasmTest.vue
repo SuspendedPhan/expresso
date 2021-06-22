@@ -78,28 +78,35 @@ export default class WasmTest extends Vue {
     const project: any = this.project;
     const rootOrganism = project.getRootOrganism();
     const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
-    const attribute = attributes[2];
+    const xAttribute = attributes[2];
+    const yAttribute = attributes[3];
 
-    const fun = module.Function.makeUnique("Average", ["a", "b"]);
-    const aParameter = fun.getParameter("a");
-    const bParameter = fun.getParameter("b");
+    const aParameter = module.FunctionParameter.makeUnique("a");
+    const bParameter = module.FunctionParameter.makeUnique("b");
     const aParameterNode = module.ParameterNode.makeUnique(aParameter);
     const bParameterNode = module.ParameterNode.makeUnique(bParameter);
     const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
     const twoNode = module.NumberNode.makeUnique(2);
-    fun.rootNode = module.DivNode.makeUnique(addNode, twoNode);
-    project.addFunction(fun);
+    const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
+    const fun = module.Function.makeUnique("Average", divNode);
+    fun.addParameter(aParameter);
+    fun.addParameter(bParameter);
+    // project.addFunction(fun);
 
     const aArgNode = module.NumberNode.makeUnique(25);
     const bArgNode = module.NumberNode.makeUnique(75);
-    const callNode = module.FunctionCallNode.makeUnique(fun, aArgNode, bArgNode);
-    attribute.setRootNode(callNode);
+    const callNode = module.FunctionCallNode.makeUnique(fun);
+    callNode.setArgument(aParameter, aArgNode);
+    callNode.setArgument(bParameter, bArgNode);
+    xAttribute.setRootNode(callNode);
+
+    yAttribute.setRootNode(module.NumberNode.makeUnique(50));
 
     // const threeNode = module.NumberNode.makeUnique(3);
     // const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
     // const oneNode = module.NumberNode.makeUnique(1);
     // twoNode.replace(oneNode);
-    // attribute.setRootNode(addNode);
+    // xAttribute.setRootNode(addNode);
 
     render(this.project, renderer);
   }

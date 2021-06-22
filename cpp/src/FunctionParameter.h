@@ -15,6 +15,8 @@ public:
 
     explicit FunctionParameter(std::string name);
     FunctionParameter(std::string id, std::string name);
+
+    const std::string &getName() const;
 };
 
 

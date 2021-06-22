@@ -1,4 +1,5 @@
 import DeadStore from "@/models/DeadStore";
+import Functions from "@/code/Functions";
 
 export default class Store {
   constructor(private wasmModule, private projects: any[] = []) {}
@@ -44,6 +45,15 @@ export default class Store {
       const a = node.getA();
       const b = node.getB();
       return [a, b];
+    } else if (node.constructor.name === 'FunctionCallNode') {
+      const parameters = Functions.vectorToIterable(node.getFunction().getParameters());
+      const argumentByParameterMap = node.getArgumentByParameterMap();
+      const argumentRootNodes: any = [];
+      for (const parameter of parameters) {
+        const argumentRootNode = argumentByParameterMap.get(parameter);
+        argumentRootNodes.push(argumentRootNode);
+      }
+      return argumentRootNodes;
     } else {
       return [];
     }
