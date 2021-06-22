@@ -104,6 +104,10 @@ export default class DeadStore {
       deadNode.b = this.toDeadNode(liveNode.getB());
     } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
+    } else if (liveNode.constructor.name === 'AttributeNode') {
+      console.error('not implemented');
+    } else if (liveNode.constructor.name === 'FunctionCallNode') {
+      console.error('not implemented');
     } else {
       console.error('toDeadNode: unknown node type');
     }
@@ -125,6 +129,10 @@ export default class DeadStore {
       return emModule.NumberNode.makeUnique(deadNode.value, deadNode.id);
     } else if (deadNode.nodeType === 'AttributeReferenceNode') {
       return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
+    } else if (deadNode.nodeType === 'AttributeNode') {
+      console.error('not implemented');
+    } else if (deadNode.nodeType === 'FunctionCallNode') {
+      console.error('not implemented');
     } else {
       console.error(deadNode.nodeType);
     }
@@ -136,17 +144,17 @@ export default class DeadStore {
     return BinaryOpNodeClass.makeUnique(liveA, liveB, deadBinaryOpNode.id);
   }
 
-  private static * getLiveAttributesDeep(liveOrganism: any) {
-    yield * Functions.vectorToIterable(liveOrganism.getAttributes());
+  private static* getLiveAttributesDeep(liveOrganism: any) {
+    yield* Functions.vectorToIterable(liveOrganism.getAttributes());
     for (const suborganism of Functions.vectorToIterable(liveOrganism.getSuborganisms())) {
-      yield * this.getLiveAttributesDeep(suborganism);
+      yield* this.getLiveAttributesDeep(suborganism);
     }
   }
 
-  private static * getDeadAttributesDeep(deadOrganism: any) {
-    yield * deadOrganism.attributes;
+  private static* getDeadAttributesDeep(deadOrganism: any) {
+    yield* deadOrganism.attributes;
     for (const deadSuborganism of deadOrganism.suborganisms) {
-      yield * this.getDeadAttributesDeep(deadSuborganism);
+      yield* this.getDeadAttributesDeep(deadSuborganism);
     }
   }
 }
