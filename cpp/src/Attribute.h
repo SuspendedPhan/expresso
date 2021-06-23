@@ -15,7 +15,6 @@
 class Organism;
 
 class Node;
-class AttributeNode;
 class NumberNode;
 
 class Attribute {
@@ -44,7 +43,7 @@ public:
 
 class EditableAttribute : public Attribute {
 private:
-    std::unique_ptr<AttributeNode> attributeNode = std::make_unique<AttributeNode>(this, std::make_unique<NumberNode>(0.0f));
+    std::unique_ptr<Node> rootNode;
     Signal onChangedSignal;
 public:
     EditableAttribute(std::string name, Organism* organism) : Attribute(std::move(name), organism) {}
@@ -56,9 +55,6 @@ public:
     bool getIsEditableAttribute() override { return true; }
 
     void setRootNode(std::unique_ptr<Node> rootNode);
-    void setAttributeNode(std::unique_ptr<AttributeNode> attributeNode);
-    AttributeNode * getAttributeNode();
-
     Node *getRootNode();
 };
 

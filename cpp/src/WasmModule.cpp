@@ -105,8 +105,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .class_function("makeUnique", &make<EditableAttribute, std::string, Organism*, std::string>, allow_raw_pointers())
             .function("getRootNode", &EditableAttribute::getRootNode, allow_raw_pointers())
             .function("setRootNode", &EditableAttribute::setRootNode, allow_raw_pointers())
-            .function("setAttributeNode", &EditableAttribute::setAttributeNode, allow_raw_pointers())
-            .function("getAttributeNode", &EditableAttribute::getAttributeNode, allow_raw_pointers())
             .function("getOnChangedSignal", &EditableAttribute::getOnChangedSignal, allow_raw_pointers());
 
     class_<CloneNumberAttribute, base<Attribute>>("CloneNumberAttribute")
@@ -168,10 +166,6 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getArgumentByParameterMap", &FunctionCallNode::getArgumentByParameterMap, allow_raw_pointers())
             .function("getFunction", &FunctionCallNode::getFunction, allow_raw_pointers())
             ;
-
-    class_<AttributeNode, base<Node>>("AttributeNode")
-            .class_function("makeUnique", &make<AttributeNode, Attribute *, std::unique_ptr<Node>, std::string>, allow_raw_pointers())
-            .function("getRootNode", &AttributeNode::getRootNode, allow_raw_pointers());
 
     class_<ParameterNode, base<Node>>("ParameterNode")
             .class_function("makeUnique", &make<ParameterNode, FunctionParameter *>, allow_raw_pointers())

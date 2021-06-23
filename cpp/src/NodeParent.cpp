@@ -19,7 +19,7 @@ bool NodeParent::isAttribute() {
 }
 
 Node *NodeParent::getNode() {
-    return mpark::getNode<Node *>(this->parent);
+    return mpark::get<Node *>(this->parent);
 }
 
 Function *NodeParent::getFunction() {
