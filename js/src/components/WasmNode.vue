@@ -92,7 +92,7 @@ export default class WasmNode extends Vue {
     // We expect the node we replaced to set the pen's selected node to be our node
     const selected = this.node.getId() === this.pen.getSelectedNode()?.getId();
     if (selected) {
-        this.selected = true;
+      this.selected = true;
     }
   }
 
@@ -104,25 +104,38 @@ export default class WasmNode extends Vue {
       this.$nextTick(() => {
         (this.$refs['searchbox'] as any).focus();
       });
-    } else if (event.key === 'ArrowUp') {
-      const parentRaw = this.node.getParentRaw();
-      if (parentRaw !== null) {
-        window.setTimeout(() => this.pen.setSelectedNode(parentRaw), 0);
-      }
+    } else {
+      this.onKeydownArrows(event);
+    }
+  }
+
+  private onKeydownArrows(event) {
+    if (this.node.getParent() === null) {
+      console.error('onkeydown get parent null');
+      return;
+    }
+
+    const parent = this.node.getParent().getNode();
+    if (!parent.isNode()) {
+      console.error("onKeydownArrows isNode false");
+      return;
+    }
+    const parentNode = parent.getNode();
+
+    if (event.key === 'ArrowUp') {
+      window.setTimeout(() => this.pen.setSelectedNode(parentNode), 0);
     } else if (event.key === 'ArrowDown') {
       const children = WasmNode.getChildren(this.node);
       if (children.length > 0) {
         window.setTimeout(() => this.pen.setSelectedNode(children[0]), 0);
       }
     } else if (event.key === 'ArrowLeft') {
-      const parentRaw = this.node.getParentRaw();
-      if (WasmNode.isBinaryOpNode(parentRaw)) {
-        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node)), 0);
+      if (WasmNode.isBinaryOpNode(parentNode)) {
+        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
       }
     } else if (event.key === 'ArrowRight') {
-      const parentRaw = this.node.getParentRaw();
-      if (WasmNode.isBinaryOpNode(parentRaw)) {
-        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentRaw, this.node)), 0);
+      if (WasmNode.isBinaryOpNode(parentNode)) {
+        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
       }
     }
   }
@@ -155,6 +168,7 @@ export default class WasmNode extends Vue {
   }
 
   private onSelectedNodeChanged() {
+    console.log("selectednodechagned");
     if (this.pen.selectedNode?.getId() === this.node.getId()) {
       this.selected = true;
     } else {

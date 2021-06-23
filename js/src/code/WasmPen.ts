@@ -10,6 +10,7 @@ export default class WasmPen {
   }
 
   setSelectedNode(selectedNode) {
+    console.log("selected");
     this.selectedNode = selectedNode;
     this.onSelectedNodeChanged.dispatch();
   }
