@@ -40,11 +40,8 @@ export default class DeadStore {
     const liveEditableAttributes = liveAttributes.filter(attribute => attribute.constructor.name === 'EditableAttribute');
     for (const liveEditableAttribute of liveEditableAttributes) {
       const deadEditableAttribute = deadAttributeById.get(liveEditableAttribute.getId());
-      const deadAttributeNode = deadEditableAttribute.attributeNode;
-      const deadRootNode = deadAttributeNode.rootNode;
-      const liveRootNode = this.toLiveNode(deadRootNode, emModule, liveAttributeById);
-      const liveAttributeNode = emModule.AttributeNode.makeUnique(liveEditableAttribute, liveRootNode, deadAttributeNode.id);
-      liveEditableAttribute.setAttributeNode(liveAttributeNode);
+      const liveRootNode = this.toLiveNode(deadEditableAttribute.rootNode, emModule, liveAttributeById);
+      liveEditableAttribute.setRootNode(liveRootNode);
     }
     return emModule.Project.makeUnique(liveRootOrganism);
   }
@@ -79,7 +76,7 @@ export default class DeadStore {
     } as any;
 
     if (liveAttribute.getIsEditableAttribute()) {
-      answer.attributeNode = this.toDeadNode(liveAttribute.getAttributeNode());
+      answer.rootNode = this.toDeadNode(liveAttribute.getRootNode());
     }
 
     return answer;
@@ -107,8 +104,6 @@ export default class DeadStore {
       deadNode.b = this.toDeadNode(liveNode.getB());
     } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
-    } else if (liveNode.constructor.name === 'AttributeNode') {
-      deadNode.rootNode = this.toDeadNode(liveNode.getRootNode());
     } else if (liveNode.constructor.name === 'FunctionCallNode') {
       console.error('not implemented');
     } else {
@@ -132,8 +127,6 @@ export default class DeadStore {
       return emModule.NumberNode.makeUnique(deadNode.value, deadNode.id);
     } else if (deadNode.nodeType === 'AttributeReferenceNode') {
       return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
-    } else if (deadNode.nodeType === 'AttributeNode') {
-      console.error('cant make an AttributeNode here');
     } else if (deadNode.nodeType === 'FunctionCallNode') {
       console.error('not implemented');
     } else {
