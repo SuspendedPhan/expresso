@@ -57,6 +57,7 @@ export default class WasmTest extends Vue {
     const attributeVector = project.getRootOrganism().getAttributes();
     const attributes = Functions.vectorToArray(attributeVector);
     const numberNode = module.NumberNode.makeUnique(20);
+    numberNode.getPp();
     const xAttribute = attributes[2];
     const xRootNode = xAttribute.getRootNode();
     // xRootNode.replace(numberNode);

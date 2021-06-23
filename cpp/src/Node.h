@@ -4,10 +4,12 @@
 #include "Attribute.h"
 #include "Code.h"
 #include "Signal.h"
+#include "NodeParent.h"
 #include "Function.h"
 #include "FunctionParameter.h"
 #include <iostream>
 #include <functional>
+#include "variant.h"
 
 template<typename T>
 using vector = std::vector<T>;
@@ -24,10 +26,7 @@ class Function;
 class Node {
 private:
     std::string id;
-
-    // TODO: make this a variant of <Node, Function, Attribute> and get rid of AttributeNode
-    Node* parent = nullptr;
-
+    std::unique_ptr<NodeParent> parent;
 protected:
     Signal onChangedSignal;
 public:
@@ -38,12 +37,12 @@ public:
     std::string getId() { return this->id; }
     void replace(std::unique_ptr<Node> node);
 
-    void setParent(Node* parent);
+    void setParent(std::unique_ptr<NodeParent> parent);
 
     Signal* getOnChangedSignal();
     virtual Attribute* getAttribute();
     Organism* getOrganismRaw();
-    Node* getParentRaw();
+    NodeParent * getParent();
 
     virtual ~Node() = default;
 };
@@ -192,21 +191,6 @@ public:
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 };
 
-class AttributeNode : public Node {
-private:
-    std::unique_ptr<Node> rootNode;
-    Attribute * attribute;
-public:
-    AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode);
-    AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id);
-
-    Node * getRootNode() const;
-    void setRootNode(unique_ptr<Node> rootNode);
-
-    float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
-
-    Attribute *getAttribute() override;
-};
 
 
 #endif //EXPRESSO_NODE_H

@@ -23,20 +23,21 @@ std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute *
 }
 
 void Node::replace(std::unique_ptr<Node> node) {
-    if (auto *binaryOpNode = dynamic_cast<BinaryOpNode *>(this->parent)) {
-        if (binaryOpNode->getA() == this) {
-            BinaryOpNode::setA(binaryOpNode, std::move(node));
-        } else if (binaryOpNode->getB() == this) {
-            BinaryOpNode::setB(binaryOpNode, std::move(node));
+    if (this->parent->isNode()) {
+        const auto parentNode = this->parent->getNode();
+        if (auto *binaryOpNode = dynamic_cast<BinaryOpNode *>(parentNode)) {
+            if (binaryOpNode->getA() == this) {
+                BinaryOpNode::setA(binaryOpNode, std::move(node));
+            } else if (binaryOpNode->getB() == this) {
+                BinaryOpNode::setB(binaryOpNode, std::move(node));
+            } else {
+                std::cerr << "replace; binaryopnode" << std::endl;
+            }
         } else {
-            std::cerr << "replace; binaryopnode" << std::endl;
+            std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
         }
-    } else if (auto *attributeNode = dynamic_cast<AttributeNode *>(this->parent)) {
-        attributeNode->setRootNode(std::move(node));
-    } else if (dynamic_cast<AttributeNode *>(this)) {
-        std::cerr << "can't replace attribute node" << std::endl;
     } else {
-        std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
+        std::cerr << "not implemented node::replace" << std::endl;
     }
 }
 
@@ -52,22 +53,22 @@ Organism *Node::getOrganismRaw() {
     return this->getAttribute()->organism;
 }
 
-Node *Node::getParentRaw() {
-    return this->parent;
+void Node::setParent(std::unique_ptr<NodeParent> parent) {
+    this->parent = std::move(parent);
 }
 
-void Node::setParent(Node *parent) {
-    this->parent = parent;
+NodeParent * Node::getParent() {
+    return this->parent.get();
 }
 
 void BinaryOpNode::setA(BinaryOpNode *op, std::unique_ptr<Node> a) {
-    a->setParent(op);
+    a->setParent(std::make_unique<NodeParent>(op));
     op->a = std::move(a);
     op->onChangedSignal.dispatch();
 }
 
 void BinaryOpNode::setB(BinaryOpNode *op, std::unique_ptr<Node> b) {
-    b->setParent(op);
+    b->setParent(std::make_unique<NodeParent>(op));
     op->b = std::move(b);
     op->onChangedSignal.dispatch();
 }
@@ -97,7 +98,7 @@ FunctionCallNode::FunctionCallNode(Function *function) : function(function) {}
 FunctionCallNode::FunctionCallNode(Function *function, std::string id) : function(function), Node(std::move(id)) {}
 
 void FunctionCallNode::setArgument(const FunctionParameter *parameter, std::unique_ptr<Node> argumentRootNode) {
-    argumentRootNode->setParent(this);
+    argumentRootNode->setParent(std::make_unique<NodeParent>(this));
     this->argumentByParameter[parameter] = std::move(argumentRootNode);
 }
 
@@ -109,32 +110,6 @@ float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeE
     return nodeEvalContext.valueByParameter.at(this->functionParameter);
 }
 
-Attribute *AttributeNode::getAttribute() {
-    return this->attribute;
-}
-
-AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode) : attribute(attribute),
-        rootNode(std::move(rootNode)) {
-    rootNode->setParent(this);
-}
-
-AttributeNode::AttributeNode(Attribute *attribute, unique_ptr<Node> rootNode, std::string id) : attribute(attribute),
-        rootNode(std::move(rootNode)), Node(std::move(id)) {
-    rootNode->setParent(this);
-}
-
-float AttributeNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
-    return this->rootNode->eval(evalContext, nodeEvalContext);
-}
-
-Node *AttributeNode::getRootNode() const {
-    return this->rootNode.get();
-}
-
-void AttributeNode::setRootNode(unique_ptr<Node> rootNode) {
-    rootNode->setParent(this);
-    this->rootNode = std::move(rootNode);
-}
 
 std::map<const FunctionParameter *, Node *> FunctionCallNode::getArgumentByParameterMap() {
     std::map<const FunctionParameter *, Node *> answer;

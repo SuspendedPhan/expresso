@@ -121,7 +121,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("replace", &Node::replace)
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
             .function("getOrganismRaw", &Node::getOrganismRaw, allow_raw_pointers())
-            .function("getParentRaw", &Node::getParentRaw, allow_raw_pointers());
+            .function("getParentRaw", &Node::getParentRaw, allow_raw_pointers())
+            .function("getPp", &Node::getPp, allow_raw_pointers());
 
     class_<BinaryOpNode, base<Node>>("BinaryOpNode")
             .class_function("setA", &BinaryOpNode::setA, allow_raw_pointers())
@@ -200,6 +201,15 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<AttributeOutput>("AttributeOutput")
             .function("getValue", &AttributeOutput::getValue)
             .function("getName", &AttributeOutput::getName);
+
+    class_<NodeParent>("NodeParent")
+            .function("isNode", &NodeParent::isNode, allow_raw_pointers())
+            .function("isFunction", &NodeParent::isFunction, allow_raw_pointers())
+            .function("isAttribute", &NodeParent::isAttribute, allow_raw_pointers())
+            .function("getNode", &NodeParent::getNode, allow_raw_pointers())
+            .function("getFunction", &NodeParent::getFunction, allow_raw_pointers())
+            .function("getAttribute", &NodeParent::getAttribute, allow_raw_pointers())
+            ;
 
     class_<Signal>("Signal");
 
