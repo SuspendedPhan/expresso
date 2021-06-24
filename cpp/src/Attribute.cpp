@@ -16,6 +16,7 @@ AttributeOutput EditableAttribute::eval(const EvalContext &evalContext) const {
 }
 
 void EditableAttribute::setRootNode(std::unique_ptr<Node> rootNode) {
+    rootNode->setParent(std::make_unique<NodeParent>(this));
     this->rootNode = std::move(rootNode);
     if (this->onChangedSignal.listener) {
         this->onChangedSignal.listener();

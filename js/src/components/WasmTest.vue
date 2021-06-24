@@ -53,6 +53,7 @@ export default class WasmTest extends Vue {
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
 
     const store = new Store(module);
+    this.store = store;
     const project = store.addProject();
     const attributeVector = project.getRootOrganism().getAttributes();
     const attributes = Functions.vectorToArray(attributeVector);

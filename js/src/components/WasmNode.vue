@@ -115,27 +115,31 @@ export default class WasmNode extends Vue {
       return;
     }
 
-    const parent = this.node.getParent().getNode();
-    if (!parent.isNode()) {
-      console.error("onKeydownArrows isNode false");
-      return;
+    const parent = this.node.getParent();
+    if (parent.isNode()) {
+      this.onKeydownDown(event);
+      const parentNode = parent.getNode();
+      if (event.key === 'ArrowUp') {
+        window.setTimeout(() => this.pen.setSelectedNode(parentNode), 0);
+      } else if (event.key === 'ArrowLeft') {
+        if (WasmNode.isBinaryOpNode(parentNode)) {
+          window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
+        }
+      } else if (event.key === 'ArrowRight') {
+        if (WasmNode.isBinaryOpNode(parentNode)) {
+          window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
+        }
+      }
+    } else if (parent.isAttribute()) {
+      this.onKeydownDown(event);
     }
-    const parentNode = parent.getNode();
+  }
 
-    if (event.key === 'ArrowUp') {
-      window.setTimeout(() => this.pen.setSelectedNode(parentNode), 0);
-    } else if (event.key === 'ArrowDown') {
+  private onKeydownDown(event) {
+    if (event.key === 'ArrowDown') {
       const children = WasmNode.getChildren(this.node);
       if (children.length > 0) {
         window.setTimeout(() => this.pen.setSelectedNode(children[0]), 0);
-      }
-    } else if (event.key === 'ArrowLeft') {
-      if (WasmNode.isBinaryOpNode(parentNode)) {
-        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
-      }
-    } else if (event.key === 'ArrowRight') {
-      if (WasmNode.isBinaryOpNode(parentNode)) {
-        window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
       }
     }
   }
@@ -168,7 +172,6 @@ export default class WasmNode extends Vue {
   }
 
   private onSelectedNodeChanged() {
-    console.log("selectednodechagned");
     if (this.pen.selectedNode?.getId() === this.node.getId()) {
       this.selected = true;
     } else {

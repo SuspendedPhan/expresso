@@ -36,6 +36,12 @@ void Node::replace(std::unique_ptr<Node> node) {
         } else {
             std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
         }
+    } else if (this->parent->isAttribute()) {
+        if (auto * attribute = dynamic_cast<EditableAttribute *>(this->parent->getAttribute())) {
+            attribute->setRootNode(std::move(node));
+        } else {
+            std::cerr << "node::replace non editable attr" << std::endl;
+        }
     } else {
         std::cerr << "not implemented node::replace" << std::endl;
     }
@@ -45,8 +51,15 @@ Signal *Node::getOnChangedSignal() {
     return &this->onChangedSignal;
 }
 
-Attribute *Node::getAttribute() {
-    return this->parent->getAttribute();
+Attribute *Node::getAttribute() { // NOLINT(misc-no-recursion)
+    if (this->parent->isNode()) {
+        return this->parent->getNode()->getAttribute();
+    } else if (this->parent->isAttribute()) {
+        return this->parent->getAttribute();
+    } else {
+        std::cerr << "Node::getAttribute dylan error" << std::endl;
+        return nullptr;
+    }
 }
 
 Organism *Node::getOrganismRaw() {
