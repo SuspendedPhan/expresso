@@ -52,32 +52,31 @@ export default class WasmTest extends Vue {
 
     const renderer = new PixiRenderer(this.$refs['viewport'], this.$refs['canvas']);
 
-    const store = new Store(module);
-    this.store = store;
-    const project = store.addProject();
-    const attributeVector = project.getRootOrganism().getAttributes();
-    const attributes = Functions.vectorToArray(attributeVector);
-    const numberNode = module.NumberNode.makeUnique(20);
-    const xAttribute = attributes[2];
-    const xRootNode = xAttribute.getRootNode();
-    // xRootNode.replace(numberNode);
-    const yAttribute = attributes[3];
-    const yRootNode = yAttribute.getRootNode();
-    const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
-    // yRootNode.replace(refNode);
-
-    const deadStore = DeadStore.fromLiveStore(store);
-    // console.log(JSON.stringify(deadStore));
-    const liveStore = DeadStore.toLiveStore(deadStore, module);
-    const dead2 = DeadStore.fromLiveStore(liveStore);
-    // console.log(JSON.stringify(dead2));
-    const liveProject = liveStore.projects[0];
-    this.project = liveProject;
-
-    // const store = Store.loadOrMake(module);
-    // const store = Store.makeDefault(module);
+    // const store = new Store(module);
     // this.store = store;
-    // this.project = store.getProjects()[0];
+    // const project = store.addProject();
+    // const attributeVector = project.getRootOrganism().getAttributes();
+    // const attributes = Functions.vectorToArray(attributeVector);
+    // const numberNode = module.NumberNode.makeUnique(20);
+    // const xAttribute = attributes[2];
+    // const xRootNode = xAttribute.getRootNode();
+    // // xRootNode.replace(numberNode);
+    // const yAttribute = attributes[3];
+    // const yRootNode = yAttribute.getRootNode();
+    // const refNode = module.AttributeReferenceNode.makeUnique(xAttribute);
+    // // yRootNode.replace(refNode);
+
+    // const deadStore = DeadStore.fromLiveStore(store);
+    // // console.log(JSON.stringify(deadStore));
+    // const liveStore = DeadStore.toLiveStore(deadStore, module);
+    // const dead2 = DeadStore.fromLiveStore(liveStore);
+    // // console.log(JSON.stringify(dead2));
+    // const liveProject = liveStore.projects[0];
+    // this.project = liveProject;
+
+    const store = Store.loadOrMake(module);
+    this.store = store;
+    this.project = store.getProjects()[0];
     // const project: any = this.project;
     // const rootOrganism = project.getRootOrganism();
     // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
