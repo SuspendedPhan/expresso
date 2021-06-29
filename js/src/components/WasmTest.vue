@@ -4,6 +4,7 @@
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>
+    <ProjectFunctionCollection />
   </div>
 </template>
 
@@ -20,9 +21,10 @@ import WasmExpressor from "@/components/WasmExpressor.vue";
 import Functions from "@/code/Functions";
 import Store from "@/models/Store";
 import DeadStore from "@/models/DeadStore";
+import ProjectFunctionCollection from "@/components/ProjectFunctionCollection.vue";
 
 @Component({
-  components: {WasmExpressor},
+  components: {ProjectFunctionCollection, WasmExpressor},
 })
 export default class WasmTest extends Vue {
   fake = null;
@@ -119,5 +121,3 @@ export default class WasmTest extends Vue {
 }
 
 </script>
-<style scoped>
-</style>
