@@ -24,3 +24,19 @@ const std::string &Project::getId() const {
 std::unique_ptr<Organism> Project::makeRootOrganism() {
     return Organism::makeWithStandardAttributes("the void");
 }
+
+Signal * Project::getOnFunctionsChangedSignal() {
+    return &this->onFunctionsChangedSignal;
+}
+
+std::vector<Function *> Project::getFunctions() {
+    std::vector<Function *> functions;
+    for (const auto &fun : this->functions) {
+        functions.emplace_back(fun.get());
+    }
+    return functions;
+}
+
+void Project::addFunction(std::unique_ptr<Function> function) {
+    this->functions.push_back(std::move(function));
+}

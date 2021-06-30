@@ -27,3 +27,11 @@ std::vector<FunctionParameter *> Function::getParameters() {
     }
     return answer;
 }
+
+const std::string &Function::getId() const {
+    return id;
+}
+
+Node * Function::getRootNode() {
+    return rootNode.get();
+}

@@ -4,7 +4,7 @@
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>
-    <ProjectFunctionCollection />
+    <ProjectFunctionCollection v-if="project" :project="project" />
   </div>
 </template>
 
@@ -30,9 +30,17 @@ export default class WasmTest extends Vue {
   fake = null;
   project = null;
   store: any = null;
+  emModule: any = null;
 
   @Provide()
   saveStoreFunctor = () => this.saveStore();
+
+  @Provide()
+  getEmModule = () => this.privateGetEmModule();
+
+  privateGetEmModule() {
+    return this.emModule;
+  }
 
   async mounted() {
     const module = await WasmModule({
@@ -44,6 +52,7 @@ export default class WasmTest extends Vue {
       },
     });
     (window as any).wasmModule = module;
+    this.emModule = module;
 
     function render(project, renderer) {
       const evalOutput = project.evalOrganismTree();
@@ -76,26 +85,27 @@ export default class WasmTest extends Vue {
     // const liveProject = liveStore.projects[0];
     // this.project = liveProject;
 
-    const store = Store.loadOrMake(module);
+    const store = Store.makeDefault(module);
+    // const store = Store.loadOrMake(module);
     this.store = store;
     this.project = store.getProjects()[0];
-    // const project: any = this.project;
+    const project: any = this.project;
     // const rootOrganism = project.getRootOrganism();
     // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
     // const xAttribute = attributes[2];
     // const yAttribute = attributes[3];
 
-    // const aParameter = module.FunctionParameter.makeUnique("a");
-    // const bParameter = module.FunctionParameter.makeUnique("b");
-    // const aParameterNode = module.ParameterNode.makeUnique(aParameter);
-    // const bParameterNode = module.ParameterNode.makeUnique(bParameter);
-    // const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
-    // const twoNode = module.NumberNode.makeUnique(2);
-    // const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
-    // const fun = module.Function.makeUnique("Average", divNode);
-    // fun.addParameter(aParameter);
-    // fun.addParameter(bParameter);
-    // // project.addFunction(fun);
+    const aParameter = module.FunctionParameter.makeUnique("a");
+    const bParameter = module.FunctionParameter.makeUnique("b");
+    const aParameterNode = module.ParameterNode.makeUnique(aParameter);
+    const bParameterNode = module.ParameterNode.makeUnique(bParameter);
+    const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
+    const twoNode = module.NumberNode.makeUnique(2);
+    const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
+    const fun = module.Function.makeUnique("Average", divNode);
+    fun.addParameter(aParameter);
+    fun.addParameter(bParameter);
+    project.addFunction(fun);
     //
     // const aArgNode = module.NumberNode.makeUnique(25);
     // const bArgNode = module.NumberNode.makeUnique(75);

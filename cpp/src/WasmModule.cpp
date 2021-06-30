@@ -81,6 +81,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getRootOrganism", &Project::getRootOrganism, allow_raw_pointers())
             .function("getId", &Project::getId)
             .function("setRootOrganism", &Project::setRootOrganism, allow_raw_pointers())
+            .function("getOnFunctionsChangedSignal", &Project::getOnFunctionsChangedSignal, allow_raw_pointers())
+            .function("getFunctions", &Project::getFunctions, allow_raw_pointers())
+            .function("addFunction", &Project::addFunction, allow_raw_pointers())
             ;
 
     class_<Organism>("Organism")
@@ -174,6 +177,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .class_function("makeUnique", &make<Function, std::string, std::unique_ptr<Node>>)
             .class_function("makeUnique", &make<Function, std::string, std::unique_ptr<Node>, std::string>)
             .function("addParameter", &Function::addParameter)
+            .function("getId", &Function::getId)
+            .function("getName", &Function::getName)
+            .function("getRootNode", &Function::getRootNode, allow_raw_pointers())
             .function("getParameters", &Function::getParameters);
 
     class_<FunctionParameter>("FunctionParameter")
@@ -243,6 +249,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<OrganismCloneOutput *>("OrganismCloneOutputVector");
     register_vector<AttributeOutput *>("AttributeOutputVector");
     register_vector<FunctionParameter *>("FunctionParameterVector");
+    register_vector<Function *>("FunctionVector");
     register_vector<FakeBook *>("FakeBookVector");
     register_map<const FunctionParameter *, Node *>("FunctionParameterToNode");
 }

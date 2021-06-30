@@ -12,24 +12,31 @@
 #include "Organism.h"
 
 class Project {
-public:
-    std::unique_ptr<Organism> rootOrganism;
+private:
     std::string id;
-
+    std::unique_ptr<Organism> rootOrganism;
+    Signal onFunctionsChangedSignal;
+    std::vector<std::unique_ptr<Function>> functions;
+public:
     explicit Project(unique_ptr<Organism> rootOrganism) : id(Code::generateUuidV4()), rootOrganism(
             std::move(rootOrganism)) {}
 
     Project(unique_ptr<Organism> rootOrganism, std::string id) : rootOrganism(std::move(rootOrganism)),
             id(std::move(id)) {}
 
-
     static unique_ptr<Organism> makeRootOrganism();
 
+
     const std::string &getId() const;
+
     std::unique_ptr<EvalOutput> evalOrganismTree() const;
     Organism* getRootOrganism() const;
+    Signal * getOnFunctionsChangedSignal();
+    std::vector<Function *> getFunctions();
 
     void setRootOrganism(std::unique_ptr<Organism> organism) { this->rootOrganism = std::move(organism); }
+
+    void addFunction(std::unique_ptr<Function> function);
 };
 
 

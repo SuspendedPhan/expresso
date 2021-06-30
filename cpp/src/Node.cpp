@@ -98,7 +98,7 @@ float FunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &no
         const auto argumentValue = argumentRootNode->eval(evalContext, nodeEvalContext);
         nodeEvalContext.valueByParameter[parameter] = argumentValue;
     }
-    const auto answer = this->function->rootNode->eval(evalContext, nodeEvalContext);
+    const auto answer = this->function->getRootNode()->eval(evalContext, nodeEvalContext);
     for (const auto &entries : this->argumentByParameter) {
         // Recursive functions are not implemented yet.
         nodeEvalContext.valueByParameter.erase(entries.first);
