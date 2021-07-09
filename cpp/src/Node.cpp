@@ -52,18 +52,28 @@ Signal *Node::getOnChangedSignal() {
 }
 
 Attribute *Node::getAttribute() { // NOLINT(misc-no-recursion)
+    if (!this->parent) {
+        std::cerr << "Node::getAttribute error! dylan" << std::endl;
+    }
+
     if (this->parent->isNode()) {
         return this->parent->getNode()->getAttribute();
     } else if (this->parent->isAttribute()) {
         return this->parent->getAttribute();
+    } else if (this->parent->isFunction()) {
+        return nullptr;
     } else {
         std::cerr << "Node::getAttribute dylan error" << std::endl;
         return nullptr;
     }
 }
 
-Organism *Node::getOrganismRaw() {
-    return this->getAttribute()->organism;
+Organism *Node::getOrganism() {
+    Attribute *attribute = this->getAttribute();
+    if (attribute == nullptr) {
+        return nullptr;
+    }
+    return attribute->organism;
 }
 
 void Node::setParent(std::unique_ptr<NodeParent> parent) {
@@ -72,6 +82,23 @@ void Node::setParent(std::unique_ptr<NodeParent> parent) {
 
 NodeParent * Node::getParent() {
     return this->parent.get();
+}
+
+Function *Node::getFunction() { // NOLINT(misc-no-recursion)
+    if (!this->parent) {
+        std::cerr << "Node::getAttribute error! dylan" << std::endl;
+    }
+
+    if (this->parent->isNode()) {
+        return this->parent->getNode()->getFunction();
+    } else if (this->parent->isAttribute()) {
+        return nullptr;
+    } else if (this->parent->isFunction()) {
+        return this->parent->getFunction();
+    } else {
+        std::cerr << "Node::getFunction dylan error" << std::endl;
+        return nullptr;
+    }
 }
 
 void BinaryOpNode::setA(BinaryOpNode *op, std::unique_ptr<Node> a) {

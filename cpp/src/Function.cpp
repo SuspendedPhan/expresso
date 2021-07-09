@@ -12,9 +12,13 @@ void Function::addParameter(std::unique_ptr<FunctionParameter> parameter) {
 }
 
 Function::Function(std::string name, std::unique_ptr<Node> rootNode, std::string id)
-        : id(std::move(id)), name(std::move(name)), rootNode(std::move(rootNode)) {}
+        : id(std::move(id)), name(std::move(name)) {
+    this->setRootNode(std::move(rootNode));
+}
 Function::Function(std::string name, std::unique_ptr<Node> rootNode)
-        : id(Code::generateUuidV4()), name(std::move(name)), rootNode(std::move(rootNode)) {}
+        : id(Code::generateUuidV4()), name(std::move(name)) {
+    this->setRootNode(std::move(rootNode));
+}
 
 const std::string &Function::getName() const {
     return name;
@@ -34,4 +38,9 @@ const std::string &Function::getId() const {
 
 Node * Function::getRootNode() {
     return rootNode.get();
+}
+
+void Function::setRootNode(std::unique_ptr<Node> rootNode) {
+    rootNode->setParent(std::make_unique<NodeParent>(this));
+    Function::rootNode = std::move(rootNode);
 }

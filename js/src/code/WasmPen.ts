@@ -15,10 +15,30 @@ export default class WasmPen {
   }
 
   static getNodeChoices(selectedNode, query) {
+    const organism = selectedNode.getOrganism();
+    const fun = selectedNode.getFunction();
+    if (organism !== null) {
+      return this.getNodeChoicesForAttributeNode(query, organism);
+    } else if (fun !== null) {
+      return this.getNodeChoicesForFunctionNode(query, fun);
+    } else {
+      console.error('dont know where this node belongs');
+    }
+  }
+
+  private static getNodeChoicesForAttributeNode(query, parentOrganism) {
     let answer = [] as any;
     answer = answer.concat(this.getNumberNodeChoices(query));
     answer = answer.concat(this.getOpNodeChoices(query));
-    answer = answer.concat(this.getAttributeNodeChoices(selectedNode, query));
+    answer = answer.concat(this.getAttributeNodeChoices(query, parentOrganism));
+    return answer;
+  }
+
+  private static getNodeChoicesForFunctionNode(query, parentFun) {
+    let answer = [] as any;
+    answer = answer.concat(this.getNumberNodeChoices(query));
+    answer = answer.concat(this.getOpNodeChoices(query));
+    answer = answer.concat(this.getParameterNodeChoices(query, parentFun));
     return answer;
   }
 
@@ -42,16 +62,20 @@ export default class WasmPen {
     return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
-  private static getAttributeNodeChoices(selectedNode, query) {
-    const organism = selectedNode.getOrganismRaw();
-    const attributes = Functions.vectorToArray(organism.getAttributes());
-
-    // We're returning a raw attribute pointer here.... could be messy
-
+  private static getAttributeNodeChoices(query, parentOrganism) {
+    const attributes = Functions.vectorToArray(parentOrganism.getAttributes());
     return attributes.map(attribute => ({
-      text: organism.getName() + "." + attribute.getName(),
+      text: parentOrganism.getName() + "." + attribute.getName(),
       nodeMakerFunction: () => this.getModule().AttributeReferenceNode.makeUnique(attribute)
     })).filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+  }
+
+  private static getParameterNodeChoices(query, parentFun) {
+    const choices = Functions.vectorToArray(parentFun.getParameters()).map(parameter => ({
+      text: parameter.getName(),
+      nodeMakerFunction: () => this.getModule().ParameterNode.makeUnique(parameter)
+    }));
+    return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }
 
   private static makeZero() {

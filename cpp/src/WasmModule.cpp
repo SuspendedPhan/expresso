@@ -121,8 +121,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getId", &Node::getId)
             .function("replace", &Node::replace)
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
-            .function("getOrganismRaw", &Node::getOrganismRaw, allow_raw_pointers())
-            .function("getParent", &Node::getParent, allow_raw_pointers());
+            .function("getOrganism", &Node::getOrganism, allow_raw_pointers())
+            .function("getParent", &Node::getParent, allow_raw_pointers())
+            .function("getFunction", &Node::getFunction, allow_raw_pointers());
 
     class_<BinaryOpNode, base<Node>>("BinaryOpNode")
             .class_function("setA", &BinaryOpNode::setA, allow_raw_pointers())

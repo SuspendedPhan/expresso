@@ -41,8 +41,9 @@ public:
 
     Signal* getOnChangedSignal();
     virtual Attribute* getAttribute();
-    Organism* getOrganismRaw();
+    Organism* getOrganism();
     NodeParent * getParent();
+    Function* getFunction();
 
     virtual ~Node() = default;
 };

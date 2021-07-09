@@ -21,16 +21,17 @@ private:
     std::unique_ptr<Node> rootNode;
 public:
     Function(std::string name, std::unique_ptr<Node> rootNode, std::string id);
-
     explicit Function(std::string name, std::unique_ptr<Node> rootNode);
 
     // Only use during construction.
     void addParameter(std::unique_ptr<FunctionParameter> parameter);
 
     const std::string &getId() const;
+
     const std::string &getName() const;
     Node * getRootNode();
     std::vector<FunctionParameter *> getParameters();
+    void setRootNode(std::unique_ptr<Node> rootNode);
 };
 
 
