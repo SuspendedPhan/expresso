@@ -5,7 +5,7 @@
       <ProjectFunctionParameter :parameter="parameter"/>
     </div>
     <AddForm button-label="Add Parameter" @submit="addParameter" />
-    <TreeLayout :elementLayout="elementLayout">
+    <TreeLayout :elementLayout="elementLayout" class="mt-4">
       <WasmNode :node="node" :key="nodeId" />
     </TreeLayout>
   </div>

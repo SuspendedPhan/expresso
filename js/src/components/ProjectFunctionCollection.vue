@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-for="fun in funs" :key="fun.getId()">
-      <ProjectFunction :fun="fun"/>
+      <ProjectFunction :fun="fun" class="p-10"/>
     </div>
     <AddForm @submit="addFunction" button-label="Add Function" />
   </div>

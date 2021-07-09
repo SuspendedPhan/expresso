@@ -3,11 +3,13 @@
     <div>{{framerate}}</div>
     <GlobalToggle label="wassup"/>
     <div class="flex">
-      <WasmExpressor class="w-1/2 h-full" v-if="project" :project="project"></WasmExpressor>
+      <div class="w-1/2 h-full">
+        <WasmExpressor v-if="project" :project="project"></WasmExpressor>
+        <ProjectFunctionCollection v-if="projectFunctionsActive" :project="project" class="absolute bg-white border p-4 m-4 shadow-md border-black" />
+      </div>
       <div ref="viewport" class="h-full w-1/2">
         <canvas ref="canvas"></canvas>
       </div>
-      <ProjectFunctionCollection v-if="project" :project="project"/>
     </div>
   </div>
 </template>
@@ -30,6 +32,7 @@ import WasmPen from "@/code/WasmPen";
 import fps from "fps";
 import numeral from "numeral";
 import GlobalToggle from "@/components/GlobalToggle.vue";
+import hotkeys from "hotkeys-js";
 
 @Component({
   components: {ProjectFunctionCollection, WasmExpressor, GlobalToggle },
@@ -50,6 +53,8 @@ export default class WasmTest extends Vue {
   @Provide()
   pen = new WasmPen();
 
+  private projectFunctionsActive = false;
+
   privateGetEmModule() {
     return this.emModule;
   }
@@ -61,6 +66,10 @@ export default class WasmTest extends Vue {
         "data",
         (framerate) => (this.framerate = numeral(framerate).format("0"))
     );
+    hotkeys('alt+f', (event) => {
+      this.projectFunctionsActive = !this.projectFunctionsActive;
+      event.preventDefault();
+    });
   }
 
   async mounted() {
