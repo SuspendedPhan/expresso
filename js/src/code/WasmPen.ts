@@ -31,6 +31,7 @@ export default class WasmPen {
     answer = answer.concat(this.getNumberNodeChoices(query));
     answer = answer.concat(this.getOpNodeChoices(query));
     answer = answer.concat(this.getAttributeNodeChoices(query, parentOrganism));
+    answer = answer.concat(this.getFunctionCallNodeChoices(query, parentOrganism.getProject()));
     return answer;
   }
 
@@ -74,6 +75,20 @@ export default class WasmPen {
     const choices = Functions.vectorToArray(parentFun.getParameters()).map(parameter => ({
       text: parameter.getName(),
       nodeMakerFunction: () => this.getModule().ParameterNode.makeUnique(parameter)
+    }));
+    return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+  }
+
+  private static getFunctionCallNodeChoices(query, project) {
+    const choices = Functions.vectorToArray(project.getFunctions()).map(fun => ({
+      text: fun.getName(),
+      nodeMakerFunction: () => {
+        const funCallNode = this.getModule().FunctionCallNode.makeUnique(fun);
+        for (const parameter of Functions.vectorToIterable(fun.getParameters())) {
+          funCallNode.setArgument(parameter, this.makeZero());
+        }
+        return funCallNode;
+      }
     }));
     return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
   }

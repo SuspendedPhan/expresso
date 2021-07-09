@@ -37,7 +37,8 @@ export class ElementLayout {
   }
 
   public recalculate() {
-    const output = this.layout.calculate(this.getRootNode());
+    const rootNode = this.getRootNode();
+    const output = this.layout.calculate(rootNode);
     for (const [
       elementKey,
       localPositionSubscriber,

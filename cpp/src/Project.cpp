@@ -37,6 +37,12 @@ std::vector<Function *> Project::getFunctions() {
     return functions;
 }
 
+void Project::setRootOrganism(std::unique_ptr<Organism> organism) {
+    organism->setProject(this);
+    this->rootOrganism = std::move(organism);
+}
+
 void Project::addFunction(std::unique_ptr<Function> function) {
+    function->setProject(this);
     this->functions.push_back(std::move(function));
 }

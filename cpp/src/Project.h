@@ -18,11 +18,14 @@ private:
     Signal onFunctionsChangedSignal;
     std::vector<std::unique_ptr<Function>> functions;
 public:
-    explicit Project(unique_ptr<Organism> rootOrganism) : id(Code::generateUuidV4()), rootOrganism(
-            std::move(rootOrganism)) {}
+    explicit Project(unique_ptr<Organism> rootOrganism) : id(Code::generateUuidV4()) {
+        this->setRootOrganism(std::move(rootOrganism));
+    }
 
-    Project(unique_ptr<Organism> rootOrganism, std::string id) : rootOrganism(std::move(rootOrganism)),
-            id(std::move(id)) {}
+    Project(unique_ptr<Organism> rootOrganism, std::string id) :
+            id(std::move(id)) {
+        this->setRootOrganism(std::move(rootOrganism));
+    }
 
     static unique_ptr<Organism> makeRootOrganism();
 
@@ -34,7 +37,7 @@ public:
     Signal * getOnFunctionsChangedSignal();
     std::vector<Function *> getFunctions();
 
-    void setRootOrganism(std::unique_ptr<Organism> organism) { this->rootOrganism = std::move(organism); }
+    void setRootOrganism(std::unique_ptr<Organism> organism);
 
     void addFunction(std::unique_ptr<Function> function);
 };

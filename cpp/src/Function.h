@@ -12,6 +12,7 @@
 #include "Node.h"
 
 class Node;
+class Project;
 
 class Function {
 private:
@@ -19,6 +20,7 @@ private:
     std::string name;
     std::vector<std::unique_ptr<FunctionParameter>> parameters;
     std::unique_ptr<Node> rootNode;
+    Project * _project;
 public:
     Function(std::string name, std::unique_ptr<Node> rootNode, std::string id);
     explicit Function(std::string name, std::unique_ptr<Node> rootNode);
@@ -32,6 +34,8 @@ public:
     Node * getRootNode();
     std::vector<FunctionParameter *> getParameters();
     void setRootNode(std::unique_ptr<Node> rootNode);
+    Project * getProject();
+    void setProject(Project *project);
 };
 
 

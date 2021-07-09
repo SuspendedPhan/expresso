@@ -93,6 +93,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getAttributes", &Organism::getAttributes)
             .function("addAttribute", &Organism::addAttribute)
             .function("getName", &Organism::getName)
+            .function("getProject", &Organism::getProject, allow_raw_pointers())
             .function("getId", &Organism::getId);
 
     class_<Attribute>("Attribute")
@@ -123,7 +124,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
             .function("getOrganism", &Node::getOrganism, allow_raw_pointers())
             .function("getParent", &Node::getParent, allow_raw_pointers())
-            .function("getFunction", &Node::getFunction, allow_raw_pointers());
+            .function("getFunction", &Node::getFunction, allow_raw_pointers())
+            .function("getProject", &Node::getProject, allow_raw_pointers())
+            ;
 
     class_<BinaryOpNode, base<Node>>("BinaryOpNode")
             .class_function("setA", &BinaryOpNode::setA, allow_raw_pointers())
@@ -183,7 +186,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getId", &Function::getId)
             .function("getName", &Function::getName)
             .function("getRootNode", &Function::getRootNode, allow_raw_pointers())
-            .function("getParameters", &Function::getParameters);
+            .function("getParameters", &Function::getParameters)
+            .function("getProject", &Function::getProject, allow_raw_pointers());
 
     class_<FunctionParameter>("FunctionParameter")
             .class_function("makeUnique", &make<FunctionParameter, std::string>)

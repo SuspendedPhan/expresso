@@ -10,18 +10,19 @@
 #include <iostream>
 #include <functional>
 #include "variant.h"
-
 template<typename T>
 using vector = std::vector<T>;
+
 template<typename T, typename V>
 using map = std::map<T, V>;
 template<typename T>
 using unique_ptr = std::unique_ptr<T>;
-
 class ParameterNode;
 
 class Attribute;
+
 class Function;
+class Project;
 
 class Node {
 private:
@@ -44,6 +45,7 @@ public:
     Organism* getOrganism();
     NodeParent * getParent();
     Function* getFunction();
+    Project* getProject();
 
     virtual ~Node() = default;
 };

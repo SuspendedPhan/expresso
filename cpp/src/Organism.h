@@ -7,14 +7,19 @@
 #include <memory>
 #include <utility>
 
+class Project;
+
+class NotRootOrganism {};
+
 class Organism {
 private:
     std::string name;
     std::string id;
+    mpark::variant<Project *, NotRootOrganism> _project = NotRootOrganism();
 
 public:
-    vector<std::unique_ptr<Attribute>> attributes;
-    vector<std::unique_ptr<Organism>> suborganisms;
+    std::vector<std::unique_ptr<Attribute>> attributes;
+    std::vector<std::unique_ptr<Organism>> suborganisms;
     EditableAttribute* cloneCountAttribute = nullptr;
     Attribute* cloneNumberAttribute = nullptr;
     Organism* superorganism = nullptr;
@@ -108,6 +113,25 @@ public:
 
     std::string getId() {
         return this->id;
+    }
+
+    Project* getProject() {
+        if (mpark::holds_alternative<Project *>(_project)) {
+            const auto project = mpark::get<Project *>(_project);
+            if (project == nullptr) {
+                std::cerr << "dylan error Organism::getProject case 1" << std::endl;
+            }
+            return project;
+        } else if (mpark::holds_alternative<NotRootOrganism>(_project)) {
+            return this->superorganism->getProject();
+        } else {
+            std::cerr << "dylan error Organism::getProject" << std::endl;
+            return nullptr;
+        }
+    }
+
+    void setProject(Project * project) {
+        _project = project;
     }
 };
 

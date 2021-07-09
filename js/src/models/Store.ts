@@ -54,7 +54,10 @@ export default class Store {
         argumentRootNodes.push(argumentRootNode);
       }
       return argumentRootNodes;
+    } else if (node.constructor.name === 'NumberNode' || node.constructor.name === 'ParameterNode') {
+      return [];
     } else {
+      console.error('unexpected no children! ' + node.constructor.name);
       return [];
     }
   }

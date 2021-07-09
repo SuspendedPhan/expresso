@@ -3,6 +3,7 @@
 //
 
 #include "Node.h"
+#include "Organism.h"
 
 #include <utility>
 
@@ -97,6 +98,23 @@ Function *Node::getFunction() { // NOLINT(misc-no-recursion)
         return this->parent->getFunction();
     } else {
         std::cerr << "Node::getFunction dylan error" << std::endl;
+        return nullptr;
+    }
+}
+
+Project *Node::getProject() {
+    if (!this->parent) {
+        std::cerr << "Node::getAttribute error! dylan" << std::endl;
+    }
+
+    auto organism = this->getOrganism();
+    auto fun = this->getFunction();
+    if (organism != nullptr) {
+        return organism->getProject();
+    } else if (fun != nullptr) {
+        return fun->getProject();
+    } else {
+        std::cerr << "Node::getProject dylan error" << std::endl;
         return nullptr;
     }
 }

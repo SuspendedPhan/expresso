@@ -44,3 +44,11 @@ void Function::setRootNode(std::unique_ptr<Node> rootNode) {
     rootNode->setParent(std::make_unique<NodeParent>(this));
     Function::rootNode = std::move(rootNode);
 }
+
+Project *Function::getProject() {
+    return _project;
+}
+
+void Function::setProject(Project *project) {
+    _project = project;
+}
