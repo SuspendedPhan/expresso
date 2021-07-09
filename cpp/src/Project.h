@@ -15,8 +15,8 @@ class Project {
 private:
     std::string id;
     std::unique_ptr<Organism> rootOrganism;
-    Signal onFunctionsChangedSignal;
-    std::vector<std::unique_ptr<Function>> functions;
+    Signal _onFunctionsChangedSignal;
+    std::vector<std::unique_ptr<Function>> _functions;
 public:
     explicit Project(unique_ptr<Organism> rootOrganism) : id(Code::generateUuidV4()) {
         this->setRootOrganism(std::move(rootOrganism));

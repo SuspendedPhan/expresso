@@ -10,9 +10,7 @@ void Signal::setListener(std::function<void()> listener) {
 }
 
 void Signal::dispatch() {
-    std::cout << "dispatch 1" << std::endl;
     if (this->listener) {
-        std::cout << "dispatch 2" << std::endl;
         this->listener();
     }
 }

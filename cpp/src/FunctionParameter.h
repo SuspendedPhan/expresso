@@ -13,6 +13,8 @@ public:
     std::string id;
     std::string name;
 
+    const std::string &getId() const;
+
     explicit FunctionParameter(std::string name);
     FunctionParameter(std::string id, std::string name);
 

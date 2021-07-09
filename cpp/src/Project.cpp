@@ -26,12 +26,12 @@ std::unique_ptr<Organism> Project::makeRootOrganism() {
 }
 
 Signal * Project::getOnFunctionsChangedSignal() {
-    return &this->onFunctionsChangedSignal;
+    return &this->_onFunctionsChangedSignal;
 }
 
 std::vector<Function *> Project::getFunctions() {
     std::vector<Function *> functions;
-    for (const auto &fun : this->functions) {
+    for (const auto &fun : this->_functions) {
         functions.emplace_back(fun.get());
     }
     return functions;
@@ -44,5 +44,6 @@ void Project::setRootOrganism(std::unique_ptr<Organism> organism) {
 
 void Project::addFunction(std::unique_ptr<Function> function) {
     function->setProject(this);
-    this->functions.push_back(std::move(function));
+    _functions.push_back(std::move(function));
+    _onFunctionsChangedSignal.dispatch();
 }

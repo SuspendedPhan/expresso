@@ -14,3 +14,7 @@ FunctionParameter::FunctionParameter(std::string name) : name(std::move(name)), 
 const std::string &FunctionParameter::getName() const {
     return name;
 }
+
+const std::string &FunctionParameter::getId() const {
+    return id;
+}

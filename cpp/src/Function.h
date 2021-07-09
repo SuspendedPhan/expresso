@@ -21,11 +21,11 @@ private:
     std::vector<std::unique_ptr<FunctionParameter>> parameters;
     std::unique_ptr<Node> rootNode;
     Project * _project;
+    Signal _onChangedSignal;
 public:
     Function(std::string name, std::unique_ptr<Node> rootNode, std::string id);
     explicit Function(std::string name, std::unique_ptr<Node> rootNode);
 
-    // Only use during construction.
     void addParameter(std::unique_ptr<FunctionParameter> parameter);
 
     const std::string &getId() const;
@@ -36,6 +36,8 @@ public:
     void setRootNode(std::unique_ptr<Node> rootNode);
     Project * getProject();
     void setProject(Project *project);
+
+    Signal * getOnChangedSignal();
 };
 
 

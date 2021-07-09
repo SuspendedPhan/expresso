@@ -8,6 +8,7 @@
 
 
 void Function::addParameter(std::unique_ptr<FunctionParameter> parameter) {
+    this->_onChangedSignal.dispatch();
     this->parameters.push_back(std::move(parameter));
 }
 
@@ -51,4 +52,8 @@ Project *Function::getProject() {
 
 void Function::setProject(Project *project) {
     _project = project;
+}
+
+Signal * Function::getOnChangedSignal() {
+    return &_onChangedSignal;
 }

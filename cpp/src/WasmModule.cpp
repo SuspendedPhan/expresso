@@ -186,13 +186,15 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getId", &Function::getId)
             .function("getName", &Function::getName)
             .function("getRootNode", &Function::getRootNode, allow_raw_pointers())
+            .function("getOnChangedSignal", &Function::getOnChangedSignal, allow_raw_pointers())
             .function("getParameters", &Function::getParameters)
             .function("getProject", &Function::getProject, allow_raw_pointers());
 
     class_<FunctionParameter>("FunctionParameter")
             .class_function("makeUnique", &make<FunctionParameter, std::string>)
             .class_function("makeUnique", &make<FunctionParameter, std::string, std::string>)
-            .function("getName", &FunctionParameter::getName);
+            .function("getName", &FunctionParameter::getName)
+            .function("getId", &FunctionParameter::getId);
 
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());

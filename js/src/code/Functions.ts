@@ -12,6 +12,10 @@ export default class Functions {
     }
   }
 
+  public static makeZero(emModule) {
+    return emModule.NumberNode.makeUnique(0);
+  }
+
   static uuid() {
     return uuidv4();
   }
