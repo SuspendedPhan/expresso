@@ -12,7 +12,7 @@
 </template>
 <script lang="ts">
 import WasmNode from "@/components/WasmNode.vue"
-import {inject, provide, ref} from "@vue/composition-api";
+import {inject, nextTick, provide, ref} from "@vue/composition-api";
 import {ElementLayout} from "@/code/ElementLayout";
 import Store from "@/models/Store";
 import TreeLayout from "@/components/TreeLayout.vue";
@@ -36,10 +36,12 @@ export default {
     const node = ref(props.fun.getRootNode());
     const nodeId = ref(node.value.getId());
     emModule.EmbindUtil.setSignalListener(props.fun.getOnChangedSignal(), () => {
-      console.log("hi");
       parameters.value = getParameters();
       node.value = props.fun.getRootNode();
       nodeId.value = node.value.getId();
+      nextTick(() => {
+        elementLayout.recalculate();
+      });
     });
 
     provide('nodeLayout', elementLayout);
