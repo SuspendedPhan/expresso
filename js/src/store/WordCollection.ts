@@ -3,6 +3,14 @@ export default class WordCollection {
     return this.words[Math.floor(Math.random() * this.words.length)];
   }
 
+  public static toRandomWordIfEmpty(text: string): string {
+    console.assert(text != null);
+    if (text === '') {
+      return (new WordCollection()).getRandomWord();
+    }
+    return text;
+  }
+
 words = [
   'part',
 'berry',

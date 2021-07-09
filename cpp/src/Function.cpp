@@ -8,8 +8,8 @@
 
 
 void Function::addParameter(std::unique_ptr<FunctionParameter> parameter) {
-    this->_onChangedSignal.dispatch();
     this->parameters.push_back(std::move(parameter));
+    this->_onChangedSignal.dispatch();
 }
 
 Function::Function(std::string name, std::unique_ptr<Node> rootNode, std::string id)
