@@ -1,6 +1,5 @@
 <template>
   <div class="expressor" ref="expressor">
-    <GlobalToggle label="wassup" class="z-10 absolute top-10"/>
     <div>
       <canvas
           ref="canvas"
@@ -36,10 +35,9 @@ import Functions from "@/code/Functions";
 import panzoom from "panzoom";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import WasmPen from "@/code/WasmPen";
-import GlobalToggle from "@/components/GlobalToggle.vue";
 
 @Component({
-  components: {GlobalToggle, WasmOrganism}
+  components: {WasmOrganism}
 })
 export default class WasmExpressor extends Vue {
   @Prop()

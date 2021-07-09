@@ -1,10 +1,14 @@
 <template>
-  <div class="flex">
-    <WasmExpressor class="w-1/2 h-full" v-if="project" :project="project"></WasmExpressor>
-    <div ref="viewport" class="h-full w-1/2">
-      <canvas ref="canvas"></canvas>
+  <div>
+    <div>{{framerate}}</div>
+    <GlobalToggle label="wassup"/>
+    <div class="flex">
+      <WasmExpressor class="w-1/2 h-full" v-if="project" :project="project"></WasmExpressor>
+      <div ref="viewport" class="h-full w-1/2">
+        <canvas ref="canvas"></canvas>
+      </div>
+      <ProjectFunctionCollection v-if="project" :project="project"/>
     </div>
-    <ProjectFunctionCollection v-if="project" :project="project" />
   </div>
 </template>
 
@@ -23,15 +27,19 @@ import Store from "@/models/Store";
 import DeadStore from "@/models/DeadStore";
 import ProjectFunctionCollection from "@/components/ProjectFunctionCollection.vue";
 import WasmPen from "@/code/WasmPen";
+import fps from "fps";
+import numeral from "numeral";
+import GlobalToggle from "@/components/GlobalToggle.vue";
 
 @Component({
-  components: {ProjectFunctionCollection, WasmExpressor},
+  components: {ProjectFunctionCollection, WasmExpressor, GlobalToggle },
 })
 export default class WasmTest extends Vue {
   fake = null;
   project = null;
   store: any = null;
   emModule: any = null;
+  framerate = '';
 
   @Provide()
   saveStoreFunctor = () => this.saveStore();
@@ -46,6 +54,15 @@ export default class WasmTest extends Vue {
     return this.emModule;
   }
 
+  ticker = fps({ every: 10 });
+
+  created() {
+    this.ticker.on(
+        "data",
+        (framerate) => (this.framerate = numeral(framerate).format("0"))
+    );
+  }
+
   async mounted() {
     const module = await WasmModule({
       locateFile: (path) => {
@@ -58,7 +75,8 @@ export default class WasmTest extends Vue {
     (window as any).wasmModule = module;
     this.emModule = module;
 
-    function render(project, renderer) {
+    const render = (project, renderer) => {
+      this.ticker.tick();
       const evalOutput = project.evalOrganismTree();
       renderer.render(evalOutput);
       evalOutput.delete();

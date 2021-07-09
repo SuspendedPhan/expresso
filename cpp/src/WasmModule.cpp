@@ -119,7 +119,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     class_<Node>("Node")
             .smart_ptr<std::shared_ptr<Node>>("Node")
-            .function("getId", &Node::getId)
+            .function("getId", &Node::getId, allow_raw_pointers())
+            .function("equals", &Node::equals, allow_raw_pointers())
             .function("replace", &Node::replace)
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
             .function("getOrganism", &Node::getOrganism, allow_raw_pointers())

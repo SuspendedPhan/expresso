@@ -42,6 +42,8 @@ export default class WasmNode extends Vue {
   searchboxQuery = '';
   localLayoutPositionSubscription!: Subscription;
 
+  private onSelectedNodeChangedFunctor = () => this.onSelectedNodeChanged();
+
   get style() {
     return `left: ${this.position.left}px; top: ${this.position.top}px;`;
   }
@@ -82,7 +84,7 @@ export default class WasmNode extends Vue {
           this.position.top = localPosition.top;
           this.position.left = localPosition.left;
         });
-    this.pen.onSelectedNodeChanged.sub(() => this.onSelectedNodeChanged());
+    this.pen.onSelectedNodeChanged.sub(this.onSelectedNodeChangedFunctor);
 
     this.onKeydownFunction = event => this.onKeydown(event);
 
@@ -147,6 +149,7 @@ export default class WasmNode extends Vue {
   destroyed() {
     document.removeEventListener('keydown', this.onKeydownFunction);
     this.localLayoutPositionSubscription.unsubscribe();
+    this.pen.onSelectedNodeChanged.unsub(this.onSelectedNodeChangedFunctor);
   }
 
   private onClick() {
@@ -174,7 +177,8 @@ export default class WasmNode extends Vue {
   }
 
   private onSelectedNodeChanged() {
-    if (this.pen.selectedNode?.getId() === this.node.getId()) {
+    const selected = this.pen.selectedNode == null ? false : this.node.equals(this.pen.selectedNode);
+    if (selected) {
       this.selected = true;
     } else {
       this.selected = false;
@@ -184,7 +188,6 @@ export default class WasmNode extends Vue {
   }
 
   private onNodeChanged() {
-    console.log("node changed");
     this.children = WasmNode.getChildren(this.node);
     this.$nextTick(() => this.nodeLayout.recalculate());
   }

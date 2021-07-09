@@ -129,6 +129,10 @@ Project *Node::getProject() {
     }
 }
 
+bool Node::equals(Node *node) {
+    return this->getId() == node->getId();
+}
+
 void BinaryOpNode::setA(BinaryOpNode *op, std::unique_ptr<Node> a) {
     a->setParent(std::make_unique<NodeParent>(op));
     op->a = std::move(a);

@@ -35,7 +35,7 @@ public:
     explicit Node(std::string id) : id(std::move(id)) {}
 
     virtual float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) = 0;
-    std::string getId() { return this->id; }
+    const std::string & getId() { return this->id; }
     void replace(std::unique_ptr<Node> node);
 
     void setParent(std::unique_ptr<NodeParent> parent);
@@ -46,6 +46,7 @@ public:
     NodeParent * getParent();
     Function* getFunction();
     Project* getProject();
+    bool equals(Node * node);
 
     virtual ~Node() = default;
 };
