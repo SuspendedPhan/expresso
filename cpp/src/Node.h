@@ -168,7 +168,6 @@ public:
     explicit FunctionCallNode(Function *function);
     FunctionCallNode(Function *function, std::string id);
 
-    // Use only during construction
     void setArgument(const FunctionParameter * parameter, std::unique_ptr<Node> argumentRootNode);
     std::map<const FunctionParameter *, Node *> getArgumentByParameterMap();
 

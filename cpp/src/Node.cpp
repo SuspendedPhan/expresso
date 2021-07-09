@@ -34,6 +34,16 @@ void Node::replace(std::unique_ptr<Node> node) {
             } else {
                 std::cerr << "replace; binaryopnode" << std::endl;
             }
+        } else if (auto *functionCallNode = dynamic_cast<FunctionCallNode *>(parentNode)) {
+            auto argumentByParameterMap = functionCallNode->getArgumentByParameterMap();
+            for (const auto &entry : argumentByParameterMap) {
+                const auto &parameter = entry.first;
+                const auto &argument = entry.second;
+                if (argument == this) {
+                    functionCallNode->setArgument(parameter, std::move(node));
+                    break;
+                }
+            }
         } else {
             std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
         }
@@ -158,6 +168,7 @@ FunctionCallNode::FunctionCallNode(Function *function, std::string id) : functio
 void FunctionCallNode::setArgument(const FunctionParameter *parameter, std::unique_ptr<Node> argumentRootNode) {
     argumentRootNode->setParent(std::make_unique<NodeParent>(this));
     this->argumentByParameter[parameter] = std::move(argumentRootNode);
+    this->onChangedSignal.dispatch();
 }
 
 const std::string &FunctionCallNode::getName() const {

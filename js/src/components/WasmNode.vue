@@ -184,6 +184,7 @@ export default class WasmNode extends Vue {
   }
 
   private onNodeChanged() {
+    console.log("node changed");
     this.children = WasmNode.getChildren(this.node);
     this.$nextTick(() => this.nodeLayout.recalculate());
   }

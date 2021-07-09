@@ -21,8 +21,8 @@ export default class Store {
   }
 
   save() {
-    const jsonDeadStore = JSON.stringify(DeadStore.fromLiveStore(this));
-    window.localStorage.setItem("emcc-evolved", jsonDeadStore);
+    // const jsonDeadStore = JSON.stringify(DeadStore.fromLiveStore(this));
+    // window.localStorage.setItem("emcc-evolved", jsonDeadStore);
   }
 
   static makeDefault(emModule: any) {
