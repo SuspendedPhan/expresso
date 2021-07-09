@@ -6,7 +6,7 @@
     </div>
     <AddForm button-label="Add Parameter" @submit="addParameter" />
     <TreeLayout :elementLayout="elementLayout">
-      <WasmNode :node="fun.getRootNode()"/>
+      <WasmNode :node="node" :key="nodeId" />
     </TreeLayout>
   </div>
 </template>
@@ -33,8 +33,13 @@ export default {
 
     const getParameters = () => Functions.vectorToArray(props.fun.getParameters());
     const parameters = ref(getParameters());
+    const node = ref(props.fun.getRootNode());
+    const nodeId = ref(node.value.getId());
     emModule.EmbindUtil.setSignalListener(props.fun.getOnChangedSignal(), () => {
+      console.log("hi");
       parameters.value = getParameters();
+      node.value = props.fun.getRootNode();
+      nodeId.value = node.value.getId();
     });
 
     provide('nodeLayout', elementLayout);
@@ -48,7 +53,9 @@ export default {
     return {
       elementLayout,
       parameters,
-      addParameter
+      addParameter,
+      node,
+      nodeId
     };
   }
 }

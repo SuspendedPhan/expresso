@@ -38,12 +38,13 @@ const std::string &Function::getId() const {
 }
 
 Node * Function::getRootNode() {
-    return rootNode.get();
+    return _rootNode.get();
 }
 
 void Function::setRootNode(std::unique_ptr<Node> rootNode) {
     rootNode->setParent(std::make_unique<NodeParent>(this));
-    Function::rootNode = std::move(rootNode);
+    _rootNode = std::move(rootNode);
+    _onChangedSignal.dispatch();
 }
 
 Project *Function::getProject() {

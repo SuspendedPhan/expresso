@@ -12,7 +12,6 @@ export default class WasmPen {
   setSelectedNode(selectedNode) {
     this.selectedNode = selectedNode;
     this.onSelectedNodeChanged.dispatch();
-    console.log(this.onSelectedNodeChanged.count);
   }
 
   static getNodeChoices(selectedNode, query) {

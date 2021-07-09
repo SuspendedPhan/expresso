@@ -24,8 +24,8 @@ std::unique_ptr<AttributeReferenceNode> AttributeReferenceNode::make(Attribute *
 }
 
 void Node::replace(std::unique_ptr<Node> node) {
-    if (this->parent->isNode()) {
-        const auto parentNode = this->parent->getNode();
+    if (_parent->isNode()) {
+        const auto parentNode = _parent->getNode();
         if (auto *binaryOpNode = dynamic_cast<BinaryOpNode *>(parentNode)) {
             if (binaryOpNode->getA() == this) {
                 BinaryOpNode::setA(binaryOpNode, std::move(node));
@@ -47,12 +47,14 @@ void Node::replace(std::unique_ptr<Node> node) {
         } else {
             std::cerr << "replace; dunno; " << typeid(node.get()).name() << std::endl;
         }
-    } else if (this->parent->isAttribute()) {
-        if (auto * attribute = dynamic_cast<EditableAttribute *>(this->parent->getAttribute())) {
+    } else if (_parent->isAttribute()) {
+        if (auto *attribute = dynamic_cast<EditableAttribute *>(_parent->getAttribute())) {
             attribute->setRootNode(std::move(node));
         } else {
             std::cerr << "node::replace non editable attr" << std::endl;
         }
+    } else if (_parent->isFunction()) {
+        _parent->getFunction()->setRootNode(std::move(node));
     } else {
         std::cerr << "not implemented node::replace" << std::endl;
     }
@@ -63,15 +65,15 @@ Signal *Node::getOnChangedSignal() {
 }
 
 Attribute *Node::getAttribute() { // NOLINT(misc-no-recursion)
-    if (!this->parent) {
+    if (!this->_parent) {
         std::cerr << "Node::getAttribute error! dylan" << std::endl;
     }
 
-    if (this->parent->isNode()) {
-        return this->parent->getNode()->getAttribute();
-    } else if (this->parent->isAttribute()) {
-        return this->parent->getAttribute();
-    } else if (this->parent->isFunction()) {
+    if (this->_parent->isNode()) {
+        return this->_parent->getNode()->getAttribute();
+    } else if (this->_parent->isAttribute()) {
+        return this->_parent->getAttribute();
+    } else if (this->_parent->isFunction()) {
         return nullptr;
     } else {
         std::cerr << "Node::getAttribute dylan error" << std::endl;
@@ -88,24 +90,24 @@ Organism *Node::getOrganism() {
 }
 
 void Node::setParent(std::unique_ptr<NodeParent> parent) {
-    this->parent = std::move(parent);
+    this->_parent = std::move(parent);
 }
 
-NodeParent * Node::getParent() {
-    return this->parent.get();
+NodeParent *Node::getParent() {
+    return this->_parent.get();
 }
 
 Function *Node::getFunction() { // NOLINT(misc-no-recursion)
-    if (!this->parent) {
+    if (!this->_parent) {
         std::cerr << "Node::getAttribute error! dylan" << std::endl;
     }
 
-    if (this->parent->isNode()) {
-        return this->parent->getNode()->getFunction();
-    } else if (this->parent->isAttribute()) {
+    if (this->_parent->isNode()) {
+        return this->_parent->getNode()->getFunction();
+    } else if (this->_parent->isAttribute()) {
         return nullptr;
-    } else if (this->parent->isFunction()) {
-        return this->parent->getFunction();
+    } else if (this->_parent->isFunction()) {
+        return this->_parent->getFunction();
     } else {
         std::cerr << "Node::getFunction dylan error" << std::endl;
         return nullptr;
@@ -113,7 +115,7 @@ Function *Node::getFunction() { // NOLINT(misc-no-recursion)
 }
 
 Project *Node::getProject() {
-    if (!this->parent) {
+    if (!this->_parent) {
         std::cerr << "Node::getAttribute error! dylan" << std::endl;
     }
 

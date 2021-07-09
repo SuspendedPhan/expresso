@@ -19,7 +19,7 @@ private:
     std::string id;
     std::string name;
     std::vector<std::unique_ptr<FunctionParameter>> parameters;
-    std::unique_ptr<Node> rootNode;
+    std::unique_ptr<Node> _rootNode;
     Project * _project;
     Signal _onChangedSignal;
 public:

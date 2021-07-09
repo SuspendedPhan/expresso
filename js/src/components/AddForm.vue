@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input v-model="name"/>
+    <input v-model="name" :placeholder="buttonLabel" />
     <button @click="onClick">{{ buttonLabel }}</button>
   </div>
 </template>

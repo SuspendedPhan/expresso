@@ -27,7 +27,7 @@ class Project;
 class Node {
 private:
     std::string id;
-    std::unique_ptr<NodeParent> parent;
+    std::unique_ptr<NodeParent> _parent;
 protected:
     Signal onChangedSignal;
 public:
