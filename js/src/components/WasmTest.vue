@@ -4,7 +4,7 @@
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>
-    <ProjectFunctionCollection v-if="project" :project="project" />
+<!--    <ProjectFunctionCollection v-if="project" :project="project" />-->
   </div>
 </template>
 
