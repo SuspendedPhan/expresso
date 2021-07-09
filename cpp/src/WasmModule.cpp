@@ -256,6 +256,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<OrganismCloneOutput *>("OrganismCloneOutputVector");
     register_vector<AttributeOutput *>("AttributeOutputVector");
     register_vector<FunctionParameter *>("FunctionParameterVector");
+    register_vector<const FunctionParameter *>("FunctionParameterVectorConst");
     register_vector<Function *>("FunctionVector");
     register_vector<FakeBook *>("FakeBookVector");
     register_map<const FunctionParameter *, Node *>("FunctionParameterToNode");

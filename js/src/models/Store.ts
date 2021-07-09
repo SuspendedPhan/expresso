@@ -1,6 +1,11 @@
 import DeadStore from "@/models/DeadStore";
 import Functions from "@/code/Functions";
 
+export enum SiblingRotationDirection {
+  Left,
+  Right
+}
+
 export default class Store {
   constructor(private wasmModule, private projects: any[] = []) {}
 
@@ -64,5 +69,44 @@ export default class Store {
 
   public static isBinaryOpNode(parentRaw) {
     return parentRaw?.getA !== undefined;
+  }
+
+  public static getSibling(parentNode: any, node, rotationDirection: SiblingRotationDirection) {
+    if (this.isBinaryOpNode(parentNode)) {
+      return this.getOtherBinaryOpSibling(parentNode, node);
+    } else if (parentNode.constructor.name === 'FunctionCallNode') {
+      const argumentByParameterMap = parentNode.getArgumentByParameterMap();
+      const parameterCount = argumentByParameterMap.size();
+      const parameters = argumentByParameterMap.keys();
+      for (let i = 0; i < parameterCount; i++) {
+        const parameter = parameters.get(i);
+        const argument = argumentByParameterMap.get(parameter);
+        if (argument.getId() == node.getId()) {
+          const index = (() => {
+            if (rotationDirection == SiblingRotationDirection.Left) {
+              return (i - 1 + parameterCount) % parameterCount;
+            } else if (rotationDirection == SiblingRotationDirection.Right) {
+              return (i + 1) % parameterCount;
+            } else {
+              console.error('SiblingRotationDirection')
+            }
+          })();
+          return argumentByParameterMap.get(parameters.get(index));
+        }
+      }
+      console.error('getSibling nothing')
+    } else {
+      console.error('store getsibling');
+    }
+  }
+
+  private static getOtherBinaryOpSibling(binaryOpParent, node) {
+    const rawA = binaryOpParent.getA();
+    const rawB = binaryOpParent.getB();
+    if (node.getId() === rawA.getId()) {
+      return rawB;
+    } else {
+      return rawA;
+    }
   }
 }

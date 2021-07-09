@@ -18,7 +18,7 @@ import Vue from "vue";
 import Searchbox from "@/components/Searchbox.vue";
 import WasmPen from "@/code/WasmPen";
 import {Subscription} from "rxjs";
-import Store from "@/models/Store";
+import Store, {SiblingRotationDirection} from "@/models/Store";
 
 @Component({
   components: {Searchbox}
@@ -124,13 +124,11 @@ export default class WasmNode extends Vue {
       if (event.key === 'ArrowUp') {
         window.setTimeout(() => this.pen.setSelectedNode(parentNode), 0);
       } else if (event.key === 'ArrowLeft') {
-        if (WasmNode.isBinaryOpNode(parentNode)) {
-          window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
-        }
+        const selectedNode = Store.getSibling(parentNode, this.node, SiblingRotationDirection.Left);
+        window.setTimeout(() => this.pen.setSelectedNode(selectedNode), 0);
       } else if (event.key === 'ArrowRight') {
-        if (WasmNode.isBinaryOpNode(parentNode)) {
-          window.setTimeout(() => this.pen.setSelectedNode(WasmNode.getOtherBinaryOpSibling(parentNode, this.node)), 0);
-        }
+        const selectedNode = Store.getSibling(parentNode, this.node, SiblingRotationDirection.Right);
+        window.setTimeout(() => this.pen.setSelectedNode(selectedNode), 0);
       }
     } else if (parent.isAttribute()) {
       this.onKeydownDown(event);
@@ -195,16 +193,6 @@ export default class WasmNode extends Vue {
 
   private static isBinaryOpNode(parentRaw) {
     return Store.isBinaryOpNode(parentRaw);
-  }
-
-  private static getOtherBinaryOpSibling(binaryOpParent, node) {
-    const rawA = binaryOpParent.getA();
-    const rawB = binaryOpParent.getB();
-    if (node.getId() === rawA.getId()) {
-      return rawB;
-    } else {
-      return rawA;
-    }
   }
 }
 
