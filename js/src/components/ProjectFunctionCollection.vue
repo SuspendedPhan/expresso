@@ -1,25 +1,25 @@
 <template>
   <div>
     <div v-for="fun in funs" :key="fun.getId()">
-      <div>{{ fun.getName() }}</div>
-      <WasmNode :node="fun.getRootNode()" />
+      <ProjectFunction :fun="fun.getName()"/>
     </div>
   </div>
 </template>
 <script lang="ts">
 import WasmNode from "@/components/WasmNode.vue";
-import {inject, ref} from "@vue/composition-api";
+import {inject, provide, ref} from "@vue/composition-api";
 import Functions from "@/code/Functions";
+import {ElementLayout} from "@/code/ElementLayout";
+import ProjectFunction from "@/components/ProjectFunction.vue";
 
 export default {
-  components: {WasmNode},
+  components: {ProjectFunction},
   props: {
     project: {}
   },
   setup(props) {
     const project = props.project;
     const emModule = inject<any>('getEmModule')();
-
     const funs = ref(Functions.vectorToArray(project.getFunctions()));
     emModule.EmbindUtil.setSignalListener(project.getOnFunctionsChangedSignal(), () => {
       funs.value = Functions.vectorToArray(project.getFunctions());
