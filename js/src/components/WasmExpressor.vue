@@ -1,15 +1,18 @@
 <template>
   <div class="expressor" ref="expressor">
-    <canvas
-        ref="canvas"
-        type="2d"
-        :width="canvasWidth"
-        :height="canvasHeight"
-        class="canvas"
-    ></canvas>
+    <GlobalToggle label="wassup" class="z-10 absolute top-10"/>
+    <div>
+      <canvas
+          ref="canvas"
+          type="2d"
+          :width="canvasWidth"
+          :height="canvasHeight"
+          class="canvas"
+      ></canvas>
+    </div>
     <div ref="panzoom">
       <WasmOrganism v-if="rootOrganism" :organism="rootOrganism" :organismLayout="organismLayout" :isRoot="true"></WasmOrganism>
-<!--      <div class="bottom-group">-->
+      <!--      <div class="bottom-group">-->
 <!--        <button @click="clearStorage" class="clearStorage">-->
 <!--          Clear storage-->
 <!--        </button>-->
@@ -33,9 +36,10 @@ import Functions from "@/code/Functions";
 import panzoom from "panzoom";
 import ResizeSensor from "css-element-queries/src/ResizeSensor";
 import WasmPen from "@/code/WasmPen";
+import GlobalToggle from "@/components/GlobalToggle.vue";
 
 @Component({
-  components: {WasmOrganism}
+  components: {GlobalToggle, WasmOrganism}
 })
 export default class WasmExpressor extends Vue {
   @Prop()
