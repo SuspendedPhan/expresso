@@ -123,6 +123,10 @@ float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeE
     return nodeEvalContext.valueByParameter.at(this->functionParameter);
 }
 
+FunctionParameter *ParameterNode::getFunctionParameter() const {
+    return functionParameter;
+}
+
 
 std::map<const FunctionParameter *, Node *> FunctionCallNode::getArgumentByParameterMap() {
     std::map<const FunctionParameter *, Node *> answer;

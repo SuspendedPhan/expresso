@@ -1,15 +1,13 @@
 <template>
   <div>
     <div v-for="fun in funs" :key="fun.getId()">
-      <ProjectFunction :fun="fun.getName()"/>
+      <ProjectFunction :fun="fun"/>
     </div>
   </div>
 </template>
 <script lang="ts">
-import WasmNode from "@/components/WasmNode.vue";
 import {inject, provide, ref} from "@vue/composition-api";
 import Functions from "@/code/Functions";
-import {ElementLayout} from "@/code/ElementLayout";
 import ProjectFunction from "@/components/ProjectFunction.vue";
 
 export default {

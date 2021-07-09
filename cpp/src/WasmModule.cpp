@@ -171,7 +171,9 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     class_<ParameterNode, base<Node>>("ParameterNode")
             .class_function("makeUnique", &make<ParameterNode, FunctionParameter *>, allow_raw_pointers())
-            .class_function("makeUnique", &make<ParameterNode, FunctionParameter *, std::string>, allow_raw_pointers());
+            .class_function("makeUnique", &make<ParameterNode, FunctionParameter *, std::string>, allow_raw_pointers())
+            .function("getFunctionParameter", &ParameterNode::getFunctionParameter, allow_raw_pointers())
+            ;
 
     class_<Function>("Function")
             .class_function("makeUnique", &make<Function, std::string, std::unique_ptr<Node>>)

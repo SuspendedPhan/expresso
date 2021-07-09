@@ -41,9 +41,6 @@ export default class WasmExpressor extends Vue {
   @Prop()
   project;
 
-  @Provide()
-  pen = new WasmPen();
-
   rootOrganism = null;
   organismLayout = null as any;
 

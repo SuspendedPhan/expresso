@@ -4,7 +4,7 @@
     <div ref="viewport" class="h-full w-1/2">
       <canvas ref="canvas"></canvas>
     </div>
-<!--    <ProjectFunctionCollection v-if="project" :project="project" />-->
+    <ProjectFunctionCollection v-if="project" :project="project" />
   </div>
 </template>
 
@@ -22,6 +22,7 @@ import Functions from "@/code/Functions";
 import Store from "@/models/Store";
 import DeadStore from "@/models/DeadStore";
 import ProjectFunctionCollection from "@/components/ProjectFunctionCollection.vue";
+import WasmPen from "@/code/WasmPen";
 
 @Component({
   components: {ProjectFunctionCollection, WasmExpressor},
@@ -37,6 +38,9 @@ export default class WasmTest extends Vue {
 
   @Provide()
   getEmModule = () => this.privateGetEmModule();
+
+  @Provide()
+  pen = new WasmPen();
 
   privateGetEmModule() {
     return this.emModule;

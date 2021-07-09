@@ -152,6 +152,8 @@ public:
             functionParameter(functionParameter) {}
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
+
+    FunctionParameter *getFunctionParameter() const;
 };
 
 class FunctionCallNode : public Node {

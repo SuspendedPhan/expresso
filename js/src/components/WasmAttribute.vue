@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>{{name}}</div>
-    <TreeLayout :element-layout="nodeLayout">
+    <TreeLayout :elementLayout="nodeLayout">
       <WasmNode v-if="rootNode" :node="rootNode" :key="rootNodeId"></WasmNode>
     </TreeLayout>
   </div>
