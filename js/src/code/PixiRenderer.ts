@@ -37,18 +37,21 @@ export default class PixiRenderer {
       const cloneOutput = cloneOutputByCloneNumber.get(i);
       const attributes = cloneOutput.getAttributes();
       let x, y;
+      let radius = 20;
       for (let i = 0; i < attributes.size(); i++) {
         const attribute = attributes.get(i);
         if (attribute.getName() === "x") {
           x = attribute.getValue();
         } else if (attribute.getName() === "y") {
           y = attribute.getValue();
+        } else if (attribute.getName() === "radius") {
+          radius = attribute.getValue();
         }
       }
       circle.x = x;
       circle.y = y;
-      circle.scale.x = 20;
-      circle.scale.y = 20;
+      circle.scale.x = radius;
+      circle.scale.y = radius;
       circle.visible = true;
 
       const suborganismOutputs = cloneOutput.getSuborganisms();
@@ -97,7 +100,8 @@ export default class PixiRenderer {
 
   private makeCircle() {
     const ret = new PIXI.Graphics();
-    ret.beginFill(0x9966ff);
+    ret.beginFill(0xffffff);
+    // ret.beginFill(0x9966ff);
     ret.drawCircle(0, 0, 1);
     ret.endFill();
     this.circles.push(ret);

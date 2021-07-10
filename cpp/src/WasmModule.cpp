@@ -198,6 +198,10 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getName", &FunctionParameter::getName)
             .function("getId", &FunctionParameter::getId);
 
+    class_<EvalContext>("EvalContext")
+            .class_function("makeUnique", &make<EvalContext>, allow_raw_pointers())
+            .function("getValueByIntrinsicAttributeMap", &EvalContext::getValueByIntrinsicAttributeMap, allow_raw_pointers());
+
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());
 
@@ -264,6 +268,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<Function *>("FunctionVector");
     register_vector<FakeBook *>("FakeBookVector");
     register_map<const FunctionParameter *, Node *>("FunctionParameterToNode");
+    register_map<const IntrinsicAttribute *, float>("IntrinsicAttributeToFloat");
 }
 
 #endif

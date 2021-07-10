@@ -1,7 +1,6 @@
 <template>
   <div>
     <div>{{framerate}}</div>
-    <GlobalToggle label="wassup"/>
     <div class="flex">
       <div class="w-1/2 h-full">
         <WasmExpressor v-if="project" :project="project"></WasmExpressor>
@@ -35,7 +34,7 @@ import GlobalToggle from "@/components/GlobalToggle.vue";
 import hotkeys from "hotkeys-js";
 
 @Component({
-  components: {ProjectFunctionCollection, WasmExpressor, GlobalToggle },
+  components: {ProjectFunctionCollection, WasmExpressor },
 })
 export default class WasmTest extends Vue {
   fake = null;
@@ -86,7 +85,13 @@ export default class WasmTest extends Vue {
 
     const render = (project, renderer) => {
       this.ticker.tick();
-      const evalOutput = project.evalOrganismTree();
+      const evalContext = this.emModule.EvalContext.makeUnique();
+      const timeAttribute = Functions.getAttributeByName(Functions.vectorToIterable(project.getRootOrganism().getAttributes()), "time");
+      const valueByIntrinsicAttributeMap = evalContext.getValueByIntrinsicAttributeMap();
+      const time = performance.now() / 1000;
+      valueByIntrinsicAttributeMap.set(timeAttribute, time);
+      const evalOutput = project.evalOrganismTree(evalContext);
+
       renderer.render(evalOutput);
       evalOutput.delete();
       window.requestAnimationFrame(() => render(project, renderer));

@@ -12,6 +12,15 @@ export default class Functions {
     }
   }
 
+  public static getAttributeByName(attributeIterable, name) {
+    for (const attribute of attributeIterable) {
+      if (attribute.getName() === name) {
+        return attribute;
+      }
+    }
+    throw new Error("cant find attribute");
+  }
+
   public static makeZero(emModule) {
     return emModule.NumberNode.makeUnique(0);
   }

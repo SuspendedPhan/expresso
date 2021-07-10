@@ -29,7 +29,10 @@ export default class DeadStore {
 
   private static toLiveProject(deadProject, emModule) {
     const liveRootOrganism = this.toLiveOrganism(deadProject.rootOrganism, emModule);
+
+    // root organism NEEDS to have its dead attributes revived before adding it to the project because of Project::addRootAttributes
     const liveProject = emModule.Project.makeUnique(liveRootOrganism);
+
     const liveFunctionById = new Map();
     const deadFunctionById = new Map();
     const liveParameterById = new Map();

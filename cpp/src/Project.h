@@ -28,18 +28,18 @@ public:
     }
 
     static unique_ptr<Organism> makeRootOrganism();
-
-
     const std::string &getId() const;
-
-    std::unique_ptr<EvalOutput> evalOrganismTree() const;
+    unique_ptr<EvalOutput> evalOrganismTree(unique_ptr<EvalContext> evalContext) const;
     Organism* getRootOrganism() const;
     Signal * getOnFunctionsChangedSignal();
     std::vector<Function *> getFunctions();
-
-    void setRootOrganism(std::unique_ptr<Organism> organism);
-
     void addFunction(std::unique_ptr<Function> function);
+
+    /**
+     * This NEEDS to be called after dead attributes are added.
+     */
+    void setRootOrganism(std::unique_ptr<Organism> organism);
+    static void addRootAttributes(Organism *organism);
 };
 
 

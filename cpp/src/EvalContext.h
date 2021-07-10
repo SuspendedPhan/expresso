@@ -22,6 +22,10 @@ class EvalContext {
 public:
     std::map<Organism *, OrganismEvalContext *> organismEvalContextByOrganism;
     std::map<const IntrinsicAttribute *, float> valueByIntrinsicAttribute;
+
+    const std::map<const IntrinsicAttribute *, float> &getValueByIntrinsicAttributeMap() const {
+        return valueByIntrinsicAttribute;
+    }
 };
 
 class NodeEvalContext {

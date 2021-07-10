@@ -6,10 +6,9 @@
 
 #include <utility>
 
-unique_ptr<EvalOutput> Project::evalOrganismTree() const {
-    EvalContext evalContext;
+unique_ptr<EvalOutput> Project::evalOrganismTree(std::unique_ptr<EvalContext> evalContext) const {
     auto evalOutput = std::make_unique<EvalOutput>();
-    evalOutput->rootOrganism = std::make_unique<OrganismOutput>(this->getRootOrganism()->eval(&evalContext));
+    evalOutput->rootOrganism = std::make_unique<OrganismOutput>(this->getRootOrganism()->eval(evalContext.get()));
     return std::move(evalOutput);
 }
 
@@ -22,7 +21,22 @@ const std::string &Project::getId() const {
 }
 
 std::unique_ptr<Organism> Project::makeRootOrganism() {
-    return Organism::makeWithStandardAttributes("the void");
+    unique_ptr<Organism> organism = Organism::makeWithStandardAttributes("the void");
+    addRootAttributes(organism.get());
+    return std::move(organism);
+}
+
+void Project::addRootAttributes(Organism *organism) {
+    bool hasTimeAttribute = false;
+    for (const auto attribute : organism->getAttributes()) {
+        if (attribute->getName() == "time") {
+            hasTimeAttribute = true;
+        }
+    }
+    if (!hasTimeAttribute) {
+        auto timeAttribute = std::make_unique<IntrinsicAttribute>("time", organism);
+        organism->addAttribute(std::move(timeAttribute));
+    }
 }
 
 Signal * Project::getOnFunctionsChangedSignal() {
@@ -39,6 +53,7 @@ std::vector<Function *> Project::getFunctions() {
 
 void Project::setRootOrganism(std::unique_ptr<Organism> organism) {
     organism->setProject(this);
+    addRootAttributes(organism.get());
     this->rootOrganism = std::move(organism);
 }
 
