@@ -116,16 +116,22 @@ export default class WasmTest extends Vue {
     // const liveProject = liveStore.projects[0];
     // this.project = liveProject;
 
-    const store = Store.makeDefault(module);
-    // const store = Store.loadOrMake(module);
+    // const store = Store.makeDefault(module);
+    const store = Store.loadOrMake(module);
     this.store = store;
     this.project = store.getProjects()[0];
     const project: any = this.project;
-    // const rootOrganism = project.getRootOrganism();
-    // const attributes = Functions.vectorToArray(rootOrganism.getAttributes());
-    // const xAttribute = attributes[2];
-    // const yAttribute = attributes[3];
 
+    // WasmTest.addAverageFunction(module, project);
+
+    // const deadStore = DeadStore.fromLiveStore(store);
+    // const liveStore = DeadStore.toLiveStore(deadStore, this.emModule);
+    // this.project = liveStore.getProjects()[0];
+
+    render(this.project, renderer);
+  }
+
+  private static addAverageFunction(module: any, project: any) {
     const aParameter = module.FunctionParameter.makeUnique("a");
     const bParameter = module.FunctionParameter.makeUnique("b");
     const aParameterNode = module.ParameterNode.makeUnique(aParameter);
@@ -133,27 +139,11 @@ export default class WasmTest extends Vue {
     const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
     const twoNode = module.NumberNode.makeUnique(2);
     const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
-    const fun = module.Function.makeUnique("Average", divNode);
+    const fun = module.Function.makeUnique("Average");
+    fun.setRootNode(divNode);
     fun.addParameter(aParameter);
     fun.addParameter(bParameter);
     project.addFunction(fun);
-    //
-    // const aArgNode = module.NumberNode.makeUnique(25);
-    // const bArgNode = module.NumberNode.makeUnique(75);
-    // const callNode = module.FunctionCallNode.makeUnique(fun);
-    // callNode.setArgument(aParameter, aArgNode);
-    // callNode.setArgument(bParameter, bArgNode);
-    // xAttribute.setRootNode(callNode);
-    //
-    // yAttribute.setRootNode(module.NumberNode.makeUnique(50));
-
-    // const threeNode = module.NumberNode.makeUnique(3);
-    // const addNode = module.AddOpNode.makeUnique(twoNode, threeNode);
-    // const oneNode = module.NumberNode.makeUnique(1);
-    // twoNode.replace(oneNode);
-    // xAttribute.setRootNode(addNode);
-
-    render(this.project, renderer);
   }
 
   private saveStore() {

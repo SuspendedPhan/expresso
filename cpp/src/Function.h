@@ -23,8 +23,8 @@ private:
     Project * _project;
     Signal _onChangedSignal;
 public:
-    Function(std::string name, std::unique_ptr<Node> rootNode, std::string id);
-    explicit Function(std::string name, std::unique_ptr<Node> rootNode);
+    Function(std::string name, std::string id);
+    explicit Function(std::string name);
 
     void addParameter(std::unique_ptr<FunctionParameter> parameter);
 

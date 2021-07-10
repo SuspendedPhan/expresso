@@ -1,5 +1,6 @@
 import Store from "@/models/Store";
 import Functions from "@/code/Functions";
+import {elementAt} from "rxjs/operators";
 
 export default class DeadStore {
   public static fromLiveStore(liveStore: Store) {
@@ -18,14 +19,30 @@ export default class DeadStore {
 
 
   private static toDeadProject(liveProject) {
+    const deadFunctions = Functions.vectorToArray(liveProject.getFunctions()).map(liveFunction => this.toDeadFunction(liveFunction));
     return {
       id: liveProject.getId(),
-      rootOrganism: this.toDeadOrganism(liveProject.getRootOrganism())
+      rootOrganism: this.toDeadOrganism(liveProject.getRootOrganism()),
+      functions: deadFunctions
     };
   }
 
   private static toLiveProject(deadProject, emModule) {
     const liveRootOrganism = this.toLiveOrganism(deadProject.rootOrganism, emModule);
+    const liveProject = emModule.Project.makeUnique(liveRootOrganism);
+    const liveFunctionById = new Map();
+    const deadFunctionById = new Map();
+    const liveParameterById = new Map();
+    for (const deadFunction of deadProject.functions) {
+      const liveFunction = this.toLiveFunction(deadFunction, emModule);
+      liveProject.addFunction(liveFunction);
+      liveFunctionById.set(deadFunction.id, liveFunction);
+      deadFunctionById.set(deadFunction.id, deadFunction);
+      for (const liveParameter of Functions.vectorToIterable(liveFunction.getParameters())) {
+        liveParameterById.set(liveParameter.getId(), liveParameter);
+      }
+    }
+
     const liveAttributeById = new Map<string, any>();
     const deadAttributeById = new Map<string, any>();
     const liveAttributes: any = Array.from(this.getLiveAttributesDeep(liveRootOrganism));
@@ -37,13 +54,19 @@ export default class DeadStore {
       deadAttributeById.set(deadAttribute.id, deadAttribute);
     }
 
+    for (const [functionId, liveFunction] of liveFunctionById.entries()) {
+      const deadFunction = deadFunctionById.get(functionId);
+      const liveRootNode = this.toLiveNode(deadFunction.rootNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
+      liveFunction.setRootNode(liveRootNode);
+    }
+
     const liveEditableAttributes = liveAttributes.filter(attribute => attribute.constructor.name === 'EditableAttribute');
     for (const liveEditableAttribute of liveEditableAttributes) {
       const deadEditableAttribute = deadAttributeById.get(liveEditableAttribute.getId());
-      const liveRootNode = this.toLiveNode(deadEditableAttribute.rootNode, emModule, liveAttributeById);
+      const liveRootNode = this.toLiveNode(deadEditableAttribute.rootNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
       liveEditableAttribute.setRootNode(liveRootNode);
     }
-    return emModule.Project.makeUnique(liveRootOrganism);
+    return liveProject;
   }
 
   private static toDeadOrganism(liveOrganism) {
@@ -105,39 +128,86 @@ export default class DeadStore {
     } else if (liveNode.constructor.name === 'AttributeReferenceNode') {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
     } else if (liveNode.constructor.name === 'FunctionCallNode') {
-      console.error('not implemented');
+      const deadArgumentByParameterId = {};
+      const argumentByParameterMap = liveNode.getArgumentByParameterMap();
+      for (let i = 0; i < argumentByParameterMap.size(); i++) {
+        const parameter = argumentByParameterMap.keys().get(i);
+        const argument = argumentByParameterMap.get(parameter);
+        deadArgumentByParameterId[parameter.getId()] = this.toDeadNode(argument);
+      }
+      deadNode.functionId = liveNode.getFunction().getId();
+      deadNode.argumentByParameterId = deadArgumentByParameterId;
+    } else if (liveNode.constructor.name === 'ParameterNode') {
+      deadNode.parameterId = liveNode.getFunctionParameter().getId();
     } else {
-      console.error('toDeadNode: unknown node type');
+      console.error('toDeadNode: unknown node type ' + liveNode.constructor.name);
     }
     return deadNode;
   }
 
-  private static toLiveNode(deadNode, emModule, liveAttributeById) {
+  private static toLiveNode(deadNode, emModule, liveAttributeById, liveFunctionById, liveParameterById) {
     if (deadNode.nodeType === 'AddOpNode') {
-      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.AddOpNode, emModule, liveAttributeById);
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.AddOpNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     } else if (deadNode.nodeType === 'SubOpNode') {
-      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.SubOpNode, emModule, liveAttributeById);
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.SubOpNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     } else if (deadNode.nodeType === 'MulOpNode') {
-      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.MulOpNode, emModule, liveAttributeById);
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.MulOpNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     } else if (deadNode.nodeType === 'DivOpNode') {
-      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.DivOpNode, emModule, liveAttributeById);
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.DivOpNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     } else if (deadNode.nodeType === 'ModOpNode') {
-      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.ModOpNode, emModule, liveAttributeById);
+      return DeadStore.toLiveBinaryOpNode(deadNode, emModule.ModOpNode, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     } else if (deadNode.nodeType === 'NumberNode') {
       return emModule.NumberNode.makeUnique(deadNode.value, deadNode.id);
     } else if (deadNode.nodeType === 'AttributeReferenceNode') {
       return emModule.AttributeReferenceNode.makeUnique(liveAttributeById.get(deadNode.referenceAttributeId), deadNode.id);
     } else if (deadNode.nodeType === 'FunctionCallNode') {
-      console.error('not implemented');
+      const liveFunction = liveFunctionById.get(deadNode.functionId);
+      const liveNode = emModule.FunctionCallNode.makeUnique(liveFunction, deadNode.id);
+      const liveParameterById = new Map();
+      for (const parameter of Functions.vectorToIterable(liveFunction.getParameters())) {
+        liveParameterById.set(parameter.getId(), parameter);
+      }
+      for (const [parameterId, deadArgument] of Object.entries(deadNode.argumentByParameterId)) {
+        const liveParameter = liveParameterById.get(parameterId);
+        const liveArgument = this.toLiveNode(deadArgument, emModule, liveAttributeById, liveFunctionById, liveParameterById);
+        liveNode.setArgument(liveParameter, liveArgument);
+      }
+      return liveNode;
+    } else if (deadNode.nodeType === 'ParameterNode') {
+      const liveParameter = liveParameterById.get(deadNode.parameterId);
+      console.assert(liveParameter, deadNode.parameterId);
+      return emModule.ParameterNode.makeUnique(liveParameter);
     } else {
       console.error(deadNode.nodeType);
     }
   }
 
-  private static toLiveBinaryOpNode(deadBinaryOpNode, BinaryOpNodeClass: any, emModule, liveAttributeById) {
-    const liveA = this.toLiveNode(deadBinaryOpNode.a, emModule, liveAttributeById);
-    const liveB = this.toLiveNode(deadBinaryOpNode.b, emModule, liveAttributeById);
+  private static toLiveBinaryOpNode(deadBinaryOpNode, BinaryOpNodeClass: any, emModule, liveAttributeById, liveFunctionById, liveParameterById) {
+    const liveA = this.toLiveNode(deadBinaryOpNode.a, emModule, liveAttributeById, liveFunctionById, liveParameterById);
+    const liveB = this.toLiveNode(deadBinaryOpNode.b, emModule, liveAttributeById, liveFunctionById, liveParameterById);
     return BinaryOpNodeClass.makeUnique(liveA, liveB, deadBinaryOpNode.id);
+  }
+
+  private static toDeadFunction(liveFunction: any) {
+    const deadParameters = Functions.vectorToArray(liveFunction.getParameters()).map(liveParameter => ({
+      id: liveParameter.getId(),
+      name: liveParameter.getName()
+    }));
+    return {
+      id: liveFunction.getId(),
+      name: liveFunction.getName(),
+      parameters: deadParameters,
+      rootNode: this.toDeadNode(liveFunction.getRootNode())
+    }
+  }
+
+  private static toLiveFunction(deadFunction, emModule) {
+    const liveFunction = emModule.Function.makeUnique(deadFunction.name, deadFunction.id);
+    for (const deadParameter of deadFunction.parameters) {
+      const liveParameter = emModule.FunctionParameter.makeUnique(deadParameter.id, deadParameter.name);
+      liveFunction.addParameter(liveParameter);
+    }
+    return liveFunction;
   }
 
   private static* getLiveAttributesDeep(liveOrganism: any) {

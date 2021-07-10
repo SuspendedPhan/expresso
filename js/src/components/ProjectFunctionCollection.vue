@@ -29,7 +29,8 @@ export default {
     const name = ref('');
     function addFunction(name) {
       const funName = WordCollection.toRandomWordIfEmpty(name);
-      const fun = emModule.Function.makeUnique(funName, Functions.makeZero(emModule));
+      const fun = emModule.Function.makeUnique(funName);
+      fun.setRootNode(Functions.makeZero(emModule))
       project.addFunction(fun);
     }
     

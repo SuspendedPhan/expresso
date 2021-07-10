@@ -169,10 +169,8 @@ export default class WasmNode extends Vue {
 
   private onSearchboxChoiceCommitted(choice) {
     const newNode = choice.nodeMakerFunction();
-    if (!window.wassup) {
-      this.node.replace(newNode);
-      this.pen.setSelectedNode(newNode);
-    }
+    this.node.replace(newNode);
+    this.pen.setSelectedNode(newNode);
     this.saveStoreFunctor();
   }
 

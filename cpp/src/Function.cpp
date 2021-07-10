@@ -12,13 +12,11 @@ void Function::addParameter(std::unique_ptr<FunctionParameter> parameter) {
     this->_onChangedSignal.dispatch();
 }
 
-Function::Function(std::string name, std::unique_ptr<Node> rootNode, std::string id)
+Function::Function(std::string name, std::string id)
         : id(std::move(id)), name(std::move(name)) {
-    this->setRootNode(std::move(rootNode));
 }
-Function::Function(std::string name, std::unique_ptr<Node> rootNode)
+Function::Function(std::string name)
         : id(Code::generateUuidV4()), name(std::move(name)) {
-    this->setRootNode(std::move(rootNode));
 }
 
 const std::string &Function::getName() const {
@@ -38,6 +36,9 @@ const std::string &Function::getId() const {
 }
 
 Node * Function::getRootNode() {
+    if (!_rootNode) {
+        std::cerr << "Function::getRootNode null" << std::endl;
+    }
     return _rootNode.get();
 }
 
