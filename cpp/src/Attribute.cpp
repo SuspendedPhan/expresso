@@ -35,6 +35,6 @@ Signal *EditableAttribute::getOnChangedSignal() {
 AttributeOutput IntrinsicAttribute::eval(const EvalContext &evalContext) const {
     AttributeOutput output;
     output.name = this->name;
-    output.value = evalContext.valueByIntrinsicAttribute.find(this)->second;
+    output.value = evalContext._valueByIntrinsicAttribute.find(this)->second;
     return output;
 }

@@ -200,7 +200,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     class_<EvalContext>("EvalContext")
             .class_function("makeUnique", &make<EvalContext>, allow_raw_pointers())
-            .function("getValueByIntrinsicAttributeMap", &EvalContext::getValueByIntrinsicAttributeMap, allow_raw_pointers());
+            .function("setValue", &EvalContext::setValue, allow_raw_pointers());
 
     class_<EvalOutput>("EvalOutput")
             .function("getRootOrganism", &EvalOutput::getRootOrganism, allow_raw_pointers());

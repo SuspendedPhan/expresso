@@ -87,11 +87,10 @@ export default class WasmTest extends Vue {
       this.ticker.tick();
       const evalContext = this.emModule.EvalContext.makeUnique();
       const timeAttribute = Functions.getAttributeByName(Functions.vectorToIterable(project.getRootOrganism().getAttributes()), "time");
-      const valueByIntrinsicAttributeMap = evalContext.getValueByIntrinsicAttributeMap();
       const time = performance.now() / 1000;
-      valueByIntrinsicAttributeMap.set(timeAttribute, time);
-      const evalOutput = project.evalOrganismTree(evalContext);
+      evalContext.setValue(timeAttribute, time);
 
+      const evalOutput = project.evalOrganismTree(evalContext);
       renderer.render(evalOutput);
       evalOutput.delete();
       window.requestAnimationFrame(() => render(project, renderer));
