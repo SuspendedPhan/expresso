@@ -125,12 +125,15 @@ export default class WasmNode extends Vue {
       const parentNode = parent.getNode();
       if (event.key === 'ArrowUp') {
         window.setTimeout(() => this.pen.setSelectedNode(parentNode), 0);
+        event.preventDefault();
       } else if (event.key === 'ArrowLeft') {
         const selectedNode = Store.getSibling(parentNode, this.node, SiblingRotationDirection.Left);
         window.setTimeout(() => this.pen.setSelectedNode(selectedNode), 0);
+        event.preventDefault();
       } else if (event.key === 'ArrowRight') {
         const selectedNode = Store.getSibling(parentNode, this.node, SiblingRotationDirection.Right);
         window.setTimeout(() => this.pen.setSelectedNode(selectedNode), 0);
+        event.preventDefault();
       }
     } else if (parent.isAttribute()) {
       this.onKeydownDown(event);
@@ -143,6 +146,7 @@ export default class WasmNode extends Vue {
       if (children.length > 0) {
         window.setTimeout(() => this.pen.setSelectedNode(children[0]), 0);
       }
+      event.preventDefault();
     }
   }
 
