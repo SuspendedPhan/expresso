@@ -36,7 +36,7 @@ void Node::replace(std::unique_ptr<Node> node) {
                 std::cerr << "replace; binaryopnode" << std::endl;
             }
         } else if (auto *functionCallNode = dynamic_cast<FunctionCallNode *>(parentNode)) {
-            for (const auto &parameter : functionCallNode->getFunction()->getParameters()) {
+            for (const auto &parameter : functionCallNode->getCalledFunction()->getParameters()) {
                 auto *argumentCollection = functionCallNode->getArgumentCollection();
                 const auto &argument = argumentCollection->getArgument(parameter);
                 if (argument == this) {
@@ -109,7 +109,7 @@ Function *Node::getFunction() { // NOLINT(misc-no-recursion)
     } else if (this->_parent->isFunction()) {
         return this->_parent->getFunction();
     } else {
-        std::cerr << "Node::getFunction dylan error" << std::endl;
+        std::cerr << "Node::getCalledFunction dylan error" << std::endl;
         return nullptr;
     }
 }
@@ -178,7 +178,7 @@ FunctionParameter *ParameterNode::getFunctionParameter() const {
     return functionParameter;
 }
 
-Function *FunctionCallNode::getFunction() const {
+Function *FunctionCallNode::getCalledFunction() const {
     return _function;
 }
 

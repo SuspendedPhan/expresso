@@ -19,8 +19,7 @@ private:
     std::string id;
     std::string name;
     FunctionParameterCollection _parameters;
-    std::function<Value(std::map<const FunctionParameter *, Value>)> eval;
-
+    std::function<Value(std::map<const FunctionParameter *, Value>)> _eval;
 public:
     PrimitiveFunction(std::string id, std::string name,
             std::vector<std::unique_ptr<FunctionParameter>> parameters,
@@ -29,6 +28,7 @@ public:
     const std::string &getId() const;
     const std::string &getName() const;
     const FunctionParameterCollection * getParameters() const;
+    const std::function<Value(std::map<const FunctionParameter *, Value>)> &getEvalFunctor() const;
 };
 
 

@@ -170,7 +170,7 @@ public:
     explicit FunctionCallNode(Function *function);
     FunctionCallNode(Function *function, std::string id);
 
-    Function *getFunction() const;
+    Function *getCalledFunction() const;
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 

@@ -17,7 +17,7 @@ FunctionParameterCollection makeParameters(std::vector<std::unique_ptr<FunctionP
 PrimitiveFunction::PrimitiveFunction(std::string id, std::string name,
         std::vector<std::unique_ptr<FunctionParameter>> parameters,
         std::function<Value(std::map<const FunctionParameter *, Value>)> eval) : id(std::move(id)), name(std::move(name)),
-        _parameters(makeParameters(std::move(parameters))), eval(std::move(eval)) {}
+        _parameters(makeParameters(std::move(parameters))), _eval(std::move(eval)) {}
 
 const std::string &PrimitiveFunction::getId() const {
     return id;
@@ -29,4 +29,8 @@ const std::string &PrimitiveFunction::getName() const {
 
 const FunctionParameterCollection * PrimitiveFunction::getParameters() const {
     return &_parameters;
+}
+
+const std::function<Value(std::map<const FunctionParameter *, Value>)> &PrimitiveFunction::getEvalFunctor() const {
+    return _eval;
 }

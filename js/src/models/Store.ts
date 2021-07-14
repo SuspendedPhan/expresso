@@ -51,7 +51,7 @@ export default class Store {
       const b = node.getB();
       return [a, b];
     } else if (node.constructor.name === 'FunctionCallNode') {
-      const parameters = Functions.vectorToIterable(node.getFunction().getParameters());
+      const parameters = Functions.vectorToIterable(node.getCalledFunction().getParameters());
       const argumentRootNodes: any = [];
       for (const parameter of parameters) {
         const argumentRootNode = node.getArgumentCollection().getArgument(parameter);
@@ -74,7 +74,7 @@ export default class Store {
     if (this.isBinaryOpNode(parentNode)) {
       return this.getOtherBinaryOpSibling(parentNode, node);
     } else if (parentNode.constructor.name === 'FunctionCallNode') {
-      const parameters = Functions.vectorToArray(parentNode.getFunction().getParameters());
+      const parameters = Functions.vectorToArray(parentNode.getCalledFunction().getParameters());
       const parameterCount = parameters.length;
       for (let i = 0; i < parameterCount; i++) {
         const parameter = parameters[i];

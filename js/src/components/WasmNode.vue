@@ -67,7 +67,7 @@ export default class WasmNode extends Vue {
     } else if (node.constructor.name === 'AttributeReferenceNode') {
       this.text = node.getReferenceRaw().getName();
     } else if (node.constructor.name === 'FunctionCallNode') {
-      this.text = node.getFunction().getName();
+      this.text = node.getCalledFunction().getName();
     } else if (node.constructor.name === 'ParameterNode') {
       this.text = node.getFunctionParameter().getName();
     } else {

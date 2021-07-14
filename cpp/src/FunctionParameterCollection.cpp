@@ -4,7 +4,7 @@
 
 #include "FunctionParameterCollection.h"
 
-std::vector<const FunctionParameter *> FunctionParameterCollection::getAll() {
+std::vector<const FunctionParameter *> FunctionParameterCollection::getAll() const {
     std::vector<const FunctionParameter *> result;
     for (const auto& t : _parameters) {
         result.push_back(t.get());

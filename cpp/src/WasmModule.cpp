@@ -39,6 +39,7 @@ class ParameterNode;
 #include "Project.h"
 #include "Car.h"
 #include "FunctionArgumentCollection.h"
+#include "PrimitiveFunctionCallNode.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -126,7 +127,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
             .function("getOrganism", &Node::getOrganism, allow_raw_pointers())
             .function("getParent", &Node::getParent, allow_raw_pointers())
-            .function("getFunction", &Node::getFunction, allow_raw_pointers())
+            .function("getCalledFunction", &Node::getFunction, allow_raw_pointers())
             .function("getProject", &Node::getProject, allow_raw_pointers())
             ;
 
@@ -169,8 +170,15 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<FunctionCallNode, base<Node>>("FunctionCallNode")
             .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
             .class_function("makeUnique", &make<FunctionCallNode, Function *, std::string>, allow_raw_pointers())
-            .function("getFunction", &FunctionCallNode::getFunction, allow_raw_pointers())
+            .function("getCalledFunction", &FunctionCallNode::getCalledFunction, allow_raw_pointers())
             .function("getArgumentCollection", &FunctionCallNode::getArgumentCollection, allow_raw_pointers())
+            ;
+
+    class_<PrimitiveFunctionCallNode, base<Node>>("PrimitiveFunctionCallNode")
+            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, PrimitiveFunction *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, std::string, PrimitiveFunction *>, allow_raw_pointers())
+            .function("getCalledFunction", &PrimitiveFunctionCallNode::getCalledFunction, allow_raw_pointers())
+            .function("getArgumentCollection", &PrimitiveFunctionCallNode::getArgumentCollection, allow_raw_pointers())
             ;
 
     class_<ParameterNode, base<Node>>("ParameterNode")
@@ -224,7 +232,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("isFunction", &NodeParent::isFunction, allow_raw_pointers())
             .function("isAttribute", &NodeParent::isAttribute, allow_raw_pointers())
             .function("getNode", &NodeParent::getNode, allow_raw_pointers())
-            .function("getFunction", &NodeParent::getFunction, allow_raw_pointers())
+            .function("getCalledFunction", &NodeParent::getFunction, allow_raw_pointers())
             .function("getAttribute", &NodeParent::getAttribute, allow_raw_pointers())
             ;
 

@@ -13,7 +13,7 @@ class FunctionParameterCollection {
 private:
     std::vector<std::unique_ptr<FunctionParameter>> _parameters;
 public:
-    std::vector<const FunctionParameter *> getAll();
+    std::vector<const FunctionParameter *> getAll() const;
     void add(std::unique_ptr<FunctionParameter> parameter);
 };
 

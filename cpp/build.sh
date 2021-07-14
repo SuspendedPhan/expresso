@@ -42,6 +42,7 @@ emcc -v
     ./cpp/src/FunctionParameterCollection.cpp \
     ./cpp/src/PrimitiveFunction.cpp \
     ./cpp/src/PrimitiveFunctionCollection.cpp \
+    ./cpp/src/PrimitiveFunctionCallNode.cpp \
 
   # Create output folder
 #  mkdir -p dist

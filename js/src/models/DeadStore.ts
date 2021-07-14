@@ -132,11 +132,11 @@ export default class DeadStore {
       deadNode.referenceAttributeId = liveNode.getReferenceRaw().getId();
     } else if (liveNode.constructor.name === 'FunctionCallNode') {
       const deadArgumentByParameterId = {};
-      for (const parameter of Functions.vectorToIterable(liveNode.getFunction().getParameters())) {
+      for (const parameter of Functions.vectorToIterable(liveNode.getCalledFunction().getParameters())) {
         const argument = liveNode.getArgumentCollection().getArgument(parameter);
         deadArgumentByParameterId[parameter.getId()] = this.toDeadNode(argument);
       }
-      deadNode.functionId = liveNode.getFunction().getId();
+      deadNode.functionId = liveNode.getCalledFunction().getId();
       deadNode.argumentByParameterId = deadArgumentByParameterId;
     } else if (liveNode.constructor.name === 'ParameterNode') {
       deadNode.parameterId = liveNode.getFunctionParameter().getId();
