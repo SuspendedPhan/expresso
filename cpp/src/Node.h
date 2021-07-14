@@ -7,6 +7,7 @@
 #include "NodeParent.h"
 #include "Function.h"
 #include "FunctionParameter.h"
+#include "FunctionArgumentCollection.h"
 #include <iostream>
 #include <functional>
 #include "variant.h"
@@ -162,21 +163,18 @@ public:
 
 class FunctionCallNode : public Node {
 private:
-    std::map<const FunctionParameter *, std::unique_ptr<Node>> argumentByParameter;
+    FunctionArgumentCollection _arguments{};
 public:
-    Function * function;
+    Function * _function;
 
     explicit FunctionCallNode(Function *function);
     FunctionCallNode(Function *function, std::string id);
-
-    void setArgument(const FunctionParameter * parameter, std::unique_ptr<Node> argumentRootNode);
-    std::map<const FunctionParameter *, Node *> getArgumentByParameterMap();
 
     Function *getFunction() const;
 
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
 
-    const std::string & getName() const;
+    FunctionArgumentCollection * getArgumentCollection();
 };
 
 

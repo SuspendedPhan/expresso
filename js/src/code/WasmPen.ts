@@ -85,7 +85,7 @@ export default class WasmPen {
       nodeMakerFunction: () => {
         const funCallNode = this.getModule().FunctionCallNode.makeUnique(fun);
         for (const parameter of Functions.vectorToIterable(fun.getParameters())) {
-          funCallNode.setArgument(parameter, this.makeZero());
+          funCallNode.getArgumentCollection().setArgument(parameter, this.makeZero());
         }
         return funCallNode;
       }

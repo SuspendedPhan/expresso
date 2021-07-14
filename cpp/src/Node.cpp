@@ -4,6 +4,7 @@
 
 #include "Node.h"
 #include "Organism.h"
+#include "FunctionArgumentCollection.h"
 
 #include <utility>
 
@@ -35,12 +36,11 @@ void Node::replace(std::unique_ptr<Node> node) {
                 std::cerr << "replace; binaryopnode" << std::endl;
             }
         } else if (auto *functionCallNode = dynamic_cast<FunctionCallNode *>(parentNode)) {
-            auto argumentByParameterMap = functionCallNode->getArgumentByParameterMap();
-            for (const auto &entry : argumentByParameterMap) {
-                const auto &parameter = entry.first;
-                const auto &argument = entry.second;
+            for (const auto &parameter : functionCallNode->getFunction()->getParameters()) {
+                auto *argumentCollection = functionCallNode->getArgumentCollection();
+                const auto &argument = argumentCollection->getArgument(parameter);
                 if (argument == this) {
-                    functionCallNode->setArgument(parameter, std::move(node));
+                    argumentCollection->setArgument(parameter, std::move(node));
                     break;
                 }
             }
@@ -153,33 +153,22 @@ void BinaryOpNode::set(BinaryOpNode *op, std::unique_ptr<Node> a, std::unique_pt
 }
 
 float FunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
-    for (const auto &entries : this->argumentByParameter) {
-        const auto &parameter = entries.first;
-        const auto &argumentRootNode = entries.second;
+    for (const auto &parameter : _function->getParameters()) {
+        const auto &argumentRootNode = _arguments.getArgument(parameter);
         const auto argumentValue = argumentRootNode->eval(evalContext, nodeEvalContext);
         nodeEvalContext.valueByParameter[parameter] = argumentValue;
     }
-    const auto answer = this->function->getRootNode()->eval(evalContext, nodeEvalContext);
-    for (const auto &entries : this->argumentByParameter) {
+    const auto answer = this->_function->getRootNode()->eval(evalContext, nodeEvalContext);
+    for (const auto &parameter : _function->getParameters()) {
         // Recursive functions are not implemented yet.
-        nodeEvalContext.valueByParameter.erase(entries.first);
+        nodeEvalContext.valueByParameter.erase(parameter);
     }
     return answer;
 }
 
-FunctionCallNode::FunctionCallNode(Function *function) : function(function) {}
+FunctionCallNode::FunctionCallNode(Function *function) : _function(function) {}
 
-FunctionCallNode::FunctionCallNode(Function *function, std::string id) : function(function), Node(std::move(id)) {}
-
-void FunctionCallNode::setArgument(const FunctionParameter *parameter, std::unique_ptr<Node> argumentRootNode) {
-    argumentRootNode->setParent(std::make_unique<NodeParent>(this));
-    this->argumentByParameter[parameter] = std::move(argumentRootNode);
-    this->onChangedSignal.dispatch();
-}
-
-const std::string &FunctionCallNode::getName() const {
-    return this->function->getName();
-}
+FunctionCallNode::FunctionCallNode(Function *function, std::string id) : _function(function), Node(std::move(id)) {}
 
 float ParameterNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
     return nodeEvalContext.valueByParameter.at(this->functionParameter);
@@ -189,15 +178,10 @@ FunctionParameter *ParameterNode::getFunctionParameter() const {
     return functionParameter;
 }
 
-
-std::map<const FunctionParameter *, Node *> FunctionCallNode::getArgumentByParameterMap() {
-    std::map<const FunctionParameter *, Node *> answer;
-    for (const auto &entry : this->argumentByParameter) {
-        answer.insert({entry.first, entry.second.get()});
-    }
-    return answer;
+Function *FunctionCallNode::getFunction() const {
+    return _function;
 }
 
-Function *FunctionCallNode::getFunction() const {
-    return function;
+FunctionArgumentCollection *FunctionCallNode::getArgumentCollection() {
+    return &_arguments;
 }

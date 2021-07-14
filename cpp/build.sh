@@ -38,6 +38,10 @@ emcc -v
     ./cpp/src/FunctionParameter.cpp \
     ./cpp/src/NodeParent.cpp \
     ./cpp/src/EvalContext.cpp \
+    ./cpp/src/FunctionArgumentCollection.cpp \
+    ./cpp/src/FunctionParameterCollection.cpp \
+    ./cpp/src/PrimitiveFunction.cpp \
+    ./cpp/src/PrimitiveFunctionCollection.cpp \
 
   # Create output folder
 #  mkdir -p dist

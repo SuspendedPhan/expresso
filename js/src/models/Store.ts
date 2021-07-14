@@ -27,7 +27,7 @@ export default class Store {
 
   save() {
     const jsonDeadStore = JSON.stringify(DeadStore.fromLiveStore(this));
-    window.localStorage.setItem("emcc-evolved", jsonDeadStore);
+    // window.localStorage.setItem("emcc-evolved", jsonDeadStore);
   }
 
   static makeDefault(emModule: any) {
@@ -52,10 +52,9 @@ export default class Store {
       return [a, b];
     } else if (node.constructor.name === 'FunctionCallNode') {
       const parameters = Functions.vectorToIterable(node.getFunction().getParameters());
-      const argumentByParameterMap = node.getArgumentByParameterMap();
       const argumentRootNodes: any = [];
       for (const parameter of parameters) {
-        const argumentRootNode = argumentByParameterMap.get(parameter);
+        const argumentRootNode = node.getArgumentCollection().getArgument(parameter);
         argumentRootNodes.push(argumentRootNode);
       }
       return argumentRootNodes;
@@ -75,12 +74,11 @@ export default class Store {
     if (this.isBinaryOpNode(parentNode)) {
       return this.getOtherBinaryOpSibling(parentNode, node);
     } else if (parentNode.constructor.name === 'FunctionCallNode') {
-      const argumentByParameterMap = parentNode.getArgumentByParameterMap();
-      const parameterCount = argumentByParameterMap.size();
-      const parameters = argumentByParameterMap.keys();
+      const parameters = Functions.vectorToArray(parentNode.getFunction().getParameters());
+      const parameterCount = parameters.length;
       for (let i = 0; i < parameterCount; i++) {
-        const parameter = parameters.get(i);
-        const argument = argumentByParameterMap.get(parameter);
+        const parameter = parameters[i];
+        const argument = parentNode.getArgumentCollection().getArgument(parameter);
         if (argument.getId() == node.getId()) {
           const index = (() => {
             if (rotationDirection == SiblingRotationDirection.Left) {
@@ -88,10 +86,11 @@ export default class Store {
             } else if (rotationDirection == SiblingRotationDirection.Right) {
               return (i + 1) % parameterCount;
             } else {
-              console.error('SiblingRotationDirection')
+              console.error('SiblingRotationDirection');
+              return -1;
             }
           })();
-          return argumentByParameterMap.get(parameters.get(index));
+          return parentNode.getArgumentCollection().getArgument(parameters[index]);
         }
       }
       console.error('getSibling nothing')

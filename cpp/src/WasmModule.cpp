@@ -38,6 +38,7 @@ class ParameterNode;
 #include "EmbindUtil.h"
 #include "Project.h"
 #include "Car.h"
+#include "FunctionArgumentCollection.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -168,10 +169,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
     class_<FunctionCallNode, base<Node>>("FunctionCallNode")
             .class_function("makeUnique", &make<FunctionCallNode, Function *>, allow_raw_pointers())
             .class_function("makeUnique", &make<FunctionCallNode, Function *, std::string>, allow_raw_pointers())
-            .function("setArgument", &FunctionCallNode::setArgument, allow_raw_pointers())
-            .function("getName", &FunctionCallNode::getName)
-            .function("getArgumentByParameterMap", &FunctionCallNode::getArgumentByParameterMap, allow_raw_pointers())
             .function("getFunction", &FunctionCallNode::getFunction, allow_raw_pointers())
+            .function("getArgumentCollection", &FunctionCallNode::getArgumentCollection, allow_raw_pointers())
             ;
 
     class_<ParameterNode, base<Node>>("ParameterNode")
@@ -197,6 +196,10 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .class_function("makeUnique", &make<FunctionParameter, std::string, std::string>)
             .function("getName", &FunctionParameter::getName)
             .function("getId", &FunctionParameter::getId);
+
+    class_<FunctionArgumentCollection>("FunctionArgumentCollection")
+            .function("setArgument", &FunctionArgumentCollection::setArgument, allow_raw_pointers())
+            .function("getArgument", &FunctionArgumentCollection::getArgument, allow_raw_pointers());
 
     class_<EvalContext>("EvalContext")
             .class_function("makeUnique", &make<EvalContext>, allow_raw_pointers())

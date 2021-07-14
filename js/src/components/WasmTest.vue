@@ -126,7 +126,7 @@ export default class WasmTest extends Vue {
     this.project = store.getProjects()[0];
     const project: any = this.project;
 
-    // WasmTest.addAverageFunction(module, project);
+    WasmTest.addAverageFunction(module, project);
 
     // const deadStore = DeadStore.fromLiveStore(store);
     // const liveStore = DeadStore.toLiveStore(deadStore, this.emModule);
