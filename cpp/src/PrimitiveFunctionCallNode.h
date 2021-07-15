@@ -12,15 +12,15 @@ class PrimitiveFunction;
 
 class PrimitiveFunctionCallNode : public Node {
 private:
-    PrimitiveFunction * _primitiveFunction;
-    FunctionArgumentCollection _arguments;
+    const PrimitiveFunction * _primitiveFunction;
+    FunctionArgumentCollection _arguments = FunctionArgumentCollection(this);
 public:
     float eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) override;
-    PrimitiveFunction * getCalledFunction();
+    const PrimitiveFunction * getCalledFunction() const;
 
-    explicit PrimitiveFunctionCallNode(PrimitiveFunction *primitiveFunction);
+    explicit PrimitiveFunctionCallNode(const PrimitiveFunction *primitiveFunction);
 
-    PrimitiveFunctionCallNode(const std::string &id, PrimitiveFunction *primitiveFunction);
+    PrimitiveFunctionCallNode(const std::string &id, const PrimitiveFunction *primitiveFunction);
 
     FunctionArgumentCollection * getArgumentCollection();
 };

@@ -32,6 +32,7 @@ export default class WasmPen {
     answer = answer.concat(this.getOpNodeChoices(query));
     answer = answer.concat(this.getAttributeNodeChoices(query, parentOrganism));
     answer = answer.concat(this.getFunctionCallNodeChoices(query, parentOrganism.getProject()));
+    answer = answer.concat(this.getPrimitiveFunctionCallNodeChoices(query));
     return answer;
   }
 
@@ -40,6 +41,7 @@ export default class WasmPen {
     answer = answer.concat(this.getNumberNodeChoices(query));
     answer = answer.concat(this.getOpNodeChoices(query));
     answer = answer.concat(this.getParameterNodeChoices(query, parentFun));
+    answer = answer.concat(this.getPrimitiveFunctionCallNodeChoices(query));
     return answer;
   }
 
@@ -84,6 +86,21 @@ export default class WasmPen {
       text: fun.getName(),
       nodeMakerFunction: () => {
         const funCallNode = this.getModule().FunctionCallNode.makeUnique(fun);
+        for (const parameter of Functions.vectorToIterable(fun.getParameters())) {
+          funCallNode.getArgumentCollection().setArgument(parameter, this.makeZero());
+        }
+        return funCallNode;
+      }
+    }));
+    return choices.filter(choice => choice.text.toLowerCase().indexOf(query.toLowerCase()) >= 0);
+  }
+
+  private static getPrimitiveFunctionCallNodeChoices(query) {
+    const primitiveFunctions = Functions.vectorToArray(this.getModule().PrimitiveFunctionCollection.getInstance().getFunctions());
+    const choices = primitiveFunctions.map(fun => ({
+      text: fun.getName(),
+      nodeMakerFunction: () => {
+        const funCallNode = this.getModule().PrimitiveFunctionCallNode.makeUnique(fun);
         for (const parameter of Functions.vectorToIterable(fun.getParameters())) {
           funCallNode.getArgumentCollection().setArgument(parameter, this.makeZero());
         }

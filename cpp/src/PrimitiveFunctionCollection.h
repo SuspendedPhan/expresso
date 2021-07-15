@@ -11,8 +11,11 @@
 
 class PrimitiveFunctionCollection {
 private:
+    static std::unique_ptr<PrimitiveFunctionCollection> _instance;
     std::vector<std::unique_ptr<PrimitiveFunction>> _primitiveFunctions;
-    void addFunctions();
+public:
+    static const PrimitiveFunctionCollection * getInstance();
+    std::vector<const PrimitiveFunction *> getFunctions() const;
 };
 
 

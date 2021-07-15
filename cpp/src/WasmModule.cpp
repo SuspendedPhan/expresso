@@ -40,6 +40,7 @@ class ParameterNode;
 #include "Car.h"
 #include "FunctionArgumentCollection.h"
 #include "PrimitiveFunctionCallNode.h"
+#include "PrimitiveFunctionCollection.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -127,7 +128,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getOnChangedSignal", &Node::getOnChangedSignal, allow_raw_pointers())
             .function("getOrganism", &Node::getOrganism, allow_raw_pointers())
             .function("getParent", &Node::getParent, allow_raw_pointers())
-            .function("getCalledFunction", &Node::getFunction, allow_raw_pointers())
+            .function("getFunction", &Node::getFunction, allow_raw_pointers())
             .function("getProject", &Node::getProject, allow_raw_pointers())
             ;
 
@@ -175,8 +176,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             ;
 
     class_<PrimitiveFunctionCallNode, base<Node>>("PrimitiveFunctionCallNode")
-            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, PrimitiveFunction *>, allow_raw_pointers())
-            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, std::string, PrimitiveFunction *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, const PrimitiveFunction *>, allow_raw_pointers())
+            .class_function("makeUnique", &make<PrimitiveFunctionCallNode, std::string, const PrimitiveFunction *>, allow_raw_pointers())
             .function("getCalledFunction", &PrimitiveFunctionCallNode::getCalledFunction, allow_raw_pointers())
             .function("getArgumentCollection", &PrimitiveFunctionCallNode::getArgumentCollection, allow_raw_pointers())
             ;
@@ -199,15 +200,29 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("getProject", &Function::getProject, allow_raw_pointers())
             .function("setRootNode", &Function::setRootNode, allow_raw_pointers());
 
+    class_<PrimitiveFunction>("PrimitiveFunction")
+            .function("getName", &PrimitiveFunction::getName)
+            .function("getId", &PrimitiveFunction::getId)
+            .function("getParameters", &PrimitiveFunction::getParameters, allow_raw_pointers())
+            ;
+
     class_<FunctionParameter>("FunctionParameter")
             .class_function("makeUnique", &make<FunctionParameter, std::string>)
             .class_function("makeUnique", &make<FunctionParameter, std::string, std::string>)
             .function("getName", &FunctionParameter::getName)
             .function("getId", &FunctionParameter::getId);
 
+    class_<FunctionParameterCollection>("FunctionParameterCollection")
+            .function("getAll", &FunctionParameterCollection::getAll)
+            ;
+
     class_<FunctionArgumentCollection>("FunctionArgumentCollection")
             .function("setArgument", &FunctionArgumentCollection::setArgument, allow_raw_pointers())
             .function("getArgument", &FunctionArgumentCollection::getArgument, allow_raw_pointers());
+
+    class_<PrimitiveFunctionCollection>("PrimitiveFunctionCollection")
+            .class_function("getInstance", &PrimitiveFunctionCollection::getInstance, allow_raw_pointers())
+            .function("getFunctions", &PrimitiveFunctionCollection::getFunctions);
 
     class_<EvalContext>("EvalContext")
             .class_function("makeUnique", &make<EvalContext>, allow_raw_pointers())
@@ -276,6 +291,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<AttributeOutput *>("AttributeOutputVector");
     register_vector<FunctionParameter *>("FunctionParameterVector");
     register_vector<const FunctionParameter *>("FunctionParameterVectorConst");
+    register_vector<const PrimitiveFunction *>("PrimitiveFunctionVector");
     register_vector<Function *>("FunctionVector");
     register_vector<FakeBook *>("FakeBookVector");
     register_map<const FunctionParameter *, Node *>("FunctionParameterToNode");

@@ -18,7 +18,7 @@ float PrimitiveFunctionCallNode::eval(const EvalContext &evalContext, NodeEvalCo
     return answer;
 }
 
-PrimitiveFunction *PrimitiveFunctionCallNode::getCalledFunction() {
+const PrimitiveFunction *PrimitiveFunctionCallNode::getCalledFunction() const {
     return _primitiveFunction;
 }
 
@@ -26,8 +26,8 @@ FunctionArgumentCollection *PrimitiveFunctionCallNode::getArgumentCollection() {
     return &_arguments;
 }
 
-PrimitiveFunctionCallNode::PrimitiveFunctionCallNode(PrimitiveFunction *primitiveFunction) : _primitiveFunction(
+PrimitiveFunctionCallNode::PrimitiveFunctionCallNode(const PrimitiveFunction *primitiveFunction) : _primitiveFunction(
         primitiveFunction) {}
 
-PrimitiveFunctionCallNode::PrimitiveFunctionCallNode(const std::string &id, PrimitiveFunction *primitiveFunction)
+PrimitiveFunctionCallNode::PrimitiveFunctionCallNode(const std::string &id, const PrimitiveFunction *primitiveFunction)
         : Node(id), _primitiveFunction(primitiveFunction) {}

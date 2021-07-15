@@ -163,7 +163,7 @@ public:
 
 class FunctionCallNode : public Node {
 private:
-    FunctionArgumentCollection _arguments{};
+    FunctionArgumentCollection _arguments = FunctionArgumentCollection(this);
 public:
     Function * _function;
 

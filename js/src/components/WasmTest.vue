@@ -120,8 +120,8 @@ export default class WasmTest extends Vue {
     // const liveProject = liveStore.projects[0];
     // this.project = liveProject;
 
-    // const store = Store.makeDefault(module);
-    const store = Store.loadOrMake(module);
+    const store = Store.makeDefault(module);
+    // const store = Store.loadOrMake(module);
     this.store = store;
     this.project = store.getProjects()[0];
     const project: any = this.project;
@@ -140,7 +140,16 @@ export default class WasmTest extends Vue {
     const bParameter = module.FunctionParameter.makeUnique("b");
     const aParameterNode = module.ParameterNode.makeUnique(aParameter);
     const bParameterNode = module.ParameterNode.makeUnique(bParameter);
-    const addNode = module.AddOpNode.makeUnique(aParameterNode, bParameterNode);
+
+    const primitiveFunctions = Functions.vectorToArray(module.PrimitiveFunctionCollection.getInstance().getFunctions());
+    const addFunction = primitiveFunctions.find(t => t.getName() === "+");
+    console.log(primitiveFunctions);
+    console.log(addFunction);
+    const addNode = module.PrimitiveFunctionCallNode.makeUnique(addFunction);
+    const parameters = Functions.vectorToArray(addFunction.getParameters().getAll());
+    addNode.getArgumentCollection().setArgument(parameters[0], aParameterNode);
+    addNode.getArgumentCollection().setArgument(parameters[1], bParameterNode);
+
     const twoNode = module.NumberNode.makeUnique(2);
     const divNode = module.DivOpNode.makeUnique(addNode, twoNode);
     const fun = module.Function.makeUnique("Average");

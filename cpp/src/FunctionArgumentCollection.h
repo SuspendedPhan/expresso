@@ -14,8 +14,11 @@ class Node;
 
 class FunctionArgumentCollection {
 private:
+    Node * _owner;
     std::map<const FunctionParameter *, std::unique_ptr<Node>> _argumentByParameter;
 public:
+    explicit FunctionArgumentCollection(Node *owner);
+
     void setArgument(const FunctionParameter * parameter, std::unique_ptr<Node> node);
     Node * getArgument(const FunctionParameter * parameter);
 };
