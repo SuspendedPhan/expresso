@@ -6,6 +6,7 @@
 #include "PrimitiveFunction.h"
 
 float PrimitiveFunctionCallNode::eval(const EvalContext &evalContext, NodeEvalContext &nodeEvalContext) {
+    std::map<const FunctionParameter *, Value>
     for (const auto &parameter : _primitiveFunction->getParameters()->getAll()) {
         const auto &argument = _arguments.getArgument(parameter);
         nodeEvalContext.valueByParameter[parameter] = argument->eval(evalContext, nodeEvalContext);

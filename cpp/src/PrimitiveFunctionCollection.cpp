@@ -64,6 +64,8 @@ const PrimitiveFunctionCollection *PrimitiveFunctionCollection::getInstance() {
         const auto a = addParameter(parameters, "a");
         const auto b = addParameter(parameters, "b");
         const auto eval = [&](std::map<const FunctionParameter *, Value> args) {
+            std::cout << "args[a] " << args[a] << std::endl;
+            std::cout << "args[b] " << args[b] << std::endl;
             return args[a] + args[b];
         };
         const auto name = "+";
