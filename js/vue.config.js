@@ -19,6 +19,12 @@ module.exports = {
           type: "javascript/auto",
           loader: "file-loader"
         },
+        {
+          test: /mymodule\.wasm$/,
+          // test: /WasmModule\.wasm$|WasmModule\.js$/,
+          type: "javascript/auto",
+          loader: "file-loader"
+        },
         // {
         //   test: /WasmModule\.js$/,
         //   loader: "exports-loader",
