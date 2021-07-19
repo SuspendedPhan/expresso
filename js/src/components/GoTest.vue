@@ -1,6 +1,6 @@
 <template>
   <div>
-    <GoNode v-if="isReady"/>
+    <GoNode v-if="setupRootNode !== null" :setupFunc="setupRootNode" />
   </div>
 </template>
 
@@ -18,12 +18,13 @@ export default {
   components: {GoNode},
   setup() {
     const go = new Go();
-    const isReady = ref(false);
+    const setupRootNode = ref(null);
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
-      isReady.value = true;
+      setupRootNode.value = () => GoModule.setupRootNode(ref);
     });
-    return {isReady};
+
+    return {setupRootNode};
   }
 }
 </script>
