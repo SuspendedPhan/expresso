@@ -27,6 +27,8 @@ function argToInvokeArg(arg: any) {
   }
 }
 
+const proxyById = new Map();
+
 const proxyHandler = {
   get: function (target: ProxyData, prop, receiver) {
     if (prop === "$$objectId") {
@@ -40,7 +42,22 @@ const proxyHandler = {
         methodName: prop,
         args: invokeArgs
       };
-      return window.invoke(invokeData);
+      const returnData = window.GoModule.invokeFunc(invokeData);
+      if (returnData === undefined) {
+        return undefined;
+      }
+
+      if (returnData.objectId !== undefined) {
+        if (!proxyById.has(returnData.objectId)) {
+          proxyById.set(returnData.objectId, GoProxy.make(returnData.objectId));
+        }
+        return proxyById.get(returnData.objectId);
+      } else if (returnData.primitive !== undefined) {
+        return returnData.primitive;
+      } else {
+        console.error("return error");
+        return undefined;
+      }
     }
   }
 }
@@ -51,6 +68,8 @@ export default class GoProxy {
       objectId
     };
 
-    return new Proxy(data, proxyHandler);
+    const proxy = new Proxy(data, proxyHandler);
+    proxyById.set(objectId, proxy);
+    return proxy;
   }
 }
