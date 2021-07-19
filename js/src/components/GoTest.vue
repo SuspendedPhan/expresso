@@ -1,32 +1,29 @@
 <template>
-  <div></div>
+  <div>
+    <GoNode v-if="isReady"/>
+  </div>
 </template>
 
 <script lang="ts">
 import GoModuleWasm from "../../public/mymodule.wasm";
 import GoProxy from "@/code/GoProxy";
 import Gom from "@/code/Gom";
-import {onMounted, onUnmounted} from "@vue/composition-api";
+import {onMounted, onUnmounted, ref} from "@vue/composition-api";
+import GoNode from "@/components/GoNode.vue";
 
 declare var Go: any;
 
 export default {
   name: "GoTest",
+  components: {GoNode},
   setup() {
     const go = new Go();
+    const isReady = ref(false);
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
-      const frog = Gom.NewFrog();
-      console.log(frog.Quack());
-      console.log(frog.AddOne(10));
-      console.log(frog.Jump());
-      console.log(frog.JumpCount());
-
-      const friend = Gom.NewFrog();
-      console.log(friend.Quack());
-      frog.SetFriend(friend);
-      console.log(frog.GetFriend().JumpCount());
+      isReady.value = true;
     });
+    return {isReady};
   }
 }
 </script>
