@@ -1,6 +1,6 @@
 <template>
   <div>
-    <GoNode v-if="setupRootNode !== null" :setupFunc="setupRootNode" />
+    <GoAttribute v-if="setupRootAttribute !== null" :setupFunc="setupRootAttribute" />
   </div>
 </template>
 
@@ -8,23 +8,23 @@
 import GoModuleWasm from "../../public/mymodule.wasm";
 import GoProxy from "@/code/GoProxy";
 import Gom from "@/code/Gom";
-import {onMounted, onUnmounted, ref} from "@vue/composition-api";
-import GoNode from "@/components/GoNode.vue";
+import {computed, onMounted, onUnmounted, ref, watch} from "@vue/composition-api";
+import GoAttribute from "@/components/GoAttribute.vue";
 
 declare var Go: any;
 
 export default {
   name: "GoTest",
-  components: {GoNode},
+  components: {GoAttribute},
   setup() {
     const go = new Go();
-    const setupRootNode = ref(null);
+    const setupRootAttribute = ref(null);
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
-      setupRootNode.value = () => GoModule.setupRootNode(ref);
+      setupRootAttribute.value = () => GoModule.setupRootAttribute(ref, watch, computed);
     });
 
-    return {setupRootNode};
+    return {setupRootAttribute};
   }
 }
 </script>

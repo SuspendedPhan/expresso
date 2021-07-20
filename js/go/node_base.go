@@ -1,8 +1,14 @@
 package main
 
 type NodeBase struct {
-	Name
-	parentNode Node
+	Id
+	parentNode        Node
+	onChildrenChanged chan struct{}
+	attribute         *Attribute
+}
+
+func (n2 *NodeBase) getOnChildrenChanged() <-chan struct{} {
+	return n2.onChildrenChanged
 }
 
 func (n2 *NodeBase) setParentNode(n Node) {
@@ -11,4 +17,12 @@ func (n2 *NodeBase) setParentNode(n Node) {
 
 func (n2 NodeBase) getParentNode() Node {
 	return n2.parentNode
+}
+
+func (n2 *NodeBase) setAttribute(a *Attribute) {
+	n2.attribute = a
+}
+
+func (n2 *NodeBase) getAttribute() *Attribute {
+	return n2.attribute
 }
