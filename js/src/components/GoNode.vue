@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="p-8">
     <div>{{id}}</div>
     <div>{{text}}</div>
     <input v-model="nodeChoiceQuery" />
@@ -7,6 +7,7 @@
       <div>{{nodeChoice.text}}</div>
       <button @click="nodeChoice.commit">Commit</button>
     </div>
+    <GoNode v-for="child in children" :key="child.id" :setup-func="child.setupFunc">{{child}}</GoNode>
   </div>
 </template>
 
@@ -18,7 +19,9 @@ export default {
     setupFunc: {}
   },
   setup(props) {
-    return props.setupFunc();
+    const upFunc = props.setupFunc();
+    console.log(upFunc);
+    return upFunc;
   }
 }
 </script>

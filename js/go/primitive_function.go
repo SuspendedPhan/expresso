@@ -3,6 +3,7 @@ package main
 var primitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
+	Name
 	parameters  []*Parameter
 	evalFunctor func(args []float32) float32
 }
@@ -29,6 +30,7 @@ func addPrimitiveFunction(name string, parameterNames []string, evalFunctor func
 	function := PrimitiveFunction{
 		evalFunctor: evalFunctor,
 	}
+	function.setName(name)
 	for _, parameterName := range parameterNames {
 		function.parameters = append(function.parameters, &Parameter{Name{parameterName}})
 	}

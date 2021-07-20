@@ -2,13 +2,19 @@ package main
 
 type NodeBase struct {
 	Id
-	parentNode        Node
-	onChildrenChanged chan struct{}
-	attribute         *Attribute
+	parentNode      Node
+	onChildReplaced chan struct{}
+	attribute       *Attribute
 }
 
-func (n2 *NodeBase) getOnChildrenChanged() <-chan struct{} {
-	return n2.onChildrenChanged
+func NewNodeBase() NodeBase {
+	base := NodeBase{}
+	base.onChildReplaced = make(chan struct{})
+	return base
+}
+
+func (n2 *NodeBase) getOnChildReplaced() <-chan struct{} {
+	return n2.onChildReplaced
 }
 
 func (n2 *NodeBase) setParentNode(n Node) {

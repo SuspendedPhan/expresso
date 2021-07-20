@@ -1,25 +1,26 @@
 package main
 
+import "fmt"
+
 type Node interface {
-	eval() float32
+	eval() float
 	replaceChild(old Node, new Node)
 	getParentNode() Node
 	setParentNode(n Node)
 	getId() string
-	getOnChildrenChanged() <-chan struct{}
+	getOnChildReplaced() <-chan struct{}
 	setAttribute(a *Attribute)
 	getAttribute() *Attribute
 	getText() string
+	getChildren() []Node
 }
 
 func replace(old Node, new Node) {
 	parentNode := old.getParentNode()
-	println("replace")
+	fmt.Printf("%+v\n", old)
 	if parentNode == nil {
-		println("nil")
 		old.getAttribute().setRootNode(new)
 	} else {
-		println("not nil")
 		parentNode.replaceChild(old, new)
 	}
 }
