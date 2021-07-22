@@ -8,12 +8,12 @@ import (
 type float = float32
 
 type NumberNode struct {
-	value float
+	Value float
 	NodeBase
 }
 
 func NewNumberNode(value float) NumberNode {
-	node := NumberNode{value: value, NodeBase: NewNodeBase()}
+	node := NumberNode{Value: value, NodeBase: NewNodeBase()}
 	node.setId(uuid.NewString())
 	return node
 }
@@ -23,14 +23,18 @@ func (n2 *NumberNode) replaceChild(old Node, new Node) {
 }
 
 func (n NumberNode) eval() float {
-	return n.value
+	return n.Value
 }
 
 func (n2 *NumberNode) getText() string {
-	text := fmt.Sprintf("x = %.6f\n", n2.value)
-	return text
+	return numberToString(n2.Value)
 }
 
 func (n2 NumberNode) getChildren() []Node {
 	return []Node{}
+}
+
+func numberToString(number float) string {
+	text := fmt.Sprintf("x = %.6f\n", number)
+	return text
 }

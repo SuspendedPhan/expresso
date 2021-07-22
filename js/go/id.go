@@ -1,13 +1,13 @@
 package main
 
 type Id struct {
-	id string
+	Id string
 }
 
 func (i Id) getId() string {
-	return i.id
+	return i.Id
 }
 
 func (i *Id) setId(id string) {
-	i.id = id
+	i.Id = id
 }

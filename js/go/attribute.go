@@ -1,7 +1,7 @@
 package main
 
 type Attribute struct {
-	rootNode Node
+	RootNode Node
 	Name
 	Id
 	onRootNodeChanged chan struct{}
@@ -12,12 +12,12 @@ func NewAttribute() *Attribute {
 }
 
 func (a Attribute) eval() float32 {
-	return a.rootNode.eval()
+	return a.RootNode.eval()
 }
 
 func (a *Attribute) setRootNode(node Node) {
 	node.setAttribute(a)
-	a.rootNode = node
+	a.RootNode = node
 	go func() {
 		a.onRootNodeChanged <- struct{}{}
 	}()

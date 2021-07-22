@@ -1,13 +1,13 @@
 <template>
   <div class="p-8">
-    <div>{{id}}</div>
-    <div>{{text}}</div>
-    <input v-model="nodeChoiceQuery" />
-    <div v-for="nodeChoice in nodeChoices" :key="nodeChoice.index">
-      <div>{{nodeChoice.text}}</div>
-      <button @click="nodeChoice.commit">Commit</button>
+    <div>{{Id}}</div>
+    <div>{{Text}}</div>
+    <input :value="NodeChoiceQuery" @input="OnNodeChoiceQueryInput" />
+    <div v-for="nodeChoice in NodeChoices" :key="nodeChoice.Index">
+      <div>{{nodeChoice.Text}}</div>
+      <button @click="nodeChoice.CommitFunc">Commit</button>
     </div>
-    <GoNode v-for="child in children" :key="child.id" :setup-func="child.setupFunc">{{child}}</GoNode>
+    <GoNode v-for="child in Children" :key="child.Id" :setup-func="child.SetupFunc">{{child}}</GoNode>
   </div>
 </template>
 
