@@ -27,6 +27,6 @@ func makeEmptyArray() js.Value {
 	return js.ValueOf([]interface{}{})
 }
 
-func makeObjectValue() js.Value {
+func makeEmptyObject() js.Value {
 	return js.ValueOf(make(map[string]interface{}))
 }

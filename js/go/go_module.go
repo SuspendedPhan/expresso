@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"syscall/js"
 )
 
@@ -13,21 +12,27 @@ type vue struct {
 
 func bootstrapGoModule() {
 	setupPrimitiveFunctions()
-	goModule := makeObjectValue()
+	setupProtoOrganisms()
+	goModule := makeEmptyObject()
+
+	rootOrganism := NewOrganism()
+	attribute := rootOrganism.addAttribute()
+	node := NewNumberNode(10)
+	attribute.setRootNode(&node)
 
 	goModule.Set("setupRootOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		organism := NewOrganism()
-		attribute := organism.addAttribute()
-		node := NewNumberNode(10)
-		attribute.setRootNode(&node)
 		vue := vue{ref, watch, computed}
-		text, _ := json.Marshal(organism)
-		println(string(text))
-		return setupOrganism(organism, vue)
+		return setupOrganism(rootOrganism, vue)
 	}).Value)
+
+	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		circlePool := args[0]
+		render(circlePool, rootOrganism)
+		return js.Undefined()
+	}))
 
 	js.Global().Set("GoModule", goModule)
 	println("after set")
@@ -40,7 +45,7 @@ func setupOrganism(organism *Organism, vue vue) interface{} {
 		attributes.Set("value", getAttributesArray(organism, vue))
 	})
 
-	returnValue := makeObjectValue()
+	returnValue := makeEmptyObject()
 	returnValue.Set("attributes", attributes)
 	return returnValue
 }
@@ -49,7 +54,7 @@ func getAttributesArray(organism *Organism, vue vue) js.Value {
 	array := makeEmptyArray()
 	for i, element := range organism.Attributes {
 		element := element
-		childValue := makeObjectValue()
+		childValue := makeEmptyObject()
 		childValue.Set("id", element.getId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			return setupAttribute(element, vue)
@@ -60,7 +65,7 @@ func getAttributesArray(organism *Organism, vue vue) js.Value {
 }
 
 func setupAttribute(a *Attribute, vue vue) js.Value {
-	returnValue := makeObjectValue()
+	returnValue := makeEmptyObject()
 	rootNodeId := vue.ref.Invoke(a.RootNode.getId())
 	returnValue.Set("id", a.getId())
 	returnValue.Set("rootNodeId", rootNodeId)

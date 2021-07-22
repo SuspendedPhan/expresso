@@ -18,6 +18,7 @@ import Gom from "@/code/Gom";
 import {computed, onMounted, onUnmounted, ref, watch} from "@vue/composition-api";
 import GoAttribute from "@/components/GoAttribute.vue";
 import GoOrganism from "@/components/GoOrganism.vue";
+import PixiRenderer from "@/code/PixiRenderer";
 
 declare var Go: any;
 
@@ -30,6 +31,8 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
       setupRootOrganism.value = () => GoModule.setupRootOrganism(ref, watch, computed);
+      const renderer = new PixiRenderer(null, null);
+      GoModule.eval(renderer.circlePool);
     });
 
     return {setupRootOrganism};

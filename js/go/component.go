@@ -69,7 +69,7 @@ func toJsValue(object interface{}, vue vue) js.Value {
 }
 
 func structToJsValue(reflectedObject reflect.Value, vue vue) js.Value {
-	value := makeObjectValue()
+	value := makeEmptyObject()
 	for i := 0; i < reflectedObject.Type().NumField(); i++ {
 		if !reflectedObject.Field(i).CanInterface() {
 			continue
