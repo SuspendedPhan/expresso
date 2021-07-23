@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"strings"
 	"syscall/js"
 )
@@ -29,13 +28,6 @@ func setupProtoOrganisms() {
 			},
 		},
 	}
-	spew.Dump(protoCircle)
-}
-
-type ProtoAttribute struct {
-	Id
-	Name
-	customPixiSetter func(pixi js.Value, value float)
 }
 
 type Circle struct {
@@ -50,16 +42,20 @@ type AttributeOutput struct {
 }
 
 type OrganismOutput struct {
-	valueByProtoAttribute map[*ProtoAttribute]float
+	ValueByProtoAttribute map[*ProtoAttribute]float
 }
 
-func render(circlePool js.Value, rootOrganism *Organism) {
+func render(rootOrganism *Organism, circlePool js.Value, circles js.Value) {
 	organismOutput := rootOrganism.eval()
+	for _, circle := range jsArrayToSlice(circles) {
+		circle.Set("visible", false)
+	}
 
 	circle := circlePool.Call("use")
 	defer func() { circlePool.Call("recycle", circle) }()
+	circle.Set("visible", true)
 
-	for protoAttribute, value := range organismOutput.valueByProtoAttribute {
+	for protoAttribute, value := range organismOutput.ValueByProtoAttribute {
 		if protoAttribute.customPixiSetter == nil {
 			circle.Set(strings.ToLower(protoAttribute.name), value)
 		} else {
@@ -67,5 +63,5 @@ func render(circlePool js.Value, rootOrganism *Organism) {
 		}
 	}
 
-	js.Global().Get("console").Call("log", circle)
+	//js.Global().Get("console").Call("log", circle)
 }

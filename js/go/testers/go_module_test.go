@@ -1,8 +1,7 @@
 package testers
 
 import (
-	"fmt"
-	"reflect"
+	"encoding/json"
 	"testing"
 )
 
@@ -10,7 +9,10 @@ type testfrog struct {
 }
 
 func TestName(t *testing.T) {
-	num := 10
-	value := reflect.ValueOf(&num)
-	fmt.Println(value.Type())
+	m := map[string]int{
+		"hi": 2,
+	}
+	marshal, _ := json.Marshal(&m)
+	println(string(marshal))
+
 }

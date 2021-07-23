@@ -16,9 +16,9 @@ func bootstrapGoModule() {
 	goModule := makeEmptyObject()
 
 	rootOrganism := NewOrganism()
-	attribute := rootOrganism.addAttribute()
-	node := NewNumberNode(10)
-	attribute.setRootNode(&node)
+	rootOrganism.addProtoAttribute(protoCircle.X)
+	rootOrganism.addProtoAttribute(protoCircle.Y)
+	rootOrganism.addProtoAttribute(protoCircle.Radius)
 
 	goModule.Set("setupRootOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
@@ -30,7 +30,8 @@ func bootstrapGoModule() {
 
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		circlePool := args[0]
-		render(circlePool, rootOrganism)
+		circles := args[1]
+		render(rootOrganism, circlePool, circles)
 		return js.Undefined()
 	}))
 
@@ -52,7 +53,7 @@ func setupOrganism(organism *Organism, vue vue) interface{} {
 
 func getAttributesArray(organism *Organism, vue vue) js.Value {
 	array := makeEmptyArray()
-	for i, element := range organism.Attributes {
+	for i, element := range organism.PlayerAttributes {
 		element := element
 		childValue := makeEmptyObject()
 		childValue.Set("id", element.getId())
