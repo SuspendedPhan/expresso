@@ -1,10 +1,10 @@
-package main
+package ast
 
 type Id struct {
 	Id string
 }
 
-func (i Id) getId() string {
+func (i Id) GetId() string {
 	return i.Id
 }
 

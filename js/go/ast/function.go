@@ -1,4 +1,4 @@
-package main
+package ast
 
 type Function struct {
 	Name
@@ -8,7 +8,7 @@ type Function struct {
 
 func (f *Function) addParameter(s string) Parameter {
 	parameter := Parameter{}
-	parameter.setName(s)
+	parameter.SetName(s)
 	f.parameters = append(f.parameters, &parameter)
 	return parameter
 }

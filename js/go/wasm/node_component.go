@@ -1,6 +1,7 @@
-package main
+package wasm
 
 import (
+	"expressionista/ast"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -21,17 +22,17 @@ type NodeChoice struct {
 	CommitFunc func()
 }
 
-func setupNode(node Node, vue vue) js.Value {
+func setupNode(node ast.Node, vue vue) js.Value {
 	nodeChoicesChan := make(chan []js.Value)
 	childrenChan := make(chan []js.Value)
 	nodeChoiceQueryChan := make(chan string)
 
 	component := NodeComponent{
 		Component: Component{
-			Id:        node.getId(),
+			Id:        node.GetId(),
 			SetupFunc: nil,
 		},
-		Text:            node.getText(),
+		Text:            node.GetText(),
 		NodeChoiceQuery: StringRef{nodeChoiceQueryChan},
 		NodeChoices:     ArrayRef{nodeChoicesChan},
 		Children:        ArrayRef{childrenChan},
@@ -39,27 +40,27 @@ func setupNode(node Node, vue vue) js.Value {
 			query := event.Get("target").Get("value").String()
 			nodeChoices := make([]*NodeChoice, 0)
 			if number64, err := strconv.ParseFloat(query, 32); err == nil {
-				number := float(number64)
+				number := ast.Float(number64)
 				nodeChoice := &NodeChoice{
-					Text: numberToString(number),
+					Text: ast.NumberToString(number),
 					CommitFunc: func() {
-						numberNode := NewNumberNode(number)
-						replace(node, &numberNode)
+						numberNode := ast.NewNumberNode(number)
+						ast.Replace(node, &numberNode)
 					},
 				}
 				nodeChoices = append(nodeChoices, nodeChoice)
 			}
 
-			for _, function := range primitiveFunctions {
-				if !strings.Contains(strings.ToLower(function.name), strings.ToLower(query)) {
+			for _, function := range ast.PrimitiveFunctions {
+				if !strings.Contains(strings.ToLower(function.GetName()), strings.ToLower(query)) {
 					continue
 				}
 				function := function
 				nodeChoice := &NodeChoice{
-					Text: function.name,
+					Text: function.GetName(),
 					CommitFunc: func() {
-						newNode := NewPrimitiveFunctionCallNode(function)
-						replace(node, newNode)
+						newNode := ast.NewPrimitiveFunctionCallNode(function)
+						ast.Replace(node, newNode)
 					},
 				}
 				nodeChoices = append(nodeChoices, nodeChoice)
@@ -84,19 +85,19 @@ func setupNode(node Node, vue vue) js.Value {
 	}()
 
 	go forever(func() {
-		<-node.getOnChildReplaced()
+		<-node.GetOnChildReplaced()
 		childrenChan <- getNodeChildren(node, vue)
 	})
 
 	return toJsValue(component, vue)
 }
 
-func getNodeChildren(node Node, vue vue) []js.Value {
+func getNodeChildren(node ast.Node, vue vue) []js.Value {
 	elements := make([]js.Value, 0)
-	for _, child := range node.getChildren() {
+	for _, child := range node.GetChildren() {
 		child := child
 		childComponent := Component{
-			Id: child.getId(),
+			Id: child.GetId(),
 			SetupFunc: func() js.Value {
 				return setupNode(child, vue)
 			},

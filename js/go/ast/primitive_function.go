@@ -1,6 +1,6 @@
-package main
+package ast
 
-var primitiveFunctions = map[string]*PrimitiveFunction{}
+var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
 	Name
@@ -8,7 +8,7 @@ type PrimitiveFunction struct {
 	evalFunctor func(args []float32) float32
 }
 
-func setupPrimitiveFunctions() {
+func SetupPrimitiveFunctions() {
 	addPrimitiveFunction("+", []string{"a", "b"}, func(args []float32) float32 {
 		return args[0] + args[1]
 	})
@@ -30,9 +30,9 @@ func addPrimitiveFunction(name string, parameterNames []string, evalFunctor func
 	function := PrimitiveFunction{
 		evalFunctor: evalFunctor,
 	}
-	function.setName(name)
+	function.SetName(name)
 	for _, parameterName := range parameterNames {
 		function.parameters = append(function.parameters, &Parameter{Name{parameterName}})
 	}
-	primitiveFunctions[name] = &function
+	PrimitiveFunctions[name] = &function
 }

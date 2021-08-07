@@ -1,4 +1,4 @@
-package main
+package ast
 
 type FunctionCallNode struct {
 	function            Function

@@ -1,4 +1,4 @@
-package main
+package ast
 
 type ParameterNode struct {
 	parameter Parameter

@@ -1,6 +1,7 @@
-package main
+package wasm
 
 import (
+	"expressionista/ast"
 	"syscall/js"
 )
 
@@ -11,14 +12,14 @@ type vue struct {
 }
 
 func bootstrapGoModule() {
-	setupPrimitiveFunctions()
-	setupProtoOrganisms()
+	ast.SetupPrimitiveFunctions()
+	ast.SetupProtoOrganisms()
 	goModule := makeEmptyObject()
 
-	rootOrganism := NewOrganism()
-	rootOrganism.addProtoAttribute(protoCircle.X)
-	rootOrganism.addProtoAttribute(protoCircle.Y)
-	rootOrganism.addProtoAttribute(protoCircle.Radius)
+	rootOrganism := ast.NewOrganism()
+	rootOrganism.AddProtoAttribute(ast.ProtoCircle.X)
+	rootOrganism.AddProtoAttribute(ast.ProtoCircle.Y)
+	rootOrganism.AddProtoAttribute(ast.ProtoCircle.Radius)
 
 	goModule.Set("setupRootOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
@@ -39,10 +40,10 @@ func bootstrapGoModule() {
 	println("after set")
 }
 
-func setupOrganism(organism *Organism, vue vue) interface{} {
+func setupOrganism(organism *ast.Organism, vue vue) interface{} {
 	attributes := vue.ref.Invoke()
 	attributes.Set("value", getAttributesArray(organism, vue))
-	organism.onAttributesChanged.on(func() {
+	organism.OnAttributesChanged.On(func() {
 		attributes.Set("value", getAttributesArray(organism, vue))
 	})
 
@@ -51,12 +52,12 @@ func setupOrganism(organism *Organism, vue vue) interface{} {
 	return returnValue
 }
 
-func getAttributesArray(organism *Organism, vue vue) js.Value {
+func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
 	array := makeEmptyArray()
 	for i, element := range organism.PlayerAttributes {
 		element := element
 		childValue := makeEmptyObject()
-		childValue.Set("id", element.getId())
+		childValue.Set("id", element.GetId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			return setupAttribute(element, vue)
 		}))
@@ -65,10 +66,10 @@ func getAttributesArray(organism *Organism, vue vue) js.Value {
 	return array
 }
 
-func setupAttribute(a *Attribute, vue vue) js.Value {
+func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	returnValue := makeEmptyObject()
-	rootNodeId := vue.ref.Invoke(a.RootNode.getId())
-	returnValue.Set("id", a.getId())
+	rootNodeId := vue.ref.Invoke(a.RootNode.GetId())
+	returnValue.Set("id", a.GetId())
 	returnValue.Set("rootNodeId", rootNodeId)
 	rootNodeSetupFunc := vue.ref.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue)
@@ -76,8 +77,8 @@ func setupAttribute(a *Attribute, vue vue) js.Value {
 	returnValue.Set("rootNodeSetupFunc", rootNodeSetupFunc)
 
 	go forever(func() {
-		<-a.onRootNodeChanged
-		rootNodeId.Set("value", a.RootNode.getId())
+		<-a.OnRootNodeChanged
+		rootNodeId.Set("value", a.RootNode.GetId())
 	})
 
 	return returnValue

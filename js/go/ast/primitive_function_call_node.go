@@ -1,4 +1,4 @@
-package main
+package ast
 
 import "github.com/google/uuid"
 
@@ -8,41 +8,41 @@ type PrimitiveFunctionCallNode struct {
 	argumentByParameter map[*Parameter]Node
 }
 
-func (p PrimitiveFunctionCallNode) getText() string {
-	return p.function.getName()
+func (p PrimitiveFunctionCallNode) GetText() string {
+	return p.function.GetName()
 }
 
-func (p PrimitiveFunctionCallNode) eval() float {
+func (p PrimitiveFunctionCallNode) Eval() Float {
 	assert(len(p.argumentByParameter) == len(p.function.parameters))
 
-	args := make([]float, 0)
+	args := make([]Float, 0)
 	for _, parameter := range p.function.parameters {
-		arg := p.argumentByParameter[parameter].eval()
+		arg := p.argumentByParameter[parameter].Eval()
 		args = append(args, arg)
 	}
 	return p.function.evalFunctor(args)
 }
 
-func (p *PrimitiveFunctionCallNode) replaceChild(old Node, new Node) {
+func (p *PrimitiveFunctionCallNode) ReplaceChild(old Node, new Node) {
 	println("replace child")
 	for parameter, node := range p.argumentByParameter {
 		if node == old {
-			p.setArgument(parameter, new)
+			p.SetArgument(parameter, new)
 			return
 		}
 	}
 	assert(false)
 }
 
-func (p *PrimitiveFunctionCallNode) setArgument(parameter *Parameter, node Node) {
+func (p *PrimitiveFunctionCallNode) SetArgument(parameter *Parameter, node Node) {
 	p.argumentByParameter[parameter] = node
-	node.setParentNode(p)
+	node.SetParentNode(p)
 	go func() {
 		p.onChildReplaced <- struct{}{}
 	}()
 }
 
-func (n2 PrimitiveFunctionCallNode) getChildren() []Node {
+func (n2 PrimitiveFunctionCallNode) GetChildren() []Node {
 	children := make([]Node, 0)
 	for _, parameter := range n2.function.parameters {
 		children = append(children, n2.argumentByParameter[parameter])
@@ -58,7 +58,7 @@ func NewPrimitiveFunctionCallNode(function *PrimitiveFunction) *PrimitiveFunctio
 	}
 	for _, parameter := range function.parameters {
 		numberNode := NewNumberNode(0)
-		node.setArgument(parameter, &numberNode)
+		node.SetArgument(parameter, &numberNode)
 	}
 	node.setId(uuid.NewString())
 	return &node

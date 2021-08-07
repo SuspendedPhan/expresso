@@ -1,4 +1,4 @@
-package main
+package ast
 
 type NodeBase struct {
 	Id
@@ -13,22 +13,22 @@ func NewNodeBase() NodeBase {
 	return base
 }
 
-func (n2 *NodeBase) getOnChildReplaced() <-chan struct{} {
+func (n2 *NodeBase) GetOnChildReplaced() <-chan struct{} {
 	return n2.onChildReplaced
 }
 
-func (n2 *NodeBase) setParentNode(n Node) {
+func (n2 *NodeBase) SetParentNode(n Node) {
 	n2.parentNode = n
 }
 
-func (n2 NodeBase) getParentNode() Node {
+func (n2 NodeBase) GetParentNode() Node {
 	return n2.parentNode
 }
 
-func (n2 *NodeBase) setAttribute(a *Attribute) {
+func (n2 *NodeBase) SetAttribute(a *Attribute) {
 	n2.attribute = a
 }
 
-func (n2 *NodeBase) getAttribute() *Attribute {
+func (n2 *NodeBase) GetAttribute() *Attribute {
 	return n2.attribute
 }

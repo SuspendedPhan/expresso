@@ -1,4 +1,4 @@
-package main
+package ast
 
 //
 //type Expr struct {
@@ -26,8 +26,8 @@ package main
 //	assert(found)
 //	parameters := function.parameters
 //	node := PrimitiveFunctionCallNode{function: function, argumentByParameter: make(map[*Parameter]Node)}
-//	node.setArgument(parameters[0], e.node)
-//	node.setArgument(parameters[1], a.node)
+//	node.SetArgument(parameters[0], e.node)
+//	node.SetArgument(parameters[1], a.node)
 //	return Expr{&node}
 //}
 //

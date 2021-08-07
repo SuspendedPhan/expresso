@@ -1,4 +1,4 @@
-package main
+package ast
 
 type Subscriber struct {
 	channel chan struct{}
@@ -9,7 +9,7 @@ type Signal struct {
 	subscribers map[*Subscriber]*Subscriber
 }
 
-func (sig *Signal) on(callback func()) (off func()) {
+func (sig *Signal) On(callback func()) (off func()) {
 	subscriber := &Subscriber{
 		channel: make(chan struct{}),
 		functor: callback,

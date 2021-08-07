@@ -1,4 +1,4 @@
-package main
+package ast
 
 import (
 	"syscall/js"
@@ -7,5 +7,5 @@ import (
 type ProtoAttribute struct {
 	Id
 	Name
-	customPixiSetter func(pixi js.Value, value float)
+	CustomPixiSetter func(pixi js.Value, value Float)
 }

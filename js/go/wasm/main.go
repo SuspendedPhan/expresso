@@ -1,6 +1,7 @@
-package main
+package wasm
 
 import (
+	"expressionista/ast"
 	"math"
 	"reflect"
 )
@@ -23,7 +24,7 @@ func main() {
 	<-c
 	return
 
-	setupPrimitiveFunctions()
+	ast.SetupPrimitiveFunctions()
 	//
 	//function := Function{}
 	//function.setName("Lerp")
