@@ -19,7 +19,8 @@ func (f FunctionCallNode) Eval(evalContext *EvalContext) Float {
 		evalContext.argumentValueByParameter[parameter] = argumentNode.Eval(evalContext)
 	}
 
-	answer := f.function.rootNode.Eval(evalContext)
+	rootNode := f.function.rootNode
+	answer := rootNode.Eval(evalContext)
 
 	for parameter := range f.argumentByParameter {
 		delete(evalContext.argumentValueByParameter, parameter)

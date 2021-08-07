@@ -43,3 +43,14 @@ type Circle struct {
 	Y      *protos.ProtoAttribute
 	Radius *protos.ProtoAttribute
 }
+
+func NewOrganismOutput() *OrganismOutput {
+	return &OrganismOutput{make([]*CloneOutput, 0)}
+}
+
+func NewCloneOutput() *CloneOutput {
+	return &CloneOutput{
+		ValueByProtoAttribute: make(map[*protos.ProtoAttribute]Float),
+		SuborganismOutputs:    make([]*OrganismOutput, 0),
+	}
+}

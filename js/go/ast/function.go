@@ -16,7 +16,7 @@ func (f *Function) addParameter(s string) *FunctionParameter {
 	return parameter
 }
 
-func (f Function) setRootNode(node Node) {
+func (f *Function) setRootNode(node Node) {
 	f.rootNode = node
 }
 

@@ -1,11 +1,9 @@
 package ast
 
 import (
-	"encoding/json"
 	"expressionista/common"
 	"expressionista/protos"
 	"github.com/google/uuid"
-	"syscall"
 )
 
 type Organism struct {
@@ -13,14 +11,17 @@ type Organism struct {
 	PlayerAttributes                   []*Attribute
 	IntrinsicAttributeByProtoAttribute map[*protos.ProtoAttribute]*IntrinsicAttribute
 	OnAttributesChanged                *Signal
+	Suborganisms                       []*Organism
 }
 
 func NewOrganism() *Organism {
-	o := &Organism{}
+	o := &Organism{Suborganisms: make([]*Organism, 0)}
 	o.SetId(uuid.NewString())
 	o.OnAttributesChanged = NewSignal()
 	o.IntrinsicAttributeByProtoAttribute = make(map[*protos.ProtoAttribute]*Attribute)
-	o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute] = NewAttribute()
+	clonesAttribute := NewAttribute()
+	clonesAttribute.setRootNode(NewNumberNode(1))
+	o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute] = clonesAttribute
 	return o
 }
 
@@ -30,22 +31,29 @@ func (o *Organism) AddAttribute() *Attribute {
 	return attribute
 }
 
-func (o *Organism) Eval(ctx *EvalContext) OrganismOutput {
-	clones := o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].eval(ctx)
+func (o *Organism) Eval(ctx *EvalContext) *OrganismOutput {
+	clonesAttribute := o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute]
+	clones := clonesAttribute.eval(ctx)
+	organismOutput := NewOrganismOutput()
 	for i := 0; i < int(clones); i++ {
+		ctx.cloneNumberByOrganism[o] = Float(i)
 		cloneOutput := NewCloneOutput()
-		for _, attribute := range o.getEvalableAttributes() {
+		for protoAttribute, attribute := range o.IntrinsicAttributeByProtoAttribute {
+			if attribute == clonesAttribute {
+				continue
+			}
 			value := attribute.eval(ctx)
-
+			cloneOutput.ValueByProtoAttribute[protoAttribute] = value
 		}
-	}
-}
 
-func NewCloneOutput() *CloneOutput {
-	return &CloneOutput{
-		ValueByProtoAttribute: make(map[*protos.ProtoAttribute]Float),
-		SuborganismOutputs:    make([]*OrganismOutput, 0),
+		for _, suborganism := range o.Suborganisms {
+			suborganismOutput := suborganism.Eval(ctx)
+			cloneOutput.SuborganismOutputs = append(cloneOutput.SuborganismOutputs, suborganismOutput)
+		}
+		organismOutput.CloneOutputs = append(organismOutput.CloneOutputs, cloneOutput)
 	}
+	delete(ctx.cloneNumberByOrganism, o)
+	return organismOutput
 }
 
 func (o *Organism) EvalBak() OrganismOutput {
@@ -63,14 +71,6 @@ func (o *Organism) AddIntrinsicAttribute(proto *protos.ProtoAttribute) {
 	attribute.setRootNode(rootNode)
 	attribute.Name = proto.Name
 	o.IntrinsicAttributeByProtoAttribute[proto] = attribute
-}
-
-func (a Organism) MarshalJSON() ([]byte, error) {
-	return json.Marshal(a)
-}
-
-func (a *Organism) UnmarshalJSON(b []byte) error {
-	return nil
 }
 
 func NewOrganismFromProto(proto *protos.ProtoOrganism) *Organism {
@@ -94,4 +94,8 @@ func (o *Organism) getEvalableAttributes() []EvalableAttribute {
 		attributes = append(attributes, attribute)
 	}
 	return attributes
+}
+
+func (o *Organism) AddSuborganism(organism *Organism) {
+	o.Suborganisms = append(o.Suborganisms, organism)
 }

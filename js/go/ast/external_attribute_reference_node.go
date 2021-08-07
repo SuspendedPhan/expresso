@@ -5,8 +5,11 @@ type ExternalAttributeReferenceNode struct {
 	ExternalAttribute *ExternalAttribute
 }
 
-func (e ExternalAttributeReferenceNode) Eval(*EvalContext) Float {
-	panic("implement me")
+func (e ExternalAttributeReferenceNode) Eval(ctx *EvalContext) Value {
+	if value, ok := ctx.valueByExternalAttribute[e.ExternalAttribute]; ok {
+		return value
+	}
+	panic("external attribute not given")
 }
 
 func (e ExternalAttributeReferenceNode) ReplaceChild(old Node, new Node) {

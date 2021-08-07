@@ -3,13 +3,23 @@ package ast
 import (
 	"expressionista/common"
 	"expressionista/protos"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestName(t *testing.T) {
+	earth, protoRadius, time := CreateUltimateTestProject()
+	context := NewEvalContext()
+	context.valueByExternalAttribute[time] = 5
+	answer := earth.Eval(context)
+	assert.Equal(t, Float(7.5), answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[0].ValueByProtoAttribute[protoRadius])
+	assert.Equal(t, Float(8), answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[1].ValueByProtoAttribute[protoRadius])
+}
+
+func CreateUltimateTestProject() (earth *Organism, protoRadius *protos.ProtoAttribute, time *ExternalAttribute) {
 	SetupPrimitiveFunctions()
 
-	time := NewExternalAttribute("Time")
+	time = NewExternalAttribute("Time")
 
 	addFunction := PrimitiveFunctions["+"]
 	addParam0 := addFunction.parameters[0]
@@ -27,10 +37,10 @@ func TestName(t *testing.T) {
 	averageFunction.setRootNode(divNode)
 
 	protoCircle := protos.NewProtoOrganism()
-	protoRadius := protos.NewProtoAttribute("Radius")
+	protoRadius = protos.NewProtoAttribute("Radius")
 	protoCircle.IntrinsicAttributes = append(protoCircle.IntrinsicAttributes, protoRadius)
 
-	earth := NewOrganism()
+	earth = NewOrganism()
 	intensity := earth.AddAttribute()
 	intensity.SetName("intensity")
 	intensityRootNode := NewPrimitiveFunctionCallNode(addFunction)
@@ -39,6 +49,7 @@ func TestName(t *testing.T) {
 	intensity.setRootNode(intensityRootNode)
 
 	moon := NewOrganismFromProto(protoCircle)
+	earth.AddSuborganism(moon)
 
 	radius, ok := moon.IntrinsicAttributeByProtoAttribute[protoRadius]
 	common.Assert(ok)
@@ -47,12 +58,7 @@ func TestName(t *testing.T) {
 	radiusNode.setArgumentByIndex(1, NewCloneNumberReferenceNode(moon))
 	radius.setRootNode(radiusNode)
 
-	answer := earth.Eval()
-	if answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[0].ValueByProtoAttribute[protoRadius] != 7.5 {
-		t.Error()
-	}
+	moon.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].setRootNode(NewNumberNode(2))
 
-	if answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[1].ValueByProtoAttribute[protoRadius] != 8 {
-		t.Error()
-	}
+	return
 }

@@ -2,10 +2,11 @@ package ast
 
 type CloneNumberReferenceNode struct {
 	NodeBase
+	organism *Organism
 }
 
-func (c CloneNumberReferenceNode) Eval(*EvalContext) Float {
-	panic("implement me")
+func (c CloneNumberReferenceNode) Eval(ctx *EvalContext) Value {
+	return ctx.cloneNumberByOrganism[c.organism]
 }
 
 func (c CloneNumberReferenceNode) ReplaceChild(old Node, new Node) {
@@ -21,6 +22,6 @@ func (c CloneNumberReferenceNode) GetChildren() []Node {
 }
 
 func NewCloneNumberReferenceNode(organism *Organism) *CloneNumberReferenceNode {
-	node := CloneNumberReferenceNode{NewNodeBase()}
+	node := CloneNumberReferenceNode{NodeBase: NewNodeBase(), organism: organism}
 	return &node
 }

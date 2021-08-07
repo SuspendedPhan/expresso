@@ -7,8 +7,8 @@ type AttributeReferenceNode struct {
 	attribute *Attribute
 }
 
-func (a AttributeReferenceNode) Eval(*EvalContext) Float {
-	panic("implement me")
+func (a AttributeReferenceNode) Eval(ctx *EvalContext) Float {
+	return a.attribute.eval(ctx)
 }
 
 func (a AttributeReferenceNode) ReplaceChild(old Node, new Node) {

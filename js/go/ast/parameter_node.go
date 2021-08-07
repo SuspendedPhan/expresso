@@ -6,8 +6,8 @@ type ParameterNode struct {
 	function  Function
 }
 
-func (p ParameterNode) Eval(*EvalContext) Float {
-	panic("implement me")
+func (p ParameterNode) Eval(ctx *EvalContext) Value {
+	return ctx.argumentValueByParameter[p.parameter]
 }
 
 func (p ParameterNode) ReplaceChild(old Node, new Node) {
