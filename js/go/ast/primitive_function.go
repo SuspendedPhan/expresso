@@ -6,7 +6,7 @@ var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
 	common.Name
-	parameters  []*Parameter
+	parameters  []*PrimitiveFunctionParameter
 	evalFunctor func(args []float32) float32
 }
 
@@ -31,10 +31,11 @@ func SetupPrimitiveFunctions() {
 func addPrimitiveFunction(name string, parameterNames []string, evalFunctor func(args []float32) float32) {
 	function := PrimitiveFunction{
 		evalFunctor: evalFunctor,
+		parameters:  make([]*PrimitiveFunctionParameter, 0),
 	}
 	function.SetName(name)
 	for _, parameterName := range parameterNames {
-		function.parameters = append(function.parameters, &Parameter{common.Name{parameterName}})
+		function.parameters = append(function.parameters, &PrimitiveFunctionParameter{common.Name{Name: parameterName}})
 	}
 	PrimitiveFunctions[name] = &function
 }

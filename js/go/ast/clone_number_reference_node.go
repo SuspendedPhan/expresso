@@ -4,7 +4,7 @@ type CloneNumberReferenceNode struct {
 	NodeBase
 }
 
-func (c CloneNumberReferenceNode) Eval() Float {
+func (c CloneNumberReferenceNode) Eval(*EvalContext) Float {
 	panic("implement me")
 }
 

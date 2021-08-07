@@ -5,7 +5,7 @@ type ExternalAttributeReferenceNode struct {
 	ExternalAttribute *ExternalAttribute
 }
 
-func (e ExternalAttributeReferenceNode) Eval() Float {
+func (e ExternalAttributeReferenceNode) Eval(*EvalContext) Float {
 	panic("implement me")
 }
 

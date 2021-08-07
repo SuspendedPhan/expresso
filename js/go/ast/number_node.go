@@ -22,7 +22,7 @@ func (n2 *NumberNode) ReplaceChild(old Node, new Node) {
 	panic("no children")
 }
 
-func (n NumberNode) Eval() Float {
+func (n NumberNode) Eval(*EvalContext) Float {
 	return n.Value
 }
 

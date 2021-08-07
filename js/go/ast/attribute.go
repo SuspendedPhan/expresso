@@ -13,8 +13,8 @@ func NewAttribute() *Attribute {
 	return &Attribute{OnRootNodeChanged: make(chan struct{})}
 }
 
-func (a Attribute) eval() float32 {
-	return a.RootNode.Eval()
+func (a Attribute) eval(evalContext *EvalContext) Value {
+	return a.RootNode.Eval(evalContext)
 }
 
 func (a *Attribute) setRootNode(node Node) {

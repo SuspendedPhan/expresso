@@ -18,9 +18,9 @@ func bootstrapGoModule() {
 	goModule := makeEmptyObject()
 
 	rootOrganism := ast.NewOrganism()
-	rootOrganism.AddProtoAttribute(ast.ProtoCircle.X)
-	rootOrganism.AddProtoAttribute(ast.ProtoCircle.Y)
-	rootOrganism.AddProtoAttribute(ast.ProtoCircle.Radius)
+	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.X)
+	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Y)
+	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Radius)
 
 	goModule.Set("setupRootOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]

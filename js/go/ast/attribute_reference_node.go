@@ -7,7 +7,7 @@ type AttributeReferenceNode struct {
 	attribute *Attribute
 }
 
-func (a AttributeReferenceNode) Eval() Float {
+func (a AttributeReferenceNode) Eval(*EvalContext) Float {
 	panic("implement me")
 }
 

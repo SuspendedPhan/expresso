@@ -17,7 +17,7 @@ func setupPixiSetters() {
 }
 
 func render(rootOrganism *ast.Organism, circlePool js.Value, circles js.Value) {
-	organismOutput := rootOrganism.Eval()
+	organismOutput := rootOrganism.EvalBak()
 	for _, circle := range jsArrayToSlice(circles) {
 		circle.Set("visible", false)
 	}

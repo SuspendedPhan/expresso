@@ -7,6 +7,8 @@ import (
 )
 
 func TestName(t *testing.T) {
+	SetupPrimitiveFunctions()
+
 	time := NewExternalAttribute("Time")
 
 	addFunction := PrimitiveFunctions["+"]
@@ -14,6 +16,15 @@ func TestName(t *testing.T) {
 	addParam1 := addFunction.parameters[1]
 
 	averageFunction := NewFunction("Average")
+	averageFunctionParam0 := averageFunction.addParameter("a")
+	averageFunctionParam1 := averageFunction.addParameter("b")
+	divNode := NewPrimitiveFunctionCallNode(PrimitiveFunctions["/"])
+	addNode := NewPrimitiveFunctionCallNode(PrimitiveFunctions["+"])
+	addNode.SetArgumentByIndex(0, NewParameterNode(averageFunctionParam0))
+	addNode.SetArgumentByIndex(1, NewParameterNode(averageFunctionParam1))
+	divNode.SetArgumentByIndex(0, addNode)
+	divNode.SetArgumentByIndex(1, NewNumberNode(2))
+	averageFunction.setRootNode(divNode)
 
 	protoCircle := protos.NewProtoOrganism()
 	protoRadius := protos.NewProtoAttribute("Radius")

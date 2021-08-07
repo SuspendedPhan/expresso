@@ -5,7 +5,7 @@ import (
 )
 
 type Node interface {
-	Eval() Float
+	Eval(evalContext *EvalContext) Float
 	ReplaceChild(old Node, new Node)
 	GetParentNode() Node
 	SetParentNode(n Node)

@@ -25,13 +25,13 @@ package ast
 //	function, found := primitiveFunctions[primitiveFunctionName]
 //	assert(found)
 //	parameters := function.parameters
-//	node := PrimitiveFunctionCallNode{function: function, argumentByParameter: make(map[*Parameter]Node)}
+//	node := PrimitiveFunctionCallNode{function: function, argumentByParameter: make(map[*PrimitiveFunctionParameter]Node)}
 //	node.SetArgument(parameters[0], e.node)
 //	node.SetArgument(parameters[1], a.node)
 //	return Expr{&node}
 //}
 //
-//func parameterExpr(parameter Parameter) Expr {
+//func parameterExpr(parameter PrimitiveFunctionParameter) Expr {
 //	return Expr{node: ParameterNode{parameter}}
 //}
 //
@@ -52,7 +52,7 @@ package ast
 //}
 //
 //func functionExpr(function Function) FunctionCallExpr {
-//	node := FunctionCallNode{function: function, argumentByParameter: make(map[*Parameter]Node)}
+//	node := FunctionCallNode{function: function, argumentByParameter: make(map[*PrimitiveFunctionParameter]Node)}
 //	return FunctionCallExpr{node}
 //}
 //

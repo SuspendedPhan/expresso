@@ -5,13 +5,14 @@ import "expressionista/common"
 type Function struct {
 	common.Name
 	rootNode   Node
-	parameters []*Parameter
+	parameters []*FunctionParameter
 }
 
-func (f *Function) addParameter(s string) Parameter {
-	parameter := Parameter{}
+func (f *Function) addParameter(s string) *FunctionParameter {
+	parameter := &FunctionParameter{}
 	parameter.SetName(s)
-	f.parameters = append(f.parameters, &parameter)
+	parameter.function = f
+	f.parameters = append(f.parameters, parameter)
 	return parameter
 }
 
@@ -23,6 +24,6 @@ func NewFunction(s string) *Function {
 	return &Function{
 		Name:       common.Name{Name: s},
 		rootNode:   nil,
-		parameters: make([]*Parameter, 0),
+		parameters: make([]*FunctionParameter, 0),
 	}
 }

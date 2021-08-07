@@ -3,7 +3,7 @@ package ast
 type FunctionCallNode struct {
 	NodeBase
 	function            *Function
-	argumentByParameter map[*Parameter]Node
+	argumentByParameter map[*FunctionParameter]Node
 }
 
 func (f FunctionCallNode) GetText() string {
@@ -14,8 +14,18 @@ func (f FunctionCallNode) GetChildren() []Node {
 	panic("implement me")
 }
 
-func (f FunctionCallNode) Eval() float32 {
-	panic("implement me")
+func (f FunctionCallNode) Eval(evalContext *EvalContext) Float {
+	for parameter, argumentNode := range f.argumentByParameter {
+		evalContext.argumentValueByParameter[parameter] = argumentNode.Eval(evalContext)
+	}
+
+	answer := f.function.rootNode.Eval(evalContext)
+
+	for parameter := range f.argumentByParameter {
+		delete(evalContext.argumentValueByParameter, parameter)
+	}
+
+	return answer
 }
 
 func (f FunctionCallNode) ReplaceChild(old Node, new Node) {
@@ -30,6 +40,6 @@ func (f FunctionCallNode) setArgumentByIndex(index int, argument Node) {
 func NewFunctionCallNode(function *Function) *FunctionCallNode {
 	return &FunctionCallNode{
 		function:            function,
-		argumentByParameter: make(map[*Parameter]Node),
+		argumentByParameter: make(map[*FunctionParameter]Node),
 	}
 }
