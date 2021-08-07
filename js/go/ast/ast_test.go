@@ -1,12 +1,9 @@
-package testers
+package ast
 
 import (
 	"encoding/json"
 	"testing"
 )
-
-type testfrog struct {
-}
 
 func TestName(t *testing.T) {
 	m := map[string]int{

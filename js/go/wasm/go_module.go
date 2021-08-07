@@ -14,6 +14,7 @@ type vue struct {
 func bootstrapGoModule() {
 	ast.SetupPrimitiveFunctions()
 	ast.SetupProtoOrganisms()
+	setupPixiSetters()
 	goModule := makeEmptyObject()
 
 	rootOrganism := ast.NewOrganism()
