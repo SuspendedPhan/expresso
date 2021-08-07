@@ -1,6 +1,9 @@
 package ast
 
-import "github.com/google/uuid"
+import (
+	"expressionista/common"
+	"github.com/google/uuid"
+)
 
 type PrimitiveFunctionCallNode struct {
 	NodeBase
@@ -13,7 +16,7 @@ func (p PrimitiveFunctionCallNode) GetText() string {
 }
 
 func (p PrimitiveFunctionCallNode) Eval() Float {
-	assert(len(p.argumentByParameter) == len(p.function.parameters))
+	common.Assert(len(p.argumentByParameter) == len(p.function.parameters))
 
 	args := make([]Float, 0)
 	for _, parameter := range p.function.parameters {
@@ -31,7 +34,7 @@ func (p *PrimitiveFunctionCallNode) ReplaceChild(old Node, new Node) {
 			return
 		}
 	}
-	assert(false)
+	common.Assert(false)
 }
 
 func (p *PrimitiveFunctionCallNode) SetArgument(parameter *Parameter, node Node) {
@@ -58,8 +61,8 @@ func NewPrimitiveFunctionCallNode(function *PrimitiveFunction) *PrimitiveFunctio
 	}
 	for _, parameter := range function.parameters {
 		numberNode := NewNumberNode(0)
-		node.SetArgument(parameter, &numberNode)
+		node.SetArgument(parameter, numberNode)
 	}
-	node.setId(uuid.NewString())
+	node.SetId(uuid.NewString())
 	return &node
 }

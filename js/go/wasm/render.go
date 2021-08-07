@@ -2,11 +2,12 @@ package wasm
 
 import (
 	"expressionista/ast"
+	"expressionista/protos"
 	"strings"
 	"syscall/js"
 )
 
-var pixiSetters = make(map[*ast.ProtoAttribute]func(pixiObject js.Value, value ast.Float))
+var pixiSetters = make(map[*protos.ProtoAttribute]func(pixiObject js.Value, value ast.Float))
 
 func setupPixiSetters() {
 	pixiSetters[ast.ProtoCircle.Radius] = func(pixiObject js.Value, value ast.Float) {
@@ -25,11 +26,13 @@ func render(rootOrganism *ast.Organism, circlePool js.Value, circles js.Value) {
 	defer func() { circlePool.Call("recycle", circle) }()
 	circle.Set("visible", true)
 
-	for protoAttribute, value := range organismOutput.ValueByProtoAttribute {
-		if pixiSetter, ok := pixiSetters[protoAttribute]; ok {
-			pixiSetter(circle, value)
-		} else {
-			circle.Set(strings.ToLower(protoAttribute.GetName()), value)
+	for _, cloneOutput := range organismOutput.CloneOutputs {
+		for protoAttribute, value := range cloneOutput.ValueByProtoAttribute {
+			if pixiSetter, ok := pixiSetters[protoAttribute]; ok {
+				pixiSetter(circle, value)
+			} else {
+				circle.Set(strings.ToLower(protoAttribute.GetName()), value)
+			}
 		}
 	}
 

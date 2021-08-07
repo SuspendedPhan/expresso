@@ -2,21 +2,24 @@ package ast
 
 import (
 	"encoding/json"
+	"expressionista/common"
+	"expressionista/protos"
 	"github.com/google/uuid"
 )
 
 type Organism struct {
-	Id
-	PlayerAttributes          []*Attribute
-	AttributeByProtoAttribute map[*ProtoAttribute]*Attribute
-	OnAttributesChanged       *Signal
+	common.Id
+	PlayerAttributes                   []*Attribute
+	IntrinsicAttributeByProtoAttribute map[*protos.ProtoAttribute]*IntrinsicAttribute
+	OnAttributesChanged                *Signal
 }
 
 func NewOrganism() *Organism {
 	o := &Organism{}
-	o.setId(uuid.NewString())
+	o.SetId(uuid.NewString())
 	o.OnAttributesChanged = NewSignal()
-	o.AttributeByProtoAttribute = make(map[*ProtoAttribute]*Attribute)
+	o.IntrinsicAttributeByProtoAttribute = make(map[*protos.ProtoAttribute]*Attribute)
+	o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute] = NewAttribute()
 	return o
 }
 
@@ -27,19 +30,20 @@ func (o *Organism) AddAttribute() *Attribute {
 }
 
 func (o *Organism) Eval() OrganismOutput {
-	return OrganismOutput{ValueByProtoAttribute: map[*ProtoAttribute]Float{
+	output := CloneOutput{ValueByProtoAttribute: map[*protos.ProtoAttribute]Float{
 		ProtoCircle.X:      10,
 		ProtoCircle.Y:      20,
 		ProtoCircle.Radius: 5,
 	}}
+	return OrganismOutput{CloneOutputs: []*CloneOutput{&output}}
 }
 
-func (o *Organism) AddProtoAttribute(proto *ProtoAttribute) {
+func (o *Organism) AddProtoAttribute(proto *protos.ProtoAttribute) {
 	attribute := NewAttribute()
 	rootNode := NewNumberNode(0)
-	attribute.setRootNode(&rootNode)
+	attribute.setRootNode(rootNode)
 	attribute.Name = proto.Name
-	o.AttributeByProtoAttribute[proto] = attribute
+	o.IntrinsicAttributeByProtoAttribute[proto] = attribute
 }
 
 func (a Organism) MarshalJSON() ([]byte, error) {
@@ -48,4 +52,8 @@ func (a Organism) MarshalJSON() ([]byte, error) {
 
 func (a *Organism) UnmarshalJSON(b []byte) error {
 	return nil
+}
+
+func NewOrganismFromProto(proto *protos.ProtoOrganism) *Organism {
+	panic("not implemented")
 }

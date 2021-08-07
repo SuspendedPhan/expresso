@@ -1,5 +1,7 @@
 package ast
 
+import "expressionista/common"
+
 type Parameter struct {
-	Name
+	common.Name
 }

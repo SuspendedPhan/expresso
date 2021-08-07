@@ -1,31 +1,35 @@
 package ast
 
 type FunctionCallNode struct {
-	function            Function
+	NodeBase
+	function            *Function
 	argumentByParameter map[*Parameter]Node
 }
 
-func (f FunctionCallNode) eval() float32 {
+func (f FunctionCallNode) GetText() string {
 	panic("implement me")
 }
 
-func (f FunctionCallNode) replaceChild(old Node, new Node) {
+func (f FunctionCallNode) GetChildren() []Node {
 	panic("implement me")
 }
 
-func (f FunctionCallNode) getParentNode() Node {
+func (f FunctionCallNode) Eval() float32 {
 	panic("implement me")
 }
 
-func (f FunctionCallNode) getName() string {
-	panic("implement me")
-}
-
-func (f FunctionCallNode) setParentNode(n Node) {
+func (f FunctionCallNode) ReplaceChild(old Node, new Node) {
 	panic("implement me")
 }
 
 func (f FunctionCallNode) setArgumentByIndex(index int, argument Node) {
 	parameter := f.function.parameters[index]
 	f.argumentByParameter[parameter] = argument
+}
+
+func NewFunctionCallNode(function *Function) *FunctionCallNode {
+	return &FunctionCallNode{
+		function:            function,
+		argumentByParameter: make(map[*Parameter]Node),
+	}
 }

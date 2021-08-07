@@ -45,7 +45,7 @@ func setupNode(node ast.Node, vue vue) js.Value {
 					Text: ast.NumberToString(number),
 					CommitFunc: func() {
 						numberNode := ast.NewNumberNode(number)
-						ast.Replace(node, &numberNode)
+						ast.Replace(node, numberNode)
 					},
 				}
 				nodeChoices = append(nodeChoices, nodeChoice)

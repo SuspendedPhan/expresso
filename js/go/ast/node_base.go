@@ -1,7 +1,12 @@
 package ast
 
+import (
+	"expressionista/common"
+	"github.com/google/uuid"
+)
+
 type NodeBase struct {
-	Id
+	common.Id
 	parentNode      Node
 	onChildReplaced chan struct{}
 	attribute       *Attribute
@@ -10,6 +15,7 @@ type NodeBase struct {
 func NewNodeBase() NodeBase {
 	base := NodeBase{}
 	base.onChildReplaced = make(chan struct{})
+	base.SetId(uuid.NewString())
 	return base
 }
 

@@ -1,4 +1,4 @@
-package ast
+package common
 
 type Id struct {
 	Id string
@@ -8,6 +8,6 @@ func (i Id) GetId() string {
 	return i.Id
 }
 
-func (i *Id) setId(id string) {
+func (i *Id) SetId(id string) {
 	i.Id = id
 }

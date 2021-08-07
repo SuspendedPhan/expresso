@@ -1,9 +1,11 @@
 package ast
 
+import "expressionista/common"
+
 var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
-	Name
+	common.Name
 	parameters  []*Parameter
 	evalFunctor func(args []float32) float32
 }
@@ -32,7 +34,7 @@ func addPrimitiveFunction(name string, parameterNames []string, evalFunctor func
 	}
 	function.SetName(name)
 	for _, parameterName := range parameterNames {
-		function.parameters = append(function.parameters, &Parameter{Name{parameterName}})
+		function.parameters = append(function.parameters, &Parameter{common.Name{parameterName}})
 	}
 	PrimitiveFunctions[name] = &function
 }

@@ -12,10 +12,10 @@ type NumberNode struct {
 	NodeBase
 }
 
-func NewNumberNode(value Float) NumberNode {
+func NewNumberNode(value Float) *NumberNode {
 	node := NumberNode{Value: value, NodeBase: NewNodeBase()}
-	node.setId(uuid.NewString())
-	return node
+	node.SetId(uuid.NewString())
+	return &node
 }
 
 func (n2 *NumberNode) ReplaceChild(old Node, new Node) {

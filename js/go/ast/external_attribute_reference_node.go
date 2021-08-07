@@ -1,0 +1,26 @@
+package ast
+
+type ExternalAttributeReferenceNode struct {
+	NodeBase
+	ExternalAttribute *ExternalAttribute
+}
+
+func (e ExternalAttributeReferenceNode) Eval() Float {
+	panic("implement me")
+}
+
+func (e ExternalAttributeReferenceNode) ReplaceChild(old Node, new Node) {
+	panic("implement me")
+}
+
+func (e ExternalAttributeReferenceNode) GetText() string {
+	panic("implement me")
+}
+
+func (e ExternalAttributeReferenceNode) GetChildren() []Node {
+	panic("implement me")
+}
+
+func NewExternalAttributeReferenceNode(externalAttribute *ExternalAttribute) *ExternalAttributeReferenceNode {
+	return &ExternalAttributeReferenceNode{NodeBase: NewNodeBase(), ExternalAttribute: externalAttribute}
+}

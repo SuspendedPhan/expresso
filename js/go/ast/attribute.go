@@ -1,9 +1,11 @@
 package ast
 
+import "expressionista/common"
+
 type Attribute struct {
 	RootNode Node
-	Name
-	Id
+	common.Name
+	common.Id
 	OnRootNodeChanged chan struct{}
 }
 

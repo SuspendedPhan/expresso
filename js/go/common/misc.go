@@ -1,4 +1,4 @@
-package ast
+package common
 
 type Name struct {
 	Name string
@@ -12,7 +12,7 @@ func (n *Name) SetName(name string) {
 	n.Name = name
 }
 
-func assert(condition bool) {
+func Assert(condition bool) {
 	if !condition {
 		panic("assertion failed")
 	}
