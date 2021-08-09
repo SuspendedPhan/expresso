@@ -7,9 +7,9 @@ import (
 
 type NodeBase struct {
 	common.Id
-	parentNode      Node
-	onChildReplaced chan struct{}
-	attribute       *Attribute
+	ParentNode      Node          `hydration:"ref"`
+	onChildReplaced chan struct{} `json:"-"`
+	Attribute       *Attribute    `hydration:"ref"`
 }
 
 func NewNodeBase() NodeBase {
@@ -24,17 +24,17 @@ func (n2 *NodeBase) GetOnChildReplaced() <-chan struct{} {
 }
 
 func (n2 *NodeBase) SetParentNode(n Node) {
-	n2.parentNode = n
+	n2.ParentNode = n
 }
 
 func (n2 NodeBase) GetParentNode() Node {
-	return n2.parentNode
+	return n2.ParentNode
 }
 
 func (n2 *NodeBase) SetAttribute(a *Attribute) {
-	n2.attribute = a
+	n2.Attribute = a
 }
 
 func (n2 *NodeBase) GetAttribute() *Attribute {
-	return n2.attribute
+	return n2.Attribute
 }

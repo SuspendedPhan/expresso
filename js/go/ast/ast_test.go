@@ -1,22 +1,71 @@
 package ast
 
 import (
+	"encoding/json"
 	"expressionista/common"
 	"expressionista/protos"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
+	"reflect"
 	"testing"
 )
 
-func TestName(t *testing.T) {
-	earth, protoRadius, time := CreateUltimateTestProject()
+func TestDehydrateAttributeReferenceNode(t *testing.T) {
+	attribute := NewAttribute()
+	attribute.SetName("radius")
+	node := NewAttributeReferenceNode(attribute)
+	attribute.setRootNode(node)
+	testDehydrateAndMarshal(t, node)
+}
+
+const shouldDebug = false
+
+func TestDehydrateAttribute(t *testing.T) {
+	attribute := NewAttribute()
+	attribute.setRootNode(NewNumberNode(10))
+	testDehydrateAndMarshal(t, attribute)
+}
+
+func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
+	dehydratedNode := dehydrate(reflect.ValueOf(obj))
+	if shouldDebug {
+		spew.Dump(dehydratedNode.Interface())
+	}
+	marshal, err := json.Marshal(dehydratedNode.Interface())
+	if err != nil {
+		println(err.Error())
+	}
+
+	dehydratedStruct := GetDehydratedStruct(reflect.TypeOf(obj).Elem())
+	unmarshaledNode := reflect.New(dehydratedStruct)
+	err = json.Unmarshal(marshal, unmarshaledNode.Interface())
+	if err != nil {
+		println(err.Error())
+	}
+	assert.Equal(t, dehydratedNode.Interface(), unmarshaledNode.Elem().Interface())
+}
+
+func TestUltimate(t *testing.T) {
+	project, earth, protoRadius, time := CreateUltimateTestProject()
+
+	marshaledProject, err := json.Marshal(project)
+	assert.NoErrorf(t, err, "no error")
+	unmarshaledProject := &Project{}
+	err = json.Unmarshal(marshaledProject, unmarshaledProject)
+	assert.NoErrorf(t, err, "no error")
+
 	context := NewEvalContext()
+
+	earth = project.GetOrganismById(earth.GetId())
+
 	context.valueByExternalAttribute[time] = 5
 	answer := earth.Eval(context)
+
 	assert.Equal(t, Float(7.5), answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[0].ValueByProtoAttribute[protoRadius])
 	assert.Equal(t, Float(8), answer.CloneOutputs[0].SuborganismOutputs[0].CloneOutputs[1].ValueByProtoAttribute[protoRadius])
 }
 
-func CreateUltimateTestProject() (earth *Organism, protoRadius *protos.ProtoAttribute, time *ExternalAttribute) {
+func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius *protos.ProtoAttribute, time *ExternalAttribute) {
 	SetupPrimitiveFunctions()
 
 	time = NewExternalAttribute("Time")

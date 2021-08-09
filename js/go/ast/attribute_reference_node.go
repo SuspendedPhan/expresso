@@ -4,11 +4,11 @@ import "github.com/google/uuid"
 
 type AttributeReferenceNode struct {
 	NodeBase
-	attribute *Attribute
+	Attribute *Attribute `ref:""`
 }
 
 func (a AttributeReferenceNode) Eval(ctx *EvalContext) Float {
-	return a.attribute.eval(ctx)
+	return a.Attribute.eval(ctx)
 }
 
 func (a AttributeReferenceNode) ReplaceChild(old Node, new Node) {
@@ -26,7 +26,7 @@ func (a AttributeReferenceNode) GetChildren() []Node {
 func NewAttributeReferenceNode(attribute *Attribute) *AttributeReferenceNode {
 	node := AttributeReferenceNode{
 		NodeBase:  NewNodeBase(),
-		attribute: attribute,
+		Attribute: attribute,
 	}
 	node.SetId(uuid.NewString())
 	return &node
