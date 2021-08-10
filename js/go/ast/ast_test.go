@@ -27,7 +27,10 @@ func TestDehydrateAttribute(t *testing.T) {
 }
 
 func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
-	dehydratedNode := dehydrate(reflect.ValueOf(obj))
+	dehydratedNode, err := dehydrate(reflect.ValueOf(obj))
+	if err != nil {
+		t.Fatal(err)
+	}
 	if shouldDebug {
 		spew.Dump(dehydratedNode.Interface())
 	}
@@ -36,7 +39,10 @@ func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
 		println(err.Error())
 	}
 
-	dehydratedStruct := GetDehydratedStruct(reflect.TypeOf(obj).Elem())
+	dehydratedStruct, err := GetDehydratedStruct(IdempotentElem(reflect.ValueOf(obj)).Type())
+	if err != nil {
+		t.Fatal(err)
+	}
 	unmarshaledNode := reflect.New(dehydratedStruct)
 	err = json.Unmarshal(marshal, unmarshaledNode.Interface())
 	if err != nil {
