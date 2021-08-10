@@ -39,11 +39,11 @@ func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
 		println(err.Error())
 	}
 
-	dehydratedStruct, err := GetDehydratedStruct(IdempotentElem(reflect.ValueOf(obj)).Type())
+	dehydratedStruct, err := DehydrateType(reflect.ValueOf(obj).Type())
 	if err != nil {
 		t.Fatal(err)
 	}
-	unmarshaledNode := reflect.New(dehydratedStruct)
+	unmarshaledNode := reflect.New(dehydratedStruct.dehydratedType)
 	err = json.Unmarshal(marshal, unmarshaledNode.Interface())
 	if err != nil {
 		println(err.Error())
