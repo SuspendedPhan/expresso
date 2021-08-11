@@ -35,6 +35,7 @@ func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
 		spew.Dump(dehydratedNode.Interface())
 	}
 	marshal, err := json.Marshal(dehydratedNode.Interface())
+	println(string(marshal))
 	if err != nil {
 		println(err.Error())
 	}

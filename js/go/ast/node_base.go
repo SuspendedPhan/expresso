@@ -7,9 +7,9 @@ import (
 
 type NodeBase struct {
 	common.Id
-	ParentNode      Node          `hydration:"ref"`
-	onChildReplaced chan struct{} `json:"-"`
-	Attribute       *Attribute    `hydration:"ref"`
+	ParentNode      Node `hydration:"ref"`
+	onChildReplaced chan struct{}
+	Attribute       *Attribute `hydration:"ref"`
 }
 
 func NewNodeBase() NodeBase {
