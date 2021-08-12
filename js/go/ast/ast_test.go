@@ -43,9 +43,25 @@ func Unmarshal(marshal []byte, hydratedType reflect.Type) (_ reflect.Value, err 
 	defer common.AddErrorInfo(&err, "Unmarshal", hydratedType.String())()
 	dehydration, err := hydration.DehydrateType(hydratedType)
 	unmarshaled := reflect.New(dehydration.DehydratedType)
-	err = json.Unmarshal(marshal, &unmarshaled)
-	common.Assert(false)
+	println(string(marshal))
+	println()
+	spew.Dump(unmarshaled.Interface())
+	err = json.Unmarshal(marshal, unmarshaled.Interface())
 	return reflect.Value{}, nil
+}
+
+func TestTemp(t *testing.T) {
+	hydration.PolymorphRegistry.Register(0, "2acd")
+	marshal, err := json.Marshal(hydration.Polymorph{
+		TypeId: "2acd",
+		Value:  4,
+	})
+	assert.Nil(t, err)
+	container := hydration.Polymorph{}
+	err = json.Unmarshal(marshal, &container)
+	assert.Nil(t, err)
+	assert.Equal(t, "2acd", container.TypeId)
+	assert.Equal(t, float64(4), container.Value)
 }
 
 func TestUnmarshal(t *testing.T) {

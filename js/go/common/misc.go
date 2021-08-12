@@ -21,9 +21,13 @@ func (n *Name) SetName(name string) {
 	n.Name = name
 }
 
-func Assert(condition bool) {
+func Assert(condition bool, objs ...interface{}) {
 	if !condition {
-		panic(AssertionError{})
+		if len(objs) == 0 {
+			panic(AssertionError{})
+		} else {
+			panic(AssertionError{err: fmt.Errorf(objsToString(objs))})
+		}
 	}
 }
 
@@ -34,11 +38,7 @@ func AssertNilErr(err error) {
 }
 
 func AddErrorInfo(err *error, objs ...interface{}) func() {
-	msgs := make([]string, 0)
-	for _, obj := range objs {
-		msgs = append(msgs, fmt.Sprintf("%v", obj))
-	}
-	msg := strings.Join(msgs, " ")
+	msg := objsToString(objs)
 
 	if Config.DebugPrint {
 		println(msg)
@@ -49,6 +49,11 @@ func AddErrorInfo(err *error, objs ...interface{}) func() {
 		}
 
 		r := recover()
+
+		// i didn't handle the case where we have an error AND a panic
+		// i don't think it should be possible
+		Assert(r == nil || *err == nil)
+
 		if r != nil {
 			assertionError, ok := r.(AssertionError)
 			if ok {
@@ -63,4 +68,13 @@ func AddErrorInfo(err *error, objs ...interface{}) func() {
 			}
 		}
 	}
+}
+
+func objsToString(objs []interface{}) string {
+	msgs := make([]string, 0)
+	for _, obj := range objs {
+		msgs = append(msgs, fmt.Sprintf("%v", obj))
+	}
+	msg := strings.Join(msgs, " ")
+	return msg
 }
