@@ -14,7 +14,7 @@ var Config = load()
 func getConfigPath() string {
 	//abs, err := filepath.Abs(path.Join("..", "work", "config.yml"))
 	//abs, err := filepath.Abs(path.Join("work", "config.yml"))
-	//AssertNil(err)
+	//AssertNilErr(err)
 	abs := `C:\Users\Dylan\Documents\GitHub\expresso\js\go\work\config.yml`
 	return abs
 }
@@ -23,16 +23,16 @@ func load() ConfigStruct {
 	filePath := getConfigPath()
 	file, err := os.ReadFile(filePath)
 	println(filePath)
-	AssertNil(err)
+	AssertNilErr(err)
 	config := ConfigStruct{}
 	err = yaml.Unmarshal(file, &config)
-	AssertNil(err)
+	AssertNilErr(err)
 	return config
 }
 
 func (config ConfigStruct) Save() {
 	marshal, err := yaml.Marshal(config)
-	AssertNil(err)
+	AssertNilErr(err)
 	err = os.WriteFile(getConfigPath(), marshal, os.FileMode(0777))
-	AssertNil(err)
+	AssertNilErr(err)
 }
