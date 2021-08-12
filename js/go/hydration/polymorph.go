@@ -17,19 +17,21 @@ type SemiUnmarshaledPolymorph struct {
 }
 
 func (p *Polymorph) UnmarshalJSON(bytes []byte) (err error) {
-	defer common.AddErrorInfo(&err, "UnmarshalJSON")()
+	handler := common.NewHandler(&err, "UnmarshalJSON")
+	defer handler.Handle()
+
 	semiUnmarshaled := &SemiUnmarshaledPolymorph{}
 	err = json.Unmarshal(bytes, semiUnmarshaled)
-	common.AssertNilErr(err)
+	handler.AssertNilErr(err)
 
 	p.TypeId = semiUnmarshaled.TypeId
 
 	valueType, ok := PolymorphRegistry.GetType(semiUnmarshaled.TypeId)
-	common.Assert(ok, "type assert")
+	handler.Assert(ok, "type assert")
 
 	p.Value = reflect.New(valueType).Elem().Interface()
 	err = json.Unmarshal(semiUnmarshaled.Value, &p.Value)
-	common.AssertNilErr(err)
+	handler.AssertNilErr(err)
 
 	return nil
 }

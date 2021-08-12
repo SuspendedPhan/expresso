@@ -56,10 +56,10 @@ func TestTemp(t *testing.T) {
 		TypeId: "2acd",
 		Value:  4,
 	})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	container := hydration.Polymorph{}
 	err = json.Unmarshal(marshal, &container)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "2acd", container.TypeId)
 	assert.Equal(t, float64(4), container.Value)
 }

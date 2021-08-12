@@ -9,10 +9,6 @@ type Name struct {
 	Name string
 }
 
-type AssertionError struct {
-	err error
-}
-
 func (n Name) GetName() string {
 	return n.Name
 }
@@ -24,16 +20,16 @@ func (n *Name) SetName(name string) {
 func Assert(condition bool, objs ...interface{}) {
 	if !condition {
 		if len(objs) == 0 {
-			panic(AssertionError{})
+			panic(assertionError{})
 		} else {
-			panic(AssertionError{err: fmt.Errorf(objsToString(objs))})
+			panic(assertionError{err: fmt.Errorf(objsToString(objs))})
 		}
 	}
 }
 
 func AssertNilErr(err error) {
 	if err != nil {
-		panic(AssertionError{err: err})
+		panic(assertionError{err: err})
 	}
 }
 
@@ -55,7 +51,7 @@ func AddErrorInfo(err *error, objs ...interface{}) func() {
 		Assert(r == nil || *err == nil)
 
 		if r != nil {
-			assertionError, ok := r.(AssertionError)
+			assertionError, ok := r.(assertionError)
 			if ok {
 				if assertionError.err == nil {
 					*err = fmt.Errorf("assertion failed: %v", msg)
