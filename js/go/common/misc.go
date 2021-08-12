@@ -17,3 +17,9 @@ func Assert(condition bool) {
 		panic("assertion failed")
 	}
 }
+
+func AssertNil(any interface{}) {
+	if any != nil {
+		panic(any)
+	}
+}

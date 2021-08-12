@@ -7,4 +7,5 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/gookit/event v1.0.5
 	github.com/stretchr/testify v1.6.1 // indirect
+	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )

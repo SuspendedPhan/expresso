@@ -6,6 +6,8 @@ import (
 	"expressionista/protos"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -49,7 +51,15 @@ func testDehydrateAndMarshal(t *testing.T, obj interface{}) {
 	if err != nil {
 		println(err.Error())
 	}
-	assert.Equal(t, dehydratedNode.Interface(), unmarshaledNode.Elem().Interface())
+	abs1, _ := filepath.Abs(`..\work\actual.txt`)
+	abs2, _ := filepath.Abs(`..\work\expected.txt`)
+	f1, err := os.Create(abs1)
+	assert.Nil(t, err)
+	f2, err := os.Create(abs2)
+	assert.Nil(t, err)
+	spew.Fdump(f1, dehydratedNode.Interface())
+	spew.Fdump(f2, unmarshaledNode.Elem().Interface())
+	//assert.Equal(t, dehydratedNode.Interface(), unmarshaledNode.Elem().Interface())
 }
 
 func TestUltimate(t *testing.T) {

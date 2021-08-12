@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"expressionista/common"
 	"fmt"
 	"go/ast"
 	"reflect"
@@ -29,41 +30,13 @@ type Polymorph struct {
 	Value  interface{}
 }
 
-func DehydrateType(hydratedType reflect.Type) (_ Dehydration, err error) {
-	defer AddErrorInfo(&err, fmt.Sprintf("DehydrateType %v", hydratedType.Name()))
+func DehydrateType(hydratedType reflect.Type) (dehydration Dehydration, err error) {
+	defer AddErrorInfo(&err, fmt.Sprintf("DehydrateType %v", hydratedType.Name()))()
+
 	hydratedElemType := IdempotentTypeElem(hydratedType)
 
 	if hydratedElemType.Kind() == reflect.Struct {
-		dehydration := Dehydration{
-			fields:       make([]FieldDehydration, 0),
-			hydratedType: hydratedElemType,
-		}
-		dehydratedFields := make([]reflect.StructField, 0)
-		for i := 0; i < hydratedElemType.NumField(); i++ {
-			hydratedField := hydratedElemType.Field(i)
-			fieldDehydration, skip, err := DehydrateFieldType(hydratedField)
-			if skip {
-				continue
-			}
-			if err != nil {
-				return Dehydration{}, err
-			}
-			dehydration.fields = append(dehydration.fields, FieldDehydration{
-				hydratedFieldIndex:   i,
-				dehydratedFieldIndex: len(dehydration.fields),
-				dehydration:          fieldDehydration,
-			})
-
-			dehydratedField := hydratedField
-			dehydratedField.Type = fieldDehydration.dehydratedType
-			if dehydratedField.Anonymous {
-				dehydratedField.Anonymous = false
-				dehydratedField.Name = hydratedField.Type.Name()
-			}
-			dehydratedFields = append(dehydratedFields, dehydratedField)
-		}
-		dehydration.dehydratedType = reflect.StructOf(dehydratedFields)
-		return dehydration, nil
+		return DehydrateStructType(hydratedElemType)
 	} else {
 		return Dehydration{
 			fields:         nil,
@@ -73,10 +46,45 @@ func DehydrateType(hydratedType reflect.Type) (_ Dehydration, err error) {
 	}
 }
 
-func DehydrateFieldType(hydratedField reflect.StructField) (_ Dehydration, skip bool, err error) {
-	defer AddErrorInfo(&err, fmt.Sprintf("dehydrate field %v", hydratedField.Type.String()))
+func DehydrateStructType(hydratedElemType reflect.Type) (_ Dehydration, err error) {
+	defer AddErrorInfo(&err, fmt.Sprintf("DehydrateTypeStructType %v", hydratedElemType.String()))()
+	dehydration := Dehydration{
+		fields:       make([]FieldDehydration, 0),
+		hydratedType: hydratedElemType,
+	}
+	dehydratedFields := make([]reflect.StructField, 0)
+	for i := 0; i < hydratedElemType.NumField(); i++ {
+		hydratedField := hydratedElemType.Field(i)
+		fieldDehydration, skip, err := DehydrateFieldType(hydratedField)
+		if skip {
+			DebugLogf("Skipped field %v", hydratedField.Name)
+			continue
+		}
+		if err != nil {
+			return Dehydration{}, err
+		}
+		dehydration.fields = append(dehydration.fields, FieldDehydration{
+			hydratedFieldIndex:   i,
+			dehydratedFieldIndex: len(dehydration.fields),
+			dehydration:          fieldDehydration,
+		})
 
-	if !ast.IsExported(hydratedField.Type.Name()) {
+		dehydratedField := hydratedField
+		dehydratedField.Type = fieldDehydration.dehydratedType
+		if dehydratedField.Anonymous {
+			dehydratedField.Anonymous = false
+			dehydratedField.Name = hydratedField.Type.Name()
+		}
+		dehydratedFields = append(dehydratedFields, dehydratedField)
+	}
+	dehydration.dehydratedType = reflect.StructOf(dehydratedFields)
+	return dehydration, nil
+}
+
+func DehydrateFieldType(hydratedField reflect.StructField) (_ Dehydration, skip bool, err error) {
+	defer AddErrorInfo(&err, fmt.Sprintf("DehydrateFieldType %v %v", hydratedField.Name, hydratedField.Type.String()))()
+
+	if !ast.IsExported(hydratedField.Name) || hydratedField.Type.Kind() == reflect.Chan {
 		return Dehydration{}, true, nil
 	} else if isHydrationRef(hydratedField) {
 		return Dehydration{
@@ -98,7 +106,15 @@ func DehydrateFieldType(hydratedField reflect.StructField) (_ Dehydration, skip 
 }
 
 func dehydrate(reflectedHydratedObj reflect.Value) (reflect.Value, error) {
+	defer func() {
+		DebugLog("")
+		DebugLogf("=== done dehydrating object %v ===", reflectedHydratedObj.Type().String())
+		DebugLog("")
+	}()
+
 	reflectedHydratedElem := IdempotentElem(reValue(reflectedHydratedObj))
+
+	DebugLog(fmt.Sprintf("dehydrate %v", reflectedHydratedElem.Type().Name()))
 
 	if reflectedHydratedElem.Kind() == reflect.Struct {
 		return dehydrateStruct(reflectedHydratedElem)
@@ -108,17 +124,25 @@ func dehydrate(reflectedHydratedObj reflect.Value) (reflect.Value, error) {
 }
 
 func dehydrateStruct(hydratedElem reflect.Value) (dehydratedStruct reflect.Value, err error) {
-	defer AddErrorInfo(&err, fmt.Sprintf("dehydrate struct | hydratedElem %v", hydratedElem.Type().Name()))
+	defer AddErrorInfo(&err, fmt.Sprintf("dehydrate struct | hydratedElem %v", hydratedElem.Type().Name()))()
 
 	dehydratedStructType, err := DehydrateType(hydratedElem.Type())
 	if err != nil {
 		return reflect.Value{}, err
 	}
-	return dehydrateStruct0(hydratedElem, dehydratedStructType)
+	DebugLog("")
+	DebugLog(fmt.Sprintf("=== done dehydrating type %v ===", hydratedElem.Type().String()))
+	DebugLog("")
+	struct0, err := dehydrateStruct0(hydratedElem, dehydratedStructType)
+	return struct0, err
 }
 
 func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (dehydratedStruct reflect.Value, err error) {
-	defer AddErrorInfo(&err, fmt.Sprintf("dehydrateStruct0 %v", hydratedStruct.Type().String()))
+	defer AddErrorInfo(&err, fmt.Sprintf("dehydrateStruct0 %v", hydratedStruct.Type().String()))()
+
+	if hydratedStruct.Type().String() == "common.Id" {
+		println()
+	}
 
 	defer func() {
 		e := recover()
@@ -136,9 +160,12 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 		dehydratedField := dehydratedStruct.Field(field.dehydratedFieldIndex)
 		hydratedField := hydratedElemStruct.Field(field.hydratedFieldIndex)
 
-		if hydratedStructField.Name == "Id" {
-			println(dehydratedField.Type().String())
-		}
+		DebugLog(fmt.Sprintf(
+			"dehydrateField %v | dehydrated type %v | hydrated type %v",
+			hydratedStructField.Name,
+			dehydratedStructField.Type.String(),
+			hydratedStructField.Type.String(),
+		))
 
 		if !dehydratedField.CanSet() {
 			return reflect.Value{}, fmt.Errorf(dehydratedStructField.Name)
@@ -241,8 +268,23 @@ func forEachStructField(reflectedObj reflect.Value, f func(field reflect.StructF
 	}
 }
 
-func AddErrorInfo(err *error, msg string) {
-	if *err != nil {
-		*err = fmt.Errorf("%v: %v", msg, *err)
+func AddErrorInfo(err *error, msg string) func() {
+	if common.Config.DebugPrint {
+		println(msg)
 	}
+	return func() {
+		if *err != nil {
+			*err = fmt.Errorf("%v: %v", msg, *err)
+		}
+	}
+}
+
+func DebugLog(msg string) {
+	if common.Config.DebugPrint {
+		println(msg)
+	}
+}
+
+func DebugLogf(s string, s2 ...interface{}) {
+	DebugLog(fmt.Sprintf(s, s2...))
 }
