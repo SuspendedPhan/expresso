@@ -1,6 +1,8 @@
 package common
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type assertionError struct {
 	err error
@@ -12,26 +14,50 @@ type Handler struct {
 	assertionFailed bool
 }
 
+var recoverEnabled = true
+
 func (h *Handler) Handle() {
+	var r interface{} = nil
+	if h.assertionFailed && recoverEnabled {
+		r = recover()
+	}
+	h.handle(r)
+}
+
+func (h *Handler) HandleCatchPanics() {
+	var r interface{} = nil
+	if recoverEnabled {
+		r = recover()
+	}
+	h.handle(r)
+}
+
+func (h *Handler) handle(recovered interface{}) {
 	msg := objsToString(h.messages)
 
 	err := h.err
 	if *err != nil {
-		*err = fmt.Errorf("%v: %v", msg, *err)
+		*err = fmt.Errorf("%v:\n%v", msg, *err)
+	}
+
+	if !recoverEnabled {
+		println("recover is disabled")
+		return
 	}
 
 	if h.assertionFailed {
-		r := recover()
-		assertionError, ok := r.(assertionError)
+		assertionError, ok := recovered.(assertionError)
 		if !ok {
-			panic(fmt.Errorf("expected an assertionError: %v", r))
+			panic(fmt.Errorf("expected an assertionError: \n%v", recovered))
 		}
 
 		if assertionError.err == nil {
-			*err = fmt.Errorf("assertion failed: %v", msg)
+			*err = fmt.Errorf("%v", msg)
 		} else {
-			*err = fmt.Errorf("%v: assertion failed: %v", msg, assertionError.err)
+			*err = fmt.Errorf("%v:\n%v", msg, assertionError.err)
 		}
+	} else if recovered != nil {
+		*err = fmt.Errorf("%v:\nrecovered from panic: \n%v", msg, recovered)
 	}
 }
 
@@ -53,6 +79,14 @@ func (h *Handler) Assert(condition bool, objs ...interface{}) {
 	}
 }
 
+func (h *Handler) DontRecover() {
+	recoverEnabled = false
+}
+
 func NewHandler(e *error, msgs ...interface{}) *Handler {
+	msg := objsToString(msgs)
+	if Config.DebugPrint {
+		println(msg)
+	}
 	return &Handler{err: e, messages: msgs}
 }

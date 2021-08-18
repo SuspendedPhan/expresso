@@ -12,7 +12,6 @@ const HydrationRefTag = "ref"
 const PolymorphRefTag = "polymorph"
 const TypeIdFieldName = "TypeId"
 const ValueFieldName = "Value"
-const ValueContainerFieldName = "ValueContainer"
 
 type FieldDehydration struct {
 	hydratedFieldIndex   int
@@ -179,9 +178,9 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 				dehydratedField.Set(id)
 			}
 		} else if isHydrationPolymorph(hydratedStructField) {
-			typeId, ok := PolymorphRegistry.GetTypeId(hydratedField.Interface())
+			typeId, ok := PolymorphRegistryInstance.GetTypeId(hydratedField.Interface())
 			if !ok {
-				return reflect.Value{}, fmt.Errorf("dehydrate polymorph: %v", hydratedField.Type().String())
+				return reflect.Value{}, fmt.Errorf("dehydrate polymorph: not registered: %v", hydratedField.Type().String())
 			}
 
 			value, err := Dehydrate(hydratedField)
@@ -190,7 +189,7 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 			}
 
 			dehydratedField.FieldByName(TypeIdFieldName).Set(reflect.ValueOf(typeId))
-			dehydratedField.FieldByName(ValueContainerFieldName).FieldByName(ValueFieldName).Set(value)
+			dehydratedField.FieldByName(ValueFieldName).Set(value)
 		} else if dehydratedStructField.Type.Kind() == reflect.Struct {
 			value, err := dehydrateStruct0(hydratedField, field.dehydration)
 			if err != nil {
@@ -225,7 +224,7 @@ func IdempotentTypeElem(t reflect.Type) reflect.Type {
 }
 
 func IdempotentElem(t reflect.Value) reflect.Value {
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Ptr || t.Kind() == reflect.Interface {
 		return t.Elem()
 	} else {
 		return t

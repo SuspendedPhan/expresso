@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type AttributeReferenceNode struct {
 	NodeBase
-	Attribute *Attribute `ref:""`
+	Attribute *Attribute `hydration:"ref"`
 }
 
 func (a AttributeReferenceNode) Eval(ctx *EvalContext) Float {

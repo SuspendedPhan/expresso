@@ -23,20 +23,44 @@ func TestDehydrateAttributeReferenceNode(t *testing.T) {
 
 const shouldDebug = false
 
+func TestRehydrateAttribute(t *testing.T) {
+	assert.NoError(t, dumpActual("hello"))
+	registry := hydration.PolymorphRegistryInstance
+	RegisterPolymorphs(&registry)
+	attr := NewAttribute()
+	numberNode := NewNumberNode(10)
+	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
+	attr.setRootNode(numberNode)
+	attr.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
+
+	deAttr, err := hydration.Dehydrate(reflect.ValueOf(attr))
+	assert.NoError(t, err)
+
+	root, err := registry.NewPolymorph(attr, deAttr.Interface())
+	assert.NoError(t, err)
+
+	rehydrated, err := hydration.Rehydrate(reflect.ValueOf(root), registry)
+	assert.NoError(t, err)
+
+	err = dumpActual(rehydrated.Interface())
+	assert.NoError(t, err)
+
+	assert.Equal(t, root, rehydrated)
+}
+
 func TestDehydrateAttribute(t *testing.T) {
-	RegisterPolymorphs(&hydration.PolymorphRegistry)
+	RegisterPolymorphs(&hydration.PolymorphRegistryInstance)
 	attribute := NewAttribute()
 	numberNode := NewNumberNode(10)
 	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
 	attribute.setRootNode(numberNode)
 	attribute.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
-	expected := `{"RootNode":{"TypeId":"f6261e46-ca56-4bfa-93ad-a14a3e1b3f05","ValueContainer":{"Value":{"Value":10,"NodeBase":{"Id":{"Id":"bc0bd040-8241-42bb-90b5-44756935fd45"},"ParentNode":"","Attribute":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}}},"Name":{"Name":""},"Id":{"Id":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}`
+	expected := `{"RootNode":{"TypeId":"f6261e46-ca56-4bfa-93ad-a14a3e1b3f05","Value":{"Value":10,"NodeBase":{"Id":{"Id":"bc0bd040-8241-42bb-90b5-44756935fd45"},"ParentNode":"","Attribute":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}},"Name":{"Name":""},"Id":{"Id":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}`
 	dehydrated, err := hydration.Dehydrate(reflect.ValueOf(attribute))
 	assert.Nil(t, err)
 	marshal, err := json.Marshal(dehydrated.Interface())
 	assert.Nil(t, err)
 	assert.Equal(t, expected, string(marshal))
-	//testDehydrateAndMarshal(t, attribute)
 }
 
 func Unmarshal(marshal []byte, hydratedType reflect.Type) (_ reflect.Value, err error) {
@@ -51,7 +75,10 @@ func Unmarshal(marshal []byte, hydratedType reflect.Type) (_ reflect.Value, err 
 }
 
 func TestTemp(t *testing.T) {
-	hydration.PolymorphRegistry.Register(0, "2acd")
+}
+
+func TestPolymorphUnmarshal(t *testing.T) {
+	hydration.PolymorphRegistryInstance.Register(0, "2acd")
 	marshal, err := json.Marshal(hydration.Polymorph{
 		TypeId: "2acd",
 		Value:  4,
@@ -65,7 +92,7 @@ func TestTemp(t *testing.T) {
 }
 
 func TestUnmarshal(t *testing.T) {
-	RegisterPolymorphs(&hydration.PolymorphRegistry)
+	RegisterPolymorphs(&hydration.PolymorphRegistryInstance)
 	attribute := NewAttribute()
 	numberNode := NewNumberNode(10)
 	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
@@ -180,4 +207,36 @@ func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius
 	moon.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].setRootNode(NewNumberNode(2))
 
 	return
+}
+
+func dumpActual(dump interface{}) (err error) {
+	hnd := common.NewHandler(&err)
+	defer hnd.Handle()
+
+	abs, err := filepath.Abs(`..\work\actual.txt`)
+	hnd.AssertNilErr(err)
+
+	open, err := os.Create(abs)
+	defer func() {
+		err := open.Close()
+		hnd.AssertNilErr(err)
+	}()
+	hnd.AssertNilErr(err)
+
+	spew.Fdump(open, dump)
+	return nil
+}
+
+func dumpExpected(err error, dump interface{}) error {
+	hnd := common.NewHandler(&err)
+	defer hnd.Handle()
+
+	abs, err := filepath.Abs(`..\work\expected.txt`)
+	hnd.AssertNilErr(err)
+
+	open, err := os.Create(abs)
+	hnd.AssertNilErr(err)
+
+	spew.Fdump(open, dump)
+	return nil
 }

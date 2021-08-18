@@ -26,7 +26,7 @@ func (p *Polymorph) UnmarshalJSON(bytes []byte) (err error) {
 
 	p.TypeId = semiUnmarshaled.TypeId
 
-	valueType, ok := PolymorphRegistry.GetType(semiUnmarshaled.TypeId)
+	valueType, ok := PolymorphRegistryInstance.GetType(semiUnmarshaled.TypeId)
 	handler.Assert(ok, "type assert")
 
 	p.Value = reflect.New(valueType).Elem().Interface()
@@ -36,13 +36,13 @@ func (p *Polymorph) UnmarshalJSON(bytes []byte) (err error) {
 	return nil
 }
 
-type ValueContainer struct {
-	Value interface{}
-}
+func (p *Polymorph) Type(registry PolymorphRegistry) (_ reflect.Type, err error) {
+	handler := common.NewHandler(&err, "couldn't find type in registry", p.TypeId)
+	defer handler.Handle()
 
-func (p ValueContainer) UnmarshalJSON(bytes []byte) error {
-	println("whatat")
-	return nil
+	t, ok := registry.GetType(p.TypeId)
+	handler.Assert(ok)
+	return t, nil
 }
 
 func isHydrationPolymorph(field reflect.StructField) bool {
