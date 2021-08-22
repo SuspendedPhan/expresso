@@ -9,7 +9,6 @@ import (
 
 const HydrationTag = "hydration"
 const HydrationRefTag = "ref"
-const PolymorphRefTag = "polymorph"
 const TypeIdFieldName = "TypeId"
 const ValueFieldName = "Value"
 
@@ -92,13 +91,6 @@ func DehydrateFieldType(hydratedField reflect.StructField) (_ Dehydration, skip 
 			fields:         nil,
 			hydratedType:   hydratedField.Type,
 			DehydratedType: reflect.TypeOf(""),
-		}, false, nil
-	} else if isHydrationPolymorph(hydratedField) {
-		polymorphType := reflect.TypeOf(Polymorph{})
-		return Dehydration{
-			fields:         nil,
-			hydratedType:   hydratedField.Type,
-			DehydratedType: polymorphType,
 		}, false, nil
 	} else {
 		fieldDehydration, err := DehydrateType(hydratedField.Type)

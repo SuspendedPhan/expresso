@@ -87,7 +87,7 @@ func rehydrateField(m FieldMapping, registry PolymorphRegistry) (_ reflect.Value
 		rehyValue := reflect.Zero(m.rehySField.Type)
 		hnd.Assert(rehyValue.Kind() == reflect.Ptr || rehyValue.Kind() == reflect.Interface)
 		return rehyValue, nil
-	} else if m.rehySField.Tag.Get(HydrationTag) == PolymorphRefTag {
+	} else if m.rehySField.Type.Kind() == reflect.Interface {
 		rehyValue, err := Rehydrate(m.dehyField, registry)
 		hnd.AssertNilErr(err)
 		return rehyValue, nil

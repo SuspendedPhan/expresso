@@ -44,8 +44,3 @@ func (p *Polymorph) Type(registry PolymorphRegistry) (_ reflect.Type, err error)
 	handler.Assert(ok)
 	return t, nil
 }
-
-func isHydrationPolymorph(field reflect.StructField) bool {
-	value, ok := field.Tag.Lookup(HydrationTag)
-	return ok && (value == PolymorphRefTag)
-}
