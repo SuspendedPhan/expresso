@@ -57,21 +57,10 @@ func TestDehydrateAttribute(t *testing.T) {
 	attribute.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
 	expected := `{"RootNode":{"TypeId":"f6261e46-ca56-4bfa-93ad-a14a3e1b3f05","Value":{"Value":10,"NodeBase":{"Id":{"Id":"bc0bd040-8241-42bb-90b5-44756935fd45"},"ParentNode":"","Attribute":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}},"Name":{"Name":""},"Id":{"Id":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}`
 	dehydrated, err := hydration.Dehydrate(reflect.ValueOf(attribute))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	marshal, err := json.Marshal(dehydrated.Interface())
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, string(marshal))
-}
-
-func Unmarshal(marshal []byte, hydratedType reflect.Type) (_ reflect.Value, err error) {
-	defer common.AddErrorInfo(&err, "Unmarshal", hydratedType.String())()
-	dehydration, err := hydration.DehydrateType(hydratedType)
-	unmarshaled := reflect.New(dehydration.DehydratedType)
-	println(string(marshal))
-	println()
-	spew.Dump(unmarshaled.Interface())
-	err = json.Unmarshal(marshal, unmarshaled.Interface())
-	return reflect.Value{}, nil
 }
 
 func TestTemp(t *testing.T) {
@@ -239,4 +228,15 @@ func dumpExpected(err error, dump interface{}) error {
 
 	spew.Fdump(open, dump)
 	return nil
+}
+
+func Unmarshal(marshal []byte, hydratedType reflect.Type) (_ reflect.Value, err error) {
+	defer common.AddErrorInfo(&err, "Unmarshal", hydratedType.String())()
+	dehydration, err := hydration.DehydrateType(hydratedType)
+	unmarshaled := reflect.New(dehydration.DehydratedType)
+	println(string(marshal))
+	println()
+	spew.Dump(unmarshaled.Interface())
+	err = json.Unmarshal(marshal, unmarshaled.Interface())
+	return reflect.Value{}, nil
 }

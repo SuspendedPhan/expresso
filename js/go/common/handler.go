@@ -61,10 +61,14 @@ func (h *Handler) handle(recovered interface{}) {
 	}
 }
 
-func (h *Handler) AssertNilErr(err error) {
+func (h *Handler) AssertNilErr(err error, objs ...interface{}) {
 	if err != nil {
 		h.assertionFailed = true
-		panic(assertionError{err: err})
+		if len(objs) == 0 {
+			panic(assertionError{err: err})
+		} else {
+			panic(assertionError{err: fmt.Errorf("%v:\n%v", objsToString(objs), err)})
+		}
 	}
 }
 

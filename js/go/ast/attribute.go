@@ -6,7 +6,7 @@ import (
 )
 
 type Attribute struct {
-	RootNode Node `hydration:"polymorph"`
+	RootNode Node
 	common.Name
 	common.Id
 	OnRootNodeChanged chan struct{} `json:"-"`
