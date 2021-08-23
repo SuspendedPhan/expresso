@@ -98,7 +98,7 @@ func DehydrateFieldType(hydratedField reflect.StructField) (_ Dehydration, skip 
 	}
 }
 
-func Dehydrate(obj reflect.Value) (_ reflect.Value, err error) {
+func Dehydrate(obj reflect.Value, registry PolymorphRegistry) (_ reflect.Value, err error) {
 	hnd := common.NewHandler(&err, "Dehydrate", obj.Type().String())
 	defer hnd.Handle()
 
@@ -113,15 +113,36 @@ func Dehydrate(obj reflect.Value) (_ reflect.Value, err error) {
 	DebugLog(fmt.Sprintf("dehydrate %v", objElem.Type().Name()))
 
 	if obj.Kind() == reflect.Interface {
-		return dehydratePolymorph(objElem, PolymorphRegistryInstance)
+		return dehydratePolymorph(objElem.Value, registry)
 	} else if objElem.Kind() == reflect.Struct {
-		return dehydrateStruct(objElem)
+		return dehydrateStruct(objElem.Value, registry)
+	} else if objElem.Kind() == reflect.Slice {
+		return dehydrateSlice(objElem, registry)
 	} else {
-		return objElem, nil
+		return objElem.Value, nil
 	}
 }
 
-func dehydrateStruct(hydratedElem reflect.Value) (dehydratedStruct reflect.Value, err error) {
+type Elem struct {
+	reflect.Value
+}
+
+func dehydrateSlice(array Elem, registry PolymorphRegistry) (_ reflect.Value, err error) {
+	hnd := common.NewHandler(&err, "")
+	defer hnd.Handle()
+
+	de := make([]interface{}, 0)
+	for i := 0; i < array.Len(); i++ {
+		el := array.Index(i)
+		dEl, err := Dehydrate(el, registry)
+		hnd.AssertNilErr(err, i)
+		de = append(de, dEl.Interface())
+	}
+
+	return reflect.ValueOf(de), nil
+}
+
+func dehydrateStruct(hydratedElem reflect.Value, registry PolymorphRegistry) (dehydratedStruct reflect.Value, err error) {
 	hnd := common.NewHandler(&err, "dehydrate struct | hydratedElem", hydratedElem.Type().Name())
 	defer hnd.Handle()
 
@@ -131,11 +152,11 @@ func dehydrateStruct(hydratedElem reflect.Value) (dehydratedStruct reflect.Value
 	DebugLog("")
 	DebugLog(fmt.Sprintf("=== done dehydrating type %v ===", hydratedElem.Type().String()))
 	DebugLog("")
-	struct0, err := dehydrateStruct0(hydratedElem, dehydratedStructType)
+	struct0, err := dehydrateStruct0(hydratedElem, dehydratedStructType, registry)
 	return struct0, err
 }
 
-func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (dehydratedStruct reflect.Value, err error) {
+func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration, registry PolymorphRegistry) (dehydratedStruct reflect.Value, err error) {
 	hnd := common.NewHandler(&err, "dehydrateStruct0", hydratedStruct.Type().String())
 	defer hnd.Handle()
 
@@ -159,7 +180,7 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 
 		if isHydrationRef(hydratedStructField) {
 			if hydratedField.IsNil() {
-				fmt.Println("can't get ID of nil", dehydratedStructField.Name)
+				DebugLogf("can't get ID of nil", dehydratedStructField.Name)
 			} else {
 				method := hydratedField.MethodByName("GetId")
 				hnd.Assert(method.IsValid(), "this field doesn't have a GetId method")
@@ -168,7 +189,7 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 				dehydratedField.Set(id)
 			}
 		} else if dehydratedStructField.Type.Kind() == reflect.Struct && dehydratedStructField.Type != reflect.TypeOf(Polymorph{}) {
-			value, err := dehydrateStruct0(hydratedField, field.dehydration)
+			value, err := dehydrateStruct0(hydratedField, field.dehydration, registry)
 			if err != nil {
 				return reflect.Value{}, err
 			}
@@ -181,7 +202,7 @@ func dehydrateStruct0(hydratedStruct reflect.Value, dehydration Dehydration) (de
 			)
 			dehydratedField.Set(value)
 		} else {
-			value, err := Dehydrate(hydratedField)
+			value, err := Dehydrate(hydratedField, registry)
 			hnd.AssertNilErr(err)
 			err = SetSafe(dehydratedField, value)
 			hnd.AssertNilErr(err, "try set safe", hydratedStructField.Name)
@@ -195,10 +216,10 @@ func dehydratePolymorph(obj reflect.Value, registry PolymorphRegistry) (_ reflec
 	defer hnd.Handle()
 
 	typeId, ok := registry.GetTypeId(obj.Interface())
-	hnd.Assert(ok, "not registered")
+	hnd.Assert(ok, "not registered", obj.Type().String())
 
 	// We could be unnecessarily dehydrating the type multiple times at this point.
-	value, err := Dehydrate(obj)
+	value, err := Dehydrate(obj, registry)
 	hnd.AssertNilErr(err)
 
 	poly := Polymorph{
@@ -225,11 +246,11 @@ func IdempotentTypeElem(t reflect.Type) reflect.Type {
 	}
 }
 
-func IdempotentElem(t reflect.Value) reflect.Value {
+func IdempotentElem(t reflect.Value) Elem {
 	if t.Kind() == reflect.Ptr || t.Kind() == reflect.Interface {
-		return t.Elem()
+		return Elem{Value: t.Elem()}
 	} else {
-		return t
+		return Elem{Value: t}
 	}
 }
 
