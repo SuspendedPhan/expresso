@@ -6,33 +6,9 @@ import (
 	"reflect"
 )
 
-func Rehydrate(dehydratedPolymorph reflect.Value, registry PolymorphRegistry) (_ reflect.Value, err error) {
-	elem := IdempotentElem(IdempotentElem(dehydratedPolymorph))
-	polymorph := Polymorph{
-		TypeId: elem.FieldByName(TypeIdFieldName).String(),
-		Value:  elem.FieldByName(ValueFieldName).Interface(),
-	}
-	return rehydratePolymorph(polymorph, registry)
-}
-
-func rehydratePolymorph(polymorph Polymorph, registry PolymorphRegistry) (_ reflect.Value, err error) {
-	hnd := common.NewHandler(&err, "rehydratePolymorph")
-	//hnd.DontRecover()
-	defer hnd.Handle()
-
-	t, err := polymorph.Type(registry)
-	hnd.AssertNilErr(err)
-
-	valueElem := IdempotentElem(reflect.ValueOf(polymorph.Value))
-	hnd.Assert(valueElem.Kind() == reflect.Struct, "expected struct kind", valueElem.Kind())
-
-	r, err := rehydrateStruct(valueElem, t, registry)
-	hnd.AssertNilErr(err)
-
-	return r, err
-}
-
-func rehydrateStruct(dehyElem reflect.Value, rehyElemType reflect.Type, registry PolymorphRegistry) (_ reflect.Value, err error) {
+func RehydrateStruct(dehydratedObj reflect.Value, rehydratedType reflect.Type, registry PolymorphRegistry) (_ reflect.Value, err error) {
+	rehyElemType := IdempotentTypeElem(rehydratedType)
+	dehyElem := IdempotentElem(dehydratedObj)
 	hnd := common.NewHandler(&err, "rehydrateStruct", dehyElem.Type().String(), rehyElemType.String())
 	defer hnd.Handle()
 
@@ -79,6 +55,29 @@ func rehydrateStruct(dehyElem reflect.Value, rehyElemType reflect.Type, registry
 	return rehyPtr, nil
 }
 
+func rehydratePolymorph(dehydratedPolymorph reflect.Value, registry PolymorphRegistry) (_ reflect.Value, err error) {
+	elem := IdempotentElem(IdempotentElem(dehydratedPolymorph))
+	polymorph := Polymorph{
+		TypeId: elem.FieldByName(TypeIdFieldName).String(),
+		Value:  elem.FieldByName(ValueFieldName).Interface(),
+	}
+
+	hnd := common.NewHandler(&err, "rehydratePolymorph")
+	//hnd.DontRecover()
+	defer hnd.Handle()
+
+	t, err := polymorph.Type(registry)
+	hnd.AssertNilErr(err)
+
+	valueElem := IdempotentElem(reflect.ValueOf(polymorph.Value))
+	hnd.Assert(valueElem.Kind() == reflect.Struct, "expected struct kind", valueElem.Kind())
+
+	r, err := RehydrateStruct(valueElem, t, registry)
+	hnd.AssertNilErr(err)
+
+	return r, err
+}
+
 func rehydrateField(m FieldMapping, registry PolymorphRegistry) (_ reflect.Value, err error) {
 	hnd := common.NewHandler(&err, "rehydrateField", m.rehySField.Name, m.rehyField.Type().String())
 	defer hnd.Handle()
@@ -88,11 +87,11 @@ func rehydrateField(m FieldMapping, registry PolymorphRegistry) (_ reflect.Value
 		hnd.Assert(rehyValue.Kind() == reflect.Ptr || rehyValue.Kind() == reflect.Interface)
 		return rehyValue, nil
 	} else if m.rehySField.Type.Kind() == reflect.Interface {
-		rehyValue, err := Rehydrate(m.dehyField, registry)
+		rehyValue, err := rehydratePolymorph(m.dehyField, registry)
 		hnd.AssertNilErr(err)
 		return rehyValue, nil
 	} else if m.rehyField.Kind() == reflect.Struct {
-		rehyValue, err := rehydrateStruct(m.dehyField, m.rehyField.Type(), registry)
+		rehyValue, err := RehydrateStruct(m.dehyField, m.rehyField.Type(), registry)
 		hnd.AssertNilErr(err)
 		return rehyValue, nil
 	} else {

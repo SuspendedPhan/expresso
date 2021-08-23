@@ -36,16 +36,16 @@ func TestRehydrateAttribute(t *testing.T) {
 	deAttr, err := hydration.Dehydrate(reflect.ValueOf(attr))
 	assert.NoError(t, err)
 
-	root, err := registry.NewPolymorph(attr, deAttr.Interface())
-	assert.NoError(t, err)
-
-	rehydrated, err := hydration.Rehydrate(reflect.ValueOf(root), registry)
+	rehydrated, err := hydration.RehydrateStruct(deAttr, reflect.TypeOf(attr), registry)
 	assert.NoError(t, err)
 
 	err = dumpActual(rehydrated.Interface())
 	assert.NoError(t, err)
 
-	assert.Equal(t, root, rehydrated)
+	err = dumpExpected(attr)
+	assert.NoError(t, err)
+
+	assert.Equal(t, attr.RootNode.(*NumberNode).Value, rehydrated.Interface().(*Attribute).RootNode.(*NumberNode).Value)
 }
 
 func TestDehydrateAttribute(t *testing.T) {
@@ -216,7 +216,7 @@ func dumpActual(dump interface{}) (err error) {
 	return nil
 }
 
-func dumpExpected(err error, dump interface{}) error {
+func dumpExpected(dump interface{}) (err error) {
 	hnd := common.NewHandler(&err)
 	defer hnd.Handle()
 
