@@ -40,26 +40,40 @@ func populateRefs(obj reflect.Value) (err error) {
 		}
 		return true
 	})
+	return nil
+}
+
+func traverse(obj reflect.Value, visit func(v reflect.Value) (shouldTraverseChildren bool)) {
+	shouldTraverse := visit(obj)
+	elem := IdempotentElem(obj)
+	if elem.Kind() == reflect.Struct && shouldTraverse {
+		for i := 0; i < elem.NumField(); i++ {
+			field := elem.Field(i)
+			traverse(field, visit)
+		}
+	}
 }
 
 func rehydrate(dehydratedObj reflect.Value, rehydratedType reflect.Type, registry PolymorphRegistry) (_ reflect.Value, err error) {
 	hnd := common.NewHandler(&err, "Rehydrate", rehydratedType.String())
 	defer hnd.Handle()
 
-	if rehydratedType.Kind() == reflect.Interface {
+	rehydratedElemType := IdempotentTypeElem(rehydratedType)
+
+	if rehydratedElemType.Kind() == reflect.Interface {
 		r, err := rehydratePolymorph(dehydratedObj, registry)
 		hnd.AssertNilErr(err)
 		return r, nil
 	}
 
-	if rehydratedType.Kind() == reflect.Struct {
-		r, err := rehydrateStruct(dehydratedObj, rehydratedType, registry)
+	if rehydratedElemType.Kind() == reflect.Struct {
+		r, err := rehydrateStruct(dehydratedObj, rehydratedElemType, registry)
 		hnd.AssertNilErr(err)
 		return r, nil
 	}
 
-	if rehydratedType.Kind() == reflect.Slice {
-		r, err := rehydrateSlice(dehydratedObj, rehydratedType, registry)
+	if rehydratedElemType.Kind() == reflect.Slice {
+		r, err := rehydrateSlice(dehydratedObj, rehydratedElemType, registry)
 		hnd.AssertNilErr(err)
 		return r, nil
 	}
