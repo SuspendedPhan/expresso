@@ -20,7 +20,10 @@ import PixiRenderer from "@/code/PixiRenderer";
 import fps from "fps";
 import numeral from "numeral";
 
+// Defined in public/wasm_exec.js, which is loaded in index.html
 declare var Go: any;
+
+// Defined in go_module.go, available after go.run(result.instance)
 declare var GoModule: any;
 
 export default {
@@ -32,9 +35,10 @@ export default {
     const viewport = ref(null);
     const canvas = ref(null);
 
+    // GoModuleWasm is the path to the mymodule.wasm file
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
-      // go_module.go - js.Global().Set("GoModule", goModule)
+
       setupRootOrganism.value = () => GoModule.setupRootOrganism(ref, watch, computed);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
