@@ -34,6 +34,7 @@ export default {
 
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
+      // go_module.go - js.Global().Set("GoModule", goModule)
       setupRootOrganism.value = () => GoModule.setupRootOrganism(ref, watch, computed);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
