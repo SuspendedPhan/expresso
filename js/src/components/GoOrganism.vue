@@ -12,6 +12,7 @@ export default {
   components: {GoAttribute},
   props: {setupFunc: {}},
   setup(props) {
+    // setupFunc() returns an object where all the keys can be used as variables in the template
     return props.setupFunc();
   }
 }
