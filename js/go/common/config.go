@@ -23,7 +23,11 @@ func load() ConfigStruct {
 	filePath := getConfigPath()
 	file, err := os.ReadFile(filePath)
 	println(filePath)
-	AssertNilErr(err)
+	if err != nil {
+		println("Warning: config file not found. Using default config options.")
+		return ConfigStruct{}
+	}
+
 	config := ConfigStruct{}
 	err = yaml.Unmarshal(file, &config)
 	AssertNilErr(err)
