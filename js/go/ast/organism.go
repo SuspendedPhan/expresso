@@ -8,6 +8,7 @@ import (
 
 type Organism struct {
 	common.Id
+	common.Name
 	PlayerAttributes                   []*Attribute
 	IntrinsicAttributeByProtoAttribute map[*protos.ProtoAttribute]*IntrinsicAttribute
 	OnAttributesChanged                *Signal

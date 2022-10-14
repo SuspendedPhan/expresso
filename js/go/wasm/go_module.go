@@ -2,6 +2,7 @@ package wasm
 
 import (
 	"expressionista/ast"
+	"strconv"
 	"syscall/js"
 )
 
@@ -30,6 +31,14 @@ func bootstrapGoModule() {
 		return setupOrganism(rootOrganism, vue)
 	}).Value)
 
+	goModule.Set("setupExpressor", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		ref := args[0]
+		watch := args[1]
+		computed := args[2]
+		vue := vue{ref, watch, computed}
+		return setupExpressor(vue)
+	}).Value)
+
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		circlePool := args[0]
 		circles := args[1]
@@ -51,6 +60,39 @@ func setupOrganism(organism *ast.Organism, vue vue) interface{} {
 	returnValue := makeEmptyObject()
 	returnValue.Set("attributes", attributes)
 	return returnValue
+}
+
+func setupExpressor(vue vue) js.Value {
+	count := 0
+
+	rootOrgs := make([]*ast.Organism, 0)
+	rootOrgsRef := vue.ref.Invoke()
+	rootOrgsRef.Set("value", makeEmptyArray())
+
+	ret := makeEmptyObject()
+	ret.Set("rootOrganismsRef", rootOrgsRef)
+	ret.Set("addOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		org := ast.NewOrganism()
+		org.SetName("organism" + strconv.Itoa(count))
+		count++
+		rootOrgs = append(rootOrgs, org)
+
+		rootOrgsRef.Set("value", getOrganismsArray(rootOrgs, vue))
+		return nil
+	}))
+	return ret
+}
+
+func getOrganismsArray(organisms []*ast.Organism, vue vue) js.Value {
+	arr := makeEmptyArray()
+	for i, el := range organisms {
+		el := el
+		childValue := makeEmptyObject()
+		childValue.Set("id", el.GetId())
+		childValue.Set("name", el.GetName())
+		arr.SetIndex(i, childValue)
+	}
+	return arr
 }
 
 func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
