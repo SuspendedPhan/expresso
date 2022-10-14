@@ -2,7 +2,7 @@
   <div>
     <div class="flex">
       <div class="w-1/2 h-full">
-        <GoOrganism v-if="setupRootOrganism !== null" :setupFunc="setupRootOrganism"/>
+        <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor"/>
       </div>
       <div ref="viewport" class="h-full w-1/2">
         <canvas ref="canvas"></canvas>
@@ -15,7 +15,7 @@
 <script lang="ts">
 import GoModuleWasm from "../../public/mymodule.wasm";
 import {computed, onMounted, onUnmounted, ref, watch} from "@vue/composition-api";
-import GoOrganism from "@/components/GoOrganism.vue";
+import GoExpressor from "@/components/GoExpressor.vue";
 import PixiRenderer from "@/code/PixiRenderer";
 import fps from "fps";
 import numeral from "numeral";
@@ -28,10 +28,10 @@ declare var GoModule: any;
 
 export default {
   name: "GoTest",
-  components: {GoOrganism},
+  components: {GoExpressor},
   setup() {
     const go = new Go();
-    const setupRootOrganism = ref<any>(null);
+    const setupExpressor = ref<any>(null);
     const viewport = ref(null);
     const canvas = ref(null);
 
@@ -39,7 +39,7 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
 
-      setupRootOrganism.value = () => GoModule.setupRootOrganism(ref, watch, computed);
+      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
         ticker.tick();
@@ -53,7 +53,7 @@ export default {
     const ticker = fps({ every: 10 });
     ticker.on("data", (framerate) => (framesPerSecond.value = numeral(framerate).format("0")));
 
-    return {setupRootOrganism, viewport, canvas, framesPerSecond};
+    return {setupExpressor, viewport, canvas, framesPerSecond};
   }
 }
 </script>

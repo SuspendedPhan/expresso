@@ -59,6 +59,8 @@ func setupOrganism(organism *ast.Organism, vue vue) interface{} {
 
 	returnValue := makeEmptyObject()
 	returnValue.Set("attributes", attributes)
+	returnValue.Set("name", organism.GetName())
+	returnValue.Set("id", organism.GetId())
 	return returnValue
 }
 
@@ -70,7 +72,7 @@ func setupExpressor(vue vue) js.Value {
 	rootOrgsRef.Set("value", makeEmptyArray())
 
 	ret := makeEmptyObject()
-	ret.Set("rootOrganismsRef", rootOrgsRef)
+	ret.Set("rootOrganisms", rootOrgsRef)
 	ret.Set("addOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		org := ast.NewOrganism()
 		org.SetName("organism" + strconv.Itoa(count))
@@ -83,13 +85,16 @@ func setupExpressor(vue vue) js.Value {
 	return ret
 }
 
+// getOrganismsArray returns [{ id, setupFunc }]
 func getOrganismsArray(organisms []*ast.Organism, vue vue) js.Value {
 	arr := makeEmptyArray()
 	for i, el := range organisms {
 		el := el
 		childValue := makeEmptyObject()
 		childValue.Set("id", el.GetId())
-		childValue.Set("name", el.GetName())
+		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return setupOrganism(el, vue)
+		}))
 		arr.SetIndex(i, childValue)
 	}
 	return arr

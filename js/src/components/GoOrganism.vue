@@ -1,6 +1,8 @@
 <template>
   <div>
-    <GoAttribute v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>
+    <div>{{name}}</div>
+    <div>{{id}}</div>
+<!--    <GoAttribute v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>-->
   </div>
 </template>
 
