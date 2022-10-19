@@ -1,8 +1,8 @@
 package wasm
 
 import (
-	"expressionista/ast"
-	"expressionista/protos"
+	"expressioni.sta/ast"
+	"expressioni.sta/protos"
 	"strings"
 	"syscall/js"
 )

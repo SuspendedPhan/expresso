@@ -1,7 +1,7 @@
 package reflectkind
 
 import (
-	"expressionista/common"
+	"expressioni.sta/common"
 	"reflect"
 )
 

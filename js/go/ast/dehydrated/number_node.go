@@ -1,6 +1,6 @@
 package dehydrated
 
-import "expressionista/ast"
+import "expressioni.sta/ast"
 
 type NumberNode struct {
 	NodeType string

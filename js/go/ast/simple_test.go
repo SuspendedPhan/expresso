@@ -2,7 +2,7 @@ package ast
 
 import (
 	"encoding/json"
-	"expressionista/common"
+	"expressioni.sta/common"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

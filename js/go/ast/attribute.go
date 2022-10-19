@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"expressionista/common"
+	"expressioni.sta/common"
 	"github.com/google/uuid"
 )
 

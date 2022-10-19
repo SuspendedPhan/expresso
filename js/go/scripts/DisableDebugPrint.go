@@ -1,7 +1,7 @@
 package main
 
 import (
-	"expressionista/common"
+	"expressioni.sta/common"
 )
 
 func main() {

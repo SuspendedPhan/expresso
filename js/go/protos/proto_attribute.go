@@ -1,7 +1,7 @@
 package protos
 
 import (
-	"expressionista/common"
+	"expressioni.sta/common"
 	"github.com/google/uuid"
 )
 

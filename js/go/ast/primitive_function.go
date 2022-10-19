@@ -1,6 +1,6 @@
 package ast
 
-import "expressionista/common"
+import "expressioni.sta/common"
 
 var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 

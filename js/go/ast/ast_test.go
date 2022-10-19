@@ -2,9 +2,9 @@ package ast
 
 import (
 	"encoding/json"
-	"expressionista/common"
-	"expressionista/hydration"
-	"expressionista/protos"
+	"expressioni.sta/common"
+	"expressioni.sta/hydration"
+	"expressioni.sta/protos"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 	"os"

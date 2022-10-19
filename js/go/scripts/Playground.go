@@ -1,7 +1,7 @@
 package main
 
 import (
-	"expressionista/ast"
+	"expressioni.sta/ast"
 	"github.com/davecgh/go-spew/spew"
 	"reflect"
 )

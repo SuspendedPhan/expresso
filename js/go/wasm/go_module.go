@@ -1,7 +1,7 @@
 package wasm
 
 import (
-	"expressionista/ast"
+	"expressioni.sta/ast"
 	"strconv"
 	"syscall/js"
 )

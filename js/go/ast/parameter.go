@@ -1,6 +1,6 @@
 package ast
 
-import "expressionista/common"
+import "expressioni.sta/common"
 
 type PrimitiveFunctionParameter struct {
 	common.Name

@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"expressionista/common"
-	"expressionista/protos"
+	"expressioni.sta/common"
+	"expressioni.sta/protos"
 )
 
 type AttributeOutput struct {

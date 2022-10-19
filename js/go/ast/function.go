@@ -1,6 +1,6 @@
 package ast
 
-import "expressionista/common"
+import "expressioni.sta/common"
 
 type Function struct {
 	common.Name
