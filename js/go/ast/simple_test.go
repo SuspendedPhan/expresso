@@ -2,7 +2,6 @@ package ast
 
 import (
 	"encoding/json"
-	"expressioni.sta/common"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -63,27 +62,27 @@ func populateAttrNodes(attrs []*Attribute, funs []*Function) {
 }
 
 func unmarshalAttrs([]byte) []*Attribute {
-
+	return nil
 }
 
 func unmarshalFuns([]byte) []*Function {
-
+	return nil
 }
 
 func marshalAttrs(attrs ...*Attribute) []byte {
-
+	return nil
 }
 
 func marshalFuns(funs ...*Function) []byte {
-
+	return nil
 }
 
 func marshalAttrRefNode(n *AttributeReferenceNode) []byte {
-
+	return nil
 }
 
 func unmarshalAttrRefNode(str []byte) AttributeReferenceNode {
-
+	return AttributeReferenceNode{}
 }
 
 func fromJson(j []byte) NumberNode {
