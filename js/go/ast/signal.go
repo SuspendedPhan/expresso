@@ -18,7 +18,7 @@ func (sig *Signal) On(callback func()) (off func()) {
 	}
 }
 
-func (sig Signal) dispatch() {
+func (sig Signal) Dispatch() {
 	for subscriber := range sig.subscribers {
 		subscriber.callback()
 	}

@@ -23,7 +23,7 @@ func TestRehydrateAttrRefNode(t *testing.T) {
 
 	attr := NewAttribute()
 	attr.SetId("f954e72d-c43d-4030-9953-486e1ea92c2b")
-	attr.setRootNode(NewNumberNode(10))
+	attr.SetRootNode(NewNumberNode(10))
 
 	node := NewAttributeReferenceNode(attr)
 	node.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
@@ -55,7 +55,7 @@ func TestRehydrateAttribute(t *testing.T) {
 	attr := NewAttribute()
 	numberNode := NewNumberNode(10)
 	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
-	attr.setRootNode(numberNode)
+	attr.SetRootNode(numberNode)
 	attr.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
 
 	deAttr, err := hydration.Dehydrate(reflect.ValueOf(attr), registry)
@@ -81,7 +81,7 @@ func TestDehydrateArray(t *testing.T) {
 	node2 := NewNumberNode(20)
 	node2.SetId("1f24d6b3-f9b1-40f5-a64f-1fc97b05b461")
 	attr := NewAttribute()
-	attr.setRootNode(node)
+	attr.SetRootNode(node)
 	attr.SetId("65d9f02d-482c-493c-9118-c7b6ea9c52a5")
 
 	root := []interface{}{attr, node2}
@@ -102,7 +102,7 @@ func TestDehydrateAttributeReferenceNode(t *testing.T) {
 	attribute := NewAttribute()
 	attribute.SetName("radius")
 	node := NewAttributeReferenceNode(attribute)
-	attribute.setRootNode(node)
+	attribute.SetRootNode(node)
 	testDehydrateAndMarshal(t, node)
 }
 
@@ -112,7 +112,7 @@ func TestDehydrateAttribute(t *testing.T) {
 	attribute := NewAttribute()
 	numberNode := NewNumberNode(10)
 	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
-	attribute.setRootNode(numberNode)
+	attribute.SetRootNode(numberNode)
 	attribute.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
 	expected := `{"RootNode":{"TypeId":"f6261e46-ca56-4bfa-93ad-a14a3e1b3f05","Value":{"Value":10,"NodeBase":{"Id":{"Id":"bc0bd040-8241-42bb-90b5-44756935fd45"},"ParentNode":"","Attribute":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}},"Name":{"Name":""},"Id":{"Id":"9e9c495c-7837-43c6-bd9b-eb4126569bf7"}}`
 	dehydrated, err := hydration.Dehydrate(reflect.ValueOf(attribute), registry)
@@ -146,7 +146,7 @@ func TestUnmarshal(t *testing.T) {
 	attribute := NewAttribute()
 	numberNode := NewNumberNode(10)
 	numberNode.SetId("bc0bd040-8241-42bb-90b5-44756935fd45")
-	attribute.setRootNode(numberNode)
+	attribute.SetRootNode(numberNode)
 	attribute.SetId("9e9c495c-7837-43c6-bd9b-eb4126569bf7")
 
 	dehydrated, err := hydration.Dehydrate(reflect.ValueOf(attribute), registry)
@@ -246,7 +246,7 @@ func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius
 	intensityRootNode := NewPrimitiveFunctionCallNode(addFunction)
 	intensityRootNode.SetArgument(addParam0, NewExternalAttributeReferenceNode(time))
 	intensityRootNode.SetArgument(addParam1, NewNumberNode(10))
-	intensity.setRootNode(intensityRootNode)
+	intensity.SetRootNode(intensityRootNode)
 
 	moon := NewOrganismFromProto(protoCircle)
 	earth.AddSuborganism(moon)
@@ -256,9 +256,9 @@ func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius
 	radiusNode := NewFunctionCallNode(averageFunction)
 	radiusNode.setArgumentByIndex(0, NewAttributeReferenceNode(intensity))
 	radiusNode.setArgumentByIndex(1, NewCloneNumberReferenceNode(moon))
-	radius.setRootNode(radiusNode)
+	radius.SetRootNode(radiusNode)
 
-	moon.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].setRootNode(NewNumberNode(2))
+	moon.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].SetRootNode(NewNumberNode(2))
 
 	return
 }

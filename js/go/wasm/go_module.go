@@ -61,6 +61,10 @@ func setupOrganism(organism *ast.Organism, vue vue) interface{} {
 	returnValue.Set("attributes", attributes)
 	returnValue.Set("name", organism.GetName())
 	returnValue.Set("id", organism.GetId())
+	returnValue.Set("addAttribute", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		organism.AddAttribute()
+		return nil
+	}))
 	return returnValue
 }
 
@@ -119,6 +123,7 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	rootNodeId := vue.ref.Invoke(a.RootNode.GetId())
 	returnValue.Set("id", a.GetId())
 	returnValue.Set("rootNodeId", rootNodeId)
+	returnValue.Set("name", a.GetName())
 	rootNodeSetupFunc := vue.ref.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue)
 	}))

@@ -16,7 +16,7 @@ func TestSimple(t *testing.T) {
 func TestAttrRefNode(t *testing.T) {
 	num := NewNumberNode(10)
 	attribute := NewAttribute()
-	attribute.setRootNode(num)
+	attribute.SetRootNode(num)
 	n := NewAttributeReferenceNode(attribute)
 
 	nJson := marshalAttrRefNode(n)
@@ -38,16 +38,16 @@ func TestComplex(t *testing.T) {
 
 	x := NewAttribute()
 	x.SetName("x")
-	x.setRootNode(NewNumberNode(10))
+	x.SetRootNode(NewNumberNode(10))
 	y := NewAttribute()
 	y.SetName("y")
-	y.setRootNode(NewNumberNode(20))
+	y.SetRootNode(NewNumberNode(20))
 
 	averageCall := NewFunctionCallNode(average)
 	averageCall.setArgumentByIndex(0, NewAttributeReferenceNode(x))
 	averageCall.setArgumentByIndex(1, NewAttributeReferenceNode(y))
 	radius := NewAttribute()
-	radius.setRootNode(averageCall)
+	radius.SetRootNode(averageCall)
 
 	marshFuns := marshalFuns(average)
 	marshAttrs := marshalAttrs(x, y, radius)

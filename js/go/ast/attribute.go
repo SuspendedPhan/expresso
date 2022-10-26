@@ -22,7 +22,7 @@ func (a Attribute) eval(evalContext *EvalContext) Value {
 	return a.RootNode.Eval(evalContext)
 }
 
-func (a *Attribute) setRootNode(node Node) {
+func (a *Attribute) SetRootNode(node Node) {
 	node.SetAttribute(a)
 	a.RootNode = node
 	go func() {

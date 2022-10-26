@@ -4,6 +4,7 @@ import (
 	"expressioni.sta/common"
 	"expressioni.sta/protos"
 	"github.com/google/uuid"
+	"strconv"
 )
 
 type Organism struct {
@@ -21,14 +22,20 @@ func NewOrganism() *Organism {
 	o.OnAttributesChanged = NewSignal()
 	o.IntrinsicAttributeByProtoAttribute = make(map[*protos.ProtoAttribute]*Attribute)
 	clonesAttribute := NewAttribute()
-	clonesAttribute.setRootNode(NewNumberNode(1))
+	clonesAttribute.SetRootNode(NewNumberNode(1))
 	o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute] = clonesAttribute
 	return o
 }
 
+var attrCount = 0
+
 func (o *Organism) AddAttribute() *Attribute {
 	attribute := NewAttribute()
+	attribute.SetName("attrib" + strconv.Itoa(attrCount))
+	attrCount++
+	attribute.SetRootNode(NewNumberNode(0))
 	o.PlayerAttributes = append(o.PlayerAttributes, attribute)
+	o.OnAttributesChanged.Dispatch()
 	return attribute
 }
 
@@ -69,7 +76,7 @@ func (o *Organism) EvalBak() OrganismOutput {
 func (o *Organism) AddIntrinsicAttribute(proto *protos.ProtoAttribute) {
 	attribute := NewAttribute()
 	rootNode := NewNumberNode(0)
-	attribute.setRootNode(rootNode)
+	attribute.SetRootNode(rootNode)
 	attribute.Name = proto.Name
 	o.IntrinsicAttributeByProtoAttribute[proto] = attribute
 }

@@ -21,7 +21,7 @@ func Replace(old Node, new Node) {
 	parentNode := old.GetParentNode()
 	fmt.Printf("%+v\n", old)
 	if parentNode == nil {
-		old.GetAttribute().setRootNode(new)
+		old.GetAttribute().SetRootNode(new)
 	} else {
 		parentNode.ReplaceChild(old, new)
 	}
