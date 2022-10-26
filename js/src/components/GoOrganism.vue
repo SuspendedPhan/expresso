@@ -2,7 +2,8 @@
   <div>
     <div>{{name}}</div>
     <div>{{id}}</div>
-<!--    <GoAttribute v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>-->
+    <GoAttribute v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>
+    <button class="button" @click="addAttribute">Add Attribute</button>
   </div>
 </template>
 
