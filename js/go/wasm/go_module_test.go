@@ -60,6 +60,33 @@ func TestOrganism(t *testing.T) {
 	assert.Equal(t, "attrib1", name1)
 }
 
+func TestNodes(t *testing.T) {
+	attribute := ast.NewAttribute()
+	attribute.SetRootNode(ast.NewNumberNode(10))
+	gue := setupAttribute(attribute, mockVue())
+	setupObject := gue.Call("rootNodeSetupFunc")
+	nodeText := setupObject.Get("text").String()
+	assert.Equal(t, "10.00", nodeText)
+}
+
+func TestNodeChoices(t *testing.T) {
+	attribute := ast.NewAttribute()
+	node := ast.NewNumberNode(10)
+	node.SetAttribute(attribute)
+	gue := setupNode(node, mockVue())
+	gue.Call("onNodeChoiceQueryInput", "20")
+	nodeChoice := gue.Get("nodeChoices").Get("value").Index(0)
+	assert.Equal(t, "20", nodeChoice.Get("text").String())
+	nodeChoice.Call("commitFunc")
+	assert.Equal(t, "20.00", attribute.RootNode.GetText())
+
+	gue = setupNode(attribute.RootNode, mockVue())
+	gue.Call("onNodeChoiceQueryInput", "30")
+	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
+	nodeChoice.Call("commitFunc")
+	assert.Equal(t, "30.00", attribute.RootNode.GetText())
+}
+
 func mockVue() vue {
 	refFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return makeEmptyObject()

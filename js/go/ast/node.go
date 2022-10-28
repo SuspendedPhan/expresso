@@ -1,9 +1,5 @@
 package ast
 
-import (
-	"fmt"
-)
-
 type Node interface {
 	Eval(evalContext *EvalContext) Float
 	ReplaceChild(old Node, new Node)
@@ -19,7 +15,6 @@ type Node interface {
 
 func Replace(old Node, new Node) {
 	parentNode := old.GetParentNode()
-	fmt.Printf("%+v\n", old)
 	if parentNode == nil {
 		old.GetAttribute().SetRootNode(new)
 	} else {

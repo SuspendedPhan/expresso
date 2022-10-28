@@ -35,6 +35,6 @@ func (n2 NumberNode) GetChildren() []Node {
 }
 
 func NumberToString(number Float) string {
-	text := fmt.Sprintf("x = %.6f\n", number)
+	text := fmt.Sprintf("%.2f", number)
 	return text
 }

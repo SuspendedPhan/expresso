@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"reflect"
 	"syscall/js"
 )
@@ -20,7 +19,7 @@ type Component struct {
 }
 
 func toJsValue(object interface{}, vue vue) js.Value {
-	fmt.Printf("%+v\n", object)
+	//fmt.Printf("%+v\n", object)
 	reflectedObject := reflect.ValueOf(object)
 	println(reflectedObject.Type().String())
 	switch object.(type) {

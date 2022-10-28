@@ -124,9 +124,9 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	returnValue.Set("id", a.GetId())
 	returnValue.Set("rootNodeId", rootNodeId)
 	returnValue.Set("name", a.GetName())
-	rootNodeSetupFunc := vue.ref.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	rootNodeSetupFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue)
-	}))
+	})
 	returnValue.Set("rootNodeSetupFunc", rootNodeSetupFunc)
 
 	go forever(func() {
