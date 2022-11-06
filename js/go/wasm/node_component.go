@@ -36,7 +36,7 @@ func setupNode(node ast.Node, vue vue) js.Value {
 	// - commitFunc: function | A function to replace this node with the chosen node.
 	ret.Set("nodeChoices", nodeChoicesRef)
 
-	ret.Set("nodeChoiceQuery", nodeChoiceQueryRef)
+	ret.Set("nodeChoiceQuery", vue.readonly.Invoke(nodeChoiceQueryRef))
 
 	// onNodeChoiceQueryInput is called when the user types input into the node choice text box.
 	// args[0] | text: string | The full input.

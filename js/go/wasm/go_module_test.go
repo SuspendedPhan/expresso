@@ -74,7 +74,7 @@ func TestNodeChoices(t *testing.T) {
 	node := ast.NewNumberNode(10)
 	node.SetAttribute(attribute)
 	gue := setupNode(node, mockVue())
-	gue.Call("onNodeChoiceQueryInput", "20")
+	gue.Call("onNodeChoiceQueryInput", makeInputEvent("20"))
 	assert.Equal(t, "20", gue.Get("nodeChoiceQuery").Get("value").String())
 
 	nodeChoice := gue.Get("nodeChoices").Get("value").Index(0)
@@ -84,19 +84,37 @@ func TestNodeChoices(t *testing.T) {
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 
 	gue = setupNode(attribute.RootNode, mockVue())
-	gue.Call("onNodeChoiceQueryInput", "30")
+	gue.Call("onNodeChoiceQueryInput", makeInputEvent("30"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
+
+	//gue = setupNode(attribute.RootNode, mockVue())
+	//gue.Call("onNodeChoiceQueryInput", "+")
+	//nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
+	//assert.Equal(t, "+", nodeChoice.Get("text").String())
+	//nodeChoice.Call("commitFunc")
+	//assert.Equal(t, "+", attribute.RootNode.GetText())
+}
+
+func makeInputEvent(inputValue string) js.Value {
+	arg := makeEmptyObject()
+	arg.Set("target", makeEmptyObject())
+	arg.Get("target").Set("value", inputValue)
+	return arg
 }
 
 func mockVue() vue {
 	refFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return makeEmptyObject()
 	}))
+	readonlyFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return args[0]
+	}))
 	return vue{
 		ref:      refFunc,
 		watch:    js.Value{},
 		computed: js.Value{},
+		readonly: readonlyFunc,
 	}
 }

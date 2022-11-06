@@ -10,6 +10,7 @@ type vue struct {
 	ref      js.Value
 	watch    js.Value
 	computed js.Value
+	readonly js.Value
 }
 
 func bootstrapGoModule() {
@@ -27,7 +28,7 @@ func bootstrapGoModule() {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed}
+		vue := vue{ref, watch, computed, args[3]}
 		return setupOrganism(rootOrganism, vue)
 	}).Value)
 
@@ -35,7 +36,7 @@ func bootstrapGoModule() {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed}
+		vue := vue{ref, watch, computed, args[3]}
 		return setupExpressor(vue)
 	}).Value)
 
