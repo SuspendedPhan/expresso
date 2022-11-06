@@ -75,8 +75,11 @@ func TestNodeChoices(t *testing.T) {
 	node.SetAttribute(attribute)
 	gue := setupNode(node, mockVue())
 	gue.Call("onNodeChoiceQueryInput", "20")
+	assert.Equal(t, "20", gue.Get("nodeChoiceQuery").Get("value").String())
+
 	nodeChoice := gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "20", nodeChoice.Get("text").String())
+
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 

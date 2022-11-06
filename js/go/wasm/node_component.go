@@ -27,6 +27,8 @@ func setupNode(node ast.Node, vue vue) js.Value {
 	ret.Set("text", node.GetText())
 	nodeChoicesRef := vue.ref.Invoke()
 	nodeChoicesRef.Set("value", makeEmptyArray())
+	nodeChoiceQueryRef := vue.ref.Invoke()
+	nodeChoiceQueryRef.Set("value", "")
 
 	// nodeChoices is an array of options for the user to replace this node with another node based on the query given to
 	// onNodeChoiceQueryInput. Each element is an object with the following keys:
@@ -34,13 +36,15 @@ func setupNode(node ast.Node, vue vue) js.Value {
 	// - commitFunc: function | A function to replace this node with the chosen node.
 	ret.Set("nodeChoices", nodeChoicesRef)
 
+	ret.Set("nodeChoiceQuery", nodeChoiceQueryRef)
+
 	// onNodeChoiceQueryInput is called when the user types input into the node choice text box.
 	// args[0] | text: string | The full input.
 	ret.Set("onNodeChoiceQueryInput", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		query := args[0]
+		query := args[0].Get("target").Get("value").String()
 
 		nodeChoices := makeEmptyArray()
-		if number64, err := strconv.ParseFloat(query.String(), 32); err == nil {
+		if number64, err := strconv.ParseFloat(query, 32); err == nil {
 			nodeChoice := makeEmptyObject()
 			nodeChoice.Set("text", query)
 			nodeChoice.Set("commitFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -50,6 +54,7 @@ func setupNode(node ast.Node, vue vue) js.Value {
 			nodeChoices.SetIndex(0, nodeChoice)
 		}
 		nodeChoicesRef.Set("value", nodeChoices)
+		nodeChoiceQueryRef.Set("value", query)
 		return nil
 	}))
 	return ret
