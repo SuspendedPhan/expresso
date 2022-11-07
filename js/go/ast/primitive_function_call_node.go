@@ -27,7 +27,6 @@ func (p PrimitiveFunctionCallNode) Eval(evalContext *EvalContext) Float {
 }
 
 func (p *PrimitiveFunctionCallNode) ReplaceChild(old Node, new Node) {
-	println("replace child")
 	for parameter, node := range p.argumentByParameter {
 		if node == old {
 			p.SetArgument(parameter, new)

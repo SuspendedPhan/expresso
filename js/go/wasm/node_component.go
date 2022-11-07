@@ -24,11 +24,21 @@ type NodeChoice struct {
 
 func setupNode(node ast.Node, vue vue) js.Value {
 	ret := makeEmptyObject()
-	ret.Set("text", node.GetText())
 	nodeChoicesRef := vue.ref.Invoke()
 	nodeChoicesRef.Set("value", makeEmptyArray())
 	nodeChoiceQueryRef := vue.ref.Invoke()
 	nodeChoiceQueryRef.Set("value", "")
+	childrenRef := vue.ref.Invoke()
+	childrenRef.Set("value", getNodeChildren(node, vue))
+
+	// key: string | The ID of this node. Used for the Vue special :key prop.
+	ret.Set("key", node.GetId())
+
+	// text: string | The display text for this node.
+	ret.Set("text", node.GetText())
+
+	// children: []{ id: string, setupFunc: function }
+	ret.Set("children", childrenRef)
 
 	// nodeChoices is an array of options for the user to replace this node with another node based on the query given to
 	// onNodeChoiceQueryInput. Each element is an object with the following keys:
@@ -64,6 +74,8 @@ func setupNode(node ast.Node, vue vue) js.Value {
 			nodeChoice := makeEmptyObject()
 			nodeChoice.Set("text", function.GetName())
 			nodeChoice.Set("commitFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				// Assumption: when the replacement happens, this node component will get destroyed, and a new one
+				// will get created. The Vue components must use the :key prop for this to work correctly.
 				newNode := ast.NewPrimitiveFunctionCallNode(function)
 				ast.Replace(node, newNode)
 				return nil
@@ -75,6 +87,7 @@ func setupNode(node ast.Node, vue vue) js.Value {
 		nodeChoiceQueryRef.Set("value", query)
 		return nil
 	}))
+
 	return ret
 
 	nodeChoicesChan := make(chan []js.Value)
@@ -135,28 +148,26 @@ func setupNode(node ast.Node, vue vue) js.Value {
 	}
 
 	go func() {
-		childrenChan <- getNodeChildren(node, vue)
+		//childrenChan <- getNodeChildren(node, vue)
 	}()
 
 	go forever(func() {
 		<-node.GetOnChildReplaced()
-		childrenChan <- getNodeChildren(node, vue)
+		//childrenChan <- getNodeChildren(node, vue)
 	})
 
 	return toJsValue(component, vue)
 }
 
-func getNodeChildren(node ast.Node, vue vue) []js.Value {
-	elements := make([]js.Value, 0)
-	for _, child := range node.GetChildren() {
+func getNodeChildren(node ast.Node, vue vue) js.Value {
+	ret := makeEmptyArray()
+	for i, child := range node.GetChildren() {
 		child := child
-		childComponent := Component{
-			Id: child.GetId(),
-			SetupFunc: func() js.Value {
-				return setupNode(child, vue)
-			},
-		}
-		elements = append(elements, toJsValue(childComponent, vue))
+		childValue := makeEmptyObject()
+		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return setupNode(child, vue)
+		}))
+		ret.SetIndex(i, childValue)
 	}
-	return elements
+	return ret
 }

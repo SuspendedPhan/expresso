@@ -89,12 +89,31 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
+	// Test 0.00 + 0.00
 	gue = setupNode(attribute.RootNode, mockVue())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "+", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "+", attribute.RootNode.GetText())
+
+	gue = setupNode(attribute.RootNode, mockVue())
+	assert.Equal(t, 2, gue.Get("children").Get("value").Length())
+	gueA := gue.Get("children").Get("value").Index(0).Call("setupFunc")
+	gueB := gue.Get("children").Get("value").Index(1).Call("setupFunc")
+	assert.Equal(t, "0.00", gueA.Get("text").String())
+	assert.Equal(t, "0.00", gueB.Get("text").String())
+
+	// Test (0.00 + 0.00) + 0.00
+	gueA.Call("onNodeChoiceQueryInput", makeInputEvent("*"))
+	nodeChoice = gueA.Get("nodeChoices").Get("value").Index(0)
+	assert.Equal(t, "*", nodeChoice.Get("text").String())
+	nodeChoice.Call("commitFunc")
+	gue = setupNode(attribute.RootNode, mockVue())
+	gueA = gue.Get("children").Get("value").Index(0).Call("setupFunc")
+	assert.Equal(t, "*", gueA.Get("text").String())
+	gueNested := gueA.Get("children").Get("value").Index(0).Call("setupFunc")
+	assert.Equal(t, "0.00", gueNested.Get("text").String())
 }
 
 func makeInputEvent(inputValue string) js.Value {
