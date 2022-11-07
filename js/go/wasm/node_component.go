@@ -52,8 +52,25 @@ func setupNode(node ast.Node, vue vue) js.Value {
 				ast.Replace(node, ast.NewNumberNode(ast.Float(number64)))
 				return nil
 			}))
+			// This will need to be changed to support multiple node choices.
 			nodeChoices.SetIndex(0, nodeChoice)
 		}
+
+		for _, function := range ast.GetPrimitiveFunctions() {
+			if !strings.Contains(strings.ToLower(function.GetName()), strings.ToLower(query)) {
+				continue
+			}
+			function := function
+			nodeChoice := makeEmptyObject()
+			nodeChoice.Set("text", function.GetName())
+			nodeChoice.Set("commitFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				newNode := ast.NewPrimitiveFunctionCallNode(function)
+				ast.Replace(node, newNode)
+				return nil
+			}))
+			nodeChoices.SetIndex(0, nodeChoice)
+		}
+
 		nodeChoicesRef.Set("value", nodeChoices)
 		nodeChoiceQueryRef.Set("value", query)
 		return nil

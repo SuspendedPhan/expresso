@@ -2,12 +2,20 @@ package ast
 
 import "expressioni.sta/common"
 
+// Deprecated: Use GetPrimitiveFunctions.
 var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
 	common.Name
 	parameters  []*PrimitiveFunctionParameter
 	evalFunctor func(args []float32) float32
+}
+
+func GetPrimitiveFunctions() map[string]*PrimitiveFunction {
+	if len(PrimitiveFunctions) == 0 {
+		SetupPrimitiveFunctions()
+	}
+	return PrimitiveFunctions
 }
 
 func SetupPrimitiveFunctions() {

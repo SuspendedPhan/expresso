@@ -89,12 +89,12 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
-	//gue = setupNode(attribute.RootNode, mockVue())
-	//gue.Call("onNodeChoiceQueryInput", "+")
-	//nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
-	//assert.Equal(t, "+", nodeChoice.Get("text").String())
-	//nodeChoice.Call("commitFunc")
-	//assert.Equal(t, "+", attribute.RootNode.GetText())
+	gue = setupNode(attribute.RootNode, mockVue())
+	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
+	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
+	assert.Equal(t, "+", nodeChoice.Get("text").String())
+	nodeChoice.Call("commitFunc")
+	assert.Equal(t, "+", attribute.RootNode.GetText())
 }
 
 func makeInputEvent(inputValue string) js.Value {
