@@ -39,9 +39,7 @@ func (p *PrimitiveFunctionCallNode) ReplaceChild(old Node, new Node) {
 func (p *PrimitiveFunctionCallNode) SetArgument(parameter *PrimitiveFunctionParameter, node Node) {
 	p.argumentByParameter[parameter] = node
 	node.SetParentNode(p)
-	go func() {
-		p.onChildReplaced <- struct{}{}
-	}()
+	p.childrenChanged.Dispatch()
 }
 
 func (n2 PrimitiveFunctionCallNode) GetChildren() []Node {

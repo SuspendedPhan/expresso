@@ -6,11 +6,11 @@ type Node interface {
 	GetParentNode() Node
 	SetParentNode(n Node)
 	GetId() string
-	GetOnChildReplaced() <-chan struct{}
 	SetAttribute(a *Attribute)
 	GetAttribute() *Attribute
 	GetText() string
 	GetChildren() []Node
+	GetChildrenChanged() *Signal
 }
 
 func Replace(old Node, new Node) {

@@ -112,7 +112,7 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice = gueA.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "*", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc")
-	gue = setupNode(attribute.RootNode, mockVue())
+	//gue = setupNode(attribute.RootNode, mockVue())
 	gueA = gue.Get("children").Get("value").Index(0).Call("setupFunc")
 	assert.Equal(t, "*", gueA.Get("text").String())
 	gueNested := gueA.Get("children").Get("value").Index(0).Call("setupFunc")

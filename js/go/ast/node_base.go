@@ -7,20 +7,20 @@ import (
 
 type NodeBase struct {
 	common.Id
-	ParentNode      Node `hydration:"ref"`
-	onChildReplaced chan struct{}
-	Attribute       *Attribute `hydration:"ref"`
+	ParentNode      Node
+	childrenChanged *Signal
+	Attribute       *Attribute
 }
 
 func NewNodeBase() NodeBase {
 	base := NodeBase{}
-	base.onChildReplaced = make(chan struct{})
+	base.childrenChanged = NewSignal()
 	base.SetId(uuid.NewString())
 	return base
 }
 
-func (n2 *NodeBase) GetOnChildReplaced() <-chan struct{} {
-	return n2.onChildReplaced
+func (n2 *NodeBase) GetChildrenChanged() *Signal {
+	return n2.childrenChanged
 }
 
 func (n2 *NodeBase) SetParentNode(n Node) {
