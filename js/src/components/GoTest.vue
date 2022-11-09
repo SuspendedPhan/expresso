@@ -39,7 +39,7 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
 
-      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly);
+      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
         ticker.tick();
