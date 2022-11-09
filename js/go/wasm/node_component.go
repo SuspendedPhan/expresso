@@ -104,6 +104,7 @@ func getNodeChildren(node ast.Node, vue vue) js.Value {
 	for i, child := range node.GetChildren() {
 		child := child
 		childValue := makeEmptyObject()
+		childValue.Set("key", child.GetId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			return setupNode(child, vue)
 		}))

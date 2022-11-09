@@ -6,7 +6,7 @@
       <div>{{ nodeChoice.text }}</div>
       <button @click="nodeChoice.commitFunc">Commit</button>
     </div>
-<!--    <GoNode v-for="child in Children" :key="child.Id" :setup-func="child.SetupFunc">{{ child }}</GoNode>-->
+    <GoNode v-for="child in children" :key="child.key" :setupFunc="child.setupFunc"/>
   </div>
 </template>
 
