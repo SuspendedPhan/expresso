@@ -15,13 +15,17 @@ func TestNewAttribute(t *testing.T) {
 	setupAttribute(attribute, mockVue())
 }
 
-func TestFunc(t *testing.T) {
+// Calls to fmt.Print hang inside Funcs.
+func TestPrintInsideInvoke(t *testing.T) {
 	t.SkipNow()
+
+	fmt.Println("this will not hang")
 	of := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		println("this won't hang either")
+		fmt.Println("this will hang now")
 		return nil
 	})
 	of.Invoke()
-	fmt.Println("hi")
 }
 
 func TestSimple(t *testing.T) {
@@ -45,7 +49,6 @@ func TestSimple(t *testing.T) {
 }
 
 func TestOrganism(t *testing.T) {
-	//t.SkipNow()
 	org := ast.NewOrganism()
 	gue := setupOrganism(org, mockVue()).(js.Value)
 	attrs := gue.Get("attributes")
