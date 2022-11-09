@@ -122,19 +122,23 @@ func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
 
 func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	returnValue := makeEmptyObject()
-	rootNodeId := vue.ref.Invoke(a.RootNode.GetId())
+	rootNodeIdRef := vue.ref.Invoke()
+	rootNodeIdRef.Set("value", a.RootNode.GetId())
 	returnValue.Set("id", a.GetId())
-	returnValue.Set("rootNodeId", rootNodeId)
+	returnValue.Set("rootNodeId", rootNodeIdRef)
 	returnValue.Set("name", a.GetName())
 	rootNodeSetupFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue)
 	})
 	returnValue.Set("rootNodeSetupFunc", rootNodeSetupFunc)
 
-	go forever(func() {
-		<-a.OnRootNodeChanged
-		rootNodeId.Set("value", a.RootNode.GetId())
+	offRootNodeChanged := a.OnRootNodeChanged.On(func() {
+		rootNodeIdRef.Set("value", a.RootNode.GetId())
 	})
+	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		offRootNodeChanged()
+		return nil
+	}))
 
 	return returnValue
 }

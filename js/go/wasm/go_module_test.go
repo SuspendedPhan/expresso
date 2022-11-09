@@ -116,6 +116,17 @@ func TestNodeChoices(t *testing.T) {
 	assert.Equal(t, "0.00", gueNested.Get("text").String())
 }
 
+func TestAttrRootNodeIdRef(t *testing.T) {
+	attr := ast.NewAttribute()
+	nodeA := ast.NewNumberNode(10)
+	nodeB := ast.NewNumberNode(20)
+	attr.SetRootNode(nodeA)
+	gueAttr := setupAttribute(attr, mockVue())
+	assert.Equal(t, nodeA.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
+	attr.SetRootNode(nodeB)
+	assert.Equal(t, nodeB.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
+}
+
 func makeInputEvent(inputValue string) js.Value {
 	arg := makeEmptyObject()
 	arg.Set("target", makeEmptyObject())
@@ -130,10 +141,14 @@ func mockVue() vue {
 	readonlyFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return args[0]
 	}))
+	onUnmountedFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return nil
+	}))
 	return vue{
-		ref:      refFunc,
-		watch:    js.Value{},
-		computed: js.Value{},
-		readonly: readonlyFunc,
+		ref:         refFunc,
+		watch:       js.Value{},
+		computed:    js.Value{},
+		readonly:    readonlyFunc,
+		onUnmounted: onUnmountedFunc,
 	}
 }
