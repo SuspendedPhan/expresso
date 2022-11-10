@@ -9,6 +9,7 @@ export class ElementLayout {
 
   private getRootNode;
 
+  // onCalculated is a useful event for redrawing the connecting lines and resizing the container.
   public onCalculated = new Observable<Output>(
     (subscriber) => (this.onCalculatedSubscriber = subscriber)
   ).pipe(share());
@@ -24,6 +25,9 @@ export class ElementLayout {
 
   private getKey;
 
+
+  // getRootNode is not used.
+  // getChildren refers to the children that we will call getKey() on.
   constructor(getRootNode, getChildren, getKey: any = null) {
     this.getKey = getKey ?? (node => node.id);
 
@@ -53,10 +57,14 @@ export class ElementLayout {
     this.onCalculatedSubscriber.next(output);
   }
 
+  // registerElement must be called so that the layout knows how to get the width and height of your elements.
   public registerElement(element, elementKey) {
     this.elementByKey.set(elementKey, element);
   }
 
+  // getLocalPositionObservable is a useful event for positioning each individual element. Note that these are local
+  // positions, which means children are positioned relative to the parent. This works well with nested elements that
+  // all have the "position: absolute" CSS rule.
   public getLocalPositionObservable(elementKey) {
     return new Observable<Point>((subscriber) => {
       this.onLocalPositionSubscriberByElementId.set(elementKey, subscriber);
