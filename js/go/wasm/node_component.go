@@ -22,14 +22,19 @@ type NodeChoice struct {
 	CommitFunc func()
 }
 
-func setupNode(node ast.Node, vue vue) js.Value {
+func setupNode(node ast.Node, vue vue, layout ElementLayout) js.Value {
 	ret := makeEmptyObject()
 	nodeChoicesRef := vue.ref.Invoke()
 	nodeChoicesRef.Set("value", makeEmptyArray())
 	nodeChoiceQueryRef := vue.ref.Invoke()
 	nodeChoiceQueryRef.Set("value", "")
 	childrenRef := vue.ref.Invoke()
-	childrenRef.Set("value", getNodeChildren(node, vue))
+	childrenRef.Set("value", getNodeChildren(node, vue, layout))
+	positionRef := vue.ref.Invoke()
+	positionRef.Set("value", makeEmptyObject())
+	positionRef.Get("value").Set("left", 0)
+	positionRef.Get("value").Set("top", 0)
+	rootElementRef := vue.ref.Invoke()
 
 	// key: string | The ID of this node. Used for the Vue special :key prop.
 	ret.Set("key", node.GetId())
@@ -88,8 +93,21 @@ func setupNode(node ast.Node, vue vue) js.Value {
 		return nil
 	}))
 
+	// position: { top: number, left: number } | The local position of the node based on layout calculation.
+	ret.Set("position", vue.readonly.Invoke(positionRef))
+
+	// rootElement: element ref | The HTML element that will be used to determine the size of the component for layout purposes.
+	ret.Set("rootElement", rootElementRef)
+
+	layout.getLocalPositionObservable(node.GetId()).Call("subscribe", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		positionRef.Set("value", args[0])
+		return nil
+	}))
+
+	layout.registerElement(rootElementRef, node.GetId())
+
 	offChildrenChanged := node.GetChildrenChanged().On(func() {
-		childrenRef.Set("value", getNodeChildren(node, vue))
+		childrenRef.Set("value", getNodeChildren(node, vue, layout))
 	})
 	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		offChildrenChanged()
@@ -99,14 +117,14 @@ func setupNode(node ast.Node, vue vue) js.Value {
 	return ret
 }
 
-func getNodeChildren(node ast.Node, vue vue) js.Value {
+func getNodeChildren(node ast.Node, vue vue, layout ElementLayout) js.Value {
 	ret := makeEmptyArray()
 	for i, child := range node.GetChildren() {
 		child := child
 		childValue := makeEmptyObject()
 		childValue.Set("key", child.GetId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return setupNode(child, vue)
+			return setupNode(child, vue, layout)
 		}))
 		ret.SetIndex(i, childValue)
 	}

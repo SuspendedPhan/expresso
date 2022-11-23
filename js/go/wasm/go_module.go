@@ -32,7 +32,7 @@ func bootstrapGoModule() {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed, args[3], args[4]}
+		vue := vue{ref, watch, computed, args[3], args[4], args[5]}
 		return setupOrganism(rootOrganism, vue)
 	}).Value)
 
@@ -40,7 +40,7 @@ func bootstrapGoModule() {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed, args[3], args[4]}
+		vue := vue{ref, watch, computed, args[3], args[4], args[5]}
 		return setupExpressor(vue)
 	}).Value)
 
@@ -125,15 +125,15 @@ func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
 
 func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	returnValue := makeEmptyObject()
+	layout := NewElementLayout(vue.elementLayoutClass, makeEmptyObject(), makeEmptyObject(), makeEmptyObject())
 	rootNodeIdRef := vue.ref.Invoke()
 	rootNodeIdRef.Set("value", a.RootNode.GetId())
 	returnValue.Set("id", a.GetId())
 	returnValue.Set("rootNodeId", rootNodeIdRef)
 	returnValue.Set("name", a.GetName())
-	rootNodeSetupFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		return setupNode(a.RootNode, vue)
-	})
-	returnValue.Set("rootNodeSetupFunc", rootNodeSetupFunc)
+	returnValue.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return setupNode(a.RootNode, vue, layout)
+	}))
 
 	offRootNodeChanged := a.OnRootNodeChanged.On(func() {
 		rootNodeIdRef.Set("value", a.RootNode.GetId())

@@ -16,6 +16,7 @@ func TestNewAttribute(t *testing.T) {
 }
 
 // Calls to fmt.Print hang inside Funcs.
+// If you need to get the stacktrace for a setupFunc in a test, call it directly instead of calling js.Value.Call("setupFunc")
 func TestPrintInsideInvoke(t *testing.T) {
 	t.SkipNow()
 
@@ -76,7 +77,7 @@ func TestNodeChoices(t *testing.T) {
 	attribute := ast.NewAttribute()
 	node := ast.NewNumberNode(10)
 	node.SetAttribute(attribute)
-	gue := setupNode(node, mockVue())
+	gue := setupNode(node, mockVue(), mockElementLayout())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("20"))
 	assert.Equal(t, "20", gue.Get("nodeChoiceQuery").Get("value").String())
 
@@ -86,21 +87,21 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 
-	gue = setupNode(attribute.RootNode, mockVue())
+	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("30"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
 	// Test 0.00 + 0.00
-	gue = setupNode(attribute.RootNode, mockVue())
+	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "+", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "+", attribute.RootNode.GetText())
 
-	gue = setupNode(attribute.RootNode, mockVue())
+	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
 	assert.Equal(t, 2, gue.Get("children").Get("value").Length())
 	gueA := gue.Get("children").Get("value").Index(0).Call("setupFunc")
 	gueB := gue.Get("children").Get("value").Index(1).Call("setupFunc")
@@ -130,6 +131,41 @@ func TestAttrRootNodeIdRef(t *testing.T) {
 	assert.Equal(t, nodeB.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
 }
 
+func TestNodeElementLayout(t *testing.T) {
+	nodeIdToPositionCallback := make(map[string]js.Value)
+	elementKeyToElement := make(map[string]js.Value)
+	layout := ElementLayout{elementLayout: makeEmptyObject()}
+	layout.elementLayout.Set("getLocalPositionObservable", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		nodeId := args[0].String()
+		localPositionObservable := makeEmptyObject()
+		localPositionObservable.Set("subscribe", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			callback := args[0]
+			nodeIdToPositionCallback[nodeId] = callback
+			return nil
+		}))
+		return localPositionObservable
+	}))
+	layout.elementLayout.Set("registerElement", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		element := args[0]
+		elementKey := args[1].String()
+		elementKeyToElement[elementKey] = element
+		return nil
+	}))
+	node := ast.NewNumberNode(10)
+	gueNode := setupNode(node, mockVue(), layout)
+	position := makeEmptyObject()
+	position.Set("left", 10)
+	position.Set("top", 20)
+	callback, found := nodeIdToPositionCallback[node.GetId()]
+	assert.True(t, found)
+	callback.Invoke(position)
+	assert.Equal(t, 10, gueNode.Get("position").Get("value").Get("left").Int())
+	assert.Equal(t, 20, gueNode.Get("position").Get("value").Get("top").Int())
+
+	_, found = elementKeyToElement[node.GetId()]
+	assert.True(t, found, "Should have called registerElement()")
+}
+
 func makeInputEvent(inputValue string) js.Value {
 	arg := makeEmptyObject()
 	arg.Set("target", makeEmptyObject())
@@ -148,10 +184,31 @@ func mockVue() vue {
 		return nil
 	}))
 	return vue{
-		ref:         refFunc,
-		watch:       js.Value{},
-		computed:    js.Value{},
-		readonly:    readonlyFunc,
-		onUnmounted: onUnmountedFunc,
+		ref:                refFunc,
+		watch:              js.Value{},
+		computed:           js.Value{},
+		readonly:           readonlyFunc,
+		onUnmounted:        onUnmountedFunc,
+		elementLayoutClass: getMockElementLayoutClass(),
 	}
+}
+
+func mockElementLayout() ElementLayout {
+	return ElementLayout{elementLayout: getMockElementLayoutClass().New()}
+}
+
+func getMockElementLayoutClass() js.Value {
+	return js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		this.Set("getLocalPositionObservable", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			object := makeEmptyObject()
+			object.Set("subscribe", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				return nil
+			}))
+			return object
+		}))
+		this.Set("registerElement", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return nil
+		}))
+		return nil
+	}))
 }

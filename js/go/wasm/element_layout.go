@@ -19,10 +19,14 @@ func (e *ElementLayout) registerElement(element js.Value, elementKey string) {
 	e.elementLayout.Call("registerElement", element, elementKey)
 }
 
-func (e ElementLayout) getLocalPositionObservable(elementKey string) js.Value {
-	return e.elementLayout.Call("getLocalPositionObservable")
+func (e *ElementLayout) getLocalPositionObservable(elementKey string) js.Value {
+	return e.elementLayout.Call("getLocalPositionObservable", elementKey)
 }
 
-func (e ElementLayout) getOnCalculated() js.Value {
+func (e *ElementLayout) getOnCalculated() js.Value {
 	return e.elementLayout.Get("onCalculated")
+}
+
+func (e *ElementLayout) recalculate() {
+	e.elementLayout.Call("recalculate")
 }
