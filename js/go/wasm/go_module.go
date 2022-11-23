@@ -12,6 +12,9 @@ type vue struct {
 	computed    js.Value
 	readonly    js.Value
 	onUnmounted js.Value
+
+	// The ElementLayout.ts class.
+	elementLayoutClass js.Value
 }
 
 func bootstrapGoModule() {
