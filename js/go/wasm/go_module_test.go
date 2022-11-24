@@ -77,7 +77,7 @@ func TestNodeChoices(t *testing.T) {
 	attribute := ast.NewAttribute()
 	node := ast.NewNumberNode(10)
 	node.SetAttribute(attribute)
-	gue := setupNode(node, mockVue(), mockElementLayout())
+	gue := setupNode(node, mockVue(), mockAttributeContext())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("20"))
 	assert.Equal(t, "20", gue.Get("nodeChoiceQuery").Get("value").String())
 
@@ -87,21 +87,21 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 
-	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
+	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("30"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
 	// Test 0.00 + 0.00
-	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
+	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "+", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc")
 	assert.Equal(t, "+", attribute.RootNode.GetText())
 
-	gue = setupNode(attribute.RootNode, mockVue(), mockElementLayout())
+	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
 	assert.Equal(t, 2, gue.Get("children").Get("value").Length())
 	gueA := gue.Get("children").Get("value").Index(0).Call("setupFunc")
 	gueB := gue.Get("children").Get("value").Index(1).Call("setupFunc")
@@ -131,6 +131,7 @@ func TestAttrRootNodeIdRef(t *testing.T) {
 	assert.Equal(t, nodeB.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
 }
 
+// TestNodeElementLayout tests that setupNode() makes the correct calls to ElementLayout.
 func TestNodeElementLayout(t *testing.T) {
 	nodeIdToPositionCallback := make(map[string]js.Value)
 	elementKeyToElement := make(map[string]js.Value)
@@ -151,8 +152,10 @@ func TestNodeElementLayout(t *testing.T) {
 		elementKeyToElement[elementKey] = element
 		return nil
 	}))
-	node := ast.NewNumberNode(10)
-	gueNode := setupNode(node, mockVue(), layout)
+	context := mockAttributeContext()
+	context.layout = layout
+	node := ast.NewPrimitiveFunctionCallNode(ast.GetPrimitiveFunctions()["+"])
+	gueNode := setupNode(node, mockVue(), context)
 	position := makeEmptyObject()
 	position.Set("left", 10)
 	position.Set("top", 20)
@@ -164,6 +167,35 @@ func TestNodeElementLayout(t *testing.T) {
 
 	_, found = elementKeyToElement[node.GetId()]
 	assert.True(t, found, "Should have called registerElement()")
+}
+
+// TestAttrContextNodeIdMap tests that setupNode() registers nodes with the attributeContext.
+func TestAttrContextNodeIdMap(t *testing.T) {
+	node := ast.NewPrimitiveFunctionCallNode(ast.GetPrimitiveFunctions()["+"])
+	context := mockAttributeContext()
+	gueNode := setupNode(node, mockVue(), context)
+	gueNode.Get("children").Get("value").Index(0).Call("setupFunc")
+	gueNode.Get("children").Get("value").Index(1).Call("setupFunc")
+	assert.Len(t, context.nodeIdToNode, 3)
+	_, found := context.nodeIdToNode[node.GetId()]
+	assert.True(t, found)
+	_, found = context.nodeIdToNode[node.GetChildren()[0].GetId()]
+	assert.True(t, found)
+	_, found = context.nodeIdToNode[node.GetChildren()[1].GetId()]
+	assert.True(t, found)
+}
+
+// TestGetChildrenIds tests getChildrenIds().
+func TestGetChildrenIds(t *testing.T) {
+	nodeIdToNode := make(map[string]ast.Node)
+	node := ast.NewPrimitiveFunctionCallNode(ast.GetPrimitiveFunctions()["+"])
+	nodeIdToNode[node.GetId()] = node
+	nodeIdToNode[node.GetChildren()[0].GetId()] = node.GetChildren()[0]
+	nodeIdToNode[node.GetChildren()[1].GetId()] = node.GetChildren()[1]
+	ids := getChildrenIds(node.GetId(), nodeIdToNode)
+	assert.Equal(t, 2, ids.Length())
+	assert.Equal(t, ids.Index(0).String(), node.GetChildren()[0].GetId())
+	assert.Equal(t, ids.Index(1).String(), node.GetChildren()[1].GetId())
 }
 
 func makeInputEvent(inputValue string) js.Value {
@@ -193,10 +225,18 @@ func mockVue() vue {
 	}
 }
 
+func mockAttributeContext() attributeContext {
+	return attributeContext{
+		nodeIdToNode: make(map[string]ast.Node),
+		layout:       mockElementLayout(),
+	}
+}
+
 func mockElementLayout() ElementLayout {
 	return ElementLayout{elementLayout: getMockElementLayoutClass().New()}
 }
 
+// getMockElementLayoutClass returns a mock LayoutElement class.
 func getMockElementLayoutClass() js.Value {
 	return js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		this.Set("getLocalPositionObservable", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

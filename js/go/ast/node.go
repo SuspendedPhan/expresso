@@ -10,6 +10,9 @@ type Node interface {
 	GetAttribute() *Attribute
 	GetText() string
 	GetChildren() []Node
+
+	// GetChildrenChanged returns a Signal which fires when this Node's list of children are changed.
+	// This fires only for the immediate children.
 	GetChildrenChanged() *Signal
 }
 

@@ -17,6 +17,12 @@ type vue struct {
 	elementLayoutClass js.Value
 }
 
+// attributeContext contains state for an Attribute Gue Component's descendants.
+type attributeContext struct {
+	nodeIdToNode map[string]ast.Node
+	layout       ElementLayout
+}
+
 func bootstrapGoModule() {
 	ast.SetupPrimitiveFunctions()
 	ast.SetupProtoOrganisms()
@@ -125,14 +131,29 @@ func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
 
 func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	returnValue := makeEmptyObject()
-	layout := NewElementLayout(vue.elementLayoutClass, makeEmptyObject(), makeEmptyObject(), makeEmptyObject())
+	nodeIdToNode := make(map[string]ast.Node)
+	layout := NewElementLayout(vue.elementLayoutClass, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		// getRootNodeFunc
+		return a.RootNode.GetId()
+	}).Value, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		// getChildrenFunc
+		nodeId := args[0].String()
+		return getChildrenIds(nodeId, nodeIdToNode)
+	}).Value, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		// getKeyFunc
+		return args[0]
+	}).Value)
+
 	rootNodeIdRef := vue.ref.Invoke()
 	rootNodeIdRef.Set("value", a.RootNode.GetId())
 	returnValue.Set("id", a.GetId())
 	returnValue.Set("rootNodeId", rootNodeIdRef)
 	returnValue.Set("name", a.GetName())
 	returnValue.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		return setupNode(a.RootNode, vue, layout)
+		return setupNode(a.RootNode, vue, attributeContext{
+			nodeIdToNode: nodeIdToNode,
+			layout:       layout,
+		})
 	}))
 
 	offRootNodeChanged := a.OnRootNodeChanged.On(func() {
@@ -144,4 +165,14 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	}))
 
 	return returnValue
+}
+
+// getChildrenIds returns a js array of ids for the given node, given an ID map.
+func getChildrenIds(nodeId string, nodeIdToNode map[string]ast.Node) js.Value {
+	ret := makeEmptyArray()
+	node := nodeIdToNode[nodeId]
+	for i, child := range node.GetChildren() {
+		ret.SetIndex(i, child.GetId())
+	}
+	return ret
 }
