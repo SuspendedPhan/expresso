@@ -2,6 +2,7 @@ package main
 
 import (
 	"expressioni.sta/ast"
+	"fmt"
 	"strconv"
 	"syscall/js"
 )
@@ -12,6 +13,7 @@ type vue struct {
 	computed    js.Value
 	readonly    js.Value
 	onUnmounted js.Value
+	nextTick    js.Value
 
 	// The ElementLayout.ts class.
 	elementLayoutClass js.Value
@@ -34,19 +36,11 @@ func bootstrapGoModule() {
 	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Y)
 	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Radius)
 
-	goModule.Set("setupRootOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		ref := args[0]
-		watch := args[1]
-		computed := args[2]
-		vue := vue{ref, watch, computed, args[3], args[4], args[5]}
-		return setupOrganism(rootOrganism, vue)
-	}).Value)
-
 	goModule.Set("setupExpressor", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed, args[3], args[4], args[5]}
+		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6]}
 		return setupExpressor(vue)
 	}).Value)
 
@@ -130,7 +124,7 @@ func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
 }
 
 func setupAttribute(a *ast.Attribute, vue vue) js.Value {
-	returnValue := makeEmptyObject()
+	ret := makeEmptyObject()
 	nodeIdToNode := make(map[string]ast.Node)
 	layout := NewElementLayout(vue.elementLayoutClass, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		// getRootNodeFunc
@@ -146,15 +140,27 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 
 	rootNodeIdRef := vue.ref.Invoke()
 	rootNodeIdRef.Set("value", a.RootNode.GetId())
-	returnValue.Set("id", a.GetId())
-	returnValue.Set("rootNodeId", rootNodeIdRef)
-	returnValue.Set("name", a.GetName())
-	returnValue.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+	nodeTreeWidthRef := vue.ref.Invoke()
+	nodeTreeWidthRef.Set("value", 0)
+	nodeTreeHeightRef := vue.ref.Invoke()
+	nodeTreeHeightRef.Set("value", 0)
+
+	ret.Set("id", a.GetId())
+	ret.Set("rootNodeId", rootNodeIdRef)
+	ret.Set("name", a.GetName())
+	ret.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue, attributeContext{
 			nodeIdToNode: nodeIdToNode,
 			layout:       layout,
 		})
 	}))
+
+	// nodeTreeWidth: string | The CSS value for the width of the entire Node tree.
+	ret.Set("nodeTreeWidth", nodeTreeWidthRef)
+
+	// nodeTreeHidth: string | The CSS value for the height of the entire Node tree.
+	ret.Set("nodeTreeHeight", nodeTreeHeightRef)
 
 	offRootNodeChanged := a.OnRootNodeChanged.On(func() {
 		rootNodeIdRef.Set("value", a.RootNode.GetId())
@@ -164,7 +170,14 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 		return nil
 	}))
 
-	return returnValue
+	layout.getOnCalculated().Call("subscribe", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		output := args[0]
+		nodeTreeWidthRef.Set("value", fmt.Sprintf("%fpx", output.Get("totalWidth").Float()))
+		nodeTreeHeightRef.Set("value", fmt.Sprintf("%fpx", output.Get("totalHeight").Float()))
+		return nil
+	}))
+
+	return ret
 }
 
 // getChildrenIds returns a js array of ids for the given node, given an ID map.

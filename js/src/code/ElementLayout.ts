@@ -65,6 +65,7 @@ export class ElementLayout {
   // getLocalPositionObservable is a useful event for positioning each individual element. Note that these are local
   // positions, which means children are positioned relative to the parent. This works well with nested elements that
   // all have the "position: absolute" CSS rule.
+  // When the event is fired, a Layout.Point object is passed.
   public getLocalPositionObservable(elementKey) {
     return new Observable<Point>((subscriber) => {
       this.onLocalPositionSubscriberByElementId.set(elementKey, subscriber);

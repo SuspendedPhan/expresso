@@ -1,3 +1,7 @@
+# Known memory leaks
+- Every js.FuncOf needs a call to Release()
+- Untested memory cleanup in node_component.go
+
 # Things you need to install
 
 1. `go get github.com/agnivade/wasmbrowsertest`

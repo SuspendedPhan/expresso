@@ -101,6 +101,7 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 
 	context.nodeIdToNode[node.GetId()] = node
 	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		// This logic has not been tested. Potential memory leak here.
 		delete(context.nodeIdToNode, node.GetId())
 		return nil
 	}))
@@ -110,7 +111,14 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 		return nil
 	}))
 
-	context.layout.registerElement(rootElementRef, node.GetId())
+	vue.nextTick.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		// This is done in the next tick so that the Vue component can bind the rootElement ref.
+		context.layout.registerElement(rootElementRef.Get("value"), node.GetId())
+
+		// This must execute after registerElement() and localPositionObservable.subscribe().
+		context.layout.recalculate()
+		return nil
+	}))
 
 	offChildrenChanged := node.GetChildrenChanged().On(func() {
 		childrenRef.Set("value", getNodeChildren(node, vue, context))

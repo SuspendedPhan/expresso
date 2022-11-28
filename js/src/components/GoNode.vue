@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div class="absolute" :style="{ left: position.left + 'px', top: position.top + 'px' }" ref="rootElement">
     <div>{{ text }}</div>
     <input :value="nodeChoiceQuery" @input="onNodeChoiceQueryInput"/>
     <div v-for="nodeChoice in nodeChoices" :key="nodeChoice.Index">

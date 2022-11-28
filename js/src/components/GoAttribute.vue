@@ -3,7 +3,9 @@
     <div>
       {{ id }}
     </div>
-    <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>
+    <div class="relative" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
+      <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>
+    </div>
   </div>
 </template>
 

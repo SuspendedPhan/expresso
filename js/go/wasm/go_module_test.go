@@ -135,7 +135,7 @@ func TestAttrRootNodeIdRef(t *testing.T) {
 func TestNodeElementLayout(t *testing.T) {
 	nodeIdToPositionCallback := make(map[string]js.Value)
 	elementKeyToElement := make(map[string]js.Value)
-	layout := ElementLayout{elementLayout: makeEmptyObject()}
+	layout := mockElementLayout()
 	layout.elementLayout.Set("getLocalPositionObservable", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		nodeId := args[0].String()
 		localPositionObservable := makeEmptyObject()
@@ -198,6 +198,15 @@ func TestGetChildrenIds(t *testing.T) {
 	assert.Equal(t, ids.Index(1).String(), node.GetChildren()[1].GetId())
 }
 
+// TestAttrNodeTreeSize tests that setupAttribute() properly sets nodeTreeWidth and nodeTreeHeight.
+func TestAttrNodeTreeSize(t *testing.T) {
+	attr := ast.NewAttribute()
+	attr.SetRootNode(ast.NewNumberNode(10))
+	gueAttr := setupAttribute(attr, mockVue())
+	assert.Equal(t, "100.000000px", gueAttr.Get("nodeTreeWidth").Get("value").String())
+	assert.Equal(t, "200.000000px", gueAttr.Get("nodeTreeHeight").Get("value").String())
+}
+
 func makeInputEvent(inputValue string) js.Value {
 	arg := makeEmptyObject()
 	arg.Set("target", makeEmptyObject())
@@ -215,12 +224,17 @@ func mockVue() vue {
 	onUnmountedFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return nil
 	}))
+	nextTickFunc := js.ValueOf(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		args[0].Invoke()
+		return nil
+	}))
 	return vue{
 		ref:                refFunc,
 		watch:              js.Value{},
 		computed:           js.Value{},
 		readonly:           readonlyFunc,
 		onUnmounted:        onUnmountedFunc,
+		nextTick:           nextTickFunc,
 		elementLayoutClass: getMockElementLayoutClass(),
 	}
 }
@@ -247,6 +261,21 @@ func getMockElementLayoutClass() js.Value {
 			return object
 		}))
 		this.Set("registerElement", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			return nil
+		}))
+
+		onCalculated := makeEmptyObject()
+		onCalculated.Set("subscribe", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			callback := args[0]
+			output := makeEmptyObject()
+			output.Set("totalWidth", 100)
+			output.Set("totalHeight", 200)
+			callback.Invoke(output)
+			return nil
+		}))
+		this.Set("onCalculated", onCalculated)
+
+		this.Set("recalculate", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			return nil
 		}))
 		return nil

@@ -14,11 +14,12 @@
 
 <script lang="ts">
 import GoModuleWasm from "../../public/mymodule.wasm";
-import {computed, onMounted, onUnmounted, ref, watch, readonly} from "@vue/composition-api";
+import {computed, onMounted, onUnmounted, ref, watch, readonly, nextTick} from "@vue/composition-api";
 import GoExpressor from "@/components/GoExpressor.vue";
 import PixiRenderer from "@/code/PixiRenderer";
 import fps from "fps";
 import numeral from "numeral";
+import { ElementLayout } from '@/code/ElementLayout';
 
 // Defined in public/wasm_exec.js, which is loaded in index.html
 declare var Go: any;
@@ -39,7 +40,7 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
 
-      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted);
+      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted, nextTick, ElementLayout);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
         ticker.tick();
