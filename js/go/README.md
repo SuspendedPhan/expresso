@@ -1,3 +1,6 @@
+# Go Version
+go version go1.17 windows/amd64
+
 # Known memory leaks
 - Every js.FuncOf needs a call to Release()
 - Untested memory cleanup in node_component.go

@@ -7,6 +7,7 @@ import (
 	"syscall/js"
 )
 
+// TODO: remove in separate commit
 type NodeComponent struct {
 	Component
 	Text                   string
@@ -34,6 +35,8 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 	positionRef.Set("value", makeEmptyObject())
 	positionRef.Get("value").Set("left", 0)
 	positionRef.Get("value").Set("top", 0)
+	isFocusedRef := vue.ref.Invoke()
+	isFocusedRef.Set("value", context.expressorContext.focus.FocusedNode() == node)
 	rootElementRef := vue.ref.Invoke()
 
 	// key: string | The ID of this node. Used for the Vue special :key prop.
@@ -64,7 +67,9 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 			nodeChoice := makeEmptyObject()
 			nodeChoice.Set("text", query)
 			nodeChoice.Set("commitFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				ast.Replace(node, ast.NewNumberNode(ast.Float(number64)))
+				newNode := ast.NewNumberNode(ast.Float(number64))
+				ast.Replace(node, newNode)
+				context.expressorContext.focus.SetFocusedNode(newNode)
 				return nil
 			}))
 			// This will need to be changed to support multiple node choices.
@@ -79,10 +84,17 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 			nodeChoice := makeEmptyObject()
 			nodeChoice.Set("text", function.GetName())
 			nodeChoice.Set("commitFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				event := args[0]
+
+				// When this node choice is clicked, we want to consume the event to prevent something like the focus
+				// manager from processing the click.
+				event.Call("stopPropagation")
+
 				// Assumption: when the replacement happens, this node component will get destroyed, and a new one
 				// will get created. The Vue components must use the :key prop for this to work correctly.
 				newNode := ast.NewPrimitiveFunctionCallNode(function)
 				ast.Replace(node, newNode)
+				context.expressorContext.focus.SetFocusedNode(newNode)
 				return nil
 			}))
 			nodeChoices.SetIndex(0, nodeChoice)
@@ -99,6 +111,21 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 	// rootElement: element ref | The HTML element that will be used to determine the size of the component for layout purposes.
 	ret.Set("rootElement", rootElementRef)
 
+	ret.Set("onClick", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		event := args[0]
+
+		// When this node is clicked, we want to consume the event to prevent its parent node from also receiving the
+		// click.
+		event.Call("stopPropagation")
+
+		context.expressorContext.focus.SetFocusedNode(node)
+		return nil
+	}))
+
+	// isFocused: bool | True if this node currently has focus.
+	ret.Set("isFocused", isFocusedRef)
+
+	// This is needed for the node layout.
 	context.nodeIdToNode[node.GetId()] = node
 	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		// This logic has not been tested. Potential memory leak here.
@@ -117,6 +144,20 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 
 		// This must execute after registerElement() and localPositionObservable.subscribe().
 		context.layout.recalculate()
+		return nil
+	}))
+
+	focusedSignal, unfocusedSignal := context.expressorContext.focus.Register(node)
+	offFocusedSignal := focusedSignal.On(func() {
+		isFocusedRef.Set("value", true)
+	})
+	offUnfocusedSignal := unfocusedSignal.On(func() {
+		isFocusedRef.Set("value", false)
+	})
+	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		context.expressorContext.focus.Unregister(node)
+		offFocusedSignal()
+		offUnfocusedSignal()
 		return nil
 	}))
 

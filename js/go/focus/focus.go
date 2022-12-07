@@ -2,10 +2,10 @@ package focus
 
 import (
 	"expressioni.sta/ast"
-	"fmt"
 )
 
-// Focus manages focus for the app. E.g. nodes, attributes, and organism focus. It should be created using NewFocus().
+// Focus manages focus for the app (e.g. nodes, attributes, organisms). For example, when a node is clicked,
+// it captures focus. Focus should be created using NewFocus().
 type Focus struct {
 	nodeToFocusedSignal   map[ast.Node]*ast.Signal
 	nodeToUnfocusedSignal map[ast.Node]*ast.Signal
@@ -20,8 +20,8 @@ func NewFocus() *Focus {
 	}
 }
 
-// Register must be called before Focus can be called on a node. It returns signals for when the given node is focused
-// or unfocused. Unregister must be called when the node is destroyed, otherwise there will be a memory leak.
+// Register returns signals for when the given node is focused or unfocused. The signals won't fire for any past
+// focus events. Unregister must be called when the node is destroyed, otherwise there will be a memory leak.
 func (f Focus) Register(n ast.Node) (focused ast.ReadonlySignal, unfocused ast.ReadonlySignal) {
 	_, found := f.nodeToFocusedSignal[n]
 	if !found {
@@ -41,24 +41,26 @@ func (f Focus) Unregister(n ast.Node) {
 	delete(f.nodeToUnfocusedSignal, n)
 }
 
-// Focus triggers the unfocused signal for the currently focused node, and the focused signal for the given node.
-// Register must be called for the node before Focus can be called.
-func (f *Focus) Focus(node ast.Node) error {
+// SetFocusedNode triggers the unfocused signal for the currently focused node. Then, it triggers the focused signal
+// for the given node. The node doesn't need to be registered.
+func (f *Focus) SetFocusedNode(node ast.Node) {
 	if node == f.focusedNode {
-		return nil
+		return
 	}
 	if f.focusedNode != nil {
 		unfocused, found := f.nodeToUnfocusedSignal[f.focusedNode]
-		if !found {
-			return fmt.Errorf("trying to unfocus, node with ID %s wasn't registered", f.focusedNode.GetId())
+		if found {
+			unfocused.Dispatch()
 		}
-		unfocused.Dispatch()
 	}
 	focused, found := f.nodeToFocusedSignal[node]
-	if !found {
-		return fmt.Errorf("trying to focus, node with ID %s wasn't registered", node.GetId())
+	if found {
+		focused.Dispatch()
 	}
-	focused.Dispatch()
 	f.focusedNode = node
-	return nil
+}
+
+// FocusedNode returns the currently focused node.
+func (f Focus) FocusedNode() ast.Node {
+	return f.focusedNode
 }

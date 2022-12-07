@@ -10,7 +10,7 @@ func TestFocus(t *testing.T) {
 	focus := NewFocus()
 	a := ast.NewNumberNode(10)
 	b := ast.NewNumberNode(20)
-	err := focus.Focus(a)
+	focus.SetFocusedNode(a)
 	assert.Error(t, err)
 
 	aFocused, aUnfocused := focus.Register(a)
@@ -31,14 +31,14 @@ func TestFocus(t *testing.T) {
 	bUnfocused.On(func() {
 		bUnfocusedCount++
 	})
-	err = focus.Focus(a)
+	focus.SetFocusedNode(a)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, aFocusedCount)
 	assert.Equal(t, 0, aUnfocusedCount)
 	assert.Equal(t, 0, bFocusedCount)
 	assert.Equal(t, 0, bUnfocusedCount)
 
-	err = focus.Focus(b)
+	focus.SetFocusedNode(b)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, aFocusedCount)
 	assert.Equal(t, 1, aUnfocusedCount)

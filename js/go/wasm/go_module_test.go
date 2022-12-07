@@ -2,6 +2,7 @@ package main
 
 import (
 	"expressioni.sta/ast"
+	"expressioni.sta/focus"
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"syscall/js"
@@ -12,11 +13,12 @@ func TestNewAttribute(t *testing.T) {
 	t.SkipNow()
 	attribute := ast.NewAttribute()
 	attribute.SetRootNode(ast.NewNumberNode(10))
-	setupAttribute(attribute, mockVue())
+	setupAttribute(attribute, mockVue(), mockExpressorContext())
 }
 
 // Calls to fmt.Print hang inside Funcs.
 // If you need to get the stacktrace for a setupFunc in a test, call it directly instead of calling js.Value.Call("setupFunc")
+// Could try upgrading from 1.19.2 to 1.19.4? Would need to rebuild the Docker image.
 func TestPrintInsideInvoke(t *testing.T) {
 	t.SkipNow()
 
@@ -31,7 +33,7 @@ func TestPrintInsideInvoke(t *testing.T) {
 
 func TestSimple(t *testing.T) {
 	t.SkipNow()
-	expressor := setupExpressor(mockVue())
+	expressor := setupExpressor(mockVue(), mockExpressorContext())
 	length := expressor.Get("rootOrganisms").Get("value").Get("length").Int()
 	assert.Equal(t, 0, length)
 
@@ -51,7 +53,7 @@ func TestSimple(t *testing.T) {
 
 func TestOrganism(t *testing.T) {
 	org := ast.NewOrganism()
-	gue := setupOrganism(org, mockVue()).(js.Value)
+	gue := setupOrganism(org, mockVue(), mockExpressorContext()).(js.Value)
 	attrs := gue.Get("attributes")
 	assert.Equal(t, 0, attrs.Get("value").Get("length").Int())
 	gue.Call("addAttribute")
@@ -67,7 +69,7 @@ func TestOrganism(t *testing.T) {
 func TestNodes(t *testing.T) {
 	attribute := ast.NewAttribute()
 	attribute.SetRootNode(ast.NewNumberNode(10))
-	gue := setupAttribute(attribute, mockVue())
+	gue := setupAttribute(attribute, mockVue(), mockExpressorContext())
 	setupObject := gue.Call("rootNodeSetupFunc")
 	nodeText := setupObject.Get("text").String()
 	assert.Equal(t, "10.00", nodeText)
@@ -84,13 +86,13 @@ func TestNodeChoices(t *testing.T) {
 	nodeChoice := gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "20", nodeChoice.Get("text").String())
 
-	nodeChoice.Call("commitFunc")
+	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 
 	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("30"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
-	nodeChoice.Call("commitFunc")
+	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
 	// Test 0.00 + 0.00
@@ -98,7 +100,7 @@ func TestNodeChoices(t *testing.T) {
 	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
 	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "+", nodeChoice.Get("text").String())
-	nodeChoice.Call("commitFunc")
+	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "+", attribute.RootNode.GetText())
 
 	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
@@ -112,8 +114,7 @@ func TestNodeChoices(t *testing.T) {
 	gueA.Call("onNodeChoiceQueryInput", makeInputEvent("*"))
 	nodeChoice = gueA.Get("nodeChoices").Get("value").Index(0)
 	assert.Equal(t, "*", nodeChoice.Get("text").String())
-	nodeChoice.Call("commitFunc")
-	//gue = setupNode(attribute.RootNode, mockVue())
+	nodeChoice.Call("commitFunc", makeClickEvent())
 	gueA = gue.Get("children").Get("value").Index(0).Call("setupFunc")
 	assert.Equal(t, "*", gueA.Get("text").String())
 	gueNested := gueA.Get("children").Get("value").Index(0).Call("setupFunc")
@@ -125,7 +126,7 @@ func TestAttrRootNodeIdRef(t *testing.T) {
 	nodeA := ast.NewNumberNode(10)
 	nodeB := ast.NewNumberNode(20)
 	attr.SetRootNode(nodeA)
-	gueAttr := setupAttribute(attr, mockVue())
+	gueAttr := setupAttribute(attr, mockVue(), mockExpressorContext())
 	assert.Equal(t, nodeA.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
 	attr.SetRootNode(nodeB)
 	assert.Equal(t, nodeB.GetId(), gueAttr.Get("rootNodeId").Get("value").String())
@@ -202,7 +203,7 @@ func TestGetChildrenIds(t *testing.T) {
 func TestAttrNodeTreeSize(t *testing.T) {
 	attr := ast.NewAttribute()
 	attr.SetRootNode(ast.NewNumberNode(10))
-	gueAttr := setupAttribute(attr, mockVue())
+	gueAttr := setupAttribute(attr, mockVue(), mockExpressorContext())
 	assert.Equal(t, "100.000000px", gueAttr.Get("nodeTreeWidth").Get("value").String())
 	assert.Equal(t, "200.000000px", gueAttr.Get("nodeTreeHeight").Get("value").String())
 }
@@ -211,6 +212,14 @@ func makeInputEvent(inputValue string) js.Value {
 	arg := makeEmptyObject()
 	arg.Set("target", makeEmptyObject())
 	arg.Get("target").Set("value", inputValue)
+	return arg
+}
+
+func makeClickEvent() js.Value {
+	arg := makeEmptyObject()
+	arg.Set("stopPropagation", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return nil
+	}))
 	return arg
 }
 
@@ -241,9 +250,14 @@ func mockVue() vue {
 
 func mockAttributeContext() attributeContext {
 	return attributeContext{
-		nodeIdToNode: make(map[string]ast.Node),
-		layout:       mockElementLayout(),
+		nodeIdToNode:     make(map[string]ast.Node),
+		layout:           mockElementLayout(),
+		expressorContext: mockExpressorContext(),
 	}
+}
+
+func mockExpressorContext() expressorContext {
+	return expressorContext{focus: focus.NewFocus()}
 }
 
 func mockElementLayout() ElementLayout {

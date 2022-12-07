@@ -2,6 +2,7 @@ package main
 
 import (
 	"expressioni.sta/ast"
+	"expressioni.sta/focus"
 	"fmt"
 	"strconv"
 	"syscall/js"
@@ -19,10 +20,16 @@ type vue struct {
 	elementLayoutClass js.Value
 }
 
-// attributeContext contains state for an Attribute Gue Component's descendants.
+// expressorContext contains mutable state for the Expressor Gue Component's descendants.
+type expressorContext struct {
+	focus *focus.Focus
+}
+
+// attributeContext contains mutable state for an Attribute Gue Component's descendants.
 type attributeContext struct {
-	nodeIdToNode map[string]ast.Node
-	layout       ElementLayout
+	nodeIdToNode     map[string]ast.Node
+	layout           ElementLayout
+	expressorContext expressorContext
 }
 
 func bootstrapGoModule() {
@@ -41,7 +48,8 @@ func bootstrapGoModule() {
 		watch := args[1]
 		computed := args[2]
 		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6]}
-		return setupExpressor(vue)
+		context := expressorContext{focus: focus.NewFocus()}
+		return setupExpressor(vue, context)
 	}).Value)
 
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -55,11 +63,11 @@ func bootstrapGoModule() {
 	println("after set")
 }
 
-func setupOrganism(organism *ast.Organism, vue vue) interface{} {
+func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) interface{} {
 	attributes := vue.ref.Invoke()
-	attributes.Set("value", getAttributesArray(organism, vue))
+	attributes.Set("value", getAttributesArray(organism, vue, context))
 	organism.OnAttributesChanged.On(func() {
-		attributes.Set("value", getAttributesArray(organism, vue))
+		attributes.Set("value", getAttributesArray(organism, vue, context))
 	})
 
 	returnValue := makeEmptyObject()
@@ -73,7 +81,7 @@ func setupOrganism(organism *ast.Organism, vue vue) interface{} {
 	return returnValue
 }
 
-func setupExpressor(vue vue) js.Value {
+func setupExpressor(vue vue, context expressorContext) js.Value {
 	count := 0
 
 	rootOrgs := make([]*ast.Organism, 0)
@@ -88,42 +96,42 @@ func setupExpressor(vue vue) js.Value {
 		count++
 		rootOrgs = append(rootOrgs, org)
 
-		rootOrgsRef.Set("value", getOrganismsArray(rootOrgs, vue))
+		rootOrgsRef.Set("value", getOrganismsArray(rootOrgs, vue, context))
 		return nil
 	}))
 	return ret
 }
 
 // getOrganismsArray returns [{ id, setupFunc }]
-func getOrganismsArray(organisms []*ast.Organism, vue vue) js.Value {
+func getOrganismsArray(organisms []*ast.Organism, vue vue, context expressorContext) js.Value {
 	arr := makeEmptyArray()
 	for i, el := range organisms {
 		el := el
 		childValue := makeEmptyObject()
 		childValue.Set("id", el.GetId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return setupOrganism(el, vue)
+			return setupOrganism(el, vue, context)
 		}))
 		arr.SetIndex(i, childValue)
 	}
 	return arr
 }
 
-func getAttributesArray(organism *ast.Organism, vue vue) js.Value {
+func getAttributesArray(organism *ast.Organism, vue vue, context expressorContext) js.Value {
 	array := makeEmptyArray()
 	for i, element := range organism.PlayerAttributes {
 		element := element
 		childValue := makeEmptyObject()
 		childValue.Set("id", element.GetId())
 		childValue.Set("setupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			return setupAttribute(element, vue)
+			return setupAttribute(element, vue, context)
 		}))
 		array.SetIndex(i, childValue)
 	}
 	return array
 }
 
-func setupAttribute(a *ast.Attribute, vue vue) js.Value {
+func setupAttribute(a *ast.Attribute, vue vue, context expressorContext) js.Value {
 	ret := makeEmptyObject()
 	nodeIdToNode := make(map[string]ast.Node)
 	layout := NewElementLayout(vue.elementLayoutClass, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -151,8 +159,9 @@ func setupAttribute(a *ast.Attribute, vue vue) js.Value {
 	ret.Set("name", a.GetName())
 	ret.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return setupNode(a.RootNode, vue, attributeContext{
-			nodeIdToNode: nodeIdToNode,
-			layout:       layout,
+			nodeIdToNode:     nodeIdToNode,
+			layout:           layout,
+			expressorContext: context,
 		})
 	}))
 
