@@ -7,22 +7,6 @@ import (
 	"syscall/js"
 )
 
-// TODO: remove in separate commit
-type NodeComponent struct {
-	Component
-	Text                   string
-	NodeChoiceQuery        StringRef
-	NodeChoices            ArrayRef
-	Children               ArrayRef
-	OnNodeChoiceQueryInput func(event js.Value)
-}
-
-type NodeChoice struct {
-	Index      int
-	Text       string
-	CommitFunc func()
-}
-
 func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 	ret := makeEmptyObject()
 	nodeChoicesRef := vue.ref.Invoke()
