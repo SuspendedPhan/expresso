@@ -22,6 +22,13 @@ func TestNewAttribute(t *testing.T) {
 func TestPrintInsideInvoke(t *testing.T) {
 	t.SkipNow()
 
+	js.FuncOf(func(this js.Value, args []js.Value) any {
+		go func() {
+			fmt.Println("this won't hang")
+		}()
+		return nil
+	}).Invoke()
+
 	fmt.Println("this will not hang")
 	of := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		println("this won't hang either")
@@ -33,7 +40,7 @@ func TestPrintInsideInvoke(t *testing.T) {
 
 func TestSimple(t *testing.T) {
 	t.SkipNow()
-	expressor := setupExpressor(mockVue(), mockExpressorContext())
+	expressor := setupExpressor(mockVue())
 	length := expressor.Get("rootOrganisms").Get("value").Get("length").Int()
 	assert.Equal(t, 0, length)
 

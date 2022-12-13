@@ -1,6 +1,6 @@
 <template>
   <div class="absolute border border-black">
-    <input class='input' ref="input" @blur='blur' @keydown='keydown' :value="query" @input="onInput" />
+    <input class='input bg-transparent' ref="input" @blur='blur' @keydown='keydown' :value="query" @input="onInput" />
     <div class='border border-solid'></div>
     <div>
       <div v-for='(choice, index) in choices' :key='index' @mousedown='onClick(choice, $event)'>
@@ -31,7 +31,7 @@ export default class Searchbox extends Vue {
   }
 
   onInput(event) {
-    this.$emit('queryInput', event.target.value);
+    this.$emit('queryInput', event);
   }
 
   keydown(event) {

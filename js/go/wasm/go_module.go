@@ -23,6 +23,9 @@ type vue struct {
 // expressorContext contains mutable state for the Expressor Gue Component's descendants.
 type expressorContext struct {
 	focus *focus.Focus
+
+	// documentKeydown is fired whenever a keydown event occurs on the webpage's document.
+	documentKeydown JsEvent
 }
 
 // attributeContext contains mutable state for an Attribute Gue Component's descendants.
@@ -48,8 +51,7 @@ func bootstrapGoModule() {
 		watch := args[1]
 		computed := args[2]
 		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6]}
-		context := expressorContext{focus: focus.NewFocus()}
-		return setupExpressor(vue, context)
+		return setupExpressor(vue)
 	}).Value)
 
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -60,7 +62,6 @@ func bootstrapGoModule() {
 	}))
 
 	js.Global().Set("GoModule", goModule)
-	println("after set")
 }
 
 func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) interface{} {
@@ -81,7 +82,19 @@ func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) in
 	return returnValue
 }
 
-func setupExpressor(vue vue, context expressorContext) js.Value {
+func setupExpressor(vue vue) js.Value {
+	keydown := NewJsEventDispatcher()
+	onKeydown := js.FuncOf(func(this js.Value, args []js.Value) any {
+		event := args[0]
+		keydown.Dispatch(event)
+		return nil
+	})
+	js.Global().Get("document").Call("addEventListener", "keydown", onKeydown)
+	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) any {
+		js.Global().Get("document").Call("removeEventListener", "keydown", onKeydown)
+		return nil
+	}))
+
 	count := 0
 
 	rootOrgs := make([]*ast.Organism, 0)
@@ -96,6 +109,7 @@ func setupExpressor(vue vue, context expressorContext) js.Value {
 		count++
 		rootOrgs = append(rootOrgs, org)
 
+		context := expressorContext{focus: focus.NewFocus(), documentKeydown: keydown}
 		rootOrgsRef.Set("value", getOrganismsArray(rootOrgs, vue, context))
 		return nil
 	}))

@@ -1,5 +1,7 @@
 package ast
 
+// TODO: use Event under the hood.
+
 type Subscriber struct {
 	callback func()
 }
