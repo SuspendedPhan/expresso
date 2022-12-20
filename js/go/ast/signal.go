@@ -1,6 +1,6 @@
 package ast
 
-// TODO: use Event under the hood.
+import "expressioni.sta/event"
 
 type Subscriber struct {
 	callback func()
@@ -15,27 +15,21 @@ type ReadonlySignal interface {
 
 // Signal is an event dispatcher. NewSignal() should be called to create a signal.
 type Signal struct {
-	subscribers map[*Subscriber]struct{}
+	dispatcher *event.Dispatcher
 }
 
 // On subscribes to this signal. The returned off function must be called the subscription is no longer needed,
 // otherwise there will be a memory leak.
 func (sig *Signal) On(callback func()) (off func()) {
-	subscriber := &Subscriber{
-		callback: callback,
-	}
-	sig.subscribers[subscriber] = struct{}{}
-	return func() {
-		delete(sig.subscribers, subscriber)
-	}
+	return sig.dispatcher.On(func(arg interface{}) {
+		callback()
+	})
 }
 
-func (sig Signal) Dispatch() {
-	for subscriber := range sig.subscribers {
-		subscriber.callback()
-	}
+func (sig *Signal) Dispatch() {
+	sig.dispatcher.Dispatch(struct{}{})
 }
 
 func NewSignal() *Signal {
-	return &Signal{subscribers: make(map[*Subscriber]struct{})}
+	return &Signal{dispatcher: event.NewDispatcher()}
 }
