@@ -2,6 +2,8 @@ package main
 
 import (
 	"expressioni.sta/ast"
+	"fmt"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"syscall/js"
@@ -38,17 +40,25 @@ func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
 	ret.Set("children", childrenRef)
 
 	// nodePickerChoices is an array of options for the user to replace this node with another node based on the query given to
-	// onNodeChoiceQueryInput. Each element is an object with the following keys:
+	// nodePickerOnQueryInput. Each element is an object with the following keys:
 	// - text: string | The display text for the node choice.
 	// - commitFunc: function | A function to replace this node with the chosen node.
 	ret.Set("nodePickerChoices", nodePickerChoicesRef)
 
-	// nodeChoiceQuery: string | the user query used for picking a new node.
+	// nodePickerQuery: string | the user query used for picking a new node.
 	ret.Set("nodePickerQuery", nodePickerQueryRef)
 
-	// onNodeChoiceQueryInput is called when the user types input into the node picker text box.
+	// nodePickerOnQueryInput is called when the user types input into the node picker text box.
 	// args[0]: Event | The js event. See documentation on MDN.
 	ret.Set("nodePickerOnQueryInput", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		defer func() {
+			// See the section "Note on js.Func" in the README.
+			if err := recover(); err != nil {
+				println(fmt.Sprint(err))
+				debug.PrintStack()
+			}
+		}()
+
 		event := args[0]
 		event.Call("stopPropagation")
 

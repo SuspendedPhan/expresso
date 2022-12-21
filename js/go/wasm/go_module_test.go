@@ -87,25 +87,25 @@ func TestNodeChoices(t *testing.T) {
 	node := ast.NewNumberNode(10)
 	node.SetAttribute(attribute)
 	gue := setupNode(node, mockVue(), mockAttributeContext())
-	gue.Call("onNodeChoiceQueryInput", makeInputEvent("20"))
-	assert.Equal(t, "20", gue.Get("nodeChoiceQuery").Get("value").String())
+	gue.Call("nodePickerOnQueryInput", makeInputEvent("20"))
+	assert.Equal(t, "20", gue.Get("nodePickerQuery").Get("value").String())
 
-	nodeChoice := gue.Get("nodeChoices").Get("value").Index(0)
+	nodeChoice := gue.Get("nodePickerChoices").Get("value").Index(0)
 	assert.Equal(t, "20", nodeChoice.Get("text").String())
 
 	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "20.00", attribute.RootNode.GetText())
 
 	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
-	gue.Call("onNodeChoiceQueryInput", makeInputEvent("30"))
-	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
+	gue.Call("nodePickerOnQueryInput", makeInputEvent("30"))
+	nodeChoice = gue.Get("nodePickerChoices").Get("value").Index(0)
 	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "30.00", attribute.RootNode.GetText())
 
 	// Test 0.00 + 0.00
 	gue = setupNode(attribute.RootNode, mockVue(), mockAttributeContext())
-	gue.Call("onNodeChoiceQueryInput", makeInputEvent("+"))
-	nodeChoice = gue.Get("nodeChoices").Get("value").Index(0)
+	gue.Call("nodePickerOnQueryInput", makeInputEvent("+"))
+	nodeChoice = gue.Get("nodePickerChoices").Get("value").Index(0)
 	assert.Equal(t, "+", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc", makeClickEvent())
 	assert.Equal(t, "+", attribute.RootNode.GetText())
@@ -118,8 +118,8 @@ func TestNodeChoices(t *testing.T) {
 	assert.Equal(t, "0.00", gueB.Get("text").String())
 
 	// Test (0.00 + 0.00) + 0.00
-	gueA.Call("onNodeChoiceQueryInput", makeInputEvent("*"))
-	nodeChoice = gueA.Get("nodeChoices").Get("value").Index(0)
+	gueA.Call("nodePickerOnQueryInput", makeInputEvent("*"))
+	nodeChoice = gueA.Get("nodePickerChoices").Get("value").Index(0)
 	assert.Equal(t, "*", nodeChoice.Get("text").String())
 	nodeChoice.Call("commitFunc", makeClickEvent())
 	gueA = gue.Get("children").Get("value").Index(0).Call("setupFunc")
@@ -219,6 +219,9 @@ func makeInputEvent(inputValue string) js.Value {
 	arg := makeEmptyObject()
 	arg.Set("target", makeEmptyObject())
 	arg.Get("target").Set("value", inputValue)
+	arg.Set("stopPropagation", js.FuncOf(func(this js.Value, args []js.Value) any {
+		return nil
+	}))
 	return arg
 }
 
@@ -264,7 +267,7 @@ func mockAttributeContext() attributeContext {
 }
 
 func mockExpressorContext() expressorContext {
-	return expressorContext{focus: focus.NewFocus()}
+	return expressorContext{focus: focus.NewFocus(), documentKeydown: NewJsEventDispatcher()}
 }
 
 func mockElementLayout() ElementLayout {

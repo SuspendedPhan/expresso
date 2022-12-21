@@ -4,6 +4,7 @@ import (
 	"expressioni.sta/ast"
 	"expressioni.sta/focus"
 	"fmt"
+	"runtime/debug"
 	"strconv"
 	"syscall/js"
 )
@@ -172,6 +173,13 @@ func setupAttribute(a *ast.Attribute, vue vue, context expressorContext) js.Valu
 	ret.Set("rootNodeId", rootNodeIdRef)
 	ret.Set("name", a.GetName())
 	ret.Set("rootNodeSetupFunc", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		defer func() {
+			// See the section "Note on js.Func" in the README.
+			if err := recover(); err != nil {
+				println(fmt.Sprint(err))
+				debug.PrintStack()
+			}
+		}()
 		return setupNode(a.RootNode, vue, attributeContext{
 			nodeIdToNode:     nodeIdToNode,
 			layout:           layout,
