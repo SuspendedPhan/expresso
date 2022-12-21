@@ -5,7 +5,6 @@ import (
 	"expressioni.sta/focus"
 	"fmt"
 	"runtime/debug"
-	"strconv"
 	"syscall/js"
 )
 
@@ -42,23 +41,23 @@ func bootstrapGoModule() {
 	setupPixiSetters()
 	goModule := makeEmptyObject()
 
-	rootOrganism := ast.NewOrganism()
-	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.X)
-	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Y)
-	rootOrganism.AddIntrinsicAttribute(ast.ProtoCircle.Radius)
-
+	rootOrgs := make([]*ast.Organism, 0)
 	goModule.Set("setupExpressor", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
 		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6]}
-		return setupExpressor(vue)
+		return setupExpressor(vue, &rootOrgs)
 	}).Value)
 
+	var pool *pixiPool = nil
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		circlePool := args[0]
-		circles := args[1]
-		render(rootOrganism, circlePool, circles)
+		if pool == nil {
+			pool = newPixiPool(circlePool)
+		}
+		outputs := eval(rootOrgs)
+		writeToPixi(outputs, pool)
 		return js.Undefined()
 	}))
 
@@ -83,40 +82,6 @@ func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) in
 	return returnValue
 }
 
-func setupExpressor(vue vue) js.Value {
-	keydown := NewJsEventDispatcher()
-	onKeydown := js.FuncOf(func(this js.Value, args []js.Value) any {
-		event := args[0]
-		keydown.Dispatch(event)
-		return nil
-	})
-	js.Global().Get("document").Call("addEventListener", "keydown", onKeydown)
-	vue.onUnmounted.Invoke(js.FuncOf(func(this js.Value, args []js.Value) any {
-		js.Global().Get("document").Call("removeEventListener", "keydown", onKeydown)
-		return nil
-	}))
-
-	count := 0
-
-	rootOrgs := make([]*ast.Organism, 0)
-	rootOrgsRef := vue.ref.Invoke()
-	rootOrgsRef.Set("value", makeEmptyArray())
-
-	ret := makeEmptyObject()
-	ret.Set("rootOrganisms", rootOrgsRef)
-	ret.Set("addOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		org := ast.NewOrganism()
-		org.SetName("organism" + strconv.Itoa(count))
-		count++
-		rootOrgs = append(rootOrgs, org)
-
-		context := expressorContext{focus: focus.NewFocus(), documentKeydown: keydown}
-		rootOrgsRef.Set("value", getOrganismsArray(rootOrgs, vue, context))
-		return nil
-	}))
-	return ret
-}
-
 // getOrganismsArray returns [{ id, setupFunc }]
 func getOrganismsArray(organisms []*ast.Organism, vue vue, context expressorContext) js.Value {
 	arr := makeEmptyArray()
@@ -134,7 +99,7 @@ func getOrganismsArray(organisms []*ast.Organism, vue vue, context expressorCont
 
 func getAttributesArray(organism *ast.Organism, vue vue, context expressorContext) js.Value {
 	array := makeEmptyArray()
-	for i, element := range organism.PlayerAttributes {
+	for i, element := range organism.Attributes() {
 		element := element
 		childValue := makeEmptyObject()
 		childValue.Set("id", element.GetId())

@@ -40,7 +40,8 @@ func TestPrintInsideInvoke(t *testing.T) {
 
 func TestSimple(t *testing.T) {
 	t.SkipNow()
-	expressor := setupExpressor(mockVue())
+	orgs := make([]*ast.Organism, 0)
+	expressor := setupExpressor(mockVue(), &orgs)
 	length := expressor.Get("rootOrganisms").Get("value").Get("length").Int()
 	assert.Equal(t, 0, length)
 

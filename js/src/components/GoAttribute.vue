@@ -1,7 +1,7 @@
 <template>
   <div>
     <div>
-      {{ id }}
+      {{name}}
     </div>
     <div class="relative" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
       <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>

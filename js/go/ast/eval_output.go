@@ -21,6 +21,14 @@ type OrganismOutput struct {
 
 var ProtoCircle *Circle = nil
 
+// GetProtoCircle returns a struct containing intrinsic attributes for a circle.
+func GetProtoCircle() *Circle {
+	if ProtoCircle == nil {
+		SetupProtoOrganisms()
+	}
+	return ProtoCircle
+}
+
 func SetupProtoOrganisms() {
 	ProtoCircle = &Circle{
 		X: &protos.ProtoAttribute{

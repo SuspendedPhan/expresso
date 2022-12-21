@@ -16,17 +16,28 @@ func setupPixiSetters() {
 	}
 }
 
-func render(rootOrganism *ast.Organism, circlePool js.Value, circles js.Value) {
-	organismOutput := rootOrganism.EvalBak()
-	for _, circle := range jsArrayToSlice(circles) {
-		circle.Set("visible", false)
+// eval evaluates the given root organisms.
+func eval(rootOrgs []*ast.Organism) []ast.OrganismOutput {
+	outputs := make([]ast.OrganismOutput, 0)
+	context := ast.NewEvalContext()
+	for _, org := range rootOrgs {
+		outputs = append(outputs, *org.Eval(context))
 	}
+	return outputs
+}
 
-	circle := circlePool.Call("use")
-	defer func() { circlePool.Call("recycle", circle) }()
-	circle.Set("visible", true)
+// writeToPixi copies the entire output data to the pixi scene graph.
+func writeToPixi(rootOutputs []ast.OrganismOutput, pool *pixiPool) {
+	pool.recycleAll()
+	for _, output := range rootOutputs {
+		writeOrganismToPixi(output, pool)
+	}
+}
 
+// writeOrganismToPixi copies an organism's output data to the pixi scene graph.
+func writeOrganismToPixi(organismOutput ast.OrganismOutput, pool *pixiPool) {
 	for _, cloneOutput := range organismOutput.CloneOutputs {
+		circle := pool.use()
 		for protoAttribute, value := range cloneOutput.ValueByProtoAttribute {
 			if pixiSetter, ok := pixiSetters[protoAttribute]; ok {
 				pixiSetter(circle, value)
@@ -35,6 +46,14 @@ func render(rootOrganism *ast.Organism, circlePool js.Value, circles js.Value) {
 			}
 		}
 	}
+}
 
-	//js.Global().Get("console").Call("log", circle)
+// pixiTest is a useful visual test.
+func pixiTest(pool *pixiPool) {
+	circle := pool.use()
+	circle.Set("visible", true)
+	circle.Set("x", 100)
+	circle.Set("y", 100)
+	circle.Get("scale").Set("x", 200)
+	circle.Get("scale").Set("y", 200)
 }

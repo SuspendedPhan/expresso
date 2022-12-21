@@ -22,6 +22,7 @@ func NewOrganism() *Organism {
 	o.OnAttributesChanged = NewSignal()
 	o.IntrinsicAttributeByProtoAttribute = make(map[*protos.ProtoAttribute]*Attribute)
 	clonesAttribute := NewAttribute()
+	clonesAttribute.SetName("clones")
 	clonesAttribute.SetRootNode(NewNumberNode(1))
 	o.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute] = clonesAttribute
 	return o
@@ -95,6 +96,18 @@ type EvalableAttribute interface {
 
 func (o *Organism) getEvalableAttributes() []EvalableAttribute {
 	attributes := make([]EvalableAttribute, 0)
+	for _, attribute := range o.PlayerAttributes {
+		attributes = append(attributes, attribute)
+	}
+	for _, attribute := range o.IntrinsicAttributeByProtoAttribute {
+		attributes = append(attributes, attribute)
+	}
+	return attributes
+}
+
+// Attributes returns a slice containing this organism's player attributes and intrinsic attributes.
+func (o *Organism) Attributes() []*Attribute {
+	attributes := make([]*Attribute, 0)
 	for _, attribute := range o.PlayerAttributes {
 		attributes = append(attributes, attribute)
 	}
