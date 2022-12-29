@@ -1,9 +1,14 @@
 <template>
-  <div>
-    <div>{{name}}</div>
-    <div>{{id}}</div>
-    <GoAttribute v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>
-    <button class="button" @click="addAttribute">Add Attribute</button>
+  <div class="border-solid border-2 border-gray-600">
+    <div class="mt-8 underline">{{name}}</div>
+    <button class="mt-2 text-sm p-0.5">Remove</button>
+    <div class="mt-16">Attributes</div>
+    <div class="mt-2 border-t-2 border-gray-600"></div>
+    <div class="divide-y-2 divide-gray-400">
+      <GoAttribute class="p-4" v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>
+    </div>
+    <div class="border-t-2 border-gray-400"></div>
+    <button class="button p-0.5 m-4" @click="addAttribute">Add Attribute</button>
   </div>
 </template>
 
@@ -22,5 +27,7 @@ export default {
 </script>
 
 <style scoped>
-
+.border-1 {
+  border-width: 1px;
+}
 </style>
