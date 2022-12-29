@@ -158,6 +158,9 @@ func setupAttribute(a *ast.Attribute, vue vue, context expressorContext) js.Valu
 	// nodeTreeHidth: string | The CSS value for the height of the entire Node tree.
 	ret.Set("nodeTreeHeight", nodeTreeHeightRef)
 
+	// nodeTreeLayout: ElementLayout | The element layout object for the node tree.
+	ret.Set("nodeTreeLayout", layout.elementLayout)
+
 	offRootNodeChanged := a.OnRootNodeChanged.On(func() {
 		rootNodeIdRef.Set("value", a.RootNode.GetId())
 	})

@@ -1,5 +1,5 @@
 <template>
-  <div class="relative border-solid border-2 box-content" ref="treeLayout" :style="treeLayoutStyle">
+  <div class="relative" ref="treeLayout" :style="treeLayoutStyle">
     <canvas
         ref="canvas"
         type="2d"

@@ -4,7 +4,9 @@
       {{name}}
     </div>
     <div class="relative node-v-margin mx-2" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
-      <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>
+      <TreeLayout :elementLayout="nodeTreeLayout">
+        <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>
+      </TreeLayout>
     </div>
     <button class="mt-4">Remove</button>
   </div>
@@ -12,9 +14,11 @@
 
 <script>
 import GoNode from "@/components/GoNode";
+import TreeLayout from "@/components/TreeLayout.vue";
+
 export default {
   name: "GoAttribute",
-  components: {GoNode},
+  components: {TreeLayout, GoNode},
   props: {setupFunc: {}},
   setup(props) {
     return props.setupFunc();
