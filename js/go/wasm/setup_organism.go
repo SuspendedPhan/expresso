@@ -5,12 +5,16 @@ import (
 	"syscall/js"
 )
 
-func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) interface{} {
+// setupOrganism returns the refs needed for the Organism Vue Component's setup method.
+func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) js.Value {
 	attributes := vue.ref.Invoke()
 	attributes.Set("value", getAttributesArray(organism, vue, context))
 	organism.OnAttributesChanged.On(func() {
 		attributes.Set("value", getAttributesArray(organism, vue, context))
 	})
+
+	childrenRef := vue.ref.Invoke()
+	childrenRef.Set("value", getOrganismsArray(organism.Suborganisms, vue, context))
 
 	returnValue := makeEmptyObject()
 	returnValue.Set("attributes", attributes)
@@ -20,7 +24,23 @@ func setupOrganism(organism *ast.Organism, vue vue, context expressorContext) in
 		organism.AddAttribute()
 		return nil
 	}))
+	returnValue.Set("addChildOrganism", js.FuncOf(func(this js.Value, args []js.Value) any {
+		subOrg := newOrganism(context)
+		organism.AddSuborganism(subOrg)
+		childrenRef.Set("value", getOrganismsArray(organism.Suborganisms, vue, context))
+		return nil
+	}))
+	returnValue.Set("children", childrenRef)
 	return returnValue
+}
+
+func newOrganism(context expressorContext) *ast.Organism {
+	subOrg := ast.NewOrganism()
+	subOrg.SetName(context.createOrganismName())
+	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().X)
+	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().Y)
+	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().Radius)
+	return subOrg
 }
 
 // getOrganismsArray returns [{ id, setupFunc }]

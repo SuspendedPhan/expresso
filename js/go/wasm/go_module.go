@@ -26,6 +26,13 @@ type expressorContext struct {
 
 	// documentKeydown is fired whenever a keydown event occurs on the webpage's document.
 	documentKeydown JsEvent
+
+	organismCount int
+}
+
+func (c expressorContext) createOrganismName() string {
+	c.organismCount++
+	return fmt.Sprintf("Organism %d", c.organismCount)
 }
 
 // attributeContext contains mutable state for an Attribute Gue Component's descendants.

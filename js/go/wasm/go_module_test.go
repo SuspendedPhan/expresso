@@ -61,7 +61,7 @@ func TestSimple(t *testing.T) {
 
 func TestOrganism(t *testing.T) {
 	org := ast.NewOrganism()
-	gue := setupOrganism(org, mockVue(), mockExpressorContext()).(js.Value)
+	gue := setupOrganism(org, mockVue(), mockExpressorContext())
 	attrs := gue.Get("attributes")
 	// We assume it starts with 1 Clones attribute.
 	assert.Equal(t, 1, attrs.Get("value").Get("length").Int())

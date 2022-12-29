@@ -3,7 +3,6 @@ package main
 import (
 	"expressioni.sta/ast"
 	"expressioni.sta/focus"
-	"strconv"
 	"syscall/js"
 )
 
@@ -22,23 +21,15 @@ func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism) js.Value {
 		return nil
 	}))
 
-	count := 0
-
+	context := expressorContext{focus: focus.NewFocus(), documentKeydown: keydown}
 	rootOrgsRef := vue.ref.Invoke()
 	rootOrgsRef.Set("value", makeEmptyArray())
 
 	ret := makeEmptyObject()
 	ret.Set("rootOrganisms", rootOrgsRef)
 	ret.Set("addOrganism", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		org := ast.NewOrganism()
-		org.SetName("organism" + strconv.Itoa(count))
-		org.AddIntrinsicAttribute(ast.ProtoCircle.X)
-		org.AddIntrinsicAttribute(ast.ProtoCircle.Y)
-		org.AddIntrinsicAttribute(ast.ProtoCircle.Radius)
-		count++
+		org := newOrganism(context)
 		*rootOrganisms = append(*rootOrganisms, org)
-
-		context := expressorContext{focus: focus.NewFocus(), documentKeydown: keydown}
 		rootOrgsRef.Set("value", getOrganismsArray(*rootOrganisms, vue, context))
 		return nil
 	}))
