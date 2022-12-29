@@ -1,11 +1,13 @@
 <template>
-  <div class="border-solid border-2 border-gray-600">
+  <div class="border-solid border-2 border-gray-600 mx-auto max-w-fit">
     <div class="mt-8 underline">{{name}}</div>
     <button class="mt-2 text-sm p-0.5">Remove</button>
     <div class="mt-16">Attributes</div>
     <div class="mt-2 border-t-2 border-gray-600"></div>
     <div class="divide-y-2 divide-gray-400">
-      <GoAttribute class="p-4" v-for="attribute in attributes" :key="attribute.id" :setup-func="attribute.setupFunc"/>
+      <div v-for="attribute in attributes" :key="attribute.id">
+        <GoAttribute class="p-4 mx-auto" :setup-func="attribute.setupFunc"/>
+      </div>
     </div>
     <div class="border-t-2 border-gray-400"></div>
     <button class="button p-0.5 m-4" @click="addAttribute">Add Attribute</button>
@@ -27,7 +29,7 @@ export default {
 </script>
 
 <style scoped>
-.border-1 {
-  border-width: 1px;
+.max-w-fit {
+  max-width: fit-content;
 }
 </style>

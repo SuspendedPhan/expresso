@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="max-w-fit">
+    <div class="max-w-fit">
       {{name}}
     </div>
     <div class="relative" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
@@ -22,5 +22,7 @@ export default {
 </script>
 
 <style scoped>
-
+.max-w-fit {
+  max-width: fit-content;
+}
 </style>
