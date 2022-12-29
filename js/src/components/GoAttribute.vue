@@ -1,11 +1,12 @@
 <template>
   <div class="max-w-fit">
-    <div class="max-w-fit">
+    <div class="border-solid border-b-2 border-gray-400 p-0.5">
       {{name}}
     </div>
-    <div class="relative" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
+    <div class="relative m-4" :style="{ width: nodeTreeWidth, height: nodeTreeHeight }">
       <GoNode :key="rootNodeId" :setup-func="rootNodeSetupFunc"></GoNode>
     </div>
+    <button class="mt-4">Remove</button>
   </div>
 </template>
 
