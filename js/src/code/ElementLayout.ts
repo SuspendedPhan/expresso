@@ -28,14 +28,16 @@ export class ElementLayout {
 
   // getRootNode is not used.
   // getChildren refers to the children that we will call getKey() on.
-  constructor(getRootNode, getChildren, getKey: any = null) {
+  constructor(getRootNode, getChildren, getKey: any = null, horizontalMargin: number, verticalMargin: number) {
     this.getKey = getKey ?? (node => node.id);
 
     this.layout = new Layout(
         this.getWidth.bind(this),
         this.getHeight.bind(this),
         getChildren,
-        this.getKey
+        this.getKey,
+        horizontalMargin,
+        verticalMargin,
     );
     this.getRootNode = getRootNode;
   }

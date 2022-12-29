@@ -23,7 +23,7 @@ import Store from "@/models/Store";
 export default class WasmAttribute extends Vue {
   @Prop() attribute;
 
-  @Provide() nodeLayout = new ElementLayout(() => this.getRootNode(), node => Store.getChildren(node), WasmAttribute.getKey);
+  @Provide() nodeLayout = new ElementLayout(() => this.getRootNode(), node => Store.getChildren(node), WasmAttribute.getKey, horizontalMargin, verticalMargin);
 
   name = null;
   rootNode = null;

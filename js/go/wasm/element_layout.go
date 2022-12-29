@@ -10,8 +10,10 @@ type ElementLayout struct {
 // NewElementLayout instantiates an instance of the provided TypeScript ElementLayout class and returns an
 // ElementLayout which is a proxy to the instance. For the rest of the parameters after the ElementLayout class, NewElementLayout passes
 // the parameters to the class constructor.
-func NewElementLayout(elementLayoutClass js.Value, getRootNodeFunc js.Value, getChildrenFunc js.Value, getKeyFunc js.Value) ElementLayout {
-	elementLayout := elementLayoutClass.New(getRootNodeFunc, getChildrenFunc, getKeyFunc)
+func NewElementLayout(elementLayoutClass js.Value, getRootNodeFunc js.Value, getChildrenFunc js.Value,
+	getKeyFunc js.Value, horizontalMargin float32, verticalMargin float32) ElementLayout {
+
+	elementLayout := elementLayoutClass.New(getRootNodeFunc, getChildrenFunc, getKeyFunc, horizontalMargin, verticalMargin)
 	return ElementLayout{elementLayout: elementLayout}
 }
 

@@ -22,14 +22,13 @@ export interface Output {
 }
 
 export class Layout {
-  private horizontalMargin = 100;
-  private verticalMargin = 100;
-
   constructor(
     private getWidth: Function,
     private getHeight: Function,
     private getChildren: Function,
-    private getKey: Function
+    private getKey: Function,
+    private horizontalMargin: number,
+    private verticalMargin: number
   ) {}
 
   // treeRoot will always be positioned at <0, 0>

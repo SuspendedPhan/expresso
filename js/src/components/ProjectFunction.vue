@@ -29,7 +29,7 @@ export default {
   },
   setup(props) {
     const emModule = inject<any>('getEmModule')();
-    const elementLayout = new ElementLayout(() => props.fun.getRootNode(), node => Store.getChildren(node), (node) => node.getId());
+    const elementLayout = new ElementLayout(() => props.fun.getRootNode(), node => Store.getChildren(node), (node) => node.getId(), horizontalMargin, verticalMargin);
 
     const getParameters = () => Functions.vectorToArray(props.fun.getParameters());
     const parameters = ref(getParameters());

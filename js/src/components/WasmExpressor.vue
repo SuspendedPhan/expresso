@@ -54,7 +54,7 @@ export default class WasmExpressor extends Vue {
 
   async mounted() {
     this.rootOrganism = this.project.getRootOrganism();
-    this.organismLayout = new ElementLayout(() => this.rootOrganism, WasmExpressor.getChildren, WasmExpressor.getKey);
+    this.organismLayout = new ElementLayout(() => this.rootOrganism, WasmExpressor.getChildren, WasmExpressor.getKey, horizontalMargin, verticalMargin);
     this.oldMounted();
   }
 

@@ -124,7 +124,7 @@ func setupAttribute(a *ast.Attribute, vue vue, context expressorContext) js.Valu
 	}).Value, js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		// getKeyFunc
 		return args[0]
-	}).Value)
+	}).Value, 100, 25)
 
 	rootNodeIdRef := vue.ref.Invoke()
 	rootNodeIdRef.Set("value", a.RootNode.GetId())
