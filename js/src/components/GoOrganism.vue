@@ -10,6 +10,9 @@
     </div>
     <div class="border-t-2 border-gray-400"></div>
     <button class="button p-0.5 m-4" @click="addAttribute">Add Attribute</button>
+    <div class="border-t-2 border-gray-400"></div>
+    <button class="button p-0.5 m-4" @click="addChildOrganism">Add Child Organism</button>
+    <GoOrganism v-for="child in children" :key="child.id" :setupFunc="child.setupFunc"></GoOrganism>
   </div>
 </template>
 
