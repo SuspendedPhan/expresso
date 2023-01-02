@@ -20,6 +20,7 @@ import PixiRenderer from "@/code/PixiRenderer";
 import fps from "fps";
 import numeral from "numeral";
 import { ElementLayout } from '@/code/ElementLayout';
+import {ResizeSensor} from "css-element-queries";
 
 // Defined in public/wasm_exec.js, which is loaded in index.html
 declare var Go: any;
@@ -40,7 +41,7 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
 
-      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted, nextTick, ElementLayout);
+      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted, nextTick, ElementLayout, ResizeSensor);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
       const onFrame = () => {
         ticker.tick();

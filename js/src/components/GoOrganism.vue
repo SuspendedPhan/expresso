@@ -1,5 +1,5 @@
 <template>
-  <div class="border-solid border-2 border-gray-600 mx-auto max-w-fit">
+  <div class="absolute border-solid border-2 border-gray-600 bg-white mx-auto max-w-fit" ref="rootElement" :style="{ left: position.left + 'px', top: position.top + 'px' }">
     <div class="mt-8 underline">{{name}}</div>
     <button class="mt-2 text-sm p-0.5">Remove</button>
     <div class="mt-8 border-t-2 border-gray-600"></div>

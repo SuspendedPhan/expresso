@@ -77,12 +77,16 @@ export class ElementLayout {
   private getWidth(node) {
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
-    return element?.clientWidth ?? 0;
+    return element?.offsetWidth ?? 0;
   }
 
   private getHeight(node) {
+    console.log(node);
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
-    return element?.clientHeight ?? 0;
+    const answer = element?.offsetHeight ?? 0;
+    console.log(element);
+    console.log(answer);
+    return answer;
   }
 }

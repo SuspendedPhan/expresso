@@ -61,7 +61,7 @@ func TestSimple(t *testing.T) {
 
 func TestOrganism(t *testing.T) {
 	org := ast.NewOrganism()
-	gue := setupOrganism(org, mockVue(), mockExpressorContext())
+	gue := setupOrganism(org, mockVue(), mockExpressorContext(), mockElementLayout())
 	attrs := gue.Get("attributes")
 	// We assume it starts with 1 Clones attribute.
 	assert.Equal(t, 1, attrs.Get("value").Get("length").Int())
@@ -257,6 +257,9 @@ func mockVue() vue {
 		onUnmounted:        onUnmountedFunc,
 		nextTick:           nextTickFunc,
 		elementLayoutClass: getMockElementLayoutClass(),
+		resizeSensorClass: js.FuncOf(func(this js.Value, args []js.Value) any {
+			return nil
+		}).Value,
 	}
 }
 
@@ -269,7 +272,7 @@ func mockAttributeContext() attributeContext {
 }
 
 func mockExpressorContext() expressorContext {
-	return expressorContext{focus: focus.NewFocus(), documentKeydown: NewJsEventDispatcher()}
+	return expressorContext{focus: focus.NewFocus(), documentKeydown: NewJsEventDispatcher(), organismIdToOrganism: make(map[string]*ast.Organism)}
 }
 
 func mockElementLayout() ElementLayout {

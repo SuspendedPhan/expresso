@@ -18,6 +18,9 @@ type vue struct {
 
 	// The ElementLayout.ts class.
 	elementLayoutClass js.Value
+
+	// The ResizeSensor class from the resize_senor npm package.
+	resizeSensorClass js.Value
 }
 
 // expressorContext contains mutable state for the Expressor Gue Component's descendants.
@@ -27,7 +30,8 @@ type expressorContext struct {
 	// documentKeydown is fired whenever a keydown event occurs on the webpage's document.
 	documentKeydown JsEvent
 
-	organismCount int
+	organismCount        int
+	organismIdToOrganism map[string]*ast.Organism
 }
 
 func (c expressorContext) createOrganismName() string {
@@ -53,7 +57,7 @@ func bootstrapGoModule() {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
-		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6]}
+		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6], args[7]}
 		return setupExpressor(vue, &rootOrgs)
 	}).Value)
 

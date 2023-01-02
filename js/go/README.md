@@ -9,6 +9,10 @@ main routine to hang before the stacktrace is actually printed. Preventing the h
 # Known memory leaks
 - Every js.FuncOf needs a call to Release()
 - Untested memory cleanup in node_component.go
+- Are we cleaning up the map expressorContext.organismIdToOrganism upon removing root organisms and child organisms?
+- In node_component.go, we subscribe to ElementLayout local position, but we never unsubscribe
+- In setup_organism.go, we subscribe to ElementLayout local position, but we never unsubscribe
+- In TreeLayout.vue, we never detach() the ResizeSensor.. might be a leak..
 
 # Things you need to install
 

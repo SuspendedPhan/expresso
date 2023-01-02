@@ -17,9 +17,7 @@ export default {
     setupFunc: {}
   },
   setup(props) {
-    const upFunc = props.setupFunc();
-    console.log(upFunc);
-    return upFunc;
+    return props.setupFunc();
   }
 }
 </script>
