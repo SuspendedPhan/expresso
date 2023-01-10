@@ -29,9 +29,12 @@ func TestSetupExpressorElementLayout(t *testing.T) {
 	rootOrgs := expressor.Get("rootOrganisms")
 	expressor.Call("addOrganism")
 	layout := rootOrgs.Get("value").Index(0).Get("elementLayout")
+
+	// Make sure the root organism has an elementLayout property.
 	assert.False(t, layout.IsUndefined())
 	assert.False(t, layout.Get("registerElement").IsUndefined())
 
+	// Make sure setupOrganism called registerElement.
 	regElInvokedArg0 := make([]js.Value, 0)
 	regElInvokedArg1 := make([]js.Value, 0)
 	layout.Set("registerElement", js.FuncOf(func(this js.Value, args []js.Value) any {

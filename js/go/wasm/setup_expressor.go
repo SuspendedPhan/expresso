@@ -8,6 +8,12 @@ import (
 	"syscall/js"
 )
 
+// rootOrganism contains the data needed to render an Organism component.
+type rootOrganism struct {
+	org    *ast.Organism
+	layout ElementLayout
+}
+
 // setupExpressor returns the refs needed for the Expressor Vue Component's setup method. The given rootOrganisms slice
 // will be appended and shortened based on UI interactions.
 func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism) js.Value {
@@ -65,9 +71,7 @@ func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism) js.Value {
 	return ret
 }
 
-// TODO: fix doc
-// TODO: dedupe?
-// getRootOrganismsArray returns [{ id, setupFunc }]
+// getRootOrganismsArray returns [{ id, elementLayout, setupFunc }]
 func getRootOrganismsArray(organisms []rootOrganism, vue vue, context expressorContext) js.Value {
 	arr := makeEmptyArray()
 	for i, el := range organisms {
@@ -98,9 +102,4 @@ func getOrganismChildrenIds(organismId string, organismIdToOrganism map[string]*
 		ret.SetIndex(i, child.GetId())
 	}
 	return ret
-}
-
-type rootOrganism struct {
-	org    *ast.Organism
-	layout ElementLayout
 }

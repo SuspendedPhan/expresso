@@ -1,8 +1,7 @@
-import {Layout, Line, Output, Point} from "@/code/Layout";
-import { Root } from "../store/Root";
+import {Layout, Output, Point} from "@/code/Layout";
 import * as rxjs from "rxjs";
-import { share } from "rxjs/operators";
-import { Observable, Subject } from "rxjs";
+import {Observable} from "rxjs";
+import {share} from "rxjs/operators";
 
 export class ElementLayout {
   private layout;
@@ -81,12 +80,8 @@ export class ElementLayout {
   }
 
   private getHeight(node) {
-    console.log(node);
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
-    const answer = element?.offsetHeight ?? 0;
-    console.log(element);
-    console.log(answer);
-    return answer;
+    return element?.offsetHeight ?? 0;
   }
 }

@@ -86,6 +86,7 @@ func setupOrganism(organism *ast.Organism, vue vue, context expressorContext, la
 	return ret
 }
 
+// newOrganism creates an organism with a generated name and the appropriate intrinsic attributes.
 func newOrganism(context expressorContext) *ast.Organism {
 	subOrg := ast.NewOrganism()
 	subOrg.SetName(context.createOrganismName())
