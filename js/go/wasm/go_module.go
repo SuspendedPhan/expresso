@@ -67,8 +67,9 @@ func bootstrapGoModule() {
 		if pool == nil {
 			pool = newPixiPool(circlePool)
 		}
-		outputs := eval(rootOrgs)
-		writeToPixi(outputs, pool)
+		pixiTest2(pool)
+		//outputs := eval(rootOrgs)
+		//writeToPixi(outputs, pool)
 		return js.Undefined()
 	}))
 

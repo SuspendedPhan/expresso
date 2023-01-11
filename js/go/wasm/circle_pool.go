@@ -27,4 +27,5 @@ func (c *pixiPool) recycleAll() {
 		pixiObject.Set("visible", false)
 		c.pool.Call("recycle", pixiObject)
 	}
+	c.usedPixiObjects = make([]js.Value, 0)
 }

@@ -2,6 +2,7 @@
   <div>
     <div class="flex">
       <div class="w-1/2 h-full">
+        <div>{{debugText}}</div>
         <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor"/>
       </div>
       <div ref="viewport" class="h-full w-1/2">
@@ -36,6 +37,7 @@ export default {
     const setupExpressor = ref<any>(null);
     const viewport = ref(null);
     const canvas = ref(null);
+    const debugText = ref();
 
     // GoModuleWasm is the path to the mymodule.wasm file
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
@@ -46,6 +48,7 @@ export default {
       const onFrame = () => {
         ticker.tick();
         GoModule.eval(renderer.circlePool, renderer.circles);
+        debugText.value = GoModule.debug;
         window.requestAnimationFrame(onFrame);
       };
       onFrame();
@@ -55,7 +58,7 @@ export default {
     const ticker = fps({ every: 10 });
     ticker.on("data", (framerate) => (framesPerSecond.value = numeral(framerate).format("0")));
 
-    return {setupExpressor, viewport, canvas, framesPerSecond};
+    return {setupExpressor, viewport, canvas, framesPerSecond, debugText};
   }
 }
 </script>

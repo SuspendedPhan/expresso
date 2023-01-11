@@ -56,24 +56,29 @@ func TestWriteToPixiChildOrganisms(t *testing.T) {
 	parent := ast.NewOrganismOutput()
 	parentClone := ast.NewCloneOutput()
 	parentClone.ValueByProtoAttribute[protos.ClonesAttribute] = 1
-	parentClone.ValueByProtoAttribute[ast.GetProtoCircle().Radius] = 10
+	parentClone.ValueByProtoAttribute[ast.GetProtoCircle().X] = 10
 	child := ast.NewOrganismOutput()
 	childClone := ast.NewCloneOutput()
 	childClone.ValueByProtoAttribute[protos.ClonesAttribute] = 1
-	childClone.ValueByProtoAttribute[ast.GetProtoCircle().Radius] = 20
+	childClone.ValueByProtoAttribute[ast.GetProtoCircle().X] = 20
 
 	child.CloneOutputs = append(child.CloneOutputs, childClone)
 	parentClone.SuborganismOutputs = append(parentClone.SuborganismOutputs, child)
 	parent.CloneOutputs = append(parent.CloneOutputs, parentClone)
 
 	outputs = append(outputs, *parent)
-	circle := makeEmptyObject()
+	circles := []js.Value{makeEmptyObject(), makeEmptyObject()}
+	usedCount := 0
 	pool := makeEmptyObject()
 	pool.Set("use", js.FuncOf(func(this js.Value, args []js.Value) any {
+		circle := circles[usedCount]
+		usedCount++
 		return circle
 	}))
 	pool.Set("recycleAll", js.FuncOf(func(this js.Value, args []js.Value) any {
 		return nil
 	}))
-	writeToPixi(outputs, pool)
+	writeToPixi(outputs, newPixiPool(pool))
+	assert.Equal(t, 10, circles[0].Get("x").Int())
+	assert.Equal(t, 20, circles[1].Get("x").Int())
 }
