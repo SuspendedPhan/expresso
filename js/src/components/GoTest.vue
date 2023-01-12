@@ -43,11 +43,11 @@ export default {
     WebAssembly.instantiateStreaming(fetch(GoModuleWasm), go.importObject).then((result) => {
       go.run(result.instance);
 
-      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted, nextTick, ElementLayout, ResizeSensor);
       const renderer = new PixiRenderer(viewport.value, canvas.value);
+      setupExpressor.value = () => GoModule.setupExpressor(ref, watch, computed, readonly, onUnmounted, nextTick, ElementLayout, ResizeSensor);
       const onFrame = () => {
         ticker.tick();
-        GoModule.eval(renderer.circlePool, renderer.circles);
+        GoModule.eval(renderer);
         debugText.value = GoModule.debug;
         window.requestAnimationFrame(onFrame);
       };

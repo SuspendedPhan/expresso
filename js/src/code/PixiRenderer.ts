@@ -1,10 +1,9 @@
 import * as PIXI from "pixi.js";
 import deePool from "deepool";
 
+// TODO: rename to PixiManager in a separate commit
 export default class PixiRenderer {
-  private app;
-  public circlePool = deePool.create(() => this.makeCircle());
-  public circles = [] as any[];
+  private app : PIXI.Application;
 
   constructor(viewportElement, canvasElement) {
     this.app = new PIXI.Application({
@@ -12,17 +11,19 @@ export default class PixiRenderer {
       view: canvasElement,
       antialias: true
     });
-    this.circlePool.grow(20);
   }
 
-  private makeCircle() {
+  public makeCircle() : PIXI.Graphics {
     const ret = new PIXI.Graphics();
     ret.beginFill(0xffffff);
-    // ret.beginFill(0x9966ff);
     ret.drawCircle(0, 0, 1);
     ret.endFill();
-    this.circles.push(ret);
     this.app.stage.addChild(ret);
     return ret;
+  }
+
+  public destroyCircle(circle : PIXI.Graphics) {
+    this.app.stage.removeChild(circle);
+    circle.destroy();
   }
 }

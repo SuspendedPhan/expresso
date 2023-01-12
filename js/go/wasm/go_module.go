@@ -3,6 +3,7 @@ package main
 import (
 	"expressioni.sta/ast"
 	"expressioni.sta/focus"
+	"expressioni.sta/pixi"
 	"fmt"
 	"runtime/debug"
 	"syscall/js"
@@ -63,13 +64,12 @@ func bootstrapGoModule() {
 
 	var pool *pixiPool = nil
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		circlePool := args[0]
+		pixiManager := args[0]
 		if pool == nil {
-			pool = newPixiPool(circlePool)
+			pool = newPixiPool(pixi.Manager{pixiManager})
 		}
-		pixiTest2(pool)
-		//outputs := eval(rootOrgs)
-		//writeToPixi(outputs, pool)
+		outputs := eval(rootOrgs)
+		writeToPixi(outputs, pool)
 		return js.Undefined()
 	}))
 
