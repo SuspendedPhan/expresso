@@ -1,3 +1,5 @@
+// This could be useful for all the environment variables being passed to the expressor
+
 import Root, { RenderShape } from "@/store/Root";
 import { DateTime } from "luxon";
 import Attribute from "@/models/Attribute";

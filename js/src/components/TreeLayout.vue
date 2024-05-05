@@ -1,3 +1,5 @@
+// This draws lines for the ElementLayout
+
 <template>
   <div class="relative" ref="treeLayout" :style="treeLayoutStyle">
     <canvas
