@@ -1,4 +1,4 @@
-import {Layout, Line, Output, Point} from "@/code/Layout";
+import {Layout, type Output, type Point} from "@/code/Layout";
 import * as rxjs from "rxjs";
 import { share } from "rxjs/operators";
 import { Observable, Subject } from "rxjs";

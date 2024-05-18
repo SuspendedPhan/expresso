@@ -36,7 +36,9 @@
     "ste-signals": "^2.0.9",
     "two.js": "^0.7.0-stable.1",
     "uuid": "^8.3.0",
-    "wu": "^2.1.0"
+    "wu": "^2.1.0",
+    "vue-class-component": "^7.2.6",
+    "vue-property-decorator": "^8.4.2"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

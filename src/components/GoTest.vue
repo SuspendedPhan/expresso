@@ -13,11 +13,11 @@
 </template>
 
 <script lang="ts">
-import GoModuleWasm from "../../public/mymodule.wasm?init";
+import GoModuleWasm from "../mymodule.wasm?init";
 import {computed, onMounted, onUnmounted, ref, watch, readonly, nextTick} from "vue";
 import GoExpressor from "@/components/GoExpressor.vue";
 import PixiRenderer from "@/code/PixiRenderer";
-import fps from "fps";
+// import fps from "fps";
 import numeral from "numeral";
 import { ElementLayout } from '@/code/ElementLayout';
 import {ResizeSensor} from "css-element-queries";
@@ -52,8 +52,8 @@ export default {
     });
 
     const framesPerSecond = ref("00");
-    const ticker = fps({ every: 10 });
-    ticker.on("data", (framerate) => (framesPerSecond.value = numeral(framerate).format("0")));
+    // const ticker = fps({ every: 10 });
+    // ticker.on("data", (framerate) => (framesPerSecond.value = numeral(framerate).format("0")));
 
     return {setupExpressor, viewport, canvas, framesPerSecond};
   }
