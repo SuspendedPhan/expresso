@@ -1,14 +1,14 @@
-import GoProxy from "@/code/GoProxy";
+import GoProxy from '@/code/GoProxy'
 
-declare var GoModule: any;
+declare var GoModule: any
 
-const target = {};
+const target = {}
 
 export default new Proxy(target, {
   get(target: {}, p: PropertyKey, receiver: any): any {
     return () => {
-      const objectId = window.GoModule.newFuncs[p]();
-      return GoProxy.make(objectId);
-    };
+      const objectId = window.GoModule.newFuncs[p]()
+      return GoProxy.make(objectId)
+    }
   }
-});
+})

@@ -2,40 +2,38 @@
   <div class="home">
     <template v-if="!showStoreGraph">
       <template v-if="showExpressor">
-        <Expressor class="expressor" v-if="oldExpressor"/>
-        <WasmExpressor class="expressor" v-else-if="tree" project="tree"/>
+        <Expressor class="expressor" v-if="oldExpressor" />
+        <WasmExpressor class="expressor" v-else-if="tree" project="tree" />
       </template>
       <Viewport :class="['viewport', { fullWidth: !showExpressor }]" />
     </template>
     <StoreGraph v-else></StoreGraph>
     <TestRunner v-if="false" class="runner" />
     <button class="flick" @click="showExpressor = !showExpressor">Flick</button>
-    <button class="storeGraph" @click="showStoreGraph = !showStoreGraph">
-      Show Store Graph
-    </button>
+    <button class="storeGraph" @click="showStoreGraph = !showStoreGraph">Show Store Graph</button>
   </div>
 </template>
 
 <script>
-import Viewport from "./Viewport";
-import Expressor from "./Expressor";
-import StoreGraph from "./StoreGraph";
-import TestRunner from "./tests/TestRunner.vue";
-import Root from "../store/Root";
-import Vue from "vue";
-import WasmExpressor from "@/components/WasmExpressor";
-import WasmModule from "../../public/WasmModule";
-import Wasm from "../../public/WasmModule.wasm";
-import Functions from "@/code/Functions";
+import Viewport from './Viewport'
+import Expressor from './Expressor'
+import StoreGraph from './StoreGraph'
+import TestRunner from './tests/TestRunner.vue'
+import Root from '../store/Root'
+import Vue from 'vue'
+import WasmExpressor from '@/components/WasmExpressor'
+import WasmModule from '../../public/WasmModule'
+import Wasm from '../../public/WasmModule.wasm'
+import Functions from '@/code/Functions'
 
 export default {
-  name: "Home",
+  name: 'Home',
   components: {
     WasmExpressor,
     Viewport,
     Expressor,
     TestRunner,
-    StoreGraph,
+    StoreGraph
   },
   props: {},
   data: function () {
@@ -44,86 +42,80 @@ export default {
       showStoreGraph: false,
       oldExpressor: false,
       tree: null
-    };
+    }
   },
   async mounted() {
-    Root.load();
-    Root.organismCollection.initRootOrganism();
-    document.addEventListener("keydown", (event) => {
-      return;
-      if (event.key === "ArrowUp" && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorUp();
-        event.preventDefault();
-      } else if (event.key === "ArrowDown" && !Root.penStore.getIsQuerying()) {
-        Root.penStore.moveCursorDown();
-        event.preventDefault();
+    Root.load()
+    Root.organismCollection.initRootOrganism()
+    document.addEventListener('keydown', (event) => {
+      return
+      if (event.key === 'ArrowUp' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorUp()
+        event.preventDefault()
+      } else if (event.key === 'ArrowDown' && !Root.penStore.getIsQuerying()) {
+        Root.penStore.moveCursorDown()
+        event.preventDefault()
       }
 
-      if (Root.penStore.getPenPosition().positionType === "Node") {
-        if (event.key === "Enter") {
-          Root.penStore.setIsQuerying(true);
-        } else if (
-          event.key === "ArrowLeft" &&
-          !Root.penStore.getIsQuerying()
-        ) {
-          Root.penStore.moveCursorLeft();
-        } else if (
-          event.key === "ArrowRight" &&
-          !Root.penStore.getIsQuerying()
-        ) {
-          Root.penStore.moveCursorRight();
-        } else if (event.key === "Escape" && Root.penStore.getIsQuerying()) {
-          Root.penStore.setIsQuerying(false);
+      if (Root.penStore.getPenPosition().positionType === 'Node') {
+        if (event.key === 'Enter') {
+          Root.penStore.setIsQuerying(true)
+        } else if (event.key === 'ArrowLeft' && !Root.penStore.getIsQuerying()) {
+          Root.penStore.moveCursorLeft()
+        } else if (event.key === 'ArrowRight' && !Root.penStore.getIsQuerying()) {
+          Root.penStore.moveCursorRight()
+        } else if (event.key === 'Escape' && Root.penStore.getIsQuerying()) {
+          Root.penStore.setIsQuerying(false)
         }
       }
-    });
+    })
 
-    Root.pen.events.on("afterPenCommit", () => {
-      Root.save();
-    });
+    Root.pen.events.on('afterPenCommit', () => {
+      Root.save()
+    })
 
     Vue.config.errorHandler = (err, vm, info) => {
-      this.consoleError = true;
-      console.error(err);
-      console.error(info);
-    };
+      this.consoleError = true
+      console.error(err)
+      console.error(info)
+    }
 
-    window.addEventListener("error", () => {
-      this.consoleError = true;
-    });
+    window.addEventListener('error', () => {
+      this.consoleError = true
+    })
 
     // --- new stuff ---
 
     const module = await WasmModule({
       locateFile: (path) => {
         if (path.endsWith('.wasm')) {
-          return Wasm;
+          return Wasm
         }
-        return path;
-      },
-    });
+        return path
+      }
+    })
 
-    const tree = new module.ExpressorTree();
-    module.ExpressorTree.populateTestTree(tree);
-    const attributeVector = tree.getRootOrganism().getAttributes();
-    const attributes = Functions.vectorToArray(attributeVector);
-    const numberNode = module.NumberNode.make(5);
-    console.log(numberNode);
-    window.numberNode = numberNode;
+    const tree = new module.ExpressorTree()
+    module.ExpressorTree.populateTestTree(tree)
+    const attributeVector = tree.getRootOrganism().getAttributes()
+    const attributes = Functions.vectorToArray(attributeVector)
+    const numberNode = module.NumberNode.make(5)
+    console.log(numberNode)
+    window.numberNode = numberNode
     // console.log('hi');
     // for (const attribute of attributes) {
     //   console.log(attribute.getName());
     // }
-    attributes[0].getRootNode().replace(numberNode);
+    attributes[0].getRootNode().replace(numberNode)
 
     {
-      const attributeVector = tree.getRootOrganism().getAttributes();
-      const attributes = Functions.vectorToArray(attributeVector);
-      console.log(attributes.get(0).getRootNode().getValue());
+      const attributeVector = tree.getRootOrganism().getAttributes()
+      const attributes = Functions.vectorToArray(attributeVector)
+      console.log(attributes.get(0).getRootNode().getValue())
     }
-    this.tree = tree;
-  },
-};
+    this.tree = tree
+  }
+}
 </script>
 <style scoped>
 .runner {

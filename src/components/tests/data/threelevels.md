@@ -1,11 +1,18 @@
 # root
+
 ## editableAttributes
-* clones
-* gravity
+
+- clones
+- gravity
+
 ## emergentAttributes
-* cloneNumber
+
+- cloneNumber
 
 ## organs
+
 ### tree
+
 #### editableAttributes
-* clones
+
+- clones

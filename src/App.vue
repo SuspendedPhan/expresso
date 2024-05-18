@@ -4,14 +4,19 @@ import { RouterView } from 'vue-router'
 
 <template>
   <div id="app">
-  <RouterView />
-    <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Grandstander:200,300,400,500">
+    <RouterView />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Grandstander:200,300,400,500"
+    />
   </div>
 </template>
 
 <style>
-body, input, button, select {
+body,
+input,
+button,
+select {
   font-size: 14pt;
   font-family: 'Grandstander';
   font-weight: 200;
@@ -44,7 +49,7 @@ p {
   color: rgba(113, 0, 225, 0.55);
 }
 .ql-color-function {
-  color: #3BB5DC;
+  color: #3bb5dc;
 }
 .ql-bg-selected {
   background-color: #a8d1ff;
@@ -57,13 +62,14 @@ p {
   margin-bottom: 5px;
 }
 
-p::selection, span::selection {
+p::selection,
+span::selection {
   /* background-color: #a8d1ff; */
   background-color: rgba(0, 0, 0, 0);
 }
 
 .ql-editor:focus {
-  outline-color: rgba(168, 209, 255, .4);
+  outline-color: rgba(168, 209, 255, 0.4);
   /* border:1px solid rgba(0, 0, 0, 0.2); */
   /* box-sizing:content-box; */
   /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */

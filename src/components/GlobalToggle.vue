@@ -5,7 +5,7 @@
   </div>
 </template>
 <script lang="ts">
-import {ref} from "vue";
+import { ref } from 'vue'
 
 export default {
   name: 'GlobalToggle',
@@ -13,14 +13,15 @@ export default {
     label: {}
   },
   setup(props) {
-    const checked = ref(false);
+    const checked = ref(false)
     function onChange(event) {
-      checked.value = event.target.checked;
-      (window as any)[props.label] = checked.value;
+      checked.value = event.target.checked
+      ;(window as any)[props.label] = checked.value
     }
 
     return {
-      checked, onChange
+      checked,
+      onChange
     }
   }
 }

@@ -8,45 +8,42 @@
 </template>
 
 <script lang="ts">
+import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
+import Vue from 'vue'
 
-import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
-import Vue from "vue";
-
-import WasmModule from '@/../public/WasmModule.js';
-import Wasm from "@/../public/WasmModule.wasm";
-import PixiRenderer from "@/code/PixiRenderer";
-import WasmExpressor from "@/components/WasmExpressor.vue";
-import Functions from "@/code/Functions";
-import Store from "../models/Store";
+import WasmModule from '@/../public/WasmModule.js'
+import Wasm from '@/../public/WasmModule.wasm'
+import PixiRenderer from '@/code/PixiRenderer'
+import WasmExpressor from '@/components/WasmExpressor.vue'
+import Functions from '@/code/Functions'
+import Store from '../models/Store'
 
 @Component({
-  components: {WasmExpressor},
+  components: { WasmExpressor }
 })
 export default class WasmTest2 extends Vue {
-  fake = null;
-  tree = null;
+  fake = null
+  tree = null
 
   async mounted() {
     const module = await WasmModule({
       locateFile: (path) => {
         if (path.endsWith('.wasm')) {
-          return Wasm;
+          return Wasm
         }
-        return path;
-      },
-    });
-    module.sayHello();
-    (window as any).wasmModule = module;
+        return path
+      }
+    })
+    module.sayHello()
+    ;(window as any).wasmModule = module
 
-    const store = new Store(module);
-    const project = store.addProject();
-    console.log(project.getRootOrganism().getName());
-    const evalOutput = project.evalOrganismTree();
-    console.log(PixiRenderer.jsifyEvalOutput(evalOutput));
+    const store = new Store(module)
+    const project = store.addProject()
+    console.log(project.getRootOrganism().getName())
+    const evalOutput = project.evalOrganismTree()
+    console.log(PixiRenderer.jsifyEvalOutput(evalOutput))
   }
 }
-
 </script>
-<style scoped>
-</style>
+<style scoped></style>

@@ -11,45 +11,41 @@
       <Organism :organism="root.organismCollection.getRoot()" :isRoot="true" />
       <div class="absolute border-solid border-2" :style="boxStyle"></div>
       <div class="bottom-group">
-        <button @click="clearStorage" class="clearStorage">
-          Clear storage
-        </button>
-        <div :class="['error-box', { error: consoleError }]">
-          you have console errors
-        </div>
+        <button @click="clearStorage" class="clearStorage">Clear storage</button>
+        <div :class="['error-box', { error: consoleError }]">you have console errors</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { PenPositionRelation } from "@/store/Pen";
-import wu from "wu";
-import Root from "../store/Root";
-import Node from "./Node";
-import Organism from "./Organism";
-import Vue from "vue";
-import panzoom from "panzoom";
-import Component from "vue-class-component";
-import { Prop } from "vue-property-decorator";
-import ResizeSensor from "css-element-queries/src/ResizeSensor";
+import { PenPositionRelation } from '@/store/Pen'
+import wu from 'wu'
+import Root from '../store/Root'
+import Node from './Node'
+import Organism from './Organism'
+import Vue from 'vue'
+import panzoom from 'panzoom'
+import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
+import ResizeSensor from 'css-element-queries/src/ResizeSensor'
 
 @Component({
   components: {
     // Node,
-    Organism,
-  },
+    Organism
+  }
 })
 export default class Expressor extends Vue {
-  root = Root;
-  attributeStore = Root.attributeStore;
-  metaorganismCollection = Root.metaorganismCollection;
-  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id;
-  consoleError = false;
-  canvasWidth = 0;
-  canvasHeight = 0;
-  panzoomTransform = {};
-  lines = [];
+  root = Root
+  attributeStore = Root.attributeStore
+  metaorganismCollection = Root.metaorganismCollection
+  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id
+  consoleError = false
+  canvasWidth = 0
+  canvasHeight = 0
+  panzoomTransform = {}
+  lines = []
 
   box = {
     width: 0,
@@ -57,89 +53,77 @@ export default class Expressor extends Vue {
   }
 
   get boxStyle() {
-    console.log("get style");
-    console.log(this.box.width);
-    return `left: 0px; width: ${this.box.width}px; height: ${this.box.height}px`;
+    console.log('get style')
+    console.log(this.box.width)
+    return `left: 0px; width: ${this.box.width}px; height: ${this.box.height}px`
   }
 
   getNodeForAttribute(attribute) {
-    return Root.nodeStore.getChild(
-      Root.attributeStore.getRootNode(attribute),
-      0
-    );
+    return Root.nodeStore.getChild(Root.attributeStore.getRootNode(attribute), 0)
   }
 
   spawn() {
-    const metaorganism = this.metaorganismCollection.getFromId(
-      this.selectedPrimitiveId
-    );
-    this.root.organismCollection.putFromMeta(undefined, metaorganism);
-    this.root.save();
+    const metaorganism = this.metaorganismCollection.getFromId(this.selectedPrimitiveId)
+    this.root.organismCollection.putFromMeta(undefined, metaorganism)
+    this.root.save()
   }
 
   clearStorage() {
-    this.root.clearStorage();
+    this.root.clearStorage()
   }
 
   removeOrganism(organism) {
-    this.root.organismCollection.remove(organism);
-    this.root.save();
+    this.root.organismCollection.remove(organism)
+    this.root.save()
   }
 
   drawLines() {
-    const context = this.$refs["canvas"].getContext("2d");
-    context.resetTransform();
-    context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-    const transform = this.panzoomTransform;
-    context.setTransform(
-      transform.scale,
-      0,
-      0,
-      transform.scale,
-      transform.x,
-      transform.y
-    );
-    context.strokeStyle = "gray";
+    const context = this.$refs['canvas'].getContext('2d')
+    context.resetTransform()
+    context.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
+    const transform = this.panzoomTransform
+    context.setTransform(transform.scale, 0, 0, transform.scale, transform.x, transform.y)
+    context.strokeStyle = 'gray'
     for (const line of this.lines) {
-      context.beginPath();
-      context.moveTo(line.startX, line.startY);
-      context.lineTo(line.endX, line.endY);
-      context.stroke();
+      context.beginPath()
+      context.moveTo(line.startX, line.startY)
+      context.lineTo(line.endX, line.endY)
+      context.stroke()
     }
   }
 
   mounted() {
-    const pz = panzoom(this.$refs["panzoom"], {
+    const pz = panzoom(this.$refs['panzoom'], {
       beforeMouseDown: function (e) {
-        var shouldIgnore = !e.altKey;
-        return shouldIgnore;
+        var shouldIgnore = !e.altKey
+        return shouldIgnore
       },
       filterKey: function (/* e, dx, dy, dz */) {
         // don't let panzoom handle this event:
-        return true;
+        return true
       },
-      zoomDoubleClickSpeed: 1,
-    });
-    pz.on("transform", (e) => {
-      this.panzoomTransform = pz.getTransform();
-      this.drawLines();
-    });
+      zoomDoubleClickSpeed: 1
+    })
+    pz.on('transform', (e) => {
+      this.panzoomTransform = pz.getTransform()
+      this.drawLines()
+    })
 
     // NOTE: maybe can remove?
-    this.canvasWidth = this.$refs["expressor"].clientWidth;
-    this.canvasHeight = this.$refs["expressor"].clientHeight;
+    this.canvasWidth = this.$refs['expressor'].clientWidth
+    this.canvasHeight = this.$refs['expressor'].clientHeight
 
-    new ResizeSensor(this.$refs["expressor"], () => {
-      this.canvasWidth = this.$refs["expressor"].clientWidth;
-      this.canvasHeight = this.$refs["expressor"].clientHeight;
-    });
+    new ResizeSensor(this.$refs['expressor'], () => {
+      this.canvasWidth = this.$refs['expressor'].clientWidth
+      this.canvasHeight = this.$refs['expressor'].clientHeight
+    })
 
     this.root.organismLayout.onCalculated.subscribe((output) => {
-      this.lines = output.lines;
-      this.box.width = output.totalWidth;
-      this.box.height = output.totalHeight;
-      this.drawLines();
-    });
+      this.lines = output.lines
+      this.box.width = output.totalWidth
+      this.box.height = output.totalHeight
+      this.drawLines()
+    })
   }
 }
 </script>

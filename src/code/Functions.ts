@@ -1,45 +1,45 @@
-import wu from 'wu';
-import { v4 as uuidv4 } from "uuid";
+import wu from 'wu'
+import { v4 as uuidv4 } from 'uuid'
 
 export default class Functions {
   static vectorToArray(vector) {
-    return Array.from(this.vectorToIterable(vector));
+    return Array.from(this.vectorToIterable(vector))
   }
 
-  static * vectorToIterable(vector) {
+  static *vectorToIterable(vector) {
     for (let i = 0; i < vector.size(); i++) {
-      yield vector.get(i);
+      yield vector.get(i)
     }
   }
 
   public static getAttributeByName(attributeIterable, name) {
     for (const attribute of attributeIterable) {
       if (attribute.getName() === name) {
-        return attribute;
+        return attribute
       }
     }
-    throw new Error("cant find attribute");
+    throw new Error('cant find attribute')
   }
 
   public static makeZero(emModule) {
-    return emModule.NumberNode.makeUnique(0);
+    return emModule.NumberNode.makeUnique(0)
   }
 
   static uuid() {
-    return uuidv4();
+    return uuidv4()
   }
 
   static toJson(obj) {
-    return JSON.stringify(obj, null, 2);
+    return JSON.stringify(obj, null, 2)
   }
 
   static pluck(obj, properties) {
-    const answer = {};
+    const answer = {}
     for (const property of properties) {
-      if (!(property in obj)) throw new Error(`${obj} doesn't have ${property}`);
-      answer[property] = obj[property];
+      if (!(property in obj)) throw new Error(`${obj} doesn't have ${property}`)
+      answer[property] = obj[property]
     }
-    return answer;
+    return answer
   }
 
   // static * allNodes(store) {
@@ -65,91 +65,91 @@ export default class Functions {
   // }
 
   // does not yield the node
-  static * traverseLeft(node, parentGetter, childrenGetter) {
+  static *traverseLeft(node, parentGetter, childrenGetter) {
     const reversedChildrenGetter = (node) => {
-      return Array.from(childrenGetter(node)).reverse();
+      return Array.from(childrenGetter(node)).reverse()
     }
-    const parent = parentGetter(node);
-    if (parent == null) return;
+    const parent = parentGetter(node)
+    if (parent == null) return
 
-    let seenNode = false;
+    let seenNode = false
     for (const child of reversedChildrenGetter(parent)) {
       if (seenNode) {
-        yield * Functions.traversePostOrder(child, reversedChildrenGetter);
+        yield* Functions.traversePostOrder(child, reversedChildrenGetter)
       }
       if (child === node) {
-        seenNode = true;
+        seenNode = true
       }
     }
-    yield parent;
-    yield * Functions.traverseLeft(parent, parentGetter, childrenGetter);
+    yield parent
+    yield* Functions.traverseLeft(parent, parentGetter, childrenGetter)
   }
 
   // does not yield the node
-  static * traverseRight(node, parentGetter, childrenGetter) {
+  static *traverseRight(node, parentGetter, childrenGetter) {
     // yield my children
     for (const child of childrenGetter(node)) {
-      yield * Functions.traversePreOrder(child, childrenGetter);
+      yield* Functions.traversePreOrder(child, childrenGetter)
     }
-    
-    let visitNode = node;
+
+    let visitNode = node
     while (true) {
-      const parent = parentGetter(visitNode);
-      if (parent == null) return;
+      const parent = parentGetter(visitNode)
+      if (parent == null) return
 
       const children = wu(childrenGetter(parent))
-        .dropWhile(child => child !== visitNode)
-        .drop(1);
+        .dropWhile((child) => child !== visitNode)
+        .drop(1)
       for (const child of children) {
-        yield * Functions.traversePreOrder(child, childrenGetter);
+        yield* Functions.traversePreOrder(child, childrenGetter)
       }
-      visitNode = parent;
+      visitNode = parent
     }
   }
 
-  static * traversePreOrder(node, childrenGetter) {
-    yield node;
+  static *traversePreOrder(node, childrenGetter) {
+    yield node
     for (const child of childrenGetter(node)) {
-      yield * Functions.traversePreOrder(child, childrenGetter);
+      yield* Functions.traversePreOrder(child, childrenGetter)
     }
   }
 
   // yields the node
-  static * traversePostOrder(node, childrenGetter) {
+  static *traversePostOrder(node, childrenGetter) {
     for (const child of childrenGetter(node)) {
-      yield * this.traversePostOrder(child, childrenGetter);
+      yield* this.traversePostOrder(child, childrenGetter)
     }
-    yield node;
+    yield node
   }
 
   // ------------------------------------------------------------
 
   static filterProps(obj, ...props) {
-    const answer = {};
+    const answer = {}
     for (const prop of props) {
-      answer[prop] = obj[prop];
+      answer[prop] = obj[prop]
     }
-    return answer;
+    return answer
   }
 
   // ------------------------------------------------------------
 
   static serialize(store) {
-    return JSON.stringify(store);
+    return JSON.stringify(store)
   }
 
   static deserialize(text) {
-    return JSON.parse(text);
+    return JSON.parse(text)
   }
 
   static isSubsequence(needle, haystack) {
-    let needleIndex = 0;
+    let needleIndex = 0
     for (const haystackChar of haystack) {
-      const needleChar = needle[needleIndex];
+      const needleChar = needle[needleIndex]
       if (haystackChar === needleChar) {
-        needleIndex++;
+        needleIndex++
       }
     }
-    return needleIndex === needle.length;
+    return needleIndex === needle.length
   }
 }

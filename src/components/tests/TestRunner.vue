@@ -1,6 +1,6 @@
 <template>
-  <div class='test-runner'>
-    <div v-for='test in store.tests' :key='test.name' class='flex'>
+  <div class="test-runner">
+    <div v-for="test in store.tests" :key="test.name" class="flex">
       <span>{{ test.status }}</span>
       <span>{{ test.name }}</span>
     </div>
@@ -8,21 +8,20 @@
 </template>
 
 <script>
-import * as TestRunner from './TestRunner';
-import { Store } from './TestRunner';
-import './Tests';
+import * as TestRunner from './TestRunner'
+import { Store } from './TestRunner'
+import './Tests'
 
 export default {
   name: 'TestRunner',
-  props: {
-  },
+  props: {},
   data: () => {
     return {
-      store: Store,
-    };
+      store: Store
+    }
   },
-  mounted: function() {
-    TestRunner.runTests();
+  mounted: function () {
+    TestRunner.runTests()
   }
 }
 </script>

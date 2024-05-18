@@ -4,6 +4,6 @@
 <script lang="ts">
 export default {
   name: 'ProjectFunctionParameter',
-  props: {parameter: {}}
+  props: { parameter: {} }
 }
 </script>

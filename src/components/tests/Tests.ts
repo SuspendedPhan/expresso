@@ -1,11 +1,11 @@
-import * as chai from "chai";
-import Functions from "../../code/Functions";
-import { RenderShape, Root } from "../../store/Root";
-import wu from "wu";
-import { describe, it, AssertionError } from "./TestRunner";
-import * as TestRunner from "./TestRunner";
-import threelevels from "./data/threelevels.json";
-import { PenPositionRelation } from "@/store/Pen";
+import * as chai from 'chai'
+import Functions from '../../code/Functions'
+import { RenderShape, Root } from '../../store/Root'
+import wu from 'wu'
+import { describe, it, AssertionError } from './TestRunner'
+import * as TestRunner from './TestRunner'
+import threelevels from './data/threelevels.json'
+import { PenPositionRelation } from '@/store/Pen'
 
 // npm run md -- -o C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.json C:\Users\Yaktori\Documents\GitHub\expresso\src\components\tests\data\threelevels.md
 
@@ -13,61 +13,61 @@ function logAndRethrow(error) {
   const customError = Object.assign(new AssertionError(), {
     message: error.message,
     actual: error.actual,
-    expected: error.expected,
-  });
-  console.error(customError);
-  throw customError;
+    expected: error.expected
+  })
+  console.error(customError)
+  throw customError
 }
 
 function expect(actual) {
   return {
     to: {
-      equal: function(expected) {
+      equal: function (expected) {
         try {
-          chai.assert.strictEqual(actual, expected);
+          chai.assert.strictEqual(actual, expected)
         } catch (error) {
-          logAndRethrow(error);
+          logAndRethrow(error)
         }
       },
       deep: {
-        equal: function(expected) {
+        equal: function (expected) {
           try {
-            chai.assert.deepStrictEqual(actual, expected);
+            chai.assert.deepStrictEqual(actual, expected)
           } catch (error) {
-            logAndRethrow(error);
+            logAndRethrow(error)
           }
         },
-        include: function(expected) {
+        include: function (expected) {
           try {
-            chai.assert.deepOwnInclude(actual, expected);
+            chai.assert.deepOwnInclude(actual, expected)
           } catch (error) {
-            logAndRethrow(error);
+            logAndRethrow(error)
           }
-        },
+        }
       },
-      throw: function() {
+      throw: function () {
         try {
-          chai.assert.throws(actual);
+          chai.assert.throws(actual)
         } catch (error) {
-          logAndRethrow(error);
+          logAndRethrow(error)
         }
       },
       not: {
-        equal: function(expected) {
+        equal: function (expected) {
           try {
-            chai.assert.notStrictEqual(actual, expected);
+            chai.assert.notStrictEqual(actual, expected)
           } catch (error) {
-            logAndRethrow(error);
+            logAndRethrow(error)
           }
-        },
-      },
-    },
-  };
+        }
+      }
+    }
+  }
 }
 
-TestRunner.clearStore();
+TestRunner.clearStore()
 
-describe("HelloWorld.vue", () => {
+describe('HelloWorld.vue', () => {
   // it("organism", () => {
   //   const root = new Root();
   //   const organismStore = root.organismStore;
@@ -1158,4 +1158,4 @@ describe("HelloWorld.vue", () => {
   //   pen.setSelection({ attributeId: attribute.id, startIndex: 3, endIndex: 3 });
   //   expect(pen.getSelection()).to.deep.equal({ attributeId: attribute.id, startIndex: 4, endIndex: 4 });
   // });
-});
+})

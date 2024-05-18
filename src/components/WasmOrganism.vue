@@ -5,11 +5,7 @@
         {{ name }}
         <!--        ({{ getMetaname(organism) }})-->
       </div>
-      <button
-          v-if="!isRoot"
-          class="button"
-          @click="removeOrganism(organism)"
-      ></button>
+      <button v-if="!isRoot" class="button" @click="removeOrganism(organism)"></button>
     </div>
     <!--    <div class="controls">-->
     <!--      <select v-model="selectedPrimitiveId">-->
@@ -27,77 +23,75 @@
     <!--    </div>-->
     <div class="attribute-group">
       <div
-          class="attribute"
-          v-for="(attribute, index) in editableAttributes"
-          :key="attribute.getId()"
+        class="attribute"
+        v-for="(attribute, index) in editableAttributes"
+        :key="attribute.getId()"
       >
         <div v-if="index !== 0" class="divider"></div>
-        <WasmAttribute :attribute="attribute"/>
+        <WasmAttribute :attribute="attribute" />
       </div>
     </div>
     <WasmOrganism
-        class="organ"
-        v-for="suborganism in suborganisms"
-        :key="suborganism"
-        :organism="suborganism"
-        :isRoot="false"
-        :organismLayout="organismLayout"
+      class="organ"
+      v-for="suborganism in suborganisms"
+      :key="suborganism"
+      :organism="suborganism"
+      :isRoot="false"
+      :organismLayout="organismLayout"
     >
     </WasmOrganism>
   </div>
 </template>
 
-<script lang='ts'>
-import wu from "wu";
-import Root from "../store/Root";
-import WasmAttribute from "./WasmAttribute.vue";
-import ResizeSensor from "css-element-queries/src/ResizeSensor";
-import Vue from "vue";
-import Component from "vue-class-component";
-import {Prop} from "vue-property-decorator";
-import {Primitive} from "@/models/Type";
-import Functions from "@/code/Functions";
+<script lang="ts">
+import wu from 'wu'
+import Root from '../store/Root'
+import WasmAttribute from './WasmAttribute.vue'
+import ResizeSensor from 'css-element-queries/src/ResizeSensor'
+import Vue from 'vue'
+import Component from 'vue-class-component'
+import { Prop } from 'vue-property-decorator'
+import { Primitive } from '@/models/Type'
+import Functions from '@/code/Functions'
 
-@Component({components: {WasmAttribute: WasmAttribute}})
+@Component({ components: { WasmAttribute: WasmAttribute } })
 export default class WasmOrganism extends Vue {
-  @Prop() organism!: any;
-  @Prop() isRoot!: boolean;
-  @Prop() organismLayout;
+  @Prop() organism!: any
+  @Prop() isRoot!: boolean
+  @Prop() organismLayout
 
-  attributeStore = Root.attributeStore;
-  metaorganismCollection = Root.metaorganismCollection;
-  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id;
-  attributeName = "";
-  editableAttributes = [] as any[];
+  attributeStore = Root.attributeStore
+  metaorganismCollection = Root.metaorganismCollection
+  selectedPrimitiveId = Root.metaorganismCollection.getMetaorganisms()[0].id
+  attributeName = ''
+  editableAttributes = [] as any[]
   position = {
     top: 0,
-    left: 0,
-  };
+    left: 0
+  }
 
-  name = "";
-  suborganisms = [];
+  name = ''
+  suborganisms = []
 
   mounted() {
     if (this.organism == null) {
-      window.setTimeout(() => this.init(), 200);
-      return;
+      window.setTimeout(() => this.init(), 200)
+      return
     } else {
-      this.init();
+      this.init()
     }
   }
 
   destroyed() {
-    this.organismLayout.recalculate();
+    this.organismLayout.recalculate()
   }
 
   get style() {
-    return `left: ${this.position.left}px; top: ${this.position.top}px;`;
+    return `left: ${this.position.left}px; top: ${this.position.top}px;`
   }
 
   spawn() {
-    const metaorganism = this.metaorganismCollection.getFromId(
-        this.selectedPrimitiveId
-    );
+    const metaorganism = this.metaorganismCollection.getFromId(this.selectedPrimitiveId)
     // const organ = this.root.organismCollection.putFromMeta(
     //     this.root.wordCollection.getRandomWord(),
     //     metaorganism
@@ -125,32 +119,33 @@ export default class WasmOrganism extends Vue {
   }
 
   init() {
-    const element = this.$refs["organism"] as any;
+    const element = this.$refs['organism'] as any
     new ResizeSensor(element, () => {
-      this.organismLayout.recalculate();
-    });
+      this.organismLayout.recalculate()
+    })
 
-    this.organismLayout.registerElement(element, this.organism.getId());
+    this.organismLayout.registerElement(element, this.organism.getId())
     this.organismLayout
-        .getLocalPositionObservable(this.organism.getId())
-        .subscribe((localPosition) => {
-          this.position.top = localPosition.top;
-          this.position.left = localPosition.left;
-        });
+      .getLocalPositionObservable(this.organism.getId())
+      .subscribe((localPosition) => {
+        this.position.top = localPosition.top
+        this.position.left = localPosition.left
+      })
 
     // Attribute.onAttributeCountChanged.sub(() => {
     //   Vue.set(this, "editableAttributes", this.getEditableAttributes());
     // });
     // this.editableAttributes = this.getEditableAttributes();
 
-    this.name = this.organism.getName();
-    const attributes = Functions.vectorToArray(this.organism.getAttributes())
-        .filter(attribute => attribute.constructor.name === "EditableAttribute");
-    this.editableAttributes = attributes;
+    this.name = this.organism.getName()
+    const attributes = Functions.vectorToArray(this.organism.getAttributes()).filter(
+      (attribute) => attribute.constructor.name === 'EditableAttribute'
+    )
+    this.editableAttributes = attributes
   }
 
   getMetaname(organism) {
-    return 'not implemented';
+    return 'not implemented'
     // return this.root.metaorganismCollection.getFromId(organism.metaorganismId).name;
   }
 }
@@ -201,7 +196,7 @@ export default class WasmOrganism extends Vue {
 }
 
 .button {
-  background-image: url("/icons/remove.svg");
+  background-image: url('/icons/remove.svg');
   background-size: 16px 16px;
   background-repeat: no-repeat;
   background-position: center;

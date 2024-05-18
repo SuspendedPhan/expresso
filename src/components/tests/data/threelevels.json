@@ -1,17 +1,10 @@
 {
   "root": {
-    "editableAttributes": [
-      "clones",
-      "gravity"
-    ],
-    "emergentAttributes": [
-      "cloneNumber"
-    ],
+    "editableAttributes": ["clones", "gravity"],
+    "emergentAttributes": ["cloneNumber"],
     "organs": {
       "tree": {
-        "editableAttributes": [
-          "clones"
-        ]
+        "editableAttributes": ["clones"]
       }
     }
   }

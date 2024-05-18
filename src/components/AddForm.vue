@@ -5,23 +5,23 @@
   </div>
 </template>
 <script lang="ts">
-import {ref} from "vue";
+import { ref } from 'vue'
 
 export default {
   name: 'AddForm',
   props: {
-    buttonLabel: {},
+    buttonLabel: {}
   },
-  setup(props, {emit}) {
-    const name = ref('');
+  setup(props, { emit }) {
+    const name = ref('')
     function onClick() {
-      emit('submit', name.value);
+      emit('submit', name.value)
     }
 
     return {
       onClick,
       name
-    };
+    }
   }
 }
 </script>
