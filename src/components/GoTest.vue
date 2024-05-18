@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import GoModuleWasm from "../../public/mymodule.wasm";
+import GoModuleWasm from "../../public/mymodule.wasm?init";
 import {computed, onMounted, onUnmounted, ref, watch, readonly, nextTick} from "vue";
 import GoExpressor from "@/components/GoExpressor.vue";
 import PixiRenderer from "@/code/PixiRenderer";

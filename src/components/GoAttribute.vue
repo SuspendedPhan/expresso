@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import GoNode from "@/components/GoNode";
+import GoNode from "@/components/GoNode.vue";
 import TreeLayout from "@/components/TreeLayout.vue";
 
 export default {

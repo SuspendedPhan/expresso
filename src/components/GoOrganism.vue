@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import GoAttribute from "@/components/GoAttribute";
+import GoAttribute from "@/components/GoAttribute.vue";
 
 export default {
   name: "GoOrganism",
