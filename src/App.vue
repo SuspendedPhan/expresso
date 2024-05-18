@@ -1,85 +1,78 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
+  <div id="app">
   <RouterView />
+    <link rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Grandstander:200,300,400,500">
+  </div>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<style>
+body, input, button, select {
+  font-size: 14pt;
+  font-family: 'Grandstander';
+  font-weight: 200;
+  line-height: 150%;
+}
+body {
+  margin: 0;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+button {
+  background-color: white;
+  border: 1px solid black;
+  border-radius: 3px;
+}
+button:hover {
+  background-color: gray;
+  color: white;
+}
+.ql-clipboard {
+  display: none;
+}
+.ql-editor {
+  overflow-y: auto;
+  word-wrap: anywhere;
+}
+p {
+  margin: 0;
+}
+.ql-color-variable {
+  color: rgba(113, 0, 225, 0.55);
+}
+.ql-color-function {
+  color: #3BB5DC;
+}
+.ql-bg-selected {
+  background-color: #a8d1ff;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+.ql-editor {
+  color: rgba(0, 0, 0, 0.6);
+  padding: 5px;
+  margin-left: -5px;
+  margin-bottom: 5px;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+p::selection, span::selection {
+  /* background-color: #a8d1ff; */
+  background-color: rgba(0, 0, 0, 0);
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.ql-editor:focus {
+  outline-color: rgba(168, 209, 255, .4);
+  /* border:1px solid rgba(0, 0, 0, 0.2); */
+  /* box-sizing:content-box; */
+  /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); */
 }
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+*,
+*:before,
+*:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 </style>
