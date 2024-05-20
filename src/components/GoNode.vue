@@ -9,17 +9,25 @@
     @click="onClick"
   >
     <div>{{ text }}</div>
-    <!-- <Searchbox v-show="nodePickerVisible" class="z-1 bg-gray-500" ref="nodePicker" :choices="nodePickerChoices" :query="nodePickerQuery" @queryInput="nodePickerOnQueryInput" @choiceCommitted="nodePickerOnCommit" /> -->
+    <Searchbox
+      v-show="nodePickerVisible"
+      class="z-1 bg-gray-500"
+      ref="nodePicker"
+      :choices="nodePickerChoices"
+      :query="nodePickerQuery"
+      @queryInput="nodePickerOnQueryInput"
+      @choiceCommitted="nodePickerOnCommit"
+    />
     <GoNode v-for="child in children" :key="child.key" :setupFunc="child.setupFunc" />
   </div>
 </template>
 
 <script lang="ts">
-// import Searchbox from "@/components/Searchbox.vue";
+import Searchbox from "@/components/Searchbox.vue";
 
 export default {
   name: 'GoNode',
-  // components: {Searchbox},
+  components: {Searchbox},
   props: {
     setupFunc: {}
   },

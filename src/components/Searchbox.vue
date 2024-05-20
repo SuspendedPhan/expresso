@@ -17,43 +17,39 @@
   </div>
 </template>
 
-<script lang="ts">
-import Component from 'vue-class-component'
-import { Prop } from 'vue-property-decorator'
-import Vue from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+const props = defineProps({
+  choices: { type: Array, required: true },
+  query: String
+})
+const emit = defineEmits(['queryInput', 'choiceCommitted', 'blur'])
+const input = ref(null)
 
-@Component({})
-export default class Searchbox extends Vue {
-  @Prop() choices
-  @Prop() query
+function onClick(choice: any, event: any) {
+  emitChoiceCommitted(choice)
+}
 
-  mounted() {}
+function onInput(event: any) {
+  emit('queryInput', event)
+}
 
-  onClick(choice, event) {
-    this.emitChoiceCommitted(choice)
+function keydown(event: any) {
+  if (event.key === 'Enter' && props.choices.length > 0) {
+    emitChoiceCommitted(props.choices[0])
   }
+}
 
-  onInput(event) {
-    this.$emit('queryInput', event)
-  }
+function emitChoiceCommitted(choice: any) {
+  emit('choiceCommitted', choice)
+}
 
-  keydown(event) {
-    if (event.key === 'Enter' && this.choices.length > 0) {
-      this.emitChoiceCommitted(this.choices[0])
-    }
-  }
+function focus() {
+  input.value.focus()
+}
 
-  private emitChoiceCommitted(choice) {
-    this.$emit('choiceCommitted', choice)
-  }
-
-  focus() {
-    ;(this.$refs['input'] as any).focus()
-  }
-
-  blur() {
-    this.$emit('blur')
-  }
+function blur() {
+  emit('blur')
 }
 </script>
 <style scoped></style>

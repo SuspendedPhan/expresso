@@ -15,7 +15,6 @@ import Vue from 'vue'
 import * as PIXI from 'pixi.js'
 import deePool from 'deepool'
 import { SignalDispatcher } from 'ste-signals'
-
 ;(window as any).root = Root
 
 @Component({})

@@ -1,5 +1,5 @@
 <template>
-  <div>  
+  <div>
     <div class="flex">
       <div class="w-1/2 h-full">
         <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor" />
@@ -36,28 +36,28 @@ export default {
     const viewport = ref(null)
     const canvas = ref(null)
 
-    const go = new Go();
-    WebAssembly.instantiateStreaming(fetch("mymodule.wasm"), go.importObject).then((result) => {
-      go.run(result.instance);
+    const go = new Go()
+    WebAssembly.instantiateStreaming(fetch('mymodule.wasm'), go.importObject).then((result) => {
+      go.run(result.instance)
       setupExpressor.value = () =>
-          GoModule.setupExpressor(
-            ref,
-            watch,
-            computed,
-            readonly,
-            onUnmounted,
-            nextTick,
-            ElementLayout,
-            ResizeSensor
-          )
-        const renderer = new PixiRenderer(viewport.value, canvas.value)
-        const onFrame = () => {
-          // ticker.tick()
-          GoModule.eval(renderer.circlePool, renderer.circles)
-          window.requestAnimationFrame(onFrame)
-        }
-        onFrame()
-    });
+        GoModule.setupExpressor(
+          ref,
+          watch,
+          computed,
+          readonly,
+          onUnmounted,
+          nextTick,
+          ElementLayout,
+          ResizeSensor
+        )
+      const renderer = new PixiRenderer(viewport.value, canvas.value)
+      const onFrame = () => {
+        // ticker.tick()
+        GoModule.eval(renderer.circlePool, renderer.circles)
+        window.requestAnimationFrame(onFrame)
+      }
+      onFrame()
+    })
 
     // fetch(GoModuleWasm)
     //   .then((response) => response.arrayBuffer())
