@@ -32,34 +32,32 @@ export default {
   name: 'GoTest',
   components: { GoExpressor },
   setup() {
-    const go = new Go()
     const setupExpressor = ref<any>(null)
     const viewport = ref(null)
     const canvas = ref(null)
 
-    // GoModuleWasm is the path to the mymodule.wasm file
-    init();
-    // init().then((instance) => {
-    //   go.run(instance);
-    //   setupExpressor.value = () =>
-    //       GoModule.setupExpressor(
-    //         ref,
-    //         watch,
-    //         computed,
-    //         readonly,
-    //         onUnmounted,
-    //         nextTick,
-    //         ElementLayout,
-    //         ResizeSensor
-    //       )
-    //     const renderer = new PixiRenderer(viewport.value, canvas.value)
-    //     const onFrame = () => {
-    //       ticker.tick()
-    //       GoModule.eval(renderer.circlePool, renderer.circles)
-    //       window.requestAnimationFrame(onFrame)
-    //     }
-    //     onFrame()
-    // });
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch("mymodule.wasm"), go.importObject).then((result) => {
+      go.run(result.instance);
+      setupExpressor.value = () =>
+          GoModule.setupExpressor(
+            ref,
+            watch,
+            computed,
+            readonly,
+            onUnmounted,
+            nextTick,
+            ElementLayout,
+            ResizeSensor
+          )
+        const renderer = new PixiRenderer(viewport.value, canvas.value)
+        const onFrame = () => {
+          // ticker.tick()
+          GoModule.eval(renderer.circlePool, renderer.circles)
+          window.requestAnimationFrame(onFrame)
+        }
+        onFrame()
+    });
 
     // fetch(GoModuleWasm)
     //   .then((response) => response.arrayBuffer())
