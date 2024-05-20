@@ -6,6 +6,10 @@ type FunctionCallNode struct {
 	argumentByParameter map[*FunctionParameter]Node
 }
 
+func (f FunctionCallNode) GetFunction() *Function {
+	return f.function
+}
+
 func (f FunctionCallNode) GetText() string {
 	panic("implement me")
 }
@@ -33,7 +37,7 @@ func (f FunctionCallNode) ReplaceChild(old Node, new Node) {
 	panic("implement me")
 }
 
-func (f FunctionCallNode) setArgumentByIndex(index int, argument Node) {
+func (f FunctionCallNode) SetArgumentByIndex(index int, argument Node) {
 	parameter := f.function.parameters[index]
 	f.argumentByParameter[parameter] = argument
 }

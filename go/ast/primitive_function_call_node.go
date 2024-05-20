@@ -11,6 +11,10 @@ type PrimitiveFunctionCallNode struct {
 	argumentByParameter map[*PrimitiveFunctionParameter]Node
 }
 
+func (p PrimitiveFunctionCallNode) GetFunction() *PrimitiveFunction {
+	return p.function
+}
+
 func (p PrimitiveFunctionCallNode) GetText() string {
 	return p.function.GetName()
 }

@@ -6,6 +6,7 @@ import "expressioni.sta/common"
 var PrimitiveFunctions = map[string]*PrimitiveFunction{}
 
 type PrimitiveFunction struct {
+	common.Id
 	common.Name
 	parameters  []*PrimitiveFunctionParameter
 	evalFunctor func(args []float32) float32
@@ -16,6 +17,10 @@ func GetPrimitiveFunctions() map[string]*PrimitiveFunction {
 		SetupPrimitiveFunctions()
 	}
 	return PrimitiveFunctions
+}
+
+func (p PrimitiveFunction) GetParameters() []*PrimitiveFunctionParameter {
+	return p.parameters
 }
 
 func SetupPrimitiveFunctions() {
@@ -42,6 +47,7 @@ func addPrimitiveFunction(name string, parameterNames []string, evalFunctor func
 		parameters:  make([]*PrimitiveFunctionParameter, 0),
 	}
 	function.SetName(name)
+	function.SetId(name)
 	for _, parameterName := range parameterNames {
 		function.parameters = append(function.parameters, &PrimitiveFunctionParameter{common.Name{Name: parameterName}})
 	}

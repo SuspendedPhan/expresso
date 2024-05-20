@@ -46,7 +46,7 @@ package ast
 //func (f FunctionCallExpr) args(exprs []Expr) FunctionCallExpr {
 //	assert(len(exprs) == len(f.node.function.parameters))
 //	for i := 0; i < len(exprs); i++ {
-//		f.node.setArgumentByIndex(i, exprs[i].node)
+//		f.node.SetArgumentByIndex(i, exprs[i].node)
 //	}
 //	return f
 //}

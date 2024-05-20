@@ -1,10 +1,11 @@
 package ast
 
 import (
+	"strconv"
+
 	"expressioni.sta/common"
 	"expressioni.sta/protos"
 	"github.com/google/uuid"
-	"strconv"
 )
 
 type Organism struct {

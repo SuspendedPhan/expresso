@@ -2,15 +2,16 @@ package ast
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"reflect"
+	"testing"
+
 	"expressioni.sta/common"
 	"expressioni.sta/hydration"
 	"expressioni.sta/protos"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"path/filepath"
-	"reflect"
-	"testing"
 )
 
 const shouldDebug = false
@@ -226,8 +227,8 @@ func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius
 	addParam1 := addFunction.parameters[1]
 
 	averageFunction := NewFunction("Average")
-	averageFunctionParam0 := averageFunction.addParameter("a")
-	averageFunctionParam1 := averageFunction.addParameter("b")
+	averageFunctionParam0 := averageFunction.AddParameter("a")
+	averageFunctionParam1 := averageFunction.AddParameter("b")
 	divNode := NewPrimitiveFunctionCallNode(PrimitiveFunctions["/"])
 	addNode := NewPrimitiveFunctionCallNode(PrimitiveFunctions["+"])
 	addNode.SetArgumentByIndex(0, NewParameterNode(averageFunctionParam0))
@@ -254,8 +255,8 @@ func CreateUltimateTestProject() (project *Project, earth *Organism, protoRadius
 	radius, ok := moon.IntrinsicAttributeByProtoAttribute[protoRadius]
 	common.Assert(ok)
 	radiusNode := NewFunctionCallNode(averageFunction)
-	radiusNode.setArgumentByIndex(0, NewAttributeReferenceNode(intensity))
-	radiusNode.setArgumentByIndex(1, NewCloneNumberReferenceNode(moon))
+	radiusNode.SetArgumentByIndex(0, NewAttributeReferenceNode(intensity))
+	radiusNode.SetArgumentByIndex(1, NewCloneNumberReferenceNode(moon))
 	radius.SetRootNode(radiusNode)
 
 	moon.IntrinsicAttributeByProtoAttribute[protos.ClonesAttribute].SetRootNode(NewNumberNode(2))

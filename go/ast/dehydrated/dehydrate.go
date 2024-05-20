@@ -2,6 +2,7 @@ package dehydrated
 
 import (
 	"expressioni.sta/ast"
+	"expressioni.sta/common"
 )
 
 const (
@@ -9,15 +10,32 @@ const (
 	NodeTypePrimitiveFunctionCall = "PrimitiveFunctionCall"
 )
 
+type Hydrator struct {
+	functionById  map[string]*ast.Function
+	attributeById map[string]*ast.Attribute
+}
+
 type NodeBase struct {
 	Id       string
 	NodeType string
 }
 
+type PrimitiveFunction struct {
+	Id         string
+	Name       string
+	Parameters []*ast.PrimitiveFunctionParameter
+}
+
 type Attribute struct {
 	RootNode interface{}
-	Name     string
 	Id       string
+	Name     string
+}
+
+type Organism struct {
+	Id         string
+	Name       string
+	Attributes []*Attribute
 }
 
 type NumberNode struct {
@@ -29,6 +47,23 @@ type PrimitiveFunctionCallNode struct {
 	NodeBase
 	FunctionId string
 	Children   []interface{}
+}
+
+type Function struct {
+	Id         string
+	Name       string
+	Parameters []string
+}
+
+type FunctionCallNode struct {
+	NodeBase
+	FunctionId string
+	Children   []interface{}
+}
+
+type AttributeReferenceNode struct {
+	NodeBase
+	AttributeId string
 }
 
 func DehydrateAttribute(attr ast.Attribute) *Attribute {
@@ -49,8 +84,20 @@ func DehydrateNode(node ast.Node) interface{} {
 	return nil
 }
 
+func HydrateNode(node interface{}) ast.Node {
+	switch node := node.(type) {
+	case *NumberNode:
+		return HydrateNumberNode(node)
+	}
+	return nil
+}
+
 func DehydrateNumberNode(node ast.NumberNode) *NumberNode {
 	return &NumberNode{Value: node.Value, NodeBase: NodeBase{Id: node.GetId(), NodeType: NodeTypeNumber}}
+}
+
+func HydrateNumberNode(node *NumberNode) *ast.NumberNode {
+	return &ast.NumberNode{Value: node.Value, NodeBase: ast.NodeBase{Id: common.Id{Id: node.Id}}}
 }
 
 func DehydratePrimitiveFunctionCallNode(node ast.PrimitiveFunctionCallNode) *PrimitiveFunctionCallNode {
@@ -59,5 +106,74 @@ func DehydratePrimitiveFunctionCallNode(node ast.PrimitiveFunctionCallNode) *Pri
 	for i, child := range children {
 		dehydratedChildren[i] = DehydrateNode(child)
 	}
-	return &PrimitiveFunctionCallNode{FunctionId: node.GetFunction(), Children: dehydratedChildren, NodeBase: NodeBase{Id: node.GetId(), NodeType: NodeTypePrimitiveFunctionCall}}
+	return &PrimitiveFunctionCallNode{FunctionId: node.GetFunction().GetId(), Children: dehydratedChildren, NodeBase: NodeBase{Id: node.GetId(), NodeType: NodeTypePrimitiveFunctionCall}}
 }
+
+func (*Hydrator) HydratePrimitiveFunctionCallNode(node *PrimitiveFunctionCallNode) *ast.PrimitiveFunctionCallNode {
+	children := make([]ast.Node, len(node.Children))
+	for i, child := range node.Children {
+		children[i] = HydrateNode(child)
+	}
+	fun := ast.GetPrimitiveFunctions()[node.FunctionId]
+	n := ast.NewPrimitiveFunctionCallNode(fun)
+	for i, child := range children {
+		n.SetArgumentByIndex(i, child)
+	}
+	return n
+}
+
+func DehydrateFunction(function *ast.Function) *Function {
+	parameters := function.GetParameters()
+	parameterNames := make([]string, len(parameters))
+	for i, parameter := range parameters {
+		parameterNames[i] = parameter.GetName()
+	}
+	return &Function{Id: function.GetId(), Name: function.GetName(), Parameters: parameterNames}
+}
+
+func HydrateFunction(function *Function) *ast.Function {
+	fun := ast.NewFunction(function.Name)
+	for _, parameter := range function.Parameters {
+		fun.AddParameter(parameter)
+	}
+	return fun
+}
+
+func DehydrateFunctionCallNode(node ast.FunctionCallNode) *FunctionCallNode {
+	children := node.GetChildren()
+	dehydratedChildren := make([]interface{}, len(children))
+	for i, child := range children {
+		dehydratedChildren[i] = DehydrateNode(child)
+	}
+	return &FunctionCallNode{FunctionId: node.GetFunction().GetId(), Children: dehydratedChildren, NodeBase: NodeBase{Id: node.GetId(), NodeType: NodeTypePrimitiveFunctionCall}}
+}
+
+func (h *Hydrator) HydrateFunctionCallNode(node *FunctionCallNode) *ast.FunctionCallNode {
+	children := make([]ast.Node, len(node.Children))
+	for i, child := range node.Children {
+		children[i] = HydrateNode(child)
+	}
+	fun := h.functionById[node.FunctionId]
+	n := ast.NewFunctionCallNode(fun)
+	for i, child := range children {
+		n.SetArgumentByIndex(i, child)
+	}
+	return n
+}
+
+func DehydrateAttributeReferenceNode(node ast.AttributeReferenceNode) *AttributeReferenceNode {
+	return &AttributeReferenceNode{AttributeId: node.GetAttribute().GetId(), NodeBase: NodeBase{Id: node.GetId()}}
+}
+
+func (h *Hydrator) HydrateAttributeReferenceNode(node *AttributeReferenceNode) *ast.AttributeReferenceNode {
+	return ast.NewAttributeReferenceNode(h.attributeById[node.AttributeId])
+}
+
+// func DehydrateOrganism(organism ast.Organism) *Organism {
+// 	attributes := organism.GetAttributes()
+// 	dehydratedAttributes := make([]*Attribute, len(attributes))
+// 	for i, attribute := range attributes {
+// 		dehydratedAttributes[i] = DehydrateAttribute(attribute)
+// 	}
+// 	return &Organism{Id: organism.GetId(), Name: organism.GetName(), Attributes: dehydratedAttributes}
+// }

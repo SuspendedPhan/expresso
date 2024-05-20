@@ -2,8 +2,9 @@ package ast
 
 import (
 	"encoding/json"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSimple(t *testing.T) {
@@ -27,8 +28,8 @@ func TestAttrRefNode(t *testing.T) {
 
 func TestComplex(t *testing.T) {
 	average := NewFunction("average")
-	a := average.addParameter("a")
-	b := average.addParameter("b")
+	a := average.AddParameter("a")
+	b := average.AddParameter("b")
 	add := NewPrimitiveFunctionCallNode(PrimitiveFunctions["+"])
 	add.SetArgumentByIndex(0, NewParameterNode(a))
 	add.SetArgumentByIndex(0, NewParameterNode(b))
@@ -44,8 +45,8 @@ func TestComplex(t *testing.T) {
 	y.SetRootNode(NewNumberNode(20))
 
 	averageCall := NewFunctionCallNode(average)
-	averageCall.setArgumentByIndex(0, NewAttributeReferenceNode(x))
-	averageCall.setArgumentByIndex(1, NewAttributeReferenceNode(y))
+	averageCall.SetArgumentByIndex(0, NewAttributeReferenceNode(x))
+	averageCall.SetArgumentByIndex(1, NewAttributeReferenceNode(y))
 	radius := NewAttribute()
 	radius.SetRootNode(averageCall)
 

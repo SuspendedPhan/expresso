@@ -1,9 +1,10 @@
 package main
 
 import (
-	"expressioni.sta/ast"
 	"math"
 	"reflect"
+
+	"expressioni.sta/ast"
 )
 
 type abser struct {
@@ -28,9 +29,9 @@ func main() {
 	//
 	//function := Function{}
 	//function.setName("Lerp")
-	//a := parameterExpr(function.addParameter("a"))
-	//b := parameterExpr(function.addParameter("b"))
-	//t := parameterExpr(function.addParameter("t"))
+	//a := parameterExpr(function.AddParameter("a"))
+	//b := parameterExpr(function.AddParameter("b"))
+	//t := parameterExpr(function.AddParameter("t"))
 	//
 	//rootNode := a.add(t.mul(b.sub(a))).getNode()
 	//function.setRootNode(rootNode)
