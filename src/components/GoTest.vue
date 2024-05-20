@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div>  
     <div class="flex">
       <div class="w-1/2 h-full">
         <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor" />
