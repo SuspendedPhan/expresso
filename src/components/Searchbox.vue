@@ -24,6 +24,8 @@ const props = defineProps({
   query: String
 })
 const emit = defineEmits(['queryInput', 'choiceCommitted', 'blur'])
+defineExpose({ focus })
+
 const input = ref(null)
 
 function onClick(choice: any, event: any) {
