@@ -3,13 +3,11 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div id="app">
-    <RouterView />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css?family=Grandstander:200,300,400,500"
-    />
-  </div>
+  <RouterView />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Grandstander:200,300,400,500"
+  />
 </template>
 
 <style>

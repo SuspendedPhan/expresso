@@ -1,14 +1,12 @@
 <template>
-  <div>
-    <div class="flex">
-      <div class="w-1/2 h-full">
-        <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor" />
-      </div>
-      <div ref="viewport" class="h-full w-1/2">
-        <canvas ref="canvas"></canvas>
-      </div>
-      <div class="fixed top-0 right-0 text-white">{{ framesPerSecond }}</div>
+  <div class="flex w-full h-full">
+    <div class="w-1/2 h-full">
+      <GoExpressor v-if="setupExpressor !== null" :setupFunc="setupExpressor" />
     </div>
+    <div ref="viewport" class="h-full w-1/2">
+      <canvas ref="canvas"></canvas>
+    </div>
+    <div class="fixed top-0 right-0 text-white">{{ framesPerSecond }}</div>
   </div>
 </template>
 
