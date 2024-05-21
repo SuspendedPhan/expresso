@@ -28,11 +28,11 @@ type PrimitiveFunction struct {
 }
 
 type Organism struct {
-	Id         string
-	Name       string
-	PlayerAttributes                   []Attribute
+	Id                                   string
+	Name                                 string
+	PlayerAttributes                     []Attribute
 	IntrinsicAttributeByProtoAttributeId map[string]Attribute
-	ProtoOrganismId				   string
+	ProtoOrganismId                      string
 }
 
 type Attribute struct {
@@ -184,9 +184,9 @@ func DehydrateOrganism(organism ast.Organism) *Organism {
 		dehydratedIntrinsicAttributeByProtoAttribute[protoAttribute.GetId()] = *DehydrateAttribute(*attribute)
 	}
 	return &Organism{
-		Id: organism.GetId(),
-		Name: organism.GetName(),
-		PlayerAttributes: dehydratedPlayerAttributes,
+		Id:                                   organism.GetId(),
+		Name:                                 organism.GetName(),
+		PlayerAttributes:                     dehydratedPlayerAttributes,
 		IntrinsicAttributeByProtoAttributeId: dehydratedIntrinsicAttributeByProtoAttribute,
 	}
 }
@@ -198,14 +198,13 @@ func (h *Hydrator) HydrateOrganism(organism *Organism) *ast.Organism {
 	}
 	intrinsicAttributeByProtoAttribute := make(map[*protos.ProtoAttribute]*ast.Attribute, len(organism.IntrinsicAttributeByProtoAttributeId))
 	for protoAttributeId, attribute := range organism.IntrinsicAttributeByProtoAttributeId {
-		// intrinsicAttributeByProtoAttribute[h.protoAttributeById[protoAttributeId]] = h.attributeById[attribute.Id]
+		protoAttribute := protos.GetProtoAttributeById(protoAttributeId)
+		intrinsicAttributeByProtoAttribute[protoAttribute] = h.attributeById[attribute.Id]
 	}
-	org:= ast.NewOrganism()
+	org := ast.NewOrganism()
 	org.SetId(organism.Id)
 	org.SetName(organism.Name)
 	org.PlayerAttributes = playerAttributes
 	org.IntrinsicAttributeByProtoAttribute = intrinsicAttributeByProtoAttribute
 	return org
-
-	// return ast.NewOrganism(organism.Name, playerAttributes, intrinsicAttributeByProtoAttribute)
 }

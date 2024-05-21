@@ -2,10 +2,10 @@ package protos
 
 import (
 	"expressioni.sta/common"
-	"github.com/google/uuid"
 )
 
 var ClonesAttribute = NewProtoAttribute("1ad93358-1a00-4aad-86dd-4be8c7de460b", "Clones")
+var protoAttributeById = map[string]*ProtoAttribute{}
 
 // ProtoAttribute is a prototype for intrinsic attributes. In other words, intrinsic attributes are instances of
 // proto attributes. For example, all circles have an attribute called Radius. There is a single proto attribute for
@@ -16,8 +16,14 @@ type ProtoAttribute struct {
 }
 
 func NewProtoAttribute(id string, name string) *ProtoAttribute {
-	return &ProtoAttribute{
-		Id:   common.Id{Id: uuid.NewString()},
+	protoAttribute := &ProtoAttribute{
+		Id:   common.Id{Id: id},
 		Name: common.Name{Name: name},
 	}
+	protoAttributeById[id] = protoAttribute
+	return protoAttribute
+}
+
+func GetProtoAttributeById(id string) *ProtoAttribute {
+	return protoAttributeById[id]
 }
