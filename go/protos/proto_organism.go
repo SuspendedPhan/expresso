@@ -14,6 +14,15 @@ func NewProtoOrganism(id string, protoAttributes ...*ProtoAttribute) *ProtoOrgan
 	}
 }
 
+func (po *ProtoOrganism) GetProtoAttributeByName(name string) *ProtoAttribute {
+	for _, protoAttribute := range po.ProtoAttributes {
+		if protoAttribute.GetName() == name {
+			return protoAttribute
+		}
+	}
+	return nil
+}
+
 var ProtoCircle = NewProtoOrganism(
 	"43277729-53d5-47a7-a80c-69a30c79c0fa",
 	NewProtoAttribute("ec211cbf-9173-4f8a-be43-01db9cd1b29a", "X"),

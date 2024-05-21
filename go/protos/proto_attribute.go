@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var ClonesAttribute = NewProtoAttribute("Clones")
+var ClonesAttribute = NewProtoAttribute("1ad93358-1a00-4aad-86dd-4be8c7de460b", "Clones")
 
 // ProtoAttribute is a prototype for intrinsic attributes. In other words, intrinsic attributes are instances of
 // proto attributes. For example, all circles have an attribute called Radius. There is a single proto attribute for

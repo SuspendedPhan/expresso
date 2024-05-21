@@ -1,9 +1,12 @@
+//go:build js && wasm
+
 package main
 
 import (
-	"github.com/stretchr/testify/assert"
 	"syscall/js"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPixiPool(t *testing.T) {

@@ -1,11 +1,12 @@
 package main
 
 import (
-	"expressioni.sta/ast"
-	"expressioni.sta/focus"
 	"fmt"
 	"runtime/debug"
 	"syscall/js"
+
+	"expressioni.sta/ast"
+	"expressioni.sta/focus"
 )
 
 type vue struct {
@@ -48,7 +49,6 @@ type attributeContext struct {
 
 func bootstrapGoModule() {
 	ast.SetupPrimitiveFunctions()
-	ast.SetupProtoOrganisms()
 	setupPixiSetters()
 	goModule := makeEmptyObject()
 

@@ -1,10 +1,12 @@
 package main
 
 import (
-	"expressioni.sta/ast"
 	"fmt"
 	"runtime/debug"
 	"syscall/js"
+
+	"expressioni.sta/ast"
+	"expressioni.sta/protos"
 )
 
 // setupOrganism returns the refs needed for the Organism Vue Component's setup method.
@@ -87,11 +89,8 @@ func setupOrganism(organism *ast.Organism, vue vue, context expressorContext, la
 }
 
 func newOrganism(context expressorContext) *ast.Organism {
-	subOrg := ast.NewOrganism()
+	subOrg := ast.NewOrganismFromProto(protos.ProtoCircle)
 	subOrg.SetName(context.createOrganismName())
-	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().X)
-	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().Y)
-	subOrg.AddIntrinsicAttribute(ast.GetProtoCircle().Radius)
 	context.organismIdToOrganism[subOrg.GetId()] = subOrg
 	return subOrg
 }

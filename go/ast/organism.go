@@ -66,15 +66,6 @@ func (o *Organism) Eval(ctx *EvalContext) *OrganismOutput {
 	return organismOutput
 }
 
-func (o *Organism) EvalBak() OrganismOutput {
-	output := CloneOutput{ValueByProtoAttribute: map[*protos.ProtoAttribute]Float{
-		ProtoCircle.X:      10,
-		ProtoCircle.Y:      20,
-		ProtoCircle.Radius: 5,
-	}}
-	return OrganismOutput{CloneOutputs: []*CloneOutput{&output}}
-}
-
 func (o *Organism) AddIntrinsicAttribute(proto *protos.ProtoAttribute) {
 	attribute := NewAttribute()
 	rootNode := NewNumberNode(0)

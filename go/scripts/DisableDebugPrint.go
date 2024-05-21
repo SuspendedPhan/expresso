@@ -1,10 +1,10 @@
 package main
 
-import (
-	"expressioni.sta/common"
-)
+// import (
+// 	"expressioni.sta/common"
+// )
 
-func main() {
-	common.Config.DebugPrint = false
-	common.Config.Save()
-}
+// func main() {
+// 	common.Config.DebugPrint = false
+// 	common.Config.Save()
+// }

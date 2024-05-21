@@ -3,8 +3,6 @@ package main
 import (
 	"math"
 	"reflect"
-
-	"expressioni.sta/ast"
 )
 
 type abser struct {
@@ -23,24 +21,6 @@ func main() {
 
 	println("end go main")
 	<-c
-	return
-
-	ast.SetupPrimitiveFunctions()
-	//
-	//function := Function{}
-	//function.setName("Lerp")
-	//a := parameterExpr(function.AddParameter("a"))
-	//b := parameterExpr(function.AddParameter("b"))
-	//t := parameterExpr(function.AddParameter("t"))
-	//
-	//rootNode := a.add(t.mul(b.sub(a))).getNode()
-	//function.setRootNode(rootNode)
-	//
-	//functionCall := functionExpr(function).args([]Expr{number(50), number(100), number(.5)}).getNode()
-	//attribute := Attribute{}
-	//attribute.setRootNode(functionCall)
-	//println(attribute.eval())
-
 }
 
 func register(reflectType reflect.Type) {

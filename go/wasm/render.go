@@ -1,16 +1,17 @@
 package main
 
 import (
-	"expressioni.sta/ast"
-	"expressioni.sta/protos"
 	"strings"
 	"syscall/js"
+
+	"expressioni.sta/ast"
+	"expressioni.sta/protos"
 )
 
 var pixiSetters = make(map[*protos.ProtoAttribute]func(pixiObject js.Value, value ast.Float))
 
 func setupPixiSetters() {
-	pixiSetters[ast.ProtoCircle.Radius] = func(pixiObject js.Value, value ast.Float) {
+	pixiSetters[protos.ProtoCircle.GetProtoAttributeByName("Radius")] = func(pixiObject js.Value, value ast.Float) {
 		pixiObject.Get("scale").Set("x", value)
 		pixiObject.Get("scale").Set("y", value)
 	}
