@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"expressioni.sta/ast"
 	"expressioni.sta/ast/dehydrated"
 )
@@ -18,4 +20,5 @@ func OnEdit() {
 	for _, rootOrganism := range rootOrganisms {
 		dehydratedOrganisms = append(dehydratedOrganisms, dehydrated.DehydrateOrganism(*rootOrganism))
 	}
+	fmt.Println("Dehydrated organisms: ", dehydratedOrganisms)
 }

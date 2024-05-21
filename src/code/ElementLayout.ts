@@ -78,12 +78,9 @@ export class ElementLayout {
   }
 
   private getHeight(node) {
-    console.log(node)
     const key = this.getKey(node)
     const element = this.elementByKey.get(key)
     const answer = element?.offsetHeight ?? 0
-    console.log(element)
-    console.log(answer)
     return answer
   }
 }
