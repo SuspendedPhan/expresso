@@ -1,11 +1,12 @@
 package main
 
 import (
-	"expressioni.sta/ast"
-	"expressioni.sta/focus"
 	"fmt"
 	"runtime/debug"
 	"syscall/js"
+
+	"expressioni.sta/ast"
+	"expressioni.sta/focus"
 )
 
 // setupExpressor returns the refs needed for the Expressor Vue Component's setup method. The given rootOrganisms slice

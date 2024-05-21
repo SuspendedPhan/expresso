@@ -5,6 +5,7 @@ import (
 	"runtime/debug"
 	"syscall/js"
 
+	"expressioni.sta/app"
 	"expressioni.sta/ast"
 	"expressioni.sta/focus"
 )
@@ -52,13 +53,13 @@ func bootstrapGoModule() {
 	setupPixiSetters()
 	goModule := makeEmptyObject()
 
-	rootOrgs := make([]*ast.Organism, 0)
+	rootOrgs := app.GetRootOrganisms()
 	goModule.Set("setupExpressor", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		ref := args[0]
 		watch := args[1]
 		computed := args[2]
 		vue := vue{ref, watch, computed, args[3], args[4], args[5], args[6], args[7]}
-		return setupExpressor(vue, &rootOrgs)
+		return setupExpressor(vue, rootOrgs)
 	}).Value)
 
 	var pool *pixiPool = nil
@@ -67,7 +68,7 @@ func bootstrapGoModule() {
 		if pool == nil {
 			pool = newPixiPool(circlePool)
 		}
-		outputs := eval(rootOrgs)
+		outputs := eval(*rootOrgs)
 		writeToPixi(outputs, pool)
 		return js.Undefined()
 	}))

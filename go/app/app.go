@@ -10,8 +10,8 @@ import (
 var rootOrganisms = make([]*ast.Organism, 0)
 var dehydratedOrganisms = make([]*dehydrated.Organism, 0)
 
-func GetRootOrganisms() []*ast.Organism {
-	return rootOrganisms
+func GetRootOrganisms() *[]*ast.Organism {
+	return &rootOrganisms
 }
 
 func OnEdit() {
@@ -21,4 +21,5 @@ func OnEdit() {
 		dehydratedOrganisms = append(dehydratedOrganisms, dehydrated.DehydrateOrganism(*rootOrganism))
 	}
 	fmt.Println("Dehydrated organisms: ", dehydratedOrganisms)
+	fmt.Println("rootOrganisms: ", rootOrganisms)
 }
