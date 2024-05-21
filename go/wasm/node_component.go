@@ -1,12 +1,14 @@
 package main
 
 import (
-	"expressioni.sta/ast"
 	"fmt"
 	"runtime/debug"
 	"strconv"
 	"strings"
 	"syscall/js"
+
+	"expressioni.sta/app"
+	"expressioni.sta/ast"
 )
 
 func setupNode(node ast.Node, vue vue, context attributeContext) js.Value {
@@ -194,6 +196,7 @@ func getNodePickerChoices(context attributeContext, node ast.Node, query string)
 			newNode := ast.NewNumberNode(ast.Float(number64))
 			ast.Replace(node, newNode)
 			context.expressorContext.focus.SetFocusedNode(newNode)
+			app.OnEdit()
 			return nil
 		}))
 		// This will need to be changed to support multiple node choices.

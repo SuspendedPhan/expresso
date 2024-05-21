@@ -85,7 +85,7 @@ func (o *Organism) AddIntrinsicAttribute(proto *protos.ProtoAttribute) {
 
 func NewOrganismFromProto(proto *protos.ProtoOrganism) *Organism {
 	organism := NewOrganism()
-	for _, attribute := range proto.IntrinsicAttributes {
+	for _, attribute := range proto.ProtoAttributes {
 		organism.AddIntrinsicAttribute(attribute)
 	}
 	return organism

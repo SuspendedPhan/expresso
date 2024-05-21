@@ -3,6 +3,7 @@ package dehydrated
 import (
 	"expressioni.sta/ast"
 	"expressioni.sta/common"
+	"expressioni.sta/protos"
 )
 
 const (
@@ -26,16 +27,18 @@ type PrimitiveFunction struct {
 	Parameters []*ast.PrimitiveFunctionParameter
 }
 
+type Organism struct {
+	Id         string
+	Name       string
+	PlayerAttributes                   []Attribute
+	IntrinsicAttributeByProtoAttributeId map[string]Attribute
+	ProtoOrganismId				   string
+}
+
 type Attribute struct {
 	RootNode interface{}
 	Id       string
 	Name     string
-}
-
-type Organism struct {
-	Id         string
-	Name       string
-	Attributes []*Attribute
 }
 
 type NumberNode struct {
@@ -169,11 +172,40 @@ func (h *Hydrator) HydrateAttributeReferenceNode(node *AttributeReferenceNode) *
 	return ast.NewAttributeReferenceNode(h.attributeById[node.AttributeId])
 }
 
-// func DehydrateOrganism(organism ast.Organism) *Organism {
-// 	attributes := organism.GetAttributes()
-// 	dehydratedAttributes := make([]*Attribute, len(attributes))
-// 	for i, attribute := range attributes {
-// 		dehydratedAttributes[i] = DehydrateAttribute(attribute)
-// 	}
-// 	return &Organism{Id: organism.GetId(), Name: organism.GetName(), Attributes: dehydratedAttributes}
-// }
+func DehydrateOrganism(organism ast.Organism) *Organism {
+	playerAttributes := organism.PlayerAttributes
+	dehydratedPlayerAttributes := make([]Attribute, len(playerAttributes))
+	for i, attribute := range playerAttributes {
+		dehydratedPlayerAttributes[i] = *DehydrateAttribute(*attribute)
+	}
+	intrinsicAttributeByProtoAttribute := organism.IntrinsicAttributeByProtoAttribute
+	dehydratedIntrinsicAttributeByProtoAttribute := make(map[string]Attribute, len(intrinsicAttributeByProtoAttribute))
+	for protoAttribute, attribute := range intrinsicAttributeByProtoAttribute {
+		dehydratedIntrinsicAttributeByProtoAttribute[protoAttribute.GetId()] = *DehydrateAttribute(*attribute)
+	}
+	return &Organism{
+		Id: organism.GetId(),
+		Name: organism.GetName(),
+		PlayerAttributes: dehydratedPlayerAttributes,
+		IntrinsicAttributeByProtoAttributeId: dehydratedIntrinsicAttributeByProtoAttribute,
+	}
+}
+
+func (h *Hydrator) HydrateOrganism(organism *Organism) *ast.Organism {
+	playerAttributes := make([]*ast.Attribute, len(organism.PlayerAttributes))
+	for i, attribute := range organism.PlayerAttributes {
+		playerAttributes[i] = h.attributeById[attribute.Id]
+	}
+	intrinsicAttributeByProtoAttribute := make(map[*protos.ProtoAttribute]*ast.Attribute, len(organism.IntrinsicAttributeByProtoAttributeId))
+	for protoAttributeId, attribute := range organism.IntrinsicAttributeByProtoAttributeId {
+		// intrinsicAttributeByProtoAttribute[h.protoAttributeById[protoAttributeId]] = h.attributeById[attribute.Id]
+	}
+	org:= ast.NewOrganism()
+	org.SetId(organism.Id)
+	org.SetName(organism.Name)
+	org.PlayerAttributes = playerAttributes
+	org.IntrinsicAttributeByProtoAttribute = intrinsicAttributeByProtoAttribute
+	return org
+
+	// return ast.NewOrganism(organism.Name, playerAttributes, intrinsicAttributeByProtoAttribute)
+}

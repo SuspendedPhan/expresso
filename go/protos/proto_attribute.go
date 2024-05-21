@@ -15,9 +15,9 @@ type ProtoAttribute struct {
 	common.Name
 }
 
-func NewProtoAttribute(s string) *ProtoAttribute {
+func NewProtoAttribute(id string, name string) *ProtoAttribute {
 	return &ProtoAttribute{
 		Id:   common.Id{Id: uuid.NewString()},
-		Name: common.Name{Name: s},
+		Name: common.Name{Name: name},
 	}
 }
