@@ -5,6 +5,7 @@ import (
 
 	"expressioni.sta/ast"
 	"expressioni.sta/ast/dehydrated"
+	"gopkg.in/yaml.v3"
 )
 
 var rootOrganisms = make([]*ast.Organism, 0)
@@ -22,4 +23,14 @@ func OnEdit() {
 	}
 	fmt.Println("Dehydrated organisms: ", dehydratedOrganisms)
 	fmt.Println("rootOrganisms: ", rootOrganisms)
+
+	// Now convert dehydrated organisms to yaml
+	attr := dehydratedOrganisms[0].IntrinsicAttributeByProtoAttributeId["ec211cbf-9173-4f8a-be43-01db9cd1b29a"]
+	// n := attr.RootNode
+	// nn := n.(*dehydrated.NumberNode)
+	a, err := yaml.Marshal(attr)
+	if err != nil {
+		fmt.Println("Error: ", err)
+	}
+	fmt.Println(string(a))
 }

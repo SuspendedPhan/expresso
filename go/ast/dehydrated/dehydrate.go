@@ -71,7 +71,7 @@ type AttributeReferenceNode struct {
 
 func DehydrateAttribute(attr ast.Attribute) *Attribute {
 	return &Attribute{
-		RootNode: attr.RootNode,
+		RootNode: DehydrateNode(attr.RootNode),
 		Name:     attr.GetName(),
 		Id:       attr.GetId(),
 	}
