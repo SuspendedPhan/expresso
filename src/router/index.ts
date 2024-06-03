@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import GoTest from '@/components/GoTest.vue'
+import GoTest from '@/main-components/ExpressoMain.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
