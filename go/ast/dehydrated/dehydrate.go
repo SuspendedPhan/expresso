@@ -69,6 +69,19 @@ type AttributeReferenceNode struct {
 	AttributeId string
 }
 
+func Hydrate(dehydratedOrganisms []*Organism) []*ast.Organism {
+	hydrator := Hydrator{
+		functionById:  make(map[string]*ast.Function),
+		attributeById: make(map[string]*ast.Attribute),
+	}
+	// TODO make for loop
+	organisms := make([]*ast.Organism, 0)
+	for _, dehydratedOrganism := range dehydratedOrganisms {
+		organisms = append(organisms, hydrator.HydrateOrganism(dehydratedOrganism))
+	}
+	return organisms
+}
+
 func DehydrateAttribute(attr ast.Attribute) *Attribute {
 	return &Attribute{
 		RootNode: DehydrateNode(attr.RootNode),

@@ -73,6 +73,12 @@ func bootstrapGoModule() {
 		return js.Undefined()
 	}))
 
+	goModule.Set("createRootOrganisms", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		rootOrganismsYaml := args[0].String()
+		app.SetRootOrganisms(rootOrganismsYaml)
+		return js.Undefined()
+	}))
+
 	js.Global().Set("GoModule", goModule)
 }
 

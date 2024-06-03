@@ -11,7 +11,7 @@ import (
 
 // setupExpressor returns the refs needed for the Expressor Vue Component's setup method. The given rootOrganisms slice
 // will be appended and shortened based on UI interactions.
-func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism) js.Value {
+func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism, onRootOrganismsChanged ast.Signal) js.Value {
 	keydown := NewJsEventDispatcher()
 	onKeydown := js.FuncOf(func(this js.Value, args []js.Value) any {
 		event := args[0]
@@ -61,6 +61,10 @@ func setupExpressor(vue vue, rootOrganisms *[]*ast.Organism) js.Value {
 			layout: layout,
 		})
 		rootOrgsRef.Set("value", getRootOrganismsArray(rootOrgs, vue, context))
+
+		onRootOrganismsChanged.On(func() {
+			rootOrgsRef.Set("value", getRootOrganismsArray(rootOrgs, vue, context))
+		})
 		return nil
 	}))
 	return ret

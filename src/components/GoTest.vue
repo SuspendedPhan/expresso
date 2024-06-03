@@ -19,6 +19,7 @@ import PixiRenderer from '@/code/PixiRenderer'
 import numeral from 'numeral'
 import { ElementLayout } from '@/code/ElementLayout'
 import { ResizeSensor } from 'css-element-queries'
+import { Gist } from '@/code/Gist'
 
 // Defined in public/wasm_exec.js, which is loaded in index.html
 declare var Go: any
@@ -48,6 +49,11 @@ export default {
           ElementLayout,
           ResizeSensor
         )
+
+      Gist.read().then((r) => {
+        GoModule.createRootOrganisms(r)
+      })
+
       const renderer = new PixiRenderer(viewport.value, canvas.value)
       const onFrame = () => {
         // ticker.tick()
