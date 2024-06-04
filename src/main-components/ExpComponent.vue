@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Component } from '@/domain/Component'
+import { Component } from '@/domain/Domain'
 import { ref } from 'vue'
 import ExpAttribute from './ExpAttribute.vue'
 const { component } = defineProps(['component'])

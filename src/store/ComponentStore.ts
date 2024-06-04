@@ -1,4 +1,4 @@
-import { Component } from '@/domain/Component'
+import { Component } from '@/domain/Domain'
 import { BehaviorSubject, Observable } from 'rxjs'
 
 export class ComponentStore {

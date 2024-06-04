@@ -16,21 +16,16 @@ export class Component {
 
 export class Attribute {
   public id: string = 'attribute' + Math.random().toString(36).substring(7)
-  private expr = new BehaviorSubject(new NumberExpr())
+  private expr = new BehaviorSubject(new NumberExpr(0))
 
   public getExpr(): Observable<Expr> {
     return this.expr
   }
 }
 
-// export class Expr {
-//   public id: string = 'expr' + Math.random().toString(36).substring(7)
-//   public getText(): string {
-//     return '+'
-//   }
-// }
+interface Expr {}
 
-export class NumberExpr {
+export class NumberExpr implements Expr {
   public id: string = 'numberExpr' + Math.random().toString(36).substring(7)
   private value: number
 
@@ -40,5 +35,28 @@ export class NumberExpr {
 
   public getText(): string {
     return this.value.toString()
+  }
+
+  getValue(): number {
+    return this.value
+  }
+}
+
+export class PrimitiveFunctionCallExpr {
+  public id: string = 'primitiveFunctionCallExpr' + Math.random().toString(36).substring(7)
+  private args = new BehaviorSubject<Array<Expr>>([])
+
+  constructor(private primitiveFunctionId: string) {}
+
+  public getPrimitiveFunctionId(): string {
+    return this.primitiveFunctionId
+  }
+
+  public getText(): string {
+    return this.primitiveFunctionId
+  }
+
+  public getArgs(): Observable<Array<Expr>> {
+    return this.args
   }
 }

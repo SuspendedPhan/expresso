@@ -1,7 +1,7 @@
 <script setup>
 import { ComponentStore } from '@/store/ComponentStore'
 import Comp from '@/main-components/ExpComponent.vue'
-import { Component } from '@/domain/Component'
+import { Component } from '@/domain/Domain'
 import { ref } from 'vue'
 
 const store = new ComponentStore()

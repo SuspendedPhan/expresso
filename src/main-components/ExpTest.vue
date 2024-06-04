@@ -2,13 +2,12 @@
 import { ref } from 'vue'
 import Store from '@/store/Store'
 import { useObservable } from '@vueuse/rxjs'
+import NumberExpr from '@/main-components/NumberExpr.vue'
+import { NumberExpr as NumberExprModel } from '@/domain/Domain'
 
-const store = new Store()
-const result = useObservable(store.getResult())
-const value = useObservable(store.getValue())
+const expr = ref(new NumberExprModel(2))
 </script>
 
 <template>
-  <input type="number" @input="(e) => store.setValue(e.target.value)" :value="value" />
-  <div>{{ result }}</div>
+  <NumberExpr :expr="expr" />
 </template>
