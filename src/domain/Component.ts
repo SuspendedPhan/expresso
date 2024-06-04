@@ -16,4 +16,16 @@ export class Component {
 
 export class Attribute {
   public id: string = 'attribute' + Math.random().toString(36).substring(7)
+  private expr = new BehaviorSubject<Expr>(new Expr())
+
+  public getExpr(): Observable<Expr> {
+    return this.expr
+  }
+}
+
+export class Expr {
+  public id: string = 'expr' + Math.random().toString(36).substring(7)
+  public getText(): string {
+    return '+'
+  }
 }
