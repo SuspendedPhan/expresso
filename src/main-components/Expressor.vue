@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import GoOrganism from '@/main-components/Component.vue'
+import GoOrganism from '@/main-components/ExpComponent.vue'
 import TreeLayout from '@/components/TreeLayout.vue'
 
 export default {
