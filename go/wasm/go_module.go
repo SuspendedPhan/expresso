@@ -14,17 +14,7 @@ func bootstrapGoModule() {
 	}))
 
 	goModule.Set("createEvaluator", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		arg := args[0]
-		e := evaluator.Evaluator{
-			Value: arg.Get("Value").Float(),
-		}
-
-		ret := makeEmptyObject()
-		ret.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			r := e.Eval()
-			return EvalResultToJsValue(r)
-		}))
-		return ret
+		return createEvaluator(this, args)
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

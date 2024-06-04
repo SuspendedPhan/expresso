@@ -24,12 +24,12 @@ type AttributeReferenceExpr struct {
 }
 
 type NumberExpr struct {
-	value Float
+	Value Float
 }
 
 type Evaluator struct {
 	// components []*Component
-	Value Float
+	NumberExpr *NumberExpr
 }
 
 type Result struct {
@@ -37,5 +37,9 @@ type Result struct {
 }
 
 func (e *Evaluator) Eval() Result {
-	return Result{e.Value + 1}
+	return Result{e.NumberExpr.Value}
+}
+
+func (n *NumberExpr) Eval() Float {
+	return n.Value
 }
