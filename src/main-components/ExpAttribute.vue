@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue'
-defineProps(['component'])
+defineProps(['attribute'])
 </script>
 
 <template>
   <div>
-    <div>{{ component.id }}</div>
+    <div>{{ attribute.id }}</div>
   </div>
 </template>
