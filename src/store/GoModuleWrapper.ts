@@ -13,13 +13,10 @@ export default class GoModuleLoader {
         this.goModuleSubject.subscribe({
           complete: () => {
             observer.next(this.goModuleSubject.value)
-            console.log('observer.next')
           }
         })
       } else {
         // Library is already loaded, emit the reference immediately
-        console.log(this.goModuleSubject.value)
-        console.log('this.goModuleSubject.value')
         observer.next(this.goModuleSubject.value)
       }
     })
@@ -29,10 +26,9 @@ export default class GoModuleLoader {
     const go = new Go()
     WebAssembly.instantiateStreaming(fetch('mymodule.wasm'), go.importObject).then((result) => {
       go.run(result.instance)
-      const h = window.GoModule.hello()
-      console.log(h)
-      console.log(window.GoModule)
-      this.goModuleSubject.next(window.GoModule)
+      const goModule = window.GoModule
+      goModule.hello()
+      this.goModuleSubject.next(goModule)
       this.goModuleSubject.complete()
     })
   }

@@ -13,7 +13,6 @@ const r = ref(-1)
 loader.subscribe((goModule) => {
   const evaluator = goModule.createEvaluator(new NumberExprModel(2))
   r.value = evaluator.eval()
-  console.log(r.value)
 })
 </script>
 
