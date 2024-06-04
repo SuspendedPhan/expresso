@@ -28,12 +28,14 @@ type NumberExpr struct {
 }
 
 type Evaluator struct {
-	components []*Component
+	// components []*Component
+	value Float
 }
 
 type Result struct {
+	value Float
 }
 
 func (e *Evaluator) Eval() Result {
-	return Result{}
+	return Result{e.value + 1}
 }

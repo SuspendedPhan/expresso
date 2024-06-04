@@ -20,4 +20,15 @@ export class ComponentStore {
   public incrementCount() {
     this.count.next(this.count.value + 1)
   }
+
+  public eval() {
+    // For each component, get its attributes, and for each attribute, get its expr
+    for (const component of this.components.value) {
+      for (const attribute of component.getAttributes().value) {
+        attribute.getExpr().value.getText()
+      }
+    }
+
+    GoModule.createEvaluator()
+  }
 }
