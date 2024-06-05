@@ -6,14 +6,6 @@ import { fileURLToPath, URL } from 'node:url'
 import { execSync } from 'node:child_process'
 
 function buildProjects() {
-  // execSync('./dev/build.sh', (err: any, stdout: any, stderr: any) => {
-  //   if (err) {
-  //     console.error(err)
-  //     return
-  //   }
-  //   console.log(stdout)
-  // })
-
   execSync('./dev/build.sh')
 }
 
