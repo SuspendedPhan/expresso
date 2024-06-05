@@ -37,7 +37,7 @@ type Result struct {
 }
 
 func (e *Evaluator) Eval() Result {
-	return Result{e.NumberExpr.Value}
+	return Result{e.NumberExpr.Value * e.NumberExpr.Value}
 }
 
 func (n *NumberExpr) Eval() Float {

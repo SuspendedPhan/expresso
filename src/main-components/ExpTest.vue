@@ -1,36 +1,38 @@
-<script setup>
-import { ref } from 'vue'
-import Store from '@/store/Store'
-import { useObservable } from '@vueuse/rxjs'
-import { timer, map, pipe } from 'rxjs'
+<script setup lang="ts">
 import NumberExpr from '@/main-components/NumberExpr.vue'
+import ExprSelect from '@/main-components/ExprSelect.vue'
 import { NumberExpr as NumberExprModel } from '@/domain/Domain'
-import AutoComplete from 'primevue/autocomplete'
-import ExprSelectTest from '@/main-components/ExprSelectTest.vue'
-import GoModuleLoader from '@/store/GoModuleWrapper'
+import GoModuleLoader from '@/store/GoModuleLoader'
+import { BehaviorSubject, combineLatest, map } from 'rxjs'
+import { useObservable } from '@vueuse/rxjs'
 
-// const expr = ref(new NumberExprModel(2))
-const loader = GoModuleLoader.get()
-const r = ref(-1)
-loader.subscribe((goModule) => {
-  const evaluator = goModule.createEvaluator(new NumberExprModel(2))
-  r.value = evaluator.eval()
-})
-const autoComplete = ref('')
+const goModule$ = GoModuleLoader.get$()
+const expr$ = new BehaviorSubject<NumberExprModel>(new NumberExprModel(0))
 
-const suggestions = ref([1, 2, 3])
-function onComplete({ query }) {
-  // convert query to number
-  const n = parseFloat(query)
-  if (isNaN(n)) {
-    suggestions.value = []
-  }
-  suggestions.value = [n]
+const expr = useObservable(expr$)
+const result = useObservable(
+  combineLatest([goModule$, expr$]).pipe(
+    map(([goModule, expr]) => {
+      const evaluator = goModule.createEvaluator(expr)
+      return evaluator.eval()
+    })
+  )
+)
+
+function onSelect(selectedExpr: NumberExprModel) {
+  expr$.next(selectedExpr)
 }
 </script>
 
 <template>
-  <!-- <NumberExpr :expr="expr" /> -->
-  <div>{{ r }}</div>
-  <ExprSelectTest />
+  <div>
+    <span class="mr-2">Input</span>
+    <NumberExpr :expr="expr" class="inline" />
+    <ExprSelect @select="onSelect" class="block" />
+  </div>
+
+  <div>
+    <span class="mr-2">Result</span>
+    <div>{{ result }}</div>
+  </div>
 </template>

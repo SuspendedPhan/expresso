@@ -5,7 +5,7 @@ import type { GoModule } from './GoModule'
 export default class GoModuleLoader {
   private static goModuleSubject = new BehaviorSubject<GoModule | null>(null)
 
-  public static get(): Observable<GoModule> {
+  public static get$(): Observable<GoModule> {
     return new Observable((observer) => {
       if (this.goModuleSubject.value === null) {
         // Subscribe to the subject to get notified when the library is loaded
