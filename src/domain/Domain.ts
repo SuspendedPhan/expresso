@@ -23,7 +23,7 @@ export class Attribute {
   }
 }
 
-interface Expr {}
+export interface Expr {}
 
 export class NumberExpr implements Expr {
   public id: string = 'numberExpr' + Math.random().toString(36).substring(7)
