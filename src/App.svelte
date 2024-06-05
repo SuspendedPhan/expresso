@@ -2,29 +2,35 @@
   import "./app.css";
   import { BehaviorSubject, combineLatest, map } from "rxjs";
   import GoModuleLoader from "./GoModuleLoader";
-  import { NumberExpr } from "./Domain";
+  import { NumberExpr, PrimitiveFunctionCallExpr } from "./Domain";
   import ExprCommand from "./ExprCommand.svelte";
+  import ExprView from "./ExprView.svelte";
 
   const goModule$ = GoModuleLoader.get$();
-  const expr = new BehaviorSubject(new NumberExpr(0));
+  const expr = new PrimitiveFunctionCallExpr("add", [
+    new NumberExpr(1),
+    new NumberExpr(2),
+  ]);
+  const expr$ = new BehaviorSubject(expr);
 
-  const result = combineLatest([goModule$, expr]).pipe(
-    map(([goModule, expr]) => {
-      const evaluator = goModule.createEvaluator(expr);
-      return evaluator.eval();
-    })
-  );
+  // const result = combineLatest([goModule$, expr$]).pipe(
+  //   map(([goModule, expr]) => {
+  //     const evaluator = goModule.createEvaluator(expr);
+  //     return evaluator.eval();
+  //   })
+  // );
 
   function handleSelect(event: CustomEvent<NumberExpr>) {
-    expr.next(event.detail);
+    // expr$.next(event.detail);
   }
 </script>
 
 <main>
   <div>Hello World</div>
-  <div>{$result}</div>
+  <!-- <div>{$result}</div> -->
 
   <ExprCommand on:select={handleSelect} />
+  <ExprView expr={$expr$} />
 </main>
 
 <style></style>

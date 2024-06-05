@@ -23,7 +23,9 @@ export class Attribute {
   }
 }
 
-export interface Expr {}
+export interface Expr {
+  getText(): string;
+}
 
 export class NumberExpr implements Expr {
   public id: string = 'numberExpr' + Math.random().toString(36).substring(7)
@@ -44,9 +46,11 @@ export class NumberExpr implements Expr {
 
 export class PrimitiveFunctionCallExpr {
   public id: string = 'primitiveFunctionCallExpr' + Math.random().toString(36).substring(7)
-  private args = new BehaviorSubject<Array<Expr>>([])
+  private args: BehaviorSubject<Array<Expr>>
 
-  constructor(private primitiveFunctionId: string) {}
+  constructor(private primitiveFunctionId: string, args: Array<Expr>) {
+    this.args = new BehaviorSubject(args)
+  }
 
   public getPrimitiveFunctionId(): string {
     return this.primitiveFunctionId

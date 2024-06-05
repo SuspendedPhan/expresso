@@ -1,21 +1,23 @@
 <script lang="ts">
-  import { of } from "rxjs";
-  import { NumberExpr, PrimitiveFunctionCallExpr } from "./Domain";
+  import { concat, concatAll, of } from "rxjs";
+  import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
 
-  export let expr: NumberExpr;
+  export let expr: Expr;
   const args$ = (() => {
     if (expr instanceof PrimitiveFunctionCallExpr) {
-      return expr.getArgs();
+      return expr.getArgs().pipe();
     }
     return of([]);
   })();
 </script>
 
 <main>
-  <div>Expr</div>
-  <div>{expr.getValue()}</div>
+  <span>Expr</span>
+  <span>{expr.getText()}</span>
 
-  <!-- {#each $args$ as arg$}
-    <ExprView expr={$arg$} />
-  {/each} -->
+  <div class="pl-2">
+    {#each $args$ as arg}
+      <svelte:self expr={arg} />
+    {/each}
+  </div>
 </main>
