@@ -6,6 +6,7 @@ import { timer, map, pipe } from 'rxjs'
 import NumberExpr from '@/main-components/NumberExpr.vue'
 import { NumberExpr as NumberExprModel } from '@/domain/Domain'
 import AutoComplete from 'primevue/autocomplete'
+import ExprSelectTest from '@/main-components/ExprSelectTest.vue'
 import GoModuleLoader from '@/store/GoModuleWrapper'
 
 // const expr = ref(new NumberExprModel(2))
@@ -31,5 +32,5 @@ function onComplete({ query }) {
 <template>
   <!-- <NumberExpr :expr="expr" /> -->
   <div>{{ r }}</div>
-  <AutoComplete v-model="autoComplete" :suggestions="suggestions" @complete="onComplete" />
+  <ExprSelectTest />
 </template>
