@@ -15,12 +15,6 @@
     })
   );
 
-  function handleInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const value = parseFloat(target.value);
-    expr.next(new NumberExpr(value));
-  }
-
   function handleSelect(event: CustomEvent<NumberExpr>) {
     expr.next(event.detail);
   }
@@ -28,7 +22,6 @@
 
 <main>
   <div>Hello World</div>
-  <input type="number" value={$expr.getValue()} on:input={handleInput} />
   <div>{$result}</div>
 
   <ExprCommand on:select={handleSelect} />
