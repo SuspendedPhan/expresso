@@ -3,8 +3,6 @@
   import { NumberExpr } from "./Domain";
   const dispatch = createEventDispatcher();
 
-  const value = "32";
-
   function handleKeydown(
     event: KeyboardEvent & { currentTarget: HTMLInputElement }
   ) {
@@ -19,5 +17,5 @@
 </script>
 
 <main>
-  <input type="number" {value} on:keydown={handleKeydown} />
+  <input type="number" on:keydown={handleKeydown} />
 </main>
