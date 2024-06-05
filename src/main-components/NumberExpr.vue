@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { NumberExpr } from '@/domain/Domain'
 import { useObservable } from '@vueuse/rxjs'
-import { ref } from 'vue'
+import { Observable, map } from 'rxjs'
 
-const props = defineProps(['expr'])
-const expr: NumberExpr = props.expr
-
-const value = expr.getValue()
+const props = defineProps(['expr$'])
+const expr$ = props.expr$ as Observable<NumberExpr>
+const value = useObservable(expr$.pipe(map((e) => e.getValue())))
 </script>
 
 <template>

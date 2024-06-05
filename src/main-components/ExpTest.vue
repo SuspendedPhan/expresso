@@ -3,13 +3,13 @@ import NumberExpr from '@/main-components/NumberExpr.vue'
 import ExprSelect from '@/main-components/ExprSelect.vue'
 import { NumberExpr as NumberExprModel } from '@/domain/Domain'
 import GoModuleLoader from '@/store/GoModuleLoader'
-import { BehaviorSubject, combineLatest, map } from 'rxjs'
+import { BehaviorSubject, combineLatest, map, tap } from 'rxjs'
 import { useObservable } from '@vueuse/rxjs'
+import { ref } from 'vue'
 
 const goModule$ = GoModuleLoader.get$()
 const expr$ = new BehaviorSubject<NumberExprModel>(new NumberExprModel(0))
 
-const expr = useObservable(expr$)
 const result = useObservable(
   combineLatest([goModule$, expr$]).pipe(
     map(([goModule, expr]) => {
@@ -27,7 +27,7 @@ function onSelect(selectedExpr: NumberExprModel) {
 <template>
   <div>
     <span class="mr-2">Input</span>
-    <NumberExpr :expr="expr" class="inline" />
+    <NumberExpr :expr$="expr$" class="inline" />
     <ExprSelect @select="onSelect" class="block" />
   </div>
 
