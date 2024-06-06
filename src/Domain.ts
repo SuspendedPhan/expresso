@@ -25,6 +25,7 @@ export class Attribute {
 
 export interface Expr {
   getText(): string;
+  getExprType(): string;
 }
 
 export class NumberExpr implements Expr {
@@ -41,6 +42,10 @@ export class NumberExpr implements Expr {
 
   getValue(): number {
     return this.value
+  }
+
+  getExprType(): string {
+    return 'Number'
   }
 }
 
@@ -60,7 +65,15 @@ export class PrimitiveFunctionCallExpr {
     return this.primitiveFunctionId
   }
 
-  public getArgs(): Observable<Array<Expr>> {
+  public getArgs$(): Observable<Array<Expr>> {
     return this.args
+  }
+
+  public getArgs(): Array<Expr> {
+    return this.args.value
+  }
+
+  getExprType(): string {
+    return 'PrimitiveFunctionCall'
   }
 }

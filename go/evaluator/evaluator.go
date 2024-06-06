@@ -7,7 +7,7 @@ type Component struct {
 }
 
 type Attribute struct {
-	rootExpr *Expr
+	rootExpr Expr
 }
 
 type Expr interface {
@@ -15,8 +15,8 @@ type Expr interface {
 }
 
 type PrimitiveFunctionCallExpr struct {
-	functionId string
-	argExprs   []*Expr
+	FunctionId string
+	Args       []Expr
 }
 
 type AttributeReferenceExpr struct {
@@ -29,7 +29,7 @@ type NumberExpr struct {
 
 type Evaluator struct {
 	// components []*Component
-	NumberExpr *NumberExpr
+	Expr Expr
 }
 
 type Result struct {
@@ -37,9 +37,17 @@ type Result struct {
 }
 
 func (e *Evaluator) Eval() Result {
-	return Result{e.NumberExpr.Value * e.NumberExpr.Value}
+	return Result{e.Expr.Eval()}
 }
 
 func (n *NumberExpr) Eval() Float {
 	return n.Value
+}
+
+func (p *PrimitiveFunctionCallExpr) Eval() Float {
+	sum := 0.0
+	for _, arg := range p.Args {
+		sum += arg.Eval()
+	}
+	return sum
 }

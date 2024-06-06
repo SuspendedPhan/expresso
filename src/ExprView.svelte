@@ -5,7 +5,7 @@
   export let expr: Expr;
   const args$ = (() => {
     if (expr instanceof PrimitiveFunctionCallExpr) {
-      return expr.getArgs().pipe();
+      return expr.getArgs$().pipe();
     }
     return of([]);
   })();

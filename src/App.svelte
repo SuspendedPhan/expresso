@@ -13,21 +13,21 @@
   ]);
   const expr$ = new BehaviorSubject(expr);
 
-  // const result = combineLatest([goModule$, expr$]).pipe(
-  //   map(([goModule, expr]) => {
-  //     const evaluator = goModule.createEvaluator(expr);
-  //     return evaluator.eval();
-  //   })
-  // );
+  const result = combineLatest([goModule$, expr$]).pipe(
+    map(([goModule, expr]) => {
+      const evaluator = goModule.createEvaluator(expr);
+      return evaluator.eval();
+    })
+  );
 
   function handleSelect(event: CustomEvent<NumberExpr>) {
-    // expr$.next(event.detail);
+    expr$.next(event.detail);
   }
 </script>
 
 <main>
   <div>Hello World</div>
-  <!-- <div>{$result}</div> -->
+  <div>{$result}</div>
 
   <ExprCommand on:select={handleSelect} />
   <ExprView expr={$expr$} />

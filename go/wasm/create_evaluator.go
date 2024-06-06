@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -19,13 +20,39 @@ func createEvaluator(this js.Value, args []js.Value) js.Value {
 }
 
 func newEvaluator(value js.Value) *evaluator.Evaluator {
+	expr := toExpr(value)
+
 	return &evaluator.Evaluator{
-		NumberExpr: newNumberExpr(value),
+		Expr: expr,
 	}
 }
 
-func newNumberExpr(value js.Value) *evaluator.NumberExpr {
+func toExpr(jsValue js.Value) evaluator.Expr {
+	fmt.Println("toExpr", jsValue)
+	switch jsValue.Call("getExprType").String() {
+	case "Number":
+		return toNumberExpr(jsValue)
+	case "PrimitiveFunctionCall":
+		return toPrimitiveFunctionCallExpr(jsValue)
+	}
+	return nil
+}
+
+func toNumberExpr(jsValue js.Value) *evaluator.NumberExpr {
+	fmt.Println("toNumberExpr", jsValue)
 	return &evaluator.NumberExpr{
-		Value: value.Call("getValue").Float(),
+		Value: jsValue.Call("getValue").Float(),
+	}
+}
+
+func toPrimitiveFunctionCallExpr(jsValue js.Value) *evaluator.PrimitiveFunctionCallExpr {
+	argExprs := jsValue.Call("getArgs")
+	args := make([]evaluator.Expr, argExprs.Length())
+	for i := 0; i < argExprs.Length(); i++ {
+		args[i] = toExpr(argExprs.Index(i))
+	}
+	return &evaluator.PrimitiveFunctionCallExpr{
+		FunctionId: jsValue.Get("functionId").String(),
+		Args:       args,
 	}
 }
