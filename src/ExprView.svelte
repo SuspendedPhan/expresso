@@ -1,6 +1,7 @@
 <script lang="ts">
   import { concat, concatAll, of } from "rxjs";
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
+  import ExprCommand from "./ExprCommand.svelte";
 
   export let expr: Expr;
   const args$ = (() => {
@@ -9,6 +10,10 @@
     }
     return of([]);
   })();
+
+  function handleSelect(event: CustomEvent<Expr>) {
+    expr.replace(event.detail);
+  }
 </script>
 
 <main>
@@ -20,4 +25,6 @@
       <svelte:self expr={arg} />
     {/each}
   </div>
+
+  <ExprCommand on:select={handleSelect} />
 </main>

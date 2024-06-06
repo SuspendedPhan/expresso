@@ -1,21 +1,31 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
-  import { NumberExpr } from "./Domain";
+  import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   const dispatch = createEventDispatcher();
 
   function handleKeydown(
     event: KeyboardEvent & { currentTarget: HTMLInputElement }
   ) {
     if (event.key === "Enter") {
-      const value = parseFloat(event.currentTarget.value);
-      if (isNaN(value)) return;
-
-      const expr = new NumberExpr(value);
-      dispatch("select", expr);
+      const expr = textToExpr(event.currentTarget.value);
+      if (expr !== null) {
+        dispatch("select", { detail: expr });
+      }
     }
+  }
+
+  function textToExpr(text: string): Expr | null {
+    const value = parseFloat(text);
+    if (!isNaN(value)) {
+      return new NumberExpr(value);
+    }
+    if (text === "+") {
+      return new PrimitiveFunctionCallExpr("+", []);
+    }
+    return null;
   }
 </script>
 
 <main>
-  <input type="number" on:keydown={handleKeydown} />
+  <input type="text" on:keydown={handleKeydown} />
 </main>

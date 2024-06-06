@@ -23,17 +23,26 @@ export class Attribute {
   }
 }
 
-export interface Expr {
-  getText(): string;
-  getExprType(): string;
+export abstract class Expr {
+  private parent: CallExpr = null
+
+  abstract getText(): string;
+  abstract getExprType(): string;
+
+  setParent(parent: CallExpr) {
+    this.parent = parent
+  }
+
+  replace(newExpr: Expr) {
+    if (this.parent) {
+      this.parent.replaceArg(this, newExpr)
+    }
+  }
 }
 
-export class NumberExpr implements Expr {
-  public id: string = 'numberExpr' + Math.random().toString(36).substring(7)
-  private value: number
-
-  constructor(value: number) {
-    this.value = value
+export class NumberExpr extends Expr {
+  constructor(private value: number) {
+    super();
   }
 
   public getText(): string {
@@ -49,16 +58,15 @@ export class NumberExpr implements Expr {
   }
 }
 
-export class PrimitiveFunctionCallExpr {
-  public id: string = 'primitiveFunctionCallExpr' + Math.random().toString(36).substring(7)
+export abstract class CallExpr extends Expr {
   private args: BehaviorSubject<Array<Expr>>
 
   constructor(private primitiveFunctionId: string, args: Array<Expr>) {
+    super();
+    for (const arg of args) {
+      arg.setParent(this);
+    }
     this.args = new BehaviorSubject(args)
-  }
-
-  public getPrimitiveFunctionId(): string {
-    return this.primitiveFunctionId
   }
 
   public getText(): string {
@@ -73,6 +81,18 @@ export class PrimitiveFunctionCallExpr {
     return this.args.value
   }
 
+  replaceArg(oldExpr: Expr, newExpr: Expr): void {
+    const index = this.args.value.indexOf(oldExpr)
+    if (index === -1) {
+      throw new Error('oldExpr not found in args')
+    }
+
+    this.args.value[index] = newExpr
+    this.args.next(this.args.value)
+  }
+}
+
+export class PrimitiveFunctionCallExpr extends CallExpr {
   getExprType(): string {
     return 'PrimitiveFunctionCall'
   }

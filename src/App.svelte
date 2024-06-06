@@ -19,17 +19,12 @@
       return evaluator.eval();
     })
   );
-
-  function handleSelect(event: CustomEvent<NumberExpr>) {
-    expr$.next(event.detail);
-  }
 </script>
 
 <main>
   <div>Hello World</div>
   <div>{$result}</div>
 
-  <ExprCommand on:select={handleSelect} />
   <ExprView expr={$expr$} />
 </main>
 
