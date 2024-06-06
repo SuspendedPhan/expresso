@@ -27,5 +27,9 @@
 </script>
 
 <main>
-  <input type="text" on:keydown={handleKeydown} />
+  <input
+    type="text"
+    on:keydown={handleKeydown}
+    class="border border-solid border-black"
+  />
 </main>

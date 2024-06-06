@@ -19,12 +19,11 @@
 <main>
   <span>Expr</span>
   <span>{expr.getText()}</span>
+  <ExprCommand on:select={handleSelect} />
 
   <div class="pl-2">
     {#each $args$ as arg}
       <svelte:self expr={arg} />
     {/each}
   </div>
-
-  <ExprCommand on:select={handleSelect} />
 </main>

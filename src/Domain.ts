@@ -61,16 +61,12 @@ export class NumberExpr extends Expr {
 export abstract class CallExpr extends Expr {
   private args: BehaviorSubject<Array<Expr>>
 
-  constructor(private primitiveFunctionId: string, args: Array<Expr>) {
+  constructor(args: Array<Expr>) {
     super();
     for (const arg of args) {
       arg.setParent(this);
     }
     this.args = new BehaviorSubject(args)
-  }
-
-  public getText(): string {
-    return this.primitiveFunctionId
   }
 
   public getArgs$(): Observable<Array<Expr>> {
@@ -93,6 +89,12 @@ export abstract class CallExpr extends Expr {
 }
 
 export class PrimitiveFunctionCallExpr extends CallExpr {
+  constructor(args: Array<Expr>) {
+    super(args)
+  }
+  getText(): string {
+    return '+'
+  }
   getExprType(): string {
     return 'PrimitiveFunctionCall'
   }

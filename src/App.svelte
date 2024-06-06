@@ -7,7 +7,7 @@
   import ExprView from "./ExprView.svelte";
 
   const goModule$ = GoModuleLoader.get$();
-  const expr = new PrimitiveFunctionCallExpr("add", [
+  const expr = new PrimitiveFunctionCallExpr([
     new NumberExpr(1),
     new NumberExpr(2),
   ]);
