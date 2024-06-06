@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -28,7 +27,6 @@ func newEvaluator(value js.Value) *evaluator.Evaluator {
 }
 
 func toExpr(jsValue js.Value) evaluator.Expr {
-	fmt.Println("toExpr", jsValue)
 	switch jsValue.Call("getExprType").String() {
 	case "Number":
 		return toNumberExpr(jsValue)
@@ -39,14 +37,13 @@ func toExpr(jsValue js.Value) evaluator.Expr {
 }
 
 func toNumberExpr(jsValue js.Value) *evaluator.NumberExpr {
-	fmt.Println("toNumberExpr", jsValue)
 	return &evaluator.NumberExpr{
 		Value: jsValue.Call("getValue").Float(),
 	}
 }
 
 func toPrimitiveFunctionCallExpr(jsValue js.Value) *evaluator.PrimitiveFunctionCallExpr {
-	argExprs := jsValue.Call("getArgs")
+	argExprs := PrimitiveFunctionCallExpr{jsValue: jsValue}.getArgs()
 	args := make([]evaluator.Expr, argExprs.Length())
 	for i := 0; i < argExprs.Length(); i++ {
 		args[i] = toExpr(argExprs.Index(i))
