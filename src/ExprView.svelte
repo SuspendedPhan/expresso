@@ -1,17 +1,22 @@
 <script lang="ts">
-  import { concat, concatAll, of } from "rxjs";
+  import { concat, concatAll, of, tap } from "rxjs";
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import ExprCommand from "./ExprCommand.svelte";
+  import Logger from "./Logger";
 
   export let expr: Expr;
+  Logger.log("ExprView", expr);
+
   const args$ = (() => {
     if (expr instanceof PrimitiveFunctionCallExpr) {
       return expr.getArgs$().pipe();
     }
     return of([]);
-  })();
+  })().pipe(tap((v) => Logger.log("args$", v)));
 
   function handleSelect(event: CustomEvent<Expr>) {
+    Logger.log("handleSelect", event.detail);
+
     expr.replace(event.detail);
   }
 </script>

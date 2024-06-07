@@ -1,7 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
-  const dispatch = createEventDispatcher();
+
+  const dispatch = createEventDispatcher<{ select: Expr }>();
 
   function handleKeydown(
     event: KeyboardEvent & { currentTarget: HTMLInputElement }
@@ -9,7 +10,7 @@
     if (event.key === "Enter") {
       const expr = textToExpr(event.currentTarget.value);
       if (expr !== null) {
-        dispatch("select", { detail: expr });
+        dispatch("select", expr);
       }
     }
   }

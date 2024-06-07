@@ -1,4 +1,5 @@
 import { BehaviorSubject, Observable } from 'rxjs'
+import Logger from './Logger'
 
 export class Component {
   public id: string = 'component' + Math.random().toString(36).substring(7)
@@ -34,8 +35,11 @@ export abstract class Expr {
   }
 
   replace(newExpr: Expr) {
+    Logger.log('replacing', this, 'with', newExpr)
     if (this.parent) {
       this.parent.replaceArg(this, newExpr)
+    } else {
+      throw new Error('Expr has no parent')
     }
   }
 }
@@ -83,6 +87,7 @@ export abstract class CallExpr extends Expr {
       throw new Error('oldExpr not found in args')
     }
 
+    newExpr.setParent(this)
     this.args.value[index] = newExpr
     this.args.next(this.args.value)
   }
