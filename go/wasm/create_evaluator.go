@@ -29,27 +29,26 @@ func newEvaluator(value js.Value) *evaluator.Evaluator {
 func toExpr(jsValue js.Value) evaluator.Expr {
 	switch jsValue.Call("getExprType").String() {
 	case "Number":
-		return toNumberExpr(jsValue)
+		return toNumberExpr(NumberExpr{jsValue: jsValue})
 	case "PrimitiveFunctionCall":
-		return toPrimitiveFunctionCallExpr(jsValue)
+		return toPrimitiveFunctionCallExpr(PrimitiveFunctionCallExpr{jsValue: jsValue})
 	}
 	return nil
 }
 
-func toNumberExpr(jsValue js.Value) *evaluator.NumberExpr {
+func toNumberExpr(n NumberExpr) *evaluator.NumberExpr {
 	return &evaluator.NumberExpr{
-		Value: jsValue.Call("getValue").Float(),
+		Value: n.getValue(),
 	}
 }
 
-func toPrimitiveFunctionCallExpr(jsValue js.Value) *evaluator.PrimitiveFunctionCallExpr {
-	argExprs := PrimitiveFunctionCallExpr{jsValue: jsValue}.getArgs()
+func toPrimitiveFunctionCallExpr(p PrimitiveFunctionCallExpr) *evaluator.PrimitiveFunctionCallExpr {
+	argExprs := p.getArgs()
 	args := make([]evaluator.Expr, argExprs.Length())
 	for i := 0; i < argExprs.Length(); i++ {
 		args[i] = toExpr(argExprs.Index(i))
 	}
 	return &evaluator.PrimitiveFunctionCallExpr{
-		FunctionId: jsValue.Get("functionId").String(),
-		Args:       args,
+		Args: args,
 	}
 }

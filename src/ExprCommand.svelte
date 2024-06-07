@@ -20,7 +20,10 @@
       return new NumberExpr(value);
     }
     if (text === "+") {
-      return new PrimitiveFunctionCallExpr("+", []);
+      return new PrimitiveFunctionCallExpr([
+        new NumberExpr(0),
+        new NumberExpr(0),
+      ]);
     }
     return null;
   }

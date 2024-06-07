@@ -15,5 +15,5 @@ func (n NumberExpr) getValue() float64 {
 }
 
 func (p PrimitiveFunctionCallExpr) getArgs() js.Value {
-	return p.jsValue.Call("getArgs").String()
+	return p.jsValue.Call("getArgs")
 }
