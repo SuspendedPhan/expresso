@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -43,6 +44,7 @@ func toNumberExpr(n NumberExpr) *evaluator.NumberExpr {
 }
 
 func toPrimitiveFunctionCallExpr(p PrimitiveFunctionCallExpr) *evaluator.PrimitiveFunctionCallExpr {
+	fmt.Println("toPrimitiveFunctionCallExpr")
 	argExprs := p.getArgs()
 	args := make([]evaluator.Expr, argExprs.Length())
 	for i := 0; i < argExprs.Length(); i++ {
