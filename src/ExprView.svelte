@@ -1,27 +1,8 @@
 <script lang="ts">
-  import {
-    BehaviorSubject,
-    Observable,
-    combineLatest,
-    combineLatestAll,
-    concat,
-    concatAll,
-    concatMap,
-    map,
-    mergeMap,
-    of,
-    subscribeOn,
-    tap,
-  } from "rxjs";
-  import {
-    CallExpr,
-    NumberExpr,
-    PrimitiveFunctionCallExpr,
-    type Expr,
-  } from "./Domain";
+  import { of } from "rxjs";
+  import { CallExpr, type Expr } from "./Domain";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./Logger";
-  import { onMount } from "svelte";
 
   export let expr: Expr;
 

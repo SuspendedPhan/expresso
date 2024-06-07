@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
-  import { BehaviorSubject, tap } from "rxjs";
+  import { BehaviorSubject } from "rxjs";
   import Logger from "./Logger";
 
   const dispatch = createEventDispatcher<{ select: Expr }>();
