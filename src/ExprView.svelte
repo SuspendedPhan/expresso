@@ -1,34 +1,75 @@
 <script lang="ts">
-  import { concat, concatAll, of, tap } from "rxjs";
-  import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
+  import {
+    BehaviorSubject,
+    Observable,
+    combineLatest,
+    combineLatestAll,
+    concat,
+    concatAll,
+    map,
+    of,
+    subscribeOn,
+    tap,
+  } from "rxjs";
+  import {
+    CallExpr,
+    NumberExpr,
+    PrimitiveFunctionCallExpr,
+    type Expr,
+  } from "./Domain";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./Logger";
+  import { onMount } from "svelte";
 
-  export let expr: Expr;
-  Logger.log("ExprView", expr);
+  export let expr$: Observable<Expr>;
+  // Logger.debug("ExprView", expr);
+  // Logger.log("ExprView", expr);
 
-  const args$ = (() => {
-    if (expr instanceof PrimitiveFunctionCallExpr) {
-      return expr.getArgs$().pipe();
-    }
-    return of([]);
-  })().pipe(tap((v) => Logger.log("args$", v)));
+  expr$.subscribe(new BehaviorSubject<Expr>(new NumberExpr(0)));
 
-  function handleSelect(event: CustomEvent<Expr>) {
-    Logger.log("handleSelect", event.detail);
+  const args$ = expr$.pipe(
+    map((v) => {
+      if (v instanceof CallExpr) {
+        return v.getArgs$();
+      }
+      return of([]);
+    }),
+    concatAll()
+  );
 
-    expr.replace(event.detail);
-  }
+  expr$.subscribe((v) => Logger.topic("ExprView").debug("expr$", v));
+  args$.subscribe((v) => Logger.topic("ExprView").debug("args$", v));
+
+  const text$ = expr$.pipe(map((v) => v.getText()));
+
+  const handleSelect$ = expr$.pipe(
+    map((v) => {
+      return (event: CustomEvent<Expr>) => {
+        Logger.log("handleSelect", event.detail);
+
+        v.replace(event.detail);
+      };
+    })
+  );
+
+  // function handleSelect(event: CustomEvent<Expr>) {
+  //   Logger.log("handleSelect", event.detail);
+
+  //   expr.replace(event.detail);
+  // }
+  onMount(() => {
+    Logger.topic("ExprView").debug("onMount");
+  });
 </script>
 
 <main>
   <span>Expr</span>
-  <span>{expr.getText()}</span>
-  <ExprCommand on:select={handleSelect} />
+  <span>{$text$}</span>
+  <ExprCommand on:select={$handleSelect$} />
 
   <div class="pl-2">
     {#each $args$ as arg}
-      <svelte:self expr={arg} />
+      <svelte:self expr$={of(arg)} />
     {/each}
   </div>
 </main>

@@ -17,29 +17,46 @@ export class Component {
 
 export class Attribute {
   public id: string = 'attribute' + Math.random().toString(36).substring(7)
-  private expr = new BehaviorSubject(new NumberExpr(0))
+  private expr$ : BehaviorSubject<Expr>;
 
-  public getExpr(): Observable<Expr> {
-    return this.expr
+  constructor() {
+    const expr = new NumberExpr(0)
+    expr.setParent(this)
+    this.expr$ = new BehaviorSubject<Expr>(expr)
+  }
+
+  public setExpr(newExpr: Expr) {
+    newExpr.setParent(this)
+    this.expr$.next(newExpr)
+  }
+
+  public getExpr$(): Observable<Expr> {
+    return this.expr$
   }
 }
 
 export abstract class Expr {
-  private parent: CallExpr = null
+  private parent: CallExpr | Attribute = null
 
   abstract getText(): string;
   abstract getExprType(): string;
 
-  setParent(parent: CallExpr) {
+  setParent(parent: CallExpr | Attribute) {
     this.parent = parent
   }
 
   replace(newExpr: Expr) {
     Logger.log('replacing', this, 'with', newExpr)
-    if (this.parent) {
+    if (!this.parent) {
+      throw new Error('Expr has no parent')
+    }
+    
+    if (this.parent instanceof Attribute) {
+      this.parent.setExpr(newExpr)
+    } else if (this.parent instanceof PrimitiveFunctionCallExpr) {
       this.parent.replaceArg(this, newExpr)
     } else {
-      throw new Error('Expr has no parent')
+      throw new Error('Unknown parent type')
     }
   }
 }
