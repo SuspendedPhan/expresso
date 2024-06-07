@@ -23,6 +23,8 @@
   import Logger from "./Logger";
   import { onMount } from "svelte";
 
+  Logger.allow("ExprView");
+
   export let expr$: Observable<Expr>;
 
   const args$ = expr$.pipe(
@@ -45,7 +47,7 @@
   const handleSelect$ = expr$.pipe(
     map((v) => {
       return (event: CustomEvent<Expr>) => {
-        Logger.log("handleSelect", event.detail);
+        Logger.debug("handleSelect", event.detail);
 
         v.replace(event.detail);
       };
