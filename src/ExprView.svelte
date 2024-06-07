@@ -6,7 +6,9 @@
     combineLatestAll,
     concat,
     concatAll,
+    concatMap,
     map,
+    mergeMap,
     of,
     subscribeOn,
     tap,
@@ -22,23 +24,21 @@
   import { onMount } from "svelte";
 
   export let expr$: Observable<Expr>;
-  // Logger.debug("ExprView", expr);
-  // Logger.log("ExprView", expr);
-
-  expr$.subscribe(new BehaviorSubject<Expr>(new NumberExpr(0)));
 
   const args$ = expr$.pipe(
-    map((v) => {
+    mergeMap((v) => {
+      Logger.topic("ExprView").log("v", v);
       if (v instanceof CallExpr) {
+        Logger.topic("ExprView").log("v.getArgs$()", v.getArgs$());
         return v.getArgs$();
       }
+      Logger.topic("ExprView").log("return of([])");
       return of([]);
-    }),
-    concatAll()
+    })
   );
 
-  expr$.subscribe((v) => Logger.topic("ExprView").debug("expr$", v));
-  args$.subscribe((v) => Logger.topic("ExprView").debug("args$", v));
+  expr$.subscribe((v) => Logger.topic("ExprView").log("expr$", v));
+  args$.subscribe((v) => Logger.topic("ExprView").log("args$", v));
 
   const text$ = expr$.pipe(map((v) => v.getText()));
 
@@ -52,13 +52,8 @@
     })
   );
 
-  // function handleSelect(event: CustomEvent<Expr>) {
-  //   Logger.log("handleSelect", event.detail);
-
-  //   expr.replace(event.detail);
-  // }
   onMount(() => {
-    Logger.topic("ExprView").debug("onMount");
+    Logger.topic("ExprView").log("onMount");
   });
 </script>
 

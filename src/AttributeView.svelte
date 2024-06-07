@@ -5,8 +5,7 @@
 
   export let attribute: Attribute;
   const expr$ = attribute.getExpr$();
-  // expr$.subscribe((v) => Logger.topic("AttributeView").log("expr$", v));
-  expr$.subscribe((v) => Logger.topic("AttributeView").debug("expr$", v));
+  expr$.subscribe((v) => Logger.topic("AttributeView").log("expr$", v));
 </script>
 
 <main>
