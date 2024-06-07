@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { BehaviorSubject, combineLatest, map } from "rxjs";
+  import { combineLatest, map } from "rxjs";
   import GoModuleLoader from "./GoModuleLoader";
-  import { Attribute, NumberExpr, PrimitiveFunctionCallExpr } from "./Domain";
-  import ExprCommand from "./ExprCommand.svelte";
-  import ExprView from "./ExprView.svelte";
+  import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
 
   const goModule$ = GoModuleLoader.get$();
