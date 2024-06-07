@@ -9,5 +9,7 @@
 </script>
 
 <main>
-  <ExprView {expr$} />
+  {#key $expr$}
+    <ExprView expr={$expr$} />
+  {/key}
 </main>

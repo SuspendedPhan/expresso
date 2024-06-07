@@ -23,50 +23,27 @@
   import Logger from "./Logger";
   import { onMount } from "svelte";
 
-  Logger.allow("ExprView");
+  export let expr: Expr;
 
-  export let expr$: Observable<Expr>;
+  Logger.topic("ExprView").log("expr", expr);
 
-  const args$ = expr$.pipe(
-    mergeMap((v) => {
-      Logger.topic("ExprView").log("v", v);
-      if (v instanceof CallExpr) {
-        Logger.topic("ExprView").log("v.getArgs$()", v.getArgs$());
-        return v.getArgs$();
-      }
-      Logger.topic("ExprView").log("return of([])");
-      return of([]);
-    })
-  );
-
-  expr$.subscribe((v) => Logger.topic("ExprView").log("expr$", v));
+  const args$ = expr instanceof CallExpr ? expr.getArgs$() : of([]);
   args$.subscribe((v) => Logger.topic("ExprView").log("args$", v));
 
-  const text$ = expr$.pipe(map((v) => v.getText()));
-
-  const handleSelect$ = expr$.pipe(
-    map((v) => {
-      return (event: CustomEvent<Expr>) => {
-        Logger.debug("handleSelect", event.detail);
-
-        v.replace(event.detail);
-      };
-    })
-  );
-
-  onMount(() => {
-    Logger.topic("ExprView").log("onMount");
-  });
+  function handleSelect(e: CustomEvent<Expr>): void {
+    Logger.debug("handleSelect", e.detail);
+    expr.replace(e.detail);
+  }
 </script>
 
 <main>
   <span>Expr</span>
-  <span>{$text$}</span>
-  <ExprCommand on:select={$handleSelect$} />
+  <span>{expr.getText()}</span>
+  <ExprCommand on:select={handleSelect} />
 
   <div class="pl-2">
-    {#each $args$ as arg}
-      <svelte:self expr$={of(arg)} />
+    {#each $args$ as arg (arg)}
+      <svelte:self expr={arg} />
     {/each}
   </div>
 </main>
