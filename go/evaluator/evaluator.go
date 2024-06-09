@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 // -- TYPES --
 
 type Float = float64
@@ -32,6 +34,7 @@ type Evaluator struct {
 // -- METHODS --
 
 func (a *Attribute) eval() Float {
+	fmt.Println("evaluating attribute", a.RootExprId)
 	return a.evaluator.exprById[a.RootExprId].eval()
 }
 
@@ -61,10 +64,12 @@ func (e *Evaluator) CreateAttribute(id string) *Attribute {
 }
 
 func (e *Evaluator) CreateNumberExpr(id string, value float64) {
+	fmt.Println("creating number expr", id, value)
 	e.exprById[id] = &NumberExpr{value: value}
 }
 
 func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string, argIds []string) {
+	fmt.Println("creating primitive function call expr", id, argIds)
 	e.exprById[id] = &PrimitiveFunctionCallExpr{argIds: argIds}
 }
 

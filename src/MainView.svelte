@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { combineLatest, map, startWith } from "rxjs";
+  import { combineLatest, interval, map, startWith } from "rxjs";
   import GoModuleLoader from "./GoModuleLoader";
   import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
@@ -9,10 +9,15 @@
   const goModule$ = GoModuleLoader.get$();
   let ctx: MainContext | null = null;
   let attribute = null;
+  let result = -1;
 
   goModule$.subscribe((v) => {
     ctx = new MainContext(v);
     attribute = ctx.createAttribute();
+    interval(1000).subscribe((v) => {
+      console.log("interval", v);
+      result = ctx.eval();
+    });
   });
 </script>
 
