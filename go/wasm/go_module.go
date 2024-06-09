@@ -17,8 +17,7 @@ func bootstrapGoModule() {
 
 	goModule.Set("createAttribute", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
-		rootExprId := args[1].String()
-		attr := ev.CreateAttribute(id, rootExprId)
+		attr := ev.CreateAttribute(id)
 		return map[string]interface{}{
 			"setExprId": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 				attr.RootExprId = args[0].String()

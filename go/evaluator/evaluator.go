@@ -54,8 +54,8 @@ func NewEvaluator() *Evaluator {
 	}
 }
 
-func (e *Evaluator) CreateAttribute(id string, rootExprId string) *Attribute {
-	attr := &Attribute{evaluator: e, RootExprId: rootExprId}
+func (e *Evaluator) CreateAttribute(id string) *Attribute {
+	attr := &Attribute{evaluator: e}
 	e.attributeById[id] = attr
 	return attr
 }
