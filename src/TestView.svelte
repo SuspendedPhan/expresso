@@ -1,7 +1,13 @@
 <script lang="ts">
+  import GoModuleLoader from "./GoModuleLoader";
   import MainContext from "./MainContext";
-  const ctx = new MainContext();
-  const attr = ctx.createAttribute();
+
+  GoModuleLoader.get$().subscribe((v) => {
+    console.log("GoModuleLoader.get$", v);
+    const ctx = new MainContext(v);
+    const id = ctx.getRootAttributeExprId();
+    console.log("id", id);
+  });
 </script>
 
 <main>
