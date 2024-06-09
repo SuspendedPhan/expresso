@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -29,7 +30,10 @@ func bootstrapGoModule() {
 		attr := ev.CreateAttribute(id)
 		return map[string]interface{}{
 			"setExprId": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				fmt.Println("go_module: setting expr id", args[0].String())
 				attr.RootExprId = args[0].String()
+
+				fmt.Println("go_module: rootExprId", ev.GetRootAttribute().RootExprId)
 				return nil
 			}),
 		}

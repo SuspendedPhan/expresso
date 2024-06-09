@@ -33,9 +33,10 @@ export default class MainContext {
   }
 
   public createAttribute(): Attribute {
-    const a = new Attribute();
+    const a = new Attribute(this.createNumberExpr(0));
     const goAttr = this.goModule.createAttribute(a.getId());
     a.getExpr$().pipe().subscribe((expr) => {
+      console.log("setting expr id", expr.getId());
       goAttr.setExprId(expr.getId());
     });
     return a;

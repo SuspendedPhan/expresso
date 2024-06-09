@@ -34,7 +34,7 @@ type Evaluator struct {
 // -- METHODS --
 
 func (a *Attribute) eval() Float {
-	fmt.Println("evaluating attribute", a.RootExprId)
+	fmt.Println("evaluator.go: evaluating attribute: RootExprId", a.RootExprId)
 	return a.evaluator.exprById[a.RootExprId].eval()
 }
 
@@ -58,6 +58,7 @@ func NewEvaluator() *Evaluator {
 }
 
 func (e *Evaluator) CreateAttribute(id string) *Attribute {
+	fmt.Println("evaluator.go: creating attribute", id)
 	attr := &Attribute{evaluator: e}
 	e.attributeById[id] = attr
 	return attr
@@ -74,6 +75,7 @@ func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string, argIds []string) 
 }
 
 func (e *Evaluator) Eval() float64 {
+	fmt.Println("evaluator.go: evaluating root attribute", e.RootAttributeId)
 	return e.attributeById[e.RootAttributeId].eval()
 }
 

@@ -22,7 +22,7 @@
 <main>
   <span>Expr</span>
   <span>{expr.getText()}</span>
-  <ExprCommand on:select={handleSelect} />
+  <ExprCommand {ctx} on:select={handleSelect} />
 
   <div class="pl-2">
     {#each $args$ as arg (arg)}

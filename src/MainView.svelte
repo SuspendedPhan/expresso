@@ -15,7 +15,7 @@
     ctx = new MainContext(v);
     attribute = ctx.createAttribute();
     interval(1000).subscribe((v) => {
-      console.log("interval", v);
+      // console.log("interval", v);
       result = ctx.eval();
     });
   });
@@ -23,6 +23,7 @@
 
 <main>
   <div>Hello World</div>
+  <div>{result}</div>
 
   {#if ctx === null || attribute === null}
     <div>Loading...</div>

@@ -6,8 +6,7 @@ export class Attribute {
   private id = crypto.randomUUID()
   private expr$ : BehaviorSubject<Expr>;
 
-  constructor() {
-    const expr = new NumberExpr(0)
+  constructor(expr: Expr) {
     expr.setParent(this)
     this.expr$ = new BehaviorSubject<Expr>(expr)
   }
