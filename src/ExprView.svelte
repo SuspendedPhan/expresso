@@ -3,7 +3,9 @@
   import { CallExpr, type Expr } from "./Domain";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./Logger";
+  import MainContext from "./MainContext";
 
+  export let ctx: MainContext;
   export let expr: Expr;
 
   Logger.topic("ExprView").log("expr", expr);

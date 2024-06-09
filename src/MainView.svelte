@@ -1,29 +1,30 @@
 <script lang="ts">
-  import { combineLatest, map } from "rxjs";
+  import { combineLatest, map, startWith } from "rxjs";
   import GoModuleLoader from "./GoModuleLoader";
   import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
   import Logger from "./Logger";
+  import MainContext from "./MainContext";
 
   const goModule$ = GoModuleLoader.get$();
-  const attribute = new Attribute();
-  const expr$ = attribute.getExpr$();
+  let ctx: MainContext | null = null;
+  let attribute = null;
 
-  const result = combineLatest([goModule$, expr$]).pipe(
-    map(([goModule, expr]) => {
-      Logger.allow("MainView");
-      Logger.topic("MainView").log("expr", expr);
-      const evaluator = goModule.createEvaluator(expr);
-      return evaluator.eval();
-    })
-  );
+  goModule$.subscribe((v) => {
+    ctx = new MainContext(v);
+    attribute = ctx.createAttribute();
+  });
 </script>
 
 <main>
   <div>Hello World</div>
-  <div>{$result}</div>
 
-  <AttributeView {attribute} />
+  {#if ctx === null || attribute === null}
+    <div>Loading...</div>
+  {:else}
+    <div>Loaded</div>
+    <AttributeView {ctx} {attribute} />
+  {/if}
 </main>
 
 <style></style>

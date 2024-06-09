@@ -25,7 +25,10 @@ export default class MainContext {
     args: Array<Expr>
   ): PrimitiveFunctionCallExpr {
     const e = new PrimitiveFunctionCallExpr(args);
-    this.goModule.createPrimitiveFunctionCallExpr(e.getId());
+    const goExpr = this.goModule.createPrimitiveFunctionCallExpr(e.getId());
+    e.getArgs$().subscribe((args) => {
+      goExpr.setArgIds(args.map((arg) => arg.getId()));
+    });
     return e;
   }
 
@@ -40,5 +43,9 @@ export default class MainContext {
 
   public getRootAttributeExprId(): string {
     return this.goModule.getRootAttributeExprId();
+  }
+
+  public eval(): number {
+    return this.goModule.eval();
   }
 }

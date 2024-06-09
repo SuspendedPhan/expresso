@@ -2,7 +2,9 @@
   import type { Attribute } from "./Domain";
   import ExprView from "./ExprView.svelte";
   import Logger from "./Logger";
+  import MainContext from "./MainContext";
 
+  export let ctx: MainContext;
   export let attribute: Attribute;
   const expr$ = attribute.getExpr$();
   expr$.subscribe((v) => Logger.topic("AttributeView").log("expr$", v));
@@ -10,6 +12,6 @@
 
 <main>
   {#key $expr$}
-    <ExprView expr={$expr$} />
+    <ExprView {ctx} expr={$expr$} />
   {/key}
 </main>

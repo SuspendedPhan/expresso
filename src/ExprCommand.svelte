@@ -3,6 +3,9 @@
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
   import Logger from "./Logger";
+  import type MainContext from "./MainContext";
+
+  export let ctx: MainContext;
 
   const dispatch = createEventDispatcher<{ select: Expr }>();
 
@@ -21,12 +24,12 @@
   function textToExpr(text: string): Expr | null {
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      return new NumberExpr(value);
+      return ctx.createNumberExpr(value);
     }
     if (text === "+") {
-      return new PrimitiveFunctionCallExpr([
-        new NumberExpr(0),
-        new NumberExpr(0),
+      return ctx.createPrimitiveFunctionCallExpr([
+        ctx.createNumberExpr(0),
+        ctx.createNumberExpr(0),
       ]);
     }
     return null;

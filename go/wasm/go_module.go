@@ -11,6 +11,15 @@ func bootstrapGoModule() {
 
 	ev := evaluator.NewEvaluator()
 
+	goModule.Set("setRootAttributeId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		ev.RootAttributeId = args[0].String()
+		return nil
+	}))
+
+	goModule.Set("getRootAttributeExprId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return ev.GetRootAttribute().RootExprId
+	}))
+
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return ev.Eval()
 	}))
@@ -24,15 +33,6 @@ func bootstrapGoModule() {
 				return nil
 			}),
 		}
-	}))
-
-	goModule.Set("setRootAttributeId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		ev.RootAttributeId = args[0].String()
-		return nil
-	}))
-
-	goModule.Set("getRootAttributeExprId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		return ev.GetRootAttribute().RootExprId
 	}))
 
 	goModule.Set("createNumberExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
