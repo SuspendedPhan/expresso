@@ -25,7 +25,7 @@ export default class MainContext {
     args: Array<Expr>
   ): PrimitiveFunctionCallExpr {
     const e = new PrimitiveFunctionCallExpr(args);
-    this.goModule.createPrimitiveFunctionCallExpr(e.getId(), args.map((arg) => arg.getId()));
+    this.goModule.createPrimitiveFunctionCallExpr(e.getId());
     return e;
   }
 
