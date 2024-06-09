@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { BehaviorSubject, map } from "rxjs";
-
-  const x$ = new BehaviorSubject(0);
-  const y$ = x$.pipe(map((v) => v + 1));
+  import MainContext from "./MainContext";
+  const ctx = new MainContext();
+  const attr = ctx.createAttribute();
 </script>
 
 <main>
   <div>Hello World</div>
-  <div>{$x$}</div>
-  <div>{$y$}</div>
 </main>
 
 <style></style>

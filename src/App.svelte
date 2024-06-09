@@ -5,8 +5,8 @@
 </script>
 
 <main>
+  <TestView />
   <!-- <MainView /> -->
-  <MainView />
 </main>
 
 <style></style>

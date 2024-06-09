@@ -27,6 +27,15 @@ func bootstrapGoModule() {
 		}
 	}))
 
+	goModule.Set("setRootAttributeId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		ev.RootAttributeId = args[0].String()
+		return nil
+	}))
+
+	goModule.Set("getRootAttributeExprId", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		return ev.GetRootAttribute().RootExprId
+	}))
+
 	goModule.Set("createNumberExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
 		value := args[1].Float()

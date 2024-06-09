@@ -5,10 +5,15 @@ import {
   NumberExpr,
   PrimitiveFunctionCallExpr,
 } from "./Domain";
-import GoModule from "./GoModule";
+import type GoModule from "./GoModule";
 
-export class MainContext {
-  goModule: GoModule;
+export default class MainContext {
+  private attribute: Attribute;
+
+  public constructor(private goModule: GoModule) {
+    this.attribute = this.createAttribute();
+    goModule.setRootAttributeId(this.attribute.getId());
+  }
 
   public createNumberExpr(value: number): NumberExpr {
     const e = new NumberExpr(value);
@@ -31,5 +36,9 @@ export class MainContext {
       goAttr.setExprId(expr.getId());
     });
     return a;
+  }
+
+  public getRootAttributeExprId(): string {
+    return this.goModule.getRootAttributeExprId();
   }
 }

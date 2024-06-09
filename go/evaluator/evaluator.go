@@ -26,7 +26,7 @@ type Evaluator struct {
 	exprById      map[string]Evaler
 	attributeById map[string]*Attribute
 
-	rootAttributeId string
+	RootAttributeId string
 }
 
 // -- METHODS --
@@ -69,5 +69,9 @@ func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string, argIds []string) 
 }
 
 func (e *Evaluator) Eval() float64 {
-	return e.attributeById[e.rootAttributeId].eval()
+	return e.attributeById[e.RootAttributeId].eval()
+}
+
+func (e *Evaluator) GetRootAttribute() *Attribute {
+	return e.attributeById[e.RootAttributeId]
 }
