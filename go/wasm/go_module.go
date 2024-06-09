@@ -9,12 +9,27 @@ import (
 func bootstrapGoModule() {
 	goModule := makeEmptyObject()
 
+	ev := evaluator.NewEvaluator()
+
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		return js.Undefined()
+		return ev.Eval()
 	}))
 
-	goModule.Set("createEvaluator", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		return createEvaluator(this, args)
+	goModule.Set("createNumberExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		value := args[1].Float()
+		ev.CreateNumberExpr(id, value)
+		return nil
+	}))
+
+	goModule.Set("createPrimitiveFunctionCallExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		argIds := make([]string, args[1].Length())
+		for i := 0; i < args[1].Length(); i++ {
+			argIds[i] = args[1].Index(i).String()
+		}
+		ev.CreatePrimitiveFunctionCallExpr(id, argIds)
+		return nil
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -22,8 +37,4 @@ func bootstrapGoModule() {
 	}))
 
 	js.Global().Set("GoModule", goModule)
-}
-
-func EvalResultToJsValue(r evaluator.Result) js.Value {
-	return js.ValueOf(r.Value)
 }

@@ -1,53 +1,67 @@
 package evaluator
 
+// -- TYPES --
+
 type Float = float64
 
-type Component struct {
-	attributes *Attribute
-}
-
 type Attribute struct {
-	rootExpr Expr
-}
-
-type Expr interface {
-	Eval() Float
-}
-
-type PrimitiveFunctionCallExpr struct {
-	FunctionId string
-	Args       []Expr
-}
-
-type AttributeReferenceExpr struct {
-	attribute *Attribute
+	evaluator  *Evaluator
+	rootExprId string
 }
 
 type NumberExpr struct {
-	Value Float
+	value Float
+}
+
+type PrimitiveFunctionCallExpr struct {
+	evaluator *Evaluator
+	argIds    []string
+}
+
+type Evaler interface {
+	eval() Float
 }
 
 type Evaluator struct {
-	// components []*Component
-	Expr Expr
+	exprById      map[string]Evaler
+	attributeById map[string]*Attribute
+
+	rootAttributeId string
 }
 
-type Result struct {
-	Value Float
+// -- METHODS --
+
+func (a *Attribute) eval() Float {
+	return a.evaluator.exprById[a.rootExprId].eval()
 }
 
-func (e *Evaluator) Eval() Result {
-	return Result{e.Expr.Eval()}
+func (n *NumberExpr) eval() Float {
+	return n.value
 }
 
-func (n *NumberExpr) Eval() Float {
-	return n.Value
-}
-
-func (p *PrimitiveFunctionCallExpr) Eval() Float {
-	sum := 0.0
-	for _, arg := range p.Args {
-		sum += arg.Eval()
+func (p *PrimitiveFunctionCallExpr) eval() Float {
+	var sum Float
+	for _, argId := range p.argIds {
+		sum += p.evaluator.exprById[argId].eval()
 	}
 	return sum
+}
+
+func NewEvaluator() *Evaluator {
+	return &Evaluator{
+		exprById:      make(map[string]Evaler),
+		attributeById: make(map[string]*Attribute),
+	}
+}
+
+func (e *Evaluator) CreateNumberExpr(id string, value float64) {
+	e.exprById[id] = &NumberExpr{value: value}
+}
+
+func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string, argIds []string) {
+	e.exprById[id] = &PrimitiveFunctionCallExpr{argIds: argIds}
+}
+
+func (e *Evaluator) Eval() float64 {
+	return e.attributeById[e.rootAttributeId].eval()
 }
