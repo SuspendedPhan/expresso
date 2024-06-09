@@ -13,7 +13,7 @@
 
   goModule$.subscribe((v) => {
     ctx = new MainContext(v);
-    attribute = ctx.createAttribute();
+    attribute = ctx.attribute;
     interval(1000).subscribe((v) => {
       // console.log("interval", v);
       result = ctx.eval();

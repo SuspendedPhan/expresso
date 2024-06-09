@@ -32,8 +32,6 @@ func bootstrapGoModule() {
 			"setExprId": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 				fmt.Println("go_module: setting expr id", args[0].String())
 				attr.RootExprId = args[0].String()
-
-				fmt.Println("go_module: rootExprId", ev.GetRootAttribute().RootExprId)
 				return nil
 			}),
 		}

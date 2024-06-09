@@ -8,7 +8,7 @@ import {
 import type GoModule from "./GoModule";
 
 export default class MainContext {
-  private attribute: Attribute;
+  public attribute: Attribute;
 
   public constructor(private goModule: GoModule) {
     this.attribute = this.createAttribute();
@@ -40,10 +40,6 @@ export default class MainContext {
       goAttr.setExprId(expr.getId());
     });
     return a;
-  }
-
-  public getRootAttributeExprId(): string {
-    return this.goModule.getRootAttributeExprId();
   }
 
   public eval(): number {
