@@ -1,22 +1,9 @@
 import { BehaviorSubject, Observable } from 'rxjs'
 import Logger from './Logger'
 
-export class Component {
-  public id: string = 'component' + Math.random().toString(36).substring(7)
-  private attributes = new BehaviorSubject<Array<Attribute>>([])
-
-  public addAttribute() {
-    this.attributes.value.push(new Attribute())
-    this.attributes.next(this.attributes.value)
-  }
-
-  public getAttributes(): Observable<Array<Attribute>> {
-    return this.attributes
-  }
-}
-
 export class Attribute {
-  public id: string = 'attribute' + Math.random().toString(36).substring(7)
+  
+  private id = crypto.randomUUID()
   private expr$ : BehaviorSubject<Expr>;
 
   constructor() {
@@ -33,10 +20,14 @@ export class Attribute {
   public getExpr$(): Observable<Expr> {
     return this.expr$
   }
+  getId(): any {
+    return this.id;
+  }
 }
 
 export abstract class Expr {
   private parent: CallExpr | Attribute = null
+  private id = crypto.randomUUID()
 
   abstract getText(): string;
   abstract getExprType(): string;
@@ -58,6 +49,10 @@ export abstract class Expr {
     } else {
       throw new Error('Unknown parent type')
     }
+  }
+
+  getId(): string {
+    return this.id
   }
 }
 

@@ -6,7 +6,7 @@ type Float = float64
 
 type Attribute struct {
 	evaluator  *Evaluator
-	rootExprId string
+	RootExprId string
 }
 
 type NumberExpr struct {
@@ -32,7 +32,7 @@ type Evaluator struct {
 // -- METHODS --
 
 func (a *Attribute) eval() Float {
-	return a.evaluator.exprById[a.rootExprId].eval()
+	return a.evaluator.exprById[a.RootExprId].eval()
 }
 
 func (n *NumberExpr) eval() Float {
@@ -52,6 +52,12 @@ func NewEvaluator() *Evaluator {
 		exprById:      make(map[string]Evaler),
 		attributeById: make(map[string]*Attribute),
 	}
+}
+
+func (e *Evaluator) CreateAttribute(id string, rootExprId string) *Attribute {
+	attr := &Attribute{evaluator: e, RootExprId: rootExprId}
+	e.attributeById[id] = attr
+	return attr
 }
 
 func (e *Evaluator) CreateNumberExpr(id string, value float64) {
