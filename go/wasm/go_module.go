@@ -46,12 +46,17 @@ func bootstrapGoModule() {
 
 	goModule.Set("createPrimitiveFunctionCallExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
-		argIds := make([]string, args[1].Length())
-		for i := 0; i < args[1].Length(); i++ {
-			argIds[i] = args[1].Index(i).String()
+		expr := ev.CreatePrimitiveFunctionCallExpr(id)
+		return map[string]interface{}{
+			"setArgIds": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				argIds := make([]string, len(args))
+				for i, arg := range args {
+					argIds[i] = arg.String()
+				}
+				expr.ArgIds = argIds
+				return nil
+			}),
 		}
-		ev.CreatePrimitiveFunctionCallExpr(id, argIds)
-		return nil
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

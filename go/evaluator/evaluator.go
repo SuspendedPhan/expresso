@@ -17,7 +17,7 @@ type NumberExpr struct {
 
 type PrimitiveFunctionCallExpr struct {
 	evaluator *Evaluator
-	argIds    []string
+	ArgIds    []string
 }
 
 type Expr interface {
@@ -44,7 +44,7 @@ func (n *NumberExpr) eval() Float {
 
 func (p *PrimitiveFunctionCallExpr) eval() Float {
 	var sum Float
-	for _, argId := range p.argIds {
+	for _, argId := range p.ArgIds {
 		sum += p.evaluator.exprById[argId].eval()
 	}
 	return sum
@@ -69,9 +69,11 @@ func (e *Evaluator) CreateNumberExpr(id string, value float64) {
 	e.exprById[id] = &NumberExpr{value: value}
 }
 
-func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string, argIds []string) {
-	fmt.Println("creating primitive function call expr", id, argIds)
-	e.exprById[id] = &PrimitiveFunctionCallExpr{argIds: argIds}
+func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string) *PrimitiveFunctionCallExpr {
+	fmt.Println("creating primitive function call expr", id)
+	expr := &PrimitiveFunctionCallExpr{}
+	e.exprById[id] = expr
+	return expr
 }
 
 func (e *Evaluator) Eval() float64 {

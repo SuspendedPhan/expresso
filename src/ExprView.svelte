@@ -26,7 +26,7 @@
 
   <div class="pl-2">
     {#each $args$ as arg (arg)}
-      <svelte:self expr={arg} />
+      <svelte:self expr={arg} {ctx} />
     {/each}
   </div>
 </main>
