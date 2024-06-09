@@ -18,12 +18,12 @@ type PrimitiveFunctionCallExpr struct {
 	argIds    []string
 }
 
-type Evaler interface {
+type Expr interface {
 	eval() Float
 }
 
 type Evaluator struct {
-	exprById      map[string]Evaler
+	exprById      map[string]Expr
 	attributeById map[string]*Attribute
 
 	RootAttributeId string
@@ -49,7 +49,7 @@ func (p *PrimitiveFunctionCallExpr) eval() Float {
 
 func NewEvaluator() *Evaluator {
 	return &Evaluator{
-		exprById:      make(map[string]Evaler),
+		exprById:      make(map[string]Expr),
 		attributeById: make(map[string]*Attribute),
 	}
 }
