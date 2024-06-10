@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Logger, { type Message } from "./Logger";
-  import { map, mergeMap } from "rxjs";
+  import { BehaviorSubject, combineLatest, map, mergeMap } from "rxjs";
 
   let overlay;
   let input;
+  const query$ = new BehaviorSubject<string>("");
 
   onMount(() => {
     overlay.style.display = `none`;
@@ -48,12 +49,31 @@
       return messages.map(formatMessage);
     })
   );
+
+  const filteredMessages$ = combineLatest([messages$, query$]).pipe(
+    map(([messages, query]) => {
+      // Filter the messages based on the query.
+      if (query === "") {
+        return messages;
+      }
+
+      return messages.filter((m) =>
+        m.toLowerCase().includes(query.toLowerCase())
+      );
+    })
+  );
+
+  function handleInput(
+    event: Event & { currentTarget: EventTarget & HTMLInputElement }
+  ) {
+    query$.next(event.currentTarget.value);
+  }
 </script>
 
 <main bind:this={overlay}>
   <div>Logs</div>
-  <input type="text" bind:this={input} />
-  {#each $messages$ as message (message)}
+  <input type="text" bind:this={input} on:input={handleInput} />
+  {#each $filteredMessages$ as message (message)}
     <div>{message}</div>
   {/each}
 </main>
