@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import Logger, { type Message } from "./Logger";
+  import { map, mergeMap } from "rxjs";
 
   let overlay;
   let input;
@@ -32,9 +34,26 @@
       }
     });
   });
+
+  function formatMessage(m: Message): string {
+    // Concat all the args.
+    const args = m.args.map((a) => a.toString()).join(" ");
+    return `${m.topic} ${args}`;
+  }
+
+  Logger.allowAll();
+  const messages$ = Logger.getMessages$().pipe(
+    map((messages) => {
+      // Format all the messages and join them with a newline.
+      return messages.map(formatMessage);
+    })
+  );
 </script>
 
 <main bind:this={overlay}>
-  <div>Hello World</div>
+  <div>Logs</div>
   <input type="text" bind:this={input} />
+  {#each $messages$ as message (message)}
+    <div>{message}</div>
+  {/each}
 </main>
