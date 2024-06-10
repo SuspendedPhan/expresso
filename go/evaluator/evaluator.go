@@ -45,7 +45,13 @@ func (n *NumberExpr) eval() Float {
 func (p *PrimitiveFunctionCallExpr) eval() Float {
 	var sum Float
 	for _, argId := range p.ArgIds {
-		sum += p.evaluator.exprById[argId].eval()
+		ev := p.evaluator
+		exprById := ev.exprById
+		expr := exprById[argId]
+		if expr == nil {
+			fmt.Println("evaluator.go: expr not found", argId)
+		}
+		sum += expr.eval()
 	}
 	return sum
 }

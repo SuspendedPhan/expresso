@@ -11,12 +11,13 @@
   let attribute = null;
   let result = -1;
 
-  goModule$.subscribe((v) => {
-    ctx = new MainContext(v);
+  goModule$.subscribe((goModule) => {
+    ctx = new MainContext(goModule);
     attribute = ctx.attribute;
     interval(1000).subscribe((v) => {
       // console.log("interval", v);
-      // result = ctx.eval();
+      goModule.debug();
+      result = ctx.eval();
     });
   });
 </script>

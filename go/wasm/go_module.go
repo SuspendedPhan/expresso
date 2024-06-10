@@ -54,9 +54,10 @@ func bootstrapGoModule() {
 		expr := ev.CreatePrimitiveFunctionCallExpr(id)
 		return map[string]interface{}{
 			"setArgIds": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				argIds := make([]string, len(args))
-				for i, arg := range args {
-					argIds[i] = arg.String()
+				exprArgs := args[0]
+				argIds := make([]string, exprArgs.Length())
+				for i := 0; i < exprArgs.Length(); i++ {
+					argIds[i] = exprArgs.Index(i).String()
 				}
 				expr.ArgIds = argIds
 				return nil
