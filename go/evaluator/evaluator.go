@@ -71,7 +71,7 @@ func (e *Evaluator) CreateNumberExpr(id string, value float64) {
 
 func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string) *PrimitiveFunctionCallExpr {
 	fmt.Println("creating primitive function call expr", id)
-	expr := &PrimitiveFunctionCallExpr{}
+	expr := &PrimitiveFunctionCallExpr{evaluator: e}
 	e.exprById[id] = expr
 	return expr
 }
@@ -83,4 +83,28 @@ func (e *Evaluator) Eval() float64 {
 
 func (e *Evaluator) GetRootAttribute() *Attribute {
 	return e.attributeById[e.RootAttributeId]
+}
+
+func (e *Evaluator) Debug() {
+	fmt.Println("evaluator.go: Debug()")
+
+	for id, expr := range e.exprById {
+		fmt.Println("  expr:", id, expr)
+
+		switch expr := expr.(type) {
+		case *NumberExpr:
+			fmt.Println("    number expr:", expr.value)
+		case *PrimitiveFunctionCallExpr:
+			fmt.Println("    primitive function call expr:", expr.ArgIds)
+		default:
+			fmt.Println("    unknown expr type")
+		}
+	}
+
+	for id, attr := range e.attributeById {
+		fmt.Println("  attr:", id, attr)
+		fmt.Println("    root expr id:", attr.RootExprId)
+	}
+
+	fmt.Println("  root attribute id:", e.RootAttributeId)
 }

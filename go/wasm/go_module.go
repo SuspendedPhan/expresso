@@ -21,6 +21,11 @@ func bootstrapGoModule() {
 		return ev.GetRootAttribute().RootExprId
 	}))
 
+	goModule.Set("debug", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		ev.Debug()
+		return nil
+	}))
+
 	goModule.Set("eval", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		return ev.Eval()
 	}))

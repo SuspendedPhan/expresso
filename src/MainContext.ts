@@ -27,8 +27,10 @@ export default class MainContext {
     const e = new PrimitiveFunctionCallExpr(args);
     const goExpr = this.goModule.createPrimitiveFunctionCallExpr(e.getId());
     e.getArgs$().subscribe((args) => {
+      // console.log("MainContext.ts: setting arg ids", args.map((arg) => arg.getId()));
       goExpr.setArgIds(args.map((arg) => arg.getId()));
     });
+    this.goModule.debug();
     return e;
   }
 
