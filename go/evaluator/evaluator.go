@@ -2,6 +2,8 @@ package evaluator
 
 import "fmt"
 
+var logger = NewLogger("evaluator.go")
+
 // -- TYPES --
 
 type Float = float64
@@ -34,7 +36,7 @@ type Evaluator struct {
 // -- METHODS --
 
 func (a *Attribute) eval() Float {
-	fmt.Println("evaluator.go: evaluating attribute: RootExprId", a.RootExprId)
+	logger.Log("Attribute.eval", a.RootExprId)
 	return a.evaluator.exprById[a.RootExprId].eval()
 }
 

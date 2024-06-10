@@ -67,3 +67,5 @@ export default class Logger {
     ALLOW_TOPICS = `ALL`;
   }
 }
+
+window.Logger = Logger;
