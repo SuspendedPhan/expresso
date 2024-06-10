@@ -1,17 +1,21 @@
 import { BehaviorSubject, Observable } from 'rxjs'
 import Logger from './Logger'
 
+const logger = Logger.topic('Domain.ts')
+
 export class Attribute {
   
   private id = crypto.randomUUID()
   private expr$ : BehaviorSubject<Expr>;
 
   constructor(expr: Expr) {
+    logger.log('Attribute constructor')
     expr.setParent(this)
     this.expr$ = new BehaviorSubject<Expr>(expr)
   }
 
   public setExpr(newExpr: Expr) {
+    logger.log('setExpr', newExpr)
     newExpr.setParent(this)
     this.expr$.next(newExpr)
   }
@@ -21,6 +25,13 @@ export class Attribute {
   }
   getId(): any {
     return this.id;
+  }
+
+  toString(): string {
+    return JSON.stringify({
+      id: this.id,
+      expr: this.expr$.value.toString()
+    });
   }
 }
 
@@ -71,6 +82,10 @@ export class NumberExpr extends Expr {
   getExprType(): string {
     return 'Number'
   }
+
+  toString(): string {
+    return this.getText();
+  }
 }
 
 export abstract class CallExpr extends Expr {
@@ -101,6 +116,13 @@ export abstract class CallExpr extends Expr {
     newExpr.setParent(this)
     this.args.value[index] = newExpr
     this.args.next(this.args.value)
+  }
+
+  toString(): string {
+    return JSON.stringify({
+      id: this.getId(),
+      args: this.args.value.map((arg) => arg.toString())
+    });
   }
 }
 
