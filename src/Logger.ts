@@ -28,14 +28,14 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      console.log(this.topic, ...args);
+      // console.log(this.topic, ...args);
       Logger.messages$.value.push({ topic: this.topic, args });
       Logger.messages$.next(Logger.messages$.value);
     }
   }
 
   public debug(...args) {
-    console.log(this.topic, ...args);
+    // console.log(this.topic, ...args);
     Logger.messages$.value.push({ topic: this.topic, args });
     Logger.messages$.next(Logger.messages$.value);
   }

@@ -70,10 +70,10 @@
   }
 </script>
 
-<main bind:this={overlay}>
+<main bind:this={overlay} class="text-left">
   <div>Logs</div>
   <input type="text" bind:this={input} on:input={handleInput} />
-  {#each $filteredMessages$ as message (message)}
+  {#each $filteredMessages$ as message}
     <div>{message}</div>
   {/each}
 </main>

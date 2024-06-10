@@ -1,6 +1,9 @@
 package evaluator
 
-import "syscall/js"
+import (
+	"fmt"
+	"syscall/js"
+)
 
 type Logger struct {
 	topic string
@@ -16,7 +19,7 @@ func (l *Logger) Log(args ...interface{}) {
 		if i > 0 {
 			message += " "
 		}
-		message += arg.(string)
+		message += fmt.Sprintf("%v", arg)
 	}
 	js.Global().Get("Logger").Call("topic", l.topic).Call("log", message)
 }

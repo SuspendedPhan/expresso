@@ -41,10 +41,12 @@ func (a *Attribute) eval() Float {
 }
 
 func (n *NumberExpr) eval() Float {
+	logger.Log("NumberExpr.eval", n.value)
 	return n.value
 }
 
 func (p *PrimitiveFunctionCallExpr) eval() Float {
+	logger.Log("PrimitiveFunctionCallExpr.eval", p.ArgIds)
 	var sum Float
 	for _, argId := range p.ArgIds {
 		ev := p.evaluator
@@ -59,6 +61,7 @@ func (p *PrimitiveFunctionCallExpr) eval() Float {
 }
 
 func NewEvaluator() *Evaluator {
+	logger.Log("NewEvaluator")
 	return &Evaluator{
 		exprById:      make(map[string]Expr),
 		attributeById: make(map[string]*Attribute),
@@ -73,29 +76,28 @@ func (e *Evaluator) CreateAttribute(id string) *Attribute {
 }
 
 func (e *Evaluator) CreateNumberExpr(id string, value float64) {
-	fmt.Println("creating number expr", id, value)
+	logger.Log("Evaluator.CreateNumberExpr", id, value)
 	e.exprById[id] = &NumberExpr{value: value}
 }
 
 func (e *Evaluator) CreatePrimitiveFunctionCallExpr(id string) *PrimitiveFunctionCallExpr {
-	fmt.Println("creating primitive function call expr", id)
+	logger.Log("Evaluator.CreatePrimitiveFunctionCallExpr", id)
 	expr := &PrimitiveFunctionCallExpr{evaluator: e}
 	e.exprById[id] = expr
 	return expr
 }
 
 func (e *Evaluator) Eval() float64 {
-	fmt.Println("evaluator.go: evaluating root attribute", e.RootAttributeId)
+	logger.Log("Evaluator.Eval", e.RootAttributeId)
 	return e.attributeById[e.RootAttributeId].eval()
 }
 
 func (e *Evaluator) GetRootAttribute() *Attribute {
+	logger.Log("Evaluator.GetRootAttribute", e.RootAttributeId)
 	return e.attributeById[e.RootAttributeId]
 }
 
 func (e *Evaluator) Debug() {
-	fmt.Println("evaluator.go: Debug()")
-
 	for id, expr := range e.exprById {
 		fmt.Println("  expr:", id, expr)
 

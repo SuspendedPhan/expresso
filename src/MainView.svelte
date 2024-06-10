@@ -16,7 +16,7 @@
     attribute = ctx.attribute;
     interval(1000).subscribe((v) => {
       // console.log("interval", v);
-      goModule.debug();
+      // goModule.debug();
       result = ctx.eval();
     });
   });
