@@ -1,7 +1,7 @@
 // const ALLOWED_TOPICS: string[] | `ALL` = `ALL`;
 
 import { BehaviorSubject, type Observable } from "rxjs";
-import type { Expr } from "./Domain";
+import type { Expr } from "../Domain";
 
 const NONE = `None`;
 

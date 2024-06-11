@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subject } from 'rxjs'
-import type { GoModule } from './GoModule'
+import type GoModule from './GoModule'
 
 export default class GoModuleLoader {
   private static goModuleSubject = new BehaviorSubject<GoModule | null>(null)

@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
-  import Logger from "./Logger";
+  import Logger from "./utils/Logger";
   import type MainContext from "./MainContext";
 
   export let ctx: MainContext;

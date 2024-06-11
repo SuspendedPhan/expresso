@@ -1,8 +1,8 @@
 <script lang="ts">
-  import "./app.css";
-  import DebugOverlay from "./DebugOverlay.svelte";
+  import "./boilerplate/app.css";
+  import DebugOverlay from "./utils/DebugOverlay.svelte";
   import MainView from "./MainView.svelte";
-  import TestView from "./TestView.svelte";
+  import TestView from "./utils/TestView.svelte";
 </script>
 
 <main>

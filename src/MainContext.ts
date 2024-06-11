@@ -4,7 +4,7 @@ import {
   NumberExpr,
   PrimitiveFunctionCallExpr,
 } from "./Domain";
-import type GoModule from "./GoModule";
+import type GoModule from "./utils/GoModule";
 
 export default class MainContext {
   public attribute: Attribute;

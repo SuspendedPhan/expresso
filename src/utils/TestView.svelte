@@ -1,6 +1,6 @@
 <script lang="ts">
   import GoModuleLoader from "./GoModuleLoader";
-  import MainContext from "./MainContext";
+  import MainContext from "../MainContext";
 
   GoModuleLoader.get$().subscribe((v) => {
     console.log("GoModuleLoader.get$", v);

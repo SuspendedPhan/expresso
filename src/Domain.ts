@@ -1,21 +1,20 @@
 import { BehaviorSubject, Observable } from 'rxjs'
-import Logger from './Logger'
-
-const logger = Logger.topic('Domain.ts')
+import Logger from './utils/Logger'
 
 export class Attribute {
+  private logger = Logger.topic('Domain.ts Attribute')
   
   private id = crypto.randomUUID()
   private expr$ : BehaviorSubject<Expr>;
 
   constructor(expr: Expr) {
-    logger.log('Attribute constructor')
-    expr.setParent(this)
+    this.logger.log('constructor')
     this.expr$ = new BehaviorSubject<Expr>(expr)
+    expr.setParent(this)
   }
 
   public setExpr(newExpr: Expr) {
-    logger.log('setExpr', newExpr)
+    this.logger.log('setExpr', newExpr)
     newExpr.setParent(this)
     this.expr$.next(newExpr)
   }
@@ -36,6 +35,7 @@ export class Attribute {
 }
 
 export abstract class Expr {
+  private exprLogger = Logger.topic('Domain.ts Expr')
   private parent: CallExpr | Attribute = null
   private id = crypto.randomUUID()
 
@@ -43,11 +43,13 @@ export abstract class Expr {
   abstract getExprType(): string;
 
   setParent(parent: CallExpr | Attribute) {
+    this.exprLogger.log('setParent', parent)
     this.parent = parent
   }
 
   replace(newExpr: Expr) {
-    Logger.log('replacing', this, 'with', newExpr)
+    this.exprLogger.log('replace', newExpr)
+    
     if (!this.parent) {
       throw new Error('Expr has no parent')
     }
@@ -67,8 +69,11 @@ export abstract class Expr {
 }
 
 export class NumberExpr extends Expr {
+  private logger = Logger.topic('Domain.ts NumberExpr')
+
   constructor(private value: number) {
     super();
+    this.logger.log('constructor', value)
   }
 
   public getText(): string {
