@@ -9,21 +9,21 @@ import Logger from "./utils/Logger";
 
 const logger = Logger.topic("Dehydrator.ts");
 
-interface DehydratedAttribute {
+export interface DehydratedAttribute {
   id: string;
   expr: DehydratedExpr;
 }
 
-interface DehydratedExpr {
+export interface DehydratedExpr {
   id: string;
   exprType: string;
 }
 
-interface DehydratedNumberExpr extends DehydratedExpr {
+export interface DehydratedNumberExpr extends DehydratedExpr {
   value: number;
 }
 
-interface DehydratedPrimitiveFunctionCallExpr extends DehydratedExpr {
+export interface DehydratedPrimitiveFunctionCallExpr extends DehydratedExpr {
   args: Array<DehydratedExpr>;
 }
 
