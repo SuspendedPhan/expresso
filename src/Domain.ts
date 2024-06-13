@@ -1,5 +1,7 @@
-import { BehaviorSubject, Observable } from 'rxjs'
+import { BehaviorSubject, Observable, of } from 'rxjs'
 import Logger from './utils/Logger'
+
+export type Parent = CallExpr | Attribute;
 
 export class Attribute {
   private logger = Logger.topic('Domain.ts Attribute')
@@ -36,13 +38,17 @@ export class Attribute {
 
 export abstract class Expr {
   private exprLogger = Logger.topic('Domain.ts Expr')
-  private parent: CallExpr | Attribute | null = null
+  private parent: Parent | null = null
   private id = crypto.randomUUID()
 
   abstract getText(): string;
   abstract getExprType(): string;
 
-  setParent(parent: CallExpr | Attribute) {
+  getParent$(): Observable<Parent | null> {
+    return of(this.parent);
+  }
+
+  setParent(parent: Parent) {
     this.exprLogger.log('setParent', parent.getId())
     this.parent = parent
   }

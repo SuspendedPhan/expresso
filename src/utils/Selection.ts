@@ -4,6 +4,7 @@ import {
   OperatorFunction,
   map,
   of,
+  share,
   switchAll,
   switchMap,
   take,
@@ -34,10 +35,20 @@ export default class Selection {
     logger.log("down");
     const getNextObject$ = (object) => this.getChild$(object);
     this.handleNavigation(getNextObject$);
-    
   }
 
-  private handleNavigation(getNextObject$: (Selectable) => Observable<Selectable | null>) {
+  public up() {
+    logger.log("up");
+    const getNextObject$ = (object: Selectable | null) =>
+      this.getParent$(object);
+    this.handleNavigation(getNextObject$);
+  }
+
+  private handleNavigation(
+    getNextObject$: (
+      currentObject: Selectable | null
+    ) => Observable<Selectable | null>
+  ) {
     const object$ = this.selectedObject$.value;
     logger.log("selectedObject", object$);
 
@@ -62,13 +73,28 @@ export default class Selection {
     } else if (object instanceof Attribute) {
       return object.getExpr$();
     } else if (object instanceof Expr) {
-      return this.getChildExpr$(object);
+      return this.getChildForExpr$(object);
     } else {
       throw new Error("Unknown object type");
     }
   }
 
-  private getChildExpr$(expr: Expr): Observable<Expr | null> {
+  private getParent$(object: Selectable | null): Observable<Selectable | null> {
+    if (object === null) {
+      return of(null);
+    } else if (object === this.root) {
+      return of(null);
+    } else if (object instanceof Attribute) {
+      throw new Error("Not implemented");
+    } else if (object instanceof Expr) {
+      return object.getParent$();
+    } else {
+      logger.log("object", object);
+      throw new Error("Unknown object type");
+    }
+  }
+
+  private getChildForExpr$(expr: Expr): Observable<Expr | null> {
     if (expr instanceof NumberExpr) {
       return of(null);
     } else if (expr instanceof CallExpr) {
@@ -79,6 +105,6 @@ export default class Selection {
   }
 
   public getSelectedObject$(): Observable<Selectable | null> {
-    return this.selectedObject$.pipe(switchAll());
+    return this.selectedObject$.pipe(switchAll(), share());
   }
 }

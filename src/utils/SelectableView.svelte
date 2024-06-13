@@ -8,7 +8,6 @@
   export let ctx: MainContext;
 
   const logger = Logger.topic("SelectableView.svelte");
-  Logger.onlyAllowTopics(["SelectableView.svelte", "Selection.ts"]);
   Logger.logToConsole();
 
   const selected$ = ctx.selection.getSelectedObject$().pipe(

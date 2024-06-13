@@ -15,6 +15,7 @@ export default class Keyboard {
 
     hotkeys("up", function (event, handler) {
       logger.log("up");
+      selection.up();
     });
 
     hotkeys("left", function (event, handler) {

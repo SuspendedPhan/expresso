@@ -50,7 +50,6 @@
     return `${m.topic} ${args}`;
   }
 
-  Logger.allowAll();
   const messages$ = Logger.getMessages$().pipe(
     map((messages) => {
       // Format all the messages and join them with a newline.

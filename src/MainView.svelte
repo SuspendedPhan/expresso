@@ -38,7 +38,6 @@
   setup();
 
   document.addEventListener("mousedown", (e) => {
-    logger.allow();
     logger.log("handleClick");
     ctx?.selection.select(of(null));
   });
