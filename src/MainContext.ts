@@ -6,12 +6,15 @@ import {
   PrimitiveFunctionCallExpr,
 } from "./Domain";
 import type GoModule from "./utils/GoModule";
+import Selection from "./utils/Selection";
 
 export default class MainContext {
   public attribute: Attribute;
+  public selection: Selection;
 
   public constructor(private goModule: GoModule) {
     this.attribute = this.createAttribute();
+    this.selection = new Selection(this.attribute);
     goModule.setRootAttributeId(this.attribute.getId());
   }
 
