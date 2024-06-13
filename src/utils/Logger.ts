@@ -9,16 +9,17 @@ let ALLOW_TOPICS: string[] | `ALL` = [`Debug`];
 // const ALLOW_TOPICS: string[] | `ALL` = `ALL`
 const DENY_TOPICS: string[] = [NONE];
 
+let logToConsole = false;
+
 export interface Message {
   topic: string;
   args: any[];
 }
 
 export default class Logger {
+  private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
   
-  private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject([]);
-  
-  private constructor(private topic: string | null) {}
+  private constructor(private topic: string) {}
 
   public log(...args) {
     if (DENY_TOPICS.includes(this.topic)) {
@@ -65,6 +66,13 @@ export default class Logger {
 
   static allowAll() {
     ALLOW_TOPICS = `ALL`;
+  }
+
+  static logToConsole() {
+    logToConsole = true;
+  }
+  static onlyAllow(topic: string) {
+    ALLOW_TOPICS = [topic];
   }
 }
 
