@@ -7,24 +7,20 @@
   import MainContext from "./MainContext";
   import Dehydrator from "./Dehydrator";
   import Rehydrator from "./Rehydrator";
+  import Main from "./Main";
 
   const logger = Logger.topic("MainView.svelte");
 
-  const goModule$ = GoModuleLoader.get$();
   let ctx: MainContext | null = null;
   let attribute = null;
   let rehydratedAttribute = null;
   let result = -1;
 
-  goModule$.subscribe((goModule) => {
-    ctx = new MainContext(goModule);
+  async function setup() {
+    const main = await Main.setup();
+    ctx = main.ctx;
     attribute = ctx.attribute;
-    interval(1000).subscribe((v) => {
-      // console.log("interval", v);
-      // goModule.debug();
-      result = ctx.eval();
-    });
-
+    
     Dehydrator.dehydrateAttribute$(attribute).subscribe(
       (dehydratedAttribute) => {
         rehydratedAttribute =
@@ -33,7 +29,13 @@
         logger.log("rehydratedAttribute", rehydratedAttribute.toString());
       }
     );
-  });
+
+    interval(1000).subscribe((v) => {
+      result = ctx.eval();
+    });
+  }
+
+  setup();
 </script>
 
 <main>
