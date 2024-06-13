@@ -1,7 +1,7 @@
 <script lang="ts">
   import { type Selectable } from "./Selection";
   import MainContext from "../MainContext";
-  import { map, share } from "rxjs";
+  import { map, of, share } from "rxjs";
   import Logger from "./Logger";
 
   export let object: Selectable;
@@ -19,12 +19,22 @@
   selected$.subscribe((selected) => {
     logger.log("selected", selected);
   });
+
+  function handleClick(
+    event: MouseEvent & { currentTarget: EventTarget & HTMLElement }
+  ) {
+    event.stopPropagation();
+    ctx.selection.select(of(object));
+  }
 </script>
 
-<main
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<div
+  on:click={handleClick}
   class="border border-black"
   class:border-solid={$selected$}
   class:border-transparent={!$selected$}
 >
   <slot />
-</main>
+</div>
