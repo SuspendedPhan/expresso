@@ -29,9 +29,11 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      // console.log(this.topic, ...args);
       Logger.messages$.value.push({ topic: this.topic, args });
       Logger.messages$.next(Logger.messages$.value);
+      if (logToConsole) {
+        console.log(this.topic, ...args);
+      }
     }
   }
 
@@ -73,6 +75,10 @@ export default class Logger {
   }
   static onlyAllow(topic: string) {
     ALLOW_TOPICS = [topic];
+  }
+
+  static onlyAllowTopics(topics: string[]) {
+    ALLOW_TOPICS = topics;
   }
 }
 

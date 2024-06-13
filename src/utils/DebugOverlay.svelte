@@ -38,7 +38,15 @@
 
   function formatMessage(m: Message): string {
     // Concat all the args.
-    const args = m.args.map((a) => a.toString()).join(" ");
+
+    const args = m.args
+      .map((a) => {
+        if (a === null) {
+          return "null";
+        }
+        return a.toString();
+      })
+      .join(" ");
     return `${m.topic} ${args}`;
   }
 

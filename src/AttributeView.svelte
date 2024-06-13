@@ -3,6 +3,7 @@
   import ExprView from "./ExprView.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
+  import SelectableView from "./utils/SelectableView.svelte";
 
   export let ctx: MainContext;
   export let attribute: Attribute;
@@ -11,7 +12,10 @@
 </script>
 
 <main>
-  {#key $expr$}
-    <ExprView {ctx} expr={$expr$} />
-  {/key}
+  <SelectableView {ctx} object={attribute}>
+    <div>Attribute</div>
+    {#key $expr$}
+      <ExprView {ctx} expr={$expr$} />
+    {/key}
+  </SelectableView>
 </main>

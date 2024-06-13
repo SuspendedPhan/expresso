@@ -1,7 +1,10 @@
 import { BehaviorSubject, Observable, map, of, take } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../Domain";
+import Logger from "./Logger";
 
-type Selectable = Attribute | Expr;
+export type Selectable = Attribute | Expr;
+
+const logger = Logger.topic("Selection.ts");
 
 export default class Selection {
   private selectedObject$ = new BehaviorSubject<Selectable | null>(null);
@@ -13,7 +16,11 @@ export default class Selection {
   }
 
   public down() {
+    logger.log("down");
+
     const selectedObject = this.selectedObject$.value;
+    logger.log("selectedObject", selectedObject);
+
     if (selectedObject === null) {
       this.selectedObject$.next(this.root);
       return;
@@ -22,7 +29,10 @@ export default class Selection {
     this.getChild$(selectedObject)
       .pipe(take(1))
       .subscribe((child) => {
-        this.selectedObject$.next(child);
+        logger.log("child", child);
+        if (child !== null) {
+          this.selectedObject$.next(child);
+        }
       });
   }
 

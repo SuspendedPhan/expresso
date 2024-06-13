@@ -3,8 +3,6 @@ import Logger from "./Logger";
 import Selection from "./Selection";
 
 const logger = Logger.topic("Keyboard.ts");
-Logger.onlyAllow("Keyboard.ts");
-Logger.logToConsole();
 
 export default class Keyboard {
   public static register(selection: Selection) {
