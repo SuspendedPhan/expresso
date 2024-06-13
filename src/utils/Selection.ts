@@ -1,4 +1,13 @@
-import { BehaviorSubject, Observable, map, of, take } from "rxjs";
+import {
+  BehaviorSubject,
+  Observable,
+  OperatorFunction,
+  map,
+  of,
+  switchAll,
+  switchMap,
+  take,
+} from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../Domain";
 import Logger from "./Logger";
 
@@ -7,37 +16,45 @@ export type Selectable = Attribute | Expr;
 const logger = Logger.topic("Selection.ts");
 
 export default class Selection {
-  private selectedObject$ = new BehaviorSubject<Selectable | null>(null);
+  private selectedObject$ = new BehaviorSubject<Observable<Selectable | null>>(
+    of(null)
+  );
 
   public constructor(private root: Attribute) {}
 
-  public select(object: any) {
-    this.selectedObject$.next(object);
+  public select(object$: Observable<Selectable | null>) {
+    if (object$ === null) {
+      this.selectedObject$.next(of(null));
+      return;
+    }
+    this.selectedObject$.next(object$);
   }
 
   public down() {
     logger.log("down");
 
-    const selectedObject = this.selectedObject$.value;
-    logger.log("selectedObject", selectedObject);
+    const object$ = this.selectedObject$.value;
+    logger.log("selectedObject", object$);
 
-    if (selectedObject === null) {
-      this.selectedObject$.next(this.root);
-      return;
-    }
-
-    this.getChild$(selectedObject)
-      .pipe(take(1))
-      .subscribe((child) => {
-        logger.log("child", child);
-        if (child !== null) {
-          this.selectedObject$.next(child);
+    const child$ = object$.pipe(
+      switchMap((object) => {
+        const child$ = this.getChild$(object);
+        return child$;
+      }),
+      switchMap((child) => {
+        if (child === null) {
+          return object$;
         }
-      });
+        return of(child);
+      })
+    );
+    this.select(child$);
   }
 
-  private getChild$(object: Selectable): Observable<Selectable | null> {
-    if (object instanceof Attribute) {
+  private getChild$(object: Selectable | null): Observable<Selectable | null> {
+    if (object === null) {
+      return of(this.root);
+    } else if (object instanceof Attribute) {
       return object.getExpr$();
     } else if (object instanceof Expr) {
       return this.getChildExpr$(object);
@@ -57,6 +74,6 @@ export default class Selection {
   }
 
   public getSelectedObject$(): Observable<Selectable | null> {
-    return this.selectedObject$;
+    return this.selectedObject$.pipe(switchAll());
   }
 }
