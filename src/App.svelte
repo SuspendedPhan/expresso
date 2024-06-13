@@ -1,6 +1,6 @@
 <script lang="ts">
   import DebugOverlay from "./utils/DebugOverlay.svelte";
-  import MainView from "./AppMainView.svelte";
+  import MainView from "./MainView.svelte";
   import TestView from "./utils/TestView.svelte";
 </script>
 
