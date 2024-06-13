@@ -43,6 +43,13 @@ export default class Logger {
     Logger.messages$.next(Logger.messages$.value);
   }
 
+  public allow() {
+    if (ALLOW_TOPICS.includes(this.topic)) return;
+    if (ALLOW_TOPICS === `ALL`) return;
+    
+    ALLOW_TOPICS.push(this.topic);
+  }
+
   static topic(topic: string) {
     return new Logger(topic);
   }

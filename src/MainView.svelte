@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { combineLatest, interval, map, startWith } from "rxjs";
+  import { combineLatest, interval, map, of, startWith } from "rxjs";
   import GoModuleLoader from "./utils/GoModuleLoader";
   import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
@@ -36,6 +36,12 @@
   }
 
   setup();
+
+  document.addEventListener("mousedown", (e) => {
+    logger.allow();
+    logger.log("handleClick");
+    ctx?.selection.select(of(null));
+  });
 </script>
 
 <main>

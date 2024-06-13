@@ -32,13 +32,18 @@ export default class Selection {
 
   public down() {
     logger.log("down");
+    const getNextObject$ = (object) => this.getChild$(object);
+    this.handleNavigation(getNextObject$);
+    
+  }
 
+  private handleNavigation(getNextObject$: (Selectable) => Observable<Selectable | null>) {
     const object$ = this.selectedObject$.value;
     logger.log("selectedObject", object$);
 
     const child$ = object$.pipe(
       switchMap((object) => {
-        const child$ = this.getChild$(object);
+        const child$ = getNextObject$(object);
         return child$;
       }),
       switchMap((child) => {

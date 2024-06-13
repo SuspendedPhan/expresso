@@ -31,7 +31,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  on:click={handleClick}
+  on:mousedown={handleClick}
   class="border border-black"
   class:border-solid={$selected$}
   class:border-transparent={!$selected$}
