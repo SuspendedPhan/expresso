@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import Logger from "./utils/Logger";
+import Logger from "./Logger";
 
 const logger = Logger.topic("Keyboard.ts");
 Logger.onlyAllow("Keyboard.ts");

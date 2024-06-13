@@ -1,7 +1,7 @@
 import { BehaviorSubject, firstValueFrom } from "rxjs";
 import Keyboard from "./Keyboard";
-import MainContext from "./MainContext";
-import GoModuleLoader from "./utils/GoModuleLoader";
+import MainContext from "../MainContext";
+import GoModuleLoader from "./GoModuleLoader";
 
 export default class Main {
   private constructor(public ctx: MainContext) {}

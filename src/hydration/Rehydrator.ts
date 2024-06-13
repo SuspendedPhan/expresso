@@ -3,7 +3,7 @@ import {
   Expr,
   NumberExpr,
   PrimitiveFunctionCallExpr,
-} from "./Domain";
+} from "../Domain";
 import {
   DehydratedAttribute,
   DehydratedExpr,

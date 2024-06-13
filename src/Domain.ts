@@ -36,14 +36,14 @@ export class Attribute {
 
 export abstract class Expr {
   private exprLogger = Logger.topic('Domain.ts Expr')
-  private parent: CallExpr | Attribute = null
+  private parent: CallExpr | Attribute | null = null
   private id = crypto.randomUUID()
 
   abstract getText(): string;
   abstract getExprType(): string;
 
   setParent(parent: CallExpr | Attribute) {
-    this.exprLogger.log('setParent', parent)
+    this.exprLogger.log('setParent', parent.getId())
     this.parent = parent
   }
 

@@ -5,9 +5,9 @@
   import AttributeView from "./AttributeView.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
-  import Dehydrator from "./Dehydrator";
-  import Rehydrator from "./Rehydrator";
-  import Main from "./Main";
+  import Dehydrator from "./hydration/Dehydrator";
+  import Rehydrator from "./hydration/Rehydrator";
+  import Main from "./utils/Main";
 
   const logger = Logger.topic("MainView.svelte");
 
@@ -20,7 +20,7 @@
     const main = await Main.setup();
     ctx = main.ctx;
     attribute = ctx.attribute;
-    
+
     Dehydrator.dehydrateAttribute$(attribute).subscribe(
       (dehydratedAttribute) => {
         rehydratedAttribute =

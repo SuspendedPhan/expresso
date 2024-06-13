@@ -4,8 +4,8 @@ import {
   Expr,
   NumberExpr,
   PrimitiveFunctionCallExpr,
-} from "./Domain";
-import Logger from "./utils/Logger";
+} from "../Domain";
+import Logger from "../utils/Logger";
 
 const logger = Logger.topic("Dehydrator.ts");
 

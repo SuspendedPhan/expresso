@@ -1,4 +1,4 @@
-import Dehydrator from "./Dehydrator";
+import Dehydrator from "./hydration/Dehydrator";
 import {
   Attribute,
   Expr,
@@ -12,10 +12,6 @@ export default class MainContext {
 
   public constructor(private goModule: GoModule) {
     this.attribute = this.createAttribute();
-    // Dehydrator.dehydrateAttribute$(this.attribute).subscribe((dehydrated) => {
-    //   console.log("MainContext.ts: dehydrated", dehydrated);
-    // });
-    
     goModule.setRootAttributeId(this.attribute.getId());
   }
 
