@@ -22,7 +22,6 @@ export default class DebugOverlaySetup {
     debugOverlay.isActive$().subscribe((active) => {
       if (active) {
         overlay.style.display = `block`;
-        setTimeout(() => input.focus(), 0);
       } else {
         overlay.style.display = `none`;
       }

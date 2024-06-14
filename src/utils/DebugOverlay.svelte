@@ -7,14 +7,14 @@
   import DebugOverlay from "./DebugOverlay";
   import DebugOverlayKeyboard from "./DebugOverlayKeyboard";
 
-  let overlay;
-  let input;
+  let overlay: HTMLElement;
+  let input: HTMLInputElement;
   const query$ = new BehaviorSubject<string>("");
 
   const debugOverlay = new DebugOverlay();
-  DebugOverlayKeyboard.register(debugOverlay);
 
   onMount(() => {
+    DebugOverlayKeyboard.register(debugOverlay, input);
     DebugOverlaySetup.setup(overlay, input, debugOverlay);
   });
 
@@ -30,15 +30,20 @@
     event: KeyboardEvent & { currentTarget: EventTarget & HTMLElement }
   ) {
     if (event.key === "/" && event.metaKey) {
-      input.blur();
       debugOverlay.toggleActive();
     }
   }
 </script>
 
-<main bind:this={overlay} class="text-left" on:keydown={handleKeydown}>
+<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+<main bind:this={overlay} class="text-left">
   <div>Logs</div>
-  <input type="text" bind:this={input} on:input={handleInput} />
+  <input
+    type="text"
+    bind:this={input}
+    on:input={handleInput}
+    on:keydown={handleKeydown}
+  />
   {#each $filteredMessages$ as message}
     <div>{message}</div>
   {/each}
