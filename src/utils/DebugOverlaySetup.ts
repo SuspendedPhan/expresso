@@ -1,7 +1,8 @@
 import { onMount } from "svelte";
+import DebugOverlay from "./DebugOverlay";
 
 export default class DebugOverlaySetup {
-  public static setup(overlay: HTMLElement, input: HTMLInputElement) {
+  public static setup(overlay: HTMLElement, input: HTMLInputElement, debugOverlay: DebugOverlay) {
     overlay.style.display = `none`;
     overlay.style.position = `fixed`;
     overlay.style.top = `0`;
@@ -17,15 +18,13 @@ export default class DebugOverlaySetup {
     overlay.style.lineHeight = `2`;
     overlay.style.overflow = `auto`;
     // overlay.style.fontFamily = `monospace`;
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "/") {
-        e.preventDefault();
-        if (overlay.style.display === "none") {
-          overlay.style.display = "block";
-          setTimeout(() => input.focus(), 0);
-        } else {
-          overlay.style.display = "none";
-        }
+
+    debugOverlay.isActive$().subscribe((active) => {
+      if (active) {
+        overlay.style.display = `block`;
+        setTimeout(() => input.focus(), 0);
+      } else {
+        overlay.style.display = `none`;
       }
     });
   }

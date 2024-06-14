@@ -5,24 +5,27 @@ import Selection from "./Selection";
 const logger = Logger.file("Keyboard.ts");
 
 export default class Keyboard {
+  public static SCOPE = "Main";
+
   public static register(selection: Selection) {
     logger.log("register");
+    hotkeys.setScope(this.SCOPE);
 
-    hotkeys("down", function (event, handler) {
+    hotkeys("down", this.SCOPE, function (event, handler) {
       logger.log("down");
       selection.down();
     });
 
-    hotkeys("up", function (event, handler) {
+    hotkeys("up", this.SCOPE, function (event, handler) {
       logger.log("up");
       selection.up();
     });
 
-    hotkeys("left", function (event, handler) {
+    hotkeys("left", this.SCOPE, function (event, handler) {
       logger.log("left");
     });
 
-    hotkeys("right", function (event, handler) {
+    hotkeys("right", this.SCOPE, function (event, handler) {
       logger.log("right");
     });
   }
