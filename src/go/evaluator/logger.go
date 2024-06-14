@@ -21,5 +21,5 @@ func (l *Logger) Log(args ...interface{}) {
 		}
 		message += fmt.Sprintf("%v", arg)
 	}
-	js.Global().Get("Logger").Call("topic", l.topic).Call("log", message)
+	js.Global().Get("Logger").Call("file", l.topic).Call("log", message)
 }

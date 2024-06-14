@@ -13,13 +13,14 @@ let logToConsole = false;
 
 export interface Message {
   topic: string;
+  method: string | null;
   args: any[];
 }
 
 export default class Logger {
   private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
   
-  private constructor(private topic: string) {}
+  private constructor(private topic: string, private methodVar: string | null = null) {}
 
   public log(...args) {
     if (DENY_TOPICS.includes(this.topic)) {
@@ -29,7 +30,7 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      Logger.messages$.value.push({ topic: this.topic, args });
+      Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args });
       Logger.messages$.next(Logger.messages$.value);
       if (logToConsole) {
         console.log(this.topic, ...args);
@@ -39,8 +40,12 @@ export default class Logger {
 
   public debug(...args) {
     // console.log(this.topic, ...args);
-    Logger.messages$.value.push({ topic: this.topic, args });
+    Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args });
     Logger.messages$.next(Logger.messages$.value);
+  }
+
+  public method(method: string): Logger {
+    return new Logger(this.topic, method);
   }
 
   public allow() {
@@ -50,8 +55,8 @@ export default class Logger {
     ALLOW_TOPICS.push(this.topic);
   }
 
-  static topic(topic: string) {
-    return new Logger(topic);
+  static file(file: string) {
+    return new Logger(file);
   }
 
   static log(...args) {

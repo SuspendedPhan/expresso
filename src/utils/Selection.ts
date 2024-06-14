@@ -14,7 +14,8 @@ import Logger from "./Logger";
 
 export type Selectable = Attribute | Expr;
 
-const logger = Logger.topic("Selection.ts");
+const logger = Logger.file("Selection.ts");
+logger.allow();
 
 export default class Selection {
   private selectedObject$ = new BehaviorSubject<Observable<Selectable | null>>(
@@ -35,6 +36,7 @@ export default class Selection {
     logger.log("down");
     const getNextObject$ = (object) => this.getChild$(object);
     this.handleNavigation(getNextObject$);
+    logger.log();
   }
 
   public up() {
@@ -42,6 +44,7 @@ export default class Selection {
     const getNextObject$ = (object: Selectable | null) =>
       this.getParent$(object);
     this.handleNavigation(getNextObject$);
+    logger.log();
   }
 
   private handleNavigation(

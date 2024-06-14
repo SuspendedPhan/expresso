@@ -36,7 +36,7 @@
   }
 
   let query$ = new BehaviorSubject<string>("");
-  query$.subscribe((v) => Logger.topic("ExprCommand").log("query$", v));
+  query$.subscribe((v) => Logger.file("ExprCommand").log("query$", v));
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }

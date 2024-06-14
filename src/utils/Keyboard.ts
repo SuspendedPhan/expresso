@@ -2,7 +2,7 @@ import hotkeys from "hotkeys-js";
 import Logger from "./Logger";
 import Selection from "./Selection";
 
-const logger = Logger.topic("Keyboard.ts");
+const logger = Logger.file("Keyboard.ts");
 
 export default class Keyboard {
   public static register(selection: Selection) {

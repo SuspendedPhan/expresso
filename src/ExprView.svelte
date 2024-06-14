@@ -9,10 +9,10 @@
   export let ctx: MainContext;
   export let expr: Expr;
 
-  Logger.topic("ExprView").log("expr", expr);
+  Logger.file("ExprView").log("expr", expr);
 
   const args$ = expr instanceof CallExpr ? expr.getArgs$() : of([]);
-  args$.subscribe((v) => Logger.topic("ExprView").log("args$", v));
+  args$.subscribe((v) => Logger.file("ExprView").log("args$", v));
 
   function handleSelect(e: CustomEvent<Expr>): void {
     Logger.debug("handleSelect", e.detail);

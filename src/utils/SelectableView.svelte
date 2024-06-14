@@ -7,7 +7,7 @@
   export let object: Selectable;
   export let ctx: MainContext;
 
-  const logger = Logger.topic("SelectableView.svelte");
+  const logger = Logger.file("SelectableView.svelte");
   Logger.logToConsole();
 
   const selected$ = ctx.selection.getSelectedObject$().pipe(

@@ -4,7 +4,7 @@ import Logger from './utils/Logger'
 export type Parent = CallExpr | Attribute;
 
 export class Attribute {
-  private logger = Logger.topic('Domain.ts Attribute')
+  private logger = Logger.file('Domain.ts Attribute')
   
   private id = crypto.randomUUID()
   private expr$ : BehaviorSubject<Expr>;
@@ -37,7 +37,7 @@ export class Attribute {
 }
 
 export abstract class Expr {
-  private exprLogger = Logger.topic('Domain.ts Expr')
+  private exprLogger = Logger.file('Domain.ts Expr')
   private parent: Parent | null = null
   private id = crypto.randomUUID()
 
@@ -75,7 +75,7 @@ export abstract class Expr {
 }
 
 export class NumberExpr extends Expr {
-  private logger = Logger.topic('Domain.ts NumberExpr')
+  private logger = Logger.file('Domain.ts NumberExpr')
 
   constructor(private value: number) {
     super();

@@ -9,7 +9,7 @@
   import Rehydrator from "./hydration/Rehydrator";
   import Main from "./utils/Main";
 
-  const logger = Logger.topic("MainView.svelte");
+  const logger = Logger.file("MainView.svelte");
 
   let ctx: MainContext | null = null;
   let attribute = null;

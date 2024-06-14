@@ -5,9 +5,9 @@ import GoModuleLoader from "./GoModuleLoader";
 import Selection from "./Selection";
 import Logger from "./Logger";
 
-const logger = Logger.topic("Main.ts");
-logger.allow();
-Logger.allow("MainView.svelte");
+const logger = Logger.file("Main.ts");
+// logger.allow();
+// Logger.allow("MainView.svelte");
 
 export default class Main {
   private constructor(public ctx: MainContext) {}

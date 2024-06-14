@@ -7,7 +7,7 @@ import {
 } from "../Domain";
 import Logger from "../utils/Logger";
 
-const logger = Logger.topic("Dehydrator.ts");
+const logger = Logger.file("Dehydrator.ts");
 
 export interface DehydratedAttribute {
   id: string;
