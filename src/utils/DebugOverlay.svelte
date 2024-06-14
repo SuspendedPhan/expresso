@@ -2,38 +2,14 @@
   import { onMount } from "svelte";
   import Logger, { type Message } from "./Logger";
   import { BehaviorSubject, combineLatest, map, mergeMap } from "rxjs";
+  import DebugOverlaySetup from "./DebugOverlaySetup";
 
   let overlay;
   let input;
   const query$ = new BehaviorSubject<string>("");
 
   onMount(() => {
-    overlay.style.display = `none`;
-    overlay.style.position = `fixed`;
-    overlay.style.top = `0`;
-    overlay.style.left = `0`;
-    overlay.style.width = `100%`;
-    overlay.style.height = `100%`;
-    overlay.style.backgroundColor = `white`;
-    overlay.style.color = `black`;
-    overlay.style.zIndex = `9999`;
-    overlay.style.padding = `20px`;
-    overlay.style.boxSizing = `border-box`;
-    overlay.style.fontSize = `16px`;
-    overlay.style.lineHeight = `2`;
-    overlay.style.overflow = `auto`;
-    // overlay.style.fontFamily = `monospace`;
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "/") {
-        e.preventDefault();
-        if (overlay.style.display === "none") {
-          overlay.style.display = "block";
-          setTimeout(() => input.focus(), 0);
-        } else {
-          overlay.style.display = "none";
-        }
-      }
-    });
+    DebugOverlaySetup.setup(overlay, input);
   });
 
   function formatMessage(m: Message): string {
