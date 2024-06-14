@@ -47,7 +47,7 @@
         return a.toString();
       })
       .join(" ");
-    return `${m.topic} ${args}`;
+    return `${m.topic} ${m.key} ${args}`;
   }
 
   const messages$ = Logger.getMessages$().pipe(

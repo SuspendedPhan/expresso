@@ -36,7 +36,6 @@ export default class Selection {
     logger.log("down");
     const getNextObject$ = (object) => this.getChild$(object);
     this.handleNavigation(getNextObject$);
-    logger.log();
   }
 
   public up() {
@@ -44,7 +43,6 @@ export default class Selection {
     const getNextObject$ = (object: Selectable | null) =>
       this.getParent$(object);
     this.handleNavigation(getNextObject$);
-    logger.log();
   }
 
   private handleNavigation(

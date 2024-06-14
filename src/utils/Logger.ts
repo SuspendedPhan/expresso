@@ -5,8 +5,8 @@ import type { Expr } from "../Domain";
 
 const NONE = `None`;
 
-let ALLOW_TOPICS: string[] | `ALL` = [`Debug`];
-// const ALLOW_TOPICS: string[] | `ALL` = `ALL`
+// let ALLOW_TOPICS: string[] | `ALL` = [`Debug`];
+const ALLOW_TOPICS: string[] | `ALL` = `ALL`
 const DENY_TOPICS: string[] = [NONE];
 
 let logToConsole = false;
@@ -14,6 +14,7 @@ let logToConsole = false;
 export interface Message {
   topic: string;
   method: string | null;
+  key: string;
   args: any[];
 }
 
@@ -22,7 +23,7 @@ export default class Logger {
   
   private constructor(private topic: string, private methodVar: string | null = null) {}
 
-  public log(...args) {
+  public log(key: string, ...args: any[]) {
     if (DENY_TOPICS.includes(this.topic)) {
       return;
     }
@@ -30,18 +31,12 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args });
+      Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args, key });
       Logger.messages$.next(Logger.messages$.value);
       if (logToConsole) {
-        console.log(this.topic, ...args);
+        console.log(this.topic, key, ...args);
       }
     }
-  }
-
-  public debug(...args) {
-    // console.log(this.topic, ...args);
-    Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args });
-    Logger.messages$.next(Logger.messages$.value);
   }
 
   public method(method: string): Logger {
@@ -59,12 +54,8 @@ export default class Logger {
     return new Logger(file);
   }
 
-  static log(...args) {
-    new Logger(NONE).log(...args);
-  }
-
-  static debug(...args) {
-    new Logger(NONE).debug(...args);
+  static log(key, ...args) {
+    new Logger(NONE).log(key, ...args);
   }
 
   static getMessages$(): Observable<Message[]> {
