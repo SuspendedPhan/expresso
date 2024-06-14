@@ -9,9 +9,9 @@
 
   let overlay: HTMLElement;
   let input: HTMLInputElement;
-  const query$ = new BehaviorSubject<string>("");
-
   const debugOverlay = new DebugOverlay();
+
+  const query$ = debugOverlay.getQuery$();
 
   onMount(() => {
     DebugOverlayKeyboard.register(debugOverlay, input);
@@ -23,7 +23,7 @@
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
   ) {
-    query$.next(event.currentTarget.value);
+    debugOverlay.setQuery(event.currentTarget.value);
   }
 
   function handleKeydown(
@@ -43,6 +43,7 @@
     bind:this={input}
     on:input={handleInput}
     on:keydown={handleKeydown}
+    class="border"
   />
   {#each $filteredMessages$ as message}
     <div>{message}</div>

@@ -9,6 +9,15 @@ export default class DebugOverlaySelection {
         this.selectedObject$.next(object);
     }
 
+    public navDown() {
+        if (this.selectedObject$.value === null) {
+            return;
+        }
+    }
+
+    public navUp() {
+    }
+
     public getSelected$(): Observable<Selectable | null> {
         return this.selectedObject$;
     }
