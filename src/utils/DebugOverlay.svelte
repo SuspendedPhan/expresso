@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Logger, { type Message } from "./Logger";
-  import { BehaviorSubject, combineLatest, map, mergeMap } from "rxjs";
+  import { BehaviorSubject, combineLatest, map, mergeMap, pipe } from "rxjs";
   import DebugOverlaySetup from "./DebugOverlaySetup";
   import DebugOverlayUtils from "./DebugOverlayUtils";
   import DebugOverlay from "./DebugOverlay";
@@ -18,7 +18,9 @@
     DebugOverlaySetup.setup(overlay, input, debugOverlay);
   });
 
-  const filteredMessages$ = DebugOverlayUtils.getFilteredMessages$(query$);
+  const messages$ = DebugOverlayUtils.getFilteredMessages$(query$).pipe(
+    map((filteredMessages) => filteredMessages.map((m) => m.text))
+  );
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -45,7 +47,7 @@
     on:keydown={handleKeydown}
     class="border"
   />
-  {#each $filteredMessages$ as message}
+  {#each $messages$ as message}
     <div>{message}</div>
   {/each}
 </main>

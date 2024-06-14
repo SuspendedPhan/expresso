@@ -1,24 +1,34 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, take } from "rxjs";
+import DebugOverlay from "./DebugOverlay";
+import { Message } from "./Logger";
 
-export interface Selectable {}
 
-export default class DebugOverlaySelection {
-    private selectedObject$ = new BehaviorSubject<Selectable | null>(null);
+export default class GenericSelection {
+    private selectedObject$ = new BehaviorSubject<Message | null>(null);
 
-    public select(object: Selectable | null) {
+    public constructor(private debugOverlay: DebugOverlay) {}
+
+    public select(object: Message | null) {
         this.selectedObject$.next(object);
     }
 
     public navDown() {
-        if (this.selectedObject$.value === null) {
-            return;
-        }
+        this.debugOverlay.getFilteredMessages$().pipe(take(1)).subscribe(messages => {
+            if (messages.length === 0) {
+                return;
+            }
+
+            const current = this.selectedObject$.value;
+            const currentIndex = current ? messages.indexOf(current) : -1;
+            const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % messages.length;
+            this.select(messages[nextIndex]);
+        });
     }
 
     public navUp() {
     }
 
-    public getSelected$(): Observable<Selectable | null> {
+    public getSelected$(): Observable<Message | null> {
         return this.selectedObject$;
     }
 }
