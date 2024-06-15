@@ -5,12 +5,13 @@ import { BehaviorSubject, type Observable } from "rxjs";
 const NONE = `None`;
 
 // let ALLOW_TOPICS: string[] | `ALL` = [`Debug`];
-let ALLOW_TOPICS: string[] | `ALL` = `ALL`
+let ALLOW_TOPICS: string[] | `ALL` = `ALL`;
 const DENY_TOPICS: string[] = [NONE];
 
 let logToConsole = false;
 
 export interface Message {
+  id: string;
   topic: string;
   method: string | null;
   key: string;
@@ -18,9 +19,14 @@ export interface Message {
 }
 
 export default class Logger {
-  private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject<Message[]>([]);
-  
-  private constructor(private topic: string, private methodVar: string | null = null) {}
+  private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject<
+    Message[]
+  >([]);
+
+  private constructor(
+    private topic: string,
+    private methodVar: string | null = null
+  ) {}
 
   public log(key: string, ...args: any[]) {
     if (DENY_TOPICS.includes(this.topic)) {
@@ -30,7 +36,13 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      Logger.messages$.value.push({ topic: this.topic, method: this.methodVar, args, key });
+      Logger.messages$.value.push({
+        id: crypto.randomUUID(),
+        topic: this.topic,
+        method: this.methodVar,
+        args,
+        key,
+      });
       Logger.messages$.next(Logger.messages$.value);
       if (logToConsole) {
         console.log(this.topic, key, ...args);
@@ -45,7 +57,7 @@ export default class Logger {
   public allow() {
     if (ALLOW_TOPICS.includes(this.topic)) return;
     if (ALLOW_TOPICS === `ALL`) return;
-    
+
     ALLOW_TOPICS.push(this.topic);
   }
 
@@ -64,7 +76,7 @@ export default class Logger {
   static allow(topic: string) {
     if (ALLOW_TOPICS.includes(topic)) return;
     if (ALLOW_TOPICS === `ALL`) return;
-    
+
     ALLOW_TOPICS.push(topic);
   }
 

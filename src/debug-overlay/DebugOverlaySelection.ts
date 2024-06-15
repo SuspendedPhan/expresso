@@ -23,7 +23,10 @@ export default class GenericSelection {
                 return;
             }
 
-            const currentIndex = messages.indexOf(current);
+            const currentIndex = messages.findIndex(message => {
+                return message.message.id === current.message.id;
+            });
+
             if (currentIndex === -1) {
                 console.error("Current message not found in messages");
                 this.selectedObject$.next(messages[0]!);

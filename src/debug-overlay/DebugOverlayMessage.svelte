@@ -6,11 +6,18 @@
   export let message: FormattedMessage;
   export let ctx: DebugOverlayContext;
 
-  const selected$ = ctx.selection
-    .getSelected$()
-    .pipe(map((selected) => selected === message));
+  const selected$ = ctx.selection.getSelected$().pipe(
+    map((selected) => {
+      if (selected === null) {
+        return false;
+      }
+      return selected.message.id === message.message.id;
+    })
+  );
 </script>
 
 <div class:border={$selected$}>
+  selected: {$selected$}
+  {message.message.id}
   {message.text}
 </div>

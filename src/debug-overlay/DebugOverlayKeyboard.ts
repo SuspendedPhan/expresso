@@ -17,11 +17,11 @@ export default class DebugOverlayKeyboard {
             event.preventDefault();
         });
 
-        hotkeys("down", this.SCOPE, function (_event, _handler) {
+        hotkeys("j", this.SCOPE, function (_event, _handler) {
             ctx.selection.navDown();
         });
 
-        hotkeys("up", this.SCOPE, function (_event, _handler) {
+        hotkeys("k", this.SCOPE, function (_event, _handler) {
             ctx.selection.navUp();
         });
 

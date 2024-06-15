@@ -6,6 +6,7 @@
   import DebugOverlayKeyboard from "./DebugOverlayKeyboard";
   import DebugOverlayMessage from "./DebugOverlayMessage.svelte";
   import DebugOverlayContext from "./DebugOverlayContext";
+  import { map, pipe } from "rxjs";
 
   let overlay: HTMLElement;
   let input: HTMLInputElement;
@@ -34,10 +35,15 @@
       debugOverlay.toggleActive();
     }
   }
+
+  const selected$ = ctx.selection
+    .getSelected$()
+    .pipe(map((selected) => JSON.stringify(selected)));
 </script>
 
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main bind:this={overlay} class="text-left">
+  <div>{$selected$}</div>
   <div>Logs</div>
   <input
     type="text"
