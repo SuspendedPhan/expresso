@@ -1,34 +1,32 @@
-import { BehaviorSubject, Observable, Subject } from 'rxjs'
+import { Observable, Subject, Subscriber } from 'rxjs'
 import type GoModule from './GoModule'
 
+declare var window: any;
+
 export default class GoModuleLoader {
-  private static goModuleSubject = new BehaviorSubject<GoModule | null>(null)
+  private static goModule: GoModule | null = null;
 
   public static get$(): Observable<GoModule> {
-    return new Observable((observer) => {
-      if (this.goModuleSubject.value === null) {
-        // Subscribe to the subject to get notified when the library is loaded
-        this.instantiate()
-        this.goModuleSubject.subscribe({
-          complete: () => {
-            observer.next(this.goModuleSubject.value)
-          }
-        })
-      } else {
-        // Library is already loaded, emit the reference immediately
-        observer.next(this.goModuleSubject.value)
-      }
-    })
+    return new Observable(this.handleSubscribe.bind(this));
   }
 
-  private static instantiate() {
-    const go = new Go()
-    WebAssembly.instantiateStreaming(fetch('mymodule.wasm'), go.importObject).then((result) => {
-      go.run(result.instance)
-      const goModule = window.GoModule
-      goModule.hello()
-      this.goModuleSubject.next(goModule)
-      this.goModuleSubject.complete()
-    })
+  private static handleSubscribe(subscriber: Subscriber<GoModule>) {
+    if (this.goModule === null) {
+      this.instantiate().then((goModule) => {
+        this.goModule = goModule;
+        subscriber.next(goModule);
+      });
+    } else {
+      subscriber.next(this.goModule);
+    }
+  }
+
+  private static async instantiate(): Promise<GoModule> {
+    const go = new global.Go()
+    const result = await WebAssembly.instantiateStreaming(fetch('mymodule.wasm'), go.importObject);
+    go.run(result.instance);
+    const goModule = window.GoModule;
+    goModule.hello();
+    return goModule;
   }
 }

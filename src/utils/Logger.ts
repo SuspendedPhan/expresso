@@ -6,7 +6,7 @@ import type { Expr } from "../Domain";
 const NONE = `None`;
 
 // let ALLOW_TOPICS: string[] | `ALL` = [`Debug`];
-const ALLOW_TOPICS: string[] | `ALL` = `ALL`
+let ALLOW_TOPICS: string[] | `ALL` = `ALL`
 const DENY_TOPICS: string[] = [NONE];
 
 let logToConsole = false;
@@ -85,4 +85,5 @@ export default class Logger {
   }
 }
 
-window.Logger = Logger;
+var window: any;
+global.Logger = Logger;

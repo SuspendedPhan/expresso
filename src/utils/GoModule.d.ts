@@ -9,7 +9,7 @@ export default interface GoModule {
 }
 
 export interface Attribute {
-  setExprId(string: id);
+  setExprId(id: string): void;
 }
 
 export interface PrimitiveFunctionCallExpr {
