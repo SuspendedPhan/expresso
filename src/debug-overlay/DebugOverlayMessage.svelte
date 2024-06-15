@@ -17,7 +17,5 @@
 </script>
 
 <div class:border={$selected$}>
-  selected: {$selected$}
-  {message.message.id}
   {message.text}
 </div>

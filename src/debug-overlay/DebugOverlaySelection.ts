@@ -18,9 +18,9 @@ export default class DebugOverlaySelection {
         this.navigator.getCurrent$().pipe(take(1)).subscribe((current) => {
             if (current === null) {
                 this.navigator.goToFirst();
+            } else {
+                this.navigator.goRight();
             }
-
-            this.navigator.goRight();
         });
     }
 
