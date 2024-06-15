@@ -1,11 +1,14 @@
 import hotkeys from "hotkeys-js";
 import DebugOverlay from "./DebugOverlay";
 import Keyboard from "./Keyboard";
+import DebugOverlayContext from "./DebugOverlayContext";
 
 export default class DebugOverlayKeyboard {
     public static SCOPE = "DebugOverlay";
     
-    public static register(debugOverlay: DebugOverlay, input: HTMLInputElement) {
+    public static register(ctx: DebugOverlayContext, input: HTMLInputElement) {
+        const debugOverlay = ctx.debugOverlay;
+
         hotkeys("cmd+/", "all", function (_event, _handler) {
             debugOverlay.toggleActive();
         });
