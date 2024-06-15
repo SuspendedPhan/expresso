@@ -16,7 +16,7 @@
 
   onMount(() => {
     DebugOverlayKeyboard.register(ctx, input);
-    DebugOverlaySetup.setup(overlay, input, debugOverlay);
+    DebugOverlaySetup.setup(overlay, debugOverlay);
   });
 
   const messages$ = DebugOverlayUtils.getFilteredMessages$(query$);
