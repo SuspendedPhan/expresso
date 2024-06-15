@@ -16,6 +16,6 @@
   );
 </script>
 
-<div class:border={$selected$}>
+<div class="border" class:border={$selected$}>
   {message.text}
 </div>

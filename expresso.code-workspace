@@ -5,6 +5,6 @@
 		}
 	],
 	"settings": {
-		"tailwindCSS.experimental.configFile": "../tailwind.config.js"
+		"tailwindCSS.experimental.configFile": "./tailwind.config.js"
 	}
 }
