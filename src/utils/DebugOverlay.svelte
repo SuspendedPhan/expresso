@@ -6,11 +6,14 @@
   import DebugOverlayUtils from "./DebugOverlayUtils";
   import DebugOverlay from "./DebugOverlay";
   import DebugOverlayKeyboard from "./DebugOverlayKeyboard";
+  import DebugOverlayMessage from "./DebugOverlayMessage.svelte";
+  import DebugOverlayContext from "./DebugOverlayContext";
 
   let overlay: HTMLElement;
   let input: HTMLInputElement;
-  const debugOverlay = new DebugOverlay();
 
+  const debugOverlay = new DebugOverlay();
+  const ctx = new DebugOverlayContext(debugOverlay);
   const query$ = debugOverlay.getQuery$();
 
   onMount(() => {
@@ -18,9 +21,7 @@
     DebugOverlaySetup.setup(overlay, input, debugOverlay);
   });
 
-  const messages$ = DebugOverlayUtils.getFilteredMessages$(query$).pipe(
-    map((filteredMessages) => filteredMessages.map((m) => m.text))
-  );
+  const messages$ = DebugOverlayUtils.getFilteredMessages$(query$);
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -48,6 +49,6 @@
     class="border"
   />
   {#each $messages$ as message}
-    <div>{message}</div>
+    <DebugOverlayMessage {message} {ctx} />
   {/each}
 </main>

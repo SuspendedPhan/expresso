@@ -1,14 +1,14 @@
 import { BehaviorSubject, Observable, take } from "rxjs";
-import DebugOverlay from "./DebugOverlay";
+import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 import { Message } from "./Logger";
 
 
 export default class GenericSelection {
-    private selectedObject$ = new BehaviorSubject<Message | null>(null);
+    private selectedObject$ = new BehaviorSubject<FormattedMessage | null>(null);
 
     public constructor(private debugOverlay: DebugOverlay) {}
 
-    public select(object: Message | null) {
+    public select(object: FormattedMessage | null) {
         this.selectedObject$.next(object);
     }
 
@@ -19,16 +19,32 @@ export default class GenericSelection {
             }
 
             const current = this.selectedObject$.value;
-            const currentIndex = current ? messages.indexOf(current) : -1;
-            const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % messages.length;
-            this.select(messages[nextIndex]);
+            if (current === null) {
+                this.selectedObject$.next(messages[0]);
+                return;
+            }
+
+            const currentIndex = messages.indexOf(current);
+            if (currentIndex === -1) {
+                console.error("Current message not found in messages");
+                this.selectedObject$.next(messages[0]);
+                return;
+            }
+
+            const nextIndex = currentIndex + 1;
+            if (nextIndex >= messages.length) {
+                return;
+            }
+
+            this.selectedObject$.next(messages[nextIndex]);
         });
     }
 
     public navUp() {
+        
     }
 
-    public getSelected$(): Observable<Message | null> {
+    public getSelected$(): Observable<FormattedMessage | null> {
         return this.selectedObject$;
     }
 }
