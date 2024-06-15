@@ -1,8 +1,7 @@
-import { onMount } from "svelte";
 import DebugOverlay from "./DebugOverlay";
 
 export default class DebugOverlaySetup {
-  public static setup(overlay: HTMLElement, input: HTMLInputElement, debugOverlay: DebugOverlay) {
+  public static setup(overlay: HTMLElement, debugOverlay: DebugOverlay) {
     overlay.style.display = `none`;
     overlay.style.position = `fixed`;
     overlay.style.top = `0`;

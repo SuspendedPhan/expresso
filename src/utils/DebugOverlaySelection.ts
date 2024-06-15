@@ -1,6 +1,5 @@
 import { BehaviorSubject, Observable, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
-import { Message } from "./Logger";
 
 
 export default class GenericSelection {
@@ -20,14 +19,14 @@ export default class GenericSelection {
 
             const current = this.selectedObject$.value;
             if (current === null) {
-                this.selectedObject$.next(messages[0]);
+                this.selectedObject$.next(messages[0]!);
                 return;
             }
 
             const currentIndex = messages.indexOf(current);
             if (currentIndex === -1) {
                 console.error("Current message not found in messages");
-                this.selectedObject$.next(messages[0]);
+                this.selectedObject$.next(messages[0]!);
                 return;
             }
 
@@ -36,7 +35,7 @@ export default class GenericSelection {
                 return;
             }
 
-            this.selectedObject$.next(messages[nextIndex]);
+            this.selectedObject$.next(messages[nextIndex]!);
         });
     }
 

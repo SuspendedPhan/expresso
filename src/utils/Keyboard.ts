@@ -11,21 +11,21 @@ export default class Keyboard {
     logger.log("register");
     hotkeys.setScope(this.SCOPE);
 
-    hotkeys("down", this.SCOPE, function (event, handler) {
+    hotkeys("down", this.SCOPE, function (_event, _handler) {
       logger.log("down");
       selection.down();
     });
 
-    hotkeys("up", this.SCOPE, function (event, handler) {
+    hotkeys("up", this.SCOPE, function (_event, _handler) {
       logger.log("up");
       selection.up();
     });
 
-    hotkeys("left", this.SCOPE, function (event, handler) {
+    hotkeys("left", this.SCOPE, function (_event, _handler) {
       logger.log("left");
     });
 
-    hotkeys("right", this.SCOPE, function (event, handler) {
+    hotkeys("right", this.SCOPE, function (_event, _handler) {
       logger.log("right");
     });
   }

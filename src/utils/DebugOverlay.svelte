@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Logger, { type Message } from "./Logger";
-  import { BehaviorSubject, combineLatest, map, mergeMap, pipe } from "rxjs";
   import DebugOverlaySetup from "./DebugOverlaySetup";
   import DebugOverlayUtils from "./DebugOverlayUtils";
   import DebugOverlay from "./DebugOverlay";

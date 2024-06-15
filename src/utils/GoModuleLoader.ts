@@ -1,4 +1,4 @@
-import { Observable, Subject, Subscriber } from 'rxjs'
+import { Observable, Subscriber } from 'rxjs'
 import type GoModule from './GoModule'
 
 declare var window: any;

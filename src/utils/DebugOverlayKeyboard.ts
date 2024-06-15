@@ -1,5 +1,4 @@
 import hotkeys from "hotkeys-js";
-import DebugOverlay from "./DebugOverlay";
 import Keyboard from "./Keyboard";
 import DebugOverlayContext from "./DebugOverlayContext";
 

@@ -94,7 +94,7 @@ export class NumberExpr extends Expr {
     return 'Number'
   }
 
-  toString(): string {
+  override toString(): string {
     return this.getText();
   }
 }
@@ -129,7 +129,7 @@ export abstract class CallExpr extends Expr {
     this.args.next(this.args.value)
   }
 
-  toString(): string {
+  override toString(): string {
     return JSON.stringify({
       id: this.getId(),
       args: this.args.value.map((arg) => arg.toString())

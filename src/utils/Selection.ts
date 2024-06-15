@@ -1,13 +1,11 @@
 import {
   BehaviorSubject,
   Observable,
-  OperatorFunction,
   map,
   of,
   share,
   switchAll,
   switchMap,
-  take,
 } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../Domain";
 import Logger from "./Logger";
@@ -98,7 +96,12 @@ export default class Selection {
     if (expr instanceof NumberExpr) {
       return of(null);
     } else if (expr instanceof CallExpr) {
-      return expr.getArgs$().pipe(map((args) => args[0]));
+      return expr.getArgs$().pipe(map((args) => {
+        if (args.length === 0) {
+          throw new Error("No args");
+        }
+        return args[0]!;
+      }));
     } else {
       throw new Error("Unknown expr type");
     }
