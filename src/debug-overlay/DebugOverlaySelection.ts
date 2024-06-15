@@ -1,10 +1,9 @@
-import { BehaviorSubject, Observable, take } from "rxjs";
+import { Observable, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 import ArrayNavigator from "./ArrayNavigator";
 
 
 export default class DebugOverlaySelection {
-    private selectedObject$ = new BehaviorSubject<FormattedMessage | null>(null);
     private navigator: ArrayNavigator<FormattedMessage>;
 
     public constructor(debugOverlay: DebugOverlay) {
@@ -12,11 +11,17 @@ export default class DebugOverlaySelection {
     }
 
     public select(object: FormattedMessage | null) {
-        this.selectedObject$.next(object);
+        this.navigator.setCurrent(object);
     }
 
     public navDown() {
-        this.navigator.goRight();
+        this.navigator.getCurrent$().pipe(take(1)).subscribe((current) => {
+            if (current === null) {
+                this.navigator.goToFirst();
+            }
+
+            this.navigator.goRight();
+        });
     }
 
     public navUp() {
@@ -24,6 +29,6 @@ export default class DebugOverlaySelection {
     }
 
     public getSelected$(): Observable<FormattedMessage | null> {
-        return this.selectedObject$;
+        return this.navigator.getCurrent$();
     }
 }

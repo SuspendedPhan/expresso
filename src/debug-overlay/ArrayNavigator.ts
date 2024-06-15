@@ -7,12 +7,22 @@ export default class ArrayNavigator<T> {
 
     }
 
-    public setCurrent(object: T) {
+    public setCurrent(object: T | null) {
         this.current$.next(object);
     }
 
     public getCurrent$() {
         return this.current$;
+    }
+
+    public goToFirst() {
+        this.objects$.pipe(take(1)).subscribe(objects => {
+            if (objects.length === 0) {
+                return;
+            }
+
+            this.current$.next(objects[0]!);
+        });
     }
 
     public goLeft() {
