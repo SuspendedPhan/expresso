@@ -18,6 +18,14 @@ export default class DebugOverlayKeyboard {
             event.preventDefault();
         });
 
+        hotkeys("down", this.SCOPE, function (_event, _handler) {
+            ctx.selection.navDown();
+        });
+
+        hotkeys("up", this.SCOPE, function (_event, _handler) {
+            ctx.selection.navUp();
+        });
+
         debugOverlay.isActive$().subscribe((active) => {
             if (active) {
                 hotkeys.setScope(this.SCOPE);

@@ -17,7 +17,7 @@
   const query$ = debugOverlay.getQuery$();
 
   onMount(() => {
-    DebugOverlayKeyboard.register(debugOverlay, input);
+    DebugOverlayKeyboard.register(ctx, input);
     DebugOverlaySetup.setup(overlay, input, debugOverlay);
   });
 
