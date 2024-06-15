@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Token from './Token';
 
 const GITHUB_API_URL = 'https://api.github.com';
 
@@ -17,7 +18,7 @@ interface Gist {
 class GistClient {
   private token: string;
 
-  constructor(token: string) {
+  constructor(token: string = Token) {
     this.token = token;
   }
 
