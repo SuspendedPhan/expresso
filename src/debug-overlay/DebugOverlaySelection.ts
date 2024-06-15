@@ -1,49 +1,26 @@
 import { BehaviorSubject, Observable, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
+import ArrayNavigator from "./ArrayNavigator";
 
 
-export default class GenericSelection {
+export default class DebugOverlaySelection {
     private selectedObject$ = new BehaviorSubject<FormattedMessage | null>(null);
+    private navigator: ArrayNavigator<FormattedMessage>;
 
-    public constructor(private debugOverlay: DebugOverlay) {}
+    public constructor(debugOverlay: DebugOverlay) {
+        this.navigator = new ArrayNavigator(debugOverlay.getFilteredMessages$(), (a, b) => a.message.id === b.message.id);
+    }
 
     public select(object: FormattedMessage | null) {
         this.selectedObject$.next(object);
     }
 
     public navDown() {
-        this.debugOverlay.getFilteredMessages$().pipe(take(1)).subscribe(messages => {
-            if (messages.length === 0) {
-                return;
-            }
-
-            const current = this.selectedObject$.value;
-            if (current === null) {
-                this.selectedObject$.next(messages[0]!);
-                return;
-            }
-
-            const currentIndex = messages.findIndex(message => {
-                return message.message.id === current.message.id;
-            });
-
-            if (currentIndex === -1) {
-                console.error("Current message not found in messages");
-                this.selectedObject$.next(messages[0]!);
-                return;
-            }
-
-            const nextIndex = currentIndex + 1;
-            if (nextIndex >= messages.length) {
-                return;
-            }
-
-            this.selectedObject$.next(messages[nextIndex]!);
-        });
+        this.navigator.goRight();
     }
 
     public navUp() {
-        
+        this.navigator.goLeft();
     }
 
     public getSelected$(): Observable<FormattedMessage | null> {
