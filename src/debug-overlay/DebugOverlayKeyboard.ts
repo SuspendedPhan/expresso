@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import Keyboard from "./Keyboard";
+import Keyboard from "../utils/Keyboard";
 import DebugOverlayContext from "./DebugOverlayContext";
 
 export default class DebugOverlayKeyboard {

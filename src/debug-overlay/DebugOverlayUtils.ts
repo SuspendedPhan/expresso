@@ -1,5 +1,5 @@
 import { Observable, combineLatest, map } from "rxjs";
-import Logger, { Message } from "./Logger";
+import Logger, { Message } from "../utils/Logger";
 import { FormattedMessage } from "./DebugOverlay";
 
 export default class DebugOverlayUtils {

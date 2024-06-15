@@ -1,5 +1,5 @@
 <script lang="ts">
-  import DebugOverlay from "./utils/DebugOverlay.svelte";
+  import DebugOverlay from "./debug-overlay/DebugOverlay.svelte";
   import MainView from "./MainView.svelte";
   import TestView from "./utils/TestView.svelte";
 </script>
