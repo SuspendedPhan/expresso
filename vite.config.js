@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import checker from 'vite-plugin-checker'
 
 import { fileURLToPath, URL } from 'node:url'
 
@@ -27,7 +28,8 @@ export default defineConfig({
       buildStart: async () => {
         buildProjects()
       }
-    }
+    },
+    checker({ typescript: true })
   ],
   resolve: {
     alias: {
