@@ -3,6 +3,9 @@ import type GoModule from './GoModule'
 
 declare var window: any;
 
+// Defined in public/wasm_exec.js
+declare var Go: any;
+
 export default class GoModuleLoader {
   private static goModule: GoModule | null = null;
 
@@ -22,7 +25,7 @@ export default class GoModuleLoader {
   }
 
   private static async instantiate(): Promise<GoModule> {
-    const go = new global.Go()
+    const go = new Go();
     const result = await WebAssembly.instantiateStreaming(fetch('mymodule.wasm'), go.importObject);
     go.run(result.instance);
     const goModule = window.GoModule;
