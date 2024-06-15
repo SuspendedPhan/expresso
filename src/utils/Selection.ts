@@ -40,8 +40,7 @@ export default class Selection {
 
   public up() {
     logger.log("up");
-    const getNextObject$ = (object: Selectable | null) =>
-      this.getParent$(object);
+    const getNextObject$ = this.getParent$.bind(this);
     this.handleNavigation(getNextObject$);
   }
 
