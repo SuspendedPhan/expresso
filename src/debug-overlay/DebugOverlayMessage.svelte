@@ -14,8 +14,18 @@
       return selected.message.id === message.message.id;
     })
   );
+
+  const borderClass$ = selected$.pipe(
+    map((selected) => {
+      if (selected) {
+        return "border-solid";
+      } else {
+        return "border-transparent";
+      }
+    })
+  );
 </script>
 
-<div class="border" class:border={$selected$}>
+<div class="border {$borderClass$}">
   {message.text}
 </div>
