@@ -34,7 +34,7 @@ export default class Selection {
 
   public down() {
     logger.log("down");
-    const getNextObject$ = (object) => this.getChild$(object);
+    const getNextObject$ = this.getChild$.bind(this);
     this.handleNavigation(getNextObject$);
   }
 

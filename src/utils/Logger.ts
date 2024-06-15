@@ -54,7 +54,7 @@ export default class Logger {
     return new Logger(file);
   }
 
-  static log(key, ...args) {
+  static log(key: string, ...args: any[]) {
     new Logger(NONE).log(key, ...args);
   }
 
@@ -85,5 +85,5 @@ export default class Logger {
   }
 }
 
-var window: any;
-global.Logger = Logger;
+declare var window: any;
+window.Logger = Logger;
