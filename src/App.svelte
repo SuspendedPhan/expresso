@@ -5,8 +5,8 @@
 </script>
 
 <main>
-  <!-- <TestView /> -->
-  <MainView />
+  <TestView />
+  <!-- <MainView /> -->
   <DebugOverlay />
 </main>
 
