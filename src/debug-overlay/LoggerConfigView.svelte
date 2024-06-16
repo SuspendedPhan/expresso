@@ -20,6 +20,8 @@
 
   <div>Keys</div>
   {#each $keys$ as key}
-    <div>{key}</div>
+    <div>{key.topic}</div>
+    <div>{key.method}</div>
+    <div>{key.key}</div>
   {/each}
 </div>
