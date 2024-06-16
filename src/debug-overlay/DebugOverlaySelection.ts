@@ -1,4 +1,4 @@
-import { BehaviorSubject, take } from "rxjs";
+import { Observable, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 import ArrayNavigator from "./ArrayNavigator";
 
@@ -8,6 +8,7 @@ export default class DebugOverlaySelection {
 
     public constructor(debugOverlay: DebugOverlay) {
         this.navigator = new ArrayNavigator(debugOverlay.getFilteredMessages$(), (a, b) => a.message.id === b.message.id);
+        
     }
 
     public select(object: FormattedMessage | null) {
@@ -28,7 +29,7 @@ export default class DebugOverlaySelection {
         this.navigator.goLeft();
     }
 
-    public getSelected$(): BehaviorSubject<FormattedMessage | null> {
+    public getSelected$(): Observable<FormattedMessage | null> {
         return this.navigator.getCurrent$();
     }
 }

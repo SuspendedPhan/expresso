@@ -1,86 +1,76 @@
-import { BehaviorSubject, Observable, take } from "rxjs";
+import { BehaviorSubject, Observable, combineLatest, map, take } from "rxjs";
 
 export default class ArrayNavigator<T> {
-    private current$ = new BehaviorSubject<T | null>(null);
+  private currentIndex$ = new BehaviorSubject<number | null>(null);
 
-    public constructor(private objects$: Observable<T[]>, private equalsFn: (a: T, b: T) => boolean) {
+  public constructor(
+    private objects$: Observable<T[]>,
+    private equalsFn: (a: T, b: T) => boolean
+  ) {}
 
+  public getIndex$(object: T) {
+    return this.objects$.pipe(
+      map((objects) => {
+        return objects.findIndex((o) => this.equalsFn(o, object));
+      })
+    );
+  }
+
+  public getCurrent$() {
+    return combineLatest([this.objects$, this.currentIndex$]).pipe(
+      map(([objects, currentIndex]) => {
+        if (currentIndex === null) {
+          return null;
+        }
+
+        return objects[currentIndex]!;
+      }),
+    //   tap(console.log)
+    );
+  }
+
+  public setCurrent(object: T | null) {
+    if (object === null) {
+      this.currentIndex$.next(null);
+      return;
     }
 
-    public setCurrent(object: T | null) {
-        this.current$.next(object);
-    }
+    this.getIndex$(object)
+      .pipe(take(1))
+      .subscribe((index) => {
+        this.currentIndex$.next(index);
+      });
+  }
 
-    public getCurrent$() {
-        return this.current$;
-    }
+  public goToFirst() {
+    this.currentIndex$.next(0);
+  }
 
-    public goToFirst() {
-        this.objects$.pipe(take(1)).subscribe(objects => {
-            if (objects.length === 0) {
+  public goLeft() {
+    this.currentIndex$.pipe(take(1)).subscribe((index) => {
+        if (index === null) {
+            return;
+        }
+    
+        if (index === 0) {
+            return;
+        }
+        this.currentIndex$.next(index - 1);
+    });
+  }
+
+  public goRight() {
+    this.currentIndex$.pipe(take(1)).subscribe((index) => {
+        if (index === null) {
+            return;
+        }
+    
+        this.objects$.pipe(take(1)).subscribe((objects) => {
+            if (index === objects.length - 1) {
                 return;
             }
-
-            this.current$.next(objects[0]!);
+            this.currentIndex$.next(index + 1);
         });
-    }
-
-    public goLeft() {
-        this.objects$.pipe(take(1)).subscribe(objects => {
-            if (objects.length === 0) {
-                return;
-            }
-
-            const current = this.current$.value;
-            if (current === null) {
-                return;
-            }
-
-            const currentIndex = objects.findIndex(object => {
-                return this.equalsFn(object, current);
-            });
-
-            if (currentIndex === -1) {
-                console.error("Current object not found in objects");
-                return;
-            }
-
-            const nextIndex = currentIndex - 1;
-            if (nextIndex < 0) {
-                return;
-            }
-
-            this.current$.next(objects[nextIndex]!);
-        });
-    }
-
-    public goRight() {
-        this.objects$.pipe(take(1)).subscribe(objects => {
-            if (objects.length === 0) {
-                return;
-            }
-
-            const current = this.current$.value;
-            if (current === null) {
-                this.current$.next(objects[0]!);
-                return;
-            }
-
-            const currentIndex = objects.findIndex(object => {
-                return this.equalsFn(object, current);
-            });
-
-            if (currentIndex === -1) {
-                console.error("Current object not found in objects");
-                return;
-            }
-
-            const nextIndex = currentIndex + 1;
-            if (nextIndex >= objects.length) {
-                return;
-            }
-
-            this.current$.next(objects[nextIndex]!);
-        });        
-    }
+    });
+  }
 }
