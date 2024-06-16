@@ -1,6 +1,7 @@
 import hotkeys from "hotkeys-js";
 import Keyboard from "../utils/Keyboard";
 import DebugOverlayContext from "./DebugOverlayContext";
+import LoggerConfig from "../utils/LoggerConfig";
 
 export default class DebugOverlayKeyboard {
     public static SCOPE = "DebugOverlay";
@@ -26,7 +27,10 @@ export default class DebugOverlayKeyboard {
         });
 
         hotkeys("m", this.SCOPE, function (_event, _handler) {
-            ctx.selection.muteSelected();
+            const selected = ctx.selection.getSelected$().value;
+            if (selected !== null) {
+                LoggerConfig.get().muteTopic(selected.message.topic);
+            }
         });
 
         debugOverlay.isActive$().subscribe((active) => {
