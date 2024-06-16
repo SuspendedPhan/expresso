@@ -12,9 +12,15 @@ export interface MutedKey {
 }
 
 export default class LoggerConfig {
+    private static instance = new LoggerConfig();
+
     private mutedTopics = new BehaviorSubject<string[]>([]);
     private mutedMethods = new BehaviorSubject<MutedMethod[]>([]);
     private mutedKeys = new BehaviorSubject<MutedKey[]>([]);
+
+    public static get(): LoggerConfig {
+        return LoggerConfig.instance;
+    }
 
     public getMutedTopics$(): Observable<string[]> {
         return this.mutedTopics;
