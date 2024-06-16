@@ -1,6 +1,7 @@
 import { Observable, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 import ArrayNavigator from "./ArrayNavigator";
+import LoggerConfig from "../utils/LoggerConfig";
 
 
 export default class DebugOverlaySelection {
@@ -30,5 +31,12 @@ export default class DebugOverlaySelection {
 
     public getSelected$(): Observable<FormattedMessage | null> {
         return this.navigator.getCurrent$();
+    }
+
+    public muteSelected() {
+        const current = this.navigator.getCurrent$().value;
+        if (current !== null) {
+            LoggerConfig.get().muteTopic(current.message.topic);
+        }
     }
 }

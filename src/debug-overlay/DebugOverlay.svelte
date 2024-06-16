@@ -6,6 +6,7 @@
   import DebugOverlayKeyboard from "./DebugOverlayKeyboard";
   import DebugOverlayMessage from "./DebugOverlayMessage.svelte";
   import DebugOverlayContext from "./DebugOverlayContext";
+  import LoggerConfigView from "./LoggerConfigView.svelte";
 
   let overlay: HTMLElement;
   let input: HTMLInputElement;
@@ -39,6 +40,7 @@
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 <main bind:this={overlay} class="text-left">
   <div>Logs</div>
+  <LoggerConfigView />
   <input
     type="text"
     bind:this={input}

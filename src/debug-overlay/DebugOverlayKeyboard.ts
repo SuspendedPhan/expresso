@@ -25,6 +25,10 @@ export default class DebugOverlayKeyboard {
             ctx.selection.navUp();
         });
 
+        hotkeys("m", this.SCOPE, function (_event, _handler) {
+            ctx.selection.muteSelected();
+        });
+
         debugOverlay.isActive$().subscribe((active) => {
             if (active) {
                 hotkeys.setScope(this.SCOPE);
