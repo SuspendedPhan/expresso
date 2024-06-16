@@ -48,7 +48,9 @@
     on:keydown={handleKeydown}
     class="border"
   />
-  {#each $messages$ as message}
-    <DebugOverlayMessage {message} {ctx} />
-  {/each}
+  {#if $messages$}
+    {#each $messages$ as message}
+      <DebugOverlayMessage {message} {ctx} />
+    {/each}
+  {/if}
 </main>

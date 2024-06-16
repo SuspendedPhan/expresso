@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, take } from "rxjs";
+import { BehaviorSubject, take } from "rxjs";
 import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 import ArrayNavigator from "./ArrayNavigator";
 

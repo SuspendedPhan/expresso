@@ -1,6 +1,7 @@
-import { Observable, combineLatest, map } from "rxjs";
+import { Observable, combineLatest, map, switchMap } from "rxjs";
 import Logger, { Message } from "../utils/Logger";
 import { FormattedMessage } from "./DebugOverlay";
+import LoggerConfig from "../utils/LoggerConfig";
 
 export default class DebugOverlayUtils {
   public static formatMessage(m: Message): FormattedMessage {
@@ -37,11 +38,30 @@ export default class DebugOverlayUtils {
           return formattedMessages;
         }
 
-        return formattedMessages.filter((m) =>
+        const queryFilteredMessages = formattedMessages.filter((m) =>
           m.text.toLowerCase().includes(query.toLowerCase())
         );
-      })
+        return queryFilteredMessages;
+      }),
+      switchMap((messages) => DebugOverlayUtils.excludeMutedMessages(messages))
     );
     return filteredMessages$;
   }
+  static excludeMutedMessages(messages: FormattedMessage[]): Observable<FormattedMessage[]> {
+    const loggerConfig = LoggerConfig.get();
+    const messagesWithMuted$ = messages.map((fm) => {
+      const muted$ = loggerConfig.isMuted$(fm.message);
+      return muted$.pipe(map((muted) => ({ fm, muted })));
+    });
+
+    return combineLatest(messagesWithMuted$).pipe(
+      map((mutedMessages) => {
+        return mutedMessages.filter((m) => !m.muted).map((m) => m.fm);
+      })
+    );
+  }
+
+  // private static excludeMutedMessages(messages: FormattedMessage[]): FormattedMessage[] {
+  //   return messages.filter((m) => !LoggerConfig.get().isMuted(m.message));
+  // }
 }
