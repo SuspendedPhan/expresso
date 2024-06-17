@@ -1,10 +1,7 @@
-import {
-  BehaviorSubject,
-  Observable,
-  combineLatest,
-  map,
-} from "rxjs";
-import { Message } from "./Logger";
+import { BehaviorSubject, Observable, combineLatest, from, map } from "rxjs";
+import Logger, { Message } from "./Logger";
+import GistPersistence from "../persistence/GistPersistence";
+import { DehydratedLoggerConfig } from "./LoggerConfigHydrator";
 
 export interface MutedMethod {
   topic: string;
@@ -18,15 +15,31 @@ export interface MutedKey {
 }
 
 export default class LoggerConfig {
-  private static instance = new LoggerConfig();
+  private static instance: LoggerConfig | null = null;
+
+  public static get$(): Observable<LoggerConfig> {
+    return from(LoggerConfig.get());
+  }
+
+  private static async get(): Promise<LoggerConfig> {
+    if (LoggerConfig.instance === null) {
+      const dehydratedConfig = await GistPersistence.readLoggerConfig();
+      const instance = new LoggerConfig();
+      if (dehydratedConfig !== null) {
+        instance.mutedTopics.next(dehydratedConfig.mutedTopics);
+        instance.mutedMethods.next(dehydratedConfig.mutedMethods);
+        instance.mutedKeys.next(dehydratedConfig.mutedKeys);
+      }
+      LoggerConfig.instance = instance;
+    }
+    return LoggerConfig.instance;
+  }
 
   private mutedTopics = new BehaviorSubject<string[]>([]);
   private mutedMethods = new BehaviorSubject<MutedMethod[]>([]);
   private mutedKeys = new BehaviorSubject<MutedKey[]>([]);
 
-  public static get(): LoggerConfig {
-    return LoggerConfig.instance;
-  }
+  public constructor() {}
 
   public getMutedTopics$(): Observable<string[]> {
     return this.mutedTopics;
@@ -111,16 +124,32 @@ export default class LoggerConfig {
     );
   }
 
-  private isMuted(message: Message, mutedTopics: string[], mutedMethods: MutedMethod[], mutedKeys: MutedKey[]): boolean {
+  private isMuted(
+    message: Message,
+    mutedTopics: string[],
+    mutedMethods: MutedMethod[],
+    mutedKeys: MutedKey[]
+  ): boolean {
     if (mutedTopics.includes(message.topic)) {
       return true;
     }
-    if (mutedMethods.find((mm) => mm.topic === message.topic && mm.method === message.method)) {
+    if (
+      mutedMethods.find(
+        (mm) => mm.topic === message.topic && mm.method === message.method
+      )
+    ) {
       return true;
     }
-    if (mutedKeys.find((mk) => mk.topic === message.topic && mk.method === message.method && mk.key === message.key)) {
+    if (
+      mutedKeys.find(
+        (mk) =>
+          mk.topic === message.topic &&
+          mk.method === message.method &&
+          mk.key === message.key
+      )
+    ) {
       return true;
     }
     return false;
-  }   
+  }
 }
