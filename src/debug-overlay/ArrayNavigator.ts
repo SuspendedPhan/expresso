@@ -17,6 +17,7 @@ export default class ArrayNavigator<T> {
         }
 
         if (index < 0 || index >= objects.length) {
+          this.current$.next(null);
           this.indexOutOfBounds$.next();
           return;
         }
@@ -75,6 +76,7 @@ export default class ArrayNavigator<T> {
   public goRight() {
     this.currentIndex$.pipe(take(1)).subscribe((index) => {
       if (index === null) {
+        this.currentIndex$.next(0);
         return;
       }
 
