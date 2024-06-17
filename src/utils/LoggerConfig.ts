@@ -1,6 +1,7 @@
 import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
 import { Message } from "./Logger";
 import GistPersistence from "../persistence/GistPersistence";
+import LoggerConfigHydrator from "./LoggerConfigHydrator";
 
 export interface MutedMethod {
   topic: string;
@@ -25,7 +26,9 @@ export default class LoggerConfig {
   private mutedKeys = new BehaviorSubject<MutedKey[]>([]);
 
   private constructor() {
-    this.load();
+    this.load().then(() => {
+      LoggerConfigHydrator.syncToPersistence(this);
+    });
   }
 
   private async load() {
