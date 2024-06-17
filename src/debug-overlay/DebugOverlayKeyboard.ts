@@ -20,15 +20,15 @@ export default class DebugOverlayKeyboard {
         });
 
         hotkeys("j", this.SCOPE, function (_event, _handler) {
-            ctx.selection.navDown();
+            ctx.selection.goRight();
         });
 
         hotkeys("k", this.SCOPE, function (_event, _handler) {
-            ctx.selection.navUp();
+            ctx.selection.goLeft();
         });
 
         hotkeys("m", this.SCOPE, function (_event, _handler) {
-            ctx.selection.getSelected$().pipe(take(1)).subscribe((selected) => {
+            ctx.selection.getCurrent$().pipe(take(1)).subscribe((selected) => {
                 if (selected !== null) {
                     LoggerConfig.get().muteKey(selected.message.topic, selected.message.method, selected.message.key);
                 }

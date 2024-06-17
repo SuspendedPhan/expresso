@@ -6,7 +6,7 @@
   export let message: FormattedMessage;
   export let ctx: DebugOverlayContext;
 
-  const selected$ = ctx.selection.getSelected$().pipe(
+  const selected$ = ctx.selection.getCurrent$().pipe(
     map((selected) => {
       if (selected === null) {
         return false;

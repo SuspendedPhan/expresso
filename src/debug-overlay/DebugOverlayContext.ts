@@ -1,10 +1,10 @@
-import DebugOverlay from "./DebugOverlay";
-import DebugOverlaySelection from "./DebugOverlaySelection";
+import ArrayNavigator from "./ArrayNavigator";
+import DebugOverlay, { FormattedMessage } from "./DebugOverlay";
 
 export default class DebugOverlayContext {
-    public selection: DebugOverlaySelection;
+    public readonly selection: ArrayNavigator<FormattedMessage>;
 
     public constructor(public debugOverlay: DebugOverlay) {
-        this.selection = new DebugOverlaySelection(debugOverlay);
+        this.selection = new ArrayNavigator(debugOverlay.getFilteredMessages$(), (a, b) => a.message.id === b.message.id);
     }
 }
