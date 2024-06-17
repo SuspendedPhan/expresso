@@ -15,16 +15,16 @@
     })
   );
 
-  // const borderClass$ = selected$.pipe(
-  //   map((selected) => {
-  //     if (selected) {
-  //       return "border-solid";
-  //     } else {
-  //       return "border-transparent";
-  //     }
-  //   })
-  // );
-  const borderClass$ = of("border-transparent");
+  const borderClass$ = selected$.pipe(
+    map((selected) => {
+      if (selected) {
+        return "border-solid";
+      } else {
+        return "border-transparent";
+      }
+    })
+  );
+  // const borderClass$ = of("border-transparent");
 </script>
 
 <div class="border {$borderClass$}">
