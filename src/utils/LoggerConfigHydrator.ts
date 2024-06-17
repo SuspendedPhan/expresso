@@ -1,6 +1,6 @@
 import { combineLatest } from "rxjs";
 import Persistence from "../persistence/Persistence";
-import LoggerConfig, { MutedKey, MutedMethod } from "./LoggerConfig";
+import LoggerConfig, { MutedKey, MutedMethod, MutedTopic } from "./LoggerConfig";
 
 export default class LoggerConfigHydrator {
   static syncToPersistence(config: LoggerConfig) {
@@ -16,7 +16,7 @@ export default class LoggerConfigHydrator {
 }
 
 export interface DehydratedLoggerConfig {
-    mutedTopics: string[];
+    mutedTopics: MutedTopic[];
     mutedMethods: MutedMethod[];
     mutedKeys: MutedKey[];
 }

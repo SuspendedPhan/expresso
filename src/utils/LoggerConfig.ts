@@ -3,12 +3,19 @@ import { Message } from "./Logger";
 import GistPersistence from "../persistence/GistPersistence";
 import LoggerConfigHydrator from "./LoggerConfigHydrator";
 
+export interface MutedTopic {
+  id: string;
+  topic: string;
+}
+
 export interface MutedMethod {
+  id: string;
   topic: string;
   method: string;
 }
 
 export interface MutedKey {
+  id: string
   topic: string;
   method: string;
   key: string;
@@ -21,7 +28,7 @@ export default class LoggerConfig {
     return LoggerConfig.instance;
   }
 
-  private mutedTopics = new BehaviorSubject<string[]>([]);
+  private mutedTopics = new BehaviorSubject<MutedTopic[]>([]);
   private mutedMethods = new BehaviorSubject<MutedMethod[]>([]);
   private mutedKeys = new BehaviorSubject<MutedKey[]>([]);
 
@@ -40,7 +47,7 @@ export default class LoggerConfig {
     }
   }
 
-  public getMutedTopics$(): Observable<string[]> {
+  public getMutedTopics$(): Observable<MutedTopic[]> {
     return this.mutedTopics;
   }
 
@@ -54,15 +61,15 @@ export default class LoggerConfig {
 
   public muteTopic(topic: string) {
     const mutedTopics = this.mutedTopics.value;
-    if (!mutedTopics.includes(topic)) {
-      mutedTopics.push(topic);
+    if (!mutedTopics.find((mt) => mt.topic === topic)) {
+      mutedTopics.push({ topic, id: crypto.randomUUID() });
       this.mutedTopics.next(mutedTopics);
     }
   }
 
   public unmuteTopic(topic: string) {
     const mutedTopics = this.mutedTopics.value;
-    const index = mutedTopics.indexOf(topic);
+    const index = mutedTopics.findIndex((mt) => mt.topic === topic);
     if (index !== -1) {
       mutedTopics.splice(index, 1);
       this.mutedTopics.next(mutedTopics);
@@ -72,7 +79,7 @@ export default class LoggerConfig {
   public muteMethod(topic: string, method: string) {
     const mutedMethods = this.mutedMethods.value;
     if (!mutedMethods.find((m) => m.topic === topic && m.method === method)) {
-      mutedMethods.push({ topic, method });
+      mutedMethods.push({ topic, method, id: crypto.randomUUID() });
       this.mutedMethods.next(mutedMethods);
     }
   }
@@ -95,7 +102,7 @@ export default class LoggerConfig {
         (m) => m.topic === topic && m.method === method && m.key === key
       )
     ) {
-      mutedKeys.push({ topic, method, key });
+      mutedKeys.push({ topic, method, key, id: crypto.randomUUID() });
       this.mutedKeys.next(mutedKeys);
     }
   }
@@ -125,11 +132,11 @@ export default class LoggerConfig {
 
   private isMuted(
     message: Message,
-    mutedTopics: string[],
+    mutedTopics: MutedTopic[],
     mutedMethods: MutedMethod[],
     mutedKeys: MutedKey[]
   ): boolean {
-    if (mutedTopics.includes(message.topic)) {
+    if (mutedTopics.find((mt) => mt.topic === message.topic)) {
       return true;
     }
     if (

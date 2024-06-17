@@ -2,6 +2,7 @@
   import { map, of } from "rxjs";
   import type { FormattedMessage } from "./DebugOverlay";
   import DebugOverlayContext from "./DebugOverlayContext";
+  import DebugOverlaySelectable from "./DebugOverlaySelectable.svelte";
 
   export let message: FormattedMessage;
   export let ctx: DebugOverlayContext;
@@ -14,19 +15,8 @@
       return selected.message.id === message.message.id;
     })
   );
-
-  const borderClass$ = selected$.pipe(
-    map((selected) => {
-      if (selected) {
-        return "border-solid";
-      } else {
-        return "border-transparent";
-      }
-    })
-  );
-  // const borderClass$ = of("border-transparent");
 </script>
 
-<div class="border {$borderClass$}">
+<DebugOverlaySelectable {selected$}>
   {message.text}
-</div>
+</DebugOverlaySelectable>
