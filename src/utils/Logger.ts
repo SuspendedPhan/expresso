@@ -1,6 +1,6 @@
 // const ALLOWED_TOPICS: string[] | `ALL` = `ALL`;
 
-import { BehaviorSubject, type Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 
 const NONE = `None`;
 
@@ -26,7 +26,8 @@ export default class Logger {
   private constructor(
     private topic: string,
     private methodVar: string | null = null
-  ) {}
+  ) {
+  }
 
   public log(key: string, ...args: any[]) {
     if (DENY_TOPICS.includes(this.topic)) {

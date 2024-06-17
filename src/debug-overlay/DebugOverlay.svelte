@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import DebugOverlaySetup from "./DebugOverlaySetup";
   import DebugOverlayUtils from "./DebugOverlayUtils";
-  import DebugOverlay from "./DebugOverlay";
+  import DebugOverlay, { type FormattedMessage } from "./DebugOverlay";
   import DebugOverlayKeyboard from "./DebugOverlayKeyboard";
   import DebugOverlayMessage from "./DebugOverlayMessage.svelte";
   import DebugOverlayContext from "./DebugOverlayContext";
@@ -20,7 +20,10 @@
     DebugOverlaySetup.setup(overlay, debugOverlay);
   });
 
-  const messages$ = DebugOverlayUtils.getFilteredMessages$(query$);
+  let messages: FormattedMessage[] = [];
+  DebugOverlayUtils.getFilteredMessages$(query$).subscribe((v) => {
+    messages = v;
+  });
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -48,8 +51,8 @@
     on:keydown={handleKeydown}
     class="border"
   />
-  {#if $messages$}
-    {#each $messages$ as message}
+  {#if messages}
+    {#each messages as message}
       <DebugOverlayMessage {message} {ctx} />
     {/each}
   {/if}

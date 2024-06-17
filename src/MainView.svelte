@@ -32,6 +32,8 @@
 
     interval(1000).subscribe((v) => {
       result = ctx.eval();
+      const obs = Logger.getMessages$().observers;
+      logger.log("observers", obs);
     });
   }
 
