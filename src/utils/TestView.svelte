@@ -5,7 +5,7 @@
     name: "TestView",
   }).then(() => {
     console.log("TestView written to debug overlay");
-    Persistence.readDebugOverlay();
+    Persistence.readLoggerConfig();
   });
 </script>
 

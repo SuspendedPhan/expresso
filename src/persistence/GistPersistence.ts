@@ -1,10 +1,11 @@
 import GistClient from "../gist/GistClient";
+import LoggerConfig from "../utils/LoggerConfig";
 
 const debugOverlayGistId = "5d5fcb97a8e74e415d37c3ae590b417a";
 const debugOverlayFilename = "debug-overlay.json";
 
 export default class GistPersistence {
-  public static async readDebugOverlay(): Promise<any> {
+  public static async readLoggerConfig(): Promise<LoggerConfig> {
     const g = new GistClient();
     return g.getGist(debugOverlayGistId).then((gist) => {
       console.log(gist);
@@ -18,7 +19,7 @@ export default class GistPersistence {
     });
   }
 
-  public static async writeDebugOverlay(content: any): Promise<any> {
+  public static async writeLoggerConfig(content: any): Promise<any> {
     const g = new GistClient();
     const stringContent = JSON.stringify(content, null, 2);
     return g.updateGist(debugOverlayGistId, {

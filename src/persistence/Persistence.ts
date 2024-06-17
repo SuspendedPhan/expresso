@@ -1,11 +1,12 @@
+import LoggerConfig from "../utils/LoggerConfig";
 import GistPersistence from "./GistPersistence";
 
 export default class Persistence {
-  public static async readDebugOverlay(): Promise<any> {
-    return GistPersistence.readDebugOverlay();
+  public static async readLoggerConfig(): Promise<LoggerConfig> {
+    return GistPersistence.readLoggerConfig();
   }
 
-  public static async writeDebugOverlay(content: any): Promise<any> {
-    return GistPersistence.writeDebugOverlay(content);
+  public static async writeLoggerConfig(content: any): Promise<LoggerConfig> {
+    return GistPersistence.writeLoggerConfig(content);
   }
 }

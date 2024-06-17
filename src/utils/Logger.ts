@@ -13,7 +13,7 @@ let logToConsole = false;
 export interface Message {
   id: string;
   topic: string;
-  method: string | null;
+  method: string;
   key: string;
   args: any[];
 }

@@ -30,7 +30,7 @@ export default class DebugOverlayKeyboard {
         hotkeys("m", this.SCOPE, function (_event, _handler) {
             ctx.selection.getSelected$().pipe(take(1)).subscribe((selected) => {
                 if (selected !== null) {
-                    LoggerConfig.get().muteTopic(selected.message.topic);
+                    LoggerConfig.get().muteKey(selected.message.topic, selected.message.method, selected.message.key);
                 }
             });
         });

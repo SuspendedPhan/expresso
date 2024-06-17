@@ -14,14 +14,11 @@
 
   <div>Methods</div>
   {#each $methods$ as method}
-    <div>{method.topic}</div>
-    <div>{method.method}</div>
+    <div>{method.topic} - {method.method}</div>
   {/each}
 
   <div>Keys</div>
   {#each $keys$ as key}
-    <div>{key.topic}</div>
-    <div>{key.method}</div>
-    <div>{key.key}</div>
+    <div>{key.topic} - {key.method} - {key.key}</div>
   {/each}
 </div>
