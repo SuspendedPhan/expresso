@@ -1,7 +1,6 @@
-import { BehaviorSubject, Observable, combineLatest, from, map } from "rxjs";
-import Logger, { Message } from "./Logger";
+import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
+import { Message } from "./Logger";
 import GistPersistence from "../persistence/GistPersistence";
-import { DehydratedLoggerConfig } from "./LoggerConfigHydrator";
 
 export interface MutedMethod {
   topic: string;
@@ -15,23 +14,9 @@ export interface MutedKey {
 }
 
 export default class LoggerConfig {
-  private static instance: LoggerConfig | null = null;
+  private static instance = new LoggerConfig();
 
-  public static get$(): Observable<LoggerConfig> {
-    return from(LoggerConfig.get());
-  }
-
-  private static async get(): Promise<LoggerConfig> {
-    if (LoggerConfig.instance === null) {
-      const dehydratedConfig = await GistPersistence.readLoggerConfig();
-      const instance = new LoggerConfig();
-      if (dehydratedConfig !== null) {
-        instance.mutedTopics.next(dehydratedConfig.mutedTopics);
-        instance.mutedMethods.next(dehydratedConfig.mutedMethods);
-        instance.mutedKeys.next(dehydratedConfig.mutedKeys);
-      }
-      LoggerConfig.instance = instance;
-    }
+  public static get(): LoggerConfig {
     return LoggerConfig.instance;
   }
 
@@ -39,7 +24,18 @@ export default class LoggerConfig {
   private mutedMethods = new BehaviorSubject<MutedMethod[]>([]);
   private mutedKeys = new BehaviorSubject<MutedKey[]>([]);
 
-  public constructor() {}
+  private constructor() {
+    this.load();
+  }
+
+  private async load() {
+    const dehydratedConfig = await GistPersistence.readLoggerConfig();
+    if (dehydratedConfig !== null) {
+      this.mutedTopics.next(dehydratedConfig.mutedTopics);
+      this.mutedMethods.next(dehydratedConfig.mutedMethods);
+      this.mutedKeys.next(dehydratedConfig.mutedKeys);
+    }
+  }
 
   public getMutedTopics$(): Observable<string[]> {
     return this.mutedTopics;

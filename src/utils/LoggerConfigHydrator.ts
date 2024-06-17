@@ -1,4 +1,4 @@
-import LoggerConfig, { MutedKey, MutedMethod } from "./LoggerConfig";
+import { MutedKey, MutedMethod } from "./LoggerConfig";
 
 export default class LoggerConfigHydrator {
     
