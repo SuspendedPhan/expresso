@@ -1,8 +1,9 @@
-import { BehaviorSubject, Observable, combineLatest, map, take } from "rxjs";
+import { BehaviorSubject, Observable, Subject, combineLatest, map, take } from "rxjs";
 
 export default class ArrayNavigator<T> {
   private currentIndex$ = new BehaviorSubject<number | null>(null);
   private current$ = new BehaviorSubject<T | null>(null);
+  private indexOutOfBounds$ = new Subject<void>();
 
   public constructor(
     private objects$: Observable<T[]>,
@@ -16,7 +17,7 @@ export default class ArrayNavigator<T> {
         }
 
         if (index < 0 || index >= objects.length) {
-          console.error("ArrayNavigator: index out of bounds");
+          this.indexOutOfBounds$.next();
           return;
         }
 
@@ -31,6 +32,10 @@ export default class ArrayNavigator<T> {
         return objects.findIndex((o) => this.equalsFn(o, object));
       })
     );
+  }
+
+  public onIndexOutOfBounds$(): Observable<void> {
+    return this.indexOutOfBounds$;
   }
 
   public getCurrent$(): Observable<T | null> {

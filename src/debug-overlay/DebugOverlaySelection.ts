@@ -8,7 +8,9 @@ export default class DebugOverlaySelection {
 
     public constructor(debugOverlay: DebugOverlay) {
         this.navigator = new ArrayNavigator(debugOverlay.getFilteredMessages$(), (a, b) => a.message.id === b.message.id);
-        
+        this.navigator.onIndexOutOfBounds$().subscribe(() => {
+            this.navigator.setCurrent(null);
+        });
     }
 
     public select(object: FormattedMessage | null) {
