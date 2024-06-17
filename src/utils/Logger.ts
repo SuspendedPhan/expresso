@@ -25,7 +25,7 @@ export default class Logger {
 
   private constructor(
     private topic: string,
-    private methodVar: string | null = null
+    private methodVar: string = `NONE`,
   ) {
   }
 
