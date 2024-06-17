@@ -1,13 +1,15 @@
 import { Observable, combineLatest, map } from "rxjs";
-import LoggerConfig, { MutedKey, MutedMethod } from "../utils/LoggerConfig";
+import LoggerConfig, { MutedKey, MutedMethod, MutedTopic } from "../utils/LoggerConfig";
 import ArrayNavigator from "./ArrayNavigator";
 
-type MuteConfig = string | MutedMethod | MutedKey;
+type MuteConfig = MutedTopic | MutedMethod | MutedKey;
 
-export default class DebugOverlayLoggerConfig {
-  private navigator = new ArrayNavigator<MuteConfig>(DebugOverlayLoggerConfig.getMuteConfigs$(), (a, b) => {
+export default class LoggerConfigController {
+  private navigator = new ArrayNavigator<MuteConfig>(LoggerConfigController.getMuteConfigs$(), (a, b) => {
+    return a.id === b.id;
   });
-  public constructor() {}
+  public constructor() {
+  }
 
   private static getMuteConfigs$() : Observable<MuteConfig[]> {
     const topics$ = LoggerConfig.get().getMutedTopics$();

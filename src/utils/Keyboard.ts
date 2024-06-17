@@ -7,6 +7,16 @@ const logger = Logger.file("Keyboard.ts");
 export default class Keyboard {
   public static SCOPE = "Main";
 
+  private static scopes: string[] = [];
+
+  public static pushScope(scope: string) {
+    this.scopes.push(scope);
+  }
+
+  public static popScope() {
+    this.scopes.pop();
+  }
+  
   public static register(selection: Selection) {
     logger.log("register");
     hotkeys.setScope(this.SCOPE);
