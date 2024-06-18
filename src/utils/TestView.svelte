@@ -1,11 +1,10 @@
 <script lang="ts">
-  import Persistence from "../persistence/Persistence";
+  import GoogleCloudPersistService from "../persistence/GCloudPersistence";
+  // import Persistence from "../persistence/Persistence";
 
-  Persistence.writeDebugOverlay({
-    name: "TestView",
-  }).then(() => {
-    console.log("TestView written to debug overlay");
-    Persistence.readLoggerConfig();
+  const s = new GoogleCloudPersistService();
+  s.writeFile("test.txt", "Hello World!").then(() => {
+    console.log("File written");
   });
 </script>
 
