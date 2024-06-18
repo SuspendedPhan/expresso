@@ -1,69 +1,32 @@
-import { gapi } from 'gapi-script';
-import GCloudKey from './GCloudKey';
-import { PersistService } from './Persistence';
+import { getBlob, getStorage, ref, uploadString } from "firebase/storage";
+import { PersistService } from "./Persistence";
+import Firebase from "../firebase/Firebase";
 
-const CLIENT_ID = GCloudKey.client_id;
-const API_KEY = GCloudKey.private_key;
-const SCOPES = 'https://www.googleapis.com/auth/devstorage.read_write';
-const BUCKET_NAME = 'expresso';
+Firebase.init();
+const storage = getStorage();
 
-export default class GoogleCloudPersistService implements PersistService {
-  constructor() {
-    this.initClient();
+export default class GCloudPersistence implements PersistService {
+  async readFile(name: string): Promise<string | null> {
+    const storageRef = ref(storage, name);
+    let blob;
+    try {
+        blob = await getBlob(storageRef);
+    } catch (e: any) {
+        if (e.code === 'storage/object-not-found') {
+            return null;
+        }
+        throw e;
+    }
+
+    const text = await blob.text();
+    return text;
   }
+  writeFile(name: string, content: string): Promise<void> {
+    const storageRef = ref(storage, name);
 
-  private initClient(): void {
-    gapi.load('client:auth2', () => {
-      gapi.client.init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/storage/v1/rest'],
-        scope: SCOPES,
-      }).then(() => {
-        gapi.auth2.getAuthInstance().isSignedIn.listen(this.updateSigninStatus.bind(this));
-        this.updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
-      });
+    // Raw string is the default if no format is provided
+    return uploadString(storageRef, content).then((snapshot) => {
+      console.log("Uploaded a raw string!");
     });
-  }
-
-  private updateSigninStatus(isSignedIn: boolean): void {
-    if (!isSignedIn) {
-      this.handleAuthClick();
-    }
-  }
-
-  private handleAuthClick(): void {
-    gapi.auth2.getAuthInstance().signIn();
-  }
-
-  async readFile(name: string): Promise<any> {
-    try {
-      const response = await gapi.client.storage.objects.get({
-        bucket: BUCKET_NAME,
-        object: name,
-        alt: 'media',
-      });
-      return response.result;
-    } catch (error) {
-      console.error('Error reading file:', error);
-      throw error;
-    }
-  }
-
-  async writeFile(name: string, content: any): Promise<void> {
-    try {
-      const base64Content = btoa(JSON.stringify(content));
-      await gapi.client.storage.objects.insert({
-        bucket: BUCKET_NAME,
-        name: name,
-        media: {
-          mimeType: 'application/json',
-          body: base64Content,
-        },
-      });
-    } catch (error) {
-      console.error('Error writing file:', error);
-      throw error;
-    }
   }
 }

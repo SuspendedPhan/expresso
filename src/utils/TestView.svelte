@@ -6,6 +6,10 @@
   s.writeFile("test.txt", "Hello World!").then(() => {
     console.log("File written");
   });
+
+  s.readFile("test.txt").then((data) => {
+    console.log("Read file: ", data);
+  });
 </script>
 
 <main>
