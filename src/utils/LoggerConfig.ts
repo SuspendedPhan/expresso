@@ -1,7 +1,7 @@
 import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
 import { Message } from "./Logger";
-import GistPersistence from "../persistence/GistPersistence";
 import LoggerConfigHydrator from "./LoggerConfigHydrator";
+import Persistence from "../persistence/Persistence";
 
 export interface MutedTopic {
   id: string;
@@ -39,7 +39,7 @@ export default class LoggerConfig {
   }
 
   private async load() {
-    const dehydratedConfig = await GistPersistence.readLoggerConfig();
+    const dehydratedConfig = await Persistence.readLoggerConfig();
     if (dehydratedConfig !== null) {
       this.mutedTopics.next(dehydratedConfig.mutedTopics);
       this.mutedMethods.next(dehydratedConfig.mutedMethods);

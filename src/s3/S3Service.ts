@@ -1,18 +1,45 @@
-import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import { Readable } from 'stream';
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 
-class S3Service {
+import {fromCognitoIdentityPool} from "@aws-sdk/credential-providers";
+
+
+const region = "us-west-2";
+
+export default class S3Service {
   private s3Client: S3Client;
 
-  constructor(region: string) {
-    this.s3Client = new S3Client({ region });
+//   AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+//     IdentityPoolId: 'us-east-1:1699ebc0-7900-4099-b910-2df94f52a030',
+//     Logins: { // optional tokens, used for authenticated login
+//       'graph.facebook.com': 'FBTOKEN',
+//       'www.amazon.com': 'AMAZONTOKEN',
+//       'accounts.google.com': 'GOOGLETOKEN'
+//     }
+//   });
+
+  constructor() {
+    const s3Client = new S3Client({
+        region,
+        credentials: fromCognitoIdentityPool({
+          clientConfig: { region: REGION }, // Configure the underlying CognitoIdentityClient.
+          identityPoolId: 'IDENTITY_POOL_ID',
+          logins: {
+                  // Optional tokens, used for authenticated login.
+              },
+        })
+      });
+    this.s3Client = s3Client;      
   }
 
   async uploadFile(bucketName: string, key: string, body: string | Buffer) {
     const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: key,
-      Body: body
+      Body: body,
     });
 
     try {
@@ -26,22 +53,20 @@ class S3Service {
   async downloadFile(bucketName: string, key: string): Promise<string | null> {
     const command = new GetObjectCommand({
       Bucket: bucketName,
-      Key: key
+      Key: key,
     });
 
     try {
       const data = await this.s3Client.send(command);
-
-      if (data.Body instanceof Readable) {
-        const chunks: Uint8Array[] = [];
-        for await (const chunk of data.Body) {
-          chunks.push(chunk);
-        }
-        const fileContent = Buffer.concat(chunks).toString('utf-8');
-        console.log("File content:", fileContent);
-        return fileContent;
+      if (data.Body) {
+        const blob = new Blob([data.Body], {
+          type: "application/octet-stream",
+        });
+        const text = await blob.text();
+        console.log("File content:", text);
+        return text;
       } else {
-        console.log("Data is not a readable stream");
+        console.log("Data body is not available");
         return null;
       }
     } catch (err) {
@@ -50,17 +75,3 @@ class S3Service {
     }
   }
 }
-
-// Usage example
-const region = "us-west-2";
-const bucketName = "your-bucket-name";
-const key = "example.txt";
-const fileContent = "Hello, S3!";
-
-const s3Service = new S3Service(region);
-
-// Upload a file
-s3Service.uploadFile(bucketName, key, fileContent).then(() => {
-  // Download the file
-  s3Service.downloadFile(bucketName, key);
-});

@@ -1,14 +1,14 @@
 import { DehydratedLoggerConfig } from "../utils/LoggerConfigHydrator";
-import GistPersistence from "./GistPersistence";
+import S3Persistence from "./S3Persistence";
 
 export default class Persistence {
   public static async readLoggerConfig(): Promise<DehydratedLoggerConfig | null> {
-    return GistPersistence.readLoggerConfig();
+    return S3Persistence.readLoggerConfig();
   }
 
   public static async writeLoggerConfig(
     content: DehydratedLoggerConfig
   ): Promise<void> {
-    return GistPersistence.writeLoggerConfig(content);
+    return S3Persistence.writeLoggerConfig(content);
   }
 }
