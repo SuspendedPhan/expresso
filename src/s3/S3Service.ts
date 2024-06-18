@@ -25,8 +25,8 @@ export default class S3Service {
     const s3Client = new S3Client({
         region,
         credentials: fromCognitoIdentityPool({
-          clientConfig: { region: REGION }, // Configure the underlying CognitoIdentityClient.
-          identityPoolId: 'IDENTITY_POOL_ID',
+          clientConfig: { region }, // Configure the underlying CognitoIdentityClient.
+          identityPoolId: 'us-west-2:479cd634-3e85-47a5-ba09-98345c4423c5',
           logins: {
                   // Optional tokens, used for authenticated login.
               },

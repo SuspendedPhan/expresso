@@ -21,6 +21,7 @@
     "@aws-sdk/client-s3": "^3.598.0",
     "@aws-sdk/credential-providers": "^3.598.0",
     "axios": "^1.7.2",
+    "google-auth-library": "^9.11.0",
     "hotkeys-js": "^3.13.7",
     "rxjs": "^7.8.1"
   }
