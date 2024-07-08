@@ -16,6 +16,10 @@ export default class PixiRenderer {
     this.circlePool.grow(20);
   }
 
+  public takeCircle() {
+    this.circlePool.();
+  }
+
   private makeCircle() {
     const ret = new PIXI.Graphics();
     ret.beginFill(0xffffff);

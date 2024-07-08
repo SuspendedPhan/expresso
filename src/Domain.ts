@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, of } from 'rxjs'
+import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs'
 import Logger from './utils/Logger'
 
 export type Parent = CallExpr | Attribute;
@@ -28,6 +28,12 @@ export class Attribute {
     return this.id;
   }
 
+  public eval$(): Observable<number> {
+    return this.expr$.pipe(switchMap((expr) => {
+      return expr.eval$();  
+    }));
+  }
+
   toString(): string {
     return JSON.stringify({
       id: this.id,
@@ -37,6 +43,10 @@ export class Attribute {
 }
 
 export abstract class Expr {
+  eval$(): Observable<number> {
+    throw new Error('Method not implemented.');
+  }
+
   private exprLogger = Logger.file('Domain.ts Expr')
   private parent: Parent | null = null
   private id = crypto.randomUUID()
