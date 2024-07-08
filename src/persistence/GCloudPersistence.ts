@@ -25,7 +25,7 @@ export default class GCloudPersistence implements PersistService {
     const storageRef = ref(storage, name);
 
     // Raw string is the default if no format is provided
-    return uploadString(storageRef, content).then((snapshot) => {
+    return uploadString(storageRef, content).then((_snapshot) => {
       console.log("Uploaded a raw string!");
     });
   }

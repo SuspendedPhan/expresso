@@ -22,6 +22,8 @@ export default class Persistence {
 
   private static async readObject(filename: string): Promise<any> {
     const file = await service.readFile(filename);
+    if (file === null) return null;
+
     const obj = JSON.parse(file);
     return obj;
   }
