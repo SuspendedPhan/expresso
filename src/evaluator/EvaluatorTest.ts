@@ -7,7 +7,7 @@ import { Attribute, NumberExpr } from "../Domain";
 
 export default class EvaluatorTest {
     public test() {
-        const circles = [];
+        const circles: any[] = [];
 
         const circle$ = new Subject<CircleComponent>();
         const evaluator = new Evaluator(circle$);
@@ -26,6 +26,8 @@ export default class EvaluatorTest {
         y$.next(new Attribute(new NumberExpr(0)));
         radius$.next(new Attribute(new NumberExpr(1)));
 
+        console.log(circles);
+        
         // TODO: verify that the circles are correctly positioned
     }
 }

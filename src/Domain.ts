@@ -1,4 +1,4 @@
-import { BehaviorSubject, map, Observable, of, switchMap } from 'rxjs'
+import { BehaviorSubject, Observable, of, switchMap } from 'rxjs'
 import Logger from './utils/Logger'
 
 export type Parent = CallExpr | Attribute;
