@@ -4,8 +4,9 @@ import deePool from "deepool";
 
 export default class PixiRenderer {
   private app;
-  public circlePool = deePool.create(() => this.makeCircle());
-  public circles = [] as any[];
+  private circlePool = deePool.create(() => this.makeCircle());
+  private circles = [] as any[];
+  private usedCircles = [] as any[]; 
 
   constructor(viewportElement: any, canvasElement: any) {
     this.app = new PIXI.Application({
@@ -17,7 +18,15 @@ export default class PixiRenderer {
   }
 
   public takeCircle() {
-    return this.circlePool.use();
+    const circle = this.circlePool.use();
+    this.usedCircles.push(circle);
+    return circle;
+  }
+
+  public releaseCircles() {
+    for (const circle of this.usedCircles) {
+      this.circlePool.recycle(circle);
+    }
   }
 
   private makeCircle() {
