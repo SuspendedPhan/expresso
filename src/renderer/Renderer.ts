@@ -1,12 +1,12 @@
 import Evaluator from "../evaluator/Evaluator";
-import PixiRenderer from "./PixiRenderer";
+import ScenePool from "./ScenePool";
 
 export default class Renderer {
-    public constructor(evaluator: Evaluator, pixi: PixiRenderer) {
+    public constructor(evaluator: Evaluator, pool: ScenePool) {
         evaluator.evaluate$().subscribe((evaluatedCircleClones) => {
-            pixi.releaseCircles();
+            pool.releaseCircles();
             for (const evaluatedCircleClone of evaluatedCircleClones) {
-                const circle = pixi.takeCircle();
+                const circle = pool.takeCircle();
                 circle.visible = true;
                 circle.x = evaluatedCircleClone.x;
                 circle.y = evaluatedCircleClone.y;
