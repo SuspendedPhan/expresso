@@ -17,7 +17,7 @@ export default class PixiRenderer {
   }
 
   public takeCircle() {
-    this.circlePool.();
+    return this.circlePool.use();
   }
 
   private makeCircle() {

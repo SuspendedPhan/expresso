@@ -1,10 +1,8 @@
-declare module 'deepool' {
-    export default {
-        create: () => {
-            use: () => T;
-            grow: (n: number) => void;
-            recycle: (item: T) => void;
-            size: () => number;
-        }
-    }
+declare module "deepool" {
+  export function create<T>(factory: () => T): {
+    use(): T;
+    grow(count: number): void;
+    recycle(item: T): void;
+    size(): number;
+  };
 }
