@@ -6,28 +6,31 @@ import ScenePool from "../renderer/ScenePool";
 import { Attribute, NumberExpr } from "../Domain";
 
 export default class EvaluatorTest {
-    public test() {
-        const circles: any[] = [];
+  public test() {
+    const circles: any[] = [];
 
-        const circle$ = new Subject<CircleComponent>();
-        const evaluator = new Evaluator(circle$);
-        new Renderer(evaluator, new ScenePool(() => {
-            const circle = {};
-            circles.push(circle);
-            return circle;
-        }));
+    const circle$ = new Subject<CircleComponent>();
+    const evaluator = new Evaluator(circle$);
+    new Renderer(
+      evaluator,
+      new ScenePool(() => {
+        const circle = { scale: {} };
+        circles.push(circle);
+        return circle;
+      })
+    );
 
-        const x$ = new Subject<Attribute>();
-        const y$ = new Subject<Attribute>();
-        const radius$ = new Subject<Attribute>();
-        const circleComponent = new CircleComponent(x$, y$, radius$);
-        circle$.next(circleComponent);
-        x$.next(new Attribute(new NumberExpr(0)));
-        y$.next(new Attribute(new NumberExpr(0)));
-        radius$.next(new Attribute(new NumberExpr(1)));
+    const x$ = new Subject<Attribute>();
+    const y$ = new Subject<Attribute>();
+    const radius$ = new Subject<Attribute>();
+    const circleComponent = new CircleComponent(x$, y$, radius$);
+    circle$.next(circleComponent);
+    x$.next(new Attribute(new NumberExpr(0)));
+    y$.next(new Attribute(new NumberExpr(0)));
+    radius$.next(new Attribute(new NumberExpr(1)));
 
-        console.log(circles);
-        
-        // TODO: verify that the circles are correctly positioned
-    }
+    console.log(circles[0]);
+
+    // TODO: verify that the circles are correctly positioned
+  }
 }
