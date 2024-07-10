@@ -12,7 +12,8 @@ export default class DebugOverlayUtils {
         if (a === null) {
           return "null";
         }
-        return a.toString();
+        return a;
+        // return a.toString();
       })
       .join(" ");
     return {

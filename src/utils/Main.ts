@@ -1,4 +1,4 @@
-import { BehaviorSubject, first, firstValueFrom } from "rxjs";
+import { BehaviorSubject, first, firstValueFrom, Subject } from "rxjs";
 import Keyboard from "./Keyboard";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
@@ -17,10 +17,12 @@ export default class Main {
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
-    const ctx = new MainContext(goModule, exprFactory, new Selection());    
-
+    
+    const root$ = new Subject<Attribute>();
+    const ctx = new MainContext(goModule, exprFactory, new Selection(root$));
+    
     const attribute = exprFactory.createAttribute();
-    exprFactory.onAttributeAdded$.next(attribute);
+    root$.next(attribute);
     
     ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
