@@ -1,4 +1,12 @@
-import { BehaviorSubject, Observable, of, Subject } from "rxjs";
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  Observable,
+  Observer,
+  of,
+  Subject,
+} from "rxjs";
 import {
   Parent,
   ReadonlyCallExpr,
@@ -6,30 +14,37 @@ import {
   ReadonlyNumberExpr,
 } from "./domain/Expr";
 import { ReadonlyAttribute } from "./Domain";
+import Logger from "./utils/Logger";
 
-class Attribute extends ReadonlyAttribute {
-  public constructor(
-    public readonly replaceWithNumberExpr: (value: number) => void,
-    public readonly replaceWithCallExpr: () => void,
-    expr$: BehaviorSubject<ReadonlyExpr>
-  ) {
-    super(expr$);
-  }
+const logger = Logger.file("ExprFactory.ts");
+
+interface ExprReplacer {
+  readonly replaceWithNumberExpr: (value: number) => void;
+  readonly replaceWithCallExpr: () => void;
 }
 
-class CallExpr extends ReadonlyCallExpr {
+class Attribute {
   public constructor(
-    public readonly replaceArgWithNumberExpr: (
-      index: number,
-      value: number
-    ) => void,
-    public readonly replaceArgWithCallExpr: (index: number) => void,
-    args$: BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>,
-    parent$: Observable<Parent>,
-  ) {
-    super(args$, parent$);
-  }
+    public readonly readonlyAttribute: ReadonlyAttribute,
+    public readonly expr$: BehaviorSubject<Expr>
+  ) {}
 }
+
+class CallExpr {
+  public constructor(
+    public readonly readonlyExpr: ReadonlyCallExpr,
+    public readonly exprReplacer: ExprReplacer
+  ) {}
+}
+
+class NumberExpr {
+  public constructor(
+    public readonly readonlyExpr: ReadonlyNumberExpr,
+    public readonly exprReplacer: ExprReplacer
+  ) {}
+}
+
+type Expr = NumberExpr | CallExpr;
 
 export default class ExprFactory {
   private _onNumberExprCreated$ = new Subject<ReadonlyNumberExpr>();
@@ -37,70 +52,118 @@ export default class ExprFactory {
   private _onAttributeCreated$ = new Subject<ReadonlyAttribute>();
 
   public createAttribute(): Attribute {
+    logger.method("createAttribute");
+
     const attribute$ = new BehaviorSubject<Parent>(null);
-    const expr = this.createNumberExpr(0, attribute$);
-    const expr$ = new BehaviorSubject<ReadonlyExpr>(expr);
+    const numberExpr$ = this.createNumberExpr$(0, attribute$);
+    const expr$ = new BehaviorSubject<Expr>(numberExpr$.value);
+    numberExpr$.subscribe(expr$);
+    const readonlyExpr$ = numberExpr$.pipe(map((expr) => expr.readonlyExpr));
 
-    const replaceWithNumberExpr = (value: number) => {
-      const numberExpr = this.createNumberExpr(value, attribute$);
-      expr$.next(numberExpr);
-    };
-
-    const replaceWithCallExpr = () => {
-      const callExpr = this.createCallExpr(attribute$);
-      expr$.next(callExpr);
-    }
-
-    const attribute = new Attribute(replaceWithNumberExpr, replaceWithCallExpr, expr$);
-    attribute$.next(attribute);
-    this._onAttributeCreated$.next(attribute);
+    const attribute = new Attribute(new ReadonlyAttribute(readonlyExpr$), expr$);
+    attribute$.next(attribute.readonlyAttribute);
+    this._onAttributeCreated$.next(attribute.readonlyAttribute);
     return attribute;
+  }
+
+  private createNumberExpr$(
+    value: number,
+    parent$: Observable<Parent>
+  ): BehaviorSubject<Expr> {
+    logger.method("createNumberExpr$").log("value", value);
+
+    const expr$ = new Subject<Expr>();
+    const value$ = new BehaviorSubject<number>(value);
+    const readonlyNumberExpr = new ReadonlyNumberExpr(value$, parent$);
+    const numberExpr = new NumberExpr(readonlyNumberExpr, {
+      replaceWithNumberExpr: (value) => {
+        this.replaceWithNumberExpr(value, parent$, expr$);
+      },
+      replaceWithCallExpr: () => {
+        this.replaceWithCallExpr(parent$, expr$);
+      },
+    });
+    expr$.next(numberExpr);
+    const result$ = new BehaviorSubject<Expr>(numberExpr);
+    expr$.subscribe(result$);
+    return result$;
   }
 
   public createNumberExpr(
     value: number,
-    parent$: Observable<Parent>
-  ): ReadonlyNumberExpr {
-    const numberExpr: ReadonlyNumberExpr = new ReadonlyNumberExpr(
+    parent$: Observable<Parent>,
+    replacer: ExprReplacer
+  ): NumberExpr {
+    logger.method("createNumberExpr").log("value", value);
+
+    const readonlyNumberExpr: ReadonlyNumberExpr = new ReadonlyNumberExpr(
       of(value),
       parent$
     );
-    this._onNumberExprCreated$.next(numberExpr);
+    const numberExpr = new NumberExpr(readonlyNumberExpr, replacer);
+    this._onNumberExprCreated$.next(readonlyNumberExpr);
     return numberExpr;
   }
 
-  public createCallExpr(parent$: Observable<Parent>): CallExpr {
+  public createCallExpr(
+    parent$: Observable<Parent>,
+    replacer: ExprReplacer
+  ): CallExpr {
+    const callExpr$ = new Subject<ReadonlyCallExpr>();
+
+    const arg0$ = new Subject<Expr>();
+    const arg1$ = new Subject<Expr>();
+
+    const arg0 = this.replaceWithNumberExpr(0, callExpr$, arg0$);
+    const arg1 = this.replaceWithNumberExpr(0, callExpr$, arg1$);
+
+    const arg0$$ = new BehaviorSubject<ReadonlyExpr>(arg0.readonlyExpr);
+    const arg1$$ = new BehaviorSubject<ReadonlyExpr>(arg1.readonlyExpr);
+
+    arg0$.pipe(map(v => v.readonlyExpr)).subscribe(arg0$$);
+    arg1$.pipe(map(v => v.readonlyExpr)).subscribe(arg1$$);
+
     const args$ = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
-    const callExpr$ = new BehaviorSubject<Parent>(null);
+    args$.next([arg0$$, arg1$$]);
 
-    const arg0 = this.createNumberExpr(19, callExpr$);
-    const arg1 = this.createNumberExpr(2, callExpr$);
-    args$.next([
-      new BehaviorSubject<ReadonlyExpr>(arg0),
-      new BehaviorSubject<ReadonlyExpr>(arg1),
-    ]);
+    const callExpr = new CallExpr(
+      new ReadonlyCallExpr(args$, parent$),
+      replacer
+    );
+    callExpr$.next(callExpr.readonlyExpr);
+    return callExpr;
+  }
 
-    const replaceArgWithNumberExpr = (index: number, value: number) => {
-      const arg = args$.value[index];
-      const numberExpr = this.createNumberExpr(value, callExpr$);
-      if (arg === undefined) {
-        throw new Error("arg is undefined");
-      }
-      arg.next(numberExpr);
-    };
+  private replaceWithNumberExpr(
+    value: number,
+    parent$: Observable<Parent>,
+    expr$: Observer<Expr>
+  ) {
+    const numberExpr = this.createNumberExpr(value, parent$, {
+      replaceWithNumberExpr: (value) => {
+        this.replaceWithNumberExpr(value, parent$, expr$);
+      },
+      replaceWithCallExpr: () => {
+        this.replaceWithCallExpr(parent$, expr$);
+      },
+    });
+    expr$.next(numberExpr);
+    return numberExpr;
+  }
 
-    const replaceArgWithCallExpr = (index: number) => {
-      const arg = args$.value[index];
-      if (arg === undefined) {
-        throw new Error("arg is undefined");
-      }
-      const callExpr = this.createCallExpr(callExpr$);
-      arg.next(callExpr);
-    };
-
-    const callExpr = new CallExpr(replaceArgWithNumberExpr, replaceArgWithCallExpr, args$, parent$);
-    callExpr$.next(callExpr);
-    this._onCallExprCreated$.next(callExpr);
+  private replaceWithCallExpr(
+    parent$: Observable<Parent>,
+    expr$: Observer<Expr>
+  ) {
+    const callExpr = this.createCallExpr(parent$, {
+      replaceWithNumberExpr: (value) => {
+        this.replaceWithNumberExpr(value, parent$, expr$);
+      },
+      replaceWithCallExpr: () => {
+        this.replaceWithCallExpr(parent$, expr$);
+      },
+    });
+    expr$.next(callExpr);
     return callExpr;
   }
 

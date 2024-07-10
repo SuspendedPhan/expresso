@@ -1,4 +1,4 @@
-import { BehaviorSubject, firstValueFrom } from "rxjs";
+import { BehaviorSubject, first, firstValueFrom } from "rxjs";
 import Keyboard from "./Keyboard";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
@@ -19,14 +19,19 @@ export default class Main {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
     const attribute = exprFactory.createAttribute();
-    attribute.replaceWithCallExpr();
-    const ctx = new MainContext(goModule, exprFactory, new Selection(attribute));
+    attribute.expr$.pipe(first()).subscribe((expr) => {
+      expr.exprReplacer.replaceWithCallExpr();
+    });
+    attribute.expr$.subscribe((expr) => {
+      console.log("Main.setup.subscribe", expr);
+    });
+    const ctx = new MainContext(goModule, exprFactory, new Selection(attribute.readonlyAttribute));
 
     
     ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
     });
     Keyboard.register(ctx.selection);
-    return new Main(ctx, attribute);
+    return new Main(ctx, attribute.readonlyAttribute);
   }
 }
