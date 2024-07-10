@@ -11,7 +11,11 @@ import {
 // import { ReadonlyAttribute, ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../Domain";
 import Logger from "./Logger";
 import { type ReadonlyAttribute } from "../Domain";
-import type { ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
+import type {
+  ReadonlyCallExpr,
+  ReadonlyExpr,
+  ReadonlyNumberExpr,
+} from "../domain/Expr";
 import { Attribute, Expr } from "../ExprFactory";
 
 export type Selectable = Attribute | Expr | null;
@@ -47,9 +51,7 @@ export default class Selection {
   }
 
   private handleNavigation(
-    getNextObject$: (
-      currentObject: Selectable
-    ) => Observable<Selectable>
+    getNextObject$: (currentObject: Selectable) => Observable<Selectable>
   ) {
     const object$ = this.selectedObject$.value;
     logger.log("selectedObject", object$);
@@ -80,18 +82,22 @@ export default class Selection {
   }
 
   private getParent$(object: Selectable): Observable<Selectable> {
-    if (object === null) {
-      return of(null);
-    } else if (object === this.root) {
-      return of(null);
-    } else if (object.type === "Attribute") {
-      throw new Error("Not implemented");
-    } else if (object) {
-      return object.parent$;
-    } else {
-      logger.log("object", object);
-      throw new Error("Unknown object type");
-    }
+    return this.root.pipe(
+      switchMap((root) => {
+        if (object === null) {
+          return of(null);
+        } else if (object === root) {
+          return of(null);
+        } else if (object.type === "Attribute") {
+          throw new Error("Not implemented");
+        } else if (object) {
+          return object.parent$;
+        } else {
+          logger.log("object", object);
+          throw new Error("Unknown object type");
+        }
+      })
+    );
   }
 
   private getChildForExpr$(expr: Expr): Observable<Selectable> {
