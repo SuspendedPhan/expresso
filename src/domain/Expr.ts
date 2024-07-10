@@ -34,7 +34,7 @@ export type Parent = ReadonlyCallExpr | ReadonlyAttribute | null;
 
 export interface ReadonlyExprBase {
   readonly id: string;
-  readonly parent: Parent;
+  readonly parent$: Observable<Parent>;
 }
 
 export interface ReadonlyNumberExpr {

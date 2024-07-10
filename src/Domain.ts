@@ -9,5 +9,5 @@ import { ReadonlyExpr } from "./domain/Expr";
 export interface ReadonlyAttribute {
   readonly type: "Attribute";
   readonly id: string;
-  readonly expr: ReadonlyExpr;
+  readonly expr$: ReadonlyExpr;
 }
