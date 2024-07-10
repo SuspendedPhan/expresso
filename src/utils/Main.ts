@@ -14,6 +14,10 @@ export default class Main {
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const ctx = new MainContext(goModule);
+
+    const n = ctx.createNumberExpr(1);
+    const r = goModule.evalExpr(n.id);
+    console.log("r", r);
     // ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
     //   logger.log("selectedObject", selectedObject);
     // });

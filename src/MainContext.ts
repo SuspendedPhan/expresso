@@ -13,23 +13,23 @@ export default class MainContext {
   public createNumberExpr(value: number): NumberExpr {
     const numberExpr: NumberExpr = new NumberExpr(value);
     numberExpr.value$.subscribe(value => {
-      this.goModule.setValue(numberExpr.id, value);
+      this.goModule.setNumberExprValue(numberExpr.id, value);
     });
     return numberExpr;
   }
 
   public createCallExpr(): CallExpr {
     const callExpr = new CallExpr();
-    this.goModule.addExpr(callExpr.id);
+    this.goModule.addCallExpr(callExpr.id);
 
     callExpr.args.subscribe(args => {
       const arg0Id = args[0]!.value.id;
       const arg0Type = `Value`;
-      this.goModule.setExprArg0(callExpr.id, arg0Id, arg0Type);
+      this.goModule.setCallExprArg0(callExpr.id, arg0Id, arg0Type);
       
       const arg1Id = args[1]!.value.id;
       const arg1Type = `Value`;
-      this.goModule.setExprArg1(callExpr.id, arg1Id, arg1Type);
+      this.goModule.setCallExprArg1(callExpr.id, arg1Id, arg1Type);
     });
 
     return callExpr;

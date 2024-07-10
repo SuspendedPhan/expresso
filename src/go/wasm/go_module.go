@@ -11,32 +11,38 @@ func bootstrapGoModule() {
 
 	ev := evaluator.NewEvaluator()
 
-	goModule.Set("addValue", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	goModule.Set("addNumberExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		ev.AddNumberExpr(id)
+		return nil
+	}))
+
+	goModule.Set("setNumberExprValue", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
 		value := args[1].Float()
-		ev.AddValue(id, value)
+		ev.SetNumberExprValue(id, value)
 		return nil
 	}))
 
-	goModule.Set("addExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	goModule.Set("addCallExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
-		ev.AddExpr(id)
+		ev.AddCallExpr(id)
 		return nil
 	}))
 
-	goModule.Set("setExprArg0", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		argId := args[1].String()
-		argType := args[2].String()
-		ev.SetExprArg0(id, argId, argType)
-		return nil
-	}))
-
-	goModule.Set("setExprArg1", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	goModule.Set("setCallExprArg0", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
 		argId := args[1].String()
 		argType := args[2].String()
-		ev.SetExprArg1(id, argId, argType)
+		ev.SetCallExprArg0(id, argId, argType)
+		return nil
+	}))
+
+	goModule.Set("setCallExprArg1", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		argId := args[1].String()
+		argType := args[2].String()
+		ev.SetCallExprArg1(id, argId, argType)
 		return nil
 	}))
 

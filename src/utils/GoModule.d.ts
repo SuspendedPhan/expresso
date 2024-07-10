@@ -1,8 +1,9 @@
 export default interface GoModule {
-  setValue(id: string, value: number): void;
-  addExpr(id: string);
-  setExprArg0(exprId: string, argId: string, argType: string): void;
-  setExprArg1(exprId: string, argId: string, argType: string): void;
+  addNumberExpr(id: string, value: number): void;
+  setNumberExprValue(id: string, value: number): void;
+  addCallExpr(id: string);
+  setCallExprArg0(exprId: string, argId: string, argType: string): void;
+  setCallExprArg1(exprId: string, argId: string, argType: string): void;
   evalExpr(exprId: string): number;
 }
 
