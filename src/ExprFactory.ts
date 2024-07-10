@@ -51,9 +51,7 @@ export default class ExprFactory {
     const attribute$ = new BehaviorSubject<Parent>(null);
     const numberExpr = this.createNumberExpr(0, attribute$);
     const exprMut$ = this.createExprMut$(numberExpr);
-    const expr$ = exprMut$.pipe(
-      map((exprMut) => exprMut.exprBaseMut.expr),
-    );
+    const expr$ = exprMut$.pipe(map((exprMut) => exprMut.exprBaseMut.expr));
 
     const attrMut: AttributeMut = {
       attribute: {
@@ -71,11 +69,10 @@ export default class ExprFactory {
   }
 
   private createExprMut$(expr: ReadonlyExpr): Observable<ExprMut> {
-    const expr$ = new BehaviorSubject<ExprMut | null>(null);
-    const exprMut$ = this.createExprMut(expr, expr$);
-    const result$ = new BehaviorSubject<ExprMut>(exprMut$);
-    (expr$ as BehaviorSubject<ExprMut>).subscribe(result$);
-    return result$;
+    const exprMutSubject$ = new BehaviorSubject<ExprMut | null>(null);
+    const exprMut$ = this.createExprMut(expr, exprMutSubject$);
+    exprMutSubject$.next(exprMut$);
+    return exprMutSubject$ as Observable<ExprMut>;
   }
 
   private createExprMut(expr: ReadonlyExpr, expr$: Observer<ExprMut>): ExprMut {
@@ -84,6 +81,8 @@ export default class ExprFactory {
         return this.createNumberExprMut(expr, expr$);
       case "CallExpr":
         return this.createCallExprMut(expr, expr$);
+      default:
+        throw new Error(`Unknown expr type: ${expr}`);
     }
   }
 
