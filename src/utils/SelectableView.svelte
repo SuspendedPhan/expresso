@@ -10,11 +10,10 @@
   const logger = Logger.file("SelectableView.svelte");
   Logger.logToConsole();
 
-  // const selected$ = ctx.selection.getSelectedObject$().pipe(
-  //   map((o) => o === object),
-  //   share()
-  // );
-  const selected$ = of(false);
+  const selected$ = ctx.selection.getSelectedObject$().pipe(
+    map((o) => o === object),
+    share()
+  );
 
   selected$.subscribe((selected) => {
     logger.log("selected", selected);

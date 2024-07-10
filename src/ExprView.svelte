@@ -41,6 +41,7 @@
   } else if (expr instanceof ReadonlyCallExpr) {
     text = "+";
   } else {
+    console.log(expr);
     throw new Error(`Unknown expr type`);
   }
 

@@ -1,18 +1,19 @@
 import {
   BehaviorSubject,
   Observable,
+  combineLatest,
   map,
   of,
   share,
   switchAll,
   switchMap,
 } from "rxjs";
-// import { Attribute, CallExpr, Expr, NumberExpr } from "../Domain";
+// import { ReadonlyAttribute, ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../Domain";
 import Logger from "./Logger";
-import { Attribute } from "../Domain";
-import { ReadonlyExpr } from "../domain/Expr";
+import { ReadonlyAttribute } from "../Domain";
+import { ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
 
-export type Selectable = Attribute | ReadonlyExpr;
+export type Selectable = ReadonlyAttribute | ReadonlyExpr;
 
 const logger = Logger.file("Selection.ts");
 logger.allow();
@@ -22,7 +23,7 @@ export default class Selection {
     of(null)
   );
 
-  public constructor(private root: Attribute) {}
+  public constructor(private root: ReadonlyAttribute) {}
 
   public select(object$: Observable<Selectable | null>) {
     if (object$ === null) {
@@ -70,9 +71,9 @@ export default class Selection {
   private getChild$(object: Selectable | null): Observable<Selectable | null> {
     if (object === null) {
       return of(this.root);
-    } else if (object instanceof Attribute) {
-      return object.getExpr$();
-    } else if (object instanceof Expr) {
+    } else if (object instanceof ReadonlyAttribute) {
+      return object.expr$;
+    } else if (object instanceof ReadonlyExpr) {
       return this.getChildForExpr$(object);
     } else {
       throw new Error("Unknown object type");
@@ -84,25 +85,25 @@ export default class Selection {
       return of(null);
     } else if (object === this.root) {
       return of(null);
-    } else if (object instanceof Attribute) {
+    } else if (object instanceof ReadonlyAttribute) {
       throw new Error("Not implemented");
-    } else if (object instanceof Expr) {
-      return object.getParent$();
+    } else if (object instanceof ReadonlyExpr) {
+      return object.parent$;
     } else {
       logger.log("object", object);
       throw new Error("Unknown object type");
     }
   }
 
-  private getChildForExpr$(expr: Expr): Observable<Expr | null> {
-    if (expr instanceof NumberExpr) {
+  private getChildForExpr$(expr: ReadonlyExpr): Observable<ReadonlyExpr | null> {
+    if (expr instanceof ReadonlyNumberExpr) {
       return of(null);
-    } else if (expr instanceof CallExpr) {
-      return expr.getArgs$().pipe(map((args) => {
-        if (args.length === 0) {
-          throw new Error("No args");
+    } else if (expr instanceof ReadonlyCallExpr) {
+      return expr.args$.pipe(switchMap((args) => {
+        if (args[0] === undefined) {
+          throw new Error("args[0] is undefined");
         }
-        return args[0]!;
+        return args[0];
       }));
     } else {
       throw new Error("Unknown expr type");

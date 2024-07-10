@@ -5,29 +5,28 @@ import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
 import ExprFactory from "../ExprFactory";
 import { ReadonlyAttribute } from "../Domain";
+import Selection from "./Selection";
 
 const logger = Logger.file("Main.ts");
 // logger.allow();
 // Logger.allow("MainView.svelte");
 
 export default class Main {
-  public attribute;
-
-  private constructor(public ctx: MainContext) {
-    this.attribute = ctx.exprFactory.createAttribute();
-    this.attribute.replaceWithCallExpr();
+  private constructor(public ctx: MainContext, public readonly attribute: ReadonlyAttribute) {
   }
 
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
-    const ctx = new MainContext(goModule, exprFactory);
+    const attribute = exprFactory.createAttribute();
+    attribute.replaceWithCallExpr();
+    const ctx = new MainContext(goModule, exprFactory, new Selection(attribute));
 
     
-    // ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
-    //   logger.log("selectedObject", selectedObject);
-    // });
-    // Keyboard.register(ctx.selection);
-    return new Main(ctx);
+    ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
+      logger.log("selectedObject", selectedObject);
+    });
+    Keyboard.register(ctx.selection);
+    return new Main(ctx, attribute);
   }
 }

@@ -1,5 +1,6 @@
 import type GoModule from "./utils/GoModule";
 import ExprFactory from "./ExprFactory";
+import Selection from "./utils/Selection";
 
 export default class MainContext {
   public constructor(
