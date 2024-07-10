@@ -1,6 +1,5 @@
 import {
   BehaviorSubject,
-  combineLatest,
   map,
   Observable,
   Observer,
@@ -19,6 +18,7 @@ import Logger from "./utils/Logger";
 const logger = Logger.file("ExprFactory.ts");
 
 interface ExprReplacer {
+  readonly expr: ReadonlyExpr;
   readonly replaceWithNumberExpr: (value: number) => void;
   readonly replaceWithCallExpr: () => void;
 }

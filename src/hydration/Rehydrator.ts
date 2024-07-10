@@ -6,7 +6,7 @@ import {
 } from "../Domain";
 import {
   DehydratedAttribute,
-  DehydratedExpr,
+  DehydratedExprBase,
   DehydratedNumberExpr,
   DehydratedPrimitiveFunctionCallExpr,
 } from "./Dehydrator";
@@ -16,7 +16,7 @@ export default class Rehydrator {
     return new Attribute(this.rehydrateExpr(dehydrated.expr));
   }
 
-  private static rehydrateExpr(dehydrated: DehydratedExpr): Expr {
+  private static rehydrateExpr(dehydrated: DehydratedExprBase): Expr {
     if (dehydrated.exprType === "NumberExpr") {
       return this.rehydrateNumberExpr(dehydrated as DehydratedNumberExpr);
     } else if (dehydrated.exprType === "PrimitiveFunctionCallExpr") {
@@ -42,7 +42,7 @@ export default class Rehydrator {
   }
 
   private static rehydrateArgs(
-    dehydratedArgs: Array<DehydratedExpr>
+    dehydratedArgs: Array<DehydratedExprBase>
   ): Array<Expr> {
     return dehydratedArgs.map((dehydratedArg) => {
       return this.rehydrateExpr(dehydratedArg);
