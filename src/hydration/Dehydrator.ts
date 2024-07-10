@@ -1,6 +1,6 @@
 import { Observable, combineLatest, map, mergeMap, of, switchMap } from "rxjs";
 import {
-  Attribute,
+  ReadonlyAttribute,
   // Expr,
   // NumberExpr,
   // PrimitiveFunctionCallExpr,
@@ -30,7 +30,7 @@ export interface DehydratedPrimitiveFunctionCallExpr extends DehydratedExpr {
 
 export default class Dehydrator {
   public static dehydrateAttribute$(
-    attribute: Attribute
+    attribute: ReadonlyAttribute
   ): Observable<DehydratedAttribute> {
     return attribute.getExpr$().pipe(
       mergeMap((expr) => {

@@ -8,12 +8,12 @@
   import Dehydrator from "./hydration/Dehydrator";
   import Rehydrator from "./hydration/Rehydrator";
   import Main from "./utils/Main";
-  import { type Attribute } from "./Domain";
+  import { type ReadonlyAttribute } from "./Domain";
 
   const logger = Logger.file("MainView.svelte");
 
   let ctx: MainContext | null = null;
-  let attribute: Attribute | null = null;
+  let attribute: ReadonlyAttribute | null = null;
   // let rehydratedAttribute = null;
   let result = -1;
 

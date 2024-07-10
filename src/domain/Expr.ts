@@ -1,18 +1,19 @@
 import { BehaviorSubject, Observable } from "rxjs";
 
-export type ReadonlyExpr = ReadonlyNumberExpr | ReadonlyCallExpr;
-
-export interface ReadonlyExprBase {
-    readonly id: string;
+export class ReadonlyExpr {
+    public readonly id = `expr-${Math.random()}`;
 }
 
-export interface ReadonlyNumberExpr extends ReadonlyExprBase {
-    readonly type: "NumberExpr";
-    readonly value$: Observable<number>;
+export class ReadonlyNumberExpr extends ReadonlyExpr {
+    public constructor(public readonly value$: Observable<number>) {
+        super();
+    }
 }
 
-export interface ReadonlyCallExpr extends ReadonlyExprBase {
-    readonly type: "CallExpr";
-    readonly args$: Observable<Observable<ReadonlyExpr>[]>;
+export class ReadonlyCallExpr extends ReadonlyExpr {
+    // readonly args$: Observable<Observable<ReadonlyExpr>[]>;
+    public constructor(public readonly args$: Observable<Observable<ReadonlyExpr>[]>) {
+        super();
+    }
 }
 

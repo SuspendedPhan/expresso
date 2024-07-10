@@ -9,8 +9,10 @@ import {
 } from "rxjs";
 // import { Attribute, CallExpr, Expr, NumberExpr } from "../Domain";
 import Logger from "./Logger";
+import { Attribute } from "../Domain";
+import { ReadonlyExpr } from "../domain/Expr";
 
-export type Selectable = Attribute | Expr;
+export type Selectable = Attribute | ReadonlyExpr;
 
 const logger = Logger.file("Selection.ts");
 logger.allow();

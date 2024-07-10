@@ -4,7 +4,8 @@ import ExprFactory from "./ExprFactory";
 export default class MainContext {
   public constructor(
     private goModule: GoModule,
-    public readonly exprFactory: ExprFactory
+    public readonly exprFactory: ExprFactory,
+    public readonly selection: Selection,
   ) {
     exprFactory.onNumberExprCreated$().subscribe((numberExpr) => {
       goModule.addNumberExpr(numberExpr.id);

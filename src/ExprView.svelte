@@ -12,7 +12,11 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import { type ReadonlyExpr } from "./domain/Expr";
+  import {
+    ReadonlyCallExpr,
+    ReadonlyNumberExpr,
+    type ReadonlyExpr,
+  } from "./domain/Expr";
 
   export let ctx: MainContext;
   export let expr: ReadonlyExpr;
@@ -21,7 +25,7 @@
 
   let args: ReadonlyExpr[] = [];
 
-  if (expr.type === "CallExpr") {
+  if (expr instanceof ReadonlyCallExpr) {
     expr.args$.subscribe((aa) => {
       combineLatest(aa).subscribe((v) => {
         args = v;
@@ -30,17 +34,14 @@
   }
 
   let text: string;
-  switch (expr.type) {
-    case "NumberExpr":
-      expr.value$.subscribe((v) => {
-        text = v.toString();
-      });
-      break;
-    case "CallExpr":
-      text = "+";
-      break;
-    default:
-      throw new Error(`Unknown expr type`);
+  if (expr instanceof ReadonlyNumberExpr) {
+    expr.value$.subscribe((v) => {
+      text = v.toString();
+    });
+  } else if (expr instanceof ReadonlyCallExpr) {
+    text = "+";
+  } else {
+    throw new Error(`Unknown expr type`);
   }
 
   function handleSelect(e: CustomEvent<Expr>): void {

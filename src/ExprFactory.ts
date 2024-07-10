@@ -9,7 +9,7 @@ import {
   ReadonlyExpr,
   ReadonlyNumberExpr,
 } from "./domain/Expr";
-import { Attribute as ReadonlyAttribute } from "./Domain";
+import { ReadonlyAttribute } from "./Domain";
 
 interface Attribute extends ReadonlyAttribute {
   replaceWithNumberExpr(value: number): void;
@@ -29,9 +29,11 @@ export default class ExprFactory {
   public createAttribute(): Attribute {
     const expr = this.createNumberExpr(0);
     const expr$ = new BehaviorSubject<ReadonlyExpr>(expr);
-    const attribute = {
-      id: `attribute-${Math.random()}`,
-      expr$,
+    const attribute = new ReadonlyAttribute(expr$);
+    this._onAttributeCreated$.next(attribute);
+    
+    return {
+      ...attribute,
       replaceWithNumberExpr: (value: number) => {
         const numberExpr = this.createNumberExpr(value);
         expr$.next(numberExpr);
@@ -41,29 +43,19 @@ export default class ExprFactory {
         expr$.next(callExpr);
       },
     };
-    this._onAttributeCreated$.next(attribute);
-    return attribute;
   }
 
   public createNumberExpr(value: number): ReadonlyNumberExpr {
-    const numberExpr: ReadonlyNumberExpr = {
-      type: "NumberExpr",
-      id: `number-${Math.random()}`,
-      value$: of(value),
-    };
+    const numberExpr: ReadonlyNumberExpr = new ReadonlyNumberExpr(of(value));
     this._onNumberExprCreated$.next(numberExpr);
     return numberExpr;
   }
 
   public createCallExpr(): CallExpr {
     const args$ = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
-    const callExpr: ReadonlyCallExpr = {
-      type: "CallExpr",
-      id: `call-${Math.random()}`,
-      args$,
-    };
+    const callExpr: ReadonlyCallExpr = new ReadonlyCallExpr(args$);
 
-    const arg0 = this.createNumberExpr(1);
+    const arg0 = this.createNumberExpr(19);
     const arg1 = this.createNumberExpr(2);
     args$.next([
       new BehaviorSubject<ReadonlyExpr>(arg0),

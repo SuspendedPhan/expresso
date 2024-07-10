@@ -3,7 +3,7 @@ import Evaluator from "./Evaluator";
 import CircleComponent from "../domain/Component";
 import Renderer from "../renderer/Renderer";
 import ScenePool from "../renderer/ScenePool";
-import { Attribute, NumberExpr } from "../Domain";
+import { ReadonlyAttribute, NumberExpr } from "../Domain";
 
 export default class EvaluatorTest {
   public test() {
@@ -20,9 +20,9 @@ export default class EvaluatorTest {
       })
     );
 
-    const x$ = new Subject<Attribute>();
-    const y$ = new Subject<Attribute>();
-    const radius$ = new Subject<Attribute>();
+    const x$ = new Subject<ReadonlyAttribute>();
+    const y$ = new Subject<ReadonlyAttribute>();
+    const radius$ = new Subject<ReadonlyAttribute>();
     const circleComponent = new CircleComponent(x$, y$, radius$);
     circle$.next(circleComponent);
     x$.next(new Attribute(new NumberExpr(0)));

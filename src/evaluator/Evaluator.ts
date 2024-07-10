@@ -1,6 +1,6 @@
 import { combineLatest, Observable, of, switchMap } from "rxjs";
 import CircleComponent from "../domain/Component";
-import { Attribute, Expr } from "../Domain";
+import { ReadonlyAttribute, Expr } from "../Domain";
 
 export interface EvaluatedCircleClone {
   x: number;
@@ -26,7 +26,7 @@ export default class Evaluator {
   }
 
   private evalAttribute$(
-    attribute$: Observable<Attribute>
+    attribute$: Observable<ReadonlyAttribute>
   ): Observable<number> {
     return attribute$.pipe(
       switchMap((attribute) => {

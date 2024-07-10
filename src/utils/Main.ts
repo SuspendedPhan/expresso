@@ -4,7 +4,7 @@ import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
 import ExprFactory from "../ExprFactory";
-import { Attribute } from "../Domain";
+import { ReadonlyAttribute } from "../Domain";
 
 const logger = Logger.file("Main.ts");
 // logger.allow();
