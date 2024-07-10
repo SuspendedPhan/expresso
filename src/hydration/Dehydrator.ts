@@ -6,7 +6,7 @@ import {
   // PrimitiveFunctionCallExpr,
 } from "../Domain";
 import Logger from "../utils/Logger";
-import { ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
+import type { ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
 
 // @ts-ignore
 const logger = Logger.file("Dehydrator.ts");

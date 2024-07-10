@@ -4,7 +4,7 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import { Attribute } from "./ExprFactory";
+  import type { Attribute } from "./ExprFactory";
 
   export let ctx: MainContext;
   export let attribute: Attribute;

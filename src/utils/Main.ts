@@ -4,7 +4,6 @@ import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
 import ExprFactory, { Attribute } from "../ExprFactory";
-import { ReadonlyAttribute } from "../Domain";
 import Selection from "./Selection";
 
 const logger = Logger.file("Main.ts");
@@ -18,20 +17,20 @@ export default class Main {
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
-    const attribute = exprFactory.createAttribute();
-    attribute.exprMut$.pipe(first()).subscribe((expr) => {
-      expr.exprReplacer.replaceWithCallExpr();
+    const attributeMut = exprFactory.createAttribute();
+    attributeMut.exprMut$.pipe(first()).subscribe((expr) => {
+      expr.exprBaseMut.replaceWithCallExpr();
     });
-    attribute.exprMut$.subscribe((expr) => {
+    attributeMut.exprMut$.subscribe((expr) => {
       console.log("Main.setup.subscribe", expr);
     });
-    const ctx = new MainContext(goModule, exprFactory, new Selection(attribute.readonlyAttribute));
+    const ctx = new MainContext(goModule, exprFactory, new Selection(attributeMut.attribute));
 
     
     ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
     });
     Keyboard.register(ctx.selection);
-    return new Main(ctx, attribute);
+    return new Main(ctx, attributeMut);
   }
 }

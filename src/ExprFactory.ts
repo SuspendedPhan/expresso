@@ -1,14 +1,11 @@
 import {
   BehaviorSubject,
-  combineLatest,
   combineLatestAll,
   map,
   Observable,
   Observer,
-  of,
   Subject,
   switchAll,
-  switchMap,
 } from "rxjs";
 import {
   Parent,
@@ -21,25 +18,25 @@ import Logger from "./utils/Logger";
 
 const logger = Logger.file("ExprFactory.ts");
 
-interface AttributeMut {
+export interface AttributeMut {
   readonly attribute: ReadonlyAttribute;
   readonly exprMut$: Observable<ExprMut>;
 }
 
 type ExprMut = NumberExprMut | CallExprMut;
 
-interface ExprBaseMut {
+export interface ExprBaseMut {
   readonly expr: ReadonlyExpr;
   readonly replaceWithNumberExpr: (value: number) => void;
   readonly replaceWithCallExpr: () => void;
 }
 
-interface CallExprMut {
+export interface CallExprMut {
   readonly exprBaseMut: ExprBaseMut;
   readonly argsMut$$: Observable<Observable<ExprMut>[]>;
 }
 
-interface NumberExprMut {
+export interface NumberExprMut {
   readonly exprBaseMut: ExprBaseMut;
 }
 

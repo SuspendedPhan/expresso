@@ -4,7 +4,7 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import { CallExpr, NumberExpr, type Expr } from "./ExprFactory";
+  import type { CallExpr, NumberExpr, type Expr } from "./ExprFactory";
 
   export let ctx: MainContext;
   export let expr: Expr;

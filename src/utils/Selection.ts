@@ -10,8 +10,8 @@ import {
 } from "rxjs";
 // import { ReadonlyAttribute, ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../Domain";
 import Logger from "./Logger";
-import { ReadonlyAttribute } from "../Domain";
-import { ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
+import { type ReadonlyAttribute } from "../Domain";
+import type { ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
 
 export type Selectable = ReadonlyAttribute | ReadonlyExpr;
 
