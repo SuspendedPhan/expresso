@@ -17,7 +17,7 @@ export default class MainContext {
 
     exprFactory.onCallExprCreated$().subscribe((callExpr) => {
       goModule.addCallExpr(callExpr.id);
-      callExpr.args$.subscribe((args) => {
+      callExpr.args$$.subscribe((args) => {
         args[0]!.subscribe((arg0) => {
           this.goModule.setCallExprArg0(callExpr.id, arg0.id);
         });

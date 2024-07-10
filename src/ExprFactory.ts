@@ -93,6 +93,7 @@ export default class ExprFactory {
     expr$: Observer<ExprMut>
   ): NumberExprMut {
     return {
+      type: "NumberExprMut",
       exprBaseMut: this.createExprBaseMut(expr, expr$),
     };
   }
@@ -102,8 +103,9 @@ export default class ExprFactory {
     expr$: Observer<ExprMut>
   ): CallExprMut {
     return {
+      type: "CallExprMut",
       exprBaseMut: this.createExprBaseMut(expr, expr$),
-      argsMut$$: expr.args$.pipe(
+      argsMut$$: expr.args$$.pipe(
         switchAll(),
         combineLatestAll(),
         map((args) => {
@@ -154,7 +156,7 @@ export default class ExprFactory {
         id: `expr-${Math.random()}`,
         parent$,
       },
-      args$: new BehaviorSubject([]),
+      args$$: new BehaviorSubject([]),
     };
   }
 
