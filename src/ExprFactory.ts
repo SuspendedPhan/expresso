@@ -24,9 +24,10 @@ class CallExpr extends ReadonlyCallExpr {
       value: number
     ) => void,
     public readonly replaceArgWithCallExpr: (index: number) => void,
-    args$: BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>
+    args$: BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>,
+    parent$: Observable<Parent>,
   ) {
-    super(args$, of(null));
+    super(args$, parent$);
   }
 }
 
@@ -39,21 +40,21 @@ export default class ExprFactory {
     const attribute$ = new BehaviorSubject<Parent>(null);
     const expr = this.createNumberExpr(0, attribute$);
     const expr$ = new BehaviorSubject<ReadonlyExpr>(expr);
-    const attribute = new ReadonlyAttribute(expr$);
+
+    const replaceWithNumberExpr = (value: number) => {
+      const numberExpr = this.createNumberExpr(value, attribute$);
+      expr$.next(numberExpr);
+    };
+
+    const replaceWithCallExpr = () => {
+      const callExpr = this.createCallExpr(attribute$);
+      expr$.next(callExpr);
+    }
+
+    const attribute = new Attribute(replaceWithNumberExpr, replaceWithCallExpr, expr$);
     attribute$.next(attribute);
     this._onAttributeCreated$.next(attribute);
-
-    return {
-      ...attribute,
-      replaceWithNumberExpr: (value: number) => {
-        const numberExpr = this.createNumberExpr(value, attribute$);
-        expr$.next(numberExpr);
-      },
-      replaceWithCallExpr: () => {
-        const callExpr = this.createCallExpr(attribute$);
-        expr$.next(callExpr);
-      },
-    };
+    return attribute;
   }
 
   public createNumberExpr(
@@ -70,8 +71,7 @@ export default class ExprFactory {
 
   public createCallExpr(parent$: Observable<Parent>): CallExpr {
     const args$ = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
-    const callExpr: ReadonlyCallExpr = new ReadonlyCallExpr(args$, parent$);
-    const callExpr$ = new BehaviorSubject<Parent>(callExpr);
+    const callExpr$ = new BehaviorSubject<Parent>(null);
 
     const arg0 = this.createNumberExpr(19, callExpr$);
     const arg1 = this.createNumberExpr(2, callExpr$);
@@ -80,27 +80,28 @@ export default class ExprFactory {
       new BehaviorSubject<ReadonlyExpr>(arg1),
     ]);
 
-    this._onCallExprCreated$.next(callExpr);
-
-    return {
-      ...callExpr,
-      replaceArgWithNumberExpr: (index: number, value: number) => {
-        const arg = args$.value[index];
-        const numberExpr = this.createNumberExpr(value, callExpr$);
-        if (arg === undefined) {
-          throw new Error("arg is undefined");
-        }
-        arg.next(numberExpr);
-      },
-      replaceArgWithCallExpr: (index: number) => {
-        const arg = args$.value[index];
-        if (arg === undefined) {
-          throw new Error("arg is undefined");
-        }
-        const callExpr = this.createCallExpr(callExpr$);
-        arg.next(callExpr);
-      },
+    const replaceArgWithNumberExpr = (index: number, value: number) => {
+      const arg = args$.value[index];
+      const numberExpr = this.createNumberExpr(value, callExpr$);
+      if (arg === undefined) {
+        throw new Error("arg is undefined");
+      }
+      arg.next(numberExpr);
     };
+
+    const replaceArgWithCallExpr = (index: number) => {
+      const arg = args$.value[index];
+      if (arg === undefined) {
+        throw new Error("arg is undefined");
+      }
+      const callExpr = this.createCallExpr(callExpr$);
+      arg.next(callExpr);
+    };
+
+    const callExpr = new CallExpr(replaceArgWithNumberExpr, replaceArgWithCallExpr, args$, parent$);
+    callExpr$.next(callExpr);
+    this._onCallExprCreated$.next(callExpr);
+    return callExpr;
   }
 
   public onNumberExprCreated$(): Observable<ReadonlyNumberExpr> {
