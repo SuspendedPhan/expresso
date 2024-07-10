@@ -4,7 +4,6 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import { ReadonlyNumberExpr } from "./domain/Expr";
   import { CallExpr, NumberExpr, type Expr } from "./ExprFactory";
 
   export let ctx: MainContext;
@@ -34,9 +33,14 @@
     throw new Error(`Unknown expr type`);
   }
 
-  function handleSelect(e: CustomEvent<Expr>): void {
-    Logger.debug("handleSelect", e.detail);
-    expr.replace(e.detail);
+  function handleSelect(e: CustomEvent<string>): void {
+    const text = e.detail;
+    const value = parseFloat(text);
+    if (!isNaN(value)) {
+      expr.exprReplacer.replaceWithNumberExpr(value);
+    } else if (text === "+") {
+      expr.exprReplacer.replaceWithCallExpr();
+    }
   }
 </script>
 
@@ -44,7 +48,7 @@
   <SelectableView {ctx} object={expr.readonlyExpr}>
     <span>Expr</span>
     <span>{text}</span>
-    <ExprCommand {ctx} on:select={handleSelect} />
+    <ExprCommand on:select={handleSelect} />
 
     <div class="pl-2">
       {#each args as arg (arg.readonlyExpr.id)}
