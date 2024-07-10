@@ -9,6 +9,12 @@ import {
   ReadonlyExpr,
   ReadonlyNumberExpr,
 } from "./domain/Expr";
+import { Attribute as ReadonlyAttribute } from "./Domain";
+
+interface Attribute extends ReadonlyAttribute {
+  replaceWithNumberExpr(value: number): void;
+  replaceWithCallExpr(): void;
+}
 
 interface CallExpr extends ReadonlyCallExpr {
   replaceArgWithNumberExpr(index: number, value: number): void;
@@ -18,6 +24,26 @@ interface CallExpr extends ReadonlyCallExpr {
 export default class ExprFactory {
   private _onNumberExprCreated$ = new Subject<ReadonlyNumberExpr>();
   private _onCallExprCreated$ = new Subject<ReadonlyCallExpr>();
+  private _onAttributeCreated$ = new Subject<ReadonlyAttribute>();
+
+  public createAttribute(): Attribute {
+    const expr = this.createNumberExpr(0);
+    const expr$ = new BehaviorSubject<ReadonlyExpr>(expr);
+    const attribute = {
+      id: `attribute-${Math.random()}`,
+      expr$,
+      replaceWithNumberExpr: (value: number) => {
+        const numberExpr = this.createNumberExpr(value);
+        expr$.next(numberExpr);
+      },
+      replaceWithCallExpr: () => {
+        const callExpr = this.createCallExpr();
+        expr$.next(callExpr);
+      },
+    };
+    this._onAttributeCreated$.next(attribute);
+    return attribute;
+  }
 
   public createNumberExpr(value: number): ReadonlyNumberExpr {
     const numberExpr: ReadonlyNumberExpr = {
