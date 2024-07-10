@@ -4,54 +4,56 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { CallExpr, NumberExpr, type Expr } from "./ExprFactory";
+  import type { ExprMut } from "./ExprFactory";
 
   export let ctx: MainContext;
-  export let expr: Expr;
+  export let expr: ExprMut;
 
   Logger.file("ExprView").log("expr", expr);
 
-  let args: Expr[] = [];
+  let text: string;
+  let args: ExprMut[] = [];
 
-  if (expr instanceof CallExpr) {
-    expr.args$.subscribe((aa) => {
+  if (expr.type === "CallExprMut") {
+    expr.argsMut$$.subscribe((aa) => {
       combineLatest(aa).subscribe((v) => {
         args = v;
       });
     });
   }
 
-  let text: string;
-  if (expr instanceof NumberExpr) {
-    expr.readonlyExpr.value$.subscribe((v) => {
-      text = v.toString();
-    });
-  } else if (expr instanceof CallExpr) {
-    text = "+";
-  } else {
-    console.log(expr);
-    throw new Error(`Unknown expr type`);
+  switch (expr.exprBaseMut.expr.type) {
+    case "NumberExpr":
+      expr.exprBaseMut.expr.value$.subscribe((v) => {
+        text = v.toString();
+      });
+      break;
+    case "CallExpr":
+      text = "+";
+      break;
+    default:
+      throw new Error(`Unknown expr type`);
   }
 
   function handleSelect(e: CustomEvent<string>): void {
     const text = e.detail;
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      expr.exprReplacer.replaceWithNumberExpr(value);
+      expr.exprBaseMut.replaceWithNumberExpr(value);
     } else if (text === "+") {
-      expr.exprReplacer.replaceWithCallExpr();
+      expr.exprBaseMut.replaceWithCallExpr();
     }
   }
 </script>
 
 <main>
-  <SelectableView {ctx} object={expr.readonlyExpr}>
+  <SelectableView {ctx} object={expr.exprBaseMut.expr}>
     <span>Expr</span>
     <span>{text}</span>
     <ExprCommand on:select={handleSelect} />
 
     <div class="pl-2">
-      {#each args as arg (arg.readonlyExpr.id)}
+      {#each args as arg (arg.exprBaseMut.expr.expr.id)}
         <svelte:self expr={arg} {ctx} />
       {/each}
     </div>

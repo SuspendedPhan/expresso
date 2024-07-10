@@ -23,7 +23,7 @@ export interface AttributeMut {
   readonly exprMut$: Observable<ExprMut>;
 }
 
-type ExprMut = NumberExprMut | CallExprMut;
+export type ExprMut = NumberExprMut | CallExprMut;
 
 export interface ExprBaseMut {
   readonly expr: ReadonlyExpr;
@@ -32,11 +32,13 @@ export interface ExprBaseMut {
 }
 
 export interface CallExprMut {
+  readonly type: "CallExprMut";
   readonly exprBaseMut: ExprBaseMut;
   readonly argsMut$$: Observable<Observable<ExprMut>[]>;
 }
 
 export interface NumberExprMut {
+  readonly type: "NumberExprMut";
   readonly exprBaseMut: ExprBaseMut;
 }
 
