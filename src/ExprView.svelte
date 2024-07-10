@@ -22,9 +22,9 @@
     });
   }
 
-  switch (expr.exprBaseMut.expr.type) {
+  switch (expr.exprBaseMut.expr$.type) {
     case "NumberExpr":
-      expr.exprBaseMut.expr.value$.subscribe((v) => {
+      expr.exprBaseMut.expr$.value$.subscribe((v) => {
         text = v.toString();
       });
       break;
@@ -39,21 +39,21 @@
     const text = e.detail;
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      expr.exprBaseMut.replaceWithNumberExpr(value);
+      expr.exprBaseMut.replaceWithNumberExpr$(value);
     } else if (text === "+") {
-      expr.exprBaseMut.replaceWithCallExpr();
+      expr.exprBaseMut.replaceWithCallExpr$();
     }
   }
 </script>
 
 <main>
-  <SelectableView {ctx} object={expr.exprBaseMut.expr}>
+  <SelectableView {ctx} object={expr.exprBaseMut.expr$}>
     <span>Expr</span>
     <span>{text}</span>
     <ExprCommand on:select={handleSelect} />
 
     <div class="pl-2">
-      {#each args as arg (arg.exprBaseMut.expr.expr.id)}
+      {#each args as arg (arg.exprBaseMut.expr$.exprBase.id)}
         <svelte:self expr={arg} {ctx} />
       {/each}
     </div>

@@ -19,7 +19,7 @@ export default class Main {
     const exprFactory = new ExprFactory();
     const attributeMut = exprFactory.createAttribute();
     attributeMut.exprMut$.pipe(first()).subscribe((expr) => {
-      expr.exprBaseMut.replaceWithCallExpr();
+      expr.exprBaseMut.replaceWithCallExpr$();
     });
     attributeMut.exprMut$.subscribe((expr) => {
       console.log("Main.setup.subscribe", expr);

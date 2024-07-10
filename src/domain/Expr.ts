@@ -39,12 +39,12 @@ export interface ReadonlyExprBase {
 
 export interface ReadonlyNumberExpr {
   readonly type: "NumberExpr";
-  readonly expr: ReadonlyExprBase;
+  readonly exprBase: ReadonlyExprBase;
   readonly value$: Observable<number>;
 }
 
 export interface ReadonlyCallExpr {
   readonly type: "CallExpr";
-  readonly expr: ReadonlyExprBase;
+  readonly exprBase: ReadonlyExprBase;
   readonly args$$: Observable<Observable<ReadonlyExpr>[]>;
 }
