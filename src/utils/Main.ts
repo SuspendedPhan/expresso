@@ -19,10 +19,10 @@ export default class Main {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
     const attribute = exprFactory.createAttribute();
-    attribute.expr$.pipe(first()).subscribe((expr) => {
+    attribute.exprMut$.pipe(first()).subscribe((expr) => {
       expr.exprReplacer.replaceWithCallExpr();
     });
-    attribute.expr$.subscribe((expr) => {
+    attribute.exprMut$.subscribe((expr) => {
       console.log("Main.setup.subscribe", expr);
     });
     const ctx = new MainContext(goModule, exprFactory, new Selection(attribute.readonlyAttribute));

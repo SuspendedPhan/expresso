@@ -23,7 +23,7 @@ const logger = Logger.file("ExprFactory.ts");
 
 interface AttributeMut {
   readonly attribute: ReadonlyAttribute;
-  readonly expr: ExprMut;
+  readonly exprMut$: Observable<ExprMut>;
 }
 
 type ExprMut = NumberExprMut | CallExprMut;
@@ -35,12 +35,12 @@ interface ExprBaseMut {
 }
 
 interface CallExprMut {
-  readonly exprBase: ExprBaseMut;
-  readonly args$: Observable<Observable<ExprMut>[]>;
+  readonly exprBaseMut: ExprBaseMut;
+  readonly argsMut$$: Observable<Observable<ExprMut>[]>;
 }
 
 interface NumberExprMut {
-  readonly exprBase: ExprBaseMut;
+  readonly exprBaseMut: ExprBaseMut;
 }
 
 export default class ExprFactory {
@@ -52,16 +52,19 @@ export default class ExprFactory {
     logger.method("createAttribute");
 
     const attribute$ = new BehaviorSubject<Parent>(null);
-    const numberExpr$ = this.createNumberExpr$(0, attribute$);
-    const expr$ = new BehaviorSubject<ExprMut>(numberExpr$.value);
-    numberExpr$.subscribe(expr$);
-    const readonlyExpr$ = numberExpr$.pipe(map((expr) => expr.exprBase.expr));
+    const numberExpr = this.createNumberExpr(0, attribute$);
+    const exprMut$ = this.createExprMut$(numberExpr);
+    const expr$ = exprMut$.pipe(
+      map((exprMut) => exprMut.exprBaseMut.expr),
+    );
 
     const attrMut: AttributeMut = {
       attribute: {
         type: "Attribute",
-        expr$: readonlyExpr$,
+        id: `attribute-${Math.random()}`,
+        expr$,
       },
+      exprMut$: exprMut$,
     };
 
     // const attribute = new Attribute(new ReadonlyAttribute(readonlyExpr$), expr$);
@@ -70,7 +73,7 @@ export default class ExprFactory {
     return attrMut;
   }
 
-  createExprMut$(expr: ReadonlyExpr): Observable<ExprMut> {
+  private createExprMut$(expr: ReadonlyExpr): Observable<ExprMut> {
     const expr$ = new BehaviorSubject<ExprMut | null>(null);
     const exprMut$ = this.createExprMut(expr, expr$);
     const result$ = new BehaviorSubject<ExprMut>(exprMut$);
@@ -78,7 +81,7 @@ export default class ExprFactory {
     return result$;
   }
 
-  createExprMut(expr: ReadonlyExpr, expr$: Observer<ExprMut>): ExprMut {
+  private createExprMut(expr: ReadonlyExpr, expr$: Observer<ExprMut>): ExprMut {
     switch (expr.type) {
       case "NumberExpr":
         return this.createNumberExprMut(expr, expr$);
@@ -92,7 +95,7 @@ export default class ExprFactory {
     expr$: Observer<ExprMut>
   ): NumberExprMut {
     return {
-      exprBase: this.createExprBaseMut(expr, expr$),
+      exprBaseMut: this.createExprBaseMut(expr, expr$),
     };
   }
 
@@ -101,8 +104,8 @@ export default class ExprFactory {
     expr$: Observer<ExprMut>
   ): CallExprMut {
     return {
-      exprBase: this.createExprBaseMut(expr, expr$),
-      args$: expr.args$.pipe(
+      exprBaseMut: this.createExprBaseMut(expr, expr$),
+      argsMut$$: expr.args$.pipe(
         switchAll(),
         combineLatestAll(),
         map((args) => {
