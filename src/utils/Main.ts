@@ -3,7 +3,7 @@ import Keyboard from "./Keyboard";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
-import ExprFactory from "../ExprFactory";
+import ExprFactory, { Attribute } from "../ExprFactory";
 import { ReadonlyAttribute } from "../Domain";
 import Selection from "./Selection";
 
@@ -12,7 +12,7 @@ const logger = Logger.file("Main.ts");
 // Logger.allow("MainView.svelte");
 
 export default class Main {
-  private constructor(public ctx: MainContext, public readonly attribute: ReadonlyAttribute) {
+  private constructor(public ctx: MainContext, public readonly attribute: Attribute) {
   }
 
   public static async setup(): Promise<Main> {
@@ -32,6 +32,6 @@ export default class Main {
       logger.log("selectedObject", selectedObject);
     });
     Keyboard.register(ctx.selection);
-    return new Main(ctx, attribute.readonlyAttribute);
+    return new Main(ctx, attribute);
   }
 }

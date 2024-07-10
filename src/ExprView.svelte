@@ -1,31 +1,20 @@
 <script lang="ts">
-  import {
-    combineLatest,
-    combineLatestAll,
-    Observable,
-    of,
-    switchAll,
-    switchMap,
-  } from "rxjs";
-  // import { CallExpr, type Expr } from "./Domain";
+  import { combineLatest } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import {
-    ReadonlyCallExpr,
-    ReadonlyNumberExpr,
-    type ReadonlyExpr,
-  } from "./domain/Expr";
+  import { ReadonlyNumberExpr } from "./domain/Expr";
+  import { CallExpr, NumberExpr, type Expr } from "./ExprFactory";
 
   export let ctx: MainContext;
-  export let expr: ReadonlyExpr;
+  export let expr: Expr;
 
   Logger.file("ExprView").log("expr", expr);
 
-  let args: ReadonlyExpr[] = [];
+  let args: Expr[] = [];
 
-  if (expr instanceof ReadonlyCallExpr) {
+  if (expr instanceof CallExpr) {
     expr.args$.subscribe((aa) => {
       combineLatest(aa).subscribe((v) => {
         args = v;
@@ -34,11 +23,11 @@
   }
 
   let text: string;
-  if (expr instanceof ReadonlyNumberExpr) {
-    expr.value$.subscribe((v) => {
+  if (expr instanceof NumberExpr) {
+    expr.readonlyExpr.value$.subscribe((v) => {
       text = v.toString();
     });
-  } else if (expr instanceof ReadonlyCallExpr) {
+  } else if (expr instanceof CallExpr) {
     text = "+";
   } else {
     console.log(expr);
@@ -52,13 +41,13 @@
 </script>
 
 <main>
-  <SelectableView {ctx} object={expr}>
+  <SelectableView {ctx} object={expr.readonlyExpr}>
     <span>Expr</span>
     <span>{text}</span>
     <ExprCommand {ctx} on:select={handleSelect} />
 
     <div class="pl-2">
-      {#each args as arg (arg.id)}
+      {#each args as arg (arg.readonlyExpr.id)}
         <svelte:self expr={arg} {ctx} />
       {/each}
     </div>

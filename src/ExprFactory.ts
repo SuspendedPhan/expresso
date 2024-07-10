@@ -23,28 +23,29 @@ interface ExprReplacer {
   readonly replaceWithCallExpr: () => void;
 }
 
-class Attribute {
+export class Attribute {
   public constructor(
     public readonly readonlyAttribute: ReadonlyAttribute,
     public readonly expr$: BehaviorSubject<Expr>
   ) {}
 }
 
-class CallExpr {
+export class CallExpr {
   public constructor(
     public readonly readonlyExpr: ReadonlyCallExpr,
-    public readonly exprReplacer: ExprReplacer
+    public readonly exprReplacer: ExprReplacer,
+    public readonly args$: Observable<Observable<Expr>[]>
   ) {}
 }
 
-class NumberExpr {
+export class NumberExpr {
   public constructor(
     public readonly readonlyExpr: ReadonlyNumberExpr,
     public readonly exprReplacer: ExprReplacer
   ) {}
 }
 
-type Expr = NumberExpr | CallExpr;
+export type Expr = NumberExpr | CallExpr;
 
 export default class ExprFactory {
   private _onNumberExprCreated$ = new Subject<ReadonlyNumberExpr>();
@@ -113,14 +114,18 @@ export default class ExprFactory {
 
     const arg0$ = this.createNumberExpr$(0, callExpr$);
     const arg1$ = this.createNumberExpr$(0, callExpr$);
-    const readonlyArgs$ = [arg0$, arg1$].map((arg$) => arg$.pipe(map((expr) => expr.readonlyExpr)));
+    const readonlyArg0$ = arg0$.pipe(map((expr) => expr.readonlyExpr));
+    const readonlyArg1$ = arg1$.pipe(map((expr) => expr.readonlyExpr));
 
-    const args$ = new BehaviorSubject<Observable<ReadonlyExpr>[]>([]);
-    args$.next(readonlyArgs$);
+    const readonlyArgs$ = new BehaviorSubject<Observable<ReadonlyExpr>[]>([]);
+    readonlyArgs$.next([readonlyArg0$, readonlyArg1$]);
+
+    const args$ = new BehaviorSubject<Observable<Expr>[]>([arg0$, arg1$]);
 
     const callExpr = new CallExpr(
-      new ReadonlyCallExpr(args$, parent$),
-      replacer
+      new ReadonlyCallExpr(readonlyArgs$, parent$),
+      replacer,
+      args$,
     );
     callExpr$.next(callExpr.readonlyExpr);
     return callExpr;
