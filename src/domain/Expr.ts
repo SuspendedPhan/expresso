@@ -1,21 +1,44 @@
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
+import ObservableArray from "../utils/ObservableArray";
 
-export class Expr {
-    public getParent$(): Observable<Parent | null> {
-    }
+export type Expr = NumberExpr;
 
-    public getExprKind$(): Observable<ExprKind> {
+export class BaseExpr {
+    private id = crypto.randomUUID();
 
+    // public getParent$(): Observable<Parent | null> {
+    // }
+
+    public getId$(): Observable<string> {
+        return of(this.id);
     }
 }
 
 type ExprKind = NumberExpr | CallExpr;
 
 export class NumberExpr {
-    public getValue$(): Observable<number> {}
+    private baseExpr = new BaseExpr();
+
+    public constructor(private value: number) {}
+
+    public getValue$(): Observable<number> {
+        return of(this.value);
+    }
+
+    public getBaseExpr(): BaseExpr {
+        return this.baseExpr;
+    }
 }
 
 export class CallExpr {
-    public getFunctionName$(): Observable<string> {}
-    public getArgs$(): Observable<Expr[]> {}
+    private args$ = new ObservableArray<Observable<Expr>>();
+    public constructor() {
+        this.args$.push(of(new NumberExpr(0)));
+        this.args$.push(of(new NumberExpr(0)));
+    }
+
+    // public getFunctionName$(): Observable<string> {}
+    public getArgs$(): ObservableArray<Observable<Expr>> {
+        return this.args$;
+    }
 }
