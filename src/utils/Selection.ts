@@ -12,20 +12,21 @@ import {
 import Logger from "./Logger";
 import { type ReadonlyAttribute } from "../Domain";
 import type { ReadonlyCallExpr, ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
+import { Attribute, Expr } from "../ExprFactory";
 
-export type Selectable = ReadonlyAttribute | ReadonlyExpr;
+export type Selectable = Attribute | Expr | null;
 
 const logger = Logger.file("Selection.ts");
 logger.allow();
 
 export default class Selection {
-  private selectedObject$ = new BehaviorSubject<Observable<Selectable | null>>(
+  private selectedObject$ = new BehaviorSubject<Observable<Selectable>>(
     of(null)
   );
 
-  public constructor(private root: ReadonlyAttribute) {}
+  public constructor(private root: Observable<Attribute>) {}
 
-  public select(object$: Observable<Selectable | null>) {
+  public select(object$: Observable<Selectable>) {
     if (object$ === null) {
       this.selectedObject$.next(of(null));
       return;
@@ -47,8 +48,8 @@ export default class Selection {
 
   private handleNavigation(
     getNextObject$: (
-      currentObject: Selectable | null
-    ) => Observable<Selectable | null>
+      currentObject: Selectable
+    ) => Observable<Selectable>
   ) {
     const object$ = this.selectedObject$.value;
     logger.log("selectedObject", object$);
@@ -68,26 +69,24 @@ export default class Selection {
     this.select(child$);
   }
 
-  private getChild$(object: Selectable | null): Observable<Selectable | null> {
+  private getChild$(object: Selectable): Observable<Selectable> {
     if (object === null) {
-      return of(this.root);
-    } else if (object instanceof ReadonlyAttribute) {
+      return this.root;
+    } else if (object.type === "Attribute") {
       return object.expr$;
-    } else if (object instanceof ReadonlyExpr) {
-      return this.getChildForExpr$(object);
     } else {
-      throw new Error("Unknown object type");
+      return this.getChildForExpr$(object);
     }
   }
 
-  private getParent$(object: Selectable | null): Observable<Selectable | null> {
+  private getParent$(object: Selectable): Observable<Selectable> {
     if (object === null) {
       return of(null);
     } else if (object === this.root) {
       return of(null);
-    } else if (object instanceof ReadonlyAttribute) {
+    } else if (object.type === "Attribute") {
       throw new Error("Not implemented");
-    } else if (object instanceof ReadonlyExpr) {
+    } else if (object) {
       return object.parent$;
     } else {
       logger.log("object", object);
@@ -95,22 +94,20 @@ export default class Selection {
     }
   }
 
-  private getChildForExpr$(expr: ReadonlyExpr): Observable<ReadonlyExpr | null> {
-    if (expr instanceof ReadonlyNumberExpr) {
+  private getChildForExpr$(expr: Expr): Observable<Selectable> {
+    if (expr.type === "NumberExpr") {
       return of(null);
-    } else if (expr instanceof ReadonlyCallExpr) {
-      return expr.args$.pipe(switchMap((args) => {
-        if (args[0] === undefined) {
-          throw new Error("args[0] is undefined");
-        }
-        return args[0];
-      }));
+    } else if (expr.type === "CallExpr") {
+      if (expr.args[0] === undefined) {
+        throw new Error("No args");
+      }
+      return expr.args[0];
     } else {
       throw new Error("Unknown expr type");
     }
   }
 
-  public getSelectedObject$(): Observable<Selectable | null> {
+  public getSelectedObject$(): Observable<Selectable> {
     return this.selectedObject$.pipe(switchAll(), share());
   }
 }

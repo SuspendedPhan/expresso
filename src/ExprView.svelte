@@ -1,59 +1,50 @@
 <script lang="ts">
-  import { combineLatest } from "rxjs";
+  import { Subject } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { ExprMut } from "./ExprFactory";
+  import type { Expr } from "./ExprFactory";
 
   export let ctx: MainContext;
-  export let expr: ExprMut;
+  export let expr$: Subject<Expr>;
 
-  Logger.file("ExprView").log("expr", expr);
+  Logger.file("ExprView").log("expr", expr$);
 
   let text: string;
-  let args: ExprMut[] = [];
+  let args: Subject<Expr>[] = [];
 
-  if (expr.type === "CallExprMut") {
-    expr.argsMut$$.subscribe((aa) => {
-      combineLatest(aa).subscribe((v) => {
-        args = v;
-      });
-    });
-  }
-
-  switch (expr.exprBaseMut.expr$.type) {
-    case "NumberExpr":
-      expr.exprBaseMut.expr$.value$.subscribe((v) => {
-        text = v.toString();
-      });
-      break;
-    case "CallExpr":
+  expr$.subscribe((expr) => {
+    if (expr.type === "NumberExpr") {
+      text = expr.value.toString();
+    } else if (expr.type === "CallExpr") {
       text = "+";
-      break;
-    default:
-      throw new Error(`Unknown expr type`);
-  }
+    }
+
+    if (expr.type === "CallExpr") {
+      args = expr.args;
+    }
+  });
 
   function handleSelect(e: CustomEvent<string>): void {
     const text = e.detail;
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      expr.exprBaseMut.replaceWithNumberExpr$(value);
+      expr$.next(ctx.exprFactory.createNumberExpr(value));
     } else if (text === "+") {
-      expr.exprBaseMut.replaceWithCallExpr$();
+      expr$.next(ctx.exprFactory.createCallExpr());
     }
   }
 </script>
 
 <main>
-  <SelectableView {ctx} object={expr.exprBaseMut.expr$}>
+  <SelectableView {ctx} object={$expr$}>
     <span>Expr</span>
     <span>{text}</span>
     <ExprCommand on:select={handleSelect} />
 
     <div class="pl-2">
-      {#each args as arg (arg.exprBaseMut.expr$.exprBase.id)}
+      {#each args as arg}
         <svelte:self expr={arg} {ctx} />
       {/each}
     </div>

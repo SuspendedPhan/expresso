@@ -1,5 +1,6 @@
 import {
   BehaviorSubject,
+  Observable,
   Subject,
 } from "rxjs";
 import Logger from "./utils/Logger";
@@ -13,30 +14,31 @@ export interface Attribute {
 }
 
 export type Expr = NumberExpr | CallExpr;
+export type Parent = Attribute | CallExpr | null;
 
 export interface NumberExpr {
   readonly type: "NumberExpr";
   readonly id: string;
   readonly value: number;
+  readonly parent$: Subject<Parent>;
 }
 
 export interface CallExpr {
   readonly type: "CallExpr";
   readonly id: string;
   readonly args: Subject<Expr>[];
+  readonly parent$: Subject<Parent>;
 }
 
 export default class ExprFactory {
-  public readonly addAttribute$ = new Subject<Attribute>();
-  public readonly addNumberExpr$ = new Subject<NumberExpr>();
-  public readonly addCallExpr$ = new Subject<CallExpr>();
-
+  private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
+  private readonly onCallExprAdded$_ = new Subject<CallExpr>();
+  
+  public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
+  public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
+  
   public createAttribute(): Attribute {
-    const expr: NumberExpr = {
-      type: "NumberExpr",
-      id: `expr-${Math.random()}`,
-      value: 0,
-    };
+    const expr = this.createNumberExpr(0);
 
     const expr$ = new BehaviorSubject<Expr>(expr);
     const attribute: Attribute = {
@@ -49,18 +51,26 @@ export default class ExprFactory {
   }
 
   public createNumberExpr(value: number): NumberExpr {
-    return {
+    const expr: NumberExpr = {
       type: "NumberExpr",
       id: `expr-${Math.random()}`,
       value,
+      parent$: new BehaviorSubject<Parent>(null),
     };
+    this.onNumberExprAdded$_.next(expr);
+    return expr;
   }
 
-  public createCallExpr(args: Expr[]): CallExpr {
-    return {
+  public createCallExpr(): CallExpr {
+    const arg0$ = new BehaviorSubject<Expr>(this.createNumberExpr(0));
+    const arg1$ = new BehaviorSubject<Expr>(this.createNumberExpr(0));
+    const expr: CallExpr = {
       type: "CallExpr",
       id: `expr-${Math.random()}`,
-      args: args.map((arg) => new BehaviorSubject<Expr>(arg)),
+      args: [arg0$, arg1$],
+      parent$: new BehaviorSubject<Parent>(null),
     };
+    this.onCallExprAdded$_.next(expr);
+    return expr;
   }
 }

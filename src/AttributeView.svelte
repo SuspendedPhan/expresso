@@ -3,19 +3,19 @@
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { AttributeMut } from "./ExprFactory";
+  import type { Attribute } from "./ExprFactory";
 
   export let ctx: MainContext;
-  export let attribute: AttributeMut;
-  const expr$ = attribute.exprMut$;
+  export let attribute: Attribute;
+  const expr$ = attribute.expr$;
   expr$.subscribe((v) => Logger.file("AttributeView").log("expr$", v));
 </script>
 
 <main>
-  <SelectableView {ctx} object={attribute.attribute}>
+  <SelectableView {ctx} object={attribute}>
     <div>Attribute</div>
     {#key $expr$}
-      <ExprView {ctx} expr={$expr$} />
+      <ExprView {ctx} {expr$} />
     {/key}
   </SelectableView>
 </main>

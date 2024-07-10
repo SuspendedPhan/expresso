@@ -4,27 +4,28 @@ import Selection from "./utils/Selection";
 
 export default class MainContext {
   public constructor(
-    private goModule: GoModule,
+    goModule: GoModule,
     public readonly exprFactory: ExprFactory,
     public readonly selection: Selection,
   ) {
-    exprFactory.onNumberExprCreated$().subscribe((numberExpr) => {
+    exprFactory.onNumberExprAdded$.subscribe((numberExpr) => {
       goModule.addNumberExpr(numberExpr.id);
-      numberExpr.value$.subscribe((value) => {
-        goModule.setNumberExprValue(numberExpr.id, value);
-      });
+      goModule.setNumberExprValue(numberExpr.id, numberExpr.value);
     });
 
-    exprFactory.onCallExprCreated$().subscribe((callExpr) => {
+    exprFactory.onCallExprAdded$.subscribe((callExpr) => {
       goModule.addCallExpr(callExpr.id);
-      callExpr.args$$.subscribe((args) => {
-        args[0]!.subscribe((arg0) => {
-          this.goModule.setCallExprArg0(callExpr.id, arg0.id);
-        });
 
-        args[1]!.subscribe((arg1) => {
-          this.goModule.setCallExprArg1(callExpr.id, arg1.id);
-        });
+      if (callExpr.args.length !== 2) {
+        throw new Error("CallExpr must have 2 args");
+      }
+
+      callExpr.args[0]?.subscribe((arg0) => {
+        goModule.setCallExprArg0(callExpr.id, arg0.id);
+      });
+
+      callExpr.args[1]?.subscribe((arg1) => {
+        goModule.setCallExprArg1(callExpr.id, arg1.id);
       });
     });
   }

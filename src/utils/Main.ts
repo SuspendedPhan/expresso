@@ -17,20 +17,15 @@ export default class Main {
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
-    const attributeMut = exprFactory.createAttribute();
-    attributeMut.exprMut$.pipe(first()).subscribe((expr) => {
-      expr.exprBaseMut.replaceWithCallExpr$();
-    });
-    attributeMut.exprMut$.subscribe((expr) => {
-      console.log("Main.setup.subscribe", expr);
-    });
-    const ctx = new MainContext(goModule, exprFactory, new Selection(attributeMut.attribute));
+    const ctx = new MainContext(goModule, exprFactory, new Selection());    
 
+    const attribute = exprFactory.createAttribute();
+    exprFactory.onAttributeAdded$.next(attribute);
     
     ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
     });
     Keyboard.register(ctx.selection);
-    return new Main(ctx, attributeMut);
+    return new Main(ctx, attribute);
   }
 }
