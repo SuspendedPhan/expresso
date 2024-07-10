@@ -4,8 +4,8 @@
   import TestView from "./utils/TestView.svelte";
 
   let test = (function () {
-    return true;
     return false;
+    return true;
   })();
 </script>
 

@@ -7,16 +7,20 @@ var logger = NewLogger("evaluator.go")
 type Float = float64
 
 type Evaluator struct {
-	ExprById map[string]interface{}
+	ExprById map[string]*Expr
+}
+
+type Expr struct {
+	Id         string
+	NumberExpr *NumberExpr
+	CallExpr   *CallExpr
 }
 
 type NumberExpr struct {
-	Id    string
 	Value Float
 }
 
 type CallExpr struct {
-	Id       string
 	arg0Id   string
 	arg0Type string // "Value" or "Expr"
 	arg1Id   string
@@ -25,48 +29,64 @@ type CallExpr struct {
 
 func NewEvaluator() *Evaluator {
 	return &Evaluator{
-		ExprById: map[string]interface{}{},
+		ExprById: map[string]*Expr{},
 	}
 }
 
 func (e *Evaluator) AddNumberExpr(id string) {
-	e.ExprById[id] = NumberExpr{Id: id}
+	e.ExprById[id] = &Expr{
+		Id:         id,
+		NumberExpr: &NumberExpr{},
+	}
 }
 
 func (e *Evaluator) SetNumberExprValue(id string, value Float) {
-	expr, found := e.ExprById[id].(NumberExpr)
+	expr, found := e.ExprById[id]
+
 	if !found {
 		panic("expr not found")
 	}
-	expr.Value = value
+	numberExpr := expr.NumberExpr
+	if numberExpr == nil {
+		panic("expr is not a number expr")
+	}
+
+	numberExpr.Value = value
 }
 
 func (e *Evaluator) AddCallExpr(id string) {
-	e.ExprById[id] = &CallExpr{
+	e.ExprById[id] = &Expr{
 		Id:       id,
-		arg0Id:   "null",
-		arg0Type: "null",
-		arg1Id:   "null",
-		arg1Type: "null",
+		CallExpr: &CallExpr{},
 	}
 }
 
 func (e *Evaluator) SetCallExprArg0(id string, argId string, argType string) {
-	expr, found := e.ExprById[id].(*CallExpr)
+	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found")
 	}
-	expr.arg0Id = argId
-	expr.arg0Type = argType
+	callExpr := expr.CallExpr
+	if callExpr == nil {
+		panic("expr is not a call expr")
+	}
+
+	callExpr.arg0Id = argId
+	callExpr.arg0Type = argType
 }
 
 func (e *Evaluator) SetCallExprArg1(id string, argId string, argType string) {
-	expr, found := e.ExprById[id].(*CallExpr)
+	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found")
 	}
-	expr.arg1Id = argId
-	expr.arg1Type = argType
+	callExpr := expr.CallExpr
+	if callExpr == nil {
+		panic("expr is not a call expr")
+	}
+
+	callExpr.arg1Id = argId
+	callExpr.arg1Type = argType
 }
 
 func (e *Evaluator) EvalExpr(exprId string) Float {
@@ -75,14 +95,15 @@ func (e *Evaluator) EvalExpr(exprId string) Float {
 		panic("expr not found")
 	}
 
-	switch expr := expr.(type) {
-	case NumberExpr:
-		return expr.Value
-	case *CallExpr:
-		arg0 := e.EvalExpr(expr.arg0Id)
-		arg1 := e.EvalExpr(expr.arg1Id)
-		return arg0 + arg1
-	default:
-		panic("unknown expr type")
+	if expr.NumberExpr != nil {
+		return expr.NumberExpr.Value
 	}
+
+	if expr.CallExpr != nil {
+		arg0 := e.EvalExpr(expr.CallExpr.arg0Id)
+		arg1 := e.EvalExpr(expr.CallExpr.arg1Id)
+		return arg0 + arg1
+	}
+
+	panic("expr is neither a number expr nor a call expr")
 }

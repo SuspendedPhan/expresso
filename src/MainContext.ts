@@ -12,6 +12,7 @@ export default class MainContext {
 
   public createNumberExpr(value: number): NumberExpr {
     const numberExpr: NumberExpr = new NumberExpr(value);
+    this.goModule.addNumberExpr(numberExpr.id);
     numberExpr.value$.subscribe(value => {
       this.goModule.setNumberExprValue(numberExpr.id, value);
     });
