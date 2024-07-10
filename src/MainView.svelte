@@ -1,7 +1,7 @@
 <script lang="ts">
   import { combineLatest, interval, map, of, startWith } from "rxjs";
   import GoModuleLoader from "./utils/GoModuleLoader";
-  import { Attribute } from "./Domain";
+  // import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";

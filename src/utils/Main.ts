@@ -16,10 +16,11 @@ export default class Main {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
     new MainContext(goModule, exprFactory);
-    const c = exprFactory.createCallExpr();
-    c.replaceArgWithNumberExpr(0, 99);
-    const r = goModule.evalExpr(c.id);
-    console.log("r", r);
+    const a = exprFactory.createAttribute();
+    a.expr$.subscribe((expr) => {
+      const r = goModule.evalExpr(expr.id);
+      console.log("r", r);
+    });
     // ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
     //   logger.log("selectedObject", selectedObject);
     // });
