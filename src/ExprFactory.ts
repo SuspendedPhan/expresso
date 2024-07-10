@@ -111,20 +111,12 @@ export default class ExprFactory {
   ): CallExpr {
     const callExpr$ = new Subject<ReadonlyCallExpr>();
 
-    const arg0$ = new Subject<Expr>();
-    const arg1$ = new Subject<Expr>();
+    const arg0$ = this.createNumberExpr$(0, callExpr$);
+    const arg1$ = this.createNumberExpr$(0, callExpr$);
+    const readonlyArgs$ = [arg0$, arg1$].map((arg$) => arg$.pipe(map((expr) => expr.readonlyExpr)));
 
-    const arg0 = this.replaceWithNumberExpr(0, callExpr$, arg0$);
-    const arg1 = this.replaceWithNumberExpr(0, callExpr$, arg1$);
-
-    const arg0$$ = new BehaviorSubject<ReadonlyExpr>(arg0.readonlyExpr);
-    const arg1$$ = new BehaviorSubject<ReadonlyExpr>(arg1.readonlyExpr);
-
-    arg0$.pipe(map(v => v.readonlyExpr)).subscribe(arg0$$);
-    arg1$.pipe(map(v => v.readonlyExpr)).subscribe(arg1$$);
-
-    const args$ = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
-    args$.next([arg0$$, arg1$$]);
+    const args$ = new BehaviorSubject<Observable<ReadonlyExpr>[]>([]);
+    args$.next(readonlyArgs$);
 
     const callExpr = new CallExpr(
       new ReadonlyCallExpr(args$, parent$),
