@@ -33,16 +33,14 @@ func bootstrapGoModule() {
 	goModule.Set("setCallExprArg0", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
 		argId := args[1].String()
-		argType := args[2].String()
-		ev.SetCallExprArg0(id, argId, argType)
+		ev.SetCallExprArg0(id, argId)
 		return nil
 	}))
 
 	goModule.Set("setCallExprArg1", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
 		argId := args[1].String()
-		argType := args[2].String()
-		ev.SetCallExprArg1(id, argId, argType)
+		ev.SetCallExprArg1(id, argId)
 		return nil
 	}))
 

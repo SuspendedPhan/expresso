@@ -3,6 +3,7 @@ import Keyboard from "./Keyboard";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
+import ExprFactory from "../ExprFactory";
 
 const logger = Logger.file("Main.ts");
 // logger.allow();
@@ -13,10 +14,11 @@ export default class Main {
 
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
-    const ctx = new MainContext(goModule);
-
-    const n = ctx.createNumberExpr(1);
-    const r = goModule.evalExpr(n.id);
+    const exprFactory = new ExprFactory();
+    new MainContext(goModule, exprFactory);
+    const c = exprFactory.createCallExpr();
+    c.replaceArgWithNumberExpr(0, 99);
+    const r = goModule.evalExpr(c.id);
     console.log("r", r);
     // ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
     //   logger.log("selectedObject", selectedObject);

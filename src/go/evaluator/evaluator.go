@@ -21,10 +21,8 @@ type NumberExpr struct {
 }
 
 type CallExpr struct {
-	arg0Id   string
-	arg0Type string // "Value" or "Expr"
-	arg1Id   string
-	arg1Type string
+	arg0Id string
+	arg1Id string
 }
 
 func NewEvaluator() *Evaluator {
@@ -61,7 +59,7 @@ func (e *Evaluator) AddCallExpr(id string) {
 	}
 }
 
-func (e *Evaluator) SetCallExprArg0(id string, argId string, argType string) {
+func (e *Evaluator) SetCallExprArg0(id string, argId string) {
 	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found")
@@ -72,10 +70,9 @@ func (e *Evaluator) SetCallExprArg0(id string, argId string, argType string) {
 	}
 
 	callExpr.arg0Id = argId
-	callExpr.arg0Type = argType
 }
 
-func (e *Evaluator) SetCallExprArg1(id string, argId string, argType string) {
+func (e *Evaluator) SetCallExprArg1(id string, argId string) {
 	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found")
@@ -86,7 +83,6 @@ func (e *Evaluator) SetCallExprArg1(id string, argId string, argType string) {
 	}
 
 	callExpr.arg1Id = argId
-	callExpr.arg1Type = argType
 }
 
 func (e *Evaluator) EvalExpr(exprId string) Float {
