@@ -1,47 +1,37 @@
+import { BehaviorSubject, map, of, partition, switchAll, switchMap } from "rxjs";
 import { CallExpr, Expr, NumberExpr } from "./domain/Expr";
 import type GoModule from "./utils/GoModule";
 import Selection from "./utils/Selection";
 
 export default class MainContext {
-  public attribute: Attribute;
-  public selection: Selection;
+  // public selection: Selection;
 
   public constructor(private goModule: GoModule) {
-    this.attribute = this.createAttribute();
-    this.selection = new Selection(this.attribute);
-    // goModule.setRootAttributeId(this.attribute.getId());
+    // this.selection = new Selection(this.attribute);
   }
 
   public createNumberExpr(value: number): NumberExpr {
-    const e = new NumberExpr(value);
-    e.getBaseExpr().getId$().subscribe((id) => {
-      this.goModule.addValue(id, value);
+    const numberExpr: NumberExpr = new NumberExpr(value);
+    numberExpr.value$.subscribe(value => {
+      this.goModule.setValue(numberExpr.id, value);
     });
-    return e;
+    return numberExpr;
   }
 
   public createCallExpr(): CallExpr {
-    const e = new CallExpr();
-    const goExpr = this.goModule.createCallExpr();
-    e.getArgs$().onPush$.subscribe((expr) => {
-      expr.getId$().subscribe((id) => {
-        goExpr.addArg(id);
-      });
+    const callExpr = new CallExpr();
+    this.goModule.addExpr(callExpr.id);
+
+    callExpr.args.subscribe(args => {
+      const arg0Id = args[0]!.value.id;
+      const arg0Type = `Value`;
+      this.goModule.setExprArg0(callExpr.id, arg0Id, arg0Type);
+      
+      const arg1Id = args[1]!.value.id;
+      const arg1Type = `Value`;
+      this.goModule.setExprArg1(callExpr.id, arg1Id, arg1Type);
     });
-    return e;
-  }
 
-  public createAttribute(): Attribute {
-    const a = new Attribute(this.createNumberExpr(0));
-    // const goAttr = this.goModule.createAttribute(a.getId());
-    // a.getExpr$().pipe().subscribe((expr) => {
-    //   console.log("setting expr id", expr.getId());
-    //   goAttr.setExprId(expr.getId());
-    // });
-    return a;
-  }
-
-  public eval(): number {
-    // return this.goModule.eval();
+    return callExpr;
   }
 }

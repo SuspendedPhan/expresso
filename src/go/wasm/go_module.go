@@ -20,11 +20,23 @@ func bootstrapGoModule() {
 
 	goModule.Set("addExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		id := args[0].String()
-		arg0Id := args[1].String()
-		arg0Type := args[2].String()
-		arg1Id := args[3].String()
-		arg1Type := args[4].String()
-		ev.AddExpr(id, arg0Id, arg0Type, arg1Id, arg1Type)
+		ev.AddExpr(id)
+		return nil
+	}))
+
+	goModule.Set("setExprArg0", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		argId := args[1].String()
+		argType := args[2].String()
+		ev.SetExprArg0(id, argId, argType)
+		return nil
+	}))
+
+	goModule.Set("setExprArg1", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		id := args[0].String()
+		argId := args[1].String()
+		argType := args[2].String()
+		ev.SetExprArg1(id, argId, argType)
 		return nil
 	}))
 

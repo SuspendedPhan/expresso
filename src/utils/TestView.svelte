@@ -1,7 +1,8 @@
 <script lang="ts">
-  import EvaluatorTest from "../evaluator/EvaluatorTest";
+  import MainContext from "../MainContext";
 
-  new EvaluatorTest().test();
+  const ctx = new MainContext();
+  ctx.createNumberExpr(0);
 </script>
 
 <main>

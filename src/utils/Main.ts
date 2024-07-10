@@ -14,10 +14,10 @@ export default class Main {
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const ctx = new MainContext(goModule);
-    ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
-      logger.log("selectedObject", selectedObject);
-    });
-    Keyboard.register(ctx.selection);
+    // ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
+    //   logger.log("selectedObject", selectedObject);
+    // });
+    // Keyboard.register(ctx.selection);
     return new Main(ctx);
   }
 }
