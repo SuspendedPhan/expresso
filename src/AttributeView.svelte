@@ -7,7 +7,7 @@
 
   export let ctx: MainContext;
   export let attribute: Attribute;
-  const expr$ = attribute.getExpr$();
+  const expr$ = attribute.expr$;
   expr$.subscribe((v) => Logger.file("AttributeView").log("expr$", v));
 </script>
 

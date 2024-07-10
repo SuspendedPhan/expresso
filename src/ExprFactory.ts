@@ -47,6 +47,7 @@ export default class ExprFactory {
 
   public createNumberExpr(value: number): ReadonlyNumberExpr {
     const numberExpr: ReadonlyNumberExpr = {
+      type: "NumberExpr",
       id: `number-${Math.random()}`,
       value$: of(value),
     };
@@ -55,15 +56,16 @@ export default class ExprFactory {
   }
 
   public createCallExpr(): CallExpr {
-    const args = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
-    const callExpr = {
+    const args$ = new BehaviorSubject<BehaviorSubject<ReadonlyExpr>[]>([]);
+    const callExpr: ReadonlyCallExpr = {
+      type: "CallExpr",
       id: `call-${Math.random()}`,
-      args,
+      args$,
     };
 
     const arg0 = this.createNumberExpr(1);
     const arg1 = this.createNumberExpr(2);
-    callExpr.args.next([
+    args$.next([
       new BehaviorSubject<ReadonlyExpr>(arg0),
       new BehaviorSubject<ReadonlyExpr>(arg1),
     ]);
@@ -73,7 +75,7 @@ export default class ExprFactory {
     return {
       ...callExpr,
       replaceArgWithNumberExpr: (index: number, value: number) => {
-        const arg = args.value[index];
+        const arg = args$.value[index];
         const numberExpr = this.createNumberExpr(value);
         if (arg === undefined) {
           throw new Error("arg is undefined");
@@ -81,7 +83,7 @@ export default class ExprFactory {
         arg.next(numberExpr);
       },
       replaceArgWithCallExpr: (index: number) => {
-        const arg = args.value[index];
+        const arg = args$.value[index];
         if (arg === undefined) {
           throw new Error("arg is undefined");
         }
