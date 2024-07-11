@@ -23,7 +23,7 @@
 
   let ctx: MainContext | null = null;
   let attribute$: BehaviorSubject<Attribute> | null = null;
-  // let rehydratedAttribute = null;
+  let rehydratedAttribute$: BehaviorSubject<Attribute> | null = null;
   let result = -1;
 
   async function setup() {
@@ -38,16 +38,17 @@
           "dehydratedAttribute",
           JSON.stringify(dehydratedAttribute, null, 6)
         );
-      });
+        const rehydratedAttribute = new Rehydrator(
+          ctx!.exprFactory
+        ).rehydrateAttribute(dehydratedAttribute);
+        console.log("rehydratedAttribute", rehydratedAttribute);
 
-    // Dehydrator.dehydrateAttribute$(attribute).subscribe(
-    //   (dehydratedAttribute) => {
-    //     rehydratedAttribute =
-    //       Rehydrator.rehydrateAttribute(dehydratedAttribute);
-    //     logger.log("dehydratedAttribute", dehydratedAttribute.toString());
-    //     logger.log("rehydratedAttribute", rehydratedAttribute.toString());
-    //   }
-    // );
+        if (rehydratedAttribute$ === null) {
+          rehydratedAttribute$ = new BehaviorSubject(rehydratedAttribute);
+        }
+
+        rehydratedAttribute$.next(rehydratedAttribute);
+      });
 
     const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
 
@@ -67,14 +68,12 @@
   <div>Hello World</div>
   <div>{result}</div>
 
-  {#if ctx === null || attribute$ === null}
+  {#if ctx === null || attribute$ === null || rehydratedAttribute$ === null}
     <div>Loading...</div>
   {:else}
     <div>Loaded</div>
     <AttributeView {ctx} {attribute$} />
-    <!-- {#key rehydratedAttribute}
-      <AttributeView {ctx} attribute={rehydratedAttribute} />
-    {/key} -->
+    <AttributeView {ctx} attribute$={rehydratedAttribute$} />
   {/if}
 </main>
 

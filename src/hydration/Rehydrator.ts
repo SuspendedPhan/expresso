@@ -1,4 +1,4 @@
-import ExprFactory, { Attribute, CallExpr, NumberExpr } from "../ExprFactory";
+import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
 import {
   DehydratedAttribute,
   DehydratedCallExpr,
@@ -11,8 +11,7 @@ export default class Rehydrator {
 
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
-    this.exprFactory.createAttribute();
-    console.log(deAttribute);
+    return this.exprFactory.createAttribute(deAttribute.id, expr);
   }
 
   private rehydrateExpr(deExpr: DehydratedExpr): Expr {
@@ -31,8 +30,7 @@ export default class Rehydrator {
   }
 
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
-    const arg0 = this.rehydrateExpr(deExpr.args[0]);
-    const arg1 = this.rehydrateExpr(deExpr.args[1]);
-    return this.exprFactory.createCallExpr(arg0, arg1, deExpr.id);
+    const args = deExpr.args.map((arg)=>this.rehydrateExpr(arg));
+    return this.exprFactory.createCallExpr(deExpr.id, args);
   }
 }
