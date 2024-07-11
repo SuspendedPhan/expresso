@@ -37,6 +37,7 @@ export default class Keyboard {
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
       logger.log("right");
+      selection.selectedObject$.next(null);
     });
   }
 }

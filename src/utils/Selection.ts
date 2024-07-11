@@ -19,51 +19,59 @@ export default class Selection {
   public readonly root$ = new BehaviorSubject<Selectable>(null);
 
   public down() {
-    combineLatest([this.selectedObject$, this.root$]).pipe(take(1)).subscribe(([selectedObject, root]) => {
-      console.log("down", selectedObject, root);
-      
-      if (selectedObject === null) {
-        this.selectedObject$.next(root);
-        return;
-      }
+    const selectedObject = this.selectedObject$.value;
+    const root = this.root$.value;
 
-      if (selectedObject.type === "Attribute") {
-        selectedObject.expr$.pipe(take(1)).subscribe(this.selectedObject$);
-        return;
-      }
 
-      if (selectedObject.type === "CallExpr") {
-        if (selectedObject.args[0] === undefined) {
-          throw new Error("CallExpr must have at least 1 args");
-        }
-        selectedObject.args[0].pipe(take(1)).subscribe(this.selectedObject$);
-        return;
-      }
+    if (selectedObject === null) {
+      this.selectedObject$.next(root);
+      return;
+    }
 
-      if (selectedObject.type === "NumberExpr") {
-        return;
-      }
+    if (selectedObject.type === "Attribute") {
+      selectedObject.expr$.pipe(take(1)).subscribe((expr) => {
+        this.selectedObject$.next(expr);
+      });
+      return;
+    }
 
-      throw new Error("Unknown type");
-    });
+    if (selectedObject.type === "CallExpr") {
+      if (selectedObject.args[0] === undefined) {
+        throw new Error("CallExpr must have at least 1 args");
+      }
+      selectedObject.args[0].pipe(take(1)).subscribe((arg) => {
+        this.selectedObject$.next(arg);
+      });
+      return;
+    }
+
+    if (selectedObject.type === "NumberExpr") {
+      return;
+    }
+
+    throw new Error("Unknown type");
   }
 
   public up() {
-    combineLatest([this.selectedObject$, this.root$]).pipe(take(1)).subscribe(([selectedObject, root]) => {
-      if (selectedObject === null) {
-        return root;
-      }
+    const selectedObject = this.selectedObject$.value;
+    if (selectedObject === null) {
+      return;
+    }
 
-      if (selectedObject.type === "Attribute") {
-        return;
-      }
+    if (selectedObject.type === "Attribute") {
+      return;
+    }
 
-      if (selectedObject.type === "CallExpr" || selectedObject.type === "NumberExpr") {
-        selectedObject.parent$.pipe(take(1)).subscribe(this.selectedObject$);
-        return;
-      }
+    if (
+      selectedObject.type === "CallExpr" ||
+      selectedObject.type === "NumberExpr"
+    ) {
+      selectedObject.parent$.pipe(take(1)).subscribe((parent) => {
+        this.selectedObject$.next(parent);
+      });
+      return;
+    }
 
-      throw new Error("Unknown type");
-    });
+    throw new Error("Unknown type");
   }
 }

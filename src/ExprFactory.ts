@@ -47,6 +47,8 @@ export default class ExprFactory {
       expr$,
     };
 
+    expr.parent$.next(attribute);
+
     return attribute;
   }
 
@@ -62,14 +64,18 @@ export default class ExprFactory {
   }
 
   public createCallExpr(): CallExpr {
-    const arg0$ = new BehaviorSubject<Expr>(this.createNumberExpr(0));
-    const arg1$ = new BehaviorSubject<Expr>(this.createNumberExpr(0));
+    const arg0 = this.createNumberExpr(0);
+    const arg1 = this.createNumberExpr(0);
+    const arg0$ = new BehaviorSubject<Expr>(arg0);
+    const arg1$ = new BehaviorSubject<Expr>(arg1);
     const expr: CallExpr = {
       type: "CallExpr",
       id: `expr-${Math.random()}`,
       args: [arg0$, arg1$],
       parent$: new BehaviorSubject<Parent>(null),
     };
+    arg0.parent$.next(expr);
+    arg1.parent$.next(expr);
     this.onCallExprAdded$_.next(expr);
     return expr;
   }
