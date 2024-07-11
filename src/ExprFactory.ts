@@ -5,7 +5,9 @@ import {
 } from "rxjs";
 import Logger from "./utils/Logger";
 
+// @ts-ignore
 const logger = Logger.file("ExprFactory.ts");
+
 let nextId = 0;
 
 export interface Attribute {
@@ -27,7 +29,7 @@ export interface NumberExpr {
 export interface CallExpr {
   readonly type: "CallExpr";
   readonly id: string;
-  readonly args: BehaviorSubject<Expr>[];
+  readonly args: readonly BehaviorSubject<Expr>[];
   readonly parent$: BehaviorSubject<Parent>;
 }
 

@@ -15,7 +15,6 @@
   combineLatest([object$, ctx.selection.selectedObject$]).subscribe(
     ([object, selectedObject]) => {
       selected = selectedObject === object;
-      console.log("SelectableView", selected, selectedObject, object);
     }
   );
 

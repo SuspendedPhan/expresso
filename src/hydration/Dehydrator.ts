@@ -1,99 +1,87 @@
-import { Observable, combineLatest, map, mergeMap, of, switchMap } from "rxjs";
 import {
-  ReadonlyAttribute,
-  // Expr,
-  // NumberExpr,
-  // PrimitiveFunctionCallExpr,
-} from "../Domain";
+  combineLatest,
+  map,
+  Observable,
+  of,
+  switchMap,
+} from "rxjs";
+import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
 import Logger from "../utils/Logger";
-import type { ReadonlyExpr, ReadonlyNumberExpr } from "../domain/Expr";
 
 // @ts-ignore
 const logger = Logger.file("Dehydrator.ts");
 
-export type DehydratedExpr = DehydratedNumberExpr | DehydratedPrimitiveFunctionCallExpr;
+export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
 export interface DehydratedAttribute {
   id: string;
   expr: DehydratedExpr;
 }
 
-export interface DehydratedExprBase {
-  id: string;
-  exprType: string;
-}
-
 export interface DehydratedNumberExpr {
-  expr: DehydratedExprBase;
+  type: "NumberExpr";
+  id: string;
   value: number;
 }
 
-export interface DehydratedPrimitiveFunctionCallExpr {
-  expr: DehydratedExprBase;
-  args: Array<DehydratedExprBase>;
+export interface DehydratedCallExpr {
+  type: "CallExpr";
+  id: string;
+  args: DehydratedExpr[];
 }
 
 export default class Dehydrator {
-  public static dehydrateAttribute$(
-    attribute: ReadonlyAttribute
+  public dehydrateAttribute$(
+    attribute: Attribute
   ): Observable<DehydratedAttribute> {
-    return attribute.expr$.pipe(
+    return this.dehydrateExpr$(attribute.expr$).pipe(
+      map((dehydratedExpr) => ({
+        id: attribute.id,
+        expr: dehydratedExpr,
+      }))
+    );
+  }
+
+  private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
+    return expr$.pipe(
       switchMap((expr) => {
-        return this.dehydrateExpr$(expr);
-      }),
-      map((dehydratedExpr) => {
-        return {
-          id: attribute.id,
-          expr: dehydratedExpr,
-        };
+        switch (expr.type) {
+          case "NumberExpr":
+            return this.dehydrateNumberExpr$(expr);
+          case "CallExpr":
+            return this.dehydrateCallExpr$(expr);
+          default:
+            throw new Error(`Unknown expr type: ${expr}`);
+        }
       })
     );
   }
 
-  private static dehydrateExpr$(expr: ReadonlyExpr): Observable<DehydratedExpr> {
-    if (expr instanceof ReadonlyNumberExpr) {
-      return this.dehydrateNumberExpr$(expr);
-    } else if (expr instanceof ReadonlyPrimitiveFunctionCallExpr) {
-      return this.dehydratePrimitiveFunctionCallExpr$(expr);
-    } else {
-      throw new Error("Unknown expr type");
-    }
-  }
-
-  private static dehydrateNumberExpr$(
+  private dehydrateNumberExpr$(
     expr: NumberExpr
   ): Observable<DehydratedNumberExpr> {
     return of({
-      id: expr.getId(),
-      exprType: `NumberExpr`,
-      value: expr.getValue(),
+      type: "NumberExpr",
+      id: expr.id,
+      value: expr.value,
     });
   }
 
-  private static dehydratePrimitiveFunctionCallExpr$(
-    expr: PrimitiveFunctionCallExpr
-  ): Observable<DehydratedPrimitiveFunctionCallExpr> {
-    const dehydratedArgs = expr.getArgs$().pipe(
-      switchMap((args) => {
-        return this.dehydrateArgs$(args);
-      })
-    );
+  private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedCallExpr> {
+    const deArgs = expr.args.map((arg$) => {
+      return this.dehydrateExpr$(arg$);
+    });
 
-    return dehydratedArgs.pipe(
+    const result: Observable<DehydratedCallExpr> = combineLatest(deArgs).pipe(
       map((dehydratedArgs) => {
         return {
-          id: expr.getId(),
-          exprType: `PrimitiveFunctionCallExpr`,
+          type: "CallExpr",
+          id: expr.id,
           args: dehydratedArgs,
         };
       })
     );
-  }
 
-  private static dehydrateArgs$(args: Array<Expr>): Observable<Array<DehydratedExprBase>> {
-    const dehydrated$Args = args.map((arg) => {
-      return this.dehydrateExpr$(arg);
-    });
-    return combineLatest(dehydrated$Args);
+    return result;
   }
 }

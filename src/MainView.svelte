@@ -31,6 +31,12 @@
     ctx = main.ctx;
     attribute$ = new BehaviorSubject(main.attribute);
 
+    new Dehydrator()
+      .dehydrateAttribute$(main.attribute)
+      .subscribe((dehydratedAttribute) => {
+        console.log("dehydratedAttribute", dehydratedAttribute);
+      });
+
     // Dehydrator.dehydrateAttribute$(attribute).subscribe(
     //   (dehydratedAttribute) => {
     //     rehydratedAttribute =

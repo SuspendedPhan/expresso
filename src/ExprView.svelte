@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BehaviorSubject, Subject } from "rxjs";
+  import { BehaviorSubject } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
@@ -13,7 +13,7 @@
   Logger.file("ExprView").log("expr", expr$);
 
   let text: string;
-  let args: BehaviorSubject<Expr>[] = [];
+  let args: readonly BehaviorSubject<Expr>[] = [];
 
   expr$.subscribe((expr) => {
     if (expr.type === "NumberExpr") {
