@@ -1,12 +1,10 @@
 import type GoModule from "./utils/GoModule";
 import ExprFactory from "./ExprFactory";
-import Selection from "./utils/Selection";
 
-export default class MainContext {
+export default class GoBridge {
   public constructor(
-    public readonly goModule: GoModule,
+    goModule: GoModule,
     public readonly exprFactory: ExprFactory,
-    public readonly selection: Selection,
   ) {
     exprFactory.onNumberExprAdded$.subscribe((numberExpr) => {
       goModule.addNumberExpr(numberExpr.id);

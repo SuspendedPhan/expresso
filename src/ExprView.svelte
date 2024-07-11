@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Subject } from "rxjs";
+  import { BehaviorSubject, Subject } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
   import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
@@ -7,12 +7,12 @@
   import type { Expr } from "./ExprFactory";
 
   export let ctx: MainContext;
-  export let expr$: Subject<Expr>;
+  export let expr$: BehaviorSubject<Expr>;
 
   Logger.file("ExprView").log("expr", expr$);
 
   let text: string;
-  let args: Subject<Expr>[] = [];
+  let args: BehaviorSubject<Expr>[] = [];
 
   expr$.subscribe((expr) => {
     if (expr.type === "NumberExpr") {
@@ -30,9 +30,9 @@
     const text = e.detail;
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      expr$.next(ctx.exprFactory.createNumberExpr(value));
+      ctx.exprFactory.replaceWithNumberExpr(expr$, value);
     } else if (text === "+") {
-      expr$.next(ctx.exprFactory.createCallExpr());
+      ctx.exprFactory.replaceWithCallExpr(expr$);
     }
   }
 </script>

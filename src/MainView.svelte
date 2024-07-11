@@ -9,12 +9,12 @@
   import Rehydrator from "./hydration/Rehydrator";
   import Main from "./utils/Main";
   import { type ReadonlyAttribute } from "./Domain";
-  import type { AttributeMut } from "./ExprFactory";
+  import type { Attribute, AttributeMut } from "./ExprFactory";
 
   const logger = Logger.file("MainView.svelte");
 
   let ctx: MainContext | null = null;
-  let attribute: AttributeMut | null = null;
+  let attribute: Attribute | null = null;
   // let rehydratedAttribute = null;
   let result = -1;
 
@@ -32,11 +32,9 @@
     //   }
     // );
 
-    // interval(1000).subscribe((v) => {
-    //   result = ctx.eval();
-    //   const obs = Logger.getMessages$().observers;
-    //   logger.log("observers", obs);
-    // });
+    combineLatest([interval(1000), attribute.expr$]).subscribe(([_, expr]) => {
+      result = ctx!.goModule.evalExpr(expr.id);
+    });
   }
 
   setup();

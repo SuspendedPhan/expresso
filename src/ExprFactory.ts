@@ -1,7 +1,9 @@
 import {
   BehaviorSubject,
   Observable,
+  Observer,
   Subject,
+  take,
 } from "rxjs";
 import Logger from "./utils/Logger";
 
@@ -10,7 +12,7 @@ const logger = Logger.file("ExprFactory.ts");
 export interface Attribute {
   readonly type: "Attribute";
   readonly id: string;
-  readonly expr$: Subject<Expr>;
+  readonly expr$: BehaviorSubject<Expr>;
 }
 
 export type Expr = NumberExpr | CallExpr;
@@ -20,20 +22,24 @@ export interface NumberExpr {
   readonly type: "NumberExpr";
   readonly id: string;
   readonly value: number;
-  readonly parent$: Subject<Parent>;
+  readonly parent$: BehaviorSubject<Parent>;
 }
 
 export interface CallExpr {
   readonly type: "CallExpr";
   readonly id: string;
-  readonly args: Subject<Expr>[];
-  readonly parent$: Subject<Parent>;
+  readonly args: BehaviorSubject<Expr>[];
+  readonly parent$: BehaviorSubject<Parent>;
 }
 
+export type ExObject = Attribute | Expr;
+
 export default class ExprFactory {
+  private readonly onObjectAdded$_ = new Subject<ExObject>();
   private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
   private readonly onCallExprAdded$_ = new Subject<CallExpr>();
   
+  public readonly onObjectAdded$: Observable<ExObject> = this.onObjectAdded$_;
   public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
   public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
   
@@ -48,7 +54,8 @@ export default class ExprFactory {
     };
 
     expr.parent$.next(attribute);
-
+    
+    this.onObjectAdded$_.next(attribute);
     return attribute;
   }
 
@@ -59,7 +66,9 @@ export default class ExprFactory {
       value,
       parent$: new BehaviorSubject<Parent>(null),
     };
+
     this.onNumberExprAdded$_.next(expr);
+    this.onObjectAdded$_.next(expr);
     return expr;
   }
 
@@ -76,7 +85,25 @@ export default class ExprFactory {
     };
     arg0.parent$.next(expr);
     arg1.parent$.next(expr);
+
     this.onCallExprAdded$_.next(expr);
+    this.onObjectAdded$_.next(expr);
+    return expr;
+  }
+
+  public replaceWithNumberExpr(expr$: BehaviorSubject<Expr>, value: number) {
+    const parent = expr$.value.parent$.value;
+    const expr = this.createNumberExpr(value);
+    expr.parent$.next(parent);
+    expr$.next(expr);
+    return expr;
+  }
+
+  public replaceWithCallExpr(expr$: BehaviorSubject<Expr>) {
+    const parent = expr$.value.parent$.value;
+    const expr = this.createCallExpr();
+    expr.parent$.next(parent);
+    expr$.next(expr);
     return expr;
   }
 }
