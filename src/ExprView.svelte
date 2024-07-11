@@ -45,7 +45,7 @@
 
     <div class="pl-2">
       {#each args as arg}
-        <svelte:self expr={arg} {ctx} />
+        <svelte:self expr$={arg} {ctx} />
       {/each}
     </div>
   </SelectableView>
