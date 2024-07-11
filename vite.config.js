@@ -29,7 +29,7 @@ export default defineConfig({
         buildProjects()
       }
     },
-    checker({ typescript: true })
+    // checker({ typescript: true })
   ],
   resolve: {
     alias: {

@@ -10,7 +10,7 @@
   const logger = Logger.file("SelectableView.svelte");
   Logger.logToConsole();
 
-  const selected$ = ctx.selection.getSelectedObject$().pipe(
+  const selected$ = ctx.selection.selectedObject$.pipe(
     map((o) => o === object),
     share()
   );
@@ -23,7 +23,8 @@
     event: MouseEvent & { currentTarget: EventTarget & HTMLElement }
   ) {
     event.stopPropagation();
-    ctx.selection.select(of(object));
+    console.log("handleClick", object);
+    ctx.selection.selectedObject$.next(object);
   }
 </script>
 
