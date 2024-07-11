@@ -1,9 +1,5 @@
 import {
   BehaviorSubject,
-  Observable,
-  combineLatest,
-  map,
-  share,
   take,
 } from "rxjs";
 import Logger from "./Logger";
@@ -21,7 +17,6 @@ export default class Selection {
   public down() {
     const selectedObject = this.selectedObject$.value;
     const root = this.root$.value;
-
 
     if (selectedObject === null) {
       this.selectedObject$.next(root);

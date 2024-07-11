@@ -18,11 +18,10 @@ export default class Main {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
     
-    const root$ = new Subject<Attribute>();
     const ctx = new MainContext(goModule, exprFactory, new Selection());
     
     const attribute = exprFactory.createAttribute();
-    root$.next(attribute);
+    ctx.selection.root$.next(attribute);
     
     ctx.selection.selectedObject$.subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
