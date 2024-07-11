@@ -8,7 +8,6 @@
   export let ctx: MainContext;
 
   const logger = Logger.file("SelectableView.svelte");
-  Logger.logToConsole();
 
   let selected = false;
 

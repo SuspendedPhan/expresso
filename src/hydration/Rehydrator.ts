@@ -1,51 +1,38 @@
-import {
-  // Attribute,
-  // Expr,
-  // NumberExpr,
-  // PrimitiveFunctionCallExpr,
-} from "../Domain";
+import ExprFactory, { Attribute, CallExpr, NumberExpr } from "../ExprFactory";
 import {
   DehydratedAttribute,
-  DehydratedExprBase,
+  DehydratedCallExpr,
+  DehydratedExpr,
   DehydratedNumberExpr,
-  DehydratedPrimitiveFunctionCallExpr,
 } from "./Dehydrator";
 
 export default class Rehydrator {
-  public static rehydrateAttribute(dehydrated: DehydratedAttribute): Attribute {
-    return new Attribute(this.rehydrateExpr(dehydrated.expr));
+  public constructor(private readonly exprFactory: ExprFactory) {}
+
+  public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
+    const expr = this.rehydrateExpr(deAttribute.expr);
+    this.exprFactory.createAttribute();
+    console.log(deAttribute);
   }
 
-  private static rehydrateExpr(dehydrated: DehydratedExprBase): Expr {
-    if (dehydrated.exprType === "NumberExpr") {
-      return this.rehydrateNumberExpr(dehydrated as DehydratedNumberExpr);
-    } else if (dehydrated.exprType === "PrimitiveFunctionCallExpr") {
-      return this.rehydratePrimitiveFunctionCallExpr(
-        dehydrated as DehydratedPrimitiveFunctionCallExpr
-      );
-    } else {
-      throw new Error("Unknown expr type");
+  private rehydrateExpr(deExpr: DehydratedExpr): Expr {
+    switch (deExpr.type) {
+      case "NumberExpr":
+        return this.rehydrateNumberExpr(deExpr);
+      case "CallExpr":
+        return this.rehydrateCallExpr(deExpr);
+      default:
+        throw new Error(`Unknown expr type: ${deExpr}`);
     }
   }
 
-  private static rehydrateNumberExpr(
-    dehydrated: DehydratedNumberExpr
-  ): NumberExpr {
-    return new NumberExpr(dehydrated.value);
+  private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
+    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id);
   }
 
-  private static rehydratePrimitiveFunctionCallExpr(
-    dehydrated: DehydratedPrimitiveFunctionCallExpr
-  ): PrimitiveFunctionCallExpr {
-    const args = this.rehydrateArgs(dehydrated.args);
-    return new PrimitiveFunctionCallExpr(args);
-  }
-
-  private static rehydrateArgs(
-    dehydratedArgs: Array<DehydratedExprBase>
-  ): Array<Expr> {
-    return dehydratedArgs.map((dehydratedArg) => {
-      return this.rehydrateExpr(dehydratedArg);
-    });
+  private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
+    const arg0 = this.rehydrateExpr(deExpr.args[0]);
+    const arg1 = this.rehydrateExpr(deExpr.args[1]);
+    return this.exprFactory.createCallExpr(arg0, arg1, deExpr.id);
   }
 }

@@ -34,7 +34,10 @@
     new Dehydrator()
       .dehydrateAttribute$(main.attribute)
       .subscribe((dehydratedAttribute) => {
-        console.log("dehydratedAttribute", dehydratedAttribute);
+        console.log(
+          "dehydratedAttribute",
+          JSON.stringify(dehydratedAttribute, null, 6)
+        );
       });
 
     // Dehydrator.dehydrateAttribute$(attribute).subscribe(

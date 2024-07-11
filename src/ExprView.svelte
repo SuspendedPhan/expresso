@@ -34,9 +34,9 @@
     const text = e.detail;
     const value = parseFloat(text);
     if (!isNaN(value)) {
-      ctx.exprFactory.replaceWithNumberExpr(expr$, value);
+      ctx.replacer.replaceWithNumberExpr(expr$, value);
     } else if (text === "+") {
-      ctx.exprFactory.replaceWithCallExpr(expr$);
+      ctx.replacer.replaceWithCallExpr(expr$);
     }
   }
 </script>

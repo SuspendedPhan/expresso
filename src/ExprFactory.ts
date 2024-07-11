@@ -35,27 +35,26 @@ export interface CallExpr {
 
 export type ExObject = Attribute | Expr;
 
-export interface ExprReplacement {
-  oldExpr: Expr;
-  newExpr: Expr;
-}
-
 export default class ExprFactory {
-  private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
   private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
   private readonly onCallExprAdded$_ = new Subject<CallExpr>();
   
-  public readonly onExprReplaced$: Observable<ExprReplacement> = this.onExprReplaced$_;
   public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
   public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
   
-  public createAttribute(): Attribute {
-    const expr = this.createNumberExpr(0);
+  public createAttribute(id?: string, expr?: Expr): Attribute {
+    if (id === undefined) {
+      id = `attribute-${nextId++}`;
+    }
+
+    if (expr === undefined) {
+      expr = this.createNumberExpr();
+    }
 
     const expr$ = new BehaviorSubject<Expr>(expr);
     const attribute: Attribute = {
       type: "Attribute",
-      id: `attribute-${nextId++}`,
+      id,
       expr$,
     };
 
@@ -64,10 +63,18 @@ export default class ExprFactory {
     return attribute;
   }
 
-  public createNumberExpr(value: number): NumberExpr {
+  public createNumberExpr(value?: number, id?: string): NumberExpr {
+    if (id === undefined) {
+      id = `expr-${nextId++}`;
+    }
+
+    if (value === undefined) {
+      value = 0;
+    }
+
     const expr: NumberExpr = {
       type: "NumberExpr",
-      id: `expr-${nextId++}`,
+      id,
       value,
       parent$: new BehaviorSubject<Parent>(null),
     };
@@ -76,41 +83,30 @@ export default class ExprFactory {
     return expr;
   }
 
-  public createCallExpr(): CallExpr {
-    const arg0 = this.createNumberExpr(0);
-    const arg1 = this.createNumberExpr(0);
-    const arg0$ = new BehaviorSubject<Expr>(arg0);
-    const arg1$ = new BehaviorSubject<Expr>(arg1);
+  public createCallExpr(id?:string, args?: readonly Expr[]): CallExpr {
+    if (id === undefined) {
+      id = `expr-${nextId++}`;
+    }
+
+    if (args === undefined) {
+      const arg0 = this.createNumberExpr();
+      const arg1 = this.createNumberExpr();
+      args = [arg0, arg1];
+    }
+    const argSubjects = args.map(arg => new BehaviorSubject<Expr>(arg));
+    
     const expr: CallExpr = {
       type: "CallExpr",
-      id: `expr-${nextId++}`,
-      args: [arg0$, arg1$],
+      id,
+      args: argSubjects,
       parent$: new BehaviorSubject<Parent>(null),
     };
-    arg0.parent$.next(expr);
-    arg1.parent$.next(expr);
+
+    for (const arg of args) {
+      arg.parent$.next(expr);
+    }
 
     this.onCallExprAdded$_.next(expr);
     return expr;
-  }
-
-  public replaceWithNumberExpr(expr$: BehaviorSubject<Expr>, value: number) {
-    const expr = this.createNumberExpr(value);
-    this.replaceWithExpr(expr$, expr);
-  }
-
-  public replaceWithCallExpr(expr$: BehaviorSubject<Expr>) {
-    const expr = this.createCallExpr();
-    this.replaceWithExpr(expr$, expr);
-  }
-
-  private replaceWithExpr(expr$: BehaviorSubject<Expr>, newExpr: Expr) {
-    const oldExpr = expr$.value;
-    const parent = expr$.value.parent$.value;
-    newExpr.parent$.next(parent);
-    expr$.next(newExpr);
-    
-    this.onExprReplaced$_.next({ oldExpr, newExpr });
-    return newExpr;
   }
 }
