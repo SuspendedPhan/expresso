@@ -7,6 +7,7 @@ import {
 } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
 import Logger from "../utils/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
 
 // @ts-ignore
 const logger = Logger.file("Dehydrator.ts");
@@ -31,6 +32,7 @@ export interface DehydratedCallExpr {
 }
 
 export default class Dehydrator {
+  @loggedMethod
   public dehydrateAttribute$(
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
@@ -42,6 +44,7 @@ export default class Dehydrator {
     );
   }
 
+  @loggedMethod
   private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
     return expr$.pipe(
       switchMap((expr) => {

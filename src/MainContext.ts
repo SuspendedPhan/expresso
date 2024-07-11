@@ -3,6 +3,7 @@ import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import Replacer from "./Replacer";
+import { loggedMethod } from "./logger/LoggerDecorator";
 
 export default class MainContext {
   public readonly replacer: Replacer;

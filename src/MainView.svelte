@@ -34,14 +34,9 @@
     new Dehydrator()
       .dehydrateAttribute$(main.attribute)
       .subscribe((dehydratedAttribute) => {
-        console.log(
-          "dehydratedAttribute",
-          JSON.stringify(dehydratedAttribute, null, 6)
-        );
         const rehydratedAttribute = new Rehydrator(
           ctx!.exprFactory
         ).rehydrateAttribute(dehydratedAttribute);
-        console.log("rehydratedAttribute", rehydratedAttribute);
 
         if (rehydratedAttribute$ === null) {
           rehydratedAttribute$ = new BehaviorSubject(rehydratedAttribute);

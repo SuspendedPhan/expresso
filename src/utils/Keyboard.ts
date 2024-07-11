@@ -1,6 +1,7 @@
 import hotkeys from "hotkeys-js";
 import Logger from "./Logger";
 import Selection from "./Selection";
+import { loggedMethod } from "../logger/LoggerDecorator";
 
 const logger = Logger.file("Keyboard.ts");
 
