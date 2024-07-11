@@ -5,6 +5,7 @@
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
   import type { Expr } from "./ExprFactory";
+  import { type Selectable } from "./utils/Selection";
 
   export let ctx: MainContext;
   export let expr$: BehaviorSubject<Expr>;
@@ -26,6 +27,9 @@
     }
   });
 
+  const selectable$ = new BehaviorSubject<Selectable>(expr$.value);
+  expr$.subscribe((v) => selectable$.next(v));
+
   function handleSelect(e: CustomEvent<string>): void {
     const text = e.detail;
     const value = parseFloat(text);
@@ -38,7 +42,7 @@
 </script>
 
 <main>
-  <SelectableView {ctx} object={$expr$}>
+  <SelectableView {ctx} object$={selectable$}>
     <span>Expr</span>
     <span>{text}</span>
     <ExprCommand on:select={handleSelect} />

@@ -1,13 +1,12 @@
 import {
   BehaviorSubject,
   Observable,
-  Observer,
   Subject,
-  take,
 } from "rxjs";
 import Logger from "./utils/Logger";
 
 const logger = Logger.file("ExprFactory.ts");
+let nextId = 0;
 
 export interface Attribute {
   readonly type: "Attribute";
@@ -34,12 +33,17 @@ export interface CallExpr {
 
 export type ExObject = Attribute | Expr;
 
+export interface ExprReplacement {
+  oldExpr: Expr;
+  newExpr: Expr;
+}
+
 export default class ExprFactory {
-  private readonly onObjectAdded$_ = new Subject<ExObject>();
+  private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
   private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
   private readonly onCallExprAdded$_ = new Subject<CallExpr>();
   
-  public readonly onObjectAdded$: Observable<ExObject> = this.onObjectAdded$_;
+  public readonly onExprReplaced$: Observable<ExprReplacement> = this.onExprReplaced$_;
   public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
   public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
   
@@ -49,26 +53,24 @@ export default class ExprFactory {
     const expr$ = new BehaviorSubject<Expr>(expr);
     const attribute: Attribute = {
       type: "Attribute",
-      id: `attribute-${Math.random()}`,
+      id: `attribute-${nextId++}`,
       expr$,
     };
 
     expr.parent$.next(attribute);
     
-    this.onObjectAdded$_.next(attribute);
     return attribute;
   }
 
   public createNumberExpr(value: number): NumberExpr {
     const expr: NumberExpr = {
       type: "NumberExpr",
-      id: `expr-${Math.random()}`,
+      id: `expr-${nextId++}`,
       value,
       parent$: new BehaviorSubject<Parent>(null),
     };
 
     this.onNumberExprAdded$_.next(expr);
-    this.onObjectAdded$_.next(expr);
     return expr;
   }
 
@@ -79,7 +81,7 @@ export default class ExprFactory {
     const arg1$ = new BehaviorSubject<Expr>(arg1);
     const expr: CallExpr = {
       type: "CallExpr",
-      id: `expr-${Math.random()}`,
+      id: `expr-${nextId++}`,
       args: [arg0$, arg1$],
       parent$: new BehaviorSubject<Parent>(null),
     };
@@ -87,23 +89,26 @@ export default class ExprFactory {
     arg1.parent$.next(expr);
 
     this.onCallExprAdded$_.next(expr);
-    this.onObjectAdded$_.next(expr);
     return expr;
   }
 
   public replaceWithNumberExpr(expr$: BehaviorSubject<Expr>, value: number) {
-    const parent = expr$.value.parent$.value;
     const expr = this.createNumberExpr(value);
-    expr.parent$.next(parent);
-    expr$.next(expr);
-    return expr;
+    this.replaceWithExpr(expr$, expr);
   }
 
   public replaceWithCallExpr(expr$: BehaviorSubject<Expr>) {
-    const parent = expr$.value.parent$.value;
     const expr = this.createCallExpr();
-    expr.parent$.next(parent);
-    expr$.next(expr);
-    return expr;
+    this.replaceWithExpr(expr$, expr);
+  }
+
+  private replaceWithExpr(expr$: BehaviorSubject<Expr>, newExpr: Expr) {
+    const oldExpr = expr$.value;
+    const parent = expr$.value.parent$.value;
+    newExpr.parent$.next(parent);
+    expr$.next(newExpr);
+    
+    this.onExprReplaced$_.next({ oldExpr, newExpr });
+    return newExpr;
   }
 }

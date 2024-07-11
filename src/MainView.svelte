@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { combineLatest, interval, map, of, startWith } from "rxjs";
+  import {
+    BehaviorSubject,
+    combineLatest,
+    interval,
+    map,
+    of,
+    startWith,
+    switchMap,
+  } from "rxjs";
   import GoModuleLoader from "./utils/GoModuleLoader";
   // import { Attribute } from "./Domain";
   import AttributeView from "./AttributeView.svelte";
@@ -9,19 +17,19 @@
   import Rehydrator from "./hydration/Rehydrator";
   import Main from "./utils/Main";
   import { type ReadonlyAttribute } from "./Domain";
-  import type { Attribute, AttributeMut } from "./ExprFactory";
+  import type { Attribute, Attribute, AttributeMut } from "./ExprFactory";
 
   const logger = Logger.file("MainView.svelte");
 
   let ctx: MainContext | null = null;
-  let attribute: Attribute | null = null;
+  let attribute$: BehaviorSubject<Attribute> | null = null;
   // let rehydratedAttribute = null;
   let result = -1;
 
   async function setup() {
     const main = await Main.setup();
     ctx = main.ctx;
-    attribute = main.attribute;
+    attribute$ = new BehaviorSubject(main.attribute);
 
     // Dehydrator.dehydrateAttribute$(attribute).subscribe(
     //   (dehydratedAttribute) => {
@@ -32,28 +40,29 @@
     //   }
     // );
 
-    combineLatest([interval(1000), attribute.expr$]).subscribe(([_, expr]) => {
+    const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
+
+    combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
       result = ctx!.goModule.evalExpr(expr.id);
     });
   }
 
   setup();
 
-  // document.addEventListener("mousedown", (e) => {
-  //   logger.log("handleClick");
-  //   ctx?.selection.select(of(null));
-  // });
+  document.addEventListener("mousedown", () => {
+    ctx?.selection.selectedObject$.next(null);
+  });
 </script>
 
 <main>
   <div>Hello World</div>
   <div>{result}</div>
 
-  {#if ctx === null || attribute === null}
+  {#if ctx === null || attribute$ === null}
     <div>Loading...</div>
   {:else}
     <div>Loaded</div>
-    <AttributeView {ctx} {attribute} />
+    <AttributeView {ctx} {attribute$} />
     <!-- {#key rehydratedAttribute}
       <AttributeView {ctx} attribute={rehydratedAttribute} />
     {/key} -->

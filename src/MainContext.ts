@@ -2,6 +2,7 @@ import type GoModule from "./utils/GoModule";
 import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
+import { combineLatest, pairwise } from "rxjs";
 
 export default class MainContext {
   public constructor(
@@ -10,5 +11,15 @@ export default class MainContext {
     public readonly selection: Selection,
   ) {
     new GoBridge(goModule, exprFactory);
+  
+    exprFactory.onExprReplaced$.subscribe(({ oldExpr, newExpr }) => {
+      console.log("Expr replaced", oldExpr, newExpr);
+      
+      if (this.selection.selectedObject$.value === oldExpr) {
+        console.log("Updating selection");
+        
+        this.selection.selectedObject$.next(newExpr);
+      }
+    });
   }
 }
