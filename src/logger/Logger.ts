@@ -17,12 +17,14 @@ export default class Logger {
     currentFunctionCall.args.push({ message: `${name}: ${value}` });
   }
   public static logCallstack() {
-    if (!LoggerDecorator.currentFunctionCall$.value) {
+    const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
+    if (!currentFunctionCall) {
       throw new Error("No current function call");
     }
-    const ancestors = this.getAncestors(
-      LoggerDecorator.currentFunctionCall$.value
-    );
+
+    currentFunctionCall.metadata.currentlyLoggingCallstack = true;
+
+    const ancestors = this.getAncestors(currentFunctionCall);
     for (const ancestor of ancestors) {
       if (ancestor.metadata.currentlyLogging) {
         continue;
@@ -57,6 +59,10 @@ export default class Logger {
       console.log(
         `${functionCall.metadata.className}.${functionCall.metadata.name}(${argString})`
       );
+
+      if (functionCall.metadata.currentlyLoggingCallstack) {
+        console.log("");
+      }
     });
   }
 }

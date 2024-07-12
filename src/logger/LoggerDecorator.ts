@@ -18,6 +18,7 @@ export interface FunctionCallMetadata {
   readonly name: string;
   readonly functionCall$: BehaviorSubject<FunctionCall | null>;
   currentlyLogging: boolean;
+  currentlyLoggingCallstack: boolean;
 }
 
 export class LoggerDecorator {
