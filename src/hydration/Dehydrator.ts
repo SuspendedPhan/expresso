@@ -26,15 +26,19 @@ export interface DehydratedCallExpr {
 }
 
 export default class Dehydrator {
-  @loggedMethod
+  // @loggedMethod
   public dehydrateAttribute$(
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
-    LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$.subscribe(
-      (functionCall) => {
-        console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL", functionCall.metadata.id);
-      }
-    );
+    // LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$.subscribe(
+    //   (functionCall) => {
+    //     console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL", functionCall.metadata.id);
+    //   }
+    // );
+    // LoggerDecorator.metadataById.get("Dehydrator.dehydrateAttribute$")?.functionCalls$.next(LoggerDecorator.currentFunctionCall$.value!);
+
+    // console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL$", LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$);
+    
 
     return this.dehydrateExpr$(attribute.expr$).pipe(
       map((dehydratedExpr) => ({
@@ -44,9 +48,9 @@ export default class Dehydrator {
     );
   }
 
-  @loggedMethod
+  // @loggedMethod
   private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
-    Logger.logCallstack();
+    // Logger.logCallstack();
     return expr$.pipe(
       switchMap((expr) => {
         switch (expr.type) {

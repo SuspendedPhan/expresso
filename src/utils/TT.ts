@@ -1,0 +1,34 @@
+import { BehaviorSubject, Subject } from "rxjs";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
+
+export default function TT() {
+  QQ.ta();
+//   QQ.ta();
+  console.log("");
+}
+
+class QQ {
+  @loggedMethod
+  public static ta() {
+    this.tb(false);
+    this.tb(true);
+  }
+
+  @loggedMethod
+  static tb(b: boolean) {
+    if (b) {
+      this.tc();
+    } else {
+      this.td();
+    }
+  }
+
+  @loggedMethod
+  static tc() {}
+
+  @loggedMethod
+  static td() {
+    Logger.logCallstack();
+  }
+}

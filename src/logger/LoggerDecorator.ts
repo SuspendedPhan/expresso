@@ -16,20 +16,21 @@ export interface FunctionCallMetadata {
   readonly id: string;
   readonly className: string;
   readonly name: string;
-  readonly functionCalls$: Subject<FunctionCall>;
-  currentlyLoggingCallstack: boolean;
+  readonly functionCalls$: ReplaySubject<FunctionCall>;
+  currentlyLogging: boolean;
 }
 
 export class LoggerDecorator {
   public static readonly currentFunctionCall$ =
     new BehaviorSubject<FunctionCall | null>(null);
   public static readonly metadataById = new Map<string, FunctionCallMetadata>();
+  public static readonly functionCalls$ = new ReplaySubject<FunctionCall>();
 
   public static loggedMethod(
     // @ts-ignore
-    target: any, 
+    target: any,
     propertyKey: string | symbol,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
@@ -50,6 +51,10 @@ export class LoggerDecorator {
       LoggerDecorator.currentFunctionCall$.next(functionCall);
 
       const result = originalMethod.apply(this, args);
+
+      if (!functionCall.argsLogged$.value) {
+        functionCall.argsLogged$.next(true);
+      }
       LoggerDecorator.currentFunctionCall$.next(parent);
       return result;
     };
@@ -70,17 +75,13 @@ export class LoggerDecorator {
     let metadata = this.metadataById.get(id);
     if (!metadata) {
       metadata = {
-        id: crypto.randomUUID(),
-        // id: `${className}.${name}`,
+        id: `${className}.${name}`,
         name,
         className,
-        functionCalls$: new Subject<FunctionCall>(),
-        currentlyLoggingCallstack: false,
+        functionCalls$: new ReplaySubject<FunctionCall>(),
+        currentlyLogging: false,
       };
       this.metadataById.set(metadata.id, metadata);
-      metadata.functionCalls$.subscribe((functionCall) => {
-        console.log(`CREATE FUNCTION CALL - ON FUNCTION ${functionCall.metadata.id}`);
-      });
     }
 
     const functionCall: FunctionCall = {
@@ -92,8 +93,6 @@ export class LoggerDecorator {
     };
 
     metadata.functionCalls$.next(functionCall);
-    console.log(this.metadataById);
-    
     return functionCall;
   }
 }
