@@ -6,11 +6,11 @@ import {
   switchMap,
 } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
-import Logger from "../utils/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
 
 // @ts-ignore
-const logger = Logger.file("Dehydrator.ts");
+// const logger = Logger.file("Dehydrator.ts");
 
 export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
@@ -46,6 +46,7 @@ export default class Dehydrator {
 
   @loggedMethod
   private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
+    Logger.logCallstack();
     return expr$.pipe(
       switchMap((expr) => {
         switch (expr.type) {

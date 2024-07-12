@@ -30,6 +30,8 @@ export class LoggerDecorator {
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
   ) {
+    console.log(target);
+    
     const originalMethod = descriptor.value;
     descriptor.value = (...args: any[]) => {
       const currentFunctionCall = this.currentFunctionCall$.value;
@@ -48,7 +50,7 @@ export class LoggerDecorator {
       }
       this.currentFunctionCall$.next(functionCall);
   
-      const result = originalMethod.apply(this, args);
+      const result = originalMethod.apply(target, args);
       this.currentFunctionCall$.next(parent);
       return result;
     };
@@ -63,7 +65,7 @@ export class LoggerDecorator {
     const name = propertyKey.toString();
     const className =
       target instanceof Function ? target.name : target.constructor.name;
-    console.log("loggedMethod", name);
+    console.log("LOGGED METHOD", name);
   
     const id = `${className}.${name}`;
     let metadata = this.metadataById.get(id);
@@ -89,7 +91,6 @@ export class LoggerDecorator {
     metadata.functionCalls$.next(functionCall);
     return functionCall;
   }
-  
 }
 
 export function loggedMethod(

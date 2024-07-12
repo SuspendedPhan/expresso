@@ -6,6 +6,8 @@ import Logger from "./Logger";
 import ExprFactory, { Attribute } from "../ExprFactory";
 import Selection from "./Selection";
 import { loggedMethod } from "../logger/LoggerDecorator";
+import DecTest from "../DecTest";
+DecTest();
 
 const logger = Logger.file("Main.ts");
 // logger.allow();

@@ -35,6 +35,8 @@ export default class Logger {
 
     private static startLoggingFunctionCall(metadata: FunctionCallMetadata) {
         metadata.functionCalls$.subscribe((functionCall) => {
+            console.log(`START ${functionCall.metadata.className}.${functionCall.metadata.name}`);
+            
             this.logFunctionCall(functionCall);
         });
     }
