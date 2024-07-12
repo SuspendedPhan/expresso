@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, ReplaySubject, Subject } from "rxjs";
+import { BehaviorSubject, ReplaySubject } from "rxjs";
 
 interface Message {
   readonly message: string;
@@ -83,6 +83,7 @@ export class LoggerDecorator {
         className,
         functionCall$: new BehaviorSubject<FunctionCall | null>(null),
         currentlyLogging: false,
+        currentlyLoggingCallstack: false,
       };
       this.metadataById.set(metadata.id, metadata);
     }

@@ -1,11 +1,10 @@
-import { BehaviorSubject, first, firstValueFrom, Subject } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import Keyboard from "./Keyboard";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
 import ExprFactory, { Attribute } from "../ExprFactory";
 import Selection from "./Selection";
-import { loggedMethod } from "../logger/LoggerDecorator";
 import TT from "./TT";
 TT();
 

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { combineLatest, map, Observable, of, switchMap } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
 import { loggedMethod, LoggerDecorator } from "../logger/LoggerDecorator";

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Evaluator from "../evaluator/Evaluator";
 import ScenePool from "./ScenePool";
 

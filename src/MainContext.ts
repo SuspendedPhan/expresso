@@ -1,5 +1,5 @@
 import type GoModule from "./utils/GoModule";
-import ExprFactory, { Expr } from "./ExprFactory";
+import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import Replacer, { ExprReplacement } from "./Replacer";
