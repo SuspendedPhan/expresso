@@ -20,10 +20,8 @@ export default class MainContext {
     );
   }
 
-  // @loggedMethod
+  @loggedMethod
   private handleExprReplaced({ oldExpr, newExpr }: ExprReplacement) {
-    console.log(this);
-
     if (this.selection.selectedObject$.value === oldExpr) {
       this.selection.selectedObject$.next(newExpr);
     }
