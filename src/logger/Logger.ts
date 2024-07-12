@@ -34,7 +34,7 @@ export default class Logger {
     }
   }
 
-  private static getAncestors(functionCall: FunctionCall): FunctionCall[] {
+  public static getAncestors(functionCall: FunctionCall): FunctionCall[] {
     const ancestors = [];
     let current: FunctionCall | null = functionCall;
     while (current) {

@@ -5,9 +5,6 @@ import GoModuleLoader from "./GoModuleLoader";
 import Logger from "./Logger";
 import ExprFactory, { Attribute } from "../ExprFactory";
 import Selection from "./Selection";
-import TT from "./TT";
-TT();
-
 const logger = Logger.file("Main.ts");
 // logger.allow();
 // Logger.allow("MainView.svelte");

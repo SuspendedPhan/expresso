@@ -1,9 +1,6 @@
-// @ts-nocheck
-
-import { combineLatest, map, Observable, of, switchMap } from "rxjs";
+import { combineLatest, map, Observable, of, switchMap, tap } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
-import { loggedMethod, LoggerDecorator } from "../logger/LoggerDecorator";
-import Logger from "../logger/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
 
 // @ts-ignore
 // const logger = Logger.file("Dehydrator.ts");
@@ -28,21 +25,14 @@ export interface DehydratedCallExpr {
 }
 
 export default class Dehydrator {
-  // @loggedMethod
+  @loggedMethod
   public dehydrateAttribute$(
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
-    // LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$.subscribe(
-    //   (functionCall) => {
-    //     console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL", functionCall.metadata.id);
-    //   }
-    // );
-    // LoggerDecorator.metadataById.get("Dehydrator.dehydrateAttribute$")?.functionCalls$.next(LoggerDecorator.currentFunctionCall$.value!);
-
-    // console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL$", LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$);
-    
-
     return this.dehydrateExpr$(attribute.expr$).pipe(
+      tap(() => {
+        console.log("Dehydrating attribute");
+      }),
       map((dehydratedExpr) => ({
         id: attribute.id,
         expr: dehydratedExpr,
@@ -50,10 +40,12 @@ export default class Dehydrator {
     );
   }
 
-  // @loggedMethod
+  @loggedMethod
   private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
-    // Logger.logCallstack();
     return expr$.pipe(
+      tap(() => {
+        console.log("Dehydrating expr");
+      }),
       switchMap((expr) => {
         switch (expr.type) {
           case "NumberExpr":
