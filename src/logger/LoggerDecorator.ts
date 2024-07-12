@@ -70,13 +70,17 @@ export class LoggerDecorator {
     let metadata = this.metadataById.get(id);
     if (!metadata) {
       metadata = {
-        id: `${className}.${name}`,
+        id: crypto.randomUUID(),
+        // id: `${className}.${name}`,
         name,
         className,
         functionCalls$: new Subject<FunctionCall>(),
         currentlyLoggingCallstack: false,
       };
       this.metadataById.set(metadata.id, metadata);
+      metadata.functionCalls$.subscribe((functionCall) => {
+        console.log(`CREATE FUNCTION CALL - ON FUNCTION ${functionCall.metadata.id}`);
+      });
     }
 
     const functionCall: FunctionCall = {
@@ -88,6 +92,8 @@ export class LoggerDecorator {
     };
 
     metadata.functionCalls$.next(functionCall);
+    console.log(this.metadataById);
+    
     return functionCall;
   }
 }

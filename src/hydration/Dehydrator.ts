@@ -1,12 +1,6 @@
-import {
-  combineLatest,
-  map,
-  Observable,
-  of,
-  switchMap,
-} from "rxjs";
+import { combineLatest, map, Observable, of, switchMap } from "rxjs";
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
-import { loggedMethod } from "../logger/LoggerDecorator";
+import { loggedMethod, LoggerDecorator } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
 
 // @ts-ignore
@@ -36,6 +30,12 @@ export default class Dehydrator {
   public dehydrateAttribute$(
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
+    LoggerDecorator.currentFunctionCall$.value?.metadata.functionCalls$.subscribe(
+      (functionCall) => {
+        console.log("DEHYDRATE ATTRIBUTE - FUNCTION CALL", functionCall.metadata.id);
+      }
+    );
+
     return this.dehydrateExpr$(attribute.expr$).pipe(
       map((dehydratedExpr) => ({
         id: attribute.id,
