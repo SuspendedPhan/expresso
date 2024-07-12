@@ -4,15 +4,15 @@ import Logger from "../logger/Logger";
 
 export default function TT() {
   QQ.ta();
-//   QQ.ta();
+  QQ.ta();
   console.log("");
 }
 
 class QQ {
   @loggedMethod
   public static ta() {
-    this.tb(false);
     this.tb(true);
+    this.tb(false);
   }
 
   @loggedMethod

@@ -16,7 +16,7 @@ export interface FunctionCallMetadata {
   readonly id: string;
   readonly className: string;
   readonly name: string;
-  readonly functionCalls$: ReplaySubject<FunctionCall>;
+  readonly functionCall$: BehaviorSubject<FunctionCall | null>;
   currentlyLogging: boolean;
 }
 
@@ -35,6 +35,12 @@ export class LoggerDecorator {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
       const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
+      if (currentFunctionCall) {
+        if (!currentFunctionCall.argsLogged$.value) {
+          currentFunctionCall.argsLogged$.next(true);
+        }
+      }
+
       const parent = currentFunctionCall;
       const functionCall: FunctionCall = LoggerDecorator.createFunctionCall(
         propertyKey,
@@ -42,12 +48,8 @@ export class LoggerDecorator {
         parent
       );
 
-      if (currentFunctionCall) {
-        currentFunctionCall.children$.next(functionCall);
-        if (!currentFunctionCall.argsLogged$.value) {
-          currentFunctionCall.argsLogged$.next(true);
-        }
-      }
+      currentFunctionCall?.children$.next(functionCall);
+
       LoggerDecorator.currentFunctionCall$.next(functionCall);
 
       const result = originalMethod.apply(this, args);
@@ -78,7 +80,7 @@ export class LoggerDecorator {
         id: `${className}.${name}`,
         name,
         className,
-        functionCalls$: new ReplaySubject<FunctionCall>(),
+        functionCall$: new BehaviorSubject<FunctionCall | null>(null),
         currentlyLogging: false,
       };
       this.metadataById.set(metadata.id, metadata);
@@ -92,7 +94,7 @@ export class LoggerDecorator {
       argsLogged$: new BehaviorSubject(false),
     };
 
-    metadata.functionCalls$.next(functionCall);
+    metadata.functionCall$.next(functionCall);
     return functionCall;
   }
 }

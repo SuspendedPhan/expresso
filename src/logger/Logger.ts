@@ -24,6 +24,10 @@ export default class Logger {
       LoggerDecorator.currentFunctionCall$.value
     );
     for (const ancestor of ancestors) {
+      if (ancestor.metadata.currentlyLogging) {
+        continue;
+      }
+      ancestor.metadata.currentlyLogging = true;
       this.startLoggingFunctionCalls(ancestor.metadata);
     }
   }
@@ -40,14 +44,8 @@ export default class Logger {
   }
 
   private static startLoggingFunctionCalls(metadata: FunctionCallMetadata) {
-    if (metadata.currentlyLogging) {
-      return;
-    }
-    metadata.currentlyLogging = true;
-
-    // console.log(`START LOGGING ${metadata.id}`, metadata.functionCalls$);
-    
-    metadata.functionCalls$.subscribe((functionCall) => {
+    metadata.functionCall$.subscribe((functionCall) => {
+      if (!functionCall) return;
       this.logFunctionCall(functionCall);
     });
   }
