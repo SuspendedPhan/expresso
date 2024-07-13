@@ -19,7 +19,7 @@ class QQ {
   @loggedMethod
   static ta$() {
     Logger.logCallstack();
-    const logger: any = LL.logger();
+    const logger = Logger.logger();
 
     return this.tt$.pipe(
       map((v) => {
@@ -44,27 +44,5 @@ class QQ {
         return v + 2;
       })
     );
-  }
-}
-
-class LL {
-  static logger() {
-    const currentCall = LoggerDecorator.currentCall$.value;
-    if (!currentCall) {
-      throw new Error("No current function call");
-    }
-
-    return {
-      log(name: string, ...args: any) {
-        const astCall = currentCall.astCall;
-        if (!astCall.currentlyLogging) {
-          return;
-        }
-
-        // concat args
-        const argString = args.map((arg: any) => arg.toString()).join(", ");
-        console.log(`${astCall.id}.${name}(${argString})`);
-      },
-    };
   }
 }

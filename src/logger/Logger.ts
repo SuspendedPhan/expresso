@@ -34,7 +34,33 @@ export default class Logger {
     }
   }
 
-  public static getAncestors(functionCall: RuntimeFunctionCall): RuntimeFunctionCall[] {
+  /**
+   * Used for logging closures, which don't necessarily include the parent scope in the callstack.
+   * logThisCallstack should be called in the method scope - any log calls made on this logger will use the logger's
+   * scope to determine if the log should be printed.
+   */
+  static logger() {
+    const currentCall = LoggerDecorator.currentCall$.value;
+    if (!currentCall) {
+      throw new Error("No current function call");
+    }
+
+    return {
+      log(name: string, ...args: any) {
+        const astCall = currentCall.astCall;
+        if (!astCall.currentlyLogging) {
+          return;
+        }
+
+        const argString = args.map((arg: any) => arg.toString()).join(", ");
+        console.log(`${astCall.id}.${name}(${argString})`);
+      },
+    };
+  }
+
+  public static getAncestors(
+    functionCall: RuntimeFunctionCall
+  ): RuntimeFunctionCall[] {
     const ancestors = [];
     let current: RuntimeFunctionCall | null = functionCall;
     while (current) {
