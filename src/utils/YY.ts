@@ -18,13 +18,14 @@ class QQ {
 
   @loggedMethod
   static ta$() {
+    Logger.logCallstack();
     return this.tt$.pipe(
       LL.tapLog("tb$", (v) => {
         const args: [string, any][] = [];
         args.push(["v", v]);
         return args;
       }),
-      LL.activate()
+      // LL.activate()
     );
   }
 
@@ -62,13 +63,20 @@ class LL {
   private static readonly scopeByAstCallId = new Map<string, TapLogScope>();
 
   static tapLog(name: string, callback: (...args: any[]) => [string, any][]) {
-    const tapLog = this.addTapLog(name);
+    const currentCall = LoggerDecorator.currentCall$.value;
+    if (!currentCall) {
+      throw new Error("No current function call");
+    }
+
     return tap((...args) => {
+      const astCall = currentCall.astCall;
+      if (!astCall.currentlyLogging){
+        return;
+      }
+
       const tapLogArgs = callback(...args);
       const argString = tapLogArgs.map((arg) => arg.join(": ")).join(", ");
-      if (tapLog.scope.currentlyLogging$.value) {
-        console.log(`${tapLog.id}(${argString})`);
-      }
+      console.log(`${astCall.id}.${name}(${argString})`);
     });
   }
 
