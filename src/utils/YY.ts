@@ -1,6 +1,5 @@
-import { BehaviorSubject, of, ReplaySubject, tap } from "rxjs";
+import { BehaviorSubject, map, of, tap } from "rxjs";
 import {
-  RuntimeFunctionCall,
   AstFunctionCall,
   loggedMethod,
   LoggerDecorator,
@@ -8,15 +7,32 @@ import {
 import Logger from "../logger/Logger";
 
 export default function YY() {
-  of("A").pipe(tap(LL.watch));
+  QQ.ta$().subscribe(() => {
+  });
+  
+  QQ.tt$.next(2);
 }
 
 class QQ {
+  public static tt$ = new BehaviorSubject(1);
+
   @loggedMethod
   static ta$() {
-    return of("A").pipe(
-      LL.tapLog("ta$", (v) => {
-        const args = [];
+    return this.tt$.pipe(
+      LL.tapLog("tb$", (v) => {
+        const args: [string, any][] = [];
+        args.push(["v", v]);
+        return args;
+      }),
+      LL.activate()
+    );
+  }
+
+  @loggedMethod
+  static tb$(v: number) {
+    return of(v).pipe(
+      LL.tapLog("tb$", (v) => {
+        const args: [string, any][] = [];
         args.push(["v", v]);
         return args;
       }),
@@ -45,12 +61,13 @@ interface TapLogScope {
 class LL {
   private static readonly scopeByAstCallId = new Map<string, TapLogScope>();
 
-  static tapLog(name: string, callback: (...args: any[]) => [][]) {
+  static tapLog(name: string, callback: (...args: any[]) => [string, any][]) {
     const tapLog = this.addTapLog(name);
     return tap((...args) => {
       const tapLogArgs = callback(...args);
+      const argString = tapLogArgs.map((arg) => arg.join(": ")).join(", ");
       if (tapLog.scope.currentlyLogging$.value) {
-        console.log(`${tapLog.id}`);
+        console.log(`${tapLog.id}(${argString})`);
       }
     });
   }
@@ -88,20 +105,48 @@ class LL {
       tapLog = {
         id: tapLogId,
         name,
+        scope,
         // TODP: remove
         currentlyLogging$: new BehaviorSubject(false),
       };
 
       scope.tapLogById.set(tapLogId, tapLog);
     }
+    return tapLog;
   }
-
-  static arg(name: string, value: any) {}
 
   /**
    * Starts logging all TapLogs in the current and ancestor scopes.
    */
   static activate() {
+    const currentCall = LoggerDecorator.currentCall$.value;
+    if (!currentCall) {
+      throw new Error("No current function call");
+    }
+
+    const scopeId = currentCall.astCall.id;
+    const scope = this.scopeByAstCallId.get(scopeId);
+    if (!scope) {
+      throw new Error("No scope");
+    }
+
+    for (const ancestor of scope.ancestors) {
+      this.startLogging(ancestor);
+    }
+    this.startLogging(currentCall.astCall);
     return tap();
+  }
+
+  static startLogging(ancestor: AstFunctionCall) {
+    const scope = this.scopeByAstCallId.get(ancestor.id);
+    if (!scope) {
+      throw new Error("No scope");
+    }
+
+    if (scope.currentlyLogging$.value) {
+      return;
+    }
+
+    scope.currentlyLogging$.next(true);
   }
 }
