@@ -1,10 +1,9 @@
 <script lang="ts">
   import ExprView from "./ExprView.svelte";
-  import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
   import type { Attribute } from "./ExprFactory";
-  import { BehaviorSubject, switchMap } from "rxjs";
+  import { BehaviorSubject, switchMap, tap } from "rxjs";
   import { type Selectable } from "./utils/Selection";
 
   export let ctx: MainContext;
@@ -15,10 +14,14 @@
 
   const expr$ = new BehaviorSubject(attribute$.value.expr$.value);
   attribute$
-    .pipe(switchMap((attr) => attr.expr$))
+    .pipe(
+      switchMap((attr) => {
+        console.log("AttributeView.switchMap");
+        return attr.expr$;
+      }),
+      tap((v) => console.log("AttributeView.tap", v.type))
+    )
     .subscribe((v) => expr$.next(v));
-
-  expr$.subscribe((v) => Logger.file("AttributeView").log("expr$", v));
 </script>
 
 <main>

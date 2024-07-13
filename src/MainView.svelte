@@ -18,8 +18,7 @@
   import Main from "./utils/Main";
   import { type ReadonlyAttribute } from "./Domain";
   import type { Attribute, Attribute, AttributeMut } from "./ExprFactory";
-
-  const logger = Logger.file("MainView.svelte");
+  import HydrationTest from "./utils/HydrationTest";
 
   let ctx: MainContext | null = null;
   let attribute$: BehaviorSubject<Attribute> | null = null;
@@ -30,22 +29,19 @@
     const main = await Main.setup();
     ctx = main.ctx;
     attribute$ = new BehaviorSubject(main.attribute);
-
-    new Dehydrator()
-      .dehydrateAttribute$(main.attribute)
-      .subscribe((dehydratedAttribute) => {
-        const rehydratedAttribute = new Rehydrator(
-          ctx!.exprFactory
-        ).rehydrateAttribute(dehydratedAttribute);
-
-        if (rehydratedAttribute$ === null) {
-          rehydratedAttribute$ = new BehaviorSubject(rehydratedAttribute);
-        }
-
-        rehydratedAttribute$.next(rehydratedAttribute);
-      });
-
     const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
+
+    HydrationTest.test(main, ctx).subscribe((a) => {
+      if (a === null) {
+        return;
+      }
+
+      console.log("Main.subscribe", a);
+      if (rehydratedAttribute$ === null) {
+        rehydratedAttribute$ = new BehaviorSubject(a);
+      }
+      rehydratedAttribute$.next(a);
+    });
 
     combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
       result = ctx!.goModule.evalExpr(expr.id);
