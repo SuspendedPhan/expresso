@@ -1,12 +1,11 @@
 import {
   BehaviorSubject,
   map,
-  MonoTypeOperatorFunction,
   of,
   switchMap,
   tap,
 } from "rxjs";
-import { loggedMethod, LoggerDecorator } from "../logger/LoggerDecorator";
+import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
 
 export default function YY() {
@@ -39,8 +38,10 @@ class QQ {
   @loggedMethod
   static tb$(v: number) {
     Logger.logCallstack();
+    const logger = Logger.logger();
     return of(v).pipe(
       map((v) => {
+        logger.log("map", v);
         return v + 2;
       })
     );
