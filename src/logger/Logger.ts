@@ -61,7 +61,7 @@ export default class Logger {
       );
 
       if (functionCall.astCall.currentlyLoggingCallstack) {
-        console.log("");
+        // console.log("");
       }
     });
   }
