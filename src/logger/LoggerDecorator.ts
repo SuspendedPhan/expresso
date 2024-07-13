@@ -4,28 +4,28 @@ interface Message {
   readonly message: string;
 }
 
-export interface FunctionCall {
-  readonly metadata: FunctionCallMetadata;
-  readonly parent: FunctionCall | null;
+export interface RuntimeFunctionCall {
+  readonly astCall: AstFunctionCall;
+  readonly parent: RuntimeFunctionCall | null;
   readonly args: Message[];
   readonly argsLogged$: BehaviorSubject<boolean>;
-  readonly children$: ReplaySubject<FunctionCall>;
+  readonly children$: ReplaySubject<RuntimeFunctionCall>;
 }
 
-export interface FunctionCallMetadata {
+export interface AstFunctionCall {
   readonly id: string;
   readonly className: string;
   readonly name: string;
-  readonly functionCall$: BehaviorSubject<FunctionCall | null>;
+  readonly runtimeCall$: BehaviorSubject<RuntimeFunctionCall | null>;
   currentlyLogging: boolean;
   currentlyLoggingCallstack: boolean;
 }
 
 export class LoggerDecorator {
-  public static readonly currentFunctionCall$ =
-    new BehaviorSubject<FunctionCall | null>(null);
-  public static readonly metadataById = new Map<string, FunctionCallMetadata>();
-  public static readonly functionCalls$ = new ReplaySubject<FunctionCall>();
+  public static readonly currentCall$ =
+    new BehaviorSubject<RuntimeFunctionCall | null>(null);
+  public static readonly astCallById = new Map<string, AstFunctionCall>();
+  public static readonly runtimeCalls$ = new ReplaySubject<RuntimeFunctionCall>();
 
   public static loggedMethod(
     // @ts-ignore
@@ -35,7 +35,7 @@ export class LoggerDecorator {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
-      const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
+      const currentFunctionCall = LoggerDecorator.currentCall$.value;
       if (currentFunctionCall) {
         if (!currentFunctionCall.argsLogged$.value) {
           currentFunctionCall.argsLogged$.next(true);
@@ -43,7 +43,7 @@ export class LoggerDecorator {
       }
 
       const parent = currentFunctionCall;
-      const functionCall: FunctionCall = LoggerDecorator.createFunctionCall(
+      const functionCall: RuntimeFunctionCall = LoggerDecorator.createFunctionCall(
         propertyKey,
         this,
         parent
@@ -51,14 +51,14 @@ export class LoggerDecorator {
 
       currentFunctionCall?.children$.next(functionCall);
 
-      LoggerDecorator.currentFunctionCall$.next(functionCall);
+      LoggerDecorator.currentCall$.next(functionCall);
 
       const result = originalMethod.apply(this, args);
 
       if (!functionCall.argsLogged$.value) {
         functionCall.argsLogged$.next(true);
       }
-      LoggerDecorator.currentFunctionCall$.next(parent);
+      LoggerDecorator.currentCall$.next(parent);
       return result;
     };
     return descriptor;
@@ -67,7 +67,7 @@ export class LoggerDecorator {
   public static createFunctionCall(
     propertyKey: string | symbol,
     thisValue: any,
-    parent: FunctionCall | null
+    parent: RuntimeFunctionCall | null
   ) {
     const name = propertyKey.toString();
     const className =
@@ -75,28 +75,28 @@ export class LoggerDecorator {
         ? thisValue.name
         : thisValue.constructor.name;
     const id = `${className}.${name}`;
-    let metadata = this.metadataById.get(id);
+    let metadata = this.astCallById.get(id);
     if (!metadata) {
       metadata = {
         id: `${className}.${name}`,
         name,
         className,
-        functionCall$: new BehaviorSubject<FunctionCall | null>(null),
+        runtimeCall$: new BehaviorSubject<RuntimeFunctionCall | null>(null),
         currentlyLogging: false,
         currentlyLoggingCallstack: false,
       };
-      this.metadataById.set(metadata.id, metadata);
+      this.astCallById.set(metadata.id, metadata);
     }
 
-    const functionCall: FunctionCall = {
-      metadata,
+    const functionCall: RuntimeFunctionCall = {
+      astCall: metadata,
       parent,
       args: [],
-      children$: new ReplaySubject<FunctionCall>(),
+      children$: new ReplaySubject<RuntimeFunctionCall>(),
       argsLogged$: new BehaviorSubject(false),
     };
 
-    metadata.functionCall$.next(functionCall);
+    metadata.runtimeCall$.next(functionCall);
     return functionCall;
   }
 }

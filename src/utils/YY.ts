@@ -1,57 +1,88 @@
 import { BehaviorSubject, of, ReplaySubject, tap } from "rxjs";
-import { FunctionCall, FunctionCallMetadata, loggedMethod, LoggerDecorator } from "../logger/LoggerDecorator";
+import {
+  RuntimeFunctionCall,
+  AstFunctionCall,
+  loggedMethod,
+  LoggerDecorator,
+} from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
 
 export default function YY() {
-    of("A").pipe(
-        tap(LL.watch),
-    );
+  of("A").pipe(tap(LL.watch));
 }
 
 class QQ {
-    @loggedMethod
-    static ta$() {
-        return of("A").pipe(
-            LL.watch(),
-        );
-    }
+  @loggedMethod
+  static ta$() {
+    return of("A").pipe(
+      LL.tapLog("ta$", (v) => {
+        LL.arg("v", v);
+      }),
+      LL.activate()
+    );
+  }
 }
 
-interface Stream {
-    id: string;
-    name: string;
-    currentlyLogging: BehaviorSubject<boolean>;
-    ancestors: Set<FunctionCallMetadata>;
+interface TapLog {
+  id: string;
+  name: string;
+}
+
+/**
+ * Contains all TapLogs for a given function call metadata.
+ */
+interface TapLogScope {
+  id: string;
+  currentlyLogging: BehaviorSubject<boolean>;
+  functionCallMetadata: AstFunctionCall;
+  ancestors: Set<AstFunctionCall>;
 }
 
 class LL {
-    private static streamMapByFunctionCallMetadataId = new Map<string, Map<string, Stream>>();
-    
-    static watch(name: string) {
-        const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
-        if (!currentFunctionCall) { throw new Error("No current function call"); }
+  private static streamMapByFunctionCallMetadataId = new Map<
+    string,
+    Map<string, TapLog>
+  >();
 
-        const ancestors = Logger.getAncestors(currentFunctionCall).map((ancestor) => ancestor.metadata);
-        const id = `${currentFunctionCall.metadata.className}.${currentFunctionCall.metadata.name}.${name}`;
-        
-
-        const metadata = this.streamMapByFunctionCallMetadataId.get(currentFunctionCall.metadata.id);
-        let stream = metadata?.get(id);
-        if (!stream) {
-            stream = {
-                id,
-                name,
-                currentlyLogging: new BehaviorSubject(false),
-                ancestors: new Set(ancestors),
-            };
-        }
-
-        return tap(() => {
-            console.log("watching");
-        });
+  static tapLog(name: string, callback: (...args: any[]) => void) {
+    const currentFunctionCall = LoggerDecorator.currentCall$.value;
+    if (!currentFunctionCall) {
+      throw new Error("No current function call");
     }
 
-    static logStack() {
-        // Get all streams
+    const ancestors = Logger.getAncestors(currentFunctionCall).map(
+      (ancestor) => ancestor.astCall
+    );
+    const id = `${currentFunctionCall.astCall.className}.${currentFunctionCall.astCall.name}.${name}`;
+
+    const metadata = this.streamMapByFunctionCallMetadataId.get(
+      currentFunctionCall.astCall.id
+    );
+    let stream = metadata?.get(id);
+    if (!stream) {
+      stream = {
+        id,
+        name,
+        currentlyLogging: new BehaviorSubject(false),
+        ancestors: new Set(ancestors),
+      };
     }
+
+    return tap((...args) => {
+      callback(...args);
+      console.log("watching");
+    });
+  }
+
+  static arg(name: string, value: any) {}
+
+  /**
+   *
+   */
+  static activate() {
+    /*
+     */
+
+    return tap();
+  }
 }

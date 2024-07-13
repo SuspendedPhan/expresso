@@ -1,12 +1,12 @@
 import {
-  FunctionCall,
-  FunctionCallMetadata,
+  RuntimeFunctionCall,
+  AstFunctionCall,
   LoggerDecorator,
 } from "./LoggerDecorator";
 
 export default class Logger {
   public static arg(name: string, value: any) {
-    const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
+    const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
       throw new Error("No current function call");
     }
@@ -17,26 +17,26 @@ export default class Logger {
     currentFunctionCall.args.push({ message: `${name}: ${value}` });
   }
   public static logCallstack() {
-    const currentFunctionCall = LoggerDecorator.currentFunctionCall$.value;
+    const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
       throw new Error("No current function call");
     }
 
-    currentFunctionCall.metadata.currentlyLoggingCallstack = true;
+    currentFunctionCall.astCall.currentlyLoggingCallstack = true;
 
     const ancestors = this.getAncestors(currentFunctionCall);
     for (const ancestor of ancestors) {
-      if (ancestor.metadata.currentlyLogging) {
+      if (ancestor.astCall.currentlyLogging) {
         continue;
       }
-      ancestor.metadata.currentlyLogging = true;
-      this.startLoggingFunctionCalls(ancestor.metadata);
+      ancestor.astCall.currentlyLogging = true;
+      this.startLoggingFunctionCalls(ancestor.astCall);
     }
   }
 
-  public static getAncestors(functionCall: FunctionCall): FunctionCall[] {
+  public static getAncestors(functionCall: RuntimeFunctionCall): RuntimeFunctionCall[] {
     const ancestors = [];
-    let current: FunctionCall | null = functionCall;
+    let current: RuntimeFunctionCall | null = functionCall;
     while (current) {
       ancestors.push(current);
       current = current.parent;
@@ -45,22 +45,22 @@ export default class Logger {
     return ancestors;
   }
 
-  private static startLoggingFunctionCalls(metadata: FunctionCallMetadata) {
-    metadata.functionCall$.subscribe((functionCall) => {
+  private static startLoggingFunctionCalls(metadata: AstFunctionCall) {
+    metadata.runtimeCall$.subscribe((functionCall) => {
       if (!functionCall) return;
       this.logFunctionCall(functionCall);
     });
   }
 
-  private static logFunctionCall(functionCall: FunctionCall) {
+  private static logFunctionCall(functionCall: RuntimeFunctionCall) {
     functionCall.argsLogged$.subscribe((argsLogged) => {
       if (!argsLogged) return;
       const argString = functionCall.args.map((arg) => arg.message).join(", ");
       console.log(
-        `${functionCall.metadata.className}.${functionCall.metadata.name}(${argString})`
+        `${functionCall.astCall.className}.${functionCall.astCall.name}(${argString})`
       );
 
-      if (functionCall.metadata.currentlyLoggingCallstack) {
+      if (functionCall.astCall.currentlyLoggingCallstack) {
         console.log("");
       }
     });
