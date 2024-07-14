@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import { Expr, Parent } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -34,15 +34,7 @@ export default class ExprManager {
     mut.expr$.next(newExpr);
   }
 
-  public setParent(expr: Expr, parent: Parent) {
-    const mut = this.exprMutByExpr.get(expr);
-    if (!mut) {
-      throw new Error(`expr$ not found for ${expr}`);
-    }
-    mut.parent$.next(parent);
-  }
-
-  public getParent$(expr: Expr): Observable<Parent> {
+  public getParent$(expr: Expr): BehaviorSubject<Parent> {
     const mut = this.exprMutByExpr.get(expr);
     if (!mut) {
       throw new Error(`expr$ not found for ${expr}`);

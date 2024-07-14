@@ -63,6 +63,9 @@ export default class ExprFactory {
       expr$,
     };
 
+    const parent$ = this.exprManager.getParent$(expr);
+    parent$.next(attribute);
+
     return attribute;
   }
 
@@ -108,7 +111,8 @@ export default class ExprFactory {
     };
 
     for (const arg of args) {
-      this.exprManager.setParent(arg, expr);
+      const parent$ = this.exprManager.getParent$(arg);
+      parent$.next(expr);
     }
 
     this.onCallExprAdded$_.next(expr);
