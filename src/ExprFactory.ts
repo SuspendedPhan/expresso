@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 import ExprManager from "./ExprManager";
@@ -8,7 +8,7 @@ let nextId = 0;
 export interface Attribute {
   readonly type: "Attribute";
   readonly id: string;
-  readonly expr$: BehaviorSubject<Expr>;
+  readonly expr$: Observable<Expr>;
 }
 
 export type Expr = NumberExpr | CallExpr;
@@ -18,14 +18,14 @@ export interface NumberExpr {
   readonly type: "NumberExpr";
   readonly id: string;
   readonly value: number;
-  readonly parent$: BehaviorSubject<Parent>;
+  readonly parent$: Observable<Parent>;
 }
 
 export interface CallExpr {
   readonly type: "CallExpr";
   readonly id: string;
-  readonly args: readonly BehaviorSubject<Expr>[];
-  readonly parent$: BehaviorSubject<Parent>;
+  readonly args: readonly Observable<Expr>[];
+  readonly parent$: Observable<Parent>;
 }
 
 export type ExObject = Attribute | Expr;
@@ -85,7 +85,7 @@ export default class ExprFactory {
       type: "NumberExpr",
       id,
       value,
-      parent$: new BehaviorSubject<Parent>(null),
+      parent$: new Observable<Parent>(null),
     };
 
     this.onNumberExprAdded$_.next(expr);
@@ -110,7 +110,7 @@ export default class ExprFactory {
       type: "CallExpr",
       id,
       args: argSubjects,
-      parent$: new BehaviorSubject<Parent>(null),
+      parent$: new Observable<Parent>(null),
     };
 
     for (const arg of args) {

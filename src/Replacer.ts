@@ -37,4 +37,7 @@ export default class Replacer {
     this.exprFactory.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
   }
+
+  private setParent(expr: Expr, parent: Expr) {
+  }
 }

@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { BehaviorSubject, map, Observable } from "rxjs";
+  import { map, Observable } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
   import type { Expr } from "./ExprFactory";
   import { loggedMethod } from "./logger/LoggerDecorator";
-  import Logger from "./logger/Logger";
 
   export let ctx: MainContext;
   export let expr$: Observable<Expr>;
