@@ -3,10 +3,8 @@ import {
   Observable,
   Subject,
 } from "rxjs";
-import Logger from "./utils/Logger";
-
-// @ts-ignore
-const logger = Logger.file("ExprFactory.ts");
+import { loggedMethod } from "./logger/LoggerDecorator";
+import Logger from "./logger/Logger";
 
 let nextId = 0;
 
@@ -42,7 +40,9 @@ export default class ExprFactory {
   public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
   public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
   
+  @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
+    Logger.logCallstack();
     if (id === undefined) {
       id = `attribute-${nextId++}`;
     }
@@ -63,7 +63,9 @@ export default class ExprFactory {
     return attribute;
   }
 
+  @loggedMethod
   public createNumberExpr(value?: number, id?: string): NumberExpr {
+    Logger.logCallstack();
     if (id === undefined) {
       id = `expr-${nextId++}`;
     }
@@ -83,7 +85,9 @@ export default class ExprFactory {
     return expr;
   }
 
+  @loggedMethod
   public createCallExpr(id?:string, args?: readonly Expr[]): CallExpr {
+    Logger.logCallstack();
     if (id === undefined) {
       id = `expr-${nextId++}`;
     }

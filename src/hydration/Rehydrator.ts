@@ -1,4 +1,6 @@
 import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
+import Logger from "../logger/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
 import {
   DehydratedAttribute,
   DehydratedCallExpr,
@@ -9,11 +11,13 @@ import {
 export default class Rehydrator {
   public constructor(private readonly exprFactory: ExprFactory) {}
 
+  @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
     return this.exprFactory.createAttribute(deAttribute.id, expr);
   }
 
+  @loggedMethod
   private rehydrateExpr(deExpr: DehydratedExpr): Expr {
     switch (deExpr.type) {
       case "NumberExpr":
@@ -24,12 +28,16 @@ export default class Rehydrator {
         throw new Error(`Unknown expr type: ${deExpr}`);
     }
   }
-
+  
+  @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
+    Logger.logCallstack();
     return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id);
   }
 
+  @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
+    Logger.logCallstack();
     const args = deExpr.args.map((arg)=>this.rehydrateExpr(arg));
     return this.exprFactory.createCallExpr(deExpr.id, args);
   }

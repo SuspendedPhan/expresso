@@ -1,31 +1,18 @@
 <script lang="ts">
   import { BehaviorSubject } from "rxjs";
   import ExprCommand from "./ExprCommand.svelte";
-  import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
   import type { Expr } from "./ExprFactory";
   import { type Selectable } from "./utils/Selection";
+  import { loggedMethod } from "./logger/LoggerDecorator";
+  import Logger from "./logger/Logger";
 
   export let ctx: MainContext;
   export let expr$: BehaviorSubject<Expr>;
 
-  Logger.file("ExprView").log("expr", expr$);
-
   let text: string;
   let args: readonly BehaviorSubject<Expr>[] = [];
-
-  expr$.subscribe((expr) => {
-    if (expr.type === "NumberExpr") {
-      text = expr.value.toString();
-    } else if (expr.type === "CallExpr") {
-      text = "+";
-    }
-
-    if (expr.type === "CallExpr") {
-      args = expr.args;
-    }
-  });
 
   const selectable$ = new BehaviorSubject<Selectable>(expr$.value);
   expr$.subscribe((v) => selectable$.next(v));
@@ -39,6 +26,29 @@
       ctx.replacer.replaceWithCallExpr(expr$);
     }
   }
+
+  class ExprView {
+    @loggedMethod
+    static setup() {
+      const logger = Logger.logger();
+      Logger.logCallstack();
+
+      expr$.subscribe((expr) => {
+        logger.log("subscribe", expr.id);
+        if (expr.type === "NumberExpr") {
+          text = expr.value.toString();
+        } else if (expr.type === "CallExpr") {
+          text = "+";
+        }
+
+        if (expr.type === "CallExpr") {
+          args = expr.args;
+        }
+      });
+    }
+  }
+
+  ExprView.setup();
 </script>
 
 <main>
