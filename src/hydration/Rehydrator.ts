@@ -14,7 +14,7 @@ export default class Rehydrator {
   @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
-    return this.exprFactory.createAttribute(deAttribute.id, expr);
+    return this.exprFactory.createAttribute(deAttribute.id + "rehydrated", expr);
   }
 
   @loggedMethod
@@ -32,13 +32,13 @@ export default class Rehydrator {
   @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
     Logger.logCallstack();
-    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id);
+    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id + "rehydrated");
   }
 
   @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     Logger.logCallstack();
     const args = deExpr.args.map((arg)=>this.rehydrateExpr(arg));
-    return this.exprFactory.createCallExpr(deExpr.id, args);
+    return this.exprFactory.createCallExpr(deExpr.id + "rehydrated", args);
   }
 }
