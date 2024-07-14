@@ -1,4 +1,4 @@
-import { Observable, Subject } from "rxjs";
+import { first, Observable, Subject } from "rxjs";
 import ExprFactory, { Expr } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -31,13 +31,12 @@ export default class Replacer {
     Logger.arg("oldExpr", oldExpr.id);
     Logger.logCallstack();
 
-    this.exprFactory.exprManager.getParent();
-    this.exprFactory.exprManager.setParent(newExpr, );
+    const parent$ = this.exprFactory.exprManager.getParent$(oldExpr);
+    parent$.pipe(first()).subscribe((parent) => {
+      this.exprFactory.exprManager.setParent(newExpr, parent);
+    });
     
     this.exprFactory.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
-  }
-
-  private setParent(expr: Expr, parent: Expr) {
   }
 }
