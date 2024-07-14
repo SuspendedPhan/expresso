@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { Expr, Parent } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -9,34 +9,44 @@ interface ExprMut {
 }
 
 export default class ExprManager {
-  private readonly exprMut$ByExpr_ = new Map<Expr, BehaviorSubject<Expr>>();
-  private readonly parent$ByExpr_ = new Map<Expr, BehaviorSubject<Parent>>();
+  private readonly exprMutByExpr = new Map<Expr, ExprMut>();
 
   @loggedMethod
   public create$(expr: Expr): BehaviorSubject<Expr> {
     Logger.logCallstack();
     Logger.arg("expr", expr.id);
-    const expr$ = new BehaviorSubject<Expr>(expr);
-    this.exprMut$ByExpr_.set(expr, expr$);
-    this.parent$ByExpr_.set(expr, new BehaviorSubject<Parent>(null));
-    return expr$;
+    const mut = {
+      parent$: new BehaviorSubject<Parent>(null),
+      expr$: new BehaviorSubject<Expr>(expr),
+    };
+
+    this.exprMutByExpr.set(expr, mut);
+    return mut.expr$;
   }
 
   public replace(expr: Expr, newExpr: Expr) {
-    const expr$ = this.exprMut$ByExpr_.get(expr);
-    if (!expr$) {
+    const mut = this.exprMutByExpr.get(expr);
+    if (!mut) {
       throw new Error(`expr$ not found for ${expr}`);
     }
-    this.exprMut$ByExpr_.set(newExpr, expr$);
-    this.exprMut$ByExpr_.delete(expr);
-    expr$.next(newExpr);
+    this.exprMutByExpr.set(newExpr, mut);
+    this.exprMutByExpr.delete(expr);
+    mut.expr$.next(newExpr);
   }
 
-  public setParent(expr: Expr, parent: Expr) {
-    const expr$ = this.exprMut$ByExpr_.get(expr);
-    if (!expr$) {
+  public setParent(expr: Expr, parent: Parent) {
+    const mut = this.exprMutByExpr.get(expr);
+    if (!mut) {
       throw new Error(`expr$ not found for ${expr}`);
     }
-    expr$.next(parent);
+    mut.parent$.next(parent);
+  }
+
+  public getParent$(expr: Expr): Observable<Parent> {
+    const mut = this.exprMutByExpr.get(expr);
+    if (!mut) {
+      throw new Error(`expr$ not found for ${expr}`);
+    }
+    return mut.parent$;
   }
 }

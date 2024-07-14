@@ -18,14 +18,12 @@ export interface NumberExpr {
   readonly type: "NumberExpr";
   readonly id: string;
   readonly value: number;
-  readonly parent$: Observable<Parent>;
 }
 
 export interface CallExpr {
   readonly type: "CallExpr";
   readonly id: string;
   readonly args: readonly Observable<Expr>[];
-  readonly parent$: Observable<Parent>;
 }
 
 export type ExObject = Attribute | Expr;
@@ -65,8 +63,6 @@ export default class ExprFactory {
       expr$,
     };
 
-    expr.parent$.next(attribute);
-
     return attribute;
   }
 
@@ -85,7 +81,6 @@ export default class ExprFactory {
       type: "NumberExpr",
       id,
       value,
-      parent$: new Observable<Parent>(null),
     };
 
     this.onNumberExprAdded$_.next(expr);
@@ -110,11 +105,10 @@ export default class ExprFactory {
       type: "CallExpr",
       id,
       args: argSubjects,
-      parent$: new Observable<Parent>(null),
     };
 
     for (const arg of args) {
-      arg.parent$.next(expr);
+      this.exprManager.setParent(arg, expr);
     }
 
     this.onCallExprAdded$_.next(expr);

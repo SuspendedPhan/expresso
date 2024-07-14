@@ -31,8 +31,8 @@ export default class Replacer {
     Logger.arg("oldExpr", oldExpr.id);
     Logger.logCallstack();
 
-    const parent = oldExpr.parent$.value;
-    newExpr.parent$.next(parent);
+    this.exprFactory.exprManager.getParent();
+    this.exprFactory.exprManager.setParent(newExpr, );
     
     this.exprFactory.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
