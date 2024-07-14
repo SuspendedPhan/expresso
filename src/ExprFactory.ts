@@ -42,9 +42,14 @@ export default class ExprFactory {
   
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
+    const logger = Logger.logger();
     Logger.logCallstack();
+    
     if (id === undefined) {
       id = `attribute-${nextId++}`;
+      logger.log("id", "not given", id);
+    } else {
+      logger.log("id", "given", id);
     }
 
     if (expr === undefined) {
