@@ -1,54 +1,48 @@
 <script lang="ts">
-  import {
-    BehaviorSubject,
-    combineLatest,
-    interval,
-    map,
-    of,
-    startWith,
-    switchMap,
-  } from "rxjs";
-  import GoModuleLoader from "./utils/GoModuleLoader";
-  // import { Attribute } from "./Domain";
+  import { BehaviorSubject, combineLatest, interval, switchMap } from "rxjs";
   import AttributeView from "./AttributeView.svelte";
-  import Logger from "./utils/Logger";
   import MainContext from "./MainContext";
-  import Dehydrator from "./hydration/Dehydrator";
-  import Rehydrator from "./hydration/Rehydrator";
   import Main from "./utils/Main";
-  import { type ReadonlyAttribute } from "./Domain";
-  import type { Attribute, Attribute, AttributeMut } from "./ExprFactory";
+  import type { Attribute } from "./ExprFactory";
   import HydrationTest from "./utils/HydrationTest";
+  import { loggedMethod } from "./logger/LoggerDecorator";
 
   let ctx: MainContext | null = null;
   let attribute$: BehaviorSubject<Attribute> | null = null;
   let rehydratedAttribute$: BehaviorSubject<Attribute> | null = null;
   let result = -1;
 
-  async function setup() {
-    const main = await Main.setup();
-    ctx = main.ctx;
-    attribute$ = new BehaviorSubject(main.attribute);
-    const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
+  class MainView {
+    static async setupAsync() {
+      const main = await Main.setup();
+      this.setup(main);
+    }
 
-    HydrationTest.test(main, ctx).subscribe((a) => {
-      if (a === null) {
-        return;
-      }
+    @loggedMethod
+    static setup(main: Main) {
+      ctx = main.ctx;
+      attribute$ = new BehaviorSubject(main.attribute);
+      const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
 
-      console.log("Main.subscribe", a);
-      if (rehydratedAttribute$ === null) {
-        rehydratedAttribute$ = new BehaviorSubject(a);
-      }
-      rehydratedAttribute$.next(a);
-    });
+      HydrationTest.test(main, ctx).subscribe((a) => {
+        if (a === null) {
+          return;
+        }
 
-    combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
-      result = ctx!.goModule.evalExpr(expr.id);
-    });
+        console.log("Main.subscribe", a);
+        if (rehydratedAttribute$ === null) {
+          rehydratedAttribute$ = new BehaviorSubject(a);
+        }
+        rehydratedAttribute$.next(a);
+      });
+
+      combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
+        result = ctx!.goModule.evalExpr(expr.id);
+      });
+    }
   }
 
-  setup();
+  MainView.setupAsync();
 
   document.addEventListener("mousedown", () => {
     ctx?.selection.selectedObject$.next(null);
