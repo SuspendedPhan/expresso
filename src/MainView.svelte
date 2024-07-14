@@ -6,6 +6,7 @@
   import type { Attribute } from "./ExprFactory";
   import HydrationTest from "./utils/HydrationTest";
   import { loggedMethod } from "./logger/LoggerDecorator";
+  import Logger from "./logger/Logger";
 
   let ctx: MainContext | null = null;
   let attribute$: BehaviorSubject<Attribute> | null = null;
@@ -20,6 +21,8 @@
 
     @loggedMethod
     static setup(main: Main) {
+      const logger = Logger.logger();
+
       ctx = main.ctx;
       attribute$ = new BehaviorSubject(main.attribute);
       const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
@@ -29,8 +32,9 @@
           return;
         }
 
-        console.log("Main.subscribe", a);
+        logger.log("Main.subscribe", a.id);
         if (rehydratedAttribute$ === null) {
+          logger.log("Main.subscribe", "create rehydratedAttribute$");
           rehydratedAttribute$ = new BehaviorSubject(a);
         }
         rehydratedAttribute$.next(a);

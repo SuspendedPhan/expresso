@@ -40,14 +40,19 @@ export default class Logger {
    * scope to determine if the log should be printed.
    */
   static logger() {
-    const currentCall = LoggerDecorator.currentCall$.value;
-    if (!currentCall) {
+    const loggerCurrentCall = LoggerDecorator.currentCall$.value;
+    if (!loggerCurrentCall) {
       throw new Error("No current function call");
     }
 
     return {
       log(name: string, ...args: any) {
-        const astCall = currentCall.astCall;
+        const currentCall = LoggerDecorator.currentCall$.value;
+        if (currentCall && !currentCall.argsLogged$.value) {
+          currentCall.argsLogged$.next(true);
+        }
+
+        const astCall = loggerCurrentCall.astCall;
         if (!astCall.currentlyLogging) {
           return;
         }

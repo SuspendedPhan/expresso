@@ -22,7 +22,7 @@
       Logger.logCallstack();
       const logger = Logger.logger();
       attribute$.subscribe((attribute) => {
-        logger.log("subscribe", attribute);
+        logger.log("subscribe", attribute.id);
         expr$ = attribute.expr$;
       });
     }
