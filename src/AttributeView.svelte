@@ -2,40 +2,26 @@
   import ExprView from "./ExprView.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { Attribute, Expr } from "./ExprFactory";
-  import { BehaviorSubject } from "rxjs";
-  import { type Selectable } from "./utils/Selection";
+  import type { Attribute } from "./ExprFactory";
+  import { BehaviorSubject, switchMap } from "rxjs";
   import { loggedMethod } from "./logger/LoggerDecorator";
-  import Logger from "./logger/Logger";
 
   export let ctx: MainContext;
   export let attribute$: BehaviorSubject<Attribute>;
 
-  const selectable$ = new BehaviorSubject<Selectable>(attribute$.value);
-  attribute$.subscribe((v) => selectable$.next(v));
-
-  let expr$: BehaviorSubject<Expr> | null = null;
-
   class AttributeView {
     @loggedMethod
-    static setup() {
-      Logger.logCallstack();
-      const logger = Logger.logger();
-      attribute$.subscribe((attribute) => {
-        // TODP: switchmap
-        logger.log("subscribe", attribute.id);
-        expr$ = attribute.expr$;
-      });
+    static expr$() {
+      return attribute$.pipe(switchMap((attr) => attr.expr$));
     }
   }
-  AttributeView.setup();
+
+  const expr$ = AttributeView.expr$();
 </script>
 
 <main>
-  <SelectableView {ctx} object$={selectable$}>
+  <SelectableView {ctx} object$={expr$}>
     <div>Attribute</div>
-    {#if expr$}
-      <ExprView {ctx} {expr$} />
-    {/if}
+    <ExprView {ctx} {expr$} />
   </SelectableView>
 </main>
