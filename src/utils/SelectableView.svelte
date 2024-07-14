@@ -1,13 +1,10 @@
 <script lang="ts">
   import { type Selectable } from "./Selection";
   import MainContext from "../MainContext";
-  import { BehaviorSubject, combineLatest } from "rxjs";
-  import Logger from "./Logger";
+  import { combineLatest, map, Observable } from "rxjs";
 
-  export let object$: BehaviorSubject<Selectable>;
+  export let object$: Observable<Selectable>;
   export let ctx: MainContext;
-
-  const logger = Logger.file("SelectableView.svelte");
 
   let selected = false;
 
@@ -17,18 +14,20 @@
     }
   );
 
-  function handleClick(
-    event: MouseEvent & { currentTarget: EventTarget & HTMLElement }
-  ) {
-    event.stopPropagation();
-    ctx.selection.selectedObject$.next(object$.value);
-  }
+  const handleClick$ = object$.pipe(
+    map((object) => {
+      return (event: MouseEvent) => {
+        event.stopPropagation();
+        ctx.selection.selectedObject$.next(object);
+      };
+    })
+  );
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  on:mousedown={handleClick}
+  on:mousedown={$handleClick$}
   class="border border-black"
   class:border-solid={selected}
   class:border-transparent={!selected}

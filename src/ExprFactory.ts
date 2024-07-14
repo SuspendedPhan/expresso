@@ -1,10 +1,7 @@
-import {
-  BehaviorSubject,
-  Observable,
-  Subject,
-} from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
+import ExprManager from "./ExprManager";
 
 let nextId = 0;
 
@@ -36,15 +33,19 @@ export type ExObject = Attribute | Expr;
 export default class ExprFactory {
   private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
   private readonly onCallExprAdded$_ = new Subject<CallExpr>();
-  
-  public readonly onNumberExprAdded$: Observable<NumberExpr> = this.onNumberExprAdded$_;
-  public readonly onCallExprAdded$: Observable<CallExpr> = this.onCallExprAdded$_;
-  
+
+  public readonly onNumberExprAdded$: Observable<NumberExpr> =
+    this.onNumberExprAdded$_;
+  public readonly onCallExprAdded$: Observable<CallExpr> =
+    this.onCallExprAdded$_;
+
+  public readonly exprManager = new ExprManager();
+
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
     const logger = Logger.logger();
     Logger.logCallstack();
-    
+
     if (id === undefined) {
       id = `attribute-${nextId++}`;
       logger.log("id", "not given", id);
@@ -56,7 +57,8 @@ export default class ExprFactory {
       expr = this.createNumberExpr();
     }
 
-    const expr$ = new BehaviorSubject<Expr>(expr);
+    const expr$ = this.exprManager.create$(expr);
+
     const attribute: Attribute = {
       type: "Attribute",
       id,
@@ -64,7 +66,7 @@ export default class ExprFactory {
     };
 
     expr.parent$.next(attribute);
-    
+
     return attribute;
   }
 
@@ -91,7 +93,7 @@ export default class ExprFactory {
   }
 
   @loggedMethod
-  public createCallExpr(id?:string, args?: readonly Expr[]): CallExpr {
+  public createCallExpr(id?: string, args?: readonly Expr[]): CallExpr {
     Logger.logCallstack();
     if (id === undefined) {
       id = `expr-${nextId++}`;
@@ -102,8 +104,8 @@ export default class ExprFactory {
       const arg1 = this.createNumberExpr();
       args = [arg0, arg1];
     }
-    const argSubjects = args.map(arg => new BehaviorSubject<Expr>(arg));
-    
+    const argSubjects = args.map((arg) => this.exprManager.create$(arg));
+
     const expr: CallExpr = {
       type: "CallExpr",
       id,

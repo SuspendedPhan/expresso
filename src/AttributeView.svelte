@@ -22,6 +22,7 @@
       Logger.logCallstack();
       const logger = Logger.logger();
       attribute$.subscribe((attribute) => {
+        // TODP: switchmap
         logger.log("subscribe", attribute.id);
         expr$ = attribute.expr$;
       });

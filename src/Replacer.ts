@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import ExprFactory, { Expr } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -16,25 +16,25 @@ export default class Replacer {
   public constructor(private readonly exprFactory: ExprFactory) {}
 
   @loggedMethod
-  public replaceWithNumberExpr(expr$: BehaviorSubject<Expr>, value: number) {
+  public replaceWithNumberExpr(oldExpr: Expr, value: number) {
     const expr = this.exprFactory.createNumberExpr(value);
-    this.replaceWithExpr(expr$, expr);
+    this.replaceWithExpr(oldExpr, expr);
   }
 
   @loggedMethod
-  public replaceWithCallExpr(expr$: BehaviorSubject<Expr>) {
+  public replaceWithCallExpr(oldExpr: Expr) {
     const expr = this.exprFactory.createCallExpr();
-    this.replaceWithExpr(expr$, expr);
+    this.replaceWithExpr(oldExpr, expr);
   }
   @loggedMethod
-  private replaceWithExpr(expr$: BehaviorSubject<Expr>, newExpr: Expr) {
+  private replaceWithExpr(oldExpr: Expr, newExpr: Expr) {
+    Logger.arg("oldExpr", oldExpr.id);
     Logger.logCallstack();
-    const oldExpr = expr$.value;
-    const parent = expr$.value.parent$.value;
-    newExpr.parent$.next(parent);
-    expr$.next(newExpr);
 
+    const parent = oldExpr.parent$.value;
+    newExpr.parent$.next(parent);
+    
+    this.exprFactory.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
-    return newExpr;
   }
 }
