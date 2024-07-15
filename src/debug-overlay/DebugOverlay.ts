@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import DebugOverlayUtils from "./DebugOverlayUtils";
-import { Message } from "../utils/Logger";
+import { Message } from "../utils/BakLogger";
 
 export interface FormattedMessage {
   text: string;

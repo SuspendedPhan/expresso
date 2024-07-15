@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
-import { Message } from "./Logger";
+import { Message } from "./BakLogger";
 import LoggerConfigHydrator from "./LoggerConfigHydrator";
 import Persistence from "../persistence/Persistence";
 

@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import Logger from "./Logger";
+import Logger from "./BakLogger";
 import Selection from "./Selection";
 
 const logger = Logger.file("Keyboard.ts");

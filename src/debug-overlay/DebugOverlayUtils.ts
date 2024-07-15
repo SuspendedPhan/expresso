@@ -1,5 +1,5 @@
 import { Observable, combineLatest, map, switchMap } from "rxjs";
-import Logger, { Message } from "../utils/Logger";
+import Logger, { Message } from "../utils/BakLogger";
 import { FormattedMessage } from "./DebugOverlay";
 import LoggerConfig from "../utils/LoggerConfig";
 
