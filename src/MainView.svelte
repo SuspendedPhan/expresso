@@ -13,6 +13,7 @@
   import HydrationTest from "./utils/HydrationTest";
   import { loggedMethod } from "./logger/LoggerDecorator";
   import Logger from "./logger/Logger";
+  import SceneView from "./scene/SceneView.svelte";
 
   let ctx: MainContext | null = null;
   let attribute$: Observable<Attribute> | null = null;
@@ -65,6 +66,7 @@
     <div>Loaded</div>
     <AttributeView {ctx} {attribute$} />
     <AttributeView {ctx} attribute$={rehydratedAttribute$} />
+    <SceneView {ctx} />
   {/if}
 </main>
 

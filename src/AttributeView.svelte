@@ -1,13 +1,13 @@
 <script lang="ts">
+  import { Observable, switchMap } from "rxjs";
+  import type { Attribute } from "./ExObjectFactory";
   import ExprView from "./ExprView.svelte";
+  import { loggedMethod } from "./logger/LoggerDecorator";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { Attribute } from "./ExObjectFactory";
-  import { BehaviorSubject, switchMap } from "rxjs";
-  import { loggedMethod } from "./logger/LoggerDecorator";
 
   export let ctx: MainContext;
-  export let attribute$: BehaviorSubject<Attribute>;
+  export let attribute$: Observable<Attribute>;
 
   class AttributeView {
     @loggedMethod
