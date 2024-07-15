@@ -1,6 +1,5 @@
 import {
   BehaviorSubject,
-  combineLatest,
   first,
   Observable,
   of,
@@ -15,42 +14,39 @@ import {
   ExprType,
 } from "../ExprFactory";
 import ExprManager from "../ExprManager";
-import { assertUnreachable } from "./Utils";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import Logger from "../logger/Logger";
+import { assertUnreachable } from "./Utils";
 
 export type Selectable = ExObject | null;
-
-const logger = Logger.file("Selection.ts");
-logger.allow();
 
 export default class Selection {
   private readonly selectedObject$$ = new BehaviorSubject<
     Observable<Selectable>
   >(of(null));
-  public readonly root$ = new BehaviorSubject<Selectable>(null);
+  private readonly root$$ = new BehaviorSubject<Observable<Selectable>>(of(null));
+  public readonly root$ = this.root$$.pipe(switchAll());
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
-  public constructor(private exprManager: ExprManager) {
-    combineLatest([this.down$, this.selectedObject$$]).subscribe(
-      ([_, selectedObject$]) => {
-        selectedObject$.pipe(first()).subscribe((selectedObject) => {
-          this.down(selectedObject);
-        });
-      }
-    );
 
-    combineLatest([this.up$, this.selectedObject$$]).subscribe(
-      ([_, selectedObject$]) => {
-        selectedObject$.pipe(first()).subscribe((selectedObject) => {
-          this.up(selectedObject);
-        });
-      }
-    );
+  public constructor(private exprManager: ExprManager) {
+    this.down$.subscribe(() => {
+      this.getSelectedObject$().pipe(first()).subscribe((selectedObject) => {
+        this.down(selectedObject);
+      });
+    });
+    this.up$.subscribe(() => {
+      this.getSelectedObject$().pipe(first()).subscribe((selectedObject) => {
+        this.up(selectedObject);
+      });
+    });
   }
 
   public getSelectedObject$(): Observable<Selectable> {
     return this.selectedObject$$.pipe(switchAll());
+  }
+
+  public setRoot$(selectable$: Observable<Selectable>) {
+    this.root$$.next(selectable$);
   }
 
   public select(object: Selectable) {
@@ -64,7 +60,6 @@ export default class Selection {
 
   @loggedMethod
   public down(selectedObject: Selectable) {
-    Logger.logCallstack();
     if (selectedObject === null) {
       this.selectedObject$$.next(this.root$);
       return;

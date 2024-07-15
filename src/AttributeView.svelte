@@ -20,7 +20,7 @@
 </script>
 
 <main>
-  <SelectableView {ctx} object$={expr$}>
+  <SelectableView {ctx} object$={attribute$}>
     <div>Attribute</div>
     <ExprView {ctx} {expr$} />
   </SelectableView>

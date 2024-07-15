@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { BehaviorSubject, combineLatest, interval, switchMap } from "rxjs";
+  import {
+    BehaviorSubject,
+    combineLatest,
+    interval,
+    Observable,
+    switchMap,
+  } from "rxjs";
   import AttributeView from "./AttributeView.svelte";
   import MainContext from "./MainContext";
   import Main from "./utils/Main";
@@ -9,22 +15,20 @@
   import Logger from "./logger/Logger";
 
   let ctx: MainContext | null = null;
-  let attribute$: BehaviorSubject<Attribute> | null = null;
+  let attribute$: Observable<Attribute> | null = null;
   let rehydratedAttribute$: BehaviorSubject<Attribute> | null = null;
   let result = -1;
 
-  class MainView {
-    static async setupAsync() {
-      const main = await Main.setup();
-      this.setup(main);
-    }
+  const main$ = Main.setup$();
+  main$.subscribe((main) => MainView.setup(main));
 
+  class MainView {
     @loggedMethod
     static setup(main: Main) {
       const logger = Logger.logger();
 
       ctx = main.ctx;
-      attribute$ = new BehaviorSubject(main.attribute);
+      attribute$ = main.attribute$;
       const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
 
       HydrationTest.test(main, ctx).subscribe((a) => {
@@ -45,8 +49,6 @@
       });
     }
   }
-
-  MainView.setupAsync();
 
   document.addEventListener("mousedown", () => {
     ctx?.selection.select(null);

@@ -1,34 +1,28 @@
-import { firstValueFrom } from "rxjs";
+import { first, map, Observable } from "rxjs";
 import { Attribute } from "../ExprFactory";
 import MainContext from "../MainContext";
+import GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";
-import GoModule from "./GoModule";
-import Logger from "../logger/Logger";
-import { loggedMethod } from "../logger/LoggerDecorator";
 
 export default class Main {
-  private constructor(public ctx: MainContext, public readonly attribute: Attribute) {
+  public readonly attribute$: Observable<Attribute>;
+  public readonly ctx: MainContext;
 
+  public static setup$(): Observable<Main> {
+    return GoModuleLoader.get$().pipe(
+      first(),
+      map((goModule) => {
+        return new Main(goModule);
+      })
+    );
   }
 
-  public static async setup(): Promise<Main> {
-    const goModule = await firstValueFrom(GoModuleLoader.get$());
-    return this.setupSync(goModule);
-  }
-
-  @loggedMethod
-  private static setupSync(goModule: GoModule): Main {
-    const logger = Logger.logger();
-    Logger.logCallstack();
+  public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
-    const attribute = ctx.exprFactory.createAttribute();
-    ctx.selection.root$.next(attribute);
-    
-    ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
-      logger.log("selectedObject", selectedObject?.id ?? "null");
-    });
+    this.ctx = ctx;
+    this.attribute$ = ctx.replacer.createAttribute$();
+    ctx.selection.setRoot$(this.attribute$);
     Keyboard.register(ctx.selection);
-    return new Main(ctx, attribute);
   }
 }

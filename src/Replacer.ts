@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { ExObject, Expr } from "./ExprFactory";
+import { Attribute, Expr } from "./ExprFactory";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
@@ -37,7 +37,8 @@ export default class MainMutator {
   }
 
   @loggedMethod
-  public createAttribute$(): Observable<ExObject> {
+  public createAttribute$(): Observable<Attribute> {
+    Logger.logCallstack();
     const attribute = this.ctx.exprFactory.createAttribute();
     const attribute$ = this.ctx.exprManager.createObject$(attribute);
     return attribute$;

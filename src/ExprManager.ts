@@ -28,6 +28,7 @@ export default class ExprManager {
   public getObject$(object: ExObject): Observable<ExObject> {
     const mut = this.objectMutByObject.get(object);
     if (!mut) {
+      console.log(this.objectMutByObject);
       throw new Error(`object$ not found for ${object?.id}`);
     }
 
@@ -37,6 +38,7 @@ export default class ExprManager {
   @loggedMethod
   public createObject$<T extends ExObject>(object: T): Observable<T> {
     Logger.arg("expr", object.id);
+    Logger.logCallstack();
 
     if (object.objectType === ExObjectType.Expr) {
       const object$ = this.createExpr$(object);
