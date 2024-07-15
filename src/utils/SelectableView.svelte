@@ -8,7 +8,7 @@
 
   let selected = false;
 
-  combineLatest([object$, ctx.selection.selectedObject$]).subscribe(
+  combineLatest([object$, ctx.selection.getSelectedObject$()]).subscribe(
     ([object, selectedObject]) => {
       selected = selectedObject === object;
     }
@@ -18,7 +18,7 @@
     map((object) => {
       return (event: MouseEvent) => {
         event.stopPropagation();
-        ctx.selection.selectedObject$.next(object);
+        ctx.selection.select(object);
       };
     })
   );

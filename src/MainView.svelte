@@ -49,7 +49,7 @@
   MainView.setupAsync();
 
   document.addEventListener("mousedown", () => {
-    ctx?.selection.selectedObject$.next(null);
+    ctx?.selection.select(null);
   });
 </script>
 
