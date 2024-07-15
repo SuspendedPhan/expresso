@@ -1,5 +1,5 @@
 import type GoModule from "./utils/GoModule";
-import ExprFactory from "./ExprFactory";
+import ExprFactory from "./ExObjectFactory";
 
 export default class GoBridge {
   public constructor(

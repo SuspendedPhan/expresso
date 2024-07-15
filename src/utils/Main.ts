@@ -1,5 +1,5 @@
 import { first, map, Observable } from "rxjs";
-import { Attribute } from "../ExprFactory";
+import { Attribute } from "../ExObjectFactory";
 import MainContext from "../MainContext";
 import GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";

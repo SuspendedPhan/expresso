@@ -1,4 +1,4 @@
-import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
+import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import {
   DehydratedAttribute,

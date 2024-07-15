@@ -2,7 +2,7 @@
   import ExprView from "./ExprView.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { Attribute } from "./ExprFactory";
+  import type { Attribute } from "./ExObjectFactory";
   import { BehaviorSubject, switchMap } from "rxjs";
   import { loggedMethod } from "./logger/LoggerDecorator";
 

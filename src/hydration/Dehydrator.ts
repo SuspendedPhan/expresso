@@ -1,5 +1,5 @@
 import { combineLatest, map, Observable, of, switchMap } from "rxjs";
-import { Attribute, CallExpr, Expr, ExprType, NumberExpr } from "../ExprFactory";
+import { Attribute, CallExpr, Expr, ExprType, NumberExpr } from "../ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
 import { assertUnreachable } from "../utils/Utils";

@@ -4,7 +4,7 @@ import {
   ExObjectType,
   Expr,
   ExprType,
-} from "./ExprFactory";
+} from "./ExObjectFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 

@@ -6,7 +6,7 @@ import {
   Subject,
   switchAll
 } from "rxjs";
-import { ExObject, ExObjectType, Expr, ExprType } from "../ExprFactory";
+import { ExObject, ExObjectType, Expr, ExprType } from "../ExObjectFactory";
 import ExObjectManager from "../ExObjectManager";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";

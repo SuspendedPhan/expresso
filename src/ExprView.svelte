@@ -3,7 +3,7 @@
   import ExprCommand from "./ExprCommand.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import { ExprType, type Expr } from "./ExprFactory";
+  import { ExprType, type Expr } from "./ExObjectFactory";
   import { loggedMethod } from "./logger/LoggerDecorator";
 
   export let ctx: MainContext;
