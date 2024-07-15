@@ -25,10 +25,10 @@ export default class HydrationTest {
             JSON.stringify(dehydratedAttribute, null, 3)
           );
           const rehydratedAttribute = new Rehydrator(
-            ctx!.exprFactory
+            ctx!.objectFactory
           ).rehydrateAttribute(dehydratedAttribute);
 
-          const attr$ = ctx.exprManager.createObject$(rehydratedAttribute);
+          const attr$ = ctx.objectManager.createObject$(rehydratedAttribute);
           rehydratedAttribute$$.next(attr$);
         });
     });

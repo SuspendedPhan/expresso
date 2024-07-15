@@ -46,9 +46,9 @@
             const text = e.detail;
             const value = parseFloat(text);
             if (!isNaN(value)) {
-              ctx.replacer.replaceWithNumberExpr(expr, value);
+              ctx.mutator.replaceWithNumberExpr(expr, value);
             } else if (text === "+") {
-              ctx.replacer.replaceWithCallExpr(expr);
+              ctx.mutator.replaceWithCallExpr(expr);
             }
           };
         })
