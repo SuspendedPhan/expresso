@@ -1,4 +1,4 @@
-import { Observable, Subject } from "rxjs";
+import { combineLatest, first, Observable, Subject } from "rxjs";
 import ExprFactory, { Expr } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -26,6 +26,7 @@ export default class Replacer {
     const expr = this.exprFactory.createCallExpr();
     this.replaceWithExpr(oldExpr, expr);
   }
+
   @loggedMethod
   private replaceWithExpr(oldExpr: Expr, newExpr: Expr) {
     Logger.arg("oldExpr", oldExpr.id);

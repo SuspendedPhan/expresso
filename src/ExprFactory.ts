@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 import ExprManager from "./ExprManager";
@@ -40,7 +40,7 @@ export default class ExprFactory {
   public readonly exprManager = new ExprManager();
 
   @loggedMethod
-  public createAttribute(id?: string, expr?: Expr): Attribute {
+  public createAttribute$(id?: string, expr?: Expr): Observable<Attribute> {
     const logger = Logger.logger();
     Logger.logCallstack();
 
@@ -63,8 +63,8 @@ export default class ExprFactory {
       expr$,
     };
 
-    this.exprManager.setParent(expr, attribute);
-    return attribute;
+    const attribute$ = this.exprManager.createAttribute$(attribute);
+    return attribute$;
   }
 
   @loggedMethod
@@ -107,11 +107,6 @@ export default class ExprFactory {
       id,
       args: argSubjects,
     };
-
-    for (const arg of args) {
-      const parent$ = this.exprManager.getParent$(arg);
-      parent$.next(expr);
-    }
 
     this.onCallExprAdded$_.next(expr);
     return expr;

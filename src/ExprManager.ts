@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, of, switchAll } from "rxjs";
+import { BehaviorSubject, first, Observable, of, switchAll } from "rxjs";
 import { Attribute, ExObject, Expr, Parent } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
@@ -42,6 +42,14 @@ export default class ExprManager {
     this.exprMutByExpr.set(newExpr, mut);
     this.exprMutByExpr.delete(expr);
     mut.expr$.next(newExpr);
+
+    if (newExpr.type === "CallExpr") {
+      for (const arg$ of newExpr.args) {
+        arg$.pipe(first()).subscribe((arg) => {
+          this.setParent(arg, newExpr);
+        });
+      }
+    }
   }
 
   public setParent(expr: Expr, parent: Parent) {
