@@ -20,12 +20,12 @@ export default class Main {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
     const exprFactory = new ExprFactory();
     
-    const ctx = new MainContext(goModule, exprFactory, new Selection());
+    const ctx = new MainContext(goModule, exprFactory);
     
     const attribute = exprFactory.createAttribute();
     ctx.selection.root$.next(attribute);
     
-    ctx.selection.selectedObject$.subscribe((selectedObject) => {
+    ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject);
     });
     Keyboard.register(ctx.selection);

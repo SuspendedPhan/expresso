@@ -23,12 +23,12 @@ export default class Keyboard {
 
     hotkeys("down", this.SCOPE, function (_event, _handler) {
       logger.log("down");
-      selection.down();
+      selection.down$.next();
     });
 
     hotkeys("up", this.SCOPE, function (_event, _handler) {
       logger.log("up");
-      selection.up();
+      selection.up$.next();
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {
@@ -37,7 +37,7 @@ export default class Keyboard {
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
       logger.log("right");
-      selection.selectedObject$.next(null);
+      // selection.selectedObject$.next(null);
     });
   }
 }

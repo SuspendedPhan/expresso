@@ -31,7 +31,7 @@ export default class HydrationTest {
         ).rehydrateAttribute(dehydratedAttribute);
 
         const attr$ =
-          ctx.exprFactory.exprManager.createAttribute$(rehydratedAttribute);
+          ctx.exprFactory.exprManager.createObject$(rehydratedAttribute);
         rehydratedAttribute$$.next(attr$);
       });
     return rehydratedAttribute$$.pipe(switchAll());

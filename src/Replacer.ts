@@ -1,7 +1,8 @@
 import { Observable, Subject } from "rxjs";
-import ExprFactory, { Attribute, ExObject, Expr } from "./ExprFactory";
+import ExprFactory, { ExObject, Expr } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
+import MainContext from "./MainContext";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -13,17 +14,17 @@ export default class MainMutator {
   public readonly onExprReplaced$: Observable<ExprReplacement> =
     this.onExprReplaced$_;
 
-  public constructor(private readonly exprFactory: ExprFactory) {}
+  public constructor(private readonly ctx: MainContext) {}
 
   @loggedMethod
   public replaceWithNumberExpr(oldExpr: Expr, value: number) {
-    const expr = this.exprFactory.createNumberExpr(value);
+    const expr = this.ctx.exprFactory.createNumberExpr(value);
     this.replaceWithExpr(oldExpr, expr);
   }
 
   @loggedMethod
   public replaceWithCallExpr(oldExpr: Expr) {
-    const expr = this.exprFactory.createCallExpr();
+    const expr = this.ctx.exprFactory.createCallExpr();
     this.replaceWithExpr(oldExpr, expr);
   }
 
@@ -32,14 +33,14 @@ export default class MainMutator {
     Logger.arg("oldExpr", oldExpr.id);
     Logger.logCallstack();
 
-    this.exprFactory.exprManager.replace(oldExpr, newExpr);
+    this.ctx.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
   }
 
   @loggedMethod
   public createAttribute$(): Observable<ExObject> {
-    const attribute = this.exprFactory.createAttribute();
-    const attribute$ = this.exprFactory.exprManager.createAttribute$(attribute);
+    const attribute = this.ctx.exprFactory.createAttribute();
+    const attribute$ = this.ctx.exprManager.createObject$(attribute);
     return attribute$;
   }
 }
