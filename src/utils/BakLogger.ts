@@ -18,7 +18,7 @@ export interface Message {
   args: any[];
 }
 
-export default class Logger {
+export default class BakLogger {
   private static messages$: BehaviorSubject<Message[]> = new BehaviorSubject<
     Message[]
   >([]);
@@ -37,22 +37,22 @@ export default class Logger {
     const all = ALLOW_TOPICS === `ALL`;
     const allow = all || ALLOW_TOPICS.includes(this.topic);
     if (allow) {
-      Logger.messages$.value.push({
+      BakLogger.messages$.value.push({
         id: crypto.randomUUID(),
         topic: this.topic,
         method: this.methodVar,
         args,
         key,
       });
-      Logger.messages$.next(Logger.messages$.value);
+      BakLogger.messages$.next(BakLogger.messages$.value);
       if (logToConsole) {
         console.log(this.topic, key, ...args);
       }
     }
   }
 
-  public method(method: string): Logger {
-    return new Logger(this.topic, method);
+  public method(method: string): BakLogger {
+    return new BakLogger(this.topic, method);
   }
 
   public allow() {
@@ -63,15 +63,15 @@ export default class Logger {
   }
 
   static file(file: string) {
-    return new Logger(file);
+    return new BakLogger(file);
   }
 
   static log(key: string, ...args: any[]) {
-    new Logger(NONE).log(key, ...args);
+    new BakLogger(NONE).log(key, ...args);
   }
 
   static getMessages$(): Observable<Message[]> {
-    return Logger.messages$;
+    return BakLogger.messages$;
   }
 
   static allow(topic: string) {
@@ -98,4 +98,4 @@ export default class Logger {
 }
 
 declare var window: any;
-window.Logger = Logger;
+window.Logger = BakLogger;

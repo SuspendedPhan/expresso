@@ -1,8 +1,8 @@
 import hotkeys from "hotkeys-js";
-import Logger from "./BakLogger";
+import BakLogger from "./BakLogger";
 import Selection from "./Selection";
 
-const logger = Logger.file("Keyboard.ts");
+const logger = BakLogger.file("Keyboard.ts");
 
 export default class Keyboard {
   public static SCOPE = "Main";

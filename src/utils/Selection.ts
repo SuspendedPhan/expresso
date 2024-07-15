@@ -8,7 +8,6 @@ import {
   switchAll,
   take,
 } from "rxjs";
-import Logger from "./BakLogger";
 import {
   ExObject,
   ExObjectType,
@@ -17,6 +16,8 @@ import {
 } from "../ExprFactory";
 import ExprManager from "../ExprManager";
 import { assertUnreachable } from "./Utils";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
 
 export type Selectable = ExObject | null;
 
@@ -61,7 +62,9 @@ export default class Selection {
     this.selectedObject$$.next(object$);
   }
 
+  @loggedMethod
   public down(selectedObject: Selectable) {
+    Logger.logCallstack();
     if (selectedObject === null) {
       this.selectedObject$$.next(this.root$);
       return;

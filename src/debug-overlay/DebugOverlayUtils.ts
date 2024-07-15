@@ -1,5 +1,5 @@
 import { Observable, combineLatest, map, switchMap } from "rxjs";
-import Logger, { Message } from "../utils/BakLogger";
+import BakLogger, { Message } from "../utils/BakLogger";
 import { FormattedMessage } from "./DebugOverlay";
 import LoggerConfig from "../utils/LoggerConfig";
 
@@ -25,7 +25,7 @@ export default class DebugOverlayUtils {
   public static getFilteredMessages$(
     query$: Observable<string>
   ): Observable<FormattedMessage[]> {
-    const formattedMessages$ = Logger.getMessages$().pipe(
+    const formattedMessages$ = BakLogger.getMessages$().pipe(
       map((messages) => {
         // Format all the messages and join them with a newline.
         return messages.map(DebugOverlayUtils.formatMessage);
