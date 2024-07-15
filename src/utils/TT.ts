@@ -32,6 +32,5 @@ class QQ {
 
   @loggedMethod
   static td() {
-    Logger.logCallstack();
   }
 }

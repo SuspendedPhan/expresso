@@ -17,7 +17,6 @@ class QQ {
 
   @loggedMethod
   static ta$() {
-    Logger.logCallstack();
     const logger = Logger.logger();
 
     return this.tt$.pipe(
@@ -37,7 +36,6 @@ class QQ {
 
   @loggedMethod
   static tb$(v: number) {
-    Logger.logCallstack();
     const logger = Logger.logger();
     return of(v).pipe(
       map((v) => {

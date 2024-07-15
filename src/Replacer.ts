@@ -31,7 +31,6 @@ export default class MainMutator {
   @loggedMethod
   private replaceWithExpr(oldExpr: Expr, newExpr: Expr) {
     Logger.arg("oldExpr", oldExpr.id);
-    Logger.logCallstack();
 
     this.ctx.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });

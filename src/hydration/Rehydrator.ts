@@ -1,5 +1,4 @@
 import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
-import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import {
   DehydratedAttribute,
@@ -33,13 +32,11 @@ export default class Rehydrator {
   
   @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
-    Logger.logCallstack();
     return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id + "rehydrated" + nextId++);
   }
 
   @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
-    Logger.logCallstack();
     const args = deExpr.args.map((arg)=>this.rehydrateExpr(arg));
     return this.exprFactory.createCallExpr(deExpr.id + "rehydrated" + nextId++, args);
   }

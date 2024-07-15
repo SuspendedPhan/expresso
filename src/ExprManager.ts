@@ -36,7 +36,6 @@ export default class ExprManager {
 
   @loggedMethod
   public createObject$<T extends ExObject>(object: T): Observable<T> {
-    Logger.logCallstack();
     Logger.arg("expr", object.id);
 
     if (object.objectType === ExObjectType.Expr) {

@@ -31,7 +31,6 @@ export default class Dehydrator {
   public dehydrateAttribute$(
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
-    Logger.logCallstack();
     const logger = Logger.logger();
     return this.dehydrateExpr$(attribute.expr$).pipe(
       map((dehydratedExpr) => {
@@ -46,7 +45,6 @@ export default class Dehydrator {
 
   @loggedMethod
   private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
-    Logger.logCallstack();
     const logger = Logger.logger();
     return expr$.pipe(
       switchMap((expr) => {

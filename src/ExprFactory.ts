@@ -53,7 +53,6 @@ export default class ExprFactory {
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
     const logger = Logger.logger();
-    Logger.logCallstack();
 
     if (id === undefined) {
       id = `attribute-${nextId++}`;
@@ -77,7 +76,6 @@ export default class ExprFactory {
 
   @loggedMethod
   public createNumberExpr(value?: number, id?: string): NumberExpr {
-    Logger.logCallstack();
     if (id === undefined) {
       id = `expr-${nextId++}`;
     }
@@ -99,7 +97,6 @@ export default class ExprFactory {
 
   @loggedMethod
   public createCallExpr(id?: string, args?: readonly Expr[]): CallExpr {
-    Logger.logCallstack();
     if (id === undefined) {
       id = `expr-${nextId++}`;
     }
