@@ -22,7 +22,7 @@ interface ExprMut {
   object$: BehaviorSubject<Expr>;
 }
 
-export default class ExprManager {
+export default class ExObjectManager {
   private readonly objectMutByObject = new Map<ExObject, ExObjectMut>();
 
   public getObject$(object: ExObject): Observable<ExObject> {

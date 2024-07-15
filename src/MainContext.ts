@@ -3,11 +3,11 @@ import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./Replacer";
-import ExprManager from "./ExprManager";
+import ExObjectManager from "./ExprManager";
 
 export default class MainContext {
   public readonly replacer: MainMutator;
-  public readonly exprManager = new ExprManager();
+  public readonly exprManager = new ExObjectManager();
   public readonly selection = new Selection(this.exprManager);
   public readonly exprFactory = new ExprFactory(this.exprManager);
 

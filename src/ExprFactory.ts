@@ -1,7 +1,7 @@
 import { Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
-import ExprManager from "./ExprManager";
+import ExObjectManager from "./ExprManager";
 
 let nextId = 0;
 
@@ -48,7 +48,7 @@ export default class ExprFactory {
   public readonly onCallExprAdded$: Observable<CallExpr> =
     this.onCallExprAdded$_;
 
-  public constructor(private readonly exprManager: ExprManager) {}
+  public constructor(private readonly exprManager: ExObjectManager) {}
 
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {

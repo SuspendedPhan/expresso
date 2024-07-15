@@ -7,7 +7,7 @@ import {
   switchAll
 } from "rxjs";
 import { ExObject, ExObjectType, Expr, ExprType } from "../ExprFactory";
-import ExprManager from "../ExprManager";
+import ExObjectManager from "../ExprManager";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { assertUnreachable } from "./Utils";
@@ -25,7 +25,7 @@ export default class Selection {
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
 
-  public constructor(private exprManager: ExprManager) {
+  public constructor(private exprManager: ExObjectManager) {
     this.down$.subscribe(() => {
       this.getSelectedObject$()
         .pipe(first())
