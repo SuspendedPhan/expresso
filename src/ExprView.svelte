@@ -3,7 +3,7 @@
   import ExprCommand from "./ExprCommand.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
-  import type { Expr } from "./ExprFactory";
+  import { ExprType, type Expr } from "./ExprFactory";
   import { loggedMethod } from "./logger/LoggerDecorator";
 
   export let ctx: MainContext;
@@ -14,12 +14,14 @@
     static text$() {
       return expr$.pipe(
         map((expr) => {
-          if (expr.objectType === "NumberExpr") {
-            return expr.value.toString();
-          } else if (expr.objectType === "CallExpr") {
-            return "+";
+          switch (expr.exprType) {
+            case ExprType.NumberExpr:
+              return expr.value.toString();
+            case ExprType.CallExpr:
+              return "+";
+            default:
+              return "";
           }
-          return "";
         })
       );
     }
@@ -28,7 +30,7 @@
     static args$() {
       return expr$.pipe(
         map((expr) => {
-          if (expr.objectType === "CallExpr") {
+          if (expr.exprType === ExprType.CallExpr) {
             return expr.args;
           }
           return [];
