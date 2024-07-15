@@ -1,6 +1,5 @@
 import { BehaviorSubject, first, Observable, of, switchAll } from "rxjs";
 import {
-  Attribute,
   ExObject,
   ExObjectType,
   Expr,

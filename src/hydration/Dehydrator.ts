@@ -1,7 +1,8 @@
 import { combineLatest, map, Observable, of, switchMap } from "rxjs";
-import { Attribute, CallExpr, Expr, NumberExpr } from "../ExprFactory";
+import { Attribute, CallExpr, Expr, ExprType, NumberExpr } from "../ExprFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
+import { assertUnreachable } from "../utils/Utils";
 
 // @ts-ignore
 // const logger = Logger.file("Dehydrator.ts");
@@ -51,14 +52,14 @@ export default class Dehydrator {
       switchMap((expr) => {
         logger.log("switchMap", expr.objectType);
 
-        switch (expr.objectType) {
-          case "NumberExpr":
+        switch (expr.exprType) {
+          case ExprType.NumberExpr:
             logger.log("switchMap.NumberExpr", expr.value);
             return this.dehydrateNumberExpr$(expr);
-          case "CallExpr":
+          case ExprType.CallExpr:
             return this.dehydrateCallExpr$(expr);
           default:
-            throw new Error(`Unknown expr type: ${expr}`);
+            assertUnreachable(expr);
         }
       })
     );

@@ -69,7 +69,7 @@ export default class ExprFactory {
     const expr$ = this.exprManager.createObject$(expr);
 
     return {
-      objectType: "Attribute",
+      objectType: ExObjectType.Attribute,
       id,
       expr$,
     };
@@ -87,7 +87,8 @@ export default class ExprFactory {
     }
 
     const expr: NumberExpr = {
-      objectType: "NumberExpr",
+      objectType: ExObjectType.Expr,
+      exprType: ExprType.NumberExpr,
       id,
       value,
     };
@@ -111,7 +112,8 @@ export default class ExprFactory {
     const argSubjects = args.map((arg) => this.exprManager.createObject$(arg));
 
     const expr: CallExpr = {
-      objectType: "CallExpr",
+      objectType: ExObjectType.Expr,
+      exprType: ExprType.CallExpr,
       id,
       args: argSubjects,
     };
