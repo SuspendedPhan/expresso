@@ -39,6 +39,7 @@ export default class ExprFactory {
 
   public readonly exprManager = new ExprManager();
 
+  @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
     const logger = Logger.logger();
     Logger.logCallstack();
@@ -54,7 +55,7 @@ export default class ExprFactory {
       expr = this.createNumberExpr();
     }
 
-    const expr$ = this.exprManager.createExpr$(expr);
+    const expr$ = this.exprManager.createObject$(expr);
 
     return {
       type: "Attribute",
@@ -96,7 +97,7 @@ export default class ExprFactory {
       const arg1 = this.createNumberExpr();
       args = [arg0, arg1];
     }
-    const argSubjects = args.map((arg) => this.exprManager.createExpr$(arg));
+    const argSubjects = args.map((arg) => this.exprManager.createObject$(arg));
 
     const expr: CallExpr = {
       type: "CallExpr",

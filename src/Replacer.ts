@@ -1,9 +1,7 @@
 import { Observable, Subject } from "rxjs";
-import ExprFactory, { Attribute, Expr } from "./ExprFactory";
+import ExprFactory, { Attribute, ExObject, Expr } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
-
-let nextId = 0;
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -39,7 +37,7 @@ export default class MainMutator {
   }
 
   @loggedMethod
-  public createAttribute$(): Observable<Attribute> {
+  public createAttribute$(): Observable<ExObject> {
     const attribute = this.exprFactory.createAttribute();
     const attribute$ = this.exprFactory.exprManager.createAttribute$(attribute);
     return attribute$;

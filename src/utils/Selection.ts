@@ -1,9 +1,7 @@
-import {
-  BehaviorSubject,
-  take,
-} from "rxjs";
+import { BehaviorSubject, Observable, of, take } from "rxjs";
 import Logger from "./Logger";
 import { Attribute, Expr } from "../ExprFactory";
+import ExprManager from "../ExprManager";
 
 export type Selectable = Attribute | Expr | null;
 
@@ -11,8 +9,14 @@ const logger = Logger.file("Selection.ts");
 logger.allow();
 
 export default class Selection {
-  public readonly selectedObject$ = new BehaviorSubject<Selectable>(null);
+  private readonly selectedObject$$ = new BehaviorSubject<Observable<Selectable>>(of());
   public readonly root$ = new BehaviorSubject<Selectable>(null);
+  public constructor(private exprManager: ExprManager) {}
+
+  public select(object: Selectable) {
+    const object$ = this.exprManager.getObject$(object);
+    this.selectedObject$$.next(object$);
+  }
 
   public down() {
     const selectedObject = this.selectedObject$.value;
