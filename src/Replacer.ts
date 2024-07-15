@@ -1,7 +1,7 @@
 import { Observable, Subject } from "rxjs";
-import ExprFactory, { ExObject, Expr } from "./ExprFactory";
-import { loggedMethod } from "./logger/LoggerDecorator";
+import { ExObject, Expr } from "./ExprFactory";
 import Logger from "./logger/Logger";
+import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
 
 export interface ExprReplacement {

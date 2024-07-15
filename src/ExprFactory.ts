@@ -48,6 +48,8 @@ export default class ExprFactory {
   public readonly onCallExprAdded$: Observable<CallExpr> =
     this.onCallExprAdded$_;
 
+  public constructor(private readonly exprManager: ExprManager) {}
+
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
     const logger = Logger.logger();

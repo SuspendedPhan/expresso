@@ -1,10 +1,9 @@
 import { firstValueFrom } from "rxjs";
-import Keyboard from "./Keyboard";
+import { Attribute } from "../ExprFactory";
 import MainContext from "../MainContext";
 import GoModuleLoader from "./GoModuleLoader";
+import Keyboard from "./Keyboard";
 import Logger from "./Logger";
-import ExprFactory, { Attribute } from "../ExprFactory";
-import Selection from "./Selection";
 import YY from "./YY";
 YY();
 
@@ -18,11 +17,8 @@ export default class Main {
 
   public static async setup(): Promise<Main> {
     const goModule = await firstValueFrom(GoModuleLoader.get$());
-    const exprFactory = new ExprFactory();
-    
-    const ctx = new MainContext(goModule, exprFactory);
-    
-    const attribute = exprFactory.createAttribute();
+    const ctx = new MainContext(goModule);
+    const attribute = ctx.exprFactory.createAttribute();
     ctx.selection.root$.next(attribute);
     
     ctx.selection.getSelectedObject$().subscribe((selectedObject) => {
