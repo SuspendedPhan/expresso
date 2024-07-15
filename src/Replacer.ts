@@ -37,31 +37,10 @@ export default class MainMutator {
     this.exprFactory.exprManager.replace(oldExpr, newExpr);
     this.onExprReplaced$_.next({ oldExpr, newExpr });
   }
-  
+
   @loggedMethod
-  public createAttribute$(id?: string, expr?: Expr): Observable<Attribute> {
-    const logger = Logger.logger();
-    Logger.logCallstack();
-
-    if (id === undefined) {
-      id = `attribute-${nextId++}`;
-      logger.log("id", "not given", id);
-    } else {
-      logger.log("id", "given", id);
-    }
-
-    if (expr === undefined) {
-      expr = this.exprFactory.createNumberExpr();
-    }
-
-    const expr$ = this.exprFactory.exprManager.createExpr$(expr);
-
-    const attribute: Attribute = {
-      type: "Attribute",
-      id,
-      expr$,
-    };
-
+  public createAttribute$(): Observable<Attribute> {
+    const attribute = this.exprFactory.createAttribute();
     const attribute$ = this.exprFactory.exprManager.createAttribute$(attribute);
     return attribute$;
   }

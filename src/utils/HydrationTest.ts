@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable } from "rxjs";
+import { BehaviorSubject, Observable, of, switchAll } from "rxjs";
 import Dehydrator from "../hydration/Dehydrator";
 import Rehydrator from "../hydration/Rehydrator";
 import Logger from "../logger/Logger";
@@ -9,8 +9,14 @@ import { Attribute } from "../ExprFactory";
 
 export default class HydrationTest {
   @loggedMethod
-  public static test(main: Main, ctx: MainContext): Observable<Attribute|null> {
-    const rehydratedAttribute$ = new BehaviorSubject<Attribute | null>(null);
+  public static test(
+    main: Main,
+    ctx: MainContext
+  ): Observable<Attribute> {
+    const rehydratedAttribute$$ = new BehaviorSubject<Observable<Attribute>>(
+      of()
+    );
+
     const logger = Logger.logger();
     new Dehydrator()
       .dehydrateAttribute$(main.attribute)
@@ -23,8 +29,11 @@ export default class HydrationTest {
         const rehydratedAttribute = new Rehydrator(
           ctx!.exprFactory
         ).rehydrateAttribute(dehydratedAttribute);
-        rehydratedAttribute$.next(rehydratedAttribute);
+
+        const attr$ =
+          ctx.exprFactory.exprManager.createAttribute$(rehydratedAttribute);
+        rehydratedAttribute$$.next(attr$);
       });
-    return rehydratedAttribute$;
+    return rehydratedAttribute$$.pipe(switchAll());
   }
 }

@@ -8,13 +8,15 @@ import {
   DehydratedNumberExpr,
 } from "./Dehydrator";
 
+let nextId = 0;
+
 export default class Rehydrator {
   public constructor(private readonly exprFactory: ExprFactory) {}
 
   @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
-    return this.exprFactory.createAttribute(deAttribute.id + "rehydrated", expr);
+    return this.exprFactory.createAttribute(deAttribute.id + "rehydrated" + nextId++, expr);
   }
 
   @loggedMethod
@@ -32,13 +34,13 @@ export default class Rehydrator {
   @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
     Logger.logCallstack();
-    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id + "rehydrated");
+    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id + "rehydrated" + nextId++);
   }
 
   @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     Logger.logCallstack();
     const args = deExpr.args.map((arg)=>this.rehydrateExpr(arg));
-    return this.exprFactory.createCallExpr(deExpr.id + "rehydrated", args);
+    return this.exprFactory.createCallExpr(deExpr.id + "rehydrated" + nextId++, args);
   }
 }

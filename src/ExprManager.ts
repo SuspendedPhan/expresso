@@ -1,5 +1,5 @@
 import { BehaviorSubject, first, Observable, of, switchAll } from "rxjs";
-import { Attribute, ExObject, Expr, Parent } from "./ExprFactory";
+import { Attribute, Expr, Parent } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 
