@@ -1,4 +1,4 @@
-import { BehaviorSubject, first, Observable, of, switchAll } from "rxjs";
+import { BehaviorSubject, first, Observable, of, Subject, switchAll } from "rxjs";
 import {
   ExObject,
   ExObjectType,
@@ -10,15 +10,18 @@ import Logger from "./logger/Logger";
 
 type ExObjectMut = BasicExObjectMut | ExprMut;
 
-interface BasicExObjectMut {
-  objectType: Exclude<ExObjectType, ExObjectType.Expr>;
+interface ExObjectMutBase {
   parent$$: BehaviorSubject<Observable<ExObject>>;
+  destroy$: Subject<ExObject>;
+}
+
+interface BasicExObjectMut extends ExObjectMutBase {
+  objectType: Exclude<ExObjectType, ExObjectType.Expr>;
   object$: Observable<ExObject>;
 }
 
-interface ExprMut {
+interface ExprMut extends ExObjectMutBase {
   objectType: ExObjectType.Expr;
-  parent$$: BehaviorSubject<Observable<ExObject>>;
   object$: BehaviorSubject<Expr>;
 }
 
@@ -49,6 +52,7 @@ export default class ExObjectManager {
       objectType: object.objectType,
       parent$$: new BehaviorSubject<Observable<ExObject>>(of()),
       object$: new BehaviorSubject<ExObject>(object),
+      destroy$: new Subject<ExObject>(),
     };
 
     const object$ = mut.object$ as Observable<T>;
@@ -69,6 +73,7 @@ export default class ExObjectManager {
       objectType: ExObjectType.Expr,
       parent$$: new BehaviorSubject<Observable<ExObject>>(of()),
       object$,
+      destroy$: new Subject<ExObject>(),
     };
 
     this.objectMutByObject.set(expr, mut);
@@ -87,6 +92,7 @@ export default class ExObjectManager {
 
     this.objectMutByObject.set(newExpr, mut);
     this.objectMutByObject.delete(expr);
+    mut.destroy$.next(expr);
     mut.object$.next(newExpr);
 
     if (newExpr.exprType === ExprType.CallExpr) {
@@ -120,5 +126,14 @@ export default class ExObjectManager {
       throw new Error(`expr$ not found for ${expr}`);
     }
     return mut.parent$$.pipe(switchAll());
+  }
+
+  public getDestroy$(exObject: ExObject): Observable<ExObject> {
+    const mut = this.objectMutByObject.get(exObject);
+    if (!mut) {
+      throw new Error(`destroy$ not found for ${exObject?.id}`);
+    }
+
+    return mut.destroy$;
   }
 }

@@ -14,26 +14,28 @@ export enum ExprType {
   CallExpr,
 }
 
-export interface Attribute {
-  readonly objectType: ExObjectType.Attribute;
+interface ExObjectBase {
+  readonly objectType: ExObjectType;
   readonly id: string;
+}
+
+export interface Attribute extends ExObjectBase {
+  readonly objectType: ExObjectType.Attribute;
   readonly expr$: Observable<Expr>;
 }
 
 export type Expr = NumberExpr | CallExpr;
 export type Parent = Attribute | CallExpr | null;
 
-export interface NumberExpr {
+export interface NumberExpr extends ExObjectBase {
   readonly objectType: ExObjectType.Expr;
   readonly exprType: ExprType.NumberExpr;
-  readonly id: string;
   readonly value: number;
 }
 
-export interface CallExpr {
+export interface CallExpr extends ExObjectBase {
   readonly objectType: ExObjectType.Expr;
   readonly exprType: ExprType.CallExpr;
-  readonly id: string;
   readonly args: readonly Observable<Expr>[];
 }
 
