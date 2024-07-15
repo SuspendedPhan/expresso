@@ -1,11 +1,26 @@
 import { BehaviorSubject, first, Observable, of, switchAll } from "rxjs";
-import { Attribute, ExObject } from "./ExprFactory";
+import {
+  Attribute,
+  ExObject,
+  ExObjectType,
+  Expr,
+  ExprType,
+} from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 
-interface ExObjectMut {
+type ExObjectMut = BasicExObjectMut | ExprMut;
+
+interface BasicExObjectMut {
+  objectType: Exclude<ExObjectType, ExObjectType.Expr>;
   parent$$: BehaviorSubject<Observable<ExObject>>;
-  object$: BehaviorSubject<ExObject>;
+  object$: Observable<ExObject>;
+}
+
+interface ExprMut {
+  objectType: ExObjectType.Expr;
+  parent$$: BehaviorSubject<Observable<ExObject>>;
+  object$: BehaviorSubject<Expr>;
 }
 
 export default class ExprManager {
@@ -20,42 +35,55 @@ export default class ExprManager {
     return mut.object$;
   }
 
-  public createAttribute$(attribute: Attribute): Observable<ExObject> {
-    const attribute$ = new BehaviorSubject<ExObject>(attribute);
-    const mut: ExObjectMut = {
+  @loggedMethod
+  public createObject$<T extends ExObject>(object: T): Observable<T> {
+    Logger.logCallstack();
+    Logger.arg("expr", object.id);
+
+    if (object.objectType === ExObjectType.Expr) {
+      const object$ = this.createExpr$(object);
+      return object$ as Observable<T>;
+    }
+
+    const mut: BasicExObjectMut = {
+      objectType: object.objectType,
       parent$$: new BehaviorSubject<Observable<ExObject>>(of()),
-      object$: attribute$,
+      object$: new BehaviorSubject<ExObject>(object),
     };
-    this.objectMutByObject.set(attribute, mut);
-    attribute.expr$.subscribe((expr) => {
-        this.setParent(expr, attribute);
-    });
-    return attribute$;
+
+    const object$ = mut.object$ as Observable<T>;
+
+    this.objectMutByObject.set(object, mut);
+    return object$;
   }
 
-  @loggedMethod
-  public createObject$(expr: ExObject): Observable<ExObject> {
-    Logger.logCallstack();
-    Logger.arg("expr", expr.id);
-    const mut: ExObjectMut = {
+  private createExpr$(expr: Expr): Observable<Expr> {
+    const object$ = new BehaviorSubject<Expr>(expr);
+    const mut: ExprMut = {
+      objectType: ExObjectType.Expr,
       parent$$: new BehaviorSubject<Observable<ExObject>>(of()),
-      object$: new BehaviorSubject<ExObject>(expr),
+      object$,
     };
 
     this.objectMutByObject.set(expr, mut);
-    return mut.object$;
+    return object$;
   }
 
-  public replace(expr: ExObject, newExpr: ExObject) {
+  public replace(expr: Expr, newExpr: Expr) {
     const mut = this.objectMutByObject.get(expr);
     if (!mut) {
       throw new Error(`expr$ not found for ${expr}`);
     }
+
+    if (mut.objectType !== ExObjectType.Expr) {
+      throw new Error(`expr$ is not ExprMut`);
+    }
+
     this.objectMutByObject.set(newExpr, mut);
     this.objectMutByObject.delete(expr);
     mut.object$.next(newExpr);
 
-    if (newExpr.type === "CallExpr") {
+    if (newExpr.exprType === ExprType.CallExpr) {
       for (const arg$ of newExpr.args) {
         arg$.pipe(first()).subscribe((arg) => {
           this.setParent(arg, newExpr);

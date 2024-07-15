@@ -49,9 +49,9 @@ export default class Dehydrator {
     const logger = Logger.logger();
     return expr$.pipe(
       switchMap((expr) => {
-        logger.log("switchMap", expr.type);
+        logger.log("switchMap", expr.objectType);
 
-        switch (expr.type) {
+        switch (expr.objectType) {
           case "NumberExpr":
             logger.log("switchMap.NumberExpr", expr.value);
             return this.dehydrateNumberExpr$(expr);

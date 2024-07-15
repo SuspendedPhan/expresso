@@ -5,8 +5,17 @@ import ExprManager from "./ExprManager";
 
 let nextId = 0;
 
+export enum ExObjectType {
+  Expr,
+  Attribute,
+}
+export enum ExprType {
+  NumberExpr,
+  CallExpr,
+}
+
 export interface Attribute {
-  readonly type: "Attribute";
+  readonly objectType: ExObjectType.Attribute;
   readonly id: string;
   readonly expr$: Observable<Expr>;
 }
@@ -15,13 +24,15 @@ export type Expr = NumberExpr | CallExpr;
 export type Parent = Attribute | CallExpr | null;
 
 export interface NumberExpr {
-  readonly type: "NumberExpr";
+  readonly objectType: ExObjectType.Expr;
+  readonly exprType: ExprType.NumberExpr;
   readonly id: string;
   readonly value: number;
 }
 
 export interface CallExpr {
-  readonly type: "CallExpr";
+  readonly objectType: ExObjectType.Expr;
+  readonly exprType: ExprType.CallExpr;
   readonly id: string;
   readonly args: readonly Observable<Expr>[];
 }
@@ -58,7 +69,7 @@ export default class ExprFactory {
     const expr$ = this.exprManager.createObject$(expr);
 
     return {
-      type: "Attribute",
+      objectType: "Attribute",
       id,
       expr$,
     };
@@ -76,7 +87,7 @@ export default class ExprFactory {
     }
 
     const expr: NumberExpr = {
-      type: "NumberExpr",
+      objectType: "NumberExpr",
       id,
       value,
     };
@@ -100,7 +111,7 @@ export default class ExprFactory {
     const argSubjects = args.map((arg) => this.exprManager.createObject$(arg));
 
     const expr: CallExpr = {
-      type: "CallExpr",
+      objectType: "CallExpr",
       id,
       args: argSubjects,
     };

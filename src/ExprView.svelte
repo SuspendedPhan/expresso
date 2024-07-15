@@ -14,9 +14,9 @@
     static text$() {
       return expr$.pipe(
         map((expr) => {
-          if (expr.type === "NumberExpr") {
+          if (expr.objectType === "NumberExpr") {
             return expr.value.toString();
-          } else if (expr.type === "CallExpr") {
+          } else if (expr.objectType === "CallExpr") {
             return "+";
           }
           return "";
@@ -28,7 +28,7 @@
     static args$() {
       return expr$.pipe(
         map((expr) => {
-          if (expr.type === "CallExpr") {
+          if (expr.objectType === "CallExpr") {
             return expr.args;
           }
           return [];
