@@ -1,22 +1,32 @@
-import { BehaviorSubject, Observable } from "rxjs";
-import { Expr, Parent } from "./ExprFactory";
+import { BehaviorSubject, Observable, of, switchAll } from "rxjs";
+import { Attribute, ExObject, Expr, Parent } from "./ExprFactory";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 
 interface ExprMut {
-  parent$: BehaviorSubject<Parent>;
+  parent$$: BehaviorSubject<Observable<Parent>>;
   expr$: BehaviorSubject<Expr>;
 }
 
 export default class ExprManager {
   private readonly exprMutByExpr = new Map<Expr, ExprMut>();
+  private readonly parent$ByParent = new Map<Parent, Observable<Parent>>();
+
+  public createAttribute$(attribute: Attribute): Observable<Attribute> {
+    const attribute$ = new BehaviorSubject<Attribute>(attribute);
+    this.parent$ByParent.set(attribute, attribute$);
+    attribute.expr$.subscribe((expr) => {
+        this.setParent(expr, attribute);
+    });
+    return attribute$;
+  }
 
   @loggedMethod
-  public create$(expr: Expr): BehaviorSubject<Expr> {
+  public createExpr$(expr: Expr) {
     Logger.logCallstack();
     Logger.arg("expr", expr.id);
     const mut = {
-      parent$: new BehaviorSubject<Parent>(null),
+      parent$$: new BehaviorSubject<Observable<Parent>>(of()),
       expr$: new BehaviorSubject<Expr>(expr),
     };
 
@@ -34,11 +44,24 @@ export default class ExprManager {
     mut.expr$.next(newExpr);
   }
 
-  public getParent$(expr: Expr): BehaviorSubject<Parent> {
+  public setParent(expr: Expr, parent: Parent) {
     const mut = this.exprMutByExpr.get(expr);
     if (!mut) {
       throw new Error(`expr$ not found for ${expr}`);
     }
-    return mut.parent$;
+
+    const parent$ = this.parent$ByParent.get(parent);
+    if (!parent$) {
+      throw new Error(`parent$ not found for ${parent}`);
+    }
+    mut.parent$$.next(parent$);
+  }
+
+  public getParent$(expr: Expr): Observable<Parent> {
+    const mut = this.exprMutByExpr.get(expr);
+    if (!mut) {
+      throw new Error(`expr$ not found for ${expr}`);
+    }
+    return mut.parent$$.pipe(switchAll());
   }
 }

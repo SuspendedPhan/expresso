@@ -1,4 +1,4 @@
-import { Observable, Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
 import ExprManager from "./ExprManager";
@@ -55,7 +55,7 @@ export default class ExprFactory {
       expr = this.createNumberExpr();
     }
 
-    const expr$ = this.exprManager.create$(expr);
+    const expr$ = this.exprManager.createExpr$(expr);
 
     const attribute: Attribute = {
       type: "Attribute",
@@ -63,9 +63,7 @@ export default class ExprFactory {
       expr$,
     };
 
-    const parent$ = this.exprManager.getParent$(expr);
-    parent$.next(attribute);
-
+    this.exprManager.setParent(expr, attribute);
     return attribute;
   }
 
@@ -102,7 +100,7 @@ export default class ExprFactory {
       const arg1 = this.createNumberExpr();
       args = [arg0, arg1];
     }
-    const argSubjects = args.map((arg) => this.exprManager.create$(arg));
+    const argSubjects = args.map((arg) => this.exprManager.createExpr$(arg));
 
     const expr: CallExpr = {
       type: "CallExpr",
