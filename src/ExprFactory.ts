@@ -40,34 +40,6 @@ export default class ExprFactory {
   public readonly exprManager = new ExprManager();
 
   @loggedMethod
-  public createAttribute$(id?: string, expr?: Expr): Observable<Attribute> {
-    const logger = Logger.logger();
-    Logger.logCallstack();
-
-    if (id === undefined) {
-      id = `attribute-${nextId++}`;
-      logger.log("id", "not given", id);
-    } else {
-      logger.log("id", "given", id);
-    }
-
-    if (expr === undefined) {
-      expr = this.createNumberExpr();
-    }
-
-    const expr$ = this.exprManager.createExpr$(expr);
-
-    const attribute: Attribute = {
-      type: "Attribute",
-      id,
-      expr$,
-    };
-
-    const attribute$ = this.exprManager.createAttribute$(attribute);
-    return attribute$;
-  }
-
-  @loggedMethod
   public createNumberExpr(value?: number, id?: string): NumberExpr {
     Logger.logCallstack();
     if (id === undefined) {

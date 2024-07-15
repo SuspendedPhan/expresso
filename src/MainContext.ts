@@ -2,11 +2,11 @@ import type GoModule from "./utils/GoModule";
 import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
-import Replacer, { ExprReplacement } from "./Replacer";
+import MainMutator, { ExprReplacement } from "./Replacer";
 import { loggedMethod } from "./logger/LoggerDecorator";
 
 export default class MainContext {
-  public readonly replacer: Replacer;
+  public readonly replacer: MainMutator;
 
   public constructor(
     public readonly goModule: GoModule,
@@ -14,7 +14,7 @@ export default class MainContext {
     public readonly selection: Selection
   ) {
     new GoBridge(goModule, exprFactory);
-    this.replacer = new Replacer(exprFactory);
+    this.replacer = new MainMutator(exprFactory);
     this.replacer.onExprReplaced$.subscribe((...args) =>
       this.handleExprReplaced(...args)
     );
