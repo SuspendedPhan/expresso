@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 
 export default class PixiFactory {
   private app;
-  constructor(viewportElement: any, canvasElement: any) {
+  constructor(viewportElement: HTMLElement, canvasElement: PIXI.ICanvas) {
     this.app = new PIXI.Application({
       resizeTo: viewportElement,
       view: canvasElement,
