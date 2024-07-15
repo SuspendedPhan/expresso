@@ -44,11 +44,14 @@ export type ExObject = Attribute | Expr;
 export default class ExprFactory {
   private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
   private readonly onCallExprAdded$_ = new Subject<CallExpr>();
+  private readonly onAttributeAdded$_ = new Subject<Attribute>();
 
   public readonly onNumberExprAdded$: Observable<NumberExpr> =
     this.onNumberExprAdded$_;
   public readonly onCallExprAdded$: Observable<CallExpr> =
     this.onCallExprAdded$_;
+  public readonly onAttributeAdded$: Observable<Attribute> =
+    this.onAttributeAdded$_;
 
   public constructor(private readonly exprManager: ExObjectManager) {}
 
@@ -69,11 +72,13 @@ export default class ExprFactory {
 
     const expr$ = this.exprManager.createObject$(expr);
 
-    return {
+    const attribute: Attribute = {
       objectType: ExObjectType.Attribute,
       id,
       expr$,
     };
+    this.onAttributeAdded$_.next(attribute);
+    return attribute;
   }
 
   @loggedMethod

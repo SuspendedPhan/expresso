@@ -19,9 +19,7 @@ export default class ScenePool {
     return circle;
   }
 
-  public releaseCircles() {
-    for (const circle of this.usedCircles) {
-      this.circlePool.recycle(circle);
-    }
+  public releaseCircle(circle) {
+    this.circlePool.recycle(circle);
   }
 }
