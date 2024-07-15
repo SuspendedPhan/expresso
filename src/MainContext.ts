@@ -2,7 +2,7 @@ import type GoModule from "./utils/GoModule";
 import ExprFactory from "./ExObjectFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
-import MainMutator from "./Replacer";
+import MainMutator from "./MainMutator";
 import ExObjectManager from "./ExObjectManager";
 
 export default class MainContext {
