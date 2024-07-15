@@ -54,6 +54,12 @@ export default class ExprManager {
     const object$ = mut.object$ as Observable<T>;
 
     this.objectMutByObject.set(object, mut);
+
+    if (object.objectType === ExObjectType.Attribute) {
+      object.expr$.pipe(first()).subscribe((expr) => {
+        this.setParent(expr, object);
+      });
+    }
     return object$;
   }
 
@@ -92,7 +98,10 @@ export default class ExprManager {
     }
   }
 
-  public setParent(object: ExObject, parent: ExObject) {
+  @loggedMethod
+  private setParent(object: ExObject, parent: ExObject) {
+    Logger.logCallstack();
+    Logger.arg("object", object.id);
     const mut = this.objectMutByObject.get(object);
     if (!mut) {
       throw new Error(`expr$ not found for ${object}`);

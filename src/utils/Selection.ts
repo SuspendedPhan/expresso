@@ -4,16 +4,11 @@ import {
   Observable,
   of,
   Subject,
-  switchAll,
-  take,
+  switchAll
 } from "rxjs";
-import {
-  ExObject,
-  ExObjectType,
-  Expr,
-  ExprType,
-} from "../ExprFactory";
+import { ExObject, ExObjectType, Expr, ExprType } from "../ExprFactory";
 import ExprManager from "../ExprManager";
+import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { assertUnreachable } from "./Utils";
 
@@ -23,21 +18,36 @@ export default class Selection {
   private readonly selectedObject$$ = new BehaviorSubject<
     Observable<Selectable>
   >(of(null));
-  private readonly root$$ = new BehaviorSubject<Observable<Selectable>>(of(null));
+  private readonly root$$ = new BehaviorSubject<Observable<Selectable>>(
+    of(null)
+  );
   public readonly root$ = this.root$$.pipe(switchAll());
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
 
   public constructor(private exprManager: ExprManager) {
     this.down$.subscribe(() => {
-      this.getSelectedObject$().pipe(first()).subscribe((selectedObject) => {
-        this.down(selectedObject);
-      });
+      this.getSelectedObject$()
+        .pipe(first())
+        .subscribe((selectedObject) => {
+          this.down(selectedObject);
+        });
     });
     this.up$.subscribe(() => {
-      this.getSelectedObject$().pipe(first()).subscribe((selectedObject) => {
-        this.up(selectedObject);
-      });
+      this.getSelectedObject$()
+        .pipe(first())
+        .subscribe((selectedObject) => {
+          this.up(selectedObject);
+        });
+    });
+  }
+
+  @loggedMethod
+  public debug() {
+    const logger = Logger.logger();
+    Logger.logCallstack();
+    this.getSelectedObject$().subscribe((selectedObject) => {
+      logger.log("selectedObject", selectedObject?.id ?? "null");
     });
   }
 
@@ -60,15 +70,21 @@ export default class Selection {
 
   @loggedMethod
   public down(selectedObject: Selectable) {
+    Logger.logCallstack();
+    const logger = Logger.logger();
     if (selectedObject === null) {
+      logger.log("", "selectedObject is null");
       this.selectedObject$$.next(this.root$);
       return;
     }
 
+    logger.log("selectedObject", selectedObject.id);
+
     switch (selectedObject.objectType) {
       case ExObjectType.Attribute:
-        selectedObject.expr$.pipe(take(1)).subscribe((expr) => {
-          this.exprManager.getObject$(expr);
+        selectedObject.expr$.pipe(first()).subscribe((expr) => {
+          const expr$ = this.exprManager.getObject$(expr);
+          this.selectedObject$$.next(expr$);
         });
         return;
       case ExObjectType.Expr:
@@ -79,7 +95,9 @@ export default class Selection {
     }
   }
 
+  @loggedMethod
   private downExpr(selectedObject: Expr) {
+    Logger.logCallstack();
     switch (selectedObject.exprType) {
       case ExprType.NumberExpr:
         return;
@@ -95,7 +113,9 @@ export default class Selection {
     }
   }
 
+  @loggedMethod
   private up(selectedObject: Selectable) {
+    Logger.logCallstack();
     if (selectedObject === null) {
       return;
     }
@@ -111,8 +131,14 @@ export default class Selection {
     }
   }
 
+  @loggedMethod
   private upExpr(selectedObject: Expr) {
+    Logger.logCallstack();
+    const logger = Logger.logger();
     const parent$ = this.exprManager.getParent$(selectedObject);
+    parent$.pipe(first()).subscribe((parent) => {
+      logger.log("parent", parent.id);
+    });
     this.selectedObject$$.next(parent$);
   }
 }

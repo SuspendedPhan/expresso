@@ -1,11 +1,11 @@
 import { BehaviorSubject, Observable, of, switchAll } from "rxjs";
 import Dehydrator from "../hydration/Dehydrator";
 import Rehydrator from "../hydration/Rehydrator";
-import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import MainContext from "../MainContext";
 import Main from "./Main";
 import { Attribute } from "../ExprFactory";
+import Logger from "../logger/Logger";
 
 export default class HydrationTest {
   @loggedMethod

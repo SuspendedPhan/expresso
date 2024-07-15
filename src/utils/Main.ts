@@ -24,5 +24,7 @@ export default class Main {
     this.attribute$ = ctx.replacer.createAttribute$();
     ctx.selection.setRoot$(this.attribute$);
     Keyboard.register(ctx.selection);
+    
+    ctx.selection.debug();
   }
 }
