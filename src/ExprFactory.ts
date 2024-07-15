@@ -1,7 +1,7 @@
 import { Observable, Subject } from "rxjs";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
-import ExObjectManager from "./ExprManager";
+import ExObjectManager from "./ExObjectManager";
 
 let nextId = 0;
 

@@ -7,7 +7,7 @@ import {
   switchAll
 } from "rxjs";
 import { ExObject, ExObjectType, Expr, ExprType } from "../ExprFactory";
-import ExObjectManager from "../ExprManager";
+import ExObjectManager from "../ExObjectManager";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { assertUnreachable } from "./Utils";

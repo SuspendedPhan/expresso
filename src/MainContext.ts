@@ -3,7 +3,7 @@ import ExprFactory from "./ExprFactory";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./Replacer";
-import ExObjectManager from "./ExprManager";
+import ExObjectManager from "./ExObjectManager";
 
 export default class MainContext {
   public readonly replacer: MainMutator;
