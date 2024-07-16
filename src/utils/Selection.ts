@@ -99,10 +99,10 @@ export default class Selection {
       case ExprType.NumberExpr:
         return;
       case ExprType.CallExpr:
-        if (selectedObject.args[0] === undefined) {
+        if (selectedObject.args$[0] === undefined) {
           throw new Error("CallExpr must have at least 1 args");
         }
-        const arg$ = selectedObject.args[0];
+        const arg$ = selectedObject.args$[0];
         this.selectedObject$$.next(arg$);
         return;
       default:

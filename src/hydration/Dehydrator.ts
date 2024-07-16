@@ -74,7 +74,7 @@ export default class Dehydrator {
   }
 
   private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedCallExpr> {
-    const deArgs = expr.args.map((arg$) => {
+    const deArgs = expr.args$.map((arg$) => {
       return this.dehydrateExpr$(arg$);
     });
 

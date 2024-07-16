@@ -112,7 +112,7 @@ export default class ExObjectManager {
     mut.object$.next(newExpr);
 
     if (newExpr.exprType === ExprType.CallExpr) {
-      for (const arg$ of newExpr.args) {
+      for (const arg$ of newExpr.args$) {
         arg$.pipe(first()).subscribe((arg) => {
           this.setParent(arg, newExpr);
         });

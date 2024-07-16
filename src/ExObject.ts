@@ -16,6 +16,7 @@ export enum ExprType {
 export interface ExObjectBase {
   readonly objectType: ExObjectType;
   readonly id: string;
+  readonly parent$: Observable<Parent>;
 }
 
 export interface Component extends ExObjectBase {
@@ -39,7 +40,7 @@ export interface NumberExpr extends ExObjectBase {
 export interface CallExpr extends ExObjectBase {
   readonly objectType: ExObjectType.Expr;
   readonly exprType: ExprType.CallExpr;
-  readonly args: readonly Observable<Expr>[];
+  readonly args$: Observable<readonly Expr[]>;
 }
 
 export type ExObject = Attribute | Expr;

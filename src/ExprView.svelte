@@ -31,7 +31,7 @@
       return expr$.pipe(
         map((expr) => {
           if (expr.exprType === ExprType.CallExpr) {
-            return expr.args;
+            return expr.args$;
           }
           return [];
         })

@@ -1,9 +1,18 @@
-import { Attribute, CallExpr, ExObjectType, Expr, ExprType, NumberExpr } from "./ExObject";
+import { BehaviorSubject } from "rxjs";
+import { Attribute, CallExpr, ExObject, ExObjectType, Expr, ExprType, NumberExpr, Parent } from "./ExObject";
 import ExObjectManager from "./ExObjectManager";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 
 let nextId = 0;
+
+type ExObjectMut = ExObject & {
+  parentMut$: BehaviorSubject<Parent>;
+}
+
+type CallExprMut = CallExpr & ExObjectMut & {
+  argsMut$: BehaviorSubject<Expr[]>;
+}
 
 export default class ExObjectFactory {
   public constructor(private readonly exprManager: ExObjectManager) {}
@@ -25,10 +34,14 @@ export default class ExObjectFactory {
 
     const expr$ = this.exprManager.createObject$(expr);
 
-    const attribute: Attribute = {
+    const parentMut$ = new BehaviorSubject<Parent>(null);
+
+    const attribute: Attribute & ExObjectMut = {
       objectType: ExObjectType.Attribute,
       id,
       expr$,
+      parent$: parentMut$,
+      parentMut$,
     };
     return attribute;
   }
@@ -43,18 +56,22 @@ export default class ExObjectFactory {
       value = 0;
     }
 
-    const expr: NumberExpr = {
+    const parentMut$ = new BehaviorSubject<Parent>(null);
+
+    const expr: NumberExpr & ExObjectMut = {
       objectType: ExObjectType.Expr,
       exprType: ExprType.NumberExpr,
       id,
       value,
+      parent$: parentMut$,
+      parentMut$,
     };
 
     return expr;
   }
 
   @loggedMethod
-  public createCallExpr(id?: string, args?: readonly Expr[]): CallExpr {
+  public createCallExpr(id?: string, args?: Expr[]): CallExpr {
     if (id === undefined) {
       id = `expr-${nextId++}`;
     }
@@ -64,13 +81,18 @@ export default class ExObjectFactory {
       const arg1 = this.createNumberExpr();
       args = [arg0, arg1];
     }
-    const argSubjects = args.map((arg) => this.exprManager.createObject$(arg));
 
-    const expr: CallExpr = {
+    const argsMut$ = new BehaviorSubject<Expr[]>(args);
+    const parentMut$ = new BehaviorSubject<Parent>(null);
+
+    const expr: CallExprMut = {
       objectType: ExObjectType.Expr,
       exprType: ExprType.CallExpr,
       id,
-      args: argSubjects,
+      args$: argsMut$,
+      argsMut$,
+      parent$: parentMut$,
+      parentMut$,
     };
 
     return expr;

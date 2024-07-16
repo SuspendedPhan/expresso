@@ -31,8 +31,8 @@ export default class GoBridge {
         case ExprType.CallExpr:
           goModule.addCallExpr(expr.id);
           const callExpr = expr;
-          const arg0$ = callExpr.args[0];
-          const arg1$ = callExpr.args[1];
+          const arg0$ = callExpr.args$[0];
+          const arg1$ = callExpr.args$[1];
           if (arg0$ === undefined || arg1$ === undefined) {
             throw new Error("CallExpr must have 2 args");
           }
