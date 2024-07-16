@@ -1,5 +1,4 @@
 import { Graphics } from "pixi.js";
-import { ExObjectType } from "./ExObject";
 
 type PixiSetter = (pixiObject: Graphics, value: number) => void;
 

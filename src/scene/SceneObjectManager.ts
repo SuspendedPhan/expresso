@@ -23,10 +23,11 @@ export class SceneObjectManager {
   private readonly tick$ = interval(1000);
 
   public constructor(private readonly ctx: SceneContext) {
-    ctx.mainCtx.objectManager.onAttributeAdded$.subscribe((attr) => {
-      const sceneObject = this.attrToSceneCircle(attr);
-      this.sceneObjectToPixi(sceneObject);
-    });
+    // todp
+    // ctx.mainCtx.objectManager.onAttributeAdded$.subscribe((attr) => {
+    //   const sceneObject = this.attrToSceneCircle(attr);
+    //   this.sceneObjectToPixi(sceneObject);
+    // });
   }
 
   @loggedMethod
