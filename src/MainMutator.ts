@@ -13,9 +13,12 @@ import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
 import { assertUnreachable } from "./utils/Utils";
 
-export type ExObjectMut = ExObject & {
-  parentMut$: BehaviorSubject<Parent>;
+export type ExObjectMutBase = {
+  readonly parentMut$: BehaviorSubject<Parent>;
+  readonly destroyMut$: Subject<void>;
 };
+
+export type ExObjectMut = ExObject & ExObjectMutBase;
 
 export type AttributeMut = Attribute &
   ExObjectMut & {
@@ -90,14 +93,9 @@ export default class MainMutator {
           assertUnreachable
       }
 
+      const oldExprMut = oldExpr as ExObjectMut;
+      oldExprMut.destroyMut$.complete();
       this.onExprReplaced$_.next({ oldExpr, newExpr });
     });
-  }
-
-  @loggedMethod
-  public createAttribute$(): Observable<Attribute> {
-    const attribute = this.ctx.objectFactory.createAttribute();
-    const attribute$ = this.ctx.objectManager.createObject$(attribute);
-    return attribute$;
   }
 }

@@ -6,7 +6,7 @@ import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";
 
 export default class Main {
-  public readonly attribute$: Observable<Attribute>;
+  public readonly attribute: Attribute;
   public readonly ctx: MainContext;
 
   public static setup$(): Observable<Main> {
@@ -21,8 +21,8 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    this.attribute$ = ctx.mutator.createAttribute$();
-    ctx.selection.setRoot$(this.attribute$);
+    this.attribute = ctx.objectFactory.createAttribute();
+    ctx.selection.root$.next(this.attribute);
     Keyboard.register(ctx.selection);
   }
 }

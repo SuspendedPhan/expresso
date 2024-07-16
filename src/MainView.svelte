@@ -1,23 +1,16 @@
 <script lang="ts">
-  import {
-    BehaviorSubject,
-    combineLatest,
-    interval,
-    Observable,
-    switchMap,
-  } from "rxjs";
   import AttributeView from "./AttributeView.svelte";
-  import MainContext from "./MainContext";
-  import Main from "./utils/Main";
   import type { Attribute } from "./ExObject";
-  import HydrationTest from "./utils/HydrationTest";
-  import { loggedMethod } from "./logger/LoggerDecorator";
   import Logger from "./logger/Logger";
+  import { loggedMethod } from "./logger/LoggerDecorator";
+  import MainContext from "./MainContext";
   import SceneView from "./scene/SceneView.svelte";
+  import HydrationTest from "./utils/HydrationTest";
+  import Main from "./utils/Main";
 
   let ctx: MainContext | null = null;
-  let attribute$: Observable<Attribute> | null = null;
-  let rehydratedAttribute$: BehaviorSubject<Attribute> | null = null;
+  let attribute: Attribute | null = null;
+  let rehydratedAttribute: Attribute | null = null;
   let result = -1;
 
   const main$ = Main.setup$();
@@ -29,8 +22,7 @@
       const logger = Logger.logger();
 
       ctx = main.ctx;
-      attribute$ = main.attribute$;
-      const expr$ = attribute$.pipe(switchMap((a) => a.expr$));
+      attribute = main.attribute;
 
       HydrationTest.test(main, ctx).subscribe((a) => {
         if (a === null) {
@@ -38,15 +30,7 @@
         }
 
         logger.log("Main.subscribe", a.id);
-        if (rehydratedAttribute$ === null) {
-          logger.log("Main.subscribe", "create rehydratedAttribute$");
-          rehydratedAttribute$ = new BehaviorSubject(a);
-        }
-        rehydratedAttribute$.next(a);
-      });
-
-      combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
-        // result = ctx!.goModule.evalExpr(expr.id);
+        rehydratedAttribute = a;
       });
     }
   }
@@ -60,12 +44,12 @@
   <div>Hello World</div>
   <div>{result}</div>
 
-  {#if ctx === null || attribute$ === null || rehydratedAttribute$ === null}
+  {#if ctx === null || attribute === null || rehydratedAttribute === null}
     <div>Loading...</div>
   {:else}
     <div>Loaded</div>
-    <AttributeView {ctx} {attribute$} />
-    <AttributeView {ctx} attribute$={rehydratedAttribute$} />
+    <AttributeView {ctx} {attribute} />
+    <AttributeView {ctx} attribute={rehydratedAttribute} />
     <SceneView {ctx} />
   {/if}
 </main>

@@ -3,6 +3,7 @@ import {
   first,
   Observable,
   of,
+  ReplaySubject,
   Subject,
   switchMap
 } from "rxjs";
@@ -20,7 +21,7 @@ type SelectedObject = Selectable | SelectedObjectType;
 
 export default class Selection {
   private readonly selectedObject$ = new BehaviorSubject<SelectedObject>(null);
-  private readonly root$ = new BehaviorSubject<Selectable>(null);
+  public readonly root$ = new ReplaySubject<ExObject>(1);
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();

@@ -14,9 +14,11 @@ export enum ExprType {
 }
 
 export interface ExObjectBase {
-  readonly objectType: ExObjectType;
   readonly id: string;
   readonly parent$: Observable<Parent>;
+
+  // Completes when destroyed.
+  readonly destroy$: Observable<void>;
 }
 
 export interface Component extends ExObjectBase {

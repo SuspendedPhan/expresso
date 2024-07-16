@@ -31,6 +31,7 @@ export class SceneObjectManager {
   }
 
   @loggedMethod
+  // @ts-ignore
   private attrToSceneCircle(sceneAttr: SceneAttribute): SceneObject {
     const logger = Logger.logger();
     return {
