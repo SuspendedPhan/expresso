@@ -38,7 +38,6 @@ export default class MainMutator {
 
   @loggedMethod
   public createAttribute$(): Observable<Attribute> {
-    Logger.logCallstack();
     const attribute = this.ctx.objectFactory.createAttribute();
     const attribute$ = this.ctx.objectManager.createObject$(attribute);
     return attribute$;

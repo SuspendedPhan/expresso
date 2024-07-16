@@ -56,7 +56,6 @@ export default class ExObjectManager {
   @loggedMethod
   public createObject$<T extends ExObject>(object: T): Observable<T> {
     Logger.arg("expr", object.id);
-    Logger.logCallstack();
 
     if (object.objectType === ExObjectType.Expr) {
       const object$ = this.createExpr$(object);
@@ -123,7 +122,6 @@ export default class ExObjectManager {
 
   @loggedMethod
   private setParent(object: ExObject, parent: ExObject) {
-    Logger.logCallstack();
     Logger.arg("object", object.id);
     const mut = this.objectMutByObject.get(object);
     if (!mut) {

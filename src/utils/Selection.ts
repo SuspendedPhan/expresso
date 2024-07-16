@@ -45,7 +45,6 @@ export default class Selection {
   @loggedMethod
   public debug() {
     const logger = Logger.logger();
-    Logger.logCallstack();
     this.getSelectedObject$().subscribe((selectedObject) => {
       logger.log("selectedObject", selectedObject?.id ?? "null");
     });
@@ -70,7 +69,6 @@ export default class Selection {
 
   @loggedMethod
   public down(selectedObject: Selectable) {
-    Logger.logCallstack();
     const logger = Logger.logger();
     if (selectedObject === null) {
       logger.log("", "selectedObject is null");
@@ -97,7 +95,6 @@ export default class Selection {
 
   @loggedMethod
   private downExpr(selectedObject: Expr) {
-    Logger.logCallstack();
     switch (selectedObject.exprType) {
       case ExprType.NumberExpr:
         return;
@@ -115,7 +112,6 @@ export default class Selection {
 
   @loggedMethod
   private up(selectedObject: Selectable) {
-    Logger.logCallstack();
     if (selectedObject === null) {
       return;
     }
@@ -133,7 +129,6 @@ export default class Selection {
 
   @loggedMethod
   private upExpr(selectedObject: Expr) {
-    Logger.logCallstack();
     const logger = Logger.logger();
     const parent$ = this.exprManager.getParent$(selectedObject);
     parent$.pipe(first()).subscribe((parent) => {
