@@ -2,8 +2,10 @@
 OBS<Attribute> -> OBS<SceneObject>
 */
 
-import { map } from "rxjs";
+import { map, of, switchMap } from "rxjs";
 import { Attribute } from "../ExObjectFactory";
+import Logger from "../logger/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
 import { OBS } from "../utils/Utils";
 import { SceneContext } from "./SceneContext";
 
@@ -14,7 +16,7 @@ export interface SceneObject {
 
 export class SceneObjectManager {
   public constructor(private readonly ctx: SceneContext) {
-    ctx.mainCtx.objectFactory.onAttributeAdded$.subscribe((attr) => {
+    ctx.mainCtx.objectManager.onAttributeAdded$.subscribe((attr) => {
       const sceneCircle = this.attrToSceneCircle(attr);
       this.sceneObjectToPixi(sceneCircle);
     });
@@ -23,16 +25,18 @@ export class SceneObjectManager {
   private attrToSceneCircle(attr: Attribute): SceneObject {
     return {
       x$: attr.expr$.pipe(
-        map((expr) => {
-          const r = this.ctx.mainCtx.goModule.evalExpr(expr.id);
-          return r;
+        switchMap((expr) => {
+          return this.ctx.mainCtx.goBridge.evalExpr$(expr);
         })
       ),
-      destroy$: this.ctx.mainCtx.objectManager.getDestroy$(attr).pipe(map(() => {})),
+      // x$: of(0),
+      destroy$: this.ctx.mainCtx.objectManager.getDestroy$(attr),
     };
   }
 
+  @loggedMethod
   private sceneObjectToPixi(sceneObject: SceneObject) {
+    Logger.logCallstack();
     const pixiObject = this.ctx.pool.takeCircle();
     sceneObject.x$.subscribe((x) => {
       pixiObject.x = x;

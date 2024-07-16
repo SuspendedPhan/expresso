@@ -10,11 +10,10 @@ export default class MainContext {
   public readonly objectManager = new ExObjectManager();
   public readonly objectFactory = new ExObjectFactory(this.objectManager);
   public readonly selection = new Selection(this.objectManager);
+  public readonly goBridge: GoBridge;
 
-  public constructor(
-    public readonly goModule: GoModule,
-  ) {
-    new GoBridge(goModule, this.objectFactory);
+  public constructor(public readonly goModule: GoModule) {
+    this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
   }
 }

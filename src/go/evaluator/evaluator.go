@@ -75,7 +75,7 @@ func (e *Evaluator) SetCallExprArg0(id string, argId string) {
 func (e *Evaluator) SetCallExprArg1(id string, argId string) {
 	expr, found := e.ExprById[id]
 	if !found {
-		panic("expr not found")
+		panic("expr not found " + id)
 	}
 	callExpr := expr.CallExpr
 	if callExpr == nil {
@@ -88,7 +88,7 @@ func (e *Evaluator) SetCallExprArg1(id string, argId string) {
 func (e *Evaluator) EvalExpr(exprId string) Float {
 	expr, found := e.ExprById[exprId]
 	if !found {
-		panic("expr not found")
+		panic("expr not found " + exprId)
 	}
 
 	if expr.NumberExpr != nil {

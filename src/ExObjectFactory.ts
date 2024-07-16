@@ -1,7 +1,7 @@
-import { Observable, Subject } from "rxjs";
-import { loggedMethod } from "./logger/LoggerDecorator";
-import Logger from "./logger/Logger";
+import { Observable } from "rxjs";
 import ExObjectManager from "./ExObjectManager";
+import Logger from "./logger/Logger";
+import { loggedMethod } from "./logger/LoggerDecorator";
 
 let nextId = 0;
 
@@ -42,17 +42,6 @@ export interface CallExpr extends ExObjectBase {
 export type ExObject = Attribute | Expr;
 
 export default class ExprFactory {
-  private readonly onNumberExprAdded$_ = new Subject<NumberExpr>();
-  private readonly onCallExprAdded$_ = new Subject<CallExpr>();
-  private readonly onAttributeAdded$_ = new Subject<Attribute>();
-
-  public readonly onNumberExprAdded$: Observable<NumberExpr> =
-    this.onNumberExprAdded$_;
-  public readonly onCallExprAdded$: Observable<CallExpr> =
-    this.onCallExprAdded$_;
-  public readonly onAttributeAdded$: Observable<Attribute> =
-    this.onAttributeAdded$_;
-
   public constructor(private readonly exprManager: ExObjectManager) {}
 
   @loggedMethod
@@ -77,7 +66,6 @@ export default class ExprFactory {
       id,
       expr$,
     };
-    this.onAttributeAdded$_.next(attribute);
     return attribute;
   }
 
@@ -98,7 +86,6 @@ export default class ExprFactory {
       value,
     };
 
-    this.onNumberExprAdded$_.next(expr);
     return expr;
   }
 
@@ -122,7 +109,6 @@ export default class ExprFactory {
       args: argSubjects,
     };
 
-    this.onCallExprAdded$_.next(expr);
     return expr;
   }
 }

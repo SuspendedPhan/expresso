@@ -46,7 +46,7 @@
       });
 
       combineLatest([interval(1000), expr$]).subscribe(([_, expr]) => {
-        result = ctx!.goModule.evalExpr(expr.id);
+        // result = ctx!.goModule.evalExpr(expr.id);
       });
     }
   }

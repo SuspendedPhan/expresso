@@ -1,12 +1,21 @@
-import { BehaviorSubject, first, Observable, of, Subject, switchAll } from "rxjs";
 import {
+  BehaviorSubject,
+  first,
+  Observable,
+  of,
+  ReplaySubject,
+  Subject,
+  switchAll,
+} from "rxjs";
+import {
+  Attribute,
   ExObject,
   ExObjectType,
   Expr,
-  ExprType,
+  ExprType
 } from "./ExObjectFactory";
-import { loggedMethod } from "./logger/LoggerDecorator";
 import Logger from "./logger/Logger";
+import { loggedMethod } from "./logger/LoggerDecorator";
 
 type ExObjectMut = BasicExObjectMut | ExprMut;
 
@@ -27,6 +36,12 @@ interface ExprMut extends ExObjectMutBase {
 
 export default class ExObjectManager {
   private readonly objectMutByObject = new Map<ExObject, ExObjectMut>();
+  private readonly onExprAdded$_ = new ReplaySubject<Expr>();
+  private readonly onAttributeAdded$_ = new ReplaySubject<Attribute>();
+
+  public readonly onExprAdded$: Observable<Expr> = this.onExprAdded$_;
+  public readonly onAttributeAdded$: Observable<Attribute> =
+    this.onAttributeAdded$_;
 
   public getObject$(object: ExObject): Observable<ExObject> {
     const mut = this.objectMutByObject.get(object);
@@ -63,6 +78,7 @@ export default class ExObjectManager {
       object.expr$.pipe(first()).subscribe((expr) => {
         this.setParent(expr, object);
       });
+      this.onAttributeAdded$_.next(object);
     }
     return object$;
   }
@@ -77,6 +93,7 @@ export default class ExObjectManager {
     };
 
     this.objectMutByObject.set(expr, mut);
+    this.onExprAdded$_.next(expr);
     return object$;
   }
 
@@ -128,9 +145,19 @@ export default class ExObjectManager {
     return mut.parent$$.pipe(switchAll());
   }
 
+  @loggedMethod
   public getDestroy$(exObject: ExObject): Observable<ExObject> {
     const mut = this.objectMutByObject.get(exObject);
     if (!mut) {
+      console.log(JSON.stringify(this.objectMutByObject));
+      const key = Array.from(this.objectMutByObject.keys()).find(
+        (key) => key.id === exObject.id
+      );
+      console.log(key?.id);
+      console.log(exObject.id);
+
+      console.log(key === exObject);
+
       throw new Error(`destroy$ not found for ${exObject?.id}`);
     }
 

@@ -9,10 +9,6 @@ export default class PixiFactory {
       canvas: canvasElement,
       antialias: true,
     });
-
-    const circle = this.makeCircle();
-    circle.scale.x = 100;
-    circle.scale.y = 100;
   }
 
   public makeCircle() {
