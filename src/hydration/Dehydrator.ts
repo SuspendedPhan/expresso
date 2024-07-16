@@ -32,35 +32,31 @@ export default class Dehydrator {
     attribute: Attribute
   ): Observable<DehydratedAttribute> {
     const logger = Logger.logger();
-    return this.dehydrateExpr$(attribute.expr$).pipe(
+
+    return attribute.expr$.pipe(
+      switchMap((expr) => {
+        return this.dehydrateExpr$(expr);
+      }),
       map((dehydratedExpr) => {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
         return {
           id: attribute.id,
           expr: dehydratedExpr,
         };
-      })
+      }),
     );
   }
 
   @loggedMethod
-  private dehydrateExpr$(expr$: Observable<Expr>): Observable<DehydratedExpr> {
-    const logger = Logger.logger();
-    return expr$.pipe(
-      switchMap((expr) => {
-        logger.log("switchMap", expr.objectType);
-
-        switch (expr.exprType) {
-          case ExprType.NumberExpr:
-            logger.log("switchMap.NumberExpr", expr.value);
-            return this.dehydrateNumberExpr$(expr);
-          case ExprType.CallExpr:
-            return this.dehydrateCallExpr$(expr);
-          default:
-            assertUnreachable(expr);
-        }
-      })
-    );
+  private dehydrateExpr$(expr: Expr): Observable<DehydratedExpr> {
+    switch (expr.exprType) {
+      case ExprType.NumberExpr:
+        return this.dehydrateNumberExpr$(expr);
+      case ExprType.CallExpr:
+        return this.dehydrateCallExpr$(expr);
+      default:
+        assertUnreachable(expr);
+    }
   }
 
   private dehydrateNumberExpr$(
@@ -74,20 +70,26 @@ export default class Dehydrator {
   }
 
   private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedCallExpr> {
-    const deArgs = expr.args$.map((arg$) => {
-      return this.dehydrateExpr$(arg$);
-    });
+    const deArgs$ = expr.args$.pipe(
+      switchMap((args) => {
+        return this.dehydrateArgs$(args);
+      }),
+    );
 
-    const result: Observable<DehydratedCallExpr> = combineLatest(deArgs).pipe(
-      map((dehydratedArgs) => {
+    const result: Observable<DehydratedCallExpr> = deArgs$.pipe(
+      map((deArgs) => {
         return {
           type: "CallExpr",
           id: expr.id,
-          args: dehydratedArgs,
+          args: deArgs,
         };
-      })
+      }),
     );
 
     return result;
+  }
+
+  private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {
+    return combineLatest(args.map((arg) => this.dehydrateExpr$(arg)));
   }
 }

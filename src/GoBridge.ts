@@ -1,15 +1,14 @@
 import {
-  combineLatest,
+  first,
   Observable,
   ReplaySubject,
   Subject
 } from "rxjs";
 import { Expr, ExprType } from "./ExObject";
+import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
 import type GoModule from "./utils/GoModule";
 import { assertUnreachable } from "./utils/Utils";
-import { loggedMethod } from "./logger/LoggerDecorator";
-import Logger from "./logger/Logger";
 
 export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
@@ -20,9 +19,7 @@ export default class GoBridge {
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
-    const logger = Logger.logger();
-
-    ctx.objectManager.onExprAdded$.subscribe((expr) => {
+    ctx.objectFactory.onExprAdded$.subscribe((expr) => {
       switch (expr.exprType) {
         case ExprType.NumberExpr:
           goModule.addNumberExpr(expr.id);
@@ -30,19 +27,18 @@ export default class GoBridge {
           break;
         case ExprType.CallExpr:
           goModule.addCallExpr(expr.id);
-          const callExpr = expr;
-          const arg0$ = callExpr.args$[0];
-          const arg1$ = callExpr.args$[1];
-          if (arg0$ === undefined || arg1$ === undefined) {
-            throw new Error("CallExpr must have 2 args");
-          }
 
-          combineLatest([arg0$, arg1$]).subscribe(([arg0, arg1]) => {
-            logger.log("evaluating call expr", expr.id, arg0.id, arg1.id);
+          expr.args$.pipe(first()).subscribe((args) => {
+            const arg0 = args[0];
+            const arg1 = args[1];
+
+            if (arg0 === undefined || arg1 === undefined) {
+              throw new Error("CallExpr must have 2 args");
+            }
+
             goModule.setCallExprArg0(expr.id, arg0.id);
             goModule.setCallExprArg1(expr.id, arg1.id);
           });
-
           break;
         default:
           assertUnreachable(expr);

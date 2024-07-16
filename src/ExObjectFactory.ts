@@ -1,4 +1,4 @@
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import {
   Attribute,
   CallExpr,
@@ -11,10 +11,14 @@ import {
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import { AttributeMut, CallExprMut, ExObjectMut } from "./MainMutator";
+import { OBS } from "./utils/Utils";
 
 let nextId = 0;
 
 export default class ExObjectFactory {
+  private readonly onExprAdded$_ = new Subject<Expr>();
+  public readonly onExprAdded$: OBS<Expr> = this.onExprAdded$_;
+
   public constructor() {}
 
   @loggedMethod
@@ -33,7 +37,6 @@ export default class ExObjectFactory {
     }
 
     const exprMut$ = new BehaviorSubject<Expr>(expr);
-
     const parentMut$ = new BehaviorSubject<Parent>(null);
 
     const attribute: AttributeMut = {

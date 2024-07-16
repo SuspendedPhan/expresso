@@ -2,14 +2,12 @@ import type GoModule from "./utils/GoModule";
 import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./MainMutator";
-import ExObjectManager from "./ExObjectManager";
 import ExObjectFactory from "./ExObjectFactory";
 
 export default class MainContext {
   public readonly mutator: MainMutator;
-  public readonly objectManager = new ExObjectManager();
-  public readonly objectFactory = new ExObjectFactory(this.objectManager);
-  public readonly selection = new Selection(this.objectManager);
+  public readonly objectFactory = new ExObjectFactory();
+  public readonly selection = new Selection();
   public readonly goBridge: GoBridge;
 
   public constructor(public readonly goModule: GoModule) {
