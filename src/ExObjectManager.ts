@@ -13,7 +13,7 @@ import {
   ExObjectType,
   Expr,
   ExprType
-} from "./ExObjectFactory";
+} from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 

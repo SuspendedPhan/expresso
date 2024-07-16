@@ -4,7 +4,7 @@ import {
   ReplaySubject,
   Subject
 } from "rxjs";
-import { Expr, ExprType } from "./ExObjectFactory";
+import { Expr, ExprType } from "./ExObject";
 import MainContext from "./MainContext";
 import type GoModule from "./utils/GoModule";
 import { assertUnreachable } from "./utils/Utils";

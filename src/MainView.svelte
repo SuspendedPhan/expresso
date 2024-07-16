@@ -9,7 +9,7 @@
   import AttributeView from "./AttributeView.svelte";
   import MainContext from "./MainContext";
   import Main from "./utils/Main";
-  import type { Attribute } from "./ExObjectFactory";
+  import type { Attribute } from "./ExObject";
   import HydrationTest from "./utils/HydrationTest";
   import { loggedMethod } from "./logger/LoggerDecorator";
   import Logger from "./logger/Logger";

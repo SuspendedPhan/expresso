@@ -3,7 +3,7 @@ OBS<Attribute> -> OBS<SceneObject>
 */
 
 import { interval, map, switchMap, withLatestFrom } from "rxjs";
-import { Attribute } from "../ExObjectFactory";
+import { Attribute } from "../ExObject";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { OBS } from "../utils/Utils";

@@ -1,5 +1,5 @@
 import { Observable, Subject } from "rxjs";
-import { Attribute, Expr } from "./ExObjectFactory";
+import { Attribute, Expr } from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";

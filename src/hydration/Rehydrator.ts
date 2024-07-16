@@ -1,4 +1,5 @@
-import ExprFactory, { Attribute, CallExpr, Expr, NumberExpr } from "../ExObjectFactory";
+import { Attribute, CallExpr, Expr, NumberExpr } from "../ExObject";
+import ExObjectFactory from "../ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import {
   DehydratedAttribute,
@@ -10,7 +11,7 @@ import {
 let nextId = 0;
 
 export default class Rehydrator {
-  public constructor(private readonly exprFactory: ExprFactory) {}
+  public constructor(private readonly exprFactory: ExObjectFactory) {}
 
   @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {

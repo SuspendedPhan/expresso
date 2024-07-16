@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Observable, switchMap } from "rxjs";
-  import type { Attribute } from "./ExObjectFactory";
+  import type { Attribute } from "./ExObject";
   import ExprView from "./ExprView.svelte";
   import { loggedMethod } from "./logger/LoggerDecorator";
   import MainContext from "./MainContext";

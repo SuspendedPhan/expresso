@@ -1,47 +1,11 @@
-import { Observable } from "rxjs";
+import { Attribute, CallExpr, ExObjectType, Expr, ExprType, NumberExpr } from "./ExObject";
 import ExObjectManager from "./ExObjectManager";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 
 let nextId = 0;
 
-export enum ExObjectType {
-  Expr,
-  Attribute,
-}
-export enum ExprType {
-  NumberExpr,
-  CallExpr,
-}
-
-interface ExObjectBase {
-  readonly objectType: ExObjectType;
-  readonly id: string;
-}
-
-export interface Attribute extends ExObjectBase {
-  readonly objectType: ExObjectType.Attribute;
-  readonly expr$: Observable<Expr>;
-}
-
-export type Expr = NumberExpr | CallExpr;
-export type Parent = Attribute | CallExpr | null;
-
-export interface NumberExpr extends ExObjectBase {
-  readonly objectType: ExObjectType.Expr;
-  readonly exprType: ExprType.NumberExpr;
-  readonly value: number;
-}
-
-export interface CallExpr extends ExObjectBase {
-  readonly objectType: ExObjectType.Expr;
-  readonly exprType: ExprType.CallExpr;
-  readonly args: readonly Observable<Expr>[];
-}
-
-export type ExObject = Attribute | Expr;
-
-export default class ExprFactory {
+export default class ExObjectFactory {
   public constructor(private readonly exprManager: ExObjectManager) {}
 
   @loggedMethod
