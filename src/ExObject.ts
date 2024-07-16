@@ -1,17 +1,25 @@
 import { Observable } from "rxjs";
 
 export enum ExObjectType {
-  Expr,
+  SceneAttribute,
+
+  Component,
   Attribute,
+  Expr,
 }
+
 export enum ExprType {
   NumberExpr,
   CallExpr,
 }
 
-interface ExObjectBase {
+export interface ExObjectBase {
   readonly objectType: ExObjectType;
   readonly id: string;
+}
+
+export interface Component extends ExObjectBase {
+  readonly objectType: ExObjectType.Component;
 }
 
 export interface Attribute extends ExObjectBase {

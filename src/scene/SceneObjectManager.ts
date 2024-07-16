@@ -3,14 +3,19 @@ OBS<Attribute> -> OBS<SceneObject>
 */
 
 import { interval, map, switchMap, withLatestFrom } from "rxjs";
-import { Attribute } from "../ExObject";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
+import { SceneAttribute } from "../SceneAttribute";
 import { OBS } from "../utils/Utils";
 import { SceneContext } from "./SceneContext";
 
+interface SceneObjectAttribute {
+  value$: OBS<number>;
+  sceneAttribute: SceneAttribute;
+}
+
 export interface SceneObject {
-  x$: OBS<number>;
+  x: SceneObjectAttribute;
   destroy$: OBS<void>;
 }
 
@@ -25,18 +30,22 @@ export class SceneObjectManager {
   }
 
   @loggedMethod
-  private attrToSceneCircle(attr: Attribute): SceneObject {
+  private attrToSceneCircle(sceneAttr: SceneAttribute): SceneObject {
     const logger = Logger.logger();
     return {
-      x$: this.tick$.pipe(
-        withLatestFrom(attr.expr$),
-        switchMap(([_, expr]) => {
-          logger.log("switchMap", expr.id);
-          const result$ = this.ctx.mainCtx.goBridge.evalExpr$(expr);
-          return result$;
-        })
-      ),
-      destroy$: this.ctx.mainCtx.objectManager.getDestroy$(attr).pipe(map(() => {})),
+      x: {
+        value$: this.tick$.pipe(
+          withLatestFrom(sceneAttr.attribute.expr$),
+          switchMap(([_, expr]) => {
+            logger.log("switchMap", expr.id);
+            const result$ = this.ctx.mainCtx.goBridge.evalExpr$(expr);
+            return result$;
+          })
+        ),
+        sceneAttribute: sceneAttr,
+      },
+      
+      destroy$: this.ctx.mainCtx.objectManager.getDestroy$(sceneAttr.attribute).pipe(map(() => {})),
     };
   }
 
@@ -45,9 +54,9 @@ export class SceneObjectManager {
     const logger = Logger.logger();
     Logger.logCallstack();
     const pixiObject = this.ctx.pool.takeCircle();
-    sceneObject.x$.subscribe((x) => {
+    sceneObject.x.value$.subscribe((x) => {
       pixiObject.visible = true;
-      pixiObject.x = x;
+      sceneObject.x.sceneAttribute.metadata.pixiSetter(pixiObject, x);
       pixiObject.scale.x = 50;
       pixiObject.scale.y = 50;
     });
