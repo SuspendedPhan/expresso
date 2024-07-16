@@ -1,8 +1,31 @@
-import { Observable, Subject } from "rxjs";
-import { Attribute, Expr } from "./ExObject";
+import { BehaviorSubject, first, Observable, Subject } from "rxjs";
+import {
+  Attribute,
+  CallExpr,
+  ExObject,
+  ExObjectType,
+  Expr,
+  ExprType,
+  Parent,
+} from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
+import { assertUnreachable } from "./utils/Utils";
+
+export type ExObjectMut = ExObject & {
+  parentMut$: BehaviorSubject<Parent>;
+};
+
+export type AttributeMut = Attribute &
+  ExObjectMut & {
+    exprMut$: BehaviorSubject<Expr>;
+  };
+
+export type CallExprMut = CallExpr &
+  ExObjectMut & {
+    argsMut$: BehaviorSubject<Expr[]>;
+  };
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -32,8 +55,43 @@ export default class MainMutator {
   private replaceWithExpr(oldExpr: Expr, newExpr: Expr) {
     Logger.arg("oldExpr", oldExpr.id);
 
-    this.ctx.objectManager.replace(oldExpr, newExpr);
-    this.onExprReplaced$_.next({ oldExpr, newExpr });
+    oldExpr.parent$.pipe(first()).subscribe((parent) => {
+      if (parent === null) {
+        throw new Error("oldExpr.parent$ is null");
+      }
+
+      switch (parent.objectType) {
+        case ExObjectType.Attribute: {
+          const attrMut = parent as AttributeMut;
+          attrMut.exprMut$.next(newExpr);
+          break;
+        }
+        case ExObjectType.Expr: {
+          switch (parent.exprType) {
+            case ExprType.CallExpr: {
+              const callExprMut = parent as CallExprMut;
+              const args = callExprMut.argsMut$.value;
+              const newArgs = args.map((arg) =>
+                arg === oldExpr ? newExpr : arg
+              );
+              callExprMut.argsMut$.next(newArgs);
+              break;
+            }
+            default:
+              assertUnreachable(parent.exprType);
+          }
+          const callExprMut = parent as CallExprMut;
+          const args = callExprMut.argsMut$.value;
+          const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
+          callExprMut.argsMut$.next(newArgs);
+          break;
+        }
+        default:
+          assertUnreachable
+      }
+
+      this.onExprReplaced$_.next({ oldExpr, newExpr });
+    });
   }
 
   @loggedMethod

@@ -4,28 +4,28 @@ import {
   Observable,
   of,
   Subject,
-  switchAll
+  switchMap
 } from "rxjs";
 import { ExObject, ExObjectType, Expr, ExprType } from "../ExObject";
-import ExObjectManager from "../ExObjectManager";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { assertUnreachable } from "./Utils";
 
+enum SelectedObjectType {
+  Root,
+}
+
 export type Selectable = ExObject | null;
+type SelectedObject = Selectable | SelectedObjectType;
 
 export default class Selection {
-  private readonly selectedObject$$ = new BehaviorSubject<
-    Observable<Selectable>
-  >(of(null));
-  private readonly root$$ = new BehaviorSubject<Observable<Selectable>>(
-    of(null)
-  );
-  public readonly root$ = this.root$$.pipe(switchAll());
+  private readonly selectedObject$ = new BehaviorSubject<SelectedObject>(null);
+  private readonly root$ = new BehaviorSubject<Selectable>(null);
+
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
 
-  public constructor(private exprManager: ExObjectManager) {
+  public constructor() {
     this.down$.subscribe(() => {
       this.getSelectedObject$()
         .pipe(first())
@@ -51,28 +51,26 @@ export default class Selection {
   }
 
   public getSelectedObject$(): Observable<Selectable> {
-    return this.selectedObject$$.pipe(switchAll());
-  }
-
-  public setRoot$(selectable$: Observable<Selectable>) {
-    this.root$$.next(selectable$);
+    return this.selectedObject$.pipe(
+      switchMap((selectedObject) => {
+        if (selectedObject === SelectedObjectType.Root) {
+          return this.root$;
+        }
+        return of(selectedObject);
+      })
+    );
   }
 
   public select(object: Selectable) {
-    if (object === null) {
-      this.selectedObject$$.next(of(null));
-      return;
-    }
-    const object$ = this.exprManager.getObject$(object);
-    this.selectedObject$$.next(object$);
+    this.selectedObject$.next(object);
   }
 
   @loggedMethod
-  public down(selectedObject: Selectable) {
+  private down(selectedObject: Selectable) {
     const logger = Logger.logger();
     if (selectedObject === null) {
       logger.log("", "selectedObject is null");
-      this.selectedObject$$.next(this.root$);
+      this.selectedObject$.next(SelectedObjectType.Root);
       return;
     }
 
@@ -81,8 +79,7 @@ export default class Selection {
     switch (selectedObject.objectType) {
       case ExObjectType.Attribute:
         selectedObject.expr$.pipe(first()).subscribe((expr) => {
-          const expr$ = this.exprManager.getObject$(expr);
-          this.selectedObject$$.next(expr$);
+          this.selectedObject$.next(expr);
         });
         return;
       case ExObjectType.Expr:
@@ -99,11 +96,14 @@ export default class Selection {
       case ExprType.NumberExpr:
         return;
       case ExprType.CallExpr:
-        if (selectedObject.args$[0] === undefined) {
-          throw new Error("CallExpr must have at least 1 args");
-        }
-        const arg$ = selectedObject.args$[0];
-        this.selectedObject$$.next(arg$);
+        const args$ = selectedObject.args$;
+        args$.pipe(first()).subscribe((args) => {
+          const arg = args[0];
+          if (arg === undefined) {
+            throw new Error("CallExpr must have at least 1 args");
+          }
+          this.selectedObject$.next(arg);
+        });
         return;
       default:
         assertUnreachable(selectedObject);
@@ -129,11 +129,9 @@ export default class Selection {
 
   @loggedMethod
   private upExpr(selectedObject: Expr) {
-    const logger = Logger.logger();
-    const parent$ = this.exprManager.getParent$(selectedObject);
+    const parent$ = selectedObject.parent$;
     parent$.pipe(first()).subscribe((parent) => {
-      logger.log("parent", parent.id);
+      this.selectedObject$.next(parent);
     });
-    this.selectedObject$$.next(parent$);
   }
 }

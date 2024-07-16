@@ -1,21 +1,21 @@
 import { BehaviorSubject } from "rxjs";
-import { Attribute, CallExpr, ExObject, ExObjectType, Expr, ExprType, NumberExpr, Parent } from "./ExObject";
-import ExObjectManager from "./ExObjectManager";
+import {
+  Attribute,
+  CallExpr,
+  ExObjectType,
+  Expr,
+  ExprType,
+  NumberExpr,
+  Parent,
+} from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
+import { AttributeMut, CallExprMut, ExObjectMut } from "./MainMutator";
 
 let nextId = 0;
 
-type ExObjectMut = ExObject & {
-  parentMut$: BehaviorSubject<Parent>;
-}
-
-type CallExprMut = CallExpr & ExObjectMut & {
-  argsMut$: BehaviorSubject<Expr[]>;
-}
-
 export default class ExObjectFactory {
-  public constructor(private readonly exprManager: ExObjectManager) {}
+  public constructor() {}
 
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
@@ -32,14 +32,15 @@ export default class ExObjectFactory {
       expr = this.createNumberExpr();
     }
 
-    const expr$ = this.exprManager.createObject$(expr);
+    const exprMut$ = new BehaviorSubject<Expr>(expr);
 
     const parentMut$ = new BehaviorSubject<Parent>(null);
 
-    const attribute: Attribute & ExObjectMut = {
+    const attribute: AttributeMut = {
       objectType: ExObjectType.Attribute,
       id,
-      expr$,
+      expr$: exprMut$,
+      exprMut$,
       parent$: parentMut$,
       parentMut$,
     };

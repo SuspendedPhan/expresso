@@ -1,36 +1,28 @@
 <script lang="ts">
-  import { type Selectable } from "./Selection";
+  import { map } from "rxjs";
   import MainContext from "../MainContext";
-  import { combineLatest, map, Observable } from "rxjs";
+  import { type Selectable } from "./Selection";
 
-  export let object$: Observable<Selectable>;
+  export let object: Selectable;
   export let ctx: MainContext;
 
-  let selected = false;
+  const selected$ = ctx.selection
+    .getSelectedObject$()
+    .pipe(map((selectedObject) => selectedObject === object));
 
-  combineLatest([object$, ctx.selection.getSelectedObject$()]).subscribe(
-    ([object, selectedObject]) => {
-      selected = selectedObject === object;
-    }
-  );
-
-  const handleClick$ = object$.pipe(
-    map((object) => {
-      return (event: MouseEvent) => {
-        event.stopPropagation();
-        ctx.selection.select(object);
-      };
-    })
-  );
+  function handleClick(event: MouseEvent) {
+    event.stopPropagation();
+    ctx.selection.select(object);
+  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
-  on:mousedown={$handleClick$}
+  on:mousedown={handleClick}
   class="border border-black"
-  class:border-solid={selected}
-  class:border-transparent={!selected}
+  class:border-solid={$selected$}
+  class:border-transparent={!$selected$}
 >
   <slot />
 </div>
