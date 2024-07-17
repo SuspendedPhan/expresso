@@ -1,4 +1,5 @@
 import { Observable } from "rxjs";
+import { ProtoComponent } from "./ProtoComponent";
 
 export enum ExObjectType {
   SceneAttribute,
@@ -23,6 +24,7 @@ export interface ExObjectBase {
 
 export interface Component extends ExObjectBase {
   readonly objectType: ExObjectType.Component;
+  readonly proto: ProtoComponent;
 }
 
 export interface Attribute extends ExObjectBase {

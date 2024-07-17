@@ -2,6 +2,7 @@ import { BehaviorSubject, Subject } from "rxjs";
 import {
   Attribute,
   CallExpr,
+  Component,
   ExObjectBase,
   ExObjectType,
   Expr,
@@ -19,11 +20,28 @@ import {
 } from "./MainMutator";
 import MainContext from "./MainContext";
 import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import { ProtoComponent } from "./ProtoComponent";
 
 let nextId = 0;
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
+
+  createComponent(proto: ProtoComponent): Component {
+    const id = `component-${nextId++}`;
+    const mutBase = this.createExObjectMutBase();
+    const base = this.createExObjectBase(mutBase, id);
+
+    const component: Component = {
+      objectType: ExObjectType.Component,
+      proto,
+      ...base,
+      ...mutBase,
+    };
+
+    (this.ctx.onComponentAdded$ as Subject<Component>).next(component);
+    return component;
+  }
 
   createSceneAttribute(x: ProtoSceneAttribute): SceneAttribute {
     const attribute = this.createAttribute(x.id);
