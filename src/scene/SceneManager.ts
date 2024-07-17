@@ -31,9 +31,9 @@ export class SceneManager {
   }
 
   private componentToSceneObject(component: Component): SceneObject {
-    for (const [protoAttribute, sceneAttribute] of component.sceneAttributeByProto) {
-      sceneAttribute.attribute.expr$
-    }
+    // for (const [protoAttribute, sceneAttribute] of component.sceneAttributeByProto) {
+    //   sceneAttribute.attribute.expr$
+    // }
   }
 
   @loggedMethod
