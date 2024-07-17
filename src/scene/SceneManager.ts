@@ -14,13 +14,16 @@ interface SceneObject {
   sceneAttribute: SceneAttribute;
 }
 
-// todp: rename to SceneManager
 export class SceneManager {
   private readonly tick$ = interval(1000);
 
   public constructor(private readonly ctx: SceneContext) {
-    // todp
-    ctx.mainCtx.onSceneAttributeAdded$.subscribe((attr) => {
+    this.setup();
+  }
+
+  @loggedMethod
+  private setup() {
+    this.ctx.mainCtx.onSceneAttributeAdded$.subscribe((attr) => {
       const sceneObject = this.attrToSceneCircle(attr);
       this.sceneObjectToPixi(sceneObject);
     });
@@ -30,6 +33,7 @@ export class SceneManager {
   // @ts-ignore
   private attrToSceneCircle(sceneAttr: SceneAttribute): SceneObject {
     const logger = Logger.logger();
+    Logger.logCallstack();
     return {
       value$: this.tick$.pipe(
         withLatestFrom(sceneAttr.attribute.expr$),
@@ -53,6 +57,7 @@ export class SceneManager {
     const sceneAttribute = sceneObject.sceneAttribute;
 
     sceneObject.value$.subscribe((value) => {
+      logger.log("subscribe", value);
       pixiObject.visible = true;
       sceneAttribute.proto.pixiSetter(pixiObject, value);
       pixiObject.scale.x = 50;

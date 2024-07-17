@@ -5,6 +5,8 @@ import {
 } from "./LoggerDecorator";
 
 export default class Logger {
+  private static readonly loggedThisValues = new Set<any>();
+
   public static arg(name: string, value: any) {
     const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
@@ -16,6 +18,7 @@ export default class Logger {
 
     currentFunctionCall.args.push({ message: `${name}: ${value}` });
   }
+
   public static logCallstack() {
     const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
@@ -32,6 +35,24 @@ export default class Logger {
       ancestor.astCall.currentlyLogging = true;
       this.startLoggingFunctionCalls(ancestor.astCall);
     }
+  }
+
+  public static logThis() {
+    const currentFunctionCall = LoggerDecorator.currentCall$.value;
+    if (!currentFunctionCall) {
+      throw new Error("No current function call");
+    }
+
+    if (this.loggedThisValues.has(currentFunctionCall.thisValue)) {
+      return;
+    }
+
+    this.loggedThisValues.add(currentFunctionCall.thisValue);
+    this.logCallstack();
+    LoggerDecorator.currentCall$.subscribe((functionCall) => {
+      if (!functionCall) return;
+      this.logCallstack();
+    });
   }
 
   /**

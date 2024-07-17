@@ -10,6 +10,7 @@ export interface RuntimeFunctionCall {
   readonly args: Message[];
   readonly argsLogged$: BehaviorSubject<boolean>;
   readonly children$: ReplaySubject<RuntimeFunctionCall>;
+  readonly thisValue: any;
 }
 
 export interface AstFunctionCall {
@@ -35,6 +36,10 @@ export class LoggerDecorator {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
+      console.log("loggedMethod", target);
+      console.log("loggedMethod", propertyKey);
+      console.log("loggedMethod", descriptor);
+
       const currentFunctionCall = LoggerDecorator.currentCall$.value;
       if (currentFunctionCall) {
         if (!currentFunctionCall.argsLogged$.value) {
@@ -94,6 +99,7 @@ export class LoggerDecorator {
       args: [],
       children$: new ReplaySubject<RuntimeFunctionCall>(),
       argsLogged$: new BehaviorSubject(false),
+      thisValue: thisValue,
     };
 
     metadata.runtimeCall$.next(functionCall);
