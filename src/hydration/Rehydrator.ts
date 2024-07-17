@@ -20,7 +20,7 @@ export default class Rehydrator {
   @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
-    return this.ctx.mutator.createAttribute(deAttribute.id + "rehydrated" + nextId++, expr);
+    return this.ctx.objectFactory.createAttribute(deAttribute.id + "rehydrated" + nextId++, expr);
   }
 
   @loggedMethod

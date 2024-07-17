@@ -1,7 +1,7 @@
 import MainContext from "../MainContext";
 import PixiFactory from "./PixiFactory";
 import { SceneContext } from "./SceneContext";
-import { SceneManager } from "./SceneObjectManager";
+import { SceneManager } from "./SceneManager";
 
 export class SceneMain {
     constructor(ctx: MainContext, pixiFactory: PixiFactory) {

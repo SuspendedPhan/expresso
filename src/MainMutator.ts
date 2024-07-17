@@ -1,4 +1,4 @@
-import { BehaviorSubject, first, Observable, Subject } from "rxjs";
+import { BehaviorSubject, first, Subject } from "rxjs";
 import {
   Attribute,
   CallExpr,
@@ -11,8 +11,8 @@ import {
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext, { ExprReplacement } from "./MainContext";
-import { assertUnreachable } from "./utils/Utils";
 import { ProtoSceneAttributeStore, SceneAttribute } from "./SceneAttribute";
+import { assertUnreachable } from "./utils/Utils";
 
 export type ExObjectMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
