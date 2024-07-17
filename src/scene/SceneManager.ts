@@ -8,6 +8,7 @@ import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
 import { OBS } from "../utils/Utils";
 import { SceneContext } from "./SceneContext";
+import { Component } from "../ExObject";
 
 interface SceneObject {
   value$: OBS<number>;
@@ -23,12 +24,16 @@ export class SceneManager {
 
   @loggedMethod
   private setup() {
-    const logger = Logger.logger();
-    this.ctx.mainCtx.onSceneAttributeAdded$.subscribe((attr) => {
-      logger.log("onSceneAttributeAdded$", attr.attribute.id);
-      const sceneObject = this.attrToSceneCircle(attr);
+    this.ctx.mainCtx.onComponentAdded$.subscribe((component) => {
+      const sceneObject = this.componentToSceneObject(component);
       this.sceneObjectToPixi(sceneObject);
     });
+  }
+
+  private componentToSceneObject(component: Component): SceneObject {
+    for (const [protoAttribute, sceneAttribute] of component.sceneAttributeByProto) {
+      sceneAttribute.attribute.expr$
+    }
   }
 
   @loggedMethod
