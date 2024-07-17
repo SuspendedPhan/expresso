@@ -48,8 +48,13 @@
     <div>Loading...</div>
   {:else}
     <div>Loaded</div>
-    <AttributeView {ctx} {attribute} />
-    <AttributeView {ctx} attribute={rehydratedAttribute} />
+    {#key attribute.id}
+      <AttributeView {ctx} {attribute} />
+    {/key}
+
+    {#key rehydratedAttribute.id}
+      <AttributeView {ctx} attribute={rehydratedAttribute} />
+    {/key}
     <SceneView {ctx} />
   {/if}
 </main>

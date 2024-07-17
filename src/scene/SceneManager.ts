@@ -23,7 +23,6 @@ export class SceneManager {
 
   @loggedMethod
   private setup() {
-    Logger.logThis();
     const logger = Logger.logger();
     this.ctx.mainCtx.onSceneAttributeAdded$.subscribe((attr) => {
       logger.log("onSceneAttributeAdded$", attr.attribute.id);
@@ -36,7 +35,6 @@ export class SceneManager {
   // @ts-ignore
   private attrToSceneCircle(sceneAttr: SceneAttribute): SceneObject {
     const logger = Logger.logger();
-    Logger.logCallstack();
     return {
       value$: this.tick$.pipe(
         withLatestFrom(sceneAttr.attribute.expr$),
@@ -54,7 +52,6 @@ export class SceneManager {
   // @ts-ignore
   private sceneObjectToPixi(sceneObject: SceneObject) {
     const logger = Logger.logger();
-    Logger.logCallstack();
     const pixiObject = this.ctx.pool.takeCircle();
 
     const sceneAttribute = sceneObject.sceneAttribute;

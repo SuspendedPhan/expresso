@@ -6,16 +6,16 @@ import {
 export default class Logger {
   private static readonly loggedThisValues = new Set<any>();
 
-  static () {
+  static {
     LoggerDecorator.currentCall$.subscribe((functionCall) => {
       if (!functionCall) return;
 
-      if (Logger.loggedThisValues.has(functionCall.thisValue)) {
+      if (this.loggedThisValues.has(functionCall.thisValue)) {
         functionCall.astCall.currentlyLogging = true;
       }
 
       if (functionCall.astCall.currentlyLogging) {
-        Logger.logFunctionCall(functionCall);
+        this.logFunctionCall(functionCall);
       }
     });
   }
