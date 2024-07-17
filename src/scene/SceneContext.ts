@@ -1,7 +1,10 @@
+import { Graphics } from "pixi.js";
 import { Evaluator } from "../evaluation/Evaluator";
 import MainContext from "../MainContext";
 import PixiFactory from "./PixiFactory";
 import ScenePool from "./ScenePool";
+
+export type SceneObject = Graphics;
 
 export class SceneContext {
   public readonly pool = new ScenePool(() => this.pixiFactory.makeCircle());

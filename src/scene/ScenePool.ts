@@ -3,6 +3,7 @@
 import * as PIXI from "pixi.js";
 
 import deePool from "deepool";
+import { SceneObject } from "./SceneContext";
 
 export default class ScenePool {
   private circlePool;
@@ -13,13 +14,13 @@ export default class ScenePool {
     this.circlePool.grow(20);
   }
 
-  public takeCircle() {
+  public takeObject(): SceneObject {
     const circle = this.circlePool.use();
     this.usedCircles.push(circle);
     return circle;
   }
 
-  public releaseCircle(circle) {
+  public releaseObject(circle: SceneObject): void {
     this.circlePool.recycle(circle);
   }
 }

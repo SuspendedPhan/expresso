@@ -3,7 +3,7 @@ import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./MainMutator";
 import ExObjectFactory from "./ExObjectFactory";
-import { first, ReplaySubject, Subject } from "rxjs";
+import { defer, first, ReplaySubject, Subject } from "rxjs";
 import { Attribute, Component, Expr } from "./ExObject";
 import { OBS } from "./utils/Utils";
 import { SceneAttribute } from "./SceneAttribute";
@@ -15,7 +15,9 @@ export interface ExprReplacement {
 
 export default class MainContext {
   private readonly onComponentAdded$_ = new Subject<Component>();
-  private readonly onSceneAttributeAdded$_ = new ReplaySubject<SceneAttribute>(10);
+  private readonly onSceneAttributeAdded$_ = new ReplaySubject<SceneAttribute>(
+    10
+  );
   private readonly onAttributeAdded$_ = new Subject<Attribute>();
   private readonly onExprAdded$_ = new Subject<Expr>();
   private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
@@ -26,6 +28,10 @@ export default class MainContext {
   public readonly onAttributeAdded$: OBS<Attribute> = this.onAttributeAdded$_;
   public readonly onExprAdded$: OBS<Expr> = this.onExprAdded$_;
   public readonly onExprReplaced$: OBS<ExprReplacement> = this.onExprReplaced$_;
+
+  public readonly rootComponents$: OBS<readonly Component[]> = defer(() => {
+    throw new Error("Not implemented");
+  });
 
   public readonly mutator: MainMutator;
   public readonly objectFactory = new ExObjectFactory(this);

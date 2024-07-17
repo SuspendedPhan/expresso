@@ -1,24 +1,23 @@
-import { Graphics } from "pixi.js";
 import { Attribute } from "./ExObject";
+import { SceneObject } from "./scene/SceneContext";
 
-type PixiSetter = (pixiObject: Graphics, value: number) => void;
+type SceneAttributeSetter = (sceneObject: SceneObject, value: number) => void;
 
 export interface ProtoSceneAttribute {
     readonly id: string;
     readonly name: string;
-    readonly pixiSetter: PixiSetter;
+    readonly sceneAttributeSetter: SceneAttributeSetter;
 }
 
-export interface SceneAttribute {
+export interface SceneAttribute extends Attribute {
     readonly proto: ProtoSceneAttribute;
-    readonly attribute: Attribute;
 }
 
 export const ProtoSceneAttributeStore = {
     x: {
         name: "x",
         id: "protoX",
-        pixiSetter: (pixiObject, value) => {
+        sceneAttributeSetter: (pixiObject, value) => {
             pixiObject.x = value;
         },
     } as ProtoSceneAttribute,

@@ -1,4 +1,4 @@
-import { AttributeCloneInstancePath } from "../CloneInstance";
+import { SceneInstancePath } from "../CloneInstance";
 
 export default interface GoModule {
   addNumberExpr(id: string): void;
@@ -11,18 +11,8 @@ export default interface GoModule {
   eval(): EvaluationMut;
 }
 
-export interface AttributeCloneInstanceEvaluation extends AttributeCloneInstance {
-  readonly result: number;
-}
-
-export interface Result {
-  readonly path: readonly ComponentCloneInstance[];
-  readonly value: number;
-}
-
 export interface Evaluation {
-  getResult(exprId: string): number;
-  getResult(attributeId: string, path: AttributeCloneInstancePath): number;
+  getResult(attributeId: string, path: SceneInstancePath): number;
 }
 
 export interface EvaluationMut extends Evaluation {

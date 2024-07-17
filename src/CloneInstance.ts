@@ -1,11 +1,11 @@
-export type AttributeCloneInstancePath = readonly ComponentCloneInstance[];
+export type SceneInstancePath = readonly ComponentSceneInstance[];
 
-export interface ComponentCloneInstance {
+export interface ComponentSceneInstance {
   readonly componentId: string;
   readonly cloneId: string;
 }
 
-export interface AttributeCloneInstance {
-  readonly path: readonly ComponentCloneInstance[];
+export interface AttributeSceneInstance {
+  readonly path: readonly ComponentSceneInstance[];
   readonly attributeId: string;
 }
