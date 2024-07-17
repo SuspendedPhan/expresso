@@ -2,6 +2,7 @@ import { BehaviorSubject, first, Subject } from "rxjs";
 import {
   Attribute,
   CallExpr,
+  Component,
   ExObject,
   ExObjectType,
   Expr,
@@ -11,7 +12,7 @@ import {
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext, { ExprReplacement } from "./MainContext";
-import { ProtoSceneAttributeStore, SceneAttribute } from "./SceneAttribute";
+import { ProtoComponentStore } from "./ProtoComponent";
 import { assertUnreachable } from "./utils/Utils";
 
 export type ExObjectMutBase = {
@@ -34,9 +35,9 @@ export type CallExprMut = CallExpr &
 export default class MainMutator {
   public constructor(private readonly ctx: MainContext) {}
 
-  public createMainObject(): SceneAttribute {
-    return this.ctx.objectFactory.createSceneAttribute(
-      ProtoSceneAttributeStore.x
+  public createMainObject(): Component {
+    return this.ctx.objectFactory.createComponent(
+      ProtoComponentStore.circle
     );
   }
 

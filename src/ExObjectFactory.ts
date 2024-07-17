@@ -32,9 +32,19 @@ export default class ExObjectFactory {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
 
+    const sceneAttributeByProto = new Map<
+      ProtoSceneAttribute,
+      SceneAttribute
+    >();
+    for (const protoAttribute of proto.protoAttributes) {
+      const sceneAttribute = this.createSceneAttribute(protoAttribute);
+      sceneAttributeByProto.set(protoAttribute, sceneAttribute);
+    }
+
     const component: Component = {
       objectType: ExObjectType.Component,
       proto,
+      sceneAttributeByProto,
       ...base,
       ...mutBase,
     };

@@ -4,6 +4,7 @@ import MainContext from "../MainContext";
 import GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";
+import { ProtoSceneAttributeStore } from "../SceneAttribute";
 
 export default class Main {
   public readonly attribute: Attribute;
@@ -21,7 +22,7 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    this.attribute = ctx.mutator.createMainObject().attribute;
+    this.attribute = ctx.mutator.createMainObject().sceneAttributeByProto.get(ProtoSceneAttributeStore.x)!.attribute;
     ctx.selection.root$.next(this.attribute);
     Keyboard.register(ctx.selection);
   }
