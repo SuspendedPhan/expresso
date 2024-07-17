@@ -9,8 +9,12 @@ import { SceneAttribute } from "../SceneAttribute";
 import { OBS } from "../utils/Utils";
 import { SceneContext } from "./SceneContext";
 import { Component } from "../ExObject";
-
+import { Evaluation } from "../utils/GoModule";
 interface SceneObject {
+  readonly sceneObjectAttributes: readonly SceneObjectAttribute[];
+}
+
+interface SceneObjectAttribute {
   value$: OBS<number>;
   sceneAttribute: SceneAttribute;
 }
@@ -26,38 +30,51 @@ export class SceneManager {
   private setup() {
     this.ctx.mainCtx.onComponentAdded$.subscribe((component) => {
       const sceneObject = this.componentToSceneObject(component);
-      this.sceneObjectToPixi(sceneObject);
+      this.addObjectToScene(sceneObject);
     });
+
+    this.ctx.evaluator.eval$.subscribe((...args) => this.handleEval(...args));
+  }
+  private handleEval(evaluation: Evaluation, componentIds: readonly string[]): void {
+    const r = evaluation.getResult("test");
   }
 
   private componentToSceneObject(component: Component): SceneObject {
-    // for (const [protoAttribute, sceneAttribute] of component.sceneAttributeByProto) {
-    //   sceneAttribute.attribute.expr$
-    // }
+
+
+    const sceneObjectAttributes: SceneObjectAttribute[] = [];
+    for (const sceneAttribute of component.sceneAttributeByProto.values()) {
+      const sceneObjectAttribute = this.createSceneObjectAttribute(sceneAttribute);
+      sceneObjectAttributes.push(sceneObjectAttribute);
+    }
+
+    return {
+      sceneObjectAttributes
+    };
   }
 
-  @loggedMethod
-  // @ts-ignore
-  private attrToSceneCircle(sceneAttr: SceneAttribute): SceneObject {
-    const logger = Logger.logger();
+  private createSceneObjectAttribute(sceneAttribute: SceneAttribute): SceneObjectAttribute {
     return {
       value$: this.tick$.pipe(
-        withLatestFrom(sceneAttr.attribute.expr$),
+        withLatestFrom(sceneAttribute.attribute.expr$),
         switchMap(([_, expr]) => {
-          logger.log("switchMap", expr.id);
           const result$ = this.ctx.mainCtx.goBridge.evalExpr$(expr);
           return result$;
         })
       ),
-      sceneAttribute: sceneAttr,
+      sceneAttribute: sceneAttribute,
     };
   }
 
   @loggedMethod
   // @ts-ignore
-  private sceneObjectToPixi(sceneObject: SceneObject) {
+  private addObjectToScene(sceneObject: SceneObject) {
     const logger = Logger.logger();
     const pixiObject = this.ctx.pool.takeCircle();
+
+    for (const sceneObjectAttribute of sceneObject.sceneObjectAttributes) {
+      sceneObjectAttribute.sceneAttribute.proto.pixiSetter(pixiObject, 0);
+    }
 
     const sceneAttribute = sceneObject.sceneAttribute;
 
