@@ -24,11 +24,13 @@ export default class Keyboard {
     hotkeys("down", this.SCOPE, function (_event, _handler) {
       logger.log("down");
       selection.down$.next();
+      return false;
     });
 
     hotkeys("up", this.SCOPE, function (_event, _handler) {
       logger.log("up");
       selection.up$.next();
+      return false;
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {

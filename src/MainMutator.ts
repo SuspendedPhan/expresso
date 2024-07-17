@@ -14,20 +14,20 @@ import MainContext from "./MainContext";
 import { assertUnreachable } from "./utils/Utils";
 
 export type ExObjectMutBase = {
-  readonly parentMut$: BehaviorSubject<Parent>;
-  readonly destroyMut$: Subject<void>;
+  readonly parentSub$: BehaviorSubject<Parent>;
+  readonly destroySub$: Subject<void>;
 };
 
 export type ExObjectMut = ExObject & ExObjectMutBase;
 
 export type AttributeMut = Attribute &
   ExObjectMut & {
-    exprMut$: BehaviorSubject<Expr>;
+    exprSub$: BehaviorSubject<Expr>;
   };
 
 export type CallExprMut = CallExpr &
   ExObjectMut & {
-    argsMut$: BehaviorSubject<Expr[]>;
+    argsSub$: BehaviorSubject<Expr[]>;
   };
 
 export interface ExprReplacement {
@@ -44,10 +44,6 @@ export default class MainMutator {
 
   public createAttribute(id?: string, expr?: Expr): Attribute {
     const attr = this.ctx.objectFactory.createAttribute(id, expr);
-    attr.expr$.pipe(first()).subscribe((expr) => {
-      const exprMut = expr as ExObjectMut;
-      exprMut.parentMut$.next(attr);
-    });
     return attr;
   }
 
@@ -80,26 +76,23 @@ export default class MainMutator {
     switch (parent.objectType) {
       case ExObjectType.Attribute: {
         const attrMut = parent as AttributeMut;
-        attrMut.exprMut$.next(newExpr);
+        attrMut.exprSub$.next(newExpr);
         break;
       }
       case ExObjectType.Expr: {
         switch (parent.exprType) {
           case ExprType.CallExpr: {
             const callExprMut = parent as CallExprMut;
-            const args = callExprMut.argsMut$.value;
-            const newArgs = args.map((arg) => arg === oldExpr ? newExpr : arg
+            const args = callExprMut.argsSub$.value;
+            const newArgs = args.map((arg) =>
+              arg === oldExpr ? newExpr : arg
             );
-            callExprMut.argsMut$.next(newArgs);
+            callExprMut.argsSub$.next(newArgs);
             break;
           }
           default:
             assertUnreachable(parent.exprType);
         }
-        const callExprMut = parent as CallExprMut;
-        const args = callExprMut.argsMut$.value;
-        const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
-        callExprMut.argsMut$.next(newArgs);
         break;
       }
       default:
@@ -108,8 +101,8 @@ export default class MainMutator {
 
     const oldExprMut = oldExpr as ExObjectMut;
     const newExprMut = newExpr as ExObjectMut;
-    newExprMut.parentMut$.next(parent);
-    oldExprMut.destroyMut$.complete();
+    newExprMut.parentSub$.next(parent);
+    oldExprMut.destroySub$.complete();
     this.onExprReplaced$_.next({ oldExpr, newExpr });
   }
 }

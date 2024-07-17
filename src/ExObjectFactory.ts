@@ -11,7 +11,12 @@ import {
 } from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
-import { AttributeMut, CallExprMut, ExObjectMut, ExObjectMutBase } from "./MainMutator";
+import {
+  AttributeMut,
+  CallExprMut,
+  ExObjectMut,
+  ExObjectMutBase,
+} from "./MainMutator";
 import { OBS } from "./utils/Utils";
 
 let nextId = 0;
@@ -39,15 +44,18 @@ export default class ExObjectFactory {
 
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
-    const exprMut$ = new BehaviorSubject<Expr>(expr);
+    const exprSub$ = new BehaviorSubject<Expr>(expr);
 
     const attribute: AttributeMut = {
       ...base,
       ...mutBase,
       objectType: ExObjectType.Attribute,
-      expr$: exprMut$,
-      exprMut$,
+      expr$: exprSub$,
+      exprSub$,
     };
+
+    const exprMut = expr as ExObjectMut;
+    exprMut.parentSub$.next(attribute);
     return attribute;
   }
 
@@ -96,7 +104,7 @@ export default class ExObjectFactory {
       objectType: ExObjectType.Expr,
       exprType: ExprType.CallExpr,
       args$: argsMut$,
-      argsMut$,
+      argsSub$: argsMut$,
       ...base,
       ...mutBase,
     };
@@ -106,16 +114,19 @@ export default class ExObjectFactory {
 
   private createExObjectMutBase(): ExObjectMutBase {
     return {
-      parentMut$: new BehaviorSubject<Parent>(null),
-      destroyMut$: new Subject<void>(),
+      parentSub$: new BehaviorSubject<Parent>(null),
+      destroySub$: new Subject<void>(),
     };
   }
 
-  private createExObjectBase(mutBase: ExObjectMutBase, id: string): ExObjectBase {
+  private createExObjectBase(
+    mutBase: ExObjectMutBase,
+    id: string
+  ): ExObjectBase {
     return {
       id,
-      parent$: mutBase.parentMut$,
-      destroy$: mutBase.destroyMut$,
+      parent$: mutBase.parentSub$,
+      destroy$: mutBase.destroySub$,
     };
   }
 }
