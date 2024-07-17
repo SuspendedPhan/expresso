@@ -9,10 +9,13 @@ export default interface GoModule {
   evalExpr(exprId: string): number;
 
   eval(): EvaluationMut;
+  
+  sceneInstancePathAppend(basePath: string, componentId: string, cloneId: string): string;
+  createAttributeSceneInstancePath(attributeId: string, sceneInstancePath: string): string;
 }
 
 export interface Evaluation {
-  getResult(attributeId: string, path: SceneInstancePath): number;
+  getResult(attributeId: string, sceneInstancePath: string): number;
 }
 
 export interface EvaluationMut extends Evaluation {

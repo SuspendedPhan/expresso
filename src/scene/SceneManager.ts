@@ -1,14 +1,10 @@
-/*
-OBS<Attribute> -> OBS<SceneObject>
-*/
-
-import { interval, withLatestFrom } from "rxjs";
+import { withLatestFrom } from "rxjs";
+import { SceneInstancePath } from "../CloneInstance";
 import { Component } from "../ExObject";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
 import { Evaluation } from "../utils/GoModule";
 import { SceneContext, SceneObject } from "./SceneContext";
-import { SceneInstancePath } from "../CloneInstance";
 
 export class SceneManager {
   public constructor(private readonly ctx: SceneContext) {
@@ -24,6 +20,7 @@ export class SceneManager {
       });
   }
 
+  // @ts-ignore
   private getCloneCount(component: Component): number {
     return 1;
   }
