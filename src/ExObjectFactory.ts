@@ -108,6 +108,11 @@ export default class ExObjectFactory {
       ...base,
       ...mutBase,
     };
+    
+    for (const arg of args) {
+      const argMut = arg as ExObjectMut;
+      argMut.parentSub$.next(expr);
+    }
 
     return expr;
   }

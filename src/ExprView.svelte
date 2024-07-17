@@ -52,7 +52,6 @@
           keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
         const targetIsInput = keyEvent.target instanceof HTMLInputElement;
         if (printable && !modifiers && !targetIsInput) {
-          console.log("keyEvent.key", keyEvent.key);
           exprCommand.focus();
         }
       });
