@@ -1,6 +1,7 @@
 import { Attribute, CallExpr, Expr, NumberExpr } from "../ExObject";
 import ExObjectFactory from "../ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
+import MainContext from "../MainContext";
 import {
   DehydratedAttribute,
   DehydratedCallExpr,
@@ -11,12 +12,15 @@ import {
 let nextId = 0;
 
 export default class Rehydrator {
-  public constructor(private readonly exprFactory: ExObjectFactory) {}
+  private readonly exprFactory: ExObjectFactory;
+  public constructor(private readonly ctx: MainContext) {
+    this.exprFactory = ctx.objectFactory;
+  }
 
   @loggedMethod
   public rehydrateAttribute(deAttribute: DehydratedAttribute): Attribute {
     const expr = this.rehydrateExpr(deAttribute.expr);
-    return this.exprFactory.createAttribute(deAttribute.id + "rehydrated" + nextId++, expr);
+    return this.ctx.mutator.createAttribute(deAttribute.id + "rehydrated" + nextId++, expr);
   }
 
   @loggedMethod

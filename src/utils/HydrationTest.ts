@@ -1,7 +1,4 @@
-import {
-  Observable,
-  ReplaySubject
-} from "rxjs";
+import { Observable, ReplaySubject } from "rxjs";
 import { Attribute } from "../ExObject";
 import Dehydrator from "../hydration/Dehydrator";
 import Rehydrator from "../hydration/Rehydrator";
@@ -26,9 +23,9 @@ export default class HydrationTest {
           "dehydratedAttribute",
           JSON.stringify(dehydratedAttribute, null, 3)
         );
-        const rehydratedAttribute = new Rehydrator(
-          ctx!.objectFactory
-        ).rehydrateAttribute(dehydratedAttribute);
+        const rehydratedAttribute = new Rehydrator(ctx).rehydrateAttribute(
+          dehydratedAttribute
+        );
 
         rehydratedAttribute$.next(rehydratedAttribute);
       });

@@ -21,7 +21,7 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    this.attribute = ctx.objectFactory.createAttribute();
+    this.attribute = ctx.mutator.createAttribute();
     ctx.selection.root$.next(this.attribute);
     Keyboard.register(ctx.selection);
   }

@@ -2,7 +2,7 @@
 OBS<Attribute> -> OBS<SceneObject>
 */
 
-import { interval, map, switchMap, withLatestFrom } from "rxjs";
+import { interval, switchMap, withLatestFrom } from "rxjs";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
@@ -47,11 +47,12 @@ export class SceneObjectManager {
         sceneAttribute: sceneAttr,
       },
       
-      destroy$: this.ctx.mainCtx.objectManager.getDestroy$(sceneAttr.attribute).pipe(map(() => {})),
+      destroy$: sceneAttr.attribute.destroy$,
     };
   }
 
   @loggedMethod
+  // @ts-ignore
   private sceneObjectToPixi(sceneObject: SceneObject) {
     const logger = Logger.logger();
     Logger.logCallstack();

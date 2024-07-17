@@ -5,6 +5,12 @@
   import BakLogger from "./utils/BakLogger";
   const dispatch = createEventDispatcher<{ select: string }>();
 
+  let input: HTMLInputElement;
+
+  export function focus() {
+    input.focus();
+  }
+
   function handleKeydown(
     event: KeyboardEvent & { currentTarget: HTMLInputElement }
   ) {
@@ -29,6 +35,7 @@
     value={$query$}
     on:input={handleInput}
     on:keydown={handleKeydown}
+    bind:this={input}
     class="border border-solid border-black"
   />
 </main>

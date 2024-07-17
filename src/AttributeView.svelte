@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { map } from "rxjs";
   import type { Attribute } from "./ExObject";
   import ExprView from "./ExprView.svelte";
   import MainContext from "./MainContext";
@@ -7,12 +8,15 @@
   export let ctx: MainContext;
   export let attribute: Attribute;
 
-  const expr$ = attribute.expr$;
+  let expr$ = attribute.expr$;
+  const exprId$ = expr$.pipe(map((expr) => expr.id));
 </script>
 
 <main>
   <SelectableView {ctx} object={attribute}>
     <div>Attribute</div>
-    <ExprView {ctx} {$expr$} />
+    {#key $exprId$}
+      <ExprView {ctx} expr={$expr$} />
+    {/key}
   </SelectableView>
 </main>

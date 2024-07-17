@@ -42,6 +42,15 @@ export default class MainMutator {
 
   public constructor(private readonly ctx: MainContext) {}
 
+  public createAttribute(id?: string, expr?: Expr): Attribute {
+    const attr = this.ctx.objectFactory.createAttribute(id, expr);
+    attr.expr$.pipe(first()).subscribe((expr) => {
+      const exprMut = expr as ExObjectMut;
+      exprMut.parentMut$.next(attr);
+    });
+    return attr;
+  }
+
   @loggedMethod
   public replaceWithNumberExpr(oldExpr: Expr, value: number) {
     const expr = this.ctx.objectFactory.createNumberExpr(value);
@@ -59,43 +68,48 @@ export default class MainMutator {
     Logger.arg("oldExpr", oldExpr.id);
 
     oldExpr.parent$.pipe(first()).subscribe((parent) => {
-      if (parent === null) {
-        throw new Error("oldExpr.parent$ is null");
-      }
-
-      switch (parent.objectType) {
-        case ExObjectType.Attribute: {
-          const attrMut = parent as AttributeMut;
-          attrMut.exprMut$.next(newExpr);
-          break;
-        }
-        case ExObjectType.Expr: {
-          switch (parent.exprType) {
-            case ExprType.CallExpr: {
-              const callExprMut = parent as CallExprMut;
-              const args = callExprMut.argsMut$.value;
-              const newArgs = args.map((arg) =>
-                arg === oldExpr ? newExpr : arg
-              );
-              callExprMut.argsMut$.next(newArgs);
-              break;
-            }
-            default:
-              assertUnreachable(parent.exprType);
-          }
-          const callExprMut = parent as CallExprMut;
-          const args = callExprMut.argsMut$.value;
-          const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
-          callExprMut.argsMut$.next(newArgs);
-          break;
-        }
-        default:
-          assertUnreachable
-      }
-
-      const oldExprMut = oldExpr as ExObjectMut;
-      oldExprMut.destroyMut$.complete();
-      this.onExprReplaced$_.next({ oldExpr, newExpr });
+      this.replaceExpr(parent, newExpr, oldExpr);
     });
+  }
+
+  private replaceExpr(parent: Parent, newExpr: Expr, oldExpr: Expr) {
+    if (parent === null) {
+      throw new Error("oldExpr.parent$ is null");
+    }
+
+    switch (parent.objectType) {
+      case ExObjectType.Attribute: {
+        const attrMut = parent as AttributeMut;
+        attrMut.exprMut$.next(newExpr);
+        break;
+      }
+      case ExObjectType.Expr: {
+        switch (parent.exprType) {
+          case ExprType.CallExpr: {
+            const callExprMut = parent as CallExprMut;
+            const args = callExprMut.argsMut$.value;
+            const newArgs = args.map((arg) => arg === oldExpr ? newExpr : arg
+            );
+            callExprMut.argsMut$.next(newArgs);
+            break;
+          }
+          default:
+            assertUnreachable(parent.exprType);
+        }
+        const callExprMut = parent as CallExprMut;
+        const args = callExprMut.argsMut$.value;
+        const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
+        callExprMut.argsMut$.next(newArgs);
+        break;
+      }
+      default:
+        assertUnreachable;
+    }
+
+    const oldExprMut = oldExpr as ExObjectMut;
+    const newExprMut = newExpr as ExObjectMut;
+    newExprMut.parentMut$.next(parent);
+    oldExprMut.destroyMut$.complete();
+    this.onExprReplaced$_.next({ oldExpr, newExpr });
   }
 }

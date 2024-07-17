@@ -1,6 +1,7 @@
 import {
   BehaviorSubject,
   first,
+  map,
   Observable,
   of,
   ReplaySubject,
@@ -59,6 +60,12 @@ export default class Selection {
         }
         return of(selectedObject);
       })
+    );
+  }
+
+  public isSelected$(object: Selectable): Observable<boolean> {
+    return this.getSelectedObject$().pipe(
+      map((selectedObject) => selectedObject === object)
     );
   }
 

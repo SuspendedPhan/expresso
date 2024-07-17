@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Observable, of } from "rxjs";
+  import { combineLatestWith, fromEvent, Observable, of } from "rxjs";
   import { ExprType, type Expr } from "./ExObject";
   import ExprCommand from "./ExprCommand.svelte";
   import MainContext from "./MainContext";
   import SelectableView from "./utils/SelectableView.svelte";
+  import { onMount } from "svelte";
 
   export let ctx: MainContext;
   export let expr: Expr;
@@ -35,13 +36,36 @@
       ctx.mutator.replaceWithCallExpr(expr);
     }
   }
+
+  let exprCommand: ExprCommand;
+
+  onMount(() => {
+    const isSelected$ = ctx.selection.isSelected$(expr);
+    const sub = fromEvent(document, "keydown")
+      .pipe(combineLatestWith(isSelected$))
+      .subscribe(([event, selected]) => {
+        if (!selected) return;
+
+        const keyEvent = event as KeyboardEvent;
+        const printable = keyEvent.key.length === 1;
+        const modifiers =
+          keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
+        const targetIsInput = keyEvent.target instanceof HTMLInputElement;
+        if (printable && !modifiers && !targetIsInput) {
+          console.log("keyEvent.key", keyEvent.key);
+          exprCommand.focus();
+        }
+      });
+
+    return () => sub.unsubscribe();
+  });
 </script>
 
 <main>
   <SelectableView {ctx} object={expr}>
     <span>Expr</span>
     <span>{getText()}</span>
-    <ExprCommand on:select={handleSelect} />
+    <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
 
     <div class="pl-2">
       {#each $args$ as arg (arg.id)}

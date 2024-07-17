@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { map } from "rxjs";
   import MainContext from "../MainContext";
   import { type Selectable } from "./Selection";
 
   export let object: Selectable;
   export let ctx: MainContext;
 
-  const selected$ = ctx.selection
-    .getSelectedObject$()
-    .pipe(map((selectedObject) => selectedObject === object));
+  const selected$ = ctx.selection.isSelected$(object);
 
   function handleClick(event: MouseEvent) {
     event.stopPropagation();
