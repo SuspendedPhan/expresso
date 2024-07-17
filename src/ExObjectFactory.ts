@@ -17,15 +17,12 @@ import {
   ExObjectMut,
   ExObjectMutBase,
 } from "./MainMutator";
-import { OBS } from "./utils/Utils";
+import MainContext from "./MainContext";
 
 let nextId = 0;
 
 export default class ExObjectFactory {
-  private readonly onExprAdded$_ = new Subject<Expr>();
-  public readonly onExprAdded$: OBS<Expr> = this.onExprAdded$_;
-
-  public constructor() {}
+  public constructor(private readonly ctx: MainContext) {}
 
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
@@ -56,6 +53,8 @@ export default class ExObjectFactory {
 
     const exprMut = expr as ExObjectMut;
     exprMut.parentSub$.next(attribute);
+
+    (this.ctx.onAttributeAdded$ as Subject<Attribute>).next(attribute);
     return attribute;
   }
 
@@ -80,6 +79,7 @@ export default class ExObjectFactory {
       ...mutBase,
     };
 
+    (this.ctx.onExprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 
@@ -114,6 +114,7 @@ export default class ExObjectFactory {
       argMut.parentSub$.next(expr);
     }
 
+    (this.ctx.onExprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 

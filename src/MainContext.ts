@@ -3,11 +3,19 @@ import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./MainMutator";
 import ExObjectFactory from "./ExObjectFactory";
-import { first } from "rxjs";
+import { first, Subject } from "rxjs";
+import { Attribute, Expr } from "./ExObject";
+import { OBS } from "./utils/Utils";
 
 export default class MainContext {
+  private readonly onAttributeAdded$_ = new Subject<Attribute>();
+  private readonly onExprAdded$_ = new Subject<Expr>();
+  
+  public readonly onAttributeAdded$: OBS<Attribute> = this.onAttributeAdded$_;
+  public readonly onExprAdded$: OBS<Expr> = this.onExprAdded$_;
+
   public readonly mutator: MainMutator;
-  public readonly objectFactory = new ExObjectFactory();
+  public readonly objectFactory = new ExObjectFactory(this);
   public readonly selection = new Selection();
   public readonly goBridge: GoBridge;
 

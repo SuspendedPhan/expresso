@@ -24,6 +24,7 @@ export class SceneObjectManager {
 
   public constructor(private readonly ctx: SceneContext) {
     // todp
+    
     // ctx.mainCtx.objectManager.onAttributeAdded$.subscribe((attr) => {
     //   const sceneObject = this.attrToSceneCircle(attr);
     //   this.sceneObjectToPixi(sceneObject);

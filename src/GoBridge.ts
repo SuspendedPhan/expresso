@@ -19,7 +19,7 @@ export default class GoBridge {
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
-    ctx.objectFactory.onExprAdded$.subscribe((expr) => {
+    ctx.onExprAdded$.subscribe((expr) => {
       switch (expr.exprType) {
         case ExprType.NumberExpr:
           goModule.addNumberExpr(expr.id);
