@@ -1,22 +1,39 @@
 import {
-  RuntimeFunctionCall,
-  AstFunctionCall,
   LoggerDecorator,
+  RuntimeFunctionCall
 } from "./LoggerDecorator";
 
 export default class Logger {
   private static readonly loggedThisValues = new Set<any>();
+
+  static () {
+    LoggerDecorator.currentCall$.subscribe((functionCall) => {
+      if (!functionCall) return;
+
+      if (Logger.loggedThisValues.has(functionCall.thisValue)) {
+        functionCall.astCall.currentlyLogging = true;
+      }
+
+      if (functionCall.astCall.currentlyLogging) {
+        Logger.logFunctionCall(functionCall);
+      }
+    });
+  }
 
   public static arg(name: string, value: any) {
     const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
       throw new Error("No current function call");
     }
-    if (currentFunctionCall.argsLogged$.value) {
-      throw new Error("Args already logged");
-    }
+
+    const sub = currentFunctionCall.argsLogged$.subscribe({
+      complete: () => {
+        throw new Error("Args have already been logged");
+      }
+    });
 
     currentFunctionCall.args.push({ message: `${name}: ${value}` });
+    sub.unsubscribe();
   }
 
   public static logCallstack() {
@@ -33,7 +50,6 @@ export default class Logger {
         continue;
       }
       ancestor.astCall.currentlyLogging = true;
-      this.startLoggingFunctionCalls(ancestor.astCall);
     }
   }
 
@@ -43,16 +59,7 @@ export default class Logger {
       throw new Error("No current function call");
     }
 
-    if (this.loggedThisValues.has(currentFunctionCall.thisValue)) {
-      return;
-    }
-
     this.loggedThisValues.add(currentFunctionCall.thisValue);
-    this.logCallstack();
-    LoggerDecorator.currentCall$.subscribe((functionCall) => {
-      if (!functionCall) return;
-      this.logCallstack();
-    });
   }
 
   /**
@@ -69,8 +76,8 @@ export default class Logger {
     return {
       log(name: string, ...args: any) {
         const currentCall = LoggerDecorator.currentCall$.value;
-        if (currentCall && !currentCall.argsLogged$.value) {
-          currentCall.argsLogged$.next(true);
+        if (currentCall) {
+          currentCall.argsLogged$.complete();
         }
 
         const astCall = loggerCurrentCall.astCall;
@@ -78,7 +85,9 @@ export default class Logger {
           return;
         }
 
-        const argString = args.map((arg: any) => arg?.toString() ?? "null/undefined").join(", ");
+        const argString = args
+          .map((arg: any) => arg?.toString() ?? "null/undefined")
+          .join(", ");
         console.log(`${astCall.id}.${name}(${argString})`);
       },
     };
@@ -97,24 +106,16 @@ export default class Logger {
     return ancestors;
   }
 
-  private static startLoggingFunctionCalls(metadata: AstFunctionCall) {
-    metadata.runtimeCall$.subscribe((functionCall) => {
-      if (!functionCall) return;
-      this.logFunctionCall(functionCall);
-    });
-  }
-
   private static logFunctionCall(functionCall: RuntimeFunctionCall) {
-    functionCall.argsLogged$.subscribe((argsLogged) => {
-      if (!argsLogged) return;
-      const argString = functionCall.args.map((arg) => arg.message).join(", ");
-      console.log(
-        `${functionCall.astCall.className}.${functionCall.astCall.name}(${argString})`
-      );
-
-      if (functionCall.astCall.currentlyLoggingCallstack) {
-        // console.log("");
-      }
+    functionCall.argsLogged$.subscribe({
+      complete: () => {
+        const argString = functionCall.args
+          .map((arg) => arg.message)
+          .join(", ");
+        console.log(
+          `${functionCall.astCall.className}.${functionCall.astCall.name}(${argString})`
+        );
+      },
     });
   }
 }

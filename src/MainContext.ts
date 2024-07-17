@@ -3,7 +3,7 @@ import Selection from "./utils/Selection";
 import GoBridge from "./GoBridge";
 import MainMutator from "./MainMutator";
 import ExObjectFactory from "./ExObjectFactory";
-import { first, Subject } from "rxjs";
+import { first, ReplaySubject, Subject } from "rxjs";
 import { Attribute, Expr } from "./ExObject";
 import { OBS } from "./utils/Utils";
 import { SceneAttribute } from "./SceneAttribute";
@@ -16,7 +16,7 @@ export interface ExprReplacement {
 export default class MainContext {
   private readonly onAttributeAdded$_ = new Subject<Attribute>();
   private readonly onExprAdded$_ = new Subject<Expr>();
-  private readonly onSceneAttributeAdded$_ = new Subject<SceneAttribute>();
+  private readonly onSceneAttributeAdded$_ = new ReplaySubject<SceneAttribute>(10);
   private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
 
   public readonly onAttributeAdded$: OBS<Attribute> = this.onAttributeAdded$_;

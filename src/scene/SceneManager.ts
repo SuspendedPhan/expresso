@@ -23,7 +23,10 @@ export class SceneManager {
 
   @loggedMethod
   private setup() {
+    Logger.logThis();
+    const logger = Logger.logger();
     this.ctx.mainCtx.onSceneAttributeAdded$.subscribe((attr) => {
+      logger.log("onSceneAttributeAdded$", attr.attribute.id);
       const sceneObject = this.attrToSceneCircle(attr);
       this.sceneObjectToPixi(sceneObject);
     });

@@ -1,4 +1,4 @@
-import { BehaviorSubject, ReplaySubject } from "rxjs";
+import { BehaviorSubject, ReplaySubject, Subject } from "rxjs";
 
 interface Message {
   readonly message: string;
@@ -8,7 +8,7 @@ export interface RuntimeFunctionCall {
   readonly astCall: AstFunctionCall;
   readonly parent: RuntimeFunctionCall | null;
   readonly args: Message[];
-  readonly argsLogged$: BehaviorSubject<boolean>;
+  readonly argsLogged$: Subject<void>;
   readonly children$: ReplaySubject<RuntimeFunctionCall>;
   readonly thisValue: any;
 }
@@ -36,15 +36,9 @@ export class LoggerDecorator {
   ) {
     const originalMethod = descriptor.value;
     descriptor.value = function (...args: any[]) {
-      console.log("loggedMethod", target);
-      console.log("loggedMethod", propertyKey);
-      console.log("loggedMethod", descriptor);
-
       const currentFunctionCall = LoggerDecorator.currentCall$.value;
       if (currentFunctionCall) {
-        if (!currentFunctionCall.argsLogged$.value) {
-          currentFunctionCall.argsLogged$.next(true);
-        }
+        currentFunctionCall.argsLogged$.complete();
       }
 
       const parent = currentFunctionCall;
@@ -60,9 +54,7 @@ export class LoggerDecorator {
 
       const result = originalMethod.apply(this, args);
 
-      if (!functionCall.argsLogged$.value) {
-        functionCall.argsLogged$.next(true);
-      }
+      functionCall.argsLogged$.complete();
       LoggerDecorator.currentCall$.next(parent);
       return result;
     };
@@ -98,7 +90,7 @@ export class LoggerDecorator {
       parent,
       args: [],
       children$: new ReplaySubject<RuntimeFunctionCall>(),
-      argsLogged$: new BehaviorSubject(false),
+      argsLogged$: new Subject(),
       thisValue: thisValue,
     };
 
