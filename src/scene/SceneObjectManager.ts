@@ -19,6 +19,7 @@ export interface SceneObject {
   destroy$: OBS<void>;
 }
 
+// todp: rename to SceneManager
 export class SceneObjectManager {
   private readonly tick$ = interval(1000);
 
@@ -60,7 +61,7 @@ export class SceneObjectManager {
     const pixiObject = this.ctx.pool.takeCircle();
     sceneObject.x.value$.subscribe((x) => {
       pixiObject.visible = true;
-      sceneObject.x.sceneAttribute.metadata.pixiSetter(pixiObject, x);
+      sceneObject.x.sceneAttribute.proto.pixiSetter(pixiObject, x);
       pixiObject.scale.x = 50;
       pixiObject.scale.y = 50;
     });

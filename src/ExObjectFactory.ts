@@ -18,11 +18,26 @@ import {
   ExObjectMutBase,
 } from "./MainMutator";
 import MainContext from "./MainContext";
+import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 
 let nextId = 0;
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
+
+  createSceneAttribute(x: ProtoSceneAttribute): SceneAttribute {
+    const attribute = this.createAttribute(x.id);
+    const sceneAttribute: SceneAttribute = {
+      proto: x,
+      attribute,
+    };
+
+    (this.ctx.onSceneAttributeAdded$ as Subject<SceneAttribute>).next(
+      sceneAttribute
+    );
+
+    return sceneAttribute;
+  }
 
   @loggedMethod
   public createAttribute(id?: string, expr?: Expr): Attribute {
@@ -108,7 +123,7 @@ export default class ExObjectFactory {
       ...base,
       ...mutBase,
     };
-    
+
     for (const arg of args) {
       const argMut = arg as ExObjectMut;
       argMut.parentSub$.next(expr);

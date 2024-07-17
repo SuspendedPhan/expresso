@@ -10,8 +10,9 @@ import {
 } from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
-import MainContext from "./MainContext";
+import MainContext, { ExprReplacement } from "./MainContext";
 import { assertUnreachable } from "./utils/Utils";
+import { ProtoSceneAttributeStore, SceneAttribute } from "./SceneAttribute";
 
 export type ExObjectMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
@@ -30,21 +31,13 @@ export type CallExprMut = CallExpr &
     argsSub$: BehaviorSubject<Expr[]>;
   };
 
-export interface ExprReplacement {
-  oldExpr: Expr;
-  newExpr: Expr;
-}
-
 export default class MainMutator {
-  private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
-  public readonly onExprReplaced$: Observable<ExprReplacement> =
-    this.onExprReplaced$_;
-
   public constructor(private readonly ctx: MainContext) {}
 
-  public createAttribute(id?: string, expr?: Expr): Attribute {
-    const attr = this.ctx.objectFactory.createAttribute(id, expr);
-    return attr;
+  public createMainObject(): SceneAttribute {
+    return this.ctx.objectFactory.createSceneAttribute(
+      ProtoSceneAttributeStore.x
+    );
   }
 
   @loggedMethod
@@ -103,6 +96,6 @@ export default class MainMutator {
     const newExprMut = newExpr as ExObjectMut;
     newExprMut.parentSub$.next(parent);
     oldExprMut.destroySub$.complete();
-    this.onExprReplaced$_.next({ oldExpr, newExpr });
+    (this.ctx.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
   }
 }
