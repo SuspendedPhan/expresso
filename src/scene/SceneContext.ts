@@ -1,6 +1,6 @@
 import { Graphics } from "pixi.js";
 import { Evaluator } from "../evaluation/Evaluator";
-import MainContext from "../MainContext";
+import MainContext from "../main-context/MainContext";
 import PixiFactory from "./PixiFactory";
 import ScenePool from "./ScenePool";
 

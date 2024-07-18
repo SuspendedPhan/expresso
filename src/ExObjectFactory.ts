@@ -12,13 +12,13 @@ import {
 } from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
-import MainContext from "./MainContext";
+import MainContext from "./main-context/MainContext";
 import {
   AttributeMut,
   CallExprMut,
   ExObjectMut,
   ExObjectMutBase,
-} from "./MainMutator";
+} from "./main-context/MainMutator";
 import { ProtoComponent } from "./ProtoComponent";
 import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import {

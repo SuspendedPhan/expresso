@@ -1,4 +1,4 @@
-import MainContext from "../MainContext";
+import MainContext from "../main-context/MainContext";
 import PixiFactory from "./PixiFactory";
 import { SceneContext } from "./SceneContext";
 import { SceneManager } from "./SceneManager";

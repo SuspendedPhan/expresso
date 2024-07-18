@@ -1,6 +1,6 @@
 import { first, map, Observable } from "rxjs";
 import { Attribute } from "../ExObject";
-import MainContext from "../MainContext";
+import MainContext from "../main-context/MainContext";
 import GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";

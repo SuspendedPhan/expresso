@@ -3,7 +3,7 @@
   import type { Attribute } from "../ExObject";
   import Logger from "../logger/Logger";
   import { loggedMethod } from "../logger/LoggerDecorator";
-  import MainContext from "../MainContext";
+  import MainContext from "../main-context/MainContext";
   import SceneView from "../scene/SceneView.svelte";
   import HydrationTest from "../utils/HydrationTest";
   import Main from "../utils/Main";

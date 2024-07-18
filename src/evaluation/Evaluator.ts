@@ -3,7 +3,7 @@ import {
   Observable,
   Subject
 } from "rxjs";
-import MainContext from "../MainContext";
+import MainContext from "../main-context/MainContext";
 import { Evaluation } from "../utils/GoModule";
 
 export class Evaluator {

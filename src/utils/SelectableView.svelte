@@ -1,5 +1,5 @@
 <script lang="ts">
-  import MainContext from "../MainContext";
+  import MainContext from "../main-context/MainContext";
   import { type Selectable } from "./Selection";
 
   export let object: Selectable;

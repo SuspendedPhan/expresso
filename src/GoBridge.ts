@@ -1,7 +1,7 @@
 import { first, Subject } from "rxjs";
 import { Expr, ExprType } from "./ExObject";
 import { loggedMethod } from "./logger/LoggerDecorator";
-import MainContext from "./MainContext";
+import MainContext from "./main-context/MainContext";
 import type GoModule from "./utils/GoModule";
 import { assertUnreachable } from "./utils/Utils";
 

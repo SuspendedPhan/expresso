@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { SceneMain } from "./SceneMain";
   import PixiFactory from "./PixiFactory";
-  import MainContext from "../MainContext";
+  import MainContext from "../main-context/MainContext";
   export let ctx: MainContext;
   let viewportElement: HTMLDivElement;
   let canvasElement: HTMLCanvasElement;

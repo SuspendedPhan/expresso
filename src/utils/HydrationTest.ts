@@ -4,7 +4,7 @@ import Dehydrator from "../hydration/Dehydrator";
 import Rehydrator from "../hydration/Rehydrator";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import MainContext from "../MainContext";
+import MainContext from "../main-context/MainContext";
 import Main from "./Main";
 
 export default class HydrationTest {

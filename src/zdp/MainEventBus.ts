@@ -1,7 +1,7 @@
 import { Attribute } from "pixi.js";
 import { ReplaySubject, Subject } from "rxjs";
 import { Component, Expr } from "../ExObject";
-import { ExprReplacement } from "../MainContext";
+import { ExprReplacement } from "../main-context/MainContext";
 import { SceneAttribute } from "../SceneAttribute";
 import { OBS } from "../utils/Utils";
 
