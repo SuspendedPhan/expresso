@@ -1,6 +1,6 @@
 import { getBlob, getStorage, ref, uploadString } from "firebase/storage";
 import { PersistService } from "./Persistence";
-import Firebase from "../firebase/Firebase";
+import Firebase from "./Firebase";
 
 Firebase.init();
 const storage = getStorage();

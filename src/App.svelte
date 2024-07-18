@@ -1,5 +1,4 @@
 <script lang="ts">
-  import DebugOverlay from "./debug-overlay/DebugOverlay.svelte";
   import MainView from "./views/MainView.svelte";
   import TestView from "./utils/TestView.svelte";
 
@@ -15,7 +14,6 @@
   {:else}
     <MainView />
   {/if}
-  <DebugOverlay />
 </main>
 
 <style></style>
