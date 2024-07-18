@@ -41,6 +41,20 @@ func bootstrapGoModule() {
 		}),
 	}))
 
+	goModule.Set("NumberExpr", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			ev.NumberExprCreate(id)
+			return nil
+		}),
+		"setValue": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			value := args[1].Float()
+			ev.NumberExprSetValue(id, value)
+			return nil
+		}),
+	}))
+
 	goModule.Set("CallExpr", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()

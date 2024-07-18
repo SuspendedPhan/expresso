@@ -28,7 +28,8 @@ type CallExpr struct {
 
 func NewEvaluator() *Evaluator {
 	return &Evaluator{
-		ExprById: map[string]*Expr{},
+		RootComponentById: map[string]*Component{},
+		ExprById:          map[string]*Expr{},
 	}
 }
 
