@@ -32,13 +32,15 @@ export type CallExprMut = CallExpr &
     argsSub$: BehaviorSubject<Expr[]>;
   };
 
-export default class MainMutator {
+export default class MainMutator implements Extracted {
   public constructor(private readonly ctx: MainContext) {}
 
   public createMainObject(): Component {
-    return this.ctx.objectFactory.createComponent(
+    const component = this.ctx.objectFactory.createComponent(
       ProtoComponentStore.circle
     );
+    (this.ctx.eventBus.rootComponents$ as Subject<Component[]>).next([component]);
+    return component;
   }
 
   @loggedMethod
@@ -99,4 +101,12 @@ export default class MainMutator {
     oldExprMut.destroySub$.complete();
     (this.ctx.eventBus.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
   }
+}
+
+interface Extracted {
+  createMainObject(): Component;
+  /* TODO: add the missing return type */
+  replaceWithNumberExpr(oldExpr: Expr, value: number): any;
+  /* TODO: add the missing return type */
+  replaceWithCallExpr(oldExpr: Expr): any;
 }

@@ -5,6 +5,7 @@ import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
 import { Evaluation } from "../utils/GoModule";
 import { SceneContext, SceneObject } from "./SceneContext";
+import Logger from "../logger/Logger";
 
 export class SceneManager {
   public constructor(private readonly ctx: SceneContext) {
@@ -13,9 +14,13 @@ export class SceneManager {
 
   @loggedMethod
   private setup() {
+    Logger.logThis();
+    Logger.logCallstack();
     this.ctx.evaluator.eval$
       .pipe(withLatestFrom(this.ctx.mainCtx.eventBus.rootComponents$))
       .subscribe(([evaluation, rootComponents]) => {
+        console.log("Updating root components");
+        
         this.updateRootComponents(evaluation, rootComponents);
       });
   }
@@ -49,11 +54,13 @@ export class SceneManager {
     }
   }
 
+  @loggedMethod
   private updateComponentSceneInstance(
     component: Component,
     evaluation: Evaluation,
     path: SceneInstancePath
   ): void {
+    Logger.arg("path", path);
     const sceneObject = this.ctx.pool.takeObject();
     const sceneAttributes = Array.from(
       component.sceneAttributeByProto.values()
@@ -68,6 +75,7 @@ export class SceneManager {
     }
   }
 
+  @loggedMethod
   private updateAttributeSceneInstance(
     sceneObject: SceneObject,
     sceneAttr: SceneAttribute,

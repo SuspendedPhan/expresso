@@ -95,6 +95,19 @@ func bootstrapGoModule() {
 				"dispose":   disposeFunc,
 			})
 		}),
+
+		"sceneInstancePathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			basePath := args[0].String()
+			componentId := args[1].String()
+			cloneId := args[2].String()
+			return evaluator.SceneInstancePathAppend(basePath, componentId, cloneId)
+		}),
+
+		"createAttributeSceneInstancePath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			attributeId := args[0].String()
+			sceneInstancePath := args[1].String()
+			return evaluator.CreateAttributeSceneInstancePath(attributeId, sceneInstancePath)
+		}),
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
