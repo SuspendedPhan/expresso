@@ -7,7 +7,9 @@ var logger = NewLogger("evaluator.go")
 type Float = float64
 
 type Evaluator struct {
-	ExprById map[string]*Expr
+	RootComponentById map[string]*Component
+	AttributeById     map[string]*Attribute
+	ExprById          map[string]*Expr
 }
 
 type Expr struct {

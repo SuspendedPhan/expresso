@@ -15,7 +15,7 @@ export default interface GoModule {
 }
 
 export interface Evaluation {
-  getResult(attributeId: string, sceneInstancePath: string): number;
+  getResult(attributeSceneInstancePath: string): number;
 }
 
 export interface EvaluationMut extends Evaluation {
