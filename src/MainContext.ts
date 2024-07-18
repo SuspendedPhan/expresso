@@ -2,7 +2,7 @@ import { first } from "rxjs";
 import { Expr } from "./ExObject";
 import ExObjectFactory from "./ExObjectFactory";
 import GoBridge from "./GoBridge";
-import { MainEventBus } from "./MainEventBus";
+import { MainEventBus } from "./main-context/MainEventBus";
 import MainMutator from "./MainMutator";
 import type GoModule from "./utils/GoModule";
 import Selection from "./utils/Selection";
