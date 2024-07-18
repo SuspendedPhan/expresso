@@ -2,29 +2,17 @@ package evaluator
 
 import "strconv"
 
-type Component struct {
-	Id           string
-	Clones       int
-	AttributeIds []string
-}
-
-type Attribute struct {
-	Id     string
-	ExprId string
-}
-
 func (e *Evaluator) Eval() *Evaluation {
 	evaluation := &Evaluation{
 		valueByAttributeSceneInstancePath: make(map[string]Float),
 	}
 
 	for _, component := range e.RootComponentById {
-		for i := 0; i < component.Clones; i++ {
+		for i := 0; i < component.CloneCount; i++ {
 			sceneInstancePath := SceneInstancePathAppend("", component.Id, strconv.Itoa(i))
-			for _, attributeId := range component.AttributeIds {
-				attribute := e.AttributeById[attributeId]
+			for _, attribute := range component.AttributeById {
 				value := e.EvalExpr(attribute.ExprId)
-				attributeSceneInstancePath := CreateAttributeSceneInstancePath(attributeId, sceneInstancePath)
+				attributeSceneInstancePath := CreateAttributeSceneInstancePath(attribute.Id, sceneInstancePath)
 				evaluation.valueByAttributeSceneInstancePath[attributeSceneInstancePath] = value
 			}
 		}

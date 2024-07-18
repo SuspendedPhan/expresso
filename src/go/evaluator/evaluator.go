@@ -8,7 +8,6 @@ type Float = float64
 
 type Evaluator struct {
 	RootComponentById map[string]*Component
-	AttributeById     map[string]*Attribute
 	ExprById          map[string]*Expr
 }
 
@@ -31,60 +30,6 @@ func NewEvaluator() *Evaluator {
 	return &Evaluator{
 		ExprById: map[string]*Expr{},
 	}
-}
-
-func (e *Evaluator) AddNumberExpr(id string) {
-	e.ExprById[id] = &Expr{
-		Id:         id,
-		NumberExpr: &NumberExpr{},
-	}
-}
-
-func (e *Evaluator) SetNumberExprValue(id string, value Float) {
-	expr, found := e.ExprById[id]
-
-	if !found {
-		panic("expr not found")
-	}
-	numberExpr := expr.NumberExpr
-	if numberExpr == nil {
-		panic("expr is not a number expr")
-	}
-
-	numberExpr.Value = value
-}
-
-func (e *Evaluator) AddCallExpr(id string) {
-	e.ExprById[id] = &Expr{
-		Id:       id,
-		CallExpr: &CallExpr{},
-	}
-}
-
-func (e *Evaluator) SetCallExprArg0(id string, argId string) {
-	expr, found := e.ExprById[id]
-	if !found {
-		panic("expr not found")
-	}
-	callExpr := expr.CallExpr
-	if callExpr == nil {
-		panic("expr is not a call expr")
-	}
-
-	callExpr.arg0Id = argId
-}
-
-func (e *Evaluator) SetCallExprArg1(id string, argId string) {
-	expr, found := e.ExprById[id]
-	if !found {
-		panic("expr not found " + id)
-	}
-	callExpr := expr.CallExpr
-	if callExpr == nil {
-		panic("expr is not a call expr")
-	}
-
-	callExpr.arg1Id = argId
 }
 
 func (e *Evaluator) EvalExpr(exprId string) Float {

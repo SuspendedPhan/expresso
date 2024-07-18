@@ -1,17 +1,39 @@
 import { SceneInstancePath } from "../CloneInstance";
 
 export default interface GoModule {
-  addNumberExpr(id: string): void;
-  setNumberExprValue(id: string, value: number): void;
-  addCallExpr(id: string);
-  setCallExprArg0(exprId: string, argId: string): void;
-  setCallExprArg1(exprId: string, argId: string): void;
-  evalExpr(exprId: string): number;
+  Component: {
+    create(componentId: string): void;
+    setCloneCount(componentId: string, count: number): void;
+    addAttribute(componentId: string, attributeId: string): void;
+  };
 
-  eval(): EvaluationMut;
-  
-  sceneInstancePathAppend(basePath: string, componentId: string, cloneId: string): string;
-  createAttributeSceneInstancePath(attributeId: string, sceneInstancePath: string): string;
+  Attribute: {
+    setExpr(attributeId: string, exprId: string): void;
+  };
+
+  NumberExpr: {
+    create(id: string): void;
+    setValue(id: string, value: number): void;
+  };
+
+  CallExpr: {
+    create(id: string): void;
+    setArg0(exprId: string, argId: string): void;
+    setArg1(exprId: string, argId: string): void;
+  };
+
+  Evaluator: {
+    eval(): EvaluationMut;
+    sceneInstancePathAppend(
+      basePath: string,
+      componentId: string,
+      cloneId: string
+    ): string;
+    createAttributeSceneInstancePath(
+      attributeId: string,
+      sceneInstancePath: string
+    ): string;
+  };
 }
 
 export interface Evaluation {
