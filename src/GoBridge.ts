@@ -1,7 +1,5 @@
 import {
   first,
-  Observable,
-  ReplaySubject,
   Subject
 } from "rxjs";
 import { Expr, ExprType } from "./ExObject";
@@ -13,20 +11,32 @@ import { assertUnreachable } from "./utils/Utils";
 export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
 
-  public constructor(private readonly goModule: GoModule, ctx: MainContext) {
+  public constructor(goModule: GoModule, ctx: MainContext) {
     this.setup(goModule, ctx);
   }
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
+    ctx.componentAdded$.subscribe((component) => {
+      goModule.Component.create(component.id);
+      goModule.Component.setCloneCount(component.id, 1);
+
+      component.sceneAttributeAdded$.subscribe((attribute) => {
+        goModule.Component.addAttribute(component.id, attribute.id);
+        attribute.expr$.subscribe((expr) => {
+          goModule.Attribute.setExpr(component.id, attribute.id, expr.id);
+        });
+      });
+    });
+
     ctx.onExprAdded$.subscribe((expr) => {
       switch (expr.exprType) {
         case ExprType.NumberExpr:
-          goModule.addNumberExpr(expr.id);
-          goModule.setNumberExprValue(expr.id, expr.value);
+          goModule.NumberExpr.create(expr.id);
+          goModule.NumberExpr.setValue(expr.id, expr.value);
           break;
         case ExprType.CallExpr:
-          goModule.addCallExpr(expr.id);
+          goModule.CallExpr.create(expr.id);
 
           expr.args$.pipe(first()).subscribe((args) => {
             const arg0 = args[0];
@@ -36,8 +46,8 @@ export default class GoBridge {
               throw new Error("CallExpr must have 2 args");
             }
 
-            goModule.setCallExprArg0(expr.id, arg0.id);
-            goModule.setCallExprArg1(expr.id, arg1.id);
+            goModule.CallExpr.setArg0(expr.id, arg0.id);
+            goModule.CallExpr.setArg1(expr.id, arg1.id);
           });
           break;
         default:
@@ -57,17 +67,5 @@ export default class GoBridge {
     }
 
     return ready$;
-  }
-
-  public evalExpr$(expr: Expr): Observable<number> {
-    const result$ = new ReplaySubject<number>(1);
-    const ready$ = this.getOrCreateReady$(expr);
-    ready$.subscribe({
-      complete: () => {
-        const r = this.goModule.evalExpr(expr.id);
-        result$.next(r);
-      }
-    });
-    return result$;
   }
 }

@@ -1,4 +1,4 @@
-import { SceneInstancePath } from "../CloneInstance";
+import { SceneInstancePath } from "../SceneInstance";
 
 export default interface GoModule {
   Component: {
@@ -8,7 +8,7 @@ export default interface GoModule {
   };
 
   Attribute: {
-    setExpr(attributeId: string, exprId: string): void;
+    setExpr(componentId: string, attributeId: string, exprId: string): void;
   };
 
   NumberExpr: {

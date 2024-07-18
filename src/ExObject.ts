@@ -27,6 +27,7 @@ export interface Component extends ExObjectBase {
   readonly objectType: ExObjectType.Component;
   readonly proto: ProtoComponent;
   readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneAttribute, SceneAttribute>;
+  readonly sceneAttributeAdded$: Observable<SceneAttribute>;
 }
 
 export interface Attribute extends ExObjectBase {

@@ -1,5 +1,5 @@
 import { withLatestFrom } from "rxjs";
-import { SceneInstancePath } from "../CloneInstance";
+import { attributeSceneInstancePathToString, SceneInstancePath } from "../SceneInstance";
 import { Component } from "../ExObject";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
@@ -74,7 +74,8 @@ export class SceneManager {
     path: SceneInstancePath,
     evaluation: Evaluation
   ): void {
-    const result = evaluation.getResult(sceneAttr.id, path);
+    const pathString = attributeSceneInstancePathToString(this.ctx.mainCtx.goModule, sceneAttr, path);
+    const result = evaluation.getResult(pathString);
     const setter = sceneAttr.proto.sceneAttributeSetter;
     setter(sceneObject, result);
   }

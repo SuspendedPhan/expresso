@@ -17,7 +17,7 @@ export class Evaluator {
 
   private setup() {
     interval(1000).subscribe(() => {
-      const evaluation = this.ctx.goModule.eval();
+      const evaluation = this.ctx.goModule.Evaluator.eval();
       this.eval$_.next(evaluation);
       evaluation.dispose();
     });

@@ -22,7 +22,7 @@ export default class MainContext {
   private readonly onExprAdded$_ = new Subject<Expr>();
   private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
 
-  public readonly onComponentAdded$: OBS<Component> = this.onComponentAdded$_;
+  public readonly componentAdded$: OBS<Component> = this.onComponentAdded$_;
   public readonly onSceneAttributeAdded$: OBS<SceneAttribute> =
     this.onSceneAttributeAdded$_;
   public readonly onAttributeAdded$: OBS<Attribute> = this.onAttributeAdded$_;

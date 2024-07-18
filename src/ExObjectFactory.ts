@@ -21,6 +21,7 @@ import {
 import MainContext from "./MainContext";
 import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ProtoComponent } from "./ProtoComponent";
+import { createBehaviorSubjectWithLifetime } from "./utils/Utils";
 
 let nextId = 0;
 
@@ -49,7 +50,7 @@ export default class ExObjectFactory {
       ...mutBase,
     };
 
-    (this.ctx.onComponentAdded$ as Subject<Component>).next(component);
+    (this.ctx.componentAdded$ as Subject<Component>).next(component);
     return component;
   }
 
@@ -84,7 +85,7 @@ export default class ExObjectFactory {
 
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
-    const exprSub$ = new BehaviorSubject<Expr>(expr);
+    const exprSub$ = createBehaviorSubjectWithLifetime(base.destroy$, expr);
 
     const attribute: AttributeMut = {
       ...base,
@@ -138,18 +139,18 @@ export default class ExObjectFactory {
       args = [arg0, arg1];
     }
 
-    const argsMut$ = new BehaviorSubject<Expr[]>(args);
-
+    
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
+    const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
 
     const expr: CallExprMut = {
-      objectType: ExObjectType.Expr,
-      exprType: ExprType.CallExpr,
-      args$: argsMut$,
-      argsSub$: argsMut$,
       ...base,
       ...mutBase,
+      objectType: ExObjectType.Expr,
+      exprType: ExprType.CallExpr,
+      args$: argsSub$,
+      argsSub$,
     };
 
     for (const arg of args) {
@@ -162,9 +163,12 @@ export default class ExObjectFactory {
   }
 
   private createExObjectMutBase(): ExObjectMutBase {
+    const destroySub$ = new Subject<void>();
+    const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(destroySub$, null);
+
     return {
-      parentSub$: new BehaviorSubject<Parent>(null),
-      destroySub$: new Subject<void>(),
+      parentSub$,
+      destroySub$,
     };
   }
 
