@@ -1,5 +1,5 @@
-import { BehaviorSubject } from "rxjs";
-import { Expr, Parent } from "./ExObject";
+import type { BehaviorSubject } from "rxjs";
+import type { Expr, Parent } from "./ex-object/ExObject";
 
 export type ExprMut = Expr & {
     mut: {

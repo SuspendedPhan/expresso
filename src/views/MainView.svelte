@@ -1,6 +1,6 @@
 <script lang="ts">
   import AttributeView from "./AttributeView.svelte";
-  import type { Attribute } from "../ExObject";
+  import type { Attribute } from "../ex-object/ExObject";
   import Logger from "../logger/Logger";
   import { loggedMethod } from "../logger/LoggerDecorator";
   import type MainContext from "../main-context/MainContext";

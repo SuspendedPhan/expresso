@@ -1,5 +1,5 @@
 import { first, Subject } from "rxjs";
-import { type Expr, ExprType } from "../ExObject";
+import { type Expr, ExprType } from "../ex-object/ExObject";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import type MainContext from "../main-context/MainContext";
 import type GoModule from "../utils/GoModule";

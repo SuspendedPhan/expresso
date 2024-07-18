@@ -1,5 +1,5 @@
 import { first } from "rxjs";
-import type { Expr } from "../ExObject";
+import type { Expr } from "../ex-object/ExObject";
 import ExObjectFactory from "../ExObjectFactory";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";

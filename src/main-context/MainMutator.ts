@@ -1,17 +1,18 @@
-import { BehaviorSubject, first, Subject } from "rxjs";
+import { type BehaviorSubject, first, type Subject } from "rxjs";
 import {
-  Attribute,
-  CallExpr,
-  Component,
-  ExObject,
+  type Attribute,
+  type CallExpr,
+  type Component,
+  type ExObject,
   ExObjectType,
-  Expr,
+  type Expr,
   ExprType,
-  Parent,
-} from "../ExObject";
+  type Parent,
+} from "../ex-object/ExObject";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import MainContext, { ExprReplacement } from "./MainContext";
+import type MainContext from "./MainContext";
+import type { ExprReplacement } from "./MainContext";
 import { ProtoComponentStore } from "../ProtoComponent";
 import { assertUnreachable } from "../utils/Utils";
 

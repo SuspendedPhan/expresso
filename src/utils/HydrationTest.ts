@@ -1,11 +1,11 @@
-import { Observable, ReplaySubject } from "rxjs";
-import { Attribute } from "../ExObject";
+import { type Observable, ReplaySubject } from "rxjs";
+import type { Attribute } from "../ex-object/ExObject";
 import Dehydrator from "../hydration/Dehydrator";
 import Rehydrator from "../hydration/Rehydrator";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import MainContext from "../main-context/MainContext";
-import Main from "./Main";
+import type MainContext from "../main-context/MainContext";
+import type Main from "./Main";
 
 export default class HydrationTest {
   @loggedMethod

@@ -1,9 +1,9 @@
-import { Attribute } from "pixi.js";
+import type { Attribute } from "pixi.js";
 import { ReplaySubject, Subject } from "rxjs";
-import { Component, Expr } from "../ExObject";
-import { ExprReplacement } from "./MainContext";
-import { SceneAttribute } from "../SceneAttribute";
-import { OBS } from "../utils/Utils";
+import type { Component, Expr } from "../ex-object/ExObject";
+import type { ExprReplacement } from "./MainContext";
+import type { SceneAttribute } from "../SceneAttribute";
+import type { OBS } from "../utils/Utils";
 
 export class MainEventBus {
   public readonly rootComponents$: OBS<readonly Component[]>;

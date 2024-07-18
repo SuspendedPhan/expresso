@@ -2,13 +2,13 @@ import {
   BehaviorSubject,
   first,
   map,
-  Observable,
+  type Observable,
   of,
   ReplaySubject,
   Subject,
   switchMap
 } from "rxjs";
-import { ExObject, ExObjectType, Expr, ExprType } from "../ExObject";
+import { type ExObject, ExObjectType, type Expr, ExprType } from "../ex-object/ExObject";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { assertUnreachable } from "./Utils";

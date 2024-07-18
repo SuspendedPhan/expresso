@@ -1,7 +1,7 @@
-import { first, map, Observable } from "rxjs";
-import { Attribute } from "../ExObject";
+import { first, map, type Observable } from "rxjs";
+import type { Attribute } from "../ex-object/ExObject";
 import MainContext from "../main-context/MainContext";
-import GoModule from "./GoModule";
+import type GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";
 import { ProtoSceneAttributeStore } from "../SceneAttribute";

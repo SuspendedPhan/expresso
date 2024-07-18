@@ -1,26 +1,26 @@
 import { Subject } from "rxjs";
 import {
-  Attribute,
-  CallExpr,
-  Component,
-  ExObjectBase,
+  type Attribute,
+  type CallExpr,
+  type Component,
+  type ExObjectBase,
   ExObjectType,
-  Expr,
+  type Expr,
   ExprType,
-  NumberExpr,
-  Parent,
-} from "./ExObject";
+  type NumberExpr,
+  type Parent,
+} from "./ex-object/ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
-import MainContext from "./main-context/MainContext";
-import {
+import type MainContext from "./main-context/MainContext";
+import type {
   AttributeMut,
   CallExprMut,
   ExObjectMut,
   ExObjectMutBase,
 } from "./main-context/MainMutator";
-import { ProtoComponent } from "./ProtoComponent";
-import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import type { ProtoComponent } from "./ProtoComponent";
+import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import {
   createBehaviorSubjectWithLifetime,
   createSubjectWithLifetime,

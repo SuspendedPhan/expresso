@@ -1,6 +1,6 @@
-import { Observable } from "rxjs";
-import { ProtoComponent } from "./ProtoComponent";
-import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import type { Observable } from "rxjs";
+import type { ProtoComponent } from "../ProtoComponent";
+import type { ProtoSceneAttribute, SceneAttribute } from "../SceneAttribute";
 
 export enum ExObjectType {
   SceneAttribute,

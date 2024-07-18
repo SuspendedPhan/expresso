@@ -1,8 +1,8 @@
-import { Attribute, CallExpr, Expr, NumberExpr } from "../ExObject";
-import ExObjectFactory from "../ExObjectFactory";
+import type { Attribute, CallExpr, Expr, NumberExpr } from "../ex-object/ExObject";
+import type ExObjectFactory from "../ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import MainContext from "../main-context/MainContext";
-import {
+import type MainContext from "../main-context/MainContext";
+import type {
   DehydratedAttribute,
   DehydratedCallExpr,
   DehydratedExpr,
