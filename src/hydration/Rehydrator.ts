@@ -1,5 +1,5 @@
 import type { Attribute, CallExpr, Expr, NumberExpr } from "../ex-object/ExObject";
-import type ExObjectFactory from "../ExObjectFactory";
+import type ExObjectFactory from "../ex-object/ExObjectFactory";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import type MainContext from "../main-context/MainContext";
 import type {

@@ -1,6 +1,6 @@
 import { first } from "rxjs";
 import type { Expr } from "../ex-object/ExObject";
-import ExObjectFactory from "../ExObjectFactory";
+import ExObjectFactory from "../ex-object/ExObjectFactory";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";

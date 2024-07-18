@@ -9,22 +9,22 @@ import {
   ExprType,
   type NumberExpr,
   type Parent,
-} from "./ex-object/ExObject";
-import Logger from "./logger/Logger";
-import { loggedMethod } from "./logger/LoggerDecorator";
-import type MainContext from "./main-context/MainContext";
+} from "./ExObject";
+import Logger from "../logger/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import type MainContext from "../main-context/MainContext";
 import type {
   AttributeMut,
   CallExprMut,
   ExObjectMut,
   ExObjectMutBase,
-} from "./main-context/MainMutator";
-import type { ProtoComponent } from "./ProtoComponent";
-import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+} from "../main-context/MainMutator";
+import type { ProtoComponent } from "../ProtoComponent";
+import type { ProtoSceneAttribute, SceneAttribute } from "../SceneAttribute";
 import {
   createBehaviorSubjectWithLifetime,
   createSubjectWithLifetime,
-} from "./utils/Utils";
+} from "../utils/Utils";
 
 let nextId = 0;
 
