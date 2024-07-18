@@ -1,8 +1,5 @@
 import hotkeys from "hotkeys-js";
-import BakLogger from "./BakLogger";
 import Selection from "./Selection";
-
-const logger = BakLogger.file("Keyboard.ts");
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -18,27 +15,22 @@ export default class Keyboard {
   }
   
   public static register(selection: Selection) {
-    logger.log("register");
     hotkeys.setScope(this.SCOPE);
 
     hotkeys("down", this.SCOPE, function (_event, _handler) {
-      logger.log("down");
       selection.down$.next();
       return false;
     });
 
     hotkeys("up", this.SCOPE, function (_event, _handler) {
-      logger.log("up");
       selection.up$.next();
       return false;
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {
-      logger.log("left");
     });
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
-      logger.log("right");
       // selection.selectedObject$.next(null);
     });
   }
