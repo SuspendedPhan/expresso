@@ -1,4 +1,3 @@
-import Logger from "./logger/Logger";
 import { SceneAttribute } from "./SceneAttribute";
 import GoModule from "./utils/GoModule";
 
@@ -14,13 +13,16 @@ export interface AttributeSceneInstance {
   readonly attributeId: string;
 }
 
-export function attributeSceneInstancePathToString(goModule: GoModule, attr: SceneAttribute, path: SceneInstancePath): string {
-  const logger = Logger.logger();
+export function sceneInstancePathToString(path: SceneInstancePath): string {
   let sceneInstancePath = "";
   for (const csi of path) {
-    logger.log("csi", JSON.stringify(csi));
-    sceneInstancePath += goModule.Evaluator.sceneInstancePathAppend(sceneInstancePath, csi.componentId, csi.cloneId);
+    sceneInstancePath += `${csi.componentId}:${csi.cloneId}`;
   }
+  return sceneInstancePath;
+}
+
+export function attributeSceneInstancePathToString(goModule: GoModule, attr: SceneAttribute, path: SceneInstancePath): string {
+  const sceneInstancePath = sceneInstancePathToString(path);
   const result = goModule.Evaluator.createAttributeSceneInstancePath(attr.id, sceneInstancePath);
   return result;
 }

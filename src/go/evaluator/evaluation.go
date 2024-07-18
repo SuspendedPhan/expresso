@@ -1,6 +1,8 @@
 package evaluator
 
-import "strconv"
+import (
+	"strconv"
+)
 
 func (e *Evaluator) Eval() *Evaluation {
 	evaluation := &Evaluation{
@@ -17,6 +19,7 @@ func (e *Evaluator) Eval() *Evaluation {
 			}
 		}
 	}
+	// spew.Dump(evaluation)
 	return evaluation
 }
 

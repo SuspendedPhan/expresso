@@ -1,7 +1,4 @@
-import {
-  first,
-  Subject
-} from "rxjs";
+import { first, Subject } from "rxjs";
 import { Expr, ExprType } from "./ExObject";
 import { loggedMethod } from "./logger/LoggerDecorator";
 import MainContext from "./MainContext";
@@ -21,12 +18,12 @@ export default class GoBridge {
       goModule.Component.create(component.id);
       goModule.Component.setCloneCount(component.id, 1);
 
-      component.sceneAttributeAdded$.subscribe((attribute) => {
+      for (const attribute of component.sceneAttributeByProto.values()) {
         goModule.Component.addAttribute(component.id, attribute.id);
         attribute.expr$.subscribe((expr) => {
           goModule.Attribute.setExpr(component.id, attribute.id, expr.id);
         });
-      });
+      }
     });
 
     ctx.eventBus.onExprAdded$.subscribe((expr) => {

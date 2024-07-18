@@ -1,5 +1,5 @@
 import { withLatestFrom } from "rxjs";
-import { attributeSceneInstancePathToString, SceneInstancePath } from "../SceneInstance";
+import { attributeSceneInstancePathToString, SceneInstancePath, sceneInstancePathToString } from "../SceneInstance";
 import { Component } from "../ExObject";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import { SceneAttribute } from "../SceneAttribute";
@@ -8,6 +8,8 @@ import { SceneContext, SceneObject } from "./SceneContext";
 import Logger from "../logger/Logger";
 
 export class SceneManager {
+  private readonly sceneObjectBySceneInstancePath = new Map<string, SceneObject>();
+
   public constructor(private readonly ctx: SceneContext) {
     this.setup();
   }
@@ -61,7 +63,13 @@ export class SceneManager {
     path: SceneInstancePath
   ): void {
     Logger.arg("path", path);
-    const sceneObject = this.ctx.pool.takeObject();
+    const pathString = sceneInstancePathToString(path);
+    let sceneObject = this.sceneObjectBySceneInstancePath.get(pathString);
+    if (!sceneObject) {
+      sceneObject = this.ctx.pool.takeObject();
+      this.sceneObjectBySceneInstancePath.set(pathString, sceneObject);
+    }
+
     const sceneAttributes = Array.from(
       component.sceneAttributeByProto.values()
     );
@@ -84,7 +92,13 @@ export class SceneManager {
   ): void {
     const pathString = attributeSceneInstancePathToString(this.ctx.mainCtx.goModule, sceneAttr, path);
     const result = evaluation.getResult(pathString);
+    console.log("result", result);
+    
+    sceneObject.visible = true;
+    sceneObject.scale.x = 100;
+    sceneObject.scale.y = 100;
     const setter = sceneAttr.proto.sceneAttributeSetter;
     setter(sceneObject, result);
+    console.log("sceneObject", sceneObject);
   }
 }
