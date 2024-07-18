@@ -1,4 +1,4 @@
-import { ProtoSceneAttribute, ProtoSceneAttributeStore } from "./SceneAttribute";
+import { type ProtoSceneAttribute, ProtoSceneAttributeStore } from "./SceneAttribute";
 
 export interface ProtoComponent {
   id: string;
