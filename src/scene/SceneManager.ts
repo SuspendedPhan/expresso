@@ -16,20 +16,11 @@ export class SceneManager {
 
   @loggedMethod
   private setup() {
-    Logger.logThis();
-    Logger.logCallstack();
     this.ctx.evaluator.eval$
       .pipe(withLatestFrom(this.ctx.mainCtx.eventBus.rootComponents$))
       .subscribe(([evaluation, rootComponents]) => {
-        console.log("Updating root components");
-        
         this.updateRootComponents(evaluation, rootComponents);
       });
-  }
-
-  // @ts-ignore
-  private getCloneCount(component: Component): number {
-    return 1;
   }
 
   private updateRootComponents(
@@ -46,7 +37,17 @@ export class SceneManager {
     evaluation: Evaluation,
     parentPath: SceneInstancePath
   ): void {
-    const cloneCount = this.getCloneCount(component);
+    component.cloneCount$.subscribe((cloneCount) => {
+      this.updateComponent1(component, evaluation, parentPath, cloneCount);
+    });
+  }
+
+  private updateComponent1(
+    component: Component,
+    evaluation: Evaluation,
+    parentPath: SceneInstancePath,
+    cloneCount: number
+  ) {
     for (let i = 0; i < cloneCount; i++) {
       const path = [
         ...parentPath,
@@ -92,13 +93,11 @@ export class SceneManager {
   ): void {
     const pathString = attributeSceneInstancePathToString(this.ctx.mainCtx.goModule, sceneAttr, path);
     const result = evaluation.getResult(pathString);
-    console.log("result", result);
     
     sceneObject.visible = true;
     sceneObject.scale.x = 100;
     sceneObject.scale.y = 100;
     const setter = sceneAttr.proto.sceneAttributeSetter;
     setter(sceneObject, result);
-    console.log("sceneObject", sceneObject);
   }
 }

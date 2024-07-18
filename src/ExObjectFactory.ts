@@ -35,6 +35,7 @@ export default class ExObjectFactory {
     const id = `component-${nextId++}`;
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
+    const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
     const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
       base.destroy$
     );
@@ -52,6 +53,7 @@ export default class ExObjectFactory {
       objectType: ExObjectType.Component,
       proto,
       sceneAttributeByProto,
+      cloneCount$: cloneCountSub$,
       sceneAttributeAdded$,
       ...base,
       ...mutBase,

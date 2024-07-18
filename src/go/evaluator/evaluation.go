@@ -15,7 +15,7 @@ func (e *Evaluator) Eval() *Evaluation {
 			for _, attribute := range component.AttributeById {
 				value := e.EvalExpr(attribute.ExprId)
 				attributeSceneInstancePath := CreateAttributeSceneInstancePath(attribute.Id, sceneInstancePath)
-				evaluation.resultByAttributeSceneInstancePath[attributeSceneInstancePath] = value
+				evaluation.resultByAttributeSceneInstancePath[attributeSceneInstancePath] = value + value*Float(i)
 			}
 		}
 	}

@@ -16,7 +16,9 @@ export default class GoBridge {
   private setup(goModule: GoModule, ctx: MainContext) {
     ctx.eventBus.componentAdded$.subscribe((component) => {
       goModule.Component.create(component.id);
-      goModule.Component.setCloneCount(component.id, 1);
+      component.cloneCount$.subscribe((cloneCount) => {
+        goModule.Component.setCloneCount(component.id, cloneCount);
+      });
 
       for (const attribute of component.sceneAttributeByProto.values()) {
         goModule.Component.addAttribute(component.id, attribute.id);
