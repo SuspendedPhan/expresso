@@ -1,11 +1,11 @@
 import { first } from "rxjs";
-import type { Expr } from "../ExObject";
-import ExObjectFactory from "../ExObjectFactory";
-import GoBridge from "../evaluation/GoBridge";
+import { Expr } from "./ExObject";
+import ExObjectFactory from "./ExObjectFactory";
+import GoBridge from "./evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
-import type GoModule from "../utils/GoModule";
-import Selection from "../utils/Selection";
+import type GoModule from "./utils/GoModule";
+import Selection from "./utils/Selection";
 
 export interface ExprReplacement {
   oldExpr: Expr;

@@ -2,7 +2,7 @@
   import { map } from "rxjs";
   import type { Attribute } from "../ExObject";
   import ExprView from "./ExprView.svelte";
-  import MainContext from "../main-context/MainContext";
+  import type MainContext from "../main-context/MainContext";
   import SelectableView from "../utils/SelectableView.svelte";
 
   export let ctx: MainContext;
