@@ -5,7 +5,7 @@ type Attribute struct {
 	ExprId string
 }
 
-func (e *Evaluator) SetExpr(componentId string, attributeId string, exprId string) {
+func (e *Evaluator) AttributeSetExpr(componentId string, attributeId string, exprId string) {
 	component, found := e.RootComponentById[componentId]
 
 	if !found {

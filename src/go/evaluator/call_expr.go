@@ -1,13 +1,13 @@
 package evaluator
 
-func (e *Evaluator) AddCallExpr(id string) {
+func (e *Evaluator) CallExprCreate(id string) {
 	e.ExprById[id] = &Expr{
 		Id:       id,
 		CallExpr: &CallExpr{},
 	}
 }
 
-func (e *Evaluator) SetCallExprArg0(id string, argId string) {
+func (e *Evaluator) CallExprSetArg0(id string, argId string) {
 	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found")
@@ -20,7 +20,7 @@ func (e *Evaluator) SetCallExprArg0(id string, argId string) {
 	callExpr.arg0Id = argId
 }
 
-func (e *Evaluator) SetCallExprArg1(id string, argId string) {
+func (e *Evaluator) CallExprSetArg1(id string, argId string) {
 	expr, found := e.ExprById[id]
 	if !found {
 		panic("expr not found " + id)

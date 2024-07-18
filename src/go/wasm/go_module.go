@@ -11,42 +11,76 @@ func bootstrapGoModule() {
 
 	ev := evaluator.NewEvaluator()
 
-	goModule.Set("addNumberExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		ev.AddNumberExpr(id)
-		return nil
+	goModule.Set("Component", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			ev.ComponentCreate(id)
+			return nil
+		}),
+		"setCloneCount": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			cloneCount := args[1].Int()
+			ev.ComponentSetCloneCount(id, cloneCount)
+			return nil
+		}),
+		"addAttribute": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			attributeId := args[1].String()
+			ev.ComponentAddAttribute(componentId, attributeId)
+			return nil
+		}),
 	}))
 
-	goModule.Set("setNumberExprValue", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		value := args[1].Float()
-		ev.SetNumberExprValue(id, value)
-		return nil
+	goModule.Set("Attribute", js.ValueOf(map[string]interface{}{
+		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			attributeId := args[1].String()
+			exprId := args[2].String()
+			ev.AttributeSetExpr(componentId, attributeId, exprId)
+			return nil
+		}),
 	}))
 
-	goModule.Set("addCallExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		ev.AddCallExpr(id)
-		return nil
+	goModule.Set("CallExpr", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			ev.CallExprCreate(id)
+			return nil
+		}),
+		"setArg0": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			argId := args[1].String()
+			ev.CallExprSetArg0(id, argId)
+			return nil
+		}),
+		"setArg1": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			argId := args[1].String()
+			ev.CallExprSetArg1(id, argId)
+			return nil
+		}),
 	}))
 
-	goModule.Set("setCallExprArg0", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		argId := args[1].String()
-		ev.SetCallExprArg0(id, argId)
-		return nil
-	}))
+	goModule.Set("Evaluator", js.ValueOf(map[string]interface{}{
+		"eval": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			evaluation := ev.Eval()
+			getResultFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				attributeSceneInstancePath := args[0].String()
+				return evaluation.GetResult(attributeSceneInstancePath)
+			})
 
-	goModule.Set("setCallExprArg1", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		id := args[0].String()
-		argId := args[1].String()
-		ev.SetCallExprArg1(id, argId)
-		return nil
-	}))
+			var disposeFunc js.Func
+			disposeFunc = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				getResultFunc.Release()
+				disposeFunc.Release()
+				return nil
+			})
 
-	goModule.Set("evalExpr", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-		exprId := args[0].String()
-		return ev.EvalExpr(exprId)
+			return js.ValueOf(map[string]interface{}{
+				"getResult": getResultFunc,
+				"dispose":   disposeFunc,
+			})
+		}),
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {

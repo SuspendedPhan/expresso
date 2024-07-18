@@ -6,14 +6,14 @@ type Component struct {
 	AttributeById map[string]*Attribute
 }
 
-func (e *Evaluator) Create(id string) {
+func (e *Evaluator) ComponentCreate(id string) {
 	e.RootComponentById[id] = &Component{
 		Id:            id,
 		AttributeById: map[string]*Attribute{},
 	}
 }
 
-func (e *Evaluator) SetCloneCount(id string, cloneCount int) {
+func (e *Evaluator) ComponentSetCloneCount(id string, cloneCount int) {
 	component, found := e.RootComponentById[id]
 
 	if !found {
@@ -23,7 +23,7 @@ func (e *Evaluator) SetCloneCount(id string, cloneCount int) {
 	component.CloneCount = cloneCount
 }
 
-func (e *Evaluator) AddAttribute(componentId string, attributeId string) {
+func (e *Evaluator) ComponentAddAttribute(componentId string, attributeId string) {
 	component, found := e.RootComponentById[componentId]
 
 	if !found {

@@ -4,7 +4,7 @@ import "strconv"
 
 func (e *Evaluator) Eval() *Evaluation {
 	evaluation := &Evaluation{
-		valueByAttributeSceneInstancePath: make(map[string]Float),
+		resultByAttributeSceneInstancePath: make(map[string]Float),
 	}
 
 	for _, component := range e.RootComponentById {
@@ -13,7 +13,7 @@ func (e *Evaluator) Eval() *Evaluation {
 			for _, attribute := range component.AttributeById {
 				value := e.EvalExpr(attribute.ExprId)
 				attributeSceneInstancePath := CreateAttributeSceneInstancePath(attribute.Id, sceneInstancePath)
-				evaluation.valueByAttributeSceneInstancePath[attributeSceneInstancePath] = value
+				evaluation.resultByAttributeSceneInstancePath[attributeSceneInstancePath] = value
 			}
 		}
 	}
@@ -21,11 +21,11 @@ func (e *Evaluator) Eval() *Evaluation {
 }
 
 type Evaluation struct {
-	valueByAttributeSceneInstancePath map[string]Float
+	resultByAttributeSceneInstancePath map[string]Float
 }
 
-func (e *Evaluation) GetValue(attributeSceneInstancePath string) Float {
-	v, ok := e.valueByAttributeSceneInstancePath[attributeSceneInstancePath]
+func (e *Evaluation) GetResult(attributeSceneInstancePath string) Float {
+	v, ok := e.resultByAttributeSceneInstancePath[attributeSceneInstancePath]
 	if !ok {
 		panic("No value for attributeSceneInstancePath: " + attributeSceneInstancePath)
 	}
