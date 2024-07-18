@@ -1,9 +1,9 @@
 <script lang="ts">
   import { combineLatestWith, fromEvent, Observable, of } from "rxjs";
-  import { ExprType, type Expr } from "./ExObject";
+  import { ExprType, type Expr } from "../ExObject";
   import ExprCommand from "./ExprCommand.svelte";
-  import MainContext from "./MainContext";
-  import SelectableView from "./utils/SelectableView.svelte";
+  import MainContext from "../MainContext";
+  import SelectableView from "../utils/SelectableView.svelte";
   import { onMount } from "svelte";
 
   export let ctx: MainContext;

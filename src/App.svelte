@@ -1,6 +1,6 @@
 <script lang="ts">
   import DebugOverlay from "./debug-overlay/DebugOverlay.svelte";
-  import MainView from "./MainView.svelte";
+  import MainView from "./views/MainView.svelte";
   import TestView from "./utils/TestView.svelte";
 
   let test = (function () {

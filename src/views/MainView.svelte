@@ -1,12 +1,12 @@
 <script lang="ts">
   import AttributeView from "./AttributeView.svelte";
-  import type { Attribute } from "./ExObject";
-  import Logger from "./logger/Logger";
-  import { loggedMethod } from "./logger/LoggerDecorator";
-  import MainContext from "./MainContext";
-  import SceneView from "./scene/SceneView.svelte";
-  import HydrationTest from "./utils/HydrationTest";
-  import Main from "./utils/Main";
+  import type { Attribute } from "../ExObject";
+  import Logger from "../logger/Logger";
+  import { loggedMethod } from "../logger/LoggerDecorator";
+  import MainContext from "../MainContext";
+  import SceneView from "../scene/SceneView.svelte";
+  import HydrationTest from "../utils/HydrationTest";
+  import Main from "../utils/Main";
 
   let ctx: MainContext | null = null;
   let attribute: Attribute | null = null;

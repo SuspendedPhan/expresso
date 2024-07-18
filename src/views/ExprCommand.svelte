@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   // import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
-  import BakLogger from "./utils/BakLogger";
+  import BakLogger from "../utils/BakLogger";
   const dispatch = createEventDispatcher<{ select: string }>();
 
   let input: HTMLInputElement;
