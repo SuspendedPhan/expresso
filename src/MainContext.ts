@@ -1,12 +1,11 @@
+import { first } from "rxjs";
+import { Expr } from "./ExObject";
+import ExObjectFactory from "./ExObjectFactory";
+import GoBridge from "./GoBridge";
+import { MainEventBus } from "./MainEventBus";
+import MainMutator from "./MainMutator";
 import type GoModule from "./utils/GoModule";
 import Selection from "./utils/Selection";
-import GoBridge from "./GoBridge";
-import MainMutator from "./MainMutator";
-import ExObjectFactory from "./ExObjectFactory";
-import { defer, first, ReplaySubject, Subject } from "rxjs";
-import { Attribute, Component, Expr } from "./ExObject";
-import { OBS } from "./utils/Utils";
-import { SceneAttribute } from "./SceneAttribute";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -14,25 +13,7 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
-  private readonly onComponentAdded$_ = new Subject<Component>();
-  private readonly onSceneAttributeAdded$_ = new ReplaySubject<SceneAttribute>(
-    10
-  );
-  private readonly onAttributeAdded$_ = new Subject<Attribute>();
-  private readonly onExprAdded$_ = new Subject<Expr>();
-  private readonly onExprReplaced$_ = new Subject<ExprReplacement>();
-
-  public readonly componentAdded$: OBS<Component> = this.onComponentAdded$_;
-  public readonly onSceneAttributeAdded$: OBS<SceneAttribute> =
-    this.onSceneAttributeAdded$_;
-  public readonly onAttributeAdded$: OBS<Attribute> = this.onAttributeAdded$_;
-  public readonly onExprAdded$: OBS<Expr> = this.onExprAdded$_;
-  public readonly onExprReplaced$: OBS<ExprReplacement> = this.onExprReplaced$_;
-
-  public readonly rootComponents$: OBS<readonly Component[]> = defer(() => {
-    throw new Error("Not implemented");
-  });
-
+  public readonly eventBus = new MainEventBus();
   public readonly mutator: MainMutator;
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly selection = new Selection();
@@ -42,7 +23,7 @@ export default class MainContext {
     this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
 
-    this.onExprReplaced$.subscribe((replacement) => {
+    this.eventBus.onExprReplaced$.subscribe((replacement) => {
       const oldExpr = replacement.oldExpr;
       const newExpr = replacement.newExpr;
       this.selection

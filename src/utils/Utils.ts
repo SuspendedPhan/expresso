@@ -9,7 +9,7 @@ export function assertUnreachable(_: never): never {
   throw new Error("Didn't expect to get here");
 }
 
-export function createSubjectWithLifetime<T>(complete$: Observable<T>): Subject<T> {
+export function createSubjectWithLifetime<T>(complete$: Observable<void>): Subject<T> {
   const subject = new Subject<T>();
   complete$.subscribe({
     complete: () => {

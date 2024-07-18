@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import {
   Attribute,
   CallExpr,
@@ -12,16 +12,19 @@ import {
 } from "./ExObject";
 import Logger from "./logger/Logger";
 import { loggedMethod } from "./logger/LoggerDecorator";
+import MainContext from "./MainContext";
 import {
   AttributeMut,
   CallExprMut,
   ExObjectMut,
   ExObjectMutBase,
 } from "./MainMutator";
-import MainContext from "./MainContext";
-import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ProtoComponent } from "./ProtoComponent";
-import { createBehaviorSubjectWithLifetime } from "./utils/Utils";
+import { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import {
+  createBehaviorSubjectWithLifetime,
+  createSubjectWithLifetime,
+} from "./utils/Utils";
 
 let nextId = 0;
 
@@ -32,6 +35,9 @@ export default class ExObjectFactory {
     const id = `component-${nextId++}`;
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
+    const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
+      base.destroy$
+    );
 
     const sceneAttributeByProto = new Map<
       ProtoSceneAttribute,
@@ -46,11 +52,12 @@ export default class ExObjectFactory {
       objectType: ExObjectType.Component,
       proto,
       sceneAttributeByProto,
+      sceneAttributeAdded$,
       ...base,
       ...mutBase,
     };
 
-    (this.ctx.componentAdded$ as Subject<Component>).next(component);
+    (this.ctx.eventBus.componentAdded$ as Subject<Component>).next(component);
     return component;
   }
 
@@ -58,10 +65,10 @@ export default class ExObjectFactory {
     const attribute = this.createAttribute(x.id);
     const sceneAttribute: SceneAttribute = {
       proto: x,
-      attribute,
+      ...attribute,
     };
 
-    (this.ctx.onSceneAttributeAdded$ as Subject<SceneAttribute>).next(
+    (this.ctx.eventBus.onSceneAttributeAdded$ as Subject<SceneAttribute>).next(
       sceneAttribute
     );
 
@@ -98,7 +105,9 @@ export default class ExObjectFactory {
     const exprMut = expr as ExObjectMut;
     exprMut.parentSub$.next(attribute);
 
-    (this.ctx.onAttributeAdded$ as Subject<Attribute>).next(attribute);
+    (this.ctx.eventBus.onAttributeAdded$ as unknown as Subject<Attribute>).next(
+      attribute
+    );
     return attribute;
   }
 
@@ -123,7 +132,7 @@ export default class ExObjectFactory {
       ...mutBase,
     };
 
-    (this.ctx.onExprAdded$ as Subject<Expr>).next(expr);
+    (this.ctx.eventBus.onExprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 
@@ -139,7 +148,6 @@ export default class ExObjectFactory {
       args = [arg0, arg1];
     }
 
-    
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
@@ -158,13 +166,16 @@ export default class ExObjectFactory {
       argMut.parentSub$.next(expr);
     }
 
-    (this.ctx.onExprAdded$ as Subject<Expr>).next(expr);
+    (this.ctx.eventBus.onExprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 
   private createExObjectMutBase(): ExObjectMutBase {
     const destroySub$ = new Subject<void>();
-    const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(destroySub$, null);
+    const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(
+      destroySub$,
+      null
+    );
 
     return {
       parentSub$,

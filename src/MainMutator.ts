@@ -97,6 +97,6 @@ export default class MainMutator {
     const newExprMut = newExpr as ExObjectMut;
     newExprMut.parentSub$.next(parent);
     oldExprMut.destroySub$.complete();
-    (this.ctx.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
+    (this.ctx.eventBus.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
   }
 }

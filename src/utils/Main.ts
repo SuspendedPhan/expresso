@@ -22,7 +22,7 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    this.attribute = ctx.mutator.createMainObject().sceneAttributeByProto.get(ProtoSceneAttributeStore.x)!.attribute;
+    this.attribute = ctx.mutator.createMainObject().sceneAttributeByProto.get(ProtoSceneAttributeStore.x)!;
     ctx.selection.root$.next(this.attribute);
     Keyboard.register(ctx.selection);
   }

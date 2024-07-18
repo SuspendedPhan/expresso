@@ -14,7 +14,7 @@ export class SceneManager {
   @loggedMethod
   private setup() {
     this.ctx.evaluator.eval$
-      .pipe(withLatestFrom(this.ctx.mainCtx.rootComponents$))
+      .pipe(withLatestFrom(this.ctx.mainCtx.eventBus.rootComponents$))
       .subscribe(([evaluation, rootComponents]) => {
         this.updateRootComponents(evaluation, rootComponents);
       });
