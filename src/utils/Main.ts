@@ -1,10 +1,10 @@
 import { first, map, type Observable } from "rxjs";
-import type { Attribute } from "../ex-object/ExObject";
-import MainContext from "../main-context/MainContext";
-import type GoModule from "./GoModule";
-import GoModuleLoader from "./GoModuleLoader";
-import Keyboard from "./Keyboard";
-import { ProtoSceneAttributeStore } from "../ex-object/SceneAttribute";
+import type { Attribute } from "src/ex-object/ExObject";
+import MainContext from "src/main-context/MainContext";
+import type GoModule from "src/utils/GoModule";
+import GoModuleLoader from "src/utils/GoModuleLoader";
+import Keyboard from "src/utils/Keyboard";
+import { ProtoSceneAttributeStore } from "src/ex-object/SceneAttribute";
 
 export default class Main {
   public readonly attribute: Attribute;

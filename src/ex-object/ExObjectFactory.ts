@@ -11,8 +11,8 @@ import {
   type Parent,
 } from "src/ex-object/ExObject";
 import Logger from "../logger/Logger";
-import { loggedMethod } from "../logger/LoggerDecorator";
-import type MainContext from "../main-context/MainContext";
+import { loggedMethod } from "src/logger/LoggerDecorator";
+import type MainContext from "src/main-context/MainContext";
 import type {
   AttributeMut,
   CallExprMut,
@@ -24,7 +24,7 @@ import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import {
   createBehaviorSubjectWithLifetime,
   createSubjectWithLifetime,
-} from "../utils/Utils";
+} from "src/utils/Utils";
 
 let nextId = 0;
 

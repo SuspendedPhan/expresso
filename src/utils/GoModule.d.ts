@@ -1,4 +1,4 @@
-import { SceneInstancePath } from "../scene/SceneInstance";
+import { SceneInstancePath } from "src/scene/SceneInstance";
 
 export default interface GoModule {
   Component: {

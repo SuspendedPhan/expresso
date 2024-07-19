@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
-import LoggerConfigHydrator from "./LoggerConfigHydrator";
-import Persistence from "../persistence/Persistence";
+import LoggerConfigHydrator from "src/LoggerConfigHydrator";
+import Persistence from "src/persistence/Persistence";
 
 export interface MutedTopic {
   id: string;

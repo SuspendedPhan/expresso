@@ -8,13 +8,13 @@ import {
   type Expr,
   ExprType,
   type Parent,
-} from "../ex-object/ExObject";
+} from "src/ex-object/ExObject";
 import Logger from "../logger/Logger";
-import { loggedMethod } from "../logger/LoggerDecorator";
+import { loggedMethod } from "src/logger/LoggerDecorator";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
 import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
-import { assertUnreachable } from "../utils/Utils";
+import { assertUnreachable } from "src/utils/Utils";
 
 export type ExObjectMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
