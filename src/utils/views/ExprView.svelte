@@ -2,7 +2,7 @@
   import { combineLatestWith, fromEvent, type Observable, of } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExObject";
   // biome-ignore lint:
-  import ExprCommand from "src/views/ExprCommand.svelte";
+  import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { onMount } from "svelte";

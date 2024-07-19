@@ -1,10 +1,10 @@
 <script lang="ts">
   import AttributeView from "./AttributeView.svelte";
   import type { Attribute } from "src/ex-object/ExObject";
-  import Logger from "../utils/logger/Logger";
+  import Logger from "src/utils/logger/Logger";
   import { loggedMethod } from "src/utils/logger/LoggerDecorator";
   import type MainContext from "src/main-context/MainContext";
-  import SceneView from "../scene/SceneView.svelte";
+  import SceneView from "src/scene/SceneView.svelte";
   import HydrationTest from "src/utils/utils/HydrationTest";
   import Main from "src/utils/utils/Main";
 
