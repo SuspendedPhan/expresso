@@ -2,6 +2,8 @@ import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 
+export type ExObject = Component | Attribute | Expr;
+
 export enum ExObjectType {
   SceneAttribute,
 
@@ -50,5 +52,3 @@ export interface CallExpr extends ExObjectBase {
   readonly exprType: ExprType.CallExpr;
   readonly args$: Observable<readonly Expr[]>;
 }
-
-export type ExObject = Attribute | Expr;

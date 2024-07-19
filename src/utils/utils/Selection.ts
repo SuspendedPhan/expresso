@@ -6,9 +6,15 @@ import {
   of,
   ReplaySubject,
   Subject,
-  switchMap
+  switchMap,
 } from "rxjs";
-import { type ExObject, ExObjectType, type Expr, ExprType } from "src/ex-object/ExObject";
+import {
+  Component,
+  type ExObject,
+  ExObjectType,
+  type Expr,
+  ExprType,
+} from "src/ex-object/ExObject";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -93,9 +99,23 @@ export default class Selection {
       case ExObjectType.Expr:
         this.downExpr(selectedObject);
         return;
+      case ExObjectType.Component:
+        this.downComponent(selectedObject);
+        return;
       default:
         assertUnreachable(selectedObject);
     }
+  }
+  downComponent(selectedObject: Component) {
+    const sceneAttributes = Array.from(
+      selectedObject.sceneAttributeByProto.values()
+    );
+    const attr = sceneAttributes[0];
+    if (attr === undefined) {
+      throw new Error("Component must have at least 1 attribute");
+    }
+
+    this.selectedObject$.next(attr);
   }
 
   @loggedMethod
@@ -124,22 +144,11 @@ export default class Selection {
       return;
     }
 
-    switch (selectedObject.objectType) {
-      case ExObjectType.Attribute:
-        return;
-      case ExObjectType.Expr:
-        this.upExpr(selectedObject);
-        return;
-      default:
-        assertUnreachable(selectedObject);
-    }
-  }
-
-  @loggedMethod
-  private upExpr(selectedObject: Expr) {
     const parent$ = selectedObject.parent$;
     parent$.pipe(first()).subscribe((parent) => {
-      this.selectedObject$.next(parent);
+      if (parent !== null) {
+        this.selectedObject$.next(parent);
+      }
     });
   }
 }
