@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { type Observable, ReplaySubject } from "rxjs";
 import type { Attribute } from "src/ex-object/ExObject";
 import Dehydrator from "src/utils/hydration/Dehydrator";

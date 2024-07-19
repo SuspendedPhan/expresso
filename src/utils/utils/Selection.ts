@@ -62,6 +62,7 @@ export default class Selection {
     return this.selectedObject$.pipe(
       switchMap((selectedObject) => {
         if (selectedObject === SelectedObjectType.Root) {
+          throw new Error("Root is not implemented");
           return this.root$;
         }
         return of(selectedObject);

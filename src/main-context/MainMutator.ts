@@ -23,6 +23,12 @@ export type ExObjectMutBase = {
 
 export type ExObjectMut = ExObject & ExObjectMutBase;
 
+export type ComponentMut = Component & ExObjectMut & {
+  // cloneCountSub$: BehaviorSubject<number>;
+  // childrenSub$: BehaviorSubject<readonly Component[]>;
+  // sceneAttributeAddedSub$: Subject<SceneAttribute>;
+};
+
 export type AttributeMut = Attribute &
   ExObjectMut & {
     exprSub$: BehaviorSubject<Expr>;
@@ -33,15 +39,18 @@ export type CallExprMut = CallExpr &
     argsSub$: BehaviorSubject<Expr[]>;
   };
 
-export default class MainMutator implements Extracted {
+export default class MainMutator {
   public constructor(private readonly ctx: MainContext) {}
 
-  public createMainObject(): Component {
+  public addRootComponent() {
     const component = this.ctx.objectFactory.createComponent(
       ProtoComponentStore.circle
     );
-    (this.ctx.eventBus.rootComponents$ as Subject<Component[]>).next([component]);
-    return component;
+
+    this.ctx.eventBus.rootComponents$.pipe(first()).subscribe((rootComponents) => {
+      const rootComponents$ = (this.ctx.eventBus.rootComponents$ as Subject<Component[]>);
+      rootComponents$.next([...rootComponents, component]);
+    });
   }
 
   @loggedMethod
@@ -102,12 +111,4 @@ export default class MainMutator implements Extracted {
     oldExprMut.destroySub$.complete();
     (this.ctx.eventBus.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
   }
-}
-
-interface Extracted {
-  createMainObject(): Component;
-  /* TODO: add the missing return type */
-  replaceWithNumberExpr(oldExpr: Expr, value: number): any;
-  /* TODO: add the missing return type */
-  replaceWithCallExpr(oldExpr: Expr): any;
 }

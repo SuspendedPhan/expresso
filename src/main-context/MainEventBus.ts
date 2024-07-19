@@ -1,9 +1,9 @@
 import type { Attribute } from "pixi.js";
-import { ReplaySubject, Subject } from "rxjs";
+import { BehaviorSubject, ReplaySubject, Subject } from "rxjs";
 import type { Component, Expr } from "src/ex-object/ExObject";
-import type { ExprReplacement } from "./MainContext";
-import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { OBS } from "src/utils/utils/Utils";
+import type { SceneAttribute } from "../ex-object/SceneAttribute";
+import type { ExprReplacement } from "./MainContext";
 
 export class MainEventBus {
   public readonly rootComponents$: OBS<readonly Component[]>;
@@ -14,9 +14,9 @@ export class MainEventBus {
   public readonly onExprReplaced$: OBS<ExprReplacement>;
 
   public constructor() {
-    this.rootComponents$ = new ReplaySubject<readonly Component[]>(10);
+    this.rootComponents$ = new BehaviorSubject<readonly Component[]>([]);
     this.componentAdded$ = new Subject<Component>();
-    this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(10);
+    this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(1);
     this.onAttributeAdded$ = new Subject<Attribute>();
     this.onExprAdded$ = new Subject<Expr>();
     this.onExprReplaced$ = new Subject<ExprReplacement>();

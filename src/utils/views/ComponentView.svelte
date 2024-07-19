@@ -11,7 +11,7 @@
 
 <main>
   <SelectableView {ctx} object={component}>
-    <div>Component</div>
+    <div>Component {component.id}</div>
     {#each attributes as attribute (attribute.id)}
       <div>
         <AttributeView {ctx} {attribute} />
