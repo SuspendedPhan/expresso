@@ -1,62 +1,17 @@
 <script lang="ts">
-  import AttributeView from "./AttributeView.svelte";
-  import type { Attribute } from "src/ex-object/ExObject";
-  import Logger from "src/utils/logger/Logger";
-  import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-  import type MainContext from "src/main-context/MainContext";
-  import SceneView from "src/scene/SceneView.svelte";
-  import HydrationTest from "src/utils/utils/HydrationTest";
+  import { map } from "rxjs";
   import Main from "src/utils/utils/Main";
-
-  let ctx: MainContext | null = null;
-  let attribute: Attribute | null = null;
-  let rehydratedAttribute: Attribute | null = null;
-  let result = -1;
+  import RootView from "./RootView.svelte";
 
   const main$ = Main.setup$();
-  main$.subscribe((main) => MainView.setup(main));
-
-  class MainView {
-    @loggedMethod
-    static setup(main: Main) {
-      const logger = Logger.logger();
-
-      ctx = main.ctx;
-      attribute = main.attribute;
-
-      HydrationTest.test(main, ctx).subscribe((a) => {
-        if (a === null) {
-          return;
-        }
-
-        logger.log("Main.subscribe", a.id);
-        rehydratedAttribute = a;
-      });
-    }
-  }
-
-  document.addEventListener("mousedown", () => {
-    ctx?.selection.select(null);
-  });
+  const ctx$ = main$.pipe(map((main) => main.ctx));
 </script>
 
-<main>
-  <div>Hello World</div>
-  <div>{result}</div>
-
-  {#if ctx === null || attribute === null || rehydratedAttribute === null}
-    <div>Loading...</div>
-  {:else}
-    <div>Loaded</div>
-    {#key attribute.id}
-      <AttributeView {ctx} {attribute} />
-    {/key}
-
-    {#key rehydratedAttribute.id}
-      <AttributeView {ctx} attribute={rehydratedAttribute} />
-    {/key}
-    <SceneView {ctx} />
+<div>
+  <div>Main View</div>
+  {#if $ctx$}
+    <RootView ctx={$ctx$} />
   {/if}
-</main>
+</div>
 
 <style></style>

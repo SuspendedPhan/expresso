@@ -25,5 +25,9 @@ export default class Main {
     this.attribute = ctx.mutator.createMainObject().sceneAttributeByProto.get(ProtoSceneAttributeStore.x)!;
     ctx.selection.root$.next(this.attribute);
     Keyboard.register(ctx.selection);
+
+    document.addEventListener("mousedown", () => {
+      ctx?.selection.select(null);
+    });
   }
 }
