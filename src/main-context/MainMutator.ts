@@ -9,8 +9,8 @@ import {
   ExprType,
   type Parent,
 } from "src/ex-object/ExObject";
-import Logger from "../logger/Logger";
-import { loggedMethod } from "src/logger/LoggerDecorator";
+import Logger from "../utils/logger/Logger";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
 import { ProtoComponentStore } from "src/ex-object/ProtoComponent";

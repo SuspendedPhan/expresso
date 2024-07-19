@@ -1,7 +1,7 @@
 import { combineLatest, map, type Observable, of, switchMap } from "rxjs";
 import { type Attribute, type CallExpr, type Expr, ExprType, type NumberExpr } from "src/ex-object/ExObject";
-import { loggedMethod } from "src/logger/LoggerDecorator";
-import Logger from "../logger/Logger";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import Logger from "src/utils/logger/Logger";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
 // @ts-ignore

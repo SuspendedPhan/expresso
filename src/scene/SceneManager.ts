@@ -1,11 +1,11 @@
 import { withLatestFrom } from "rxjs";
 import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstancePathToString } from "./SceneInstance";
 import type { Component } from "src/ex-object/ExObject";
-import { loggedMethod } from "src/logger/LoggerDecorator";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import type { SceneContext, SceneObject } from "./SceneContext";
-import Logger from "../logger/Logger";
+import Logger from "../utils/logger/Logger";
 
 export class SceneManager {
   private readonly sceneObjectBySceneInstancePath = new Map<string, SceneObject>();

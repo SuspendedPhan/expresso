@@ -9,8 +9,8 @@ import {
   switchMap
 } from "rxjs";
 import { type ExObject, ExObjectType, type Expr, ExprType } from "src/ex-object/ExObject";
-import Logger from "src/logger/Logger";
-import { loggedMethod } from "src/logger/LoggerDecorator";
+import Logger from "src/utils/logger/Logger";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
 enum SelectedObjectType {

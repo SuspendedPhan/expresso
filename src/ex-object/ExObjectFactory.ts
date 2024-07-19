@@ -10,8 +10,8 @@ import {
   type NumberExpr,
   type Parent,
 } from "src/ex-object/ExObject";
-import Logger from "../logger/Logger";
-import { loggedMethod } from "src/logger/LoggerDecorator";
+import Logger from "../utils/logger/Logger";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type MainContext from "src/main-context/MainContext";
 import type {
   AttributeMut,
