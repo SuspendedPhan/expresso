@@ -19,8 +19,8 @@ import type {
   ExObjectMut,
   ExObjectMutBase,
 } from "../main-context/MainMutator";
-import type { ProtoComponent } from "../ProtoComponent";
-import type { ProtoSceneAttribute, SceneAttribute } from "../SceneAttribute";
+import type { ProtoComponent } from "src/ex-object/ProtoComponent";
+import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import {
   createBehaviorSubjectWithLifetime,
   createSubjectWithLifetime,

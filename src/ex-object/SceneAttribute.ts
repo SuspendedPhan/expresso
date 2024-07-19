@@ -1,5 +1,5 @@
-import type { Attribute } from "./ex-object/ExObject";
-import type { SceneObject } from "./scene/SceneContext";
+import type { Attribute } from "src/ex-object/ExObject";
+import type { SceneObject } from "src/scene/SceneContext";
 
 type SceneAttributeSetter = (sceneObject: SceneObject, value: number) => void;
 

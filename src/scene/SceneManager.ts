@@ -1,8 +1,8 @@
 import { withLatestFrom } from "rxjs";
-import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstancePathToString } from "../SceneInstance";
+import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstancePathToString } from "./SceneInstance";
 import type { Component } from "../ex-object/ExObject";
 import { loggedMethod } from "../logger/LoggerDecorator";
-import type { SceneAttribute } from "../SceneAttribute";
+import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { Evaluation } from "../utils/GoModule";
 import type { SceneContext, SceneObject } from "./SceneContext";
 import Logger from "../logger/Logger";

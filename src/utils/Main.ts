@@ -4,7 +4,7 @@ import MainContext from "../main-context/MainContext";
 import type GoModule from "./GoModule";
 import GoModuleLoader from "./GoModuleLoader";
 import Keyboard from "./Keyboard";
-import { ProtoSceneAttributeStore } from "../SceneAttribute";
+import { ProtoSceneAttributeStore } from "../ex-object/SceneAttribute";
 
 export default class Main {
   public readonly attribute: Attribute;

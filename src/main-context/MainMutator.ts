@@ -13,7 +13,7 @@ import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
-import { ProtoComponentStore } from "../ProtoComponent";
+import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
 import { assertUnreachable } from "../utils/Utils";
 
 export type ExObjectMutBase = {

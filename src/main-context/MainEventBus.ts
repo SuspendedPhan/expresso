@@ -2,7 +2,7 @@ import type { Attribute } from "pixi.js";
 import { ReplaySubject, Subject } from "rxjs";
 import type { Component, Expr } from "../ex-object/ExObject";
 import type { ExprReplacement } from "./MainContext";
-import type { SceneAttribute } from "../SceneAttribute";
+import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { OBS } from "../utils/Utils";
 
 export class MainEventBus {
