@@ -9,7 +9,7 @@ import {
   ExprType,
   type NumberExpr,
   type Parent,
-} from "./ExObject";
+} from "src/ex-object/ExObject";
 import Logger from "../logger/Logger";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import type MainContext from "../main-context/MainContext";

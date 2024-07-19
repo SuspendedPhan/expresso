@@ -27,6 +27,7 @@
     "google-auth-library": "^9.11.0",
     "hotkeys-js": "^3.13.7",
     "pixi.js": "^8.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "vite-tsconfig-paths": "^4.3.2"
   }
 }

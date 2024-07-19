@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import checker from 'vite-plugin-checker'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 import { fileURLToPath, URL } from 'node:url'
 
@@ -14,6 +15,7 @@ function buildProjects() {
 export default defineConfig({
   plugins: [
     svelte(),
+    tsconfigPaths(),
     {
       name: 'prebuild-commands',
       handleHotUpdate: async ({ file, server }) => {
@@ -31,10 +33,4 @@ export default defineConfig({
     },
     checker({ typescript: true })
   ],
-  resolve: {
-    alias: {
-      src: "/src",
-      // '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
 })
