@@ -3,7 +3,7 @@
   import type { Attribute } from "src/ex-object/ExObject";
   import ExprView from "./ExprView.svelte";
   import type MainContext from "src/main-context/MainContext";
-  import SelectableView from "../utils/SelectableView.svelte";
+  import SelectableView from "src/utils/utils/SelectableView.svelte";
 
   export let ctx: MainContext;
   export let attribute: Attribute;

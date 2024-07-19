@@ -4,7 +4,7 @@ import {
   Subject
 } from "rxjs";
 import MainContext from "src/main-context/MainContext";
-import { Evaluation } from "src/utils/GoModule";
+import { Evaluation } from "src/utils/utils/GoModule";
 
 export class Evaluator {
   private eval$_ = new Subject<Evaluation>();

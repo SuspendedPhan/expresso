@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import Selection from "src/utils/Selection";
+import type Selection from "src/utils/utils/Selection";
 
 export default class Keyboard {
   public static SCOPE = "Main";

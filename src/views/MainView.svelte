@@ -5,8 +5,8 @@
   import { loggedMethod } from "src/logger/LoggerDecorator";
   import type MainContext from "src/main-context/MainContext";
   import SceneView from "../scene/SceneView.svelte";
-  import HydrationTest from "../utils/HydrationTest";
-  import Main from "../utils/Main";
+  import HydrationTest from "src/utils/utils/HydrationTest";
+  import Main from "src/utils/utils/Main";
 
   let ctx: MainContext | null = null;
   let attribute: Attribute | null = null;

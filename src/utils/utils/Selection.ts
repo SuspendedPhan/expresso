@@ -11,7 +11,7 @@ import {
 import { type ExObject, ExObjectType, type Expr, ExprType } from "src/ex-object/ExObject";
 import Logger from "src/logger/Logger";
 import { loggedMethod } from "src/logger/LoggerDecorator";
-import { assertUnreachable } from "src/utils/Utils";
+import { assertUnreachable } from "src/utils/utils/Utils";
 
 enum SelectedObjectType {
   Root,

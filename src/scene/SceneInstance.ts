@@ -1,5 +1,5 @@
 import type { SceneAttribute } from "src/ex-object/SceneAttribute";
-import type GoModule from "src/utils/GoModule";
+import type GoModule from "src/utils/utils/GoModule";
 
 export type SceneInstancePath = readonly ComponentSceneInstance[];
 

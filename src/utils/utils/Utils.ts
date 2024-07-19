@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { BehaviorSubject, type Observable, Subject } from "rxjs";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;

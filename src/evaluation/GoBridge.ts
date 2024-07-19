@@ -2,8 +2,8 @@ import { first, Subject } from "rxjs";
 import { type Expr, ExprType } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/logger/LoggerDecorator";
 import type MainContext from "src/main-context/MainContext";
-import type GoModule from "src/utils/GoModule";
-import { assertUnreachable } from "src/utils/Utils";
+import type GoModule from "src/utils/utils/GoModule";
+import { assertUnreachable } from "src/utils/utils/Utils";
 
 export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();

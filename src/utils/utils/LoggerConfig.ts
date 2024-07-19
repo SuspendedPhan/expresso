@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { BehaviorSubject, Observable, combineLatest, map } from "rxjs";
+import { BehaviorSubject, type Observable, combineLatest, map } from "rxjs";
 import LoggerConfigHydrator from "src/LoggerConfigHydrator";
 import Persistence from "src/persistence/Persistence";
 

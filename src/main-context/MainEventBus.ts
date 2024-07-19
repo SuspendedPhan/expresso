@@ -3,7 +3,7 @@ import { ReplaySubject, Subject } from "rxjs";
 import type { Component, Expr } from "src/ex-object/ExObject";
 import type { ExprReplacement } from "./MainContext";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
-import type { OBS } from "src/utils/Utils";
+import type { OBS } from "src/utils/utils/Utils";
 
 export class MainEventBus {
   public readonly rootComponents$: OBS<readonly Component[]>;

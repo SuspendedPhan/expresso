@@ -14,7 +14,7 @@ import { loggedMethod } from "src/logger/LoggerDecorator";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
 import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
-import { assertUnreachable } from "src/utils/Utils";
+import { assertUnreachable } from "src/utils/utils/Utils";
 
 export type ExObjectMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;

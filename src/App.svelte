@@ -1,6 +1,6 @@
 <script lang="ts">
   import MainView from "./views/MainView.svelte";
-  import TestView from "./utils/TestView.svelte";
+  import TestView from "./utils/utils/TestView.svelte";
 
   let test = (function () {
     return false;

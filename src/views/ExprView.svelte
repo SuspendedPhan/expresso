@@ -1,9 +1,10 @@
 <script lang="ts">
   import { combineLatestWith, fromEvent, type Observable, of } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExObject";
-  import ExprCommand from "./ExprCommand.svelte";
+  // biome-ignore lint:
+  import ExprCommand from "src/views/ExprCommand.svelte";
   import type MainContext from "src/main-context/MainContext";
-  import SelectableView from "../utils/SelectableView.svelte";
+  import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { onMount } from "svelte";
 
   export let ctx: MainContext;

@@ -1,5 +1,5 @@
 import { Observable, Subscriber } from 'rxjs'
-import type GoModule from 'src/utils/GoModule'
+import type GoModule from 'src/utils/utils/GoModule'
 
 declare var window: any;
 

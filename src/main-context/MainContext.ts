@@ -4,8 +4,8 @@ import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
-import type GoModule from "src/utils/GoModule";
-import Selection from "../utils/Selection";
+import type GoModule from "src/utils/utils/GoModule";
+import Selection from "../utils/utils/Selection";
 
 export interface ExprReplacement {
   oldExpr: Expr;

@@ -3,7 +3,7 @@ import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstan
 import type { Component } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/logger/LoggerDecorator";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
-import type { Evaluation } from "src/utils/GoModule";
+import type { Evaluation } from "src/utils/utils/GoModule";
 import type { SceneContext, SceneObject } from "./SceneContext";
 import Logger from "../logger/Logger";
 

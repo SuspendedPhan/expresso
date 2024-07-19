@@ -24,7 +24,7 @@ import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import {
   createBehaviorSubjectWithLifetime,
   createSubjectWithLifetime,
-} from "src/utils/Utils";
+} from "src/utils/utils/Utils";
 
 let nextId = 0;
 
