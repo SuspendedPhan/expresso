@@ -1,4 +1,4 @@
-import { DehydratedLoggerConfig } from "../utils/utils/LoggerConfigHydrator";
+import { DehydratedLoggerConfig } from "src/utils/utils/LoggerConfigHydrator";
 import GCloudPersistence from "./GCloudPersistence";
 
 const service: PersistService = new GCloudPersistence();

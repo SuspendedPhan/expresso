@@ -1,5 +1,5 @@
 import { combineLatest } from "rxjs";
-import Persistence from "src/persistence/Persistence";
+import Persistence from "src/utils/persistence/Persistence";
 import LoggerConfig, { MutedKey, MutedMethod, MutedTopic } from "./LoggerConfig";
 
 export default class LoggerConfigHydrator {
