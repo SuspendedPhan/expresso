@@ -32,7 +32,7 @@ export interface Component extends ExObjectBase {
   readonly proto: ProtoComponent;
   readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneAttribute, SceneAttribute>;
   readonly cloneCount$: Observable<number>;
-  // readonly children$: Observable<readonly Component[]>;
+  readonly children$: Observable<readonly Component[]>;
   readonly sceneAttributeAdded$: Observable<SceneAttribute>;
 }
 

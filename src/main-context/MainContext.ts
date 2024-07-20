@@ -6,6 +6,7 @@ import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import type GoModule from "src/utils/utils/GoModule";
 import Selection from "../utils/utils/Selection";
+import ComponentMutator from "src/mutator/ComponentMutator";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -15,6 +16,7 @@ export interface ExprReplacement {
 export default class MainContext {
   public readonly eventBus = new MainEventBus();
   public readonly mutator: MainMutator;
+  public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly selection = new Selection();
   public readonly goBridge: GoBridge;

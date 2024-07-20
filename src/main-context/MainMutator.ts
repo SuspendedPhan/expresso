@@ -9,12 +9,11 @@ import {
   ExprType,
   type Parent,
 } from "src/ex-object/ExObject";
-import Logger from "../utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { assertUnreachable } from "src/utils/utils/Utils";
+import Logger from "../utils/logger/Logger";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
-import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
-import { assertUnreachable } from "src/utils/utils/Utils";
 
 export type ExObjectMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
@@ -41,17 +40,6 @@ export type CallExprMut = CallExpr &
 
 export default class MainMutator {
   public constructor(private readonly ctx: MainContext) {}
-
-  public addRootComponent() {
-    const component = this.ctx.objectFactory.createComponent(
-      ProtoComponentStore.circle
-    );
-
-    this.ctx.eventBus.rootComponents$.pipe(first()).subscribe((rootComponents) => {
-      const rootComponents$ = (this.ctx.eventBus.rootComponents$ as Subject<Component[]>);
-      rootComponents$.next([...rootComponents, component]);
-    });
-  }
 
   @loggedMethod
   public replaceWithNumberExpr(oldExpr: Expr, value: number) {

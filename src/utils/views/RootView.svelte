@@ -8,7 +8,9 @@
 </script>
 
 <div>
-  <button on:click={() => ctx.mutator.addRootComponent()}>Add Component</button>
+  <button on:click={() => ctx.componentMutator.addRootComponent()}
+    >Add Component</button
+  >
   {#if $rootComponents$}
     {#each $rootComponents$ as component (component.id)}
       <ComponentView {ctx} {component} />

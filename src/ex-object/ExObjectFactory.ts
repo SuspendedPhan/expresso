@@ -24,6 +24,7 @@ import type {
   ExObjectMutBase,
 } from "../main-context/MainMutator";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import { ComponentMut } from "src/mutator/ComponentMutator";
 
 let nextId = 0;
 
@@ -35,6 +36,7 @@ export default class ExObjectFactory {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
+    const childrenSub$ = createBehaviorSubjectWithLifetime<readonly Component[]>(base.destroy$, []);
     const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
       base.destroy$
     );
@@ -48,11 +50,13 @@ export default class ExObjectFactory {
       sceneAttributeByProto.set(protoAttribute, sceneAttribute);
     }
 
-    const component: Component = {
+    const component: ComponentMut = {
       objectType: ExObjectType.Component,
       proto,
       sceneAttributeByProto,
       cloneCount$: cloneCountSub$,
+      children$: childrenSub$,
+      childrenSub$,
       sceneAttributeAdded$,
       ...base,
       ...mutBase,
