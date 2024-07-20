@@ -21,6 +21,7 @@
     "@aws-sdk/client-s3": "^3.598.0",
     "@aws-sdk/credential-providers": "^3.598.0",
     "axios": "^1.7.2",
+    "css-element-queries": "^1.2.3",
     "deepool": "^3.0.1",
     "firebase": "^10.12.2",
     "gapi-script": "^1.2.0",

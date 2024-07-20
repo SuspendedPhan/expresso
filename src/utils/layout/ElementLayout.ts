@@ -13,8 +13,7 @@ export class ElementLayout {
     (subscriber) => (this.onCalculatedSubscriber = subscriber)
   ).pipe(share());
 
-
-  private onCalculatedSubscriber;
+  private onCalculatedSubscriber: any;
 
   private onLocalPositionSubscriberByElementId = new Map<
     string,
@@ -24,19 +23,24 @@ export class ElementLayout {
 
   private getKey;
 
-
   // getRootNode is not used.
   // getChildren refers to the children that we will call getKey() on.
-  constructor(getRootNode, getChildren, getKey: any = null, horizontalMargin: number, verticalMargin: number) {
-    this.getKey = getKey ?? (node => node.id);
+  constructor(
+    getRootNode: () => any,
+    getChildren: (node: any) => readonly any[],
+    getKey: ((node: any) => string) | null = null,
+    horizontalMargin: number,
+    verticalMargin: number
+  ) {
+    this.getKey = getKey ?? ((node) => node.id);
 
     this.layout = new Layout(
-        this.getWidth.bind(this),
-        this.getHeight.bind(this),
-        getChildren,
-        this.getKey,
-        horizontalMargin,
-        verticalMargin,
+      this.getWidth.bind(this),
+      this.getHeight.bind(this),
+      getChildren,
+      this.getKey,
+      horizontalMargin,
+      verticalMargin
     );
     this.getRootNode = getRootNode;
   }
@@ -59,7 +63,7 @@ export class ElementLayout {
   }
 
   // registerElement must be called so that the layout knows how to get the width and height of your elements.
-  public registerElement(element, elementKey) {
+  public registerElement(element: any, elementKey: string) {
     this.elementByKey.set(elementKey, element);
   }
 
@@ -67,19 +71,19 @@ export class ElementLayout {
   // positions, which means children are positioned relative to the parent. This works well with nested elements that
   // all have the "position: absolute" CSS rule.
   // When the event is fired, a Layout.Point object is passed.
-  public getLocalPositionObservable(elementKey): Observable<Point> {
+  public getLocalPositionObservable(elementKey: string): Observable<Point> {
     return new Observable<Point>((subscriber) => {
       this.onLocalPositionSubscriberByElementId.set(elementKey, subscriber);
     });
   }
 
-  private getWidth(node) {
+  private getWidth(node: any) {
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
     return element?.offsetWidth ?? 0;
   }
 
-  private getHeight(node) {
+  private getHeight(node: any) {
     console.log(node);
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
