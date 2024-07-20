@@ -17,7 +17,7 @@
   <div class="border border-black p-4 bg-white card">
     <SelectableView {ctx} object={component}>
       <div class="flex flex-col items-center">
-        <div>Component {component.id}</div>
+        <div>{component.id}</div>
         {#each attributes as attribute (attribute.id)}
           <div>
             <AttributeView {ctx} {attribute} />

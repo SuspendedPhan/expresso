@@ -21,7 +21,7 @@
 
 <main>
   <SelectableView {ctx} object={attribute}>
-    <div>Attribute</div>
+    <div>{attribute.id}</div>
     {#key $exprId$}
       {#if $elementLayout$}
         <TreeView elementLayout={$elementLayout$}>

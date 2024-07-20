@@ -6,7 +6,7 @@
   const rootComponents$ = ctx.eventBus.rootComponents$;
 </script>
 
-<div class="p-4 flex flex-col items-center">
+<div class="p-4 flex flex-col items-center overflow-scroll">
   <button
     on:click={() => ctx.componentMutator.addRootComponent()}
     class="btn mb-4">Add Component</button

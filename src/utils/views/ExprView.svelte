@@ -66,7 +66,7 @@
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
-    <span>Expr</span>
+    <span>{expr.id}</span>
     <span>{getText()}</span>
     <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
 

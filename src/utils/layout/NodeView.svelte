@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { ElementLayout } from "../layout/ElementLayout";
+  import { ResizeSensor } from "css-element-queries";
 
   export let elementLayout: ElementLayout;
   export let elementKey: string;
@@ -16,7 +17,15 @@
       });
     elementLayout.recalculate();
 
+    const handleResize = () => {
+      tick().then(() => {
+        elementLayout.recalculate();
+      });
+    };
+    const sensor = new ResizeSensor(element, handleResize);
+
     return () => {
+      sensor.detach(handleResize);
       sub.unsubscribe();
     };
   });
