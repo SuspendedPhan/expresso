@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { ElementLayout } from "./ElementLayout";
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
   import type { Line } from "src/utils/layout/Layout";
@@ -28,9 +28,9 @@
       canvasWidth = treeLayout.clientWidth;
       canvasHeight = treeLayout.clientHeight;
       drawLines(canvas, lines);
-      // nextTick(() => {
-      //   drawLines(canvas, lines);
-      // });
+      tick().then(() => {
+        drawLines(canvas, lines);
+      });
     });
   });
 
