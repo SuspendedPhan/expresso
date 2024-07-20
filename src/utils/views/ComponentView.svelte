@@ -2,34 +2,19 @@
   import type { Component } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
-  import AttributeView from "./AttributeView.svelte";
-  import { onMount } from "svelte";
   import { ElementLayout } from "../layout/ElementLayout";
+  import NodeView from "../layout/NodeView.svelte";
+  import AttributeView from "./AttributeView.svelte";
 
   export let ctx: MainContext;
   export let component: Component;
   export let elementLayout: ElementLayout;
   const attributes = component.sceneAttributeByProto.values();
   const children$ = component.children$;
-  children$.subscribe((children) => {
-    console.log("children$ changed", children);
-  });
-
-  let element: HTMLElement;
-  onMount(() => {
-    elementLayout.registerElement(element, component.id);
-    elementLayout
-      .getLocalPositionObservable(component.id)
-      .subscribe((position) => {
-        element.style.left = `${position.left}px`;
-        element.style.top = `${position.top}px`;
-      });
-    elementLayout.recalculate();
-  });
 </script>
 
-<div class="absolute inline-block" bind:this={element}>
-  <div class="border border-black p-4">
+<NodeView elementKey={component.id} {elementLayout}>
+  <div class="border border-black p-4 bg-white">
     <SelectableView {ctx} object={component}>
       <button on:click={() => ctx.componentMutator.addChild(component)}
         >Add Child</button
@@ -47,4 +32,4 @@
       {/each}
     {/if}
   </div>
-</div>
+</NodeView>

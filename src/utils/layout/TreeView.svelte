@@ -20,10 +20,6 @@
   });
 
   onMount(() => {
-    // nextTick(() => {
-    //   elementLayout.recalculate();
-    // });
-
     new ResizeSensor(treeLayout, () => {
       canvasWidth = treeLayout.clientWidth;
       canvasHeight = treeLayout.clientHeight;

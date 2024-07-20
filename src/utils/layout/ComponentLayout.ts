@@ -25,8 +25,6 @@ export default class ComponentLayout {
   }
 
   static getChildren(component: Component, childrenByComponent: Map<Component, readonly Component[]>): readonly Component[] {
-    console.log('getChildren', component);
-    console.log('childrenByComponent', childrenByComponent);
     return childrenByComponent.get(component) ?? [];
   }
 }

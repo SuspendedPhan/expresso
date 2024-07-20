@@ -5,7 +5,7 @@
   import TreeView from "../layout/TreeView.svelte";
   import ComponentView from "./ComponentView.svelte";
   import { ResizeSensor } from "css-element-queries";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
 
   export let ctx: MainContext;
   export let component: Component;
@@ -15,7 +15,9 @@
 
   onMount(() => {
     new ResizeSensor(element, () => {
-      elementLayout.recalculate();
+      tick().then(() => {
+        elementLayout.recalculate();
+      });
     });
   });
 </script>

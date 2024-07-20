@@ -18,7 +18,7 @@ export class MainEventBus {
     this.componentAdded$ = new ReplaySubject<Component>(10);
     this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(1);
     this.onAttributeAdded$ = new Subject<Attribute>();
-    this.onExprAdded$ = new Subject<Expr>();
+    this.onExprAdded$ = new ReplaySubject<Expr>(10);
     this.onExprReplaced$ = new Subject<ExprReplacement>();
   }
 }

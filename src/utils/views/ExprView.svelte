@@ -6,9 +6,12 @@
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { onMount } from "svelte";
+  import NodeView from "../layout/NodeView.svelte";
+  import { ElementLayout } from "../layout/ElementLayout";
 
   export let ctx: MainContext;
   export let expr: Expr;
+  export let elementLayout: ElementLayout;
 
   let args$: Observable<readonly Expr[]>;
   if (expr.exprType === ExprType.CallExpr) {
@@ -61,7 +64,7 @@
   });
 </script>
 
-<main>
+<NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
     <span>Expr</span>
     <span>{getText()}</span>
@@ -69,8 +72,8 @@
 
     <div class="pl-2">
       {#each $args$ as arg (arg.id)}
-        <svelte:self expr={arg} {ctx} />
+        <svelte:self expr={arg} {ctx} {elementLayout} />
       {/each}
     </div>
   </SelectableView>
-</main>
+</NodeView>
