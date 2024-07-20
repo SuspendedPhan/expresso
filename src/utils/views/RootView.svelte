@@ -1,7 +1,7 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
-  import ComponentView from "./ComponentView.svelte";
   import SceneView from "src/scene/SceneView.svelte";
+  import RootComponentView from "./RootComponentView.svelte";
 
   export let ctx: MainContext;
   const rootComponents$ = ctx.eventBus.rootComponents$;
@@ -13,7 +13,7 @@
   >
   {#if $rootComponents$}
     {#each $rootComponents$ as component (component.id)}
-      <ComponentView {ctx} {component} />
+      <RootComponentView {ctx} {component} />
     {/each}
   {/if}
 

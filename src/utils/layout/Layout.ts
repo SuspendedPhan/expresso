@@ -22,17 +22,30 @@ export interface Output {
 }
 
 export class Layout {
+  private getWidthFn: Function;
+
   constructor(
-    private getWidth: Function,
+    getWidth: Function,
     private getHeight: Function,
     private getChildren: Function,
     private getKey: Function,
     private horizontalMargin: number,
     private verticalMargin: number
-  ) {}
+  ) {
+    this.getWidthFn = getWidth;
+  }
+
+  private getWidth(node: any) {
+    const width = this.getWidthFn(node);
+    if (width === undefined) {
+      throw new Error("Width is undefined");
+    }
+
+    return width;
+  }
 
   // treeRoot will always be positioned at <0, 0>
-  calculate(treeRoot): Output {
+  calculate(treeRoot: any): Output {
     const subtreeWidthsByKey = new Map<any, number>();
     const subtreeHeightsByKey = new Map<any, number>();
     this.calculateSubtreeWidth(treeRoot, subtreeWidthsByKey);
@@ -57,7 +70,7 @@ export class Layout {
       localPositionsByKey,
       subtreeWidthsByKey
     );
-    const lines = [];
+    const lines: any[] = [];
 
     this.calculateLinesFromParentToChildren(
       treeRoot,
@@ -78,7 +91,7 @@ export class Layout {
    * Local positions, subtree widths, and subtree heights.
    */
   private calculateForChildren(
-    subroot,
+    subroot: any,
     localPositionsByKey: LocalPositionsByKey,
     subtreeWidthsByKey: Map<any, number>
   ) {
@@ -105,7 +118,7 @@ export class Layout {
     }
   }
 
-  private calculateSubtreeWidth(subroot, subtreeWidthsByKey: Map<any, number>) {
+  private calculateSubtreeWidth(subroot: any, subtreeWidthsByKey: Map<any, number>) {
     if (subtreeWidthsByKey.has(this.getKey(subroot))) {
       return;
     }
@@ -120,7 +133,7 @@ export class Layout {
   }
 
   private calculateSubtreeHeight(
-    subroot,
+    subroot: any,
     subtreeHeightsByKey: Map<any, number>
   ) {
     if (subtreeHeightsByKey.has(this.getKey(subroot))) {
@@ -146,7 +159,7 @@ export class Layout {
     subtreeHeightsByKey.set(this.getKey(subroot), subtreeHeight);
   }
 
-  private calculateChildrenWidth(subroot, subtreeWidthsByKey): number {
+  private calculateChildrenWidth(subroot: any, subtreeWidthsByKey: any): number {
     let childrenWidth = 0;
     const children = Array.from(this.getChildren(subroot));
     for (const child of children) {
@@ -160,10 +173,10 @@ export class Layout {
   }
 
   private calculateLinesFromParentToChildren(
-    subroot,
-    subrootWorldPosition,
-    localPositionsByKey,
-    lines
+    subroot: any,
+    subrootWorldPosition: any,
+    localPositionsByKey: any,
+    lines: any
   ) {
     const subrootWorldCenter = {
       x: subrootWorldPosition.left + this.getWidth(subroot) / 2,

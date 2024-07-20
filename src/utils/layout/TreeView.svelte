@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { ElementLayout } from "./ElementLayout";
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
-  import { Line } from "./Layout";
+  import type { Line } from "src/utils/layout/Layout";
 
   export let elementLayout: ElementLayout;
   let canvas: HTMLCanvasElement;

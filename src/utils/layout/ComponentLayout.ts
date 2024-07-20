@@ -8,6 +8,7 @@ export default class ComponentLayout {
     rootComponent: Component
   ): ElementLayout {
     const childrenByComponent = new Map<Component, readonly Component[]>();
+    
     ctx.eventBus.componentAdded$.subscribe((component) => {
       component.children$.subscribe((children) => {
         childrenByComponent.set(component, children);
@@ -16,10 +17,16 @@ export default class ComponentLayout {
 
     return new ElementLayout(
       () => rootComponent,
-      (component) => childrenByComponent.get(component) ?? [],
+      (component) => this.getChildren(component, childrenByComponent),
       (component) => component.id,
       40,
       40
     );
+  }
+
+  static getChildren(component: Component, childrenByComponent: Map<Component, readonly Component[]>): readonly Component[] {
+    console.log('getChildren', component);
+    console.log('childrenByComponent', childrenByComponent);
+    return childrenByComponent.get(component) ?? [];
   }
 }

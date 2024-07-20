@@ -48,6 +48,8 @@ export class ElementLayout {
   public recalculate() {
     const rootNode = this.getRootNode();
     const output = this.layout.calculate(rootNode);
+    console.log(output);
+    
     for (const [
       elementKey,
       localPositionSubscriber,

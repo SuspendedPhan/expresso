@@ -15,7 +15,7 @@ export class MainEventBus {
 
   public constructor() {
     this.rootComponents$ = new BehaviorSubject<readonly Component[]>([]);
-    this.componentAdded$ = new Subject<Component>();
+    this.componentAdded$ = new ReplaySubject<Component>(10);
     this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(1);
     this.onAttributeAdded$ = new Subject<Attribute>();
     this.onExprAdded$ = new Subject<Expr>();
