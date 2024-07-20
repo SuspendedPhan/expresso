@@ -8,7 +8,6 @@
 </script>
 
 <div>
-  <div>Main View</div>
   {#if $ctx$}
     <AppLayoutView ctx={$ctx$} />
   {/if}

@@ -6,9 +6,10 @@
   const rootComponents$ = ctx.eventBus.rootComponents$;
 </script>
 
-<div>
-  <button on:click={() => ctx.componentMutator.addRootComponent()}
-    >Add Component</button
+<div class="p-4 flex flex-col items-center">
+  <button
+    on:click={() => ctx.componentMutator.addRootComponent()}
+    class="btn mb-4">Add Component</button
   >
   {#if $rootComponents$}
     {#each $rootComponents$ as component (component.id)}

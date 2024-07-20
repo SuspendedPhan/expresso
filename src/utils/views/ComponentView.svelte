@@ -14,17 +14,20 @@
 </script>
 
 <NodeView elementKey={component.id} {elementLayout}>
-  <div class="border border-black p-4 bg-white">
+  <div class="border border-black p-4 bg-white card">
     <SelectableView {ctx} object={component}>
-      <button on:click={() => ctx.componentMutator.addChild(component)}
-        >Add Child</button
-      >
-      <div>Component {component.id}</div>
-      {#each attributes as attribute (attribute.id)}
-        <div>
-          <AttributeView {ctx} {attribute} />
-        </div>
-      {/each}
+      <div class="flex flex-col items-center">
+        <div>Component {component.id}</div>
+        {#each attributes as attribute (attribute.id)}
+          <div>
+            <AttributeView {ctx} {attribute} />
+          </div>
+        {/each}
+        <button
+          on:click={() => ctx.componentMutator.addChild(component)}
+          class="btn mt-4">Add Child</button
+        >
+      </div>
     </SelectableView>
     {#if $children$}
       {#each $children$ as child (child.id)}
