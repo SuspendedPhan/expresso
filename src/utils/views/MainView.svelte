@@ -1,7 +1,7 @@
 <script lang="ts">
   import { map } from "rxjs";
   import Main from "src/utils/utils/Main";
-  import RootView from "./RootView.svelte";
+  import AppLayoutView from "./AppLayoutView.svelte";
 
   const main$ = Main.setup$();
   const ctx$ = main$.pipe(map((main) => main.ctx));
@@ -10,7 +10,7 @@
 <div>
   <div>Main View</div>
   {#if $ctx$}
-    <RootView ctx={$ctx$} />
+    <AppLayoutView ctx={$ctx$} />
   {/if}
 </div>
 

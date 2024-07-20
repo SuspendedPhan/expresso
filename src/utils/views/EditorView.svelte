@@ -1,6 +1,5 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
-  import SceneView from "src/scene/SceneView.svelte";
   import RootComponentView from "./RootComponentView.svelte";
 
   export let ctx: MainContext;
@@ -16,8 +15,6 @@
       <RootComponentView {ctx} {component} />
     {/each}
   {/if}
-
-  <SceneView {ctx} />
 </div>
 
 <style></style>
