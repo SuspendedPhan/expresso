@@ -3,6 +3,8 @@ import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 
 export type ExObject = Component | Attribute | Expr;
+export type Parent = Component | Attribute | CallExpr | null;
+export type Expr = NumberExpr | CallExpr;
 
 export enum ExObjectType {
   SceneAttribute,
@@ -38,9 +40,6 @@ export interface Attribute extends ExObjectBase {
   readonly objectType: ExObjectType.Attribute;
   readonly expr$: Observable<Expr>;
 }
-
-export type Expr = NumberExpr | CallExpr;
-export type Parent = Attribute | CallExpr | null;
 
 export interface NumberExpr extends ExObjectBase {
   readonly objectType: ExObjectType.Expr;

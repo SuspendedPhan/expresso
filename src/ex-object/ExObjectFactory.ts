@@ -10,21 +10,20 @@ import {
   type NumberExpr,
   type Parent,
 } from "src/ex-object/ExObject";
-import Logger from "../utils/logger/Logger";
-import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type MainContext from "src/main-context/MainContext";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import {
+  createBehaviorSubjectWithLifetime,
+  createSubjectWithLifetime,
+} from "src/utils/utils/Utils";
 import type {
   AttributeMut,
   CallExprMut,
   ExObjectMut,
   ExObjectMutBase,
 } from "../main-context/MainMutator";
-import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
-import {
-  createBehaviorSubjectWithLifetime,
-  createSubjectWithLifetime,
-} from "src/utils/utils/Utils";
 
 let nextId = 0;
 
@@ -59,16 +58,26 @@ export default class ExObjectFactory {
       ...mutBase,
     };
 
+    for (const sceneAttribute of sceneAttributeByProto.values()) {
+      const sceneAttributeMut = sceneAttribute as unknown as AttributeMut;
+      sceneAttributeMut.parentSub$.next(component);
+    }
+
     (this.ctx.eventBus.componentAdded$ as Subject<Component>).next(component);
     return component;
   }
 
-  createSceneAttribute(x: ProtoSceneAttribute): SceneAttribute {
-    const attribute = this.createAttribute(x.id);
+  private createSceneAttribute(x: ProtoSceneAttribute): SceneAttribute {
+    const id = `scene-attribute-${nextId++}`;
+    const expr = this.createNumberExpr();
+    const attribute = this.createAttributeBase(id, expr);
     const sceneAttribute: SceneAttribute = {
       proto: x,
       ...attribute,
     };
+
+    const exprMut = expr as unknown as ExObjectMut;
+    exprMut.parentSub$.next(sceneAttribute);
 
     (this.ctx.eventBus.onSceneAttributeAdded$ as Subject<SceneAttribute>).next(
       sceneAttribute
@@ -77,21 +86,21 @@ export default class ExObjectFactory {
     return sceneAttribute;
   }
 
+  public createAttribute(): Attribute {
+    const id = `attribute-${nextId++}`;
+    const expr = this.createNumberExpr();
+    return this.createAttribute1(id, expr);
+  }
+
+  private createAttribute1(id: string, expr: Expr): Attribute {
+    const attribute = this.createAttributeBase(id, expr);
+    const exprMut = expr as ExObjectMut;
+    exprMut.parentSub$.next(attribute);
+    return attribute;
+  }
+
   @loggedMethod
-  public createAttribute(id?: string, expr?: Expr): Attribute {
-    const logger = Logger.logger();
-
-    if (id === undefined) {
-      id = `attribute-${nextId++}`;
-      logger.log("id", "not given", id);
-    } else {
-      logger.log("id", "given", id);
-    }
-
-    if (expr === undefined) {
-      expr = this.createNumberExpr();
-    }
-
+  private createAttributeBase(id: string, expr: Expr): Attribute {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const exprSub$ = createBehaviorSubjectWithLifetime(base.destroy$, expr);
@@ -103,9 +112,6 @@ export default class ExObjectFactory {
       expr$: exprSub$,
       exprSub$,
     };
-
-    const exprMut = expr as ExObjectMut;
-    exprMut.parentSub$.next(attribute);
 
     (this.ctx.eventBus.onAttributeAdded$ as unknown as Subject<Attribute>).next(
       attribute

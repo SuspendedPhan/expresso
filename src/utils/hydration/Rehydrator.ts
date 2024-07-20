@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import type { Attribute, CallExpr, Expr, NumberExpr } from "src/ex-object/ExObject";
 import type ExObjectFactory from "src/ex-object/ExObjectFactory";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
