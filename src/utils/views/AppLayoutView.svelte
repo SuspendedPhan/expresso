@@ -6,9 +6,13 @@
   export let ctx: MainContext;
 </script>
 
-<div>
-  <EditorView {ctx} />
-  <SceneView {ctx} />
+<div class="grid grid-cols-2">
+  <div class="">
+    <EditorView {ctx} />
+  </div>
+  <div class="">
+    <SceneView {ctx} />
+  </div>
 </div>
 
 <style></style>
