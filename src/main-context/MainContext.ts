@@ -1,4 +1,4 @@
-import { first, Subject } from "rxjs";
+import { first, Subject, switchAll, switchMap, tap } from "rxjs";
 import type { Expr, Project } from "src/ex-object/ExObject";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import GoBridge from "../evaluation/GoBridge";
@@ -9,6 +9,7 @@ import Selection from "../utils/utils/Selection";
 import ComponentMutator from "src/mutator/ComponentMutator";
 import Persistence from "src/utils/persistence/Persistence";
 import Rehydrator from "src/utils/hydration/Rehydrator";
+import ProjectMutator from "src/mutator/ProjectMutator";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -18,6 +19,7 @@ export interface ExprReplacement {
 export default class MainContext {
   public readonly eventBus = new MainEventBus();
   public readonly mutator: MainMutator;
+  public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly selection = new Selection();
@@ -40,10 +42,11 @@ export default class MainContext {
         });
     });
 
-    this.eventBus.rootComponents$.subscribe((rootComponents) => {
-      const rootComponent = rootComponents[0];
-      this.selection.root$.next(rootComponent ?? null);
-    });
+    this.eventBus.project$
+      .pipe(switchMap((project) => project.rootComponents$))
+      .subscribe((rootComponents) => {
+        this.selection.root$.next(rootComponents[0] ?? null);
+      });
 
     Persistence.readProject$.subscribe((deProject) => {
       const project = new Rehydrator(this).rehydrateProject(deProject);

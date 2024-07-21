@@ -13,21 +13,6 @@ export type ComponentMut = Component &
 export default class ComponentMutator {
   public constructor(private readonly ctx: MainContext) {}
 
-  public addRootComponent() {
-    const component = this.ctx.objectFactory.createComponent(
-      ProtoComponentStore.circle
-    );
-
-    this.ctx.eventBus.rootComponents$
-      .pipe(first())
-      .subscribe((rootComponents) => {
-        const rootComponents$ = this.ctx.eventBus.rootComponents$ as Subject<
-          Component[]
-        >;
-        rootComponents$.next([...rootComponents, component]);
-      });
-  }
-
   @loggedMethod
   public addChild(parent: Component) {
     const component = this.ctx.objectFactory.createComponent(
