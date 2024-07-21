@@ -48,30 +48,15 @@ export default class MainContext {
         this.selection.root$.next(rootComponents[0] ?? null);
       });
 
-    // Persistence.readProject$.subscribe((deProject) => {
-    //   console.log("deProject", deProject);
+    Persistence.readProject$.subscribe((deProject) => {
+      console.log("deProject", deProject);
       
-    //   if (deProject === null) {
-    //     this.objectFactory.createProject();
-    //   } else {
-    //     const project = new Rehydrator(this).rehydrateProject(deProject);
-    //     (this.eventBus.currentProject$ as Subject<Project>).next(project);
-    //   }
-    // });
-
-    Persistence.readProject$.subscribe({
-      next: (deProject) => {
-        console.log("deProject", deProject);
-        
-        if (deProject === null) {
-          this.objectFactory.createProject();
-        } else {
-          const project = new Rehydrator(this).rehydrateProject(deProject);
-          (this.eventBus.currentProject$ as Subject<Project>).next(project);
-        }
-      },
-      complete: () => console.log("readProject$ complete)"),
-      error: (err) => console.error("readProject$ error", err),
+      if (deProject === null) {
+        this.objectFactory.createProject();
+      } else {
+        const project = new Rehydrator(this).rehydrateProject(deProject);
+        (this.eventBus.currentProject$ as Subject<Project>).next(project);
+      }
     });
   }
 }
