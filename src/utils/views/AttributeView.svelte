@@ -1,13 +1,11 @@
 <script lang="ts">
   import { map } from "rxjs";
   import type { SceneAttribute } from "src/ex-object/ExObject";
-  import ExprView from "./ExprView.svelte";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
-  import TreeView from "../layout/TreeView.svelte";
   import ExprLayout from "../layout/ExprLayout";
-  import { AttributeType, SceneAttribute } from "src/ex-object/SceneAttribute";
-  import { assertUnreachable } from "../utils/Utils";
+  import TreeView from "../layout/TreeView.svelte";
+  import ExprView from "./ExprView.svelte";
 
   export let ctx: MainContext;
   export let attribute: SceneAttribute;

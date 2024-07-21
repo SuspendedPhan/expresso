@@ -66,8 +66,11 @@
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
-    <div class="rounded-sm border border-solid border-neutral">
-      <span>{expr.id}</span>
+    <div class="rounded-sm card card-compact card-bordered group p-2">
+      <span
+        class="absolute group-hover:visible invisible w-max rounded-sm pointer-events-none badge left-full ml-2"
+        >{expr.id}</span
+      >
       <span>{getText()}</span>
       <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
 
