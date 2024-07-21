@@ -19,8 +19,8 @@ export default class ComponentLayout {
       () => rootComponent,
       (component) => this.getChildren(component, childrenByComponent),
       (component) => component.id,
-      40,
-      40
+      16,
+      16
     );
   }
 

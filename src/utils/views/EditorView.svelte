@@ -11,11 +11,14 @@
     on:click={() => ctx.componentMutator.addRootComponent()}
     class="btn mb-4">Add Component</button
   >
-  {#if $rootComponents$}
-    {#each $rootComponents$ as component (component.id)}
-      <RootComponentView {ctx} {component} />
-    {/each}
-  {/if}
+  <div class="grid grid-flow-row">
+    {#if $rootComponents$}
+      {#each $rootComponents$ as component (component.id)}
+        <div class="divider"></div>
+        <RootComponentView {ctx} {component} />
+      {/each}
+    {/if}
+  </div>
 </div>
 
 <style></style>

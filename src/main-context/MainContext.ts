@@ -37,5 +37,10 @@ export default class MainContext {
           }
         });
     });
+
+    this.eventBus.rootComponents$.subscribe((rootComponents) => {
+      const rootComponent = rootComponents[0];
+      this.selection.root$.next(rootComponent ?? null);
+    });
   }
 }

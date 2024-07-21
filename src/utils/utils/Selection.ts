@@ -28,7 +28,7 @@ type SelectedObject = Selectable | SelectedObjectType;
 
 export default class Selection {
   private readonly selectedObject$ = new BehaviorSubject<SelectedObject>(null);
-  public readonly root$ = new ReplaySubject<ExObject>(1);
+  public readonly root$ = new ReplaySubject<Selectable>(1);
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
@@ -62,7 +62,6 @@ export default class Selection {
     return this.selectedObject$.pipe(
       switchMap((selectedObject) => {
         if (selectedObject === SelectedObjectType.Root) {
-          throw new Error("Root is not implemented");
           return this.root$;
         }
         return of(selectedObject);

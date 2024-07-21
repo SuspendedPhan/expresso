@@ -9,6 +9,9 @@
 
   export let ctx: MainContext;
   export let component: Component;
+  let clazz = "";
+  export { clazz as class };
+
   const elementLayout = ComponentLayout.create(ctx, component);
 
   let element: HTMLElement;
@@ -22,7 +25,7 @@
   });
 </script>
 
-<div>
+<div class={clazz}>
   <TreeView {elementLayout}>
     <div bind:this={element}>
       <ComponentView {ctx} {component} {elementLayout} />
