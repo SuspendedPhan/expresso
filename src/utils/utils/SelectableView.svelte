@@ -19,7 +19,7 @@
 <div
   on:mousedown={handleClick}
   class="border {classString}"
-  class:border-black={$selected$}
+  class:ring={$selected$}
 >
   <slot />
 </div>

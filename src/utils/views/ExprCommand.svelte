@@ -32,9 +32,10 @@
 </script>
 
 <div
-  class="card absolute top-full left-0 mt-2 p-2 bg-white {displayClass} border border-solid border-black"
+  class="absolute top-full left-0 mt-2 p-2 bg-white {displayClass} ring rounded-sm"
 >
   <input
+    class="outline-none"
     type="text"
     value={$query$}
     on:input={handleInput}
