@@ -5,9 +5,12 @@
   const dispatch = createEventDispatcher<{ select: string }>();
 
   let input: HTMLInputElement;
+  let displayClass = "hidden";
 
-  export function focus() {
+  export function startEditing(key: string) {
+    displayClass = "";
     input.focus();
+    input.value = key;
   }
 
   function handleKeydown(
@@ -26,13 +29,14 @@
   }
 </script>
 
-<main>
+<div
+  class="card absolute top-full left-0 mt-2 p-2 bg-white {displayClass} border border-solid border-black"
+>
   <input
     type="text"
     value={$query$}
     on:input={handleInput}
     on:keydown={handleKeydown}
     bind:this={input}
-    class="border border-solid border-black"
   />
-</main>
+</div>

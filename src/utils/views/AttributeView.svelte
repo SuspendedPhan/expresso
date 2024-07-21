@@ -1,14 +1,17 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import type { Attribute } from "src/ex-object/ExObject";
+  import type { SceneAttribute } from "src/ex-object/ExObject";
   import ExprView from "./ExprView.svelte";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import TreeView from "../layout/TreeView.svelte";
   import ExprLayout from "../layout/ExprLayout";
+  import { AttributeType, SceneAttribute } from "src/ex-object/SceneAttribute";
+  import { assertUnreachable } from "../utils/Utils";
 
   export let ctx: MainContext;
-  export let attribute: Attribute;
+  export let attribute: SceneAttribute;
+  let name = attribute.proto.name;
 
   let expr$ = attribute.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
@@ -21,7 +24,7 @@
 
 <main>
   <SelectableView {ctx} object={attribute}>
-    <div>{attribute.id}</div>
+    <div>{name}</div>
     {#key $exprId$}
       {#if $elementLayout$}
         <TreeView elementLayout={$elementLayout$}>

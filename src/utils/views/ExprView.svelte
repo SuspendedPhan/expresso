@@ -56,7 +56,7 @@
           keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
         const targetIsInput = keyEvent.target instanceof HTMLInputElement;
         if (printable && !modifiers && !targetIsInput) {
-          exprCommand.focus();
+          exprCommand.startEditing(keyEvent.key);
         }
       });
 
@@ -66,14 +66,16 @@
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
-    <span>{expr.id}</span>
-    <span>{getText()}</span>
-    <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
+    <div class="rounded-sm border border-solid border-neutral">
+      <span>{expr.id}</span>
+      <span>{getText()}</span>
+      <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
 
-    <div class="pl-2">
-      {#each $args$ as arg (arg.id)}
-        <svelte:self expr={arg} {ctx} {elementLayout} />
-      {/each}
+      <div class="pl-2">
+        {#each $args$ as arg (arg.id)}
+          <svelte:self expr={arg} {ctx} {elementLayout} />
+        {/each}
+      </div>
     </div>
   </SelectableView>
 </NodeView>
