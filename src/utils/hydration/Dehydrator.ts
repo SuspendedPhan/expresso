@@ -9,6 +9,10 @@ import { assertUnreachable } from "src/utils/utils/Utils";
 
 export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
+export interface DehydratedProject {
+
+}
+
 export interface DehydratedAttribute {
   id: string;
   expr: DehydratedExpr;
@@ -27,6 +31,10 @@ export interface DehydratedCallExpr {
 }
 
 export default class Dehydrator {
+  public dehydrateProject$(): Observable<DehydratedProject> {
+    throw new Error("Not implemented");
+  }
+
   @loggedMethod
   public dehydrateAttribute$(
     attribute: Attribute

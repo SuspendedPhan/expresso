@@ -27,6 +27,10 @@ export interface ExObjectBase {
   readonly destroy$: Observable<void>;
 }
 
+export interface Project {
+  readonly rootComponents$: Observable<Component[]>;
+}
+
 export interface Component extends ExObjectBase {
   readonly objectType: ExObjectType.Component;
   readonly proto: ProtoComponent;

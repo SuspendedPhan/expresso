@@ -1,8 +1,11 @@
+import { Observable } from "rxjs";
 import { DehydratedLoggerConfig } from "src/utils/utils/LoggerConfigHydrator";
+import { DehydratedProject } from "../hydration/Dehydrator";
 import GCloudPersistence from "./GCloudPersistence";
 
 const service: PersistService = new GCloudPersistence();
 const debugOverlayFilename = "debug-overlay.json";
+const projectFilename = "project.json";
 
 export interface PersistService {
   readFile(name: string): Promise<string | null>;
@@ -18,6 +21,16 @@ export default class Persistence {
     cfg: DehydratedLoggerConfig
   ): Promise<void> {
     return this.writeObject(debugOverlayFilename, cfg);
+  }
+
+  public static readProject$ = new Observable<DehydratedProject>((subscriber) => {
+    const project: DehydratedProject = this.readObject(projectFilename);
+    subscriber.next(project);
+    subscriber.complete();
+  });
+
+  public static writeProject(project: DehydratedProject): void {
+    this.writeObject(projectFilename, project);
   }
 
   private static async readObject(filename: string): Promise<any> {

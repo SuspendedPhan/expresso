@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import type { Attribute, CallExpr, Expr, NumberExpr } from "src/ex-object/ExObject";
+import type { Attribute, CallExpr, Expr, NumberExpr, Project } from "src/ex-object/ExObject";
 import type ExObjectFactory from "src/ex-object/ExObjectFactory";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type MainContext from "src/main-context/MainContext";
@@ -17,6 +17,10 @@ export default class Rehydrator {
   private readonly exprFactory: ExObjectFactory;
   public constructor(private readonly ctx: MainContext) {
     this.exprFactory = ctx.objectFactory;
+  }
+
+  public rehydrateProject(deProject: DehydratedProject): Project {
+    throw new Error("Not implemented");
   }
 
   @loggedMethod
