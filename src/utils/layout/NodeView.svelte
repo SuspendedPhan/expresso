@@ -31,6 +31,6 @@
   });
 </script>
 
-<div class="absolute inline-block" bind:this={element}>
+<div class="absolute inline-block box-content" bind:this={element}>
   <slot></slot>
 </div>

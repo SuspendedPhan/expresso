@@ -20,15 +20,15 @@
   );
 </script>
 
-<main>
-  <SelectableView {ctx} object={attribute}>
-    <div>{name}</div>
-    {#key $exprId$}
-      {#if $elementLayout$}
-        <TreeView elementLayout={$elementLayout$}>
-          <ExprView {ctx} expr={$expr$} elementLayout={$elementLayout$} />
-        </TreeView>
-      {/if}
-    {/key}
-  </SelectableView>
-</main>
+<div>
+  <!-- <SelectableView {ctx} object={attribute}> -->
+  <div class="text-center mb-4">{name}</div>
+  {#key $exprId$}
+    {#if $elementLayout$}
+      <TreeView elementLayout={$elementLayout$}>
+        <ExprView {ctx} expr={$expr$} elementLayout={$elementLayout$} />
+      </TreeView>
+    {/if}
+  {/key}
+  <!-- </SelectableView> -->
+</div>

@@ -4,6 +4,7 @@
 
   export let object: Selectable;
   export let ctx: MainContext;
+  export let classString: string = "";
 
   const selected$ = ctx.selection.isSelected$(object);
 
@@ -17,9 +18,8 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   on:mousedown={handleClick}
-  class="border border-black"
-  class:border-solid={$selected$}
-  class:border-transparent={!$selected$}
+  class="border {classString}"
+  class:border-black={$selected$}
 >
   <slot />
 </div>

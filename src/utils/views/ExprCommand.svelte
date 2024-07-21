@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, tick } from "svelte";
   // import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
   const dispatch = createEventDispatcher<{ select: string }>();
@@ -9,8 +9,10 @@
 
   export function startEditing(key: string) {
     displayClass = "";
-    input.focus();
-    input.value = key;
+    // input.value = key;
+    tick().then(() => {
+      input.focus();
+    });
   }
 
   function handleKeydown(

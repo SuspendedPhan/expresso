@@ -66,9 +66,12 @@
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
-    <div class="rounded-sm card card-compact card-bordered p-2 container">
+    <div
+      class="rounded-sm card card-compact card-bordered p-2 container bg-base-100"
+      style="min-width: 24px;"
+    >
       <span
-        class="absolute invisible w-max rounded-sm pointer-events-none badge left-full ml-2 tooltip"
+        class="absolute invisible w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2"
         >{expr.id}</span
       >
       <span>{getText()}</span>
