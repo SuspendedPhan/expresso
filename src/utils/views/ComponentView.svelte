@@ -18,7 +18,7 @@
     <SelectableView
       {ctx}
       object={component}
-      classString="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
+      class="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
     >
       <div class="">{component.id}</div>
       <div class="divider"></div>

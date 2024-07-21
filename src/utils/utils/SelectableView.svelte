@@ -4,7 +4,8 @@
 
   export let object: Selectable;
   export let ctx: MainContext;
-  export let classString: string = "";
+  let clazz: string = "";
+  export { clazz as class };
 
   const selected$ = ctx.selection.isSelected$(object);
 
@@ -16,10 +17,6 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
-  on:mousedown={handleClick}
-  class="border {classString}"
-  class:ring={$selected$}
->
+<div on:mousedown={handleClick} class={clazz} class:ring={$selected$}>
   <slot />
 </div>

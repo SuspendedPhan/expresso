@@ -13,7 +13,7 @@
   });
 </script>
 
-<div bind:this={viewportElement}>
+<div bind:this={viewportElement} class="fixed w-1/2 h-full">
   <canvas bind:this={canvasElement} />
 </div>
 

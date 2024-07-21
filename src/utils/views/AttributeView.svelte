@@ -21,8 +21,9 @@
 </script>
 
 <div>
-  <!-- <SelectableView {ctx} object={attribute}> -->
-  <div class="text-center mb-4">{name}</div>
+  <SelectableView {ctx} object={attribute} class="mb-4">
+    <div class="text-center">{name}</div>
+  </SelectableView>
   {#key $exprId$}
     {#if $elementLayout$}
       <TreeView elementLayout={$elementLayout$}>
@@ -30,5 +31,4 @@
       </TreeView>
     {/if}
   {/key}
-  <!-- </SelectableView> -->
 </div>

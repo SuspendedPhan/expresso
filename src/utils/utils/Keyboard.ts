@@ -28,9 +28,11 @@ export default class Keyboard {
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {
+      return false;
     });
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
+      return false;
       // selection.selectedObject$.next(null);
     });
   }
