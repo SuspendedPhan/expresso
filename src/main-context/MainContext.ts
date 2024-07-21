@@ -1,15 +1,15 @@
-import { first, Subject, switchAll, switchMap, tap } from "rxjs";
+import { first, Subject, switchMap } from "rxjs";
 import type { Expr, Project } from "src/ex-object/ExObject";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
+import ComponentMutator from "src/mutator/ComponentMutator";
+import ProjectMutator from "src/mutator/ProjectMutator";
+import Rehydrator from "src/utils/hydration/Rehydrator";
+import Persistence from "src/utils/persistence/Persistence";
+import type GoModule from "src/utils/utils/GoModule";
 import GoBridge from "../evaluation/GoBridge";
+import Selection from "../utils/utils/Selection";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
-import type GoModule from "src/utils/utils/GoModule";
-import Selection from "../utils/utils/Selection";
-import ComponentMutator from "src/mutator/ComponentMutator";
-import Persistence from "src/utils/persistence/Persistence";
-import Rehydrator from "src/utils/hydration/Rehydrator";
-import ProjectMutator from "src/mutator/ProjectMutator";
 
 export interface ExprReplacement {
   oldExpr: Expr;
