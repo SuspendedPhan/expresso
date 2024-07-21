@@ -66,9 +66,9 @@
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
-    <div class="rounded-sm card card-compact card-bordered group p-2">
+    <div class="rounded-sm card card-compact card-bordered p-2 container">
       <span
-        class="absolute group-hover:visible invisible w-max rounded-sm pointer-events-none badge left-full ml-2"
+        class="absolute invisible w-max rounded-sm pointer-events-none badge left-full ml-2 tooltip"
         >{expr.id}</span
       >
       <span>{getText()}</span>
@@ -82,3 +82,9 @@
     </div>
   </SelectableView>
 </NodeView>
+
+<style>
+  .container:hover > .tooltip {
+    visibility: visible;
+  }
+</style>
