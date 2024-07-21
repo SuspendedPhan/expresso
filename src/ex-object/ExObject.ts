@@ -28,7 +28,8 @@ export interface ExObjectBase {
 }
 
 export interface Project {
-  readonly rootComponents$: Observable<Component[]>;
+  readonly id: string;
+  readonly rootComponents$: Observable<readonly Component[]>;
 }
 
 export interface Component extends ExObjectBase {

@@ -6,7 +6,7 @@ import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { ExprReplacement } from "./MainContext";
 
 export class MainEventBus {
-  public readonly project$: OBS<Project>;
+  public readonly currentProject$: OBS<Project>;
   public readonly rootComponents$: OBS<readonly Component[]>;
   public readonly componentAdded$: OBS<Component>;
   public readonly onSceneAttributeAdded$: OBS<SceneAttribute>;
@@ -15,8 +15,8 @@ export class MainEventBus {
   public readonly onExprReplaced$: OBS<ExprReplacement>;
 
   public constructor() {
-    this.project$ = new ReplaySubject<Project>(1);
-    this.rootComponents$ = this.project$.pipe(switchMap((project) => project.rootComponents$));
+    this.currentProject$ = new ReplaySubject<Project>(1);
+    this.rootComponents$ = this.currentProject$.pipe(switchMap((project) => project.rootComponents$));
     this.componentAdded$ = new ReplaySubject<Component>(10);
     this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(1);
     this.onAttributeAdded$ = new Subject<Attribute>();

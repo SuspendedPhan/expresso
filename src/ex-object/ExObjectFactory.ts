@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import {
   type Attribute,
   type CallExpr,
@@ -9,6 +9,7 @@ import {
   ExprType,
   type NumberExpr,
   type Parent,
+  Project,
 } from "src/ex-object/ExObject";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type MainContext from "src/main-context/MainContext";
@@ -30,6 +31,19 @@ let nextId = 0;
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
+
+  createProject(): Project {
+    const id = `project-${nextId++}`;
+    const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>([]);
+
+    const project: Project = {
+      id,
+      rootComponents$: rootComponentsSub$,
+    };
+
+    (this.ctx.eventBus.currentProject$ as Subject<Project>).next(project);
+    return project;
+  }
 
   createComponent(proto: ProtoComponent): Component {
     const id = `component-${nextId++}`;
