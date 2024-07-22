@@ -8,12 +8,9 @@ export class FirebaseAuthentication {
   public static readonly userLoggedIn$: OBS<void> = this.userLoggedIn$_;
 
   static init() {
-    const user = firebase.auth().currentUser;
-    console.log(user);
     firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        console.log("user is logged in");
         this.userLoggedIn$_.complete();
       } else {
         this.startAuthUI();
@@ -29,8 +26,6 @@ export class FirebaseAuthentication {
           // User successfully signed in.
           // Return type determines whether we continue the redirect automatically
           // or whether we leave that to developer to handle.
-          console.log("success");
-
           return false;
         },
       },

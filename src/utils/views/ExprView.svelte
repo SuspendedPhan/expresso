@@ -85,8 +85,8 @@
       on:mouseleave={handleMouseLeave}
     >
       <span
-        class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2"
-        class:bg-black={tooltipVisible}>{expr.id}</span
+        class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2 z-10"
+        class:invisible={!tooltipVisible}>{expr.id}</span
       >
       <span>{getText()}</span>
       <ExprCommand on:select={handleSelect} bind:this={exprCommand} />

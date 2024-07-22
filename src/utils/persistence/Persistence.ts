@@ -29,7 +29,6 @@ export default class Persistence {
     new Observable<DehydratedProject | null>((subscriber) => {
       FirebaseAuthentication.userLoggedIn$.subscribe({
         complete: () => {
-          console.log("userLoggedIn$ completed");
           this.readObject(projectFilename).then((project) => {
             subscriber.next(project);
             subscriber.complete();

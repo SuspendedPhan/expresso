@@ -76,7 +76,6 @@ export default class Dehydrator {
   public dehydrateComponent$(
     component: Component
   ): Observable<DehydratedComponent> {
-    Logger.logThis();
     const logger = Logger.logger();
 
     const protoAttributeBySceneAttributeId = new Map<
@@ -117,8 +116,6 @@ export default class Dehydrator {
 
     return combineLatest([deAttrs$, deChildren$]).pipe(
       map(([deAttrs, deChildren]) => {
-        console.log("deAttrs", deAttrs);
-        
         return {
           id: component.id,
           protoComponentId: component.proto.id,

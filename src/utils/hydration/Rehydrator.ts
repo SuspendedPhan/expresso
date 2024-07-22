@@ -24,8 +24,6 @@ import type {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
-let nextId = 0;
-
 export default class Rehydrator {
   private readonly exprFactory: ExObjectFactory;
   public constructor(private readonly ctx: MainContext) {
@@ -81,7 +79,7 @@ export default class Rehydrator {
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
     return this.exprFactory.createNumberExpr(
       deExpr.value,
-      deExpr.id + nextId++
+      deExpr.id
     );
   }
 
@@ -89,7 +87,7 @@ export default class Rehydrator {
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
     return this.exprFactory.createCallExpr(
-      deExpr.id + nextId++,
+      deExpr.id,
       args
     );
   }

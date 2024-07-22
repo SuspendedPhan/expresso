@@ -50,8 +50,6 @@ export default class MainContext {
       });
 
     Persistence.readProject$.subscribe((deProject) => {
-      console.log("deProject", deProject);
-      
       if (deProject === null) {
         this.objectFactory.createProjectNew();
       } else {
@@ -64,7 +62,6 @@ export default class MainContext {
     this.eventBus.currentProject$.pipe(
       switchMap((project) => dehydrator.dehydrateProject$(project))
     ).subscribe((deProject) => {
-      console.log("write deProject", deProject);
       Persistence.writeProject(deProject);
     });
   }

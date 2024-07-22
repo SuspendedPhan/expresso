@@ -2,10 +2,10 @@ package main
 
 func main() {
 	c := make(chan struct{}, 0)
-	println("start go main")
+	// println("go main")
 
 	bootstrapGoModule()
 
-	println("end go main")
+	// println("end go main")
 	<-c
 }
