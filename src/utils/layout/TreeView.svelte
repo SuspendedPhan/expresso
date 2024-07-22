@@ -12,11 +12,20 @@
   let treeLayout: HTMLElement;
   let canvasWidth: number;
   let canvasHeight: number;
+  let xTranslation = 0;
 
   elementLayout.onCalculated.subscribe((output) => {
     treeLayoutStyle = `left: 0px; width: ${output.totalWidth}px; height: ${output.totalHeight}px`;
     lines = output.lines;
     drawLines(canvas, output.lines);
+
+    let leftMost = 0;
+    for (const position of output.localPositionsByKey.values()) {
+      if (position.left < 0 && position.left < leftMost) {
+        leftMost = position.left;
+      }
+    }
+    xTranslation = -leftMost / 2;
   });
 
   onMount(() => {
@@ -46,7 +55,12 @@
 </script>
 
 <div>
-  <div class="relative" bind:this={treeLayout} style={treeLayoutStyle}>
+  <div
+    class="relative"
+    bind:this={treeLayout}
+    style={treeLayoutStyle}
+    style:transform="translateX({xTranslation}px)"
+  >
     <canvas
       bind:this={canvas}
       type="2d"

@@ -2,6 +2,8 @@ import { Layout, Output, Point } from "src/utils/layout/Layout";
 import * as rxjs from "rxjs";
 import { Observable } from "rxjs";
 import { share } from "rxjs/operators";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
 
 export class ElementLayout {
   private layout;
@@ -45,7 +47,11 @@ export class ElementLayout {
     this.getRootNode = getRootNode;
   }
 
+  @loggedMethod
   public recalculate() {
+    const logger = Logger.logger();
+    Logger.logThis();
+
     const rootNode = this.getRootNode();
     const output = this.layout.calculate(rootNode);
     
@@ -55,6 +61,9 @@ export class ElementLayout {
     ] of this.onLocalPositionSubscriberByElementId.entries()) {
       localPositionSubscriber.next(output.localPositionsByKey.get(elementKey));
     }
+
+    logger.log("output", JSON.stringify(output));
+    logger.log("localPositionsByKey", JSON.stringify(Array.from(output.localPositionsByKey.entries())));
 
     console.assert(
       this.onCalculatedSubscriber,
