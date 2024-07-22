@@ -14,14 +14,6 @@ export interface Line {
   endY: number;
 }
 
-interface Subtree {
-  root: Node;
-
-  width$: OBS<number>;
-  localLeft$: OBS<number>;
-  children$: OBS<Subtree[]>;
-}
-
 export interface Node {
   width$: OBS<number>;
   height$: OBS<number>;
@@ -31,27 +23,29 @@ export interface Node {
 
 export class Layout {
   public constructor(root: Node) {
-    this.attach(root, 0);
+    this.attach(root, 0, 0);
   }
 
-  private attach(subroot: Node, subtreeWorldLeft: number) {
+  private attach(subroot: Node, subtreeWorldLeft: number, subtreeWorldTop: number) {
     const subtreeWidth$ = this.getSubtreeWidth$(subroot);
     const subrootLeft$ = this.getNodeLeft$(subroot, subtreeWorldLeft, subtreeWidth$);
     subrootLeft$.subscribe(subrootLeft => {
-      subroot.worldPositionSub$.next({left: subrootLeft, top: 0});
+      subroot.worldPositionSub$.next({left: subrootLeft, top: subtreeWorldTop});
     });
 
     subroot.children$.pipe(
       switchMap(children => {
-        const worldLefts$: OBS<[Node[], number[]]> = this.getSubtreeChildrenWorldLefts$(children, subtreeWorldLeft).pipe(
-          map(worldLefts => {
-            return [children, worldLefts];
+        const childrenHeight$ = this.getChildrenHeight$(children);
+        const worldLefts$ = this.getSubtreeChildrenWorldLefts$(children, subtreeWorldLeft);
+        return combineLatest([childrenHeight$, worldLefts$]).pipe(
+          map(([childrenHeight, worldLefts]) => {
+            return [children, childrenHeight, worldLefts] as const;
           })
-        );
-        return worldLefts$;
+        )
       })
-      
-    ).subscribe(([children, worldLefts]) => {
+    ).subscribe(([children, childrenHeight, worldLefts]) => {
+      const childSubtreeWorldTop = this.getSubtreeWorldTop(childrenHeight, subtreeWorldTop);
+
       for (let i = 0; i < children.length; i++) {
         const child = children[i];
         const worldLeft = worldLefts[i];
@@ -59,7 +53,7 @@ export class Layout {
         if (!child || !worldLeft) {
           throw new Error("Child or worldLeft is undefined");
         }
-        this.attach(child, worldLeft);
+        this.attach(child, worldLeft, childSubtreeWorldTop);
       }
     });
   }
@@ -102,10 +96,10 @@ export class Layout {
     );
   }
 
-  private getMaxHeight$(children: Node[]): OBS<number> {
+  private getChildrenHeight$(children: Node[]): OBS<number> {
     return combineLatest(children.map((child) => child.height$)).pipe(
       map((heights) => {
-        return this.getMaxHeight(heights);
+        return this.getChildrenHeight(heights);
       })
     );
   }
@@ -114,8 +108,8 @@ export class Layout {
     return parentTop + parentRowHeight;
   }
 
-  private getMaxHeight(heights: number[]): number {
-    return Math.max(...heights);
+  private getChildrenHeight(childHeights: number[]): number {
+    return Math.max(...childHeights);
   }
 
   private getSubtreeWidth(childWidths: number[]): number {
