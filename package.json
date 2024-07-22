@@ -25,6 +25,7 @@
     "css-element-queries": "^1.2.3",
     "deepool": "^3.0.1",
     "firebase": "^10.12.2",
+    "firebaseui": "^6.1.0",
     "gapi-script": "^1.2.0",
     "google-auth-library": "^9.11.0",
     "hotkeys-js": "^3.13.7",
