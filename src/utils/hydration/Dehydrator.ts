@@ -4,7 +4,8 @@ import {
   Component,
   type Expr,
   ExprType,
-  type NumberExpr
+  type NumberExpr,
+  Project
 } from "src/ex-object/ExObject";
 import {
   ProtoSceneAttribute,
@@ -20,6 +21,7 @@ import { assertUnreachable } from "src/utils/utils/Utils";
 export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
 export interface DehydratedProject {
+  id: string;
   rootComponents: DehydratedComponent[];
 }
 
@@ -48,8 +50,25 @@ export interface DehydratedCallExpr {
 }
 
 export default class Dehydrator {
-  public dehydrateProject$(): Observable<DehydratedProject> {
-    throw new Error("Not implemented");
+  public dehydrateProject$(project: Project): Observable<DehydratedProject> {
+    const deComponents$ = project.rootComponents$.pipe(
+      switchMap((components) => {
+        return combineLatest(
+          components.map((component) => {
+            return this.dehydrateComponent$(component);
+          })
+        );
+      })
+    );
+
+    return deComponents$.pipe(
+      map((deComponents) => {
+        return {
+          id: project.id,
+          rootComponents: deComponents,
+        };
+      })
+    );
   }
 
   public dehydrateComponent$(

@@ -1,30 +1,28 @@
 import type {
-  Attribute,
   CallExpr,
   Component,
   Expr,
   NumberExpr,
-  Project,
+  Project
 } from "src/ex-object/ExObject";
 import type ExObjectFactory from "src/ex-object/ExObjectFactory";
-import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import type MainContext from "src/main-context/MainContext";
-import type {
-  DehydratedSceneAttribute,
-  DehydratedCallExpr,
-  DehydratedExpr,
-  DehydratedNumberExpr,
-  DehydratedProject,
-  DehydratedComponent,
-} from "src/utils/hydration/Dehydrator";
+import {
+  getProtoComponentById
+} from "src/ex-object/ProtoComponent";
 import {
   getProtoSceneAttributeById,
   SceneAttribute,
 } from "src/ex-object/SceneAttribute";
-import {
-  getProtoComponentById,
-  ProtoComponentStore,
-} from "src/ex-object/ProtoComponent";
+import type MainContext from "src/main-context/MainContext";
+import type {
+  DehydratedCallExpr,
+  DehydratedComponent,
+  DehydratedExpr,
+  DehydratedNumberExpr,
+  DehydratedProject,
+  DehydratedSceneAttribute,
+} from "src/utils/hydration/Dehydrator";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
 let nextId = 0;
 
@@ -35,7 +33,10 @@ export default class Rehydrator {
   }
 
   public rehydrateProject(deProject: DehydratedProject): Project {
-    throw new Error("Not implemented");
+    const rootComponents = deProject.rootComponents.map((deComponent) =>
+      this.rehydrateComponent(deComponent)
+    );
+    return this.ctx.objectFactory.createProject(deProject.id, rootComponents);
   }
 
   public rehydrateComponent(deComponent: DehydratedComponent): Component {
@@ -43,7 +44,7 @@ export default class Rehydrator {
     const sceneAttributes = deComponent.sceneAttributes.map((sceneAttribute) =>
       this.rehydrateSceneAttribute(sceneAttribute)
     );
-    return this.ctx.objectFactory.createComponentNew(proto, sceneAttributes);
+    return this.ctx.objectFactory.createComponent(deComponent.id, sceneAttributes, proto);
   }
 
   @loggedMethod

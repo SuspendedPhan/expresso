@@ -52,7 +52,7 @@ export default class MainContext {
       console.log("deProject", deProject);
       
       if (deProject === null) {
-        this.objectFactory.createProject();
+        this.objectFactory.createProjectNew();
       } else {
         const project = new Rehydrator(this).rehydrateProject(deProject);
         (this.eventBus.currentProject$ as Subject<Project>).next(project);

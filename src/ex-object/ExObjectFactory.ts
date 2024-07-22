@@ -32,9 +32,10 @@ let nextId = 0;
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
 
-  createProject(): Project {
-    const id = `project-${nextId++}`;
-    const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>([]);
+  public createProject(id: string, rootComponents: readonly Component[]): Project {
+    const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>(
+      rootComponents
+    );
 
     const project: Project = {
       id,
@@ -45,9 +46,12 @@ export default class ExObjectFactory {
     return project;
   }
 
+  public createProjectNew(): Project {
+    const id = `project-${nextId++}`;
+    return this.createProject(id, []);
+  }
 
-  createComponentNew(proto: ProtoComponent): Component {
-    const id = `component-${nextId++}`;
+  public createComponent(id: string, sceneAttributes: readonly SceneAttribute[], proto: ProtoComponent): Component {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
@@ -60,9 +64,16 @@ export default class ExObjectFactory {
       ProtoSceneAttribute,
       SceneAttribute
     >();
-    for (const protoAttribute of proto.protoAttributes) {
-      const sceneAttribute = this.createSceneAttributeNew(protoAttribute);
-      sceneAttributeByProto.set(protoAttribute, sceneAttribute);
+
+    if (proto.protoAttributes.length !== sceneAttributes.length) {
+      throw new Error("Scene attributes length does not match component proto");
+    }
+
+    for (const sceneAttribute of sceneAttributes) {
+      sceneAttributeByProto.set(sceneAttribute.proto, sceneAttribute);
+      if (proto.protoAttributes.includes(sceneAttribute.proto)) {
+        throw new Error("Scene attribute proto not in component proto");
+      }
     }
 
     const component: ComponentMut = {
@@ -83,6 +94,19 @@ export default class ExObjectFactory {
     }
 
     (this.ctx.eventBus.componentAdded$ as Subject<Component>).next(component);
+    return component;
+  }
+
+  public createComponentNew(proto: ProtoComponent): Component {
+    const id = `component-${nextId++}`;
+
+    const sceneAttributes: SceneAttribute[] = [];
+    for (const protoAttribute of proto.protoAttributes) {
+      const sceneAttribute = this.createSceneAttributeNew(protoAttribute);
+      sceneAttributes.push(sceneAttribute);
+    }
+
+    const component = this.createComponent(id, sceneAttributes, proto);
     return component;
   }
 
