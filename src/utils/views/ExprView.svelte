@@ -62,17 +62,31 @@
 
     return () => sub.unsubscribe();
   });
+
+  let tooltipVisible = false;
+  function handleMouseOver(event: MouseEvent) {
+    event.stopPropagation();
+    tooltipVisible = true;
+  }
+
+  function handleMouseLeave() {
+    tooltipVisible = false;
+  }
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>
   <SelectableView {ctx} object={expr}>
+    <!-- svelte-ignore a11y-no-static-element-interactions -->
+    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div
       class="rounded-sm card card-compact card-bordered p-2 container bg-base-100"
       style="min-width: 24px;"
+      on:mouseover={handleMouseOver}
+      on:mouseleave={handleMouseLeave}
     >
       <span
-        class="absolute invisible w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2"
-        >{expr.id}</span
+        class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2"
+        class:bg-black={tooltipVisible}>{expr.id}</span
       >
       <span>{getText()}</span>
       <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
@@ -87,7 +101,4 @@
 </NodeView>
 
 <style>
-  .container:hover > .tooltip {
-    visibility: visible;
-  }
 </style>
