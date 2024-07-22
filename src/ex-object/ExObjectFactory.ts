@@ -45,7 +45,8 @@ export default class ExObjectFactory {
     return project;
   }
 
-  createComponent(proto: ProtoComponent): Component {
+
+  createComponentNew(proto: ProtoComponent): Component {
     const id = `component-${nextId++}`;
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
@@ -60,7 +61,7 @@ export default class ExObjectFactory {
       SceneAttribute
     >();
     for (const protoAttribute of proto.protoAttributes) {
-      const sceneAttribute = this.createSceneAttribute(protoAttribute);
+      const sceneAttribute = this.createSceneAttributeNew(protoAttribute);
       sceneAttributeByProto.set(protoAttribute, sceneAttribute);
     }
 
@@ -85,12 +86,10 @@ export default class ExObjectFactory {
     return component;
   }
 
-  private createSceneAttribute(x: ProtoSceneAttribute): SceneAttribute {
-    const id = `scene-attribute-${nextId++}`;
-    const expr = this.createNumberExpr();
+  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneAttribute): SceneAttribute {
     const attribute = this.createAttributeBase(id, expr);
     const sceneAttribute: SceneAttribute = {
-      proto: x,
+      proto,
       ...attribute,
     };
 
@@ -102,6 +101,12 @@ export default class ExObjectFactory {
     );
 
     return sceneAttribute;
+  }
+
+  private createSceneAttributeNew(proto: ProtoSceneAttribute): SceneAttribute {
+    const id = `scene-attribute-${nextId++}`;
+    const expr = this.createNumberExpr();
+    return this.createSceneAttribute(id, expr, proto);
   }
 
   public createAttribute(): Attribute {

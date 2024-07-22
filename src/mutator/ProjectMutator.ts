@@ -11,7 +11,7 @@ export default class ProjectMutator {
   public constructor(private readonly ctx: MainContext) {}
 
   public addRootComponent() {
-    const component = this.ctx.objectFactory.createComponent(
+    const component = this.ctx.objectFactory.createComponentNew(
       ProtoComponentStore.circle
     );
 

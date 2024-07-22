@@ -8,10 +8,14 @@ export interface ProtoComponent {
 
 export const ProtoComponentStore = {
   circle: {
-    id: "protoCircle",
+    id: "circle",
     name: "Circle",
     protoAttributes: [
       ProtoSceneAttributeStore.x,
     ],
   } as ProtoComponent,
 };
+
+export function getProtoComponentById(id: string): ProtoComponent {
+  return (ProtoComponentStore as any)[id];
+}

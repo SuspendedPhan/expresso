@@ -15,7 +15,7 @@ export default class ComponentMutator {
 
   @loggedMethod
   public addChild(parent: Component) {
-    const component = this.ctx.objectFactory.createComponent(
+    const component = this.ctx.objectFactory.createComponentNew(
       ProtoComponentStore.circle
     );
 

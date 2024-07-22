@@ -1,7 +1,17 @@
 import { combineLatest, map, type Observable, of, switchMap } from "rxjs";
-import { type Attribute, type CallExpr, type Expr, ExprType, type NumberExpr } from "src/ex-object/ExObject";
-import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import {
+  type CallExpr,
+  Component,
+  type Expr,
+  ExprType,
+  type NumberExpr
+} from "src/ex-object/ExObject";
+import {
+  ProtoSceneAttribute,
+  SceneAttribute,
+} from "src/ex-object/SceneAttribute";
 import Logger from "src/utils/logger/Logger";
+import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
 // @ts-ignore
@@ -10,11 +20,18 @@ import { assertUnreachable } from "src/utils/utils/Utils";
 export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
 export interface DehydratedProject {
-
+  rootComponents: DehydratedComponent[];
 }
 
-export interface DehydratedAttribute {
+export interface DehydratedComponent {
   id: string;
+  protoComponentId: string;
+  sceneAttributes: DehydratedSceneAttribute[];
+}
+
+export interface DehydratedSceneAttribute {
+  id: string;
+  protoSceneAttributeId: string;
   expr: DehydratedExpr;
 }
 
@@ -35,10 +52,41 @@ export default class Dehydrator {
     throw new Error("Not implemented");
   }
 
+  public dehydrateComponent$(
+    component: Component
+  ): Observable<DehydratedComponent> {
+    const protoAttributeBySceneAttributeId = new Map<
+      string,
+      ProtoSceneAttribute
+    >();
+    for (const [
+      protoAttribute,
+      sceneAttribute,
+    ] of component.sceneAttributeByProto) {
+      protoAttributeBySceneAttributeId.set(sceneAttribute.id, protoAttribute);
+    }
+
+    const deAttr$s = Array.from(component.sceneAttributeByProto.values()).map(
+      (sceneAttribute) => {
+        return this.dehydrateAttribute$(sceneAttribute);
+      }
+    );
+
+    return combineLatest(deAttr$s).pipe(
+      map((deAttrs) => {
+        return {
+          id: component.id,
+          protoComponentId: component.proto.id,
+          sceneAttributes: deAttrs,
+        };
+      })
+    );
+  }
+
   @loggedMethod
   public dehydrateAttribute$(
-    attribute: Attribute
-  ): Observable<DehydratedAttribute> {
+    attribute: SceneAttribute
+  ): Observable<DehydratedSceneAttribute> {
     const logger = Logger.logger();
 
     return attribute.expr$.pipe(
@@ -50,8 +98,9 @@ export default class Dehydrator {
         return {
           id: attribute.id,
           expr: dehydratedExpr,
+          protoSceneAttributeId: attribute.proto.id,
         };
-      }),
+      })
     );
   }
 
@@ -81,7 +130,7 @@ export default class Dehydrator {
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
         return this.dehydrateArgs$(args);
-      }),
+      })
     );
 
     const result: Observable<DehydratedCallExpr> = deArgs$.pipe(
@@ -91,7 +140,7 @@ export default class Dehydrator {
           id: expr.id,
           args: deArgs,
         };
-      }),
+      })
     );
 
     return result;

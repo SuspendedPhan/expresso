@@ -25,7 +25,7 @@ export default class HydrationTest {
           "dehydratedAttribute",
           JSON.stringify(dehydratedAttribute, null, 3)
         );
-        const rehydratedAttribute = new Rehydrator(ctx).rehydrateAttribute(
+        const rehydratedAttribute = new Rehydrator(ctx).rehydrateSceneAttribute(
           dehydratedAttribute
         );
 
