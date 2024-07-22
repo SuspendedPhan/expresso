@@ -25,8 +25,8 @@ export default class ComponentLayout {
       () => rootExpr,
       (component) => this.getChildren(component, childrenByExpr),
       (component) => component.id,
-      40,
-      40
+      16,
+      16
     );
   }
 

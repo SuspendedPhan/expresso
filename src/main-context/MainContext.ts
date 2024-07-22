@@ -10,6 +10,7 @@ import GoBridge from "../evaluation/GoBridge";
 import Selection from "../utils/utils/Selection";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
+import Dehydrator from "src/utils/hydration/Dehydrator";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -57,6 +58,14 @@ export default class MainContext {
         const project = new Rehydrator(this).rehydrateProject(deProject);
         (this.eventBus.currentProject$ as Subject<Project>).next(project);
       }
+    });
+
+    const dehydrator = new Dehydrator();
+    this.eventBus.currentProject$.pipe(
+      switchMap((project) => dehydrator.dehydrateProject$(project))
+    ).subscribe((deProject) => {
+      console.log("write deProject", deProject);
+      Persistence.writeProject(deProject);
     });
   }
 }

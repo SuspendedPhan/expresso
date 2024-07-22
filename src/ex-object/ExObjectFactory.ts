@@ -26,6 +26,7 @@ import type {
 } from "../main-context/MainMutator";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
+import { ProjectMut } from "src/mutator/ProjectMutator";
 
 let nextId = 0;
 
@@ -37,9 +38,10 @@ export default class ExObjectFactory {
       rootComponents
     );
 
-    const project: Project = {
+    const project: ProjectMut = {
       id,
       rootComponents$: rootComponentsSub$,
+      rootComponentsSub$,
     };
 
     (this.ctx.eventBus.currentProject$ as Subject<Project>).next(project);
@@ -51,7 +53,7 @@ export default class ExObjectFactory {
     return this.createProject(id, []);
   }
 
-  public createComponent(id: string, sceneAttributes: readonly SceneAttribute[], proto: ProtoComponent): Component {
+  public createComponent(id: string, sceneAttributes: readonly SceneAttribute[], children: readonly Component[], proto: ProtoComponent): Component {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
@@ -71,7 +73,9 @@ export default class ExObjectFactory {
 
     for (const sceneAttribute of sceneAttributes) {
       sceneAttributeByProto.set(sceneAttribute.proto, sceneAttribute);
-      if (proto.protoAttributes.includes(sceneAttribute.proto)) {
+      if (!proto.protoAttributes.includes(sceneAttribute.proto)) {
+        console.log(proto.protoAttributes);
+        console.log(sceneAttribute.proto);
         throw new Error("Scene attribute proto not in component proto");
       }
     }
@@ -93,6 +97,12 @@ export default class ExObjectFactory {
       sceneAttributeMut.parentSub$.next(component);
     }
 
+    childrenSub$.next(children);
+    for (const child of children) {
+      const childMut = child as unknown as ComponentMut;
+      childMut.parentSub$.next(component);
+    }
+
     (this.ctx.eventBus.componentAdded$ as Subject<Component>).next(component);
     return component;
   }
@@ -106,7 +116,7 @@ export default class ExObjectFactory {
       sceneAttributes.push(sceneAttribute);
     }
 
-    const component = this.createComponent(id, sceneAttributes, proto);
+    const component = this.createComponent(id, sceneAttributes, [], proto);
     return component;
   }
 

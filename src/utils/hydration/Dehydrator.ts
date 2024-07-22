@@ -29,6 +29,7 @@ export interface DehydratedComponent {
   id: string;
   protoComponentId: string;
   sceneAttributes: DehydratedSceneAttribute[];
+  children: DehydratedComponent[];
 }
 
 export interface DehydratedSceneAttribute {
@@ -71,9 +72,13 @@ export default class Dehydrator {
     );
   }
 
+  @loggedMethod
   public dehydrateComponent$(
     component: Component
   ): Observable<DehydratedComponent> {
+    Logger.logThis();
+    const logger = Logger.logger();
+
     const protoAttributeBySceneAttributeId = new Map<
       string,
       ProtoSceneAttribute
@@ -87,16 +92,38 @@ export default class Dehydrator {
 
     const deAttr$s = Array.from(component.sceneAttributeByProto.values()).map(
       (sceneAttribute) => {
+        logger.log("map", "sceneAttribute", sceneAttribute);
         return this.dehydrateAttribute$(sceneAttribute);
       }
     );
 
-    return combineLatest(deAttr$s).pipe(
-      map((deAttrs) => {
+    const deAttrs$ = combineLatest(deAttr$s);
+
+    const deChildren$ = component.children$.pipe(
+      switchMap((children) => {
+        logger.log("switchMap", "children", children);
+        if (children.length === 0) {
+          return of([]);
+        }
+
+        return combineLatest(
+          children.map((child) => {
+            logger.log("map", "child", child);
+            return this.dehydrateComponent$(child);
+          })
+        );
+      })
+    );
+
+    return combineLatest([deAttrs$, deChildren$]).pipe(
+      map(([deAttrs, deChildren]) => {
+        console.log("deAttrs", deAttrs);
+        
         return {
           id: component.id,
           protoComponentId: component.proto.id,
           sceneAttributes: deAttrs,
+          children: deChildren,
         };
       })
     );

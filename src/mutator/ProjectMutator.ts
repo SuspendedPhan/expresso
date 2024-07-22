@@ -22,4 +22,8 @@ export default class ProjectMutator {
       });
     });
   }
+
+  public newProject(): any {
+    this.ctx.objectFactory.createProjectNew();
+  }
 }

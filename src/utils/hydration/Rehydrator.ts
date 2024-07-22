@@ -44,7 +44,12 @@ export default class Rehydrator {
     const sceneAttributes = deComponent.sceneAttributes.map((sceneAttribute) =>
       this.rehydrateSceneAttribute(sceneAttribute)
     );
-    return this.ctx.objectFactory.createComponent(deComponent.id, sceneAttributes, proto);
+
+    const children = deComponent.children.map((child) =>
+      this.rehydrateComponent(child)
+    );
+
+    return this.ctx.objectFactory.createComponent(deComponent.id, sceneAttributes, children, proto);
   }
 
   @loggedMethod
@@ -76,7 +81,7 @@ export default class Rehydrator {
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
     return this.exprFactory.createNumberExpr(
       deExpr.value,
-      deExpr.id + "rehydrated" + nextId++
+      deExpr.id + nextId++
     );
   }
 
@@ -84,7 +89,7 @@ export default class Rehydrator {
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
     return this.exprFactory.createCallExpr(
-      deExpr.id + "rehydrated" + nextId++,
+      deExpr.id + nextId++,
       args
     );
   }

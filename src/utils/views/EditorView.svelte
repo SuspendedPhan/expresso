@@ -6,11 +6,15 @@
   const rootComponents$ = ctx.eventBus.rootComponents$;
 </script>
 
-<div class="p-4 flex flex-col items-center overflow-scroll">
-  <button
-    on:click={() => ctx.componentMutator.addRootComponent()}
-    class="btn mb-4">Add Component</button
-  >
+<div class="p-8 flex flex-col items-center overflow-scroll">
+  <div class="flex gap-4">
+    <button on:click={() => ctx.projectMutator.addRootComponent()} class="btn"
+      >Add Component</button
+    >
+    <button on:click={() => ctx.projectMutator.newProject()} class="btn"
+      >New Project</button
+    >
+  </div>
   <div class="grid grid-flow-row">
     {#if $rootComponents$}
       {#each $rootComponents$ as component (component.id)}
