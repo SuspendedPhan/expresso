@@ -151,4 +151,79 @@ export default class Selection {
       }
     });
   }
+
+  public left() {
+    this.navHorizontal((selectedObject: SelectedObject, args: readonly Expr[]) => {
+      const index = args.indexOf(selectedObject as Expr);
+      if (index === -1) {
+        throw new Error("selectedObject is not in args");
+      }
+
+      if (index === args.length - 1) {
+        const selectedObject = args[0];
+        if (selectedObject === undefined) {
+          throw new Error("Index error trying to select first arg");
+        }
+        this.selectedObject$.next(selectedObject);
+      } else {
+        const selectedObject = args[index + 1];
+        if (selectedObject === undefined) {
+          throw new Error("Index error trying to select next arg");
+        }
+        this.selectedObject$.next(selectedObject);
+      }
+    });
+  }
+
+  public right() {
+    this.navHorizontal((selectedObject: SelectedObject, args: readonly Expr[]) => {
+      const index = args.indexOf(selectedObject as Expr);
+      if (index === -1) {
+        throw new Error("selectedObject is not in args");
+      }
+
+      if (index === args.length - 1) {
+        const selectedObject = args[0];
+        if (selectedObject === undefined) {
+          throw new Error("Index error trying to select first arg");
+        }
+        this.selectedObject$.next(selectedObject);
+      } else {
+        const selectedObject = args[index + 1];
+        if (selectedObject === undefined) {
+          throw new Error("Index error trying to select next arg");
+        }
+        this.selectedObject$.next(selectedObject);
+      }
+    });
+  }
+
+  private navHorizontal(navHorizontal1: (selectedObject: SelectedObject, args: readonly Expr[]) => void) {
+    this.getSelectedObject$()
+      .pipe(first())
+      .subscribe((selectedObject) => {
+        if (selectedObject === null) {
+          return;
+        }
+
+        selectedObject.parent$.pipe(first()).subscribe((parent) => {
+          if (parent === null) {
+            return;
+          }
+
+          if (parent.objectType !== ExObjectType.Expr) {
+            return;
+          }
+
+          if (parent.exprType !== ExprType.CallExpr) {
+            return;
+          }
+
+          const args$ = parent.args$;
+          args$.pipe(first()).subscribe((args) => {
+            navHorizontal1(selectedObject, args);
+          });
+        });
+      });
+  }
 }

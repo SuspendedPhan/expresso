@@ -28,12 +28,13 @@ export default class Keyboard {
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {
+      selection.left();
       return false;
     });
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
+      selection.right();
       return false;
-      // selection.selectedObject$.next(null);
     });
   }
 }
