@@ -49,7 +49,12 @@ export default class MainContext {
         this.selection.root$.next(rootComponents[0] ?? null);
       });
 
+    this.objectFactory.createProjectNew();
     Persistence.readProject$.subscribe((deProject) => {
+      if (window as any === window) {
+        return;
+      }
+
       if (deProject === null) {
         this.objectFactory.createProjectNew();
       } else {

@@ -58,7 +58,6 @@ export class Layout {
     subtreeWorldLeft: number,
     subtreeWorldTop: number
   ) {
-    Logger.logThis();
     const logger = Logger.logger();
     logger.log("subroot", subroot);
     logger.log("subtreeWorldLeft", subtreeWorldLeft);
@@ -104,6 +103,11 @@ export class Layout {
           childrenHeight,
           subtreeWorldTop
         );
+        if (children.length !== worldLefts.length) {
+          console.log("children", children);
+          console.log("worldLefts", worldLefts);
+          throw new Error("Children and worldLefts have different lengths");
+        }
 
         for (let i = 0; i < children.length; i++) {
           const child = children[i];

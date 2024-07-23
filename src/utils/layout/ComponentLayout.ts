@@ -42,9 +42,13 @@ export default class ElementLayout<T extends ElementNode<T>> {
     return this.getOrCreateOutput(object);
   }
 
+  @loggedMethod
   private getOrCreateOutput(object: T): LayoutOutput {
+    Logger.logCallstack();
+    const logger = Logger.logger();
     let layoutOutput = this.layoutOutputByObject.get(object);
     if (!layoutOutput) {
+      logger.log("creating output", object.id);
       layoutOutput = {
         worldPosition$: new Subject<Point>(),
       };
@@ -69,7 +73,6 @@ export default class ElementLayout<T extends ElementNode<T>> {
   @loggedMethod
   private createNode(object: T, isRootNode: boolean): Node {
     const logger = Logger.logger();
-    Logger.logThis();
     logger.log("object", object.id);
     logger.log("isRootNode", isRootNode);
 

@@ -15,7 +15,7 @@ export default class ComponentMutator {
   public constructor(private readonly ctx: MainContext) {}
 
   @loggedMethod
-  public addChild(parent: Component) {
+  public addChild(parent: Component): Component {
     const component = this.ctx.objectFactory.createComponentNew(
       ProtoComponentStore.circle
     );
@@ -26,5 +26,7 @@ export default class ComponentMutator {
     });
 
     parentMut.childAddedSub$.next(component);
+
+    return component;
   }
 }

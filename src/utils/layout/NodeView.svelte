@@ -22,12 +22,20 @@
     const sub = elementLayout
       .getOutput(layoutObject)
       .worldPosition$.subscribe((pos) => {
+        console.log("worldPosition", layoutObject.id, pos);
         element.style.left = `${pos.left}px`;
         element.style.top = `${pos.top}px`;
       });
 
     const handleResize = () => {
       tick().then(() => {
+        console.log(
+          "resize",
+          layoutObject.id,
+          element.offsetWidth,
+          element.offsetHeight
+        );
+
         width$.next(element.offsetWidth);
         height$.next(element.offsetHeight);
       });

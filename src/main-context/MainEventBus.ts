@@ -37,7 +37,6 @@ export class MainEventBus {
 
   @loggedMethod
   public getDescendants$(component: Component): OBS<readonly Component[]> {
-    Logger.logThis();
     const logger = Logger.logger();
 
     return component.children$.pipe(
@@ -52,10 +51,7 @@ export class MainEventBus {
         );
         const descendants$ = combineLatest(childrenDescendants$).pipe(
           map((childrenDescendants) => {
-            console.log("childrenDescendants", childrenDescendants);
-            
-            const result = childrenDescendants.flat();
-            logger.log("childrenDescendants", result.map((c) => c.id));
+            logger.log("childrenDescendants", childrenDescendants);
             const descendants = childrenDescendants.flat();
             return [...children, ...descendants];
           })
