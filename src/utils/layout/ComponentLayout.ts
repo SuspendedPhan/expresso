@@ -1,30 +1,81 @@
+import { map, Subject } from "rxjs";
 import { Component } from "src/ex-object/ExObject";
-import { ElementLayout } from "./ElementLayout";
-import MainContext from "src/main-context/MainContext";
+import { OBS } from "../utils/Utils";
+import { Layout, Node, Point } from "./Layout";
+
+export interface ComponentViewLayoutInput {
+  width$: OBS<number>;
+  height$: OBS<number>;
+}
+
+export interface ComponentViewLayoutOutput {
+  worldPosition$: OBS<Point>;
+}
+
+export type ComponentViewFactory = (
+  output: ComponentViewLayoutOutput
+) => ComponentViewLayoutInput;
 
 export default class ComponentLayout {
-  public static create(
-    ctx: MainContext,
-    rootComponent: Component
-  ): ElementLayout {
-    const childrenByComponent = new Map<Component, readonly Component[]>();
-    
-    ctx.eventBus.componentAdded$.subscribe((component) => {
-      component.children$.subscribe((children) => {
-        childrenByComponent.set(component, children);
-      });
-    });
+  private layout = new Layout();
 
-    return new ElementLayout(
-      () => rootComponent,
-      (component) => this.getChildren(component, childrenByComponent),
-      (component) => component.id,
-      16,
-      16
-    );
+  private layoutInputByComponent = new Map<Component, ComponentViewLayoutInput>();
+
+  public constructor(rootComponent: Component, private factory: ComponentViewFactory) {
+    const worldPosition$ = new Subject<Point>();
+    const input = factory({
+      worldPosition$,
+    });
+    
+    const node = this.layout.createRootNode({
+      width$: input.width$,
+      height$: input.height$,
+      children$: this.getChildren$(rootComponent),
+    });
+    node.worldPosition.subscribe(worldPosition$);
   }
 
-  static getChildren(component: Component, childrenByComponent: Map<Component, readonly Component[]>): readonly Component[] {
-    return childrenByComponent.get(component) ?? [];
+  public registerElement(component: Component, input: ComponentViewLayoutInput): void {
+
+  }
+
+  private getOrCreateLayoutInput(component: Component): ComponentViewLayoutInput {
+    let input = this.layoutInputByComponent.get(component);
+    if (!input) {
+      input = {
+        width$: new Subject<number>(),
+        height$: new Subject<number>(),
+      };
+      this.layoutInputByComponent.set(component, input);
+    }
+    return input;
+  }
+
+  private createNode(component: Component): Node {
+    const worldPosition$ = new Subject<Point>();
+    const input = this.factory({
+      worldPosition$,
+    });
+
+    const node = this.layout.createNode({
+      children$: this.getChildren$(component),
+      width$: input.width$,
+      height$: input.height$,
+    });
+    node.worldPosition.subscribe(worldPosition$);
+    return node;
+  }
+
+  private getChildren$(
+    component: Component,
+  ): OBS<readonly Node[]> {
+    return component.children$.pipe(
+      map((children) => {
+        return children.map((child) => {
+          const childNode = this.createNode(child);
+          return childNode;
+        });
+      })
+    );
   }
 }

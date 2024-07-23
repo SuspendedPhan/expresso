@@ -32,11 +32,13 @@ export class Layout {
   public constructor() {
   }
 
-  public setRoot(node: Node) {
+  public createRootNode(input: NodeInput): Node {
+    const node = this.createNode(input);
     this.attach(node as NodeMut, 0, 0);
+    return node;
   }
 
-  public addNode(input: NodeInput): Node {
+  public createNode(input: NodeInput): Node {
     const worldPositionSub$ = new Subject<Point>();
     const node: NodeMut = {
       ...input,

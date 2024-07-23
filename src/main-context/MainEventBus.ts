@@ -1,5 +1,5 @@
 import type { Attribute } from "pixi.js";
-import { ReplaySubject, Subject, switchMap } from "rxjs";
+import { combineLatest, map, mergeAll, of, ReplaySubject, Subject, switchMap } from "rxjs";
 import type { Component, Expr, Project } from "src/ex-object/ExObject";
 import type { OBS } from "src/utils/utils/Utils";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
@@ -13,7 +13,7 @@ export class MainEventBus {
   public readonly onAttributeAdded$: OBS<Attribute>;
   public readonly onExprAdded$: OBS<Expr>;
   public readonly onExprReplaced$: OBS<ExprReplacement>;
-
+  
   public constructor() {
     this.currentProject$ = new ReplaySubject<Project>(1);
     this.rootComponents$ = this.currentProject$.pipe(switchMap((project) => project.rootComponents$));
@@ -22,5 +22,20 @@ export class MainEventBus {
     this.onAttributeAdded$ = new Subject<Attribute>();
     this.onExprAdded$ = new ReplaySubject<Expr>(10);
     this.onExprReplaced$ = new Subject<ExprReplacement>();
+  }
+
+  public getDescendants$(component: Component): OBS<readonly Component[]> {
+    return component.children$.pipe(
+      switchMap((children) => {
+        if (children.length === 0) {
+          return of([]);
+        }
+
+        const childrenDescendants$ = children.map((child) => this.getDescendants$(child));
+        return combineLatest(childrenDescendants$).pipe(
+          map((childrenDescendants) => childrenDescendants.flat())
+        );
+      })
+    );
   }
 }
