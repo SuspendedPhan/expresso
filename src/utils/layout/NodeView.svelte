@@ -1,31 +1,35 @@
-<script lang="ts">
+<script lang="ts" generics="T extends ElementNode<T>">
+  import { Subject } from "rxjs";
+
+  import ElementLayout, { ElementNode } from "./ComponentLayout";
+
   import { onMount, tick } from "svelte";
-  import { ElementLayout } from "../layout/ElementLayout";
   import { ResizeSensor } from "css-element-queries";
 
-  export let elementLayout: ElementLayout;
-  export let elementKey: string;
+  export let elementLayout: ElementLayout<T>;
+  export let layoutObject: T;
 
   let element: HTMLElement;
-  onMount(() => {
-    elementLayout.registerElement(element, elementKey);
-    const sub = elementLayout
-      .getLocalPositionObservable(elementKey)
-      .subscribe((position) => {
-        element.style.left = `${position.left}px`;
-        element.style.top = `${position.top}px`;
-        console.log("position", position);
+  const width$ = new Subject<number>();
+  const height$ = new Subject<number>();
 
-        setTimeout(() => {
-          element.style.left = `${position.left}px`;
-          element.style.top = `${position.top}px`;
-        }, 500);
+  onMount(() => {
+    elementLayout.registerElement(layoutObject, {
+      width$,
+      height$,
+    });
+
+    const sub = elementLayout
+      .getOutput(layoutObject)
+      .worldPosition$.subscribe((pos) => {
+        element.style.left = `${pos.left}px`;
+        element.style.top = `${pos.top}px`;
       });
-    elementLayout.recalculate();
 
     const handleResize = () => {
       tick().then(() => {
-        elementLayout.recalculate();
+        width$.next(element.offsetWidth);
+        height$.next(element.offsetHeight);
       });
     };
     const sensor = new ResizeSensor(element, handleResize);

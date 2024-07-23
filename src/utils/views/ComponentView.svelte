@@ -2,23 +2,18 @@
   import type { Component } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
+  import ElementLayout from "../layout/ComponentLayout";
   import NodeView from "../layout/NodeView.svelte";
   import AttributeView from "./AttributeView.svelte";
-  import ElementLayout from "../layout/ComponentLayout";
-  import { onMount } from "svelte";
 
   export let ctx: MainContext;
   export let component: Component;
-  export let layout: ElementLayout;
+  export let layout: ElementLayout<Component>;
   const attributes = component.sceneAttributeByProto.values();
   const children$ = component.children$;
-
-  onMount(() => {
-    layout.registerElement(component, element);
-  });
 </script>
 
-<NodeView elementKey={component.id} {elementLayout}>
+<NodeView layoutObject={component} elementLayout={layout}>
   <div>
     <SelectableView
       {ctx}
