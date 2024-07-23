@@ -108,7 +108,8 @@ export default class ExObjectFactory {
   }
 
   public createComponentNew(proto: ProtoComponent): Component {
-    const id = `component-${nextId++}`;
+    // const id = `component-${nextId++}`;
+    const id = `component-${crypto.randomUUID()}`;
 
     const sceneAttributes: SceneAttribute[] = [];
     for (const protoAttribute of proto.protoAttributes) {

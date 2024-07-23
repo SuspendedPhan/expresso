@@ -16,10 +16,10 @@
         element.style.top = `${position.top}px`;
         console.log("position", position);
 
-        setTimeout(() => {
-          element.style.left = `${position.left}px`;
-          element.style.top = `${position.top}px`;
-        }, 500);
+        // setTimeout(() => {
+        //   element.style.left = `${position.left}px`;
+        //   element.style.top = `${position.top}px`;
+        // }, 500);
       });
     elementLayout.recalculate();
 
