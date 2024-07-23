@@ -10,7 +10,7 @@
   export let component: Component;
   export let layout: ElementLayout<Component>;
   const attributes = component.sceneAttributeByProto.values();
-  const children$ = component.children$;
+  // const children$ = component.children$;
 </script>
 
 <NodeView layoutObject={component} elementLayout={layout}>
@@ -34,10 +34,10 @@
         >
       </div>
     </SelectableView>
-    {#if $children$}
+    <!-- {#if $children$}
       {#each $children$ as child (child.id)}
         <svelte:self {ctx} component={child} {layout} />
       {/each}
-    {/if}
+    {/if} -->
   </div>
 </NodeView>

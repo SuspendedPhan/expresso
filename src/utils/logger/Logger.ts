@@ -59,6 +59,7 @@ export default class Logger {
       throw new Error("No current function call");
     }
 
+    currentFunctionCall.astCall.currentlyLogging = true;
     this.loggedThisValues.add(currentFunctionCall.thisValue);
   }
 
@@ -88,7 +89,8 @@ export default class Logger {
         const argString = args
           .map((arg: any) => arg?.toString() ?? "null/undefined")
           .join(", ");
-        console.log(`${astCall.id}.${name}(${argString})`);
+        console.log(`${astCall.id}.${name}`, ...args);
+        // console.log(`${astCall.id}.${name}(${argString})`);
       },
     };
   }

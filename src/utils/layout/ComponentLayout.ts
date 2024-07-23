@@ -1,6 +1,8 @@
 import { map, Subject } from "rxjs";
 import { OBS, SUB } from "../utils/Utils";
 import { Layout, Node, Point } from "./Layout";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
 
 export interface ElementNode<T> {
   children$: OBS<readonly T[]>;
@@ -63,7 +65,13 @@ export default class ElementLayout<T extends ElementNode<T>> {
     return input;
   }
 
+  @loggedMethod
   private createNode(object: T, isRootNode: boolean): Node {
+    const logger = Logger.logger();
+    Logger.logThis();
+    logger.log("object", object.id);
+    logger.log("isRootNode", isRootNode);
+    
     const output = this.getOrCreateOutput(object);
     const layoutInput = this.getOrCreateLayoutInput(object);
 
