@@ -50,13 +50,17 @@ export class MainEventBus {
         const childrenDescendants$ = children.map((child) =>
           this.getDescendants$(child)
         );
-        return combineLatest(childrenDescendants$).pipe(
+        const descendants$ = combineLatest(childrenDescendants$).pipe(
           map((childrenDescendants) => {
+            console.log("childrenDescendants", childrenDescendants);
+            
             const result = childrenDescendants.flat();
             logger.log("childrenDescendants", result.map((c) => c.id));
-            return childrenDescendants.flat();
+            const descendants = childrenDescendants.flat();
+            return [...children, ...descendants];
           })
         );
+        return descendants$;
       })
     );
   }

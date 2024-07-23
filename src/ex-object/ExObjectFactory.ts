@@ -28,7 +28,7 @@ import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
 
-let nextId = 0;
+let nextId = Math.floor(Math.random() * 40000);
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
