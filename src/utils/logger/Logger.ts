@@ -86,9 +86,9 @@ export default class Logger {
           return;
         }
 
-        const argString = args
-          .map((arg: any) => arg?.toString() ?? "null/undefined")
-          .join(", ");
+        // const argString = args
+        //   .map((arg: any) => arg?.toString() ?? "null/undefined")
+        //   .join(", ");
         console.log(`${astCall.id}.${name}`, ...args);
         // console.log(`${astCall.id}.${name}(${argString})`);
       },

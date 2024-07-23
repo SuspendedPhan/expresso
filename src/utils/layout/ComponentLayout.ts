@@ -1,10 +1,11 @@
-import { map, Subject } from "rxjs";
+import { map, ReplaySubject, Subject } from "rxjs";
 import { OBS, SUB } from "../utils/Utils";
 import { Layout, Node, Point } from "./Layout";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
 
 export interface ElementNode<T> {
+  id: string;
   children$: OBS<readonly T[]>;
 }
 
@@ -57,8 +58,8 @@ export default class ElementLayout<T extends ElementNode<T>> {
     let input = this.layoutInputByObject.get(object);
     if (!input) {
       input = {
-        widthSub$: new Subject<number>(),
-        heightSub$: new Subject<number>(),
+        widthSub$: new ReplaySubject<number>(1),
+        heightSub$: new ReplaySubject<number>(1),
       };
       this.layoutInputByObject.set(object, input);
     }
@@ -71,11 +72,15 @@ export default class ElementLayout<T extends ElementNode<T>> {
     Logger.logThis();
     logger.log("object", object.id);
     logger.log("isRootNode", isRootNode);
-    
-    const output = this.getOrCreateOutput(object);
+
     const layoutInput = this.getOrCreateLayoutInput(object);
+    layoutInput.widthSub$.subscribe((width) => {
+      logger.log("object", object.id);
+      logger.log("width", width);
+    });
 
     const nodeInput = {
+      id: object.id,
       width$: layoutInput.widthSub$,
       height$: layoutInput.heightSub$,
       children$: this.getChildren$(object),
@@ -88,7 +93,12 @@ export default class ElementLayout<T extends ElementNode<T>> {
       node = this.layout.createNode(nodeInput);
     }
 
-    node.worldPosition.subscribe(output.worldPosition$ as SUB<Point>);
+    const output = this.getOrCreateOutput(object);
+    node.worldPosition.subscribe((position) => {
+      logger.log("position, object id", object.id);
+      logger.log("position", position);
+      (output.worldPosition$ as SUB<Point>).next(position);
+    });
     return node;
   }
 

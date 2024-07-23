@@ -54,6 +54,10 @@ export default class Dehydrator {
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
     const deComponents$ = project.rootComponents$.pipe(
       switchMap((components) => {
+        if (components.length === 0) {
+          return of([]);
+        }
+
         return combineLatest(
           components.map((component) => {
             return this.dehydrateComponent$(component);

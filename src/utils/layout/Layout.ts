@@ -1,5 +1,7 @@
 import { combineLatest, map, Subject, switchMap } from "rxjs";
 import { OBS, SUB } from "../utils/Utils";
+import { loggedMethod } from "../logger/LoggerDecorator";
+import Logger from "../logger/Logger";
 
 export interface Point {
   left: number;
@@ -15,6 +17,7 @@ export interface Line {
 }
 
 export interface NodeInput {
+  id: string;
   width$: OBS<number>;
   height$: OBS<number>;
   children$: OBS<readonly Node[]>;
@@ -24,13 +27,13 @@ export interface Node {
   worldPosition: OBS<Point>;
 }
 
-type NodeMut = NodeInput & Node & {
-  worldPositionSub$: SUB<Point>;
-}
+type NodeMut = NodeInput &
+  Node & {
+    worldPositionSub$: SUB<Point>;
+  };
 
 export class Layout {
-  public constructor() {
-  }
+  public constructor() {}
 
   public createRootNode(input: NodeInput): Node {
     const node = this.createNode(input);
@@ -38,6 +41,7 @@ export class Layout {
     return node;
   }
 
+  @loggedMethod
   public createNode(input: NodeInput): Node {
     const worldPositionSub$ = new Subject<Point>();
     const node: NodeMut = {
@@ -48,47 +52,95 @@ export class Layout {
     return node;
   }
 
-  private attach(subroot: NodeMut, subtreeWorldLeft: number, subtreeWorldTop: number) {
+  @loggedMethod
+  private attach(
+    subroot: NodeMut,
+    subtreeWorldLeft: number,
+    subtreeWorldTop: number
+  ) {
+    Logger.logThis();
+    const logger = Logger.logger();
+    logger.log("subroot", subroot);
+    logger.log("subtreeWorldLeft", subtreeWorldLeft);
+    logger.log("subtreeWorldTop", subtreeWorldTop);
+
     const subtreeWidth$ = this.getSubtreeWidth$(subroot);
-    const subrootLeft$ = this.getNodeLeft$(subroot, subtreeWorldLeft, subtreeWidth$);
-    subrootLeft$.subscribe(subrootLeft => {
-      subroot.worldPositionSub$.next({left: subrootLeft, top: subtreeWorldTop});
+    const subrootLeft$ = this.getNodeLeft$(
+      subroot,
+      subtreeWorldLeft,
+      subtreeWidth$
+    );
+    subrootLeft$.subscribe((subrootLeft) => {
+      logger.log("subrootLeft", subrootLeft);
+      subroot.worldPositionSub$.next({
+        left: subrootLeft,
+        top: subtreeWorldTop,
+      });
     });
 
-    subroot.children$.pipe(
-      switchMap(children => {
-        const childrenHeight$ = this.getChildrenHeight$(children as readonly NodeMut[]);
-        const worldLefts$ = this.getSubtreeChildrenWorldLefts$(children as readonly NodeMut[], subtreeWorldLeft);
-        return combineLatest([childrenHeight$, worldLefts$]).pipe(
-          map(([childrenHeight, worldLefts]) => {
-            return [children, childrenHeight, worldLefts] as const;
-          })
-        )
-      })
-    ).subscribe(([children, childrenHeight, worldLefts]) => {
-      const childSubtreeWorldTop = this.getSubtreeWorldTop(childrenHeight, subtreeWorldTop);
+    subroot.children$
+      .pipe(
+        switchMap((children) => {
+          const childrenHeight$ = this.getChildrenHeight$(
+            children as readonly NodeMut[]
+          );
+          const worldLefts$ = this.getSubtreeChildrenWorldLefts$(
+            children as readonly NodeMut[],
+            subtreeWorldLeft
+          );
+          return combineLatest([childrenHeight$, worldLefts$]).pipe(
+            map(([childrenHeight, worldLefts]) => {
+              return [children, childrenHeight, worldLefts] as const;
+            })
+          );
+        })
+      )
+      .subscribe(([children, childrenHeight, worldLefts]) => {
+        logger.log("children", children);
+        logger.log("childrenHeight", childrenHeight);
+        logger.log("worldLefts", worldLefts);
 
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i];
-        const worldLeft = worldLefts[i];
+        const childSubtreeWorldTop = this.getSubtreeWorldTop(
+          childrenHeight,
+          subtreeWorldTop
+        );
 
-        if (child === undefined || worldLeft === undefined) {
-          console.log("child", child, "worldLeft", worldLeft);
-          
-          throw new Error("Child or worldLeft is undefined");
+        for (let i = 0; i < children.length; i++) {
+          const child = children[i];
+          const worldLeft = worldLefts[i];
+
+          if (child === undefined || worldLeft === undefined) {
+            console.log("child", child, "worldLeft", worldLeft);
+
+            throw new Error("Child or worldLeft is undefined");
+          }
+          this.attach(child as NodeMut, worldLeft, childSubtreeWorldTop);
         }
-        this.attach(child as NodeMut, worldLeft, childSubtreeWorldTop);
-      }
-    });
+      });
   }
 
+  @loggedMethod
   private getNodeLeft$(
     subroot: NodeMut,
     subtreeWorldLeft: number,
     subtreeWidth$: OBS<number>
   ): OBS<number> {
+    const logger = Logger.logger();
+    logger.log("subroot", subroot);
+    subroot.width$.subscribe((width) => {
+      logger.log("subroot", subroot);
+      logger.log("subroot width", width);
+    });
+    subtreeWidth$.subscribe((width) => {
+      logger.log("subroot", subroot);
+      logger.log("subtreeWidth", width);
+    });
+
     return combineLatest([subroot.width$, subtreeWidth$]).pipe(
       map(([nodeWidth, subtreeWidth]) => {
+        logger.log("subroot", subroot);
+        logger.log("nodeWidth", nodeWidth);
+        logger.log("subtreeWidth", subtreeWidth);
         return this.getNodeLeft(nodeWidth, subtreeWorldLeft, subtreeWidth);
       })
     );
@@ -140,31 +192,34 @@ export class Layout {
     return childWidths.reduce((acc, width) => acc + width, 0);
   }
 
+  @loggedMethod
   private getSubtreeChildrenWorldLefts$(
     children: readonly NodeMut[],
     translateX: number
   ): OBS<number[]> {
+    const logger = Logger.logger();
     const localLefts$ = this.getSubtreeLocalLefts$(children);
     return localLefts$.pipe(
       map((localLefts) => {
+        logger.log("localLefts", localLefts);
         return this.getSubtreeChildrenWorldLefts(localLefts, translateX);
       })
     );
   }
 
+  @loggedMethod
   private getSubtreeChildrenWorldLefts(
     localLefts: number[],
     translateX: number
   ): number[] {
-    let worldLefts: number[] = [];
-    let worldLeft = translateX;
-    for (const localLeft of localLefts) {
-      worldLefts.push(worldLeft);
-      worldLeft += localLeft;
-    }
+    const logger = Logger.logger();
+    const worldLefts = localLefts.map((localLeft) => localLeft + translateX);
+
+    logger.log("worldLefts", worldLefts);
     return worldLefts;
   }
 
+  @loggedMethod
   private getSubtreeLocalLefts$(children: readonly NodeMut[]): OBS<number[]> {
     const subtreeWidths$ = combineLatest(
       children.map((child) => this.getSubtreeWidth$(child))
@@ -176,7 +231,11 @@ export class Layout {
     );
   }
 
+  @loggedMethod
   private getSubtreeLocalLefts(subtreeWidths: number[]): number[] {
+    const logger = Logger.logger();
+    logger.log("subtreeWidths", subtreeWidths);
+
     let localLefts: number[] = [];
     let localLeft = 0;
     for (const width of subtreeWidths) {
