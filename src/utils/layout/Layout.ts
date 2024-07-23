@@ -82,6 +82,7 @@ export class Layout {
     subroot.children$
       .pipe(
         switchMap((children) => {
+          logger.log("children", children);
           const childrenHeight$ = this.getChildrenHeight$(
             children as readonly NodeMut[]
           );
@@ -97,7 +98,6 @@ export class Layout {
         })
       )
       .subscribe(([children, childrenHeight, worldLefts]) => {
-        logger.log("children", children);
         logger.log("childrenHeight", childrenHeight);
         logger.log("worldLefts", worldLefts);
 
@@ -106,8 +106,9 @@ export class Layout {
           subtreeWorldTop
         );
         if (children.length !== worldLefts.length) {
-          console.log("children", children);
-          console.log("worldLefts", worldLefts);
+          logger.log("subroot", subroot.id);
+          logger.log("children", children);
+          logger.log("worldLefts", worldLefts);
           throw new Error("Children and worldLefts have different lengths");
         }
 
@@ -160,9 +161,14 @@ export class Layout {
     return subtreeWorldLeft + (subtreeWidth - nodeWidth) / 2;
   }
 
+  @loggedMethod
   private getSubtreeWidth$(subtreeRoot: NodeMut): OBS<number> {
+    Logger.logFunction();
+    const logger = Logger.logger();
     return subtreeRoot.children$.pipe(
       switchMap((children) => {
+        logger.log("subtreeRoot", subtreeRoot.id);
+        logger.log("children", children);
         if (children.length === 0) {
           return subtreeRoot.width$;
         }

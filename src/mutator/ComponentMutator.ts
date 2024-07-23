@@ -3,6 +3,7 @@ import { Component } from "src/ex-object/ExObject";
 import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
 import MainContext from "src/main-context/MainContext";
 import { ExObjectMut } from "src/main-context/MainMutator";
+import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
 export type ComponentMut = Component &
@@ -16,6 +17,9 @@ export default class ComponentMutator {
 
   @loggedMethod
   public addChild(parent: Component): Component {
+    Logger.logFunction();
+    const logger = Logger.logger();
+    logger.log("parent", parent);
     const component = this.ctx.objectFactory.createComponentNew(
       ProtoComponentStore.circle
     );

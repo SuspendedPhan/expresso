@@ -120,6 +120,12 @@ export default class Logger {
   private static logFunctionCall(functionCall: RuntimeFunctionCall) {
     functionCall.argsLogged$.subscribe({
       complete: () => {
+        if (functionCall.logged) {
+          return;
+        }
+
+        functionCall.logged = true;
+
         const argString = functionCall.args
           .map((arg) => arg.message)
           .join(", ");

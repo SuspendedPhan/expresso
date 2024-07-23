@@ -48,9 +48,9 @@ export default class ElementLayout<T extends ElementNode<T>> {
 
   @loggedMethod
   private getOrCreateOutput(object: T): LayoutOutput {
-    Logger.logFunction();
-    Logger.arg("object", object.id);
     const logger = Logger.logger();
+    logger.log("object", object.id);
+
     let output = this.layoutOutputByObject.get(object);
     if (!output) {
       logger.log("creating output", object.id);
@@ -114,9 +114,14 @@ export default class ElementLayout<T extends ElementNode<T>> {
     return node;
   }
 
+  @loggedMethod
   private getChildren$(object: T): OBS<readonly Node[]> {
+    const logger = Logger.logger();
+    Logger.logFunction();
     return object.children$.pipe(
       map((children) => {
+        logger.log("object id", object.id);
+        logger.log("children", children);
         return children.map((child) => {
           const childNode = this.createNode(child, false);
           return childNode;

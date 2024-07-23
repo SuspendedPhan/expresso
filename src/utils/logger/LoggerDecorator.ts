@@ -11,6 +11,7 @@ export interface RuntimeFunctionCall {
   readonly argsLogged$: Subject<void>;
   readonly children$: ReplaySubject<RuntimeFunctionCall>;
   readonly thisValue: any;
+  logged: boolean;
 }
 
 export interface AstFunctionCall {
@@ -92,6 +93,7 @@ export class LoggerDecorator {
       children$: new ReplaySubject<RuntimeFunctionCall>(),
       argsLogged$: new Subject(),
       thisValue: thisValue,
+      logged: false,
     };
 
     metadata.runtimeCall$.next(functionCall);
