@@ -1,4 +1,4 @@
-import { combineLatest, map, Observable, of, switchAll, switchMap } from "rxjs";
+import { combineLatest, map, Subject, switchMap } from "rxjs";
 import { OBS, SUB } from "../utils/Utils";
 
 export interface Point {
@@ -17,25 +17,36 @@ export interface Line {
 export interface NodeInput {
   width$: OBS<number>;
   height$: OBS<number>;
-  children$: OBS<NodeInput[]>;
+  children$: OBS<readonly Node[]>;
 }
 
-export interface NodeOutput {
+export interface Node {
   worldPosition: OBS<Point>;
 }
 
+type NodeMut = NodeInput & Node & {
+  worldPositionSub$: SUB<Point>;
+}
+
 export class Layout {
-  public constructor(root: NodeInput) {
-    this.attach(root, 0, 0);
+  public constructor() {
   }
 
-  public setRootNode(node: NodeInput): OBS<NodeOutput> {
-
+  public setRoot(node: Node) {
+    this.attach(node as NodeMut, 0, 0);
   }
 
-  // public addChild
+  public addNode(input: NodeInput): Node {
+    const worldPositionSub$ = new Subject<Point>();
+    const node: NodeMut = {
+      ...input,
+      worldPosition: worldPositionSub$,
+      worldPositionSub$,
+    };
+    return node;
+  }
 
-  private attach(subroot: NodeInput, subtreeWorldLeft: number, subtreeWorldTop: number) {
+  private attach(subroot: NodeMut, subtreeWorldLeft: number, subtreeWorldTop: number) {
     const subtreeWidth$ = this.getSubtreeWidth$(subroot);
     const subrootLeft$ = this.getNodeLeft$(subroot, subtreeWorldLeft, subtreeWidth$);
     subrootLeft$.subscribe(subrootLeft => {
@@ -44,8 +55,8 @@ export class Layout {
 
     subroot.children$.pipe(
       switchMap(children => {
-        const childrenHeight$ = this.getChildrenHeight$(children);
-        const worldLefts$ = this.getSubtreeChildrenWorldLefts$(children, subtreeWorldLeft);
+        const childrenHeight$ = this.getChildrenHeight$(children as readonly NodeMut[]);
+        const worldLefts$ = this.getSubtreeChildrenWorldLefts$(children as readonly NodeMut[], subtreeWorldLeft);
         return combineLatest([childrenHeight$, worldLefts$]).pipe(
           map(([childrenHeight, worldLefts]) => {
             return [children, childrenHeight, worldLefts] as const;
@@ -68,7 +79,7 @@ export class Layout {
   }
 
   private getNodeLeft$(
-    subroot: NodeInput,
+    subroot: NodeMut,
     subtreeWorldLeft: number,
     subtreeWidth$: OBS<number>
   ): OBS<number> {
@@ -87,7 +98,7 @@ export class Layout {
     return subtreeWorldLeft + (subtreeWidth - nodeWidth) / 2;
   }
 
-  private getSubtreeWidth$(subtreeRoot: NodeInput): OBS<number> {
+  private getSubtreeWidth$(subtreeRoot: NodeMut): OBS<number> {
     return subtreeRoot.children$.pipe(
       switchMap((children) => {
         if (children.length === 0) {
@@ -95,7 +106,7 @@ export class Layout {
         }
 
         return combineLatest(
-          children.map((child) => this.getSubtreeWidth$(child))
+          children.map((child) => this.getSubtreeWidth$(child as NodeMut))
         ).pipe(
           map((childrenWidths) => {
             return this.getSubtreeWidth(childrenWidths);
@@ -105,7 +116,7 @@ export class Layout {
     );
   }
 
-  private getChildrenHeight$(children: NodeInput[]): OBS<number> {
+  private getChildrenHeight$(children: readonly NodeMut[]): OBS<number> {
     return combineLatest(children.map((child) => child.height$)).pipe(
       map((heights) => {
         return this.getChildrenHeight(heights);
@@ -126,7 +137,7 @@ export class Layout {
   }
 
   private getSubtreeChildrenWorldLefts$(
-    children: NodeInput[],
+    children: readonly NodeMut[],
     translateX: number
   ): OBS<number[]> {
     const localLefts$ = this.getSubtreeLocalLefts$(children);
@@ -150,7 +161,7 @@ export class Layout {
     return worldLefts;
   }
 
-  private getSubtreeLocalLefts$(children: NodeInput[]): OBS<number[]> {
+  private getSubtreeLocalLefts$(children: readonly NodeMut[]): OBS<number[]> {
     const subtreeWidths$ = combineLatest(
       children.map((child) => this.getSubtreeWidth$(child))
     );
