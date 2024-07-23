@@ -1,56 +1,36 @@
 <script lang="ts">
   import type { Component } from "src/ex-object/ExObject";
   import MainContext from "src/main-context/MainContext";
-  import ElementLayout from "../layout/ComponentLayout";
+  import ComponentLayout from "../layout/ComponentLayout";
+  import TreeView from "../layout/TreeView.svelte";
   import ComponentView from "./ComponentView.svelte";
+  import { ResizeSensor } from "css-element-queries";
+  import { onMount, tick } from "svelte";
 
   export let ctx: MainContext;
   export let component: Component;
   let clazz = "";
   export { clazz as class };
 
-  const layout = new ElementLayout(component);
-  const descendants$ = ctx.eventBus.getDescendants$(component);
+  const elementLayout = ComponentLayout.create(ctx, component);
 
-  // const worldPosById: Record<string, Point> = {};
-  // console.log("worldPositionPosById", worldPosById);
-  // layout.getOutput(component).worldPosition$.subscribe((pos) => {
-  //   worldPosById[component.id] = pos;
-  // });
+  let element: HTMLElement;
 
-  // descendants$.subscribe((descendants) => {
-  //   for (const descendant of descendants) {
-  //     layout.getOutput(descendant).worldPosition$.subscribe((pos) => {
-  //       worldPosById[descendant.id] = pos;
-  //     });
-  //     layout
-  //       .getOutput(descendant)
-  //       .worldPosition$.pipe(debounceTime(100))
-  //       .subscribe(() => {
-  //         console.log("worldPositionByPosId", worldPosById);
-  //       });
-  //   }
-  // });
-  // descendants$.pipe(debounceTime(100)).subscribe((descendants) => {
-  //   console.log(
-  //     "descendants",
-  //     descendants.map((d) => d.id)
-  //   );
-  // });
-
-  // const child1 = ctx.componentMutator.addChild(component);
-  // ctx.componentMutator.addChild(child1);
+  onMount(() => {
+    new ResizeSensor(element, () => {
+      tick().then(() => {
+        elementLayout.recalculate();
+      });
+    });
+  });
 </script>
 
-<div class="{clazz} relative" style="height: 1000px;">
-  {#key component.id}
-    <ComponentView {ctx} {component} {layout} />
-  {/key}
-  {#each $descendants$ as descendant}
-    {#key descendant.id}
-      <ComponentView {ctx} component={descendant} {layout} />
-    {/key}
-  {/each}
+<div class={clazz}>
+  <TreeView {elementLayout}>
+    <div bind:this={element}>
+      <ComponentView {ctx} {component} {elementLayout} />
+    </div>
+  </TreeView>
 </div>
 
 <style></style>

@@ -7,6 +7,7 @@
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { onMount } from "svelte";
   import NodeView from "../layout/NodeView.svelte";
+  import { ElementLayout } from "../layout/ElementLayout";
 
   export let ctx: MainContext;
   export let expr: Expr;

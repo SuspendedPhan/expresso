@@ -1,4 +1,4 @@
-import { BehaviorSubject, mergeAll, mergeWith, Subject, switchMap } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import {
   type Attribute,
   type CallExpr,
@@ -28,7 +28,7 @@ import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
 
-let nextId = Math.floor(Math.random() * 40000);
+let nextId = 0;
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {}
@@ -61,7 +61,6 @@ export default class ExObjectFactory {
     const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
       base.destroy$
     );
-    const childAddedSub$ = createSubjectWithLifetime<Component>(base.destroy$);
 
     const sceneAttributeByProto = new Map<
       ProtoSceneAttribute,
@@ -81,16 +80,6 @@ export default class ExObjectFactory {
       }
     }
 
-    const descendantAdded$ = childrenSub$.pipe(
-      switchMap((children) => {
-        return children.map((child) => {
-          const added$ = child.descendantAdded$.pipe(mergeWith(child.childAdded$));
-          return added$;
-        });
-      }),
-      mergeAll()
-    );
-
     const component: ComponentMut = {
       objectType: ExObjectType.Component,
       proto,
@@ -99,9 +88,6 @@ export default class ExObjectFactory {
       children$: childrenSub$,
       childrenSub$,
       sceneAttributeAdded$,
-      childAdded$: childAddedSub$,
-      childAddedSub$,
-      descendantAdded$,
       ...base,
       ...mutBase,
     };
@@ -122,8 +108,7 @@ export default class ExObjectFactory {
   }
 
   public createComponentNew(proto: ProtoComponent): Component {
-    const id = `component-${crypto.randomUUID()}`;
-    // const id = `component-${nextId++}`;
+    const id = `component-${nextId++}`;
 
     const sceneAttributes: SceneAttribute[] = [];
     for (const protoAttribute of proto.protoAttributes) {

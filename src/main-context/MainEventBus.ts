@@ -1,18 +1,9 @@
 import type { Attribute } from "pixi.js";
-import {
-  combineLatest,
-  map,
-  of,
-  ReplaySubject,
-  Subject,
-  switchMap,
-} from "rxjs";
+import { ReplaySubject, Subject, switchMap } from "rxjs";
 import type { Component, Expr, Project } from "src/ex-object/ExObject";
 import type { OBS } from "src/utils/utils/Utils";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { ExprReplacement } from "./MainContext";
-import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import Logger from "src/utils/logger/Logger";
 
 export class MainEventBus {
   public readonly currentProject$: OBS<Project>;
@@ -25,39 +16,11 @@ export class MainEventBus {
 
   public constructor() {
     this.currentProject$ = new ReplaySubject<Project>(1);
-    this.rootComponents$ = this.currentProject$.pipe(
-      switchMap((project) => project.rootComponents$)
-    );
+    this.rootComponents$ = this.currentProject$.pipe(switchMap((project) => project.rootComponents$));
     this.componentAdded$ = new ReplaySubject<Component>(10);
     this.onSceneAttributeAdded$ = new ReplaySubject<SceneAttribute>(1);
     this.onAttributeAdded$ = new Subject<Attribute>();
     this.onExprAdded$ = new ReplaySubject<Expr>(10);
     this.onExprReplaced$ = new Subject<ExprReplacement>();
-  }
-
-  @loggedMethod
-  public getDescendants$(component: Component): OBS<readonly Component[]> {
-    const logger = Logger.logger();
-
-    return component.children$.pipe(
-      switchMap((children) => {
-        if (children.length === 0) {
-          logger.log("no children");
-          return of([]);
-        }
-
-        const childrenDescendants$ = children.map((child) =>
-          this.getDescendants$(child)
-        );
-        const descendants$ = combineLatest(childrenDescendants$).pipe(
-          map((childrenDescendants) => {
-            logger.log("childrenDescendants", childrenDescendants);
-            const descendants = childrenDescendants.flat();
-            return [...children, ...descendants];
-          })
-        );
-        return descendants$;
-      })
-    );
   }
 }
