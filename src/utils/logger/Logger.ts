@@ -53,7 +53,16 @@ export default class Logger {
     }
   }
 
-  public static logThis() {
+  public static logFunction() {
+    const currentFunctionCall = LoggerDecorator.currentCall$.value;
+    if (!currentFunctionCall) {
+      throw new Error("No current function call");
+    }
+
+    currentFunctionCall.astCall.currentlyLogging = true;
+  }
+
+  public static logClass() {
     const currentFunctionCall = LoggerDecorator.currentCall$.value;
     if (!currentFunctionCall) {
       throw new Error("No current function call");

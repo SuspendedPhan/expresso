@@ -44,7 +44,6 @@ export default class ElementLayout<T extends ElementNode<T>> {
 
   @loggedMethod
   private getOrCreateOutput(object: T): LayoutOutput {
-    Logger.logCallstack();
     const logger = Logger.logger();
     let layoutOutput = this.layoutOutputByObject.get(object);
     if (!layoutOutput) {

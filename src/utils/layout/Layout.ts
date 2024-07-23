@@ -58,8 +58,9 @@ export class Layout {
     subtreeWorldLeft: number,
     subtreeWorldTop: number
   ) {
+    Logger.logFunction();
     const logger = Logger.logger();
-    logger.log("subroot", subroot);
+    logger.log("subrootId", subroot.id);
     logger.log("subtreeWorldLeft", subtreeWorldLeft);
     logger.log("subtreeWorldTop", subtreeWorldTop);
 
@@ -70,6 +71,7 @@ export class Layout {
       subtreeWidth$
     );
     subrootLeft$.subscribe((subrootLeft) => {
+      logger.log("subrootLeftId", subroot.id);
       logger.log("subrootLeft", subrootLeft);
       subroot.worldPositionSub$.next({
         left: subrootLeft,
