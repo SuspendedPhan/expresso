@@ -14,19 +14,28 @@ export interface Line {
   endY: number;
 }
 
-export interface Node {
+export interface NodeInput {
   width$: OBS<number>;
   height$: OBS<number>;
-  children$: OBS<Node[]>;
-  worldPositionSub$: SUB<Point>;
+  children$: OBS<NodeInput[]>;
+}
+
+export interface NodeOutput {
+  worldPosition: OBS<Point>;
 }
 
 export class Layout {
-  public constructor(root: Node) {
+  public constructor(root: NodeInput) {
     this.attach(root, 0, 0);
   }
 
-  private attach(subroot: Node, subtreeWorldLeft: number, subtreeWorldTop: number) {
+  public setRootNode(node: NodeInput): OBS<NodeOutput> {
+
+  }
+
+  // public addChild
+
+  private attach(subroot: NodeInput, subtreeWorldLeft: number, subtreeWorldTop: number) {
     const subtreeWidth$ = this.getSubtreeWidth$(subroot);
     const subrootLeft$ = this.getNodeLeft$(subroot, subtreeWorldLeft, subtreeWidth$);
     subrootLeft$.subscribe(subrootLeft => {
@@ -59,7 +68,7 @@ export class Layout {
   }
 
   private getNodeLeft$(
-    subroot: Node,
+    subroot: NodeInput,
     subtreeWorldLeft: number,
     subtreeWidth$: OBS<number>
   ): OBS<number> {
@@ -78,7 +87,7 @@ export class Layout {
     return subtreeWorldLeft + (subtreeWidth - nodeWidth) / 2;
   }
 
-  private getSubtreeWidth$(subtreeRoot: Node): OBS<number> {
+  private getSubtreeWidth$(subtreeRoot: NodeInput): OBS<number> {
     return subtreeRoot.children$.pipe(
       switchMap((children) => {
         if (children.length === 0) {
@@ -96,7 +105,7 @@ export class Layout {
     );
   }
 
-  private getChildrenHeight$(children: Node[]): OBS<number> {
+  private getChildrenHeight$(children: NodeInput[]): OBS<number> {
     return combineLatest(children.map((child) => child.height$)).pipe(
       map((heights) => {
         return this.getChildrenHeight(heights);
@@ -117,7 +126,7 @@ export class Layout {
   }
 
   private getSubtreeChildrenWorldLefts$(
-    children: Node[],
+    children: NodeInput[],
     translateX: number
   ): OBS<number[]> {
     const localLefts$ = this.getSubtreeLocalLefts$(children);
@@ -141,7 +150,7 @@ export class Layout {
     return worldLefts;
   }
 
-  private getSubtreeLocalLefts$(children: Node[]): OBS<number[]> {
+  private getSubtreeLocalLefts$(children: NodeInput[]): OBS<number[]> {
     const subtreeWidths$ = combineLatest(
       children.map((child) => this.getSubtreeWidth$(child))
     );
