@@ -11,6 +11,15 @@
 
   const layout = new ElementLayout(component);
   const descendants$ = ctx.eventBus.getDescendants$(component);
+  descendants$.subscribe((descendants) => {
+    console.log(descendants);
+
+    for (const descendant of descendants) {
+      layout.getOutput(descendant).worldPosition$.subscribe((pos) => {
+        console.log(descendant.id, pos);
+      });
+    }
+  });
 </script>
 
 <div class="{clazz} relative">

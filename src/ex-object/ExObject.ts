@@ -39,6 +39,8 @@ export interface Component extends ExObjectBase {
   readonly cloneCount$: Observable<number>;
   readonly children$: Observable<readonly Component[]>;
   readonly sceneAttributeAdded$: Observable<SceneAttribute>;
+  readonly childAdded$: Observable<Component>;
+  readonly descendantAdded$: Observable<Component>;
 }
 
 export interface Attribute extends ExObjectBase {

@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, mergeAll, mergeWith, Subject, switchMap } from "rxjs";
 import {
   type Attribute,
   type CallExpr,
@@ -61,6 +61,7 @@ export default class ExObjectFactory {
     const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
       base.destroy$
     );
+    const childAddedSub$ = createSubjectWithLifetime<Component>(base.destroy$);
 
     const sceneAttributeByProto = new Map<
       ProtoSceneAttribute,
@@ -80,6 +81,16 @@ export default class ExObjectFactory {
       }
     }
 
+    const descendantAdded$ = childrenSub$.pipe(
+      switchMap((children) => {
+        return children.map((child) => {
+          const added$ = child.descendantAdded$.pipe(mergeWith(child.childAdded$));
+          return added$;
+        });
+      }),
+      mergeAll()
+    );
+
     const component: ComponentMut = {
       objectType: ExObjectType.Component,
       proto,
@@ -88,6 +99,9 @@ export default class ExObjectFactory {
       children$: childrenSub$,
       childrenSub$,
       sceneAttributeAdded$,
+      childAdded$: childAddedSub$,
+      childAddedSub$,
+      descendantAdded$,
       ...base,
       ...mutBase,
     };

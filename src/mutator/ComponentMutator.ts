@@ -8,6 +8,7 @@ import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 export type ComponentMut = Component &
   ExObjectMut & {
     readonly childrenSub$: Subject<readonly Component[]>;
+    readonly childAddedSub$: Subject<Component>;
   };
 
 export default class ComponentMutator {
@@ -19,9 +20,11 @@ export default class ComponentMutator {
       ProtoComponentStore.circle
     );
 
+    const parentMut = parent as unknown as ComponentMut;
     parent.children$.pipe(first()).subscribe((children) => {
-      const parentMut = parent as unknown as ComponentMut;
       parentMut.childrenSub$.next([...children, component]);
     });
+
+    parentMut.childAddedSub$.next(component);
   }
 }
