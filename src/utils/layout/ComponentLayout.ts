@@ -38,23 +38,33 @@ export default class ElementLayout<T extends ElementNode<T>> {
     input.height$.subscribe(layoutInput.heightSub$);
   }
 
+  @loggedMethod
   public getOutput(object: T): LayoutOutput {
-    return this.getOrCreateOutput(object);
+    const logger = Logger.logger();
+    const output = this.getOrCreateOutput(object);
+    logger.log("output", this.layoutOutputByObject);
+    return output;
   }
 
   @loggedMethod
   private getOrCreateOutput(object: T): LayoutOutput {
+    Logger.logFunction();
+    Logger.arg("object", object.id);
     const logger = Logger.logger();
-    let layoutOutput = this.layoutOutputByObject.get(object);
-    if (!layoutOutput) {
+    let output = this.layoutOutputByObject.get(object);
+    if (!output) {
       logger.log("creating output", object.id);
-      layoutOutput = {
+      output = {
         worldPosition$: new Subject<Point>(),
       };
-      this.layoutOutputByObject.set(object, layoutOutput);
+      this.layoutOutputByObject.set(object, output);
     }
 
-    return layoutOutput;
+    output.worldPosition$.subscribe((position) => {
+      logger.log("object id", object.id);
+      logger.log("position", position);
+    });
+    return output;
   }
 
   private getOrCreateLayoutInput(object: T): LayoutInputSub {

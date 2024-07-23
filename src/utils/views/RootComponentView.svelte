@@ -44,9 +44,13 @@
 </script>
 
 <div class="{clazz} relative" style="height: 1000px;">
-  <ComponentView {ctx} {component} {layout} />
+  {#key component.id}
+    <ComponentView {ctx} {component} {layout} />
+  {/key}
   {#each $descendants$ as descendant}
-    <ComponentView {ctx} component={descendant} {layout} />
+    {#key descendant.id}
+      <ComponentView {ctx} component={descendant} {layout} />
+    {/key}
   {/each}
 </div>
 
