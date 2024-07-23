@@ -72,10 +72,12 @@ export class Layout {
         const child = children[i];
         const worldLeft = worldLefts[i];
 
-        if (!child || !worldLeft) {
+        if (child === undefined || worldLeft === undefined) {
+          console.log("child", child, "worldLeft", worldLeft);
+          
           throw new Error("Child or worldLeft is undefined");
         }
-        this.attach(child, worldLeft, childSubtreeWorldTop);
+        this.attach(child as NodeMut, worldLeft, childSubtreeWorldTop);
       }
     });
   }

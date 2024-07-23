@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, tick } from "svelte";
-  import { ElementLayout } from "./ElementLayout";
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
   import type { Line } from "src/utils/layout/Layout";
 

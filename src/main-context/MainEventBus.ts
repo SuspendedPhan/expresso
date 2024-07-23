@@ -1,5 +1,5 @@
 import type { Attribute } from "pixi.js";
-import { combineLatest, map, mergeAll, of, ReplaySubject, Subject, switchMap } from "rxjs";
+import { combineLatest, map, of, ReplaySubject, Subject, switchMap } from "rxjs";
 import type { Component, Expr, Project } from "src/ex-object/ExObject";
 import type { OBS } from "src/utils/utils/Utils";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";

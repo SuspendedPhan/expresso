@@ -36,7 +36,7 @@
     </SelectableView>
     {#if $children$}
       {#each $children$ as child (child.id)}
-        <svelte:self {ctx} component={child} {elementLayout} />
+        <svelte:self {ctx} component={child} {layout} />
       {/each}
     {/if}
   </div>

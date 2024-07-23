@@ -1,7 +1,7 @@
 <script lang="ts" generics="T extends ElementNode<T>">
   import { Subject } from "rxjs";
 
-  import ElementLayout, { ElementNode } from "./ComponentLayout";
+  import ElementLayout, { type ElementNode } from "./ComponentLayout";
 
   import { onMount, tick } from "svelte";
   import { ResizeSensor } from "css-element-queries";

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import type { SceneAttribute } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
-  import ExprLayout from "../layout/ExprLayout";
   import TreeView from "../layout/TreeView.svelte";
   import ExprView from "./ExprView.svelte";
+  import { type SceneAttribute } from "src/ex-object/SceneAttribute";
 
   export let ctx: MainContext;
   export let attribute: SceneAttribute;
@@ -15,9 +14,11 @@
   const exprId$ = expr$.pipe(map((expr) => expr.id));
 
   // Hmmm... this seems inefficient
-  const elementLayout$ = expr$.pipe(
-    map((expr) => ExprLayout.create(ctx, expr))
-  );
+  const elementLayout$ = null;
+
+  // const elementLayout$ = expr$.pipe(
+  //   map((expr) => ExprLayout.create(ctx, expr))
+  // );
 </script>
 
 <div>
