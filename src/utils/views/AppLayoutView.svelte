@@ -12,8 +12,6 @@
   const activeWindow$ = ctx.viewCtx.activeWindow$.pipe(
     map((w) => {
       const sc = activeWindowToSvelteComponent(w);
-      console.log(sc);
-
       return sc;
     })
   );

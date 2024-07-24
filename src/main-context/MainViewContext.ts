@@ -3,8 +3,10 @@ import { ElementLayout } from "src/utils/layout/ElementLayout";
 
 export enum Window {
   ProjectEditor,
+  ProjectComponentList,
   ProjectFunctionList,
   LibraryProjectList,
+  LibraryComponentList,
   LibraryFunctionList,
 }
 export default class MainViewContext {

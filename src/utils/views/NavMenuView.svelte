@@ -14,6 +14,11 @@
     <NavItemView {ctx} window={Window.ProjectEditor}>Editor</NavItemView>
   </li>
   <li>
+    <NavItemView {ctx} window={Window.ProjectComponentList}
+      >Components</NavItemView
+    >
+  </li>
+  <li>
     <NavItemView {ctx} window={Window.ProjectFunctionList}
       >Functions</NavItemView
     >
@@ -22,6 +27,11 @@
   <div class="menu-title">Library</div>
   <li>
     <NavItemView {ctx} window={Window.LibraryProjectList}>Projects</NavItemView>
+  </li>
+  <li>
+    <NavItemView {ctx} window={Window.LibraryComponentList}
+      >Components</NavItemView
+    >
   </li>
   <li>
     <NavItemView {ctx} window={Window.LibraryFunctionList}
