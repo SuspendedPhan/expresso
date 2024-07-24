@@ -5,6 +5,7 @@ import MainContext from "src/main-context/MainContext";
 
 export type ProjectMut = Project & {
   readonly rootComponentsSub$: Subject<readonly Component[]>;
+  readonly currentOrdinalSub$: Subject<number>;
 };
 
 export default class ProjectMutator {

@@ -11,6 +11,7 @@ import Selection from "../utils/utils/Selection";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
+import MainViewContext from "./MainViewContext";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -18,6 +19,7 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
+  public readonly viewCtx = new MainViewContext();
   public readonly eventBus = new MainEventBus();
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);

@@ -26,7 +26,7 @@
   </SelectableView>
   {#key $exprId$}
     {#if $elementLayout$}
-      <TreeView elementLayout={$elementLayout$}>
+      <TreeView elementLayout={$elementLayout$} {ctx}>
         <ExprView {ctx} expr={$expr$} elementLayout={$elementLayout$} />
       </TreeView>
     {/if}

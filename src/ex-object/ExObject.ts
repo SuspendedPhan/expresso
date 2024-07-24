@@ -1,6 +1,7 @@
 import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import { OBS } from "src/utils/utils/Utils";
 
 export type ExObject = Component | Attribute | Expr;
 export type Parent = Component | Attribute | CallExpr | null;
@@ -21,6 +22,7 @@ export enum ExprType {
 
 export interface ExObjectBase {
   readonly id: string;
+  readonly ordinal: number;
   readonly parent$: Observable<Parent>;
 
   // Completes when destroyed.
@@ -30,6 +32,7 @@ export interface ExObjectBase {
 export interface Project {
   readonly id: string;
   readonly rootComponents$: Observable<readonly Component[]>;
+  readonly currentOrdinal$: OBS<number>;
 }
 
 export interface Component extends ExObjectBase {

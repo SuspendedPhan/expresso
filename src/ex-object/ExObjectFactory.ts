@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, first, Subject } from "rxjs";
 import {
   type Attribute,
   type CallExpr,
@@ -28,20 +28,29 @@ import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
 
-let nextId = 0;
-
 export default class ExObjectFactory {
-  public constructor(private readonly ctx: MainContext) {}
+  private currentOrdinal = 0;
+  public constructor(private readonly ctx: MainContext) {
+    this.ctx.eventBus.currentProject$.subscribe((project) => {
+      project.currentOrdinal$.subscribe((ordinal) => {
+        this.currentOrdinal = ordinal;
+      });
+    });
+  }
 
   public createProject(id: string, rootComponents: readonly Component[]): Project {
     const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>(
       rootComponents
     );
 
+    const currentOrdinalSub$ = new BehaviorSubject<number>(0);
+
     const project: ProjectMut = {
       id,
       rootComponents$: rootComponentsSub$,
       rootComponentsSub$,
+      currentOrdinal$: currentOrdinalSub$,
+      currentOrdinalSub$,
     };
 
     (this.ctx.eventBus.currentProject$ as Subject<Project>).next(project);
@@ -49,7 +58,7 @@ export default class ExObjectFactory {
   }
 
   public createProjectNew(): Project {
-    const id = `project-${nextId++}`;
+    const id = `project-${crypto.randomUUID()}`;
     return this.createProject(id, []);
   }
 
@@ -108,7 +117,6 @@ export default class ExObjectFactory {
   }
 
   public createComponentNew(proto: ProtoComponent): Component {
-    // const id = `component-${nextId++}`;
     const id = `component-${crypto.randomUUID()}`;
 
     const sceneAttributes: SceneAttribute[] = [];
@@ -139,13 +147,13 @@ export default class ExObjectFactory {
   }
 
   private createSceneAttributeNew(proto: ProtoSceneAttribute): SceneAttribute {
-    const id = `scene-attribute-${nextId++}`;
+    const id = `scene-attribute-${crypto.randomUUID()}`;
     const expr = this.createNumberExpr();
     return this.createSceneAttribute(id, expr, proto);
   }
 
   public createAttribute(): Attribute {
-    const id = `attribute-${nextId++}`;
+    const id = `attribute-${crypto.randomUUID()}`;
     const expr = this.createNumberExpr();
     return this.createAttribute1(id, expr);
   }
@@ -180,7 +188,7 @@ export default class ExObjectFactory {
   @loggedMethod
   public createNumberExpr(value?: number, id?: string): NumberExpr {
     if (id === undefined) {
-      id = `expr-${nextId++}`;
+      id = `expr-${crypto.randomUUID()}`;
     }
 
     if (value === undefined) {
@@ -205,7 +213,7 @@ export default class ExObjectFactory {
   @loggedMethod
   public createCallExpr(id?: string, args?: Expr[]): CallExpr {
     if (id === undefined) {
-      id = `expr-${nextId++}`;
+      id = `expr-${crypto.randomUUID()}`;
     }
 
     if (args === undefined) {
@@ -253,10 +261,15 @@ export default class ExObjectFactory {
     mutBase: ExObjectMutBase,
     id: string
   ): ExObjectBase {
-    return {
+    const exObjectBase = {
       id,
+      ordinal: this.currentOrdinal,
       parent$: mutBase.parentSub$,
       destroy$: mutBase.destroySub$,
     };
+    this.ctx.eventBus.currentProject$.pipe(first()).subscribe((project) => {
+      (project as ProjectMut).currentOrdinalSub$.next(this.currentOrdinal + 1);
+    });
+    return exObjectBase;
   }
 }

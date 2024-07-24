@@ -3,13 +3,16 @@
   import { ElementLayout } from "./ElementLayout";
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
   import type { Line } from "src/utils/layout/Layout";
+  import MainContext from "src/main-context/MainContext";
+  import { first } from "rxjs";
 
   export let elementLayout: ElementLayout;
+  export let ctx: MainContext;
   let canvas: HTMLCanvasElement;
 
   let lines: Line[] = [];
   let treeLayoutStyle: string;
-  let treeLayout: HTMLElement;
+  let rootElement: HTMLElement;
   let canvasWidth: number;
   let canvasHeight: number;
   let xTranslation = 0;
@@ -19,19 +22,15 @@
     lines = output.lines;
     drawLines(canvas, output.lines);
 
-    let leftMost = 0;
-    for (const position of output.localPositionsByKey.values()) {
-      if (position.left < 0 && position.left < leftMost) {
-        leftMost = position.left;
-      }
-    }
-    xTranslation = -leftMost / 2;
+    // ctx.viewCtx.editorViewWidth$.pipe(first()).subscribe((width) => {
+    //   xTranslation = output.totalWidth / 2 - width / 2;
+    // });
   });
 
   onMount(() => {
-    new ResizeSensor(treeLayout, () => {
-      canvasWidth = treeLayout.clientWidth;
-      canvasHeight = treeLayout.clientHeight;
+    new ResizeSensor(rootElement, () => {
+      canvasWidth = rootElement.clientWidth;
+      canvasHeight = rootElement.clientHeight;
       drawLines(canvas, lines);
       tick().then(() => {
         drawLines(canvas, lines);
@@ -54,20 +53,17 @@
   }
 </script>
 
-<div>
-  <div
-    class="relative"
-    bind:this={treeLayout}
-    style={treeLayoutStyle}
-    style:transform="translateX({xTranslation}px)"
-  >
-    <canvas
-      bind:this={canvas}
-      type="2d"
-      width={canvasWidth}
-      height={canvasHeight}
-      class="w-full h-full absolute"
-    ></canvas>
-    <slot></slot>
-  </div>
+<div
+  class="relative"
+  bind:this={rootElement}
+  style={treeLayoutStyle}
+  style:transform="translateX({xTranslation}px)"
+>
+  <canvas
+    bind:this={canvas}
+    width={canvasWidth}
+    height={canvasHeight}
+    class="w-full h-full absolute"
+  ></canvas>
+  <slot></slot>
 </div>

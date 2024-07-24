@@ -20,7 +20,7 @@
       object={component}
       class="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
     >
-      <div class="">{component.id}</div>
+      <div class="">Component {component.ordinal}</div>
       <div class="divider"></div>
       <div class="flex flex-col items-center">
         {#each attributes as attribute (attribute.id)}

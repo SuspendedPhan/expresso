@@ -36,5 +36,16 @@ export default class Keyboard {
       selection.right();
       return false;
     });
+
+    document.addEventListener("keydown", (event) => {
+      switch (event.key) {
+        case "ArrowDown":
+        case "ArrowUp":
+        case "ArrowLeft":
+        case "ArrowRight":
+          event.preventDefault();
+          break;
+      }
+    });
   }
 }

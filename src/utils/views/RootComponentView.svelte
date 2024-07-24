@@ -6,6 +6,7 @@
   import ComponentView from "./ComponentView.svelte";
   import { ResizeSensor } from "css-element-queries";
   import { onMount, tick } from "svelte";
+  import { combineLatest, first, map } from "rxjs";
 
   export let ctx: MainContext;
   export let component: Component;
@@ -23,14 +24,29 @@
       });
     });
   });
+
+  const xTranslation$ = combineLatest([
+    elementLayout.onCalculated,
+    ctx.viewCtx.editorViewWidth$,
+  ]).pipe(
+    map(([output, width]) => {
+      if (output.totalWidth < width) {
+        return 0;
+      } else {
+        return output.totalWidth / 2 - width / 2;
+      }
+    })
+  );
 </script>
 
 <div class={clazz}>
-  <TreeView {elementLayout}>
-    <div bind:this={element}>
-      <ComponentView {ctx} {component} {elementLayout} />
-    </div>
-  </TreeView>
+  <div style:transform="translateX({$xTranslation$}px)">
+    <TreeView {elementLayout} {ctx}>
+      <div bind:this={element}>
+        <ComponentView {ctx} {component} {elementLayout} />
+      </div>
+    </TreeView>
+  </div>
 </div>
 
 <style></style>
