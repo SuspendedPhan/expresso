@@ -45,7 +45,7 @@
   );
 </script>
 
-<div class=" overflow-scroll" bind:this={rootElement}>
+<div bind:this={rootElement}>
   <div
     class="flex flex-col items-center p-8"
     style:transform="translateX(calc({$xTranslation$}px + 2rem))"

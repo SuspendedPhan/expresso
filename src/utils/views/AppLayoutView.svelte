@@ -14,11 +14,11 @@
 
 <div id="firebaseui-auth-container"></div>
 
-<div class="grid grid-cols-2">
-  <div class="">
+<div class="flex">
+  <div class="grow-0 shrink-0 basis-1/2" style="overflow: scroll;">
     <EditorView {ctx} />
   </div>
-  <div class="">
+  <div class="grow-1 shrink-0 basis-1/2">
     <SceneView {ctx} />
   </div>
 </div>
