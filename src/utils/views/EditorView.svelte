@@ -48,7 +48,7 @@
 <div bind:this={rootElement}>
   <div
     class="flex flex-col items-center p-8"
-    style:transform="translateX(calc({$xTranslation$}px + 2rem))"
+    style:transform="translateX(calc({$xTranslation$}px + 1rem))"
   >
     <div class="flex gap-4">
       <button on:click={() => ctx.projectMutator.addRootComponent()} class="btn"
