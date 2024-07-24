@@ -7,10 +7,8 @@
   const ctx$ = main$.pipe(map((main) => main.ctx));
 </script>
 
-<div>
-  {#if $ctx$}
-    <AppLayoutView ctx={$ctx$} />
-  {/if}
-</div>
+{#if $ctx$}
+  <AppLayoutView ctx={$ctx$} />
+{/if}
 
 <style></style>

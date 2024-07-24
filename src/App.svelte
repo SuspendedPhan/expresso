@@ -8,12 +8,10 @@
   })();
 </script>
 
-<main>
-  {#if test}
-    <TestView />
-  {:else}
-    <MainView />
-  {/if}
-</main>
+{#if test}
+  <TestView />
+{:else}
+  <MainView />
+{/if}
 
 <style></style>

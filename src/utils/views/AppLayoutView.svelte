@@ -18,8 +18,8 @@
 
 <div id="firebaseui-auth-container"></div>
 
-<div class="flex">
-  <ul class="shrink-0 menu bg-base-200 p-4">
+<div class="flex h-full">
+  <ul class="shrink-0 menu bg-base-200 p-4 h-full">
     <div class="menu-title">
       <span>Hello World</span>
     </div>
