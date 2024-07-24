@@ -1,5 +1,8 @@
-import { ReplaySubject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
+import { ElementLayout } from "src/utils/layout/ElementLayout";
 
 export default class MainViewContext {
-    public readonly editorViewWidth$ = new ReplaySubject<number>(1);
+  public readonly componentLayouts$ = new BehaviorSubject<
+    readonly ElementLayout[]
+  >([]);
 }
