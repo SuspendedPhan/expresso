@@ -1,16 +1,20 @@
 import { Window } from "src/main-context/MainViewContext";
 import { assertUnreachable } from "./Utils";
+import EditorView from "../views/EditorView.svelte";
+import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
+import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
+import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
 
 export function activeWindowToSvelteComponent(activeWindow: Window): any {
   switch (activeWindow) {
     case Window.ProjectEditor:
-      return import("src/utils/views/EditorView.svelte");
+      return EditorView;
     case Window.ProjectFunctionList:
-      return import("src/utils/views/ProjectFunctionListView.svelte");
+      return ProjectFunctionListView;
     case Window.LibraryProjectList:
-      return import("src/utils/views/LibraryProjectListView.svelte");
+      return LibraryProjectListView;
     case Window.LibraryFunctionList:
-      return import("src/utils/views/LibraryFunctionListView.svelte");
+      return LibraryFunctionListView;
     default:
       assertUnreachable(activeWindow);
   }
