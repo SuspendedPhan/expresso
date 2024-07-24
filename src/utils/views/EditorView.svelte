@@ -37,9 +37,10 @@
       }
 
       if (largestWidth < width) {
-        return 0;
+        return `0`;
       } else {
-        return largestWidth / 2 - width / 2;
+        const translation = largestWidth / 2 - width / 2;
+        return `calc(${translation}px + 1rem)`;
       }
     })
   );
@@ -48,7 +49,7 @@
 <div bind:this={rootElement}>
   <div
     class="flex flex-col items-center p-8"
-    style:transform="translateX(calc({$xTranslation$}px + 1rem))"
+    style:transform="translateX({$xTranslation$})"
   >
     <div class="flex gap-4">
       <button on:click={() => ctx.projectMutator.addRootComponent()} class="btn"
