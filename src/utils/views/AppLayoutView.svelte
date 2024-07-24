@@ -6,6 +6,7 @@
   import EditorView from "./EditorView.svelte";
   import NavItemView from "./NavItemView.svelte";
   import { Window } from "src/main-context/MainViewContext";
+  import NavMenuView from "./NavMenuView.svelte";
 
   export let ctx: MainContext;
 
@@ -19,31 +20,7 @@
 <div id="firebaseui-auth-container"></div>
 
 <div class="flex h-full">
-  <ul class="shrink-0 menu bg-base-200 p-4 h-full">
-    <div class="menu-title">
-      <span>Hello World</span>
-    </div>
-    <li>
-      <NavItemView {ctx} window={Window.ProjectEditor}>Editor</NavItemView>
-    </li>
-    <li>
-      <NavItemView {ctx} window={Window.ProjectFunctionList}
-        >Functions</NavItemView
-      >
-    </li>
-    <div class="divider my-0"></div>
-    <div class="menu-title">Library</div>
-    <li>
-      <NavItemView {ctx} window={Window.LibraryProjectList}
-        >Projects</NavItemView
-      >
-    </li>
-    <li>
-      <NavItemView {ctx} window={Window.LibraryFunctionList}
-        >Functions</NavItemView
-      >
-    </li>
-  </ul>
+  <NavMenuView {ctx} class="shrink-0" />
 
   <div class="shrink-1 basis-1/2" style="overflow: auto;">
     <svelte:component this={activeWindow} {ctx} />
