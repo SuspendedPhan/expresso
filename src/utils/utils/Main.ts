@@ -22,7 +22,7 @@ export default class Main {
     Keyboard.register(ctx, ctx.focusManager);
 
     document.addEventListener("mousedown", () => {
-      ctx?.focusManager.focus({ type: "None" });
+      ctx?.focusManager.focusNone();
     });
   }
 }

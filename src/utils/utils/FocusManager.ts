@@ -8,35 +8,49 @@ import {
 } from "src/ex-object/ExObject";
 import { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
+import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
-type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus | LibraryNavFocus | LibraryProjectFocus;
+export type Focus =
+  | NoneFocus
+  | ExObjectFocus
+  | ProjectNavFocus
+  | LibraryNavFocus
+  | LibraryProjectFocus;
 
-interface NoneFocus {
+export interface NoneFocus {
   type: "None";
+  window: Window;
 }
 
-interface ExObjectFocus {
+export interface ExObjectFocus {
   type: "ExObject";
   exObject: ExObject;
+  window: Window.ProjectEditor;
 }
 
-interface ProjectNavFocus {
+export interface ProjectNavFocus {
   type: "ProjectNav";
+  window: Window;
 }
 
-interface LibraryNavFocus {
+export interface LibraryNavFocus {
   type: "LibraryNav";
+  window: Window;
 }
 
-interface LibraryProjectFocus {
+export interface LibraryProjectFocus {
   type: "LibraryProject";
   project: LibraryProject;
+  window: Window.LibraryProjectList;
 }
 
 export default class FocusManager {
-  private readonly focus$ = new BehaviorSubject<Focus>({ type: "None" });
+  private readonly focus$ = new BehaviorSubject<Focus>({
+    type: "None",
+    window: Window.ProjectEditor,
+  });
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
@@ -58,14 +72,6 @@ export default class FocusManager {
     });
   }
 
-  @loggedMethod
-  public debug() {
-    // const logger = Logger.logger();
-    // this.getFocus$().subscribe((selectedObject) => {
-    //   logger.log("selectedObject", (selectedObject as any).id ?? "null");
-    // });
-  }
-
   public getFocus$(): Observable<Focus> {
     return this.focus$;
   }
@@ -81,13 +87,42 @@ export default class FocusManager {
     );
   }
 
-  public focus(object: Focus) {
-    this.focus$.next(object);
+  public focusExObject(exObject: ExObject) {
+    this.focus$.next(FocusManager.createExObjectFocus(exObject));
+  }
+
+  public focusProjectNav() {
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
+      this.focus$.next({ type: "ProjectNav", window });
+    });
+  }
+
+  public focusLibraryNav() {
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
+      this.focus$.next({ type: "LibraryNav", window });
+    });
+  }
+
+  public focusLibraryProject(project: LibraryProject) {
+    this.focus$.next({
+      type: "LibraryProject",
+      project,
+      window: Window.LibraryProjectList,
+    });
+  }
+
+  public focusNone() {
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
+      this.focus$.next({ type: "None", window });
+    });
   }
 
   @loggedMethod
   private down(focus: Focus) {
-    // const logger = Logger.logger();
+    if (focus.window === Window.LibraryProjectList) {
+      this.ctx.projectManager.navDown(focus);
+      return;
+    }
 
     switch (focus.type) {
       case "None":
@@ -98,10 +133,6 @@ export default class FocusManager {
       case "ProjectNav":
       case "LibraryNav":
         return;
-      case "LibraryProject":
-        const project = this.ctx.projectManager.getNextProject(focus.project);
-        this.focus$.next({ type: "LibraryProject",  project});
-        return;
       default:
         assertUnreachable(focus);
     }
@@ -111,7 +142,7 @@ export default class FocusManager {
     switch (focus.objectType) {
       case ExObjectType.Attribute:
         focus.expr$.pipe(first()).subscribe((expr) => {
-          this.focus$.next({ type: "ExObject", exObject: expr });
+          this.focus$.next(FocusManager.createExObjectFocus(expr));
         });
         return;
       case ExObjectType.Expr:
@@ -134,7 +165,7 @@ export default class FocusManager {
       throw new Error("Component must have at least 1 attribute");
     }
 
-    this.focus$.next({ type: "ExObject", exObject: attr });
+    this.focus$.next(FocusManager.createExObjectFocus(attr));
   }
 
   @loggedMethod
@@ -149,7 +180,7 @@ export default class FocusManager {
           if (arg === undefined) {
             throw new Error("CallExpr must have at least 1 args");
           }
-          this.focus$.next({ type: "ExObject", exObject: arg });
+          this.focus$.next(FocusManager.createExObjectFocus(arg));
         });
         return;
       default:
@@ -168,6 +199,18 @@ export default class FocusManager {
       case "ProjectNav":
       case "LibraryNav":
         return;
+      case "LibraryProject":
+        this.ctx.projectManager
+          .getPrevProject$(focus.project)
+          .pipe(first())
+          .subscribe((project) => {
+            this.focus$.next({
+              type: "LibraryProject",
+              project,
+              window: Window.LibraryProjectList,
+            });
+          });
+        return;
       default:
         assertUnreachable(focus);
     }
@@ -177,7 +220,7 @@ export default class FocusManager {
     const parent$ = focus.parent$;
     parent$.pipe(first()).subscribe((parent) => {
       if (parent !== null) {
-        this.focus$.next({ type: "ExObject", exObject: parent });
+        this.focus$.next(FocusManager.createExObjectFocus(parent));
       }
     });
   }
@@ -194,13 +237,13 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next({ type: "ExObject", exObject: arg });
+        this.focus$.next(FocusManager.createExObjectFocus(arg));
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next({ type: "ExObject", exObject: arg });
+        this.focus$.next(FocusManager.createExObjectFocus(arg));
       }
     });
   }
@@ -217,13 +260,13 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next({ type: "ExObject", exObject: arg });
+        this.focus$.next(FocusManager.createExObjectFocus(arg));
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next({ type: "ExObject", exObject: arg });
+        this.focus$.next(FocusManager.createExObjectFocus(arg));
       }
     });
   }
@@ -240,6 +283,7 @@ export default class FocusManager {
           return;
         case "ProjectNav":
         case "LibraryNav":
+        case "LibraryProject":
           return;
         default:
           assertUnreachable(focus);
@@ -269,5 +313,9 @@ export default class FocusManager {
         navHorizontal1(exObject, args);
       });
     });
+  }
+
+  public static createExObjectFocus(exObject: ExObject): ExObjectFocus {
+    return { type: "ExObject", exObject, window: Window.ProjectEditor };
   }
 }

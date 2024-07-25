@@ -1,6 +1,7 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
   import { Constants } from "../utils/ViewUtils";
+  import LibraryProjectView from "./LibraryProjectView.svelte";
 
   export let ctx: MainContext;
 
@@ -12,10 +13,7 @@
   <table class="table">
     <tbody
       >{#each $projects$ as project}
-        <tr>
-          <td>{project.id}</td>
-          <td>{project.name}</td>
-        </tr>
+        <LibraryProjectView {ctx} {project} />
       {/each}</tbody
     >
   </table>

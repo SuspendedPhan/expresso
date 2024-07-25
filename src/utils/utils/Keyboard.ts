@@ -37,7 +37,7 @@ export default class Keyboard {
     //   // switch (e.key)
     // });
     hotkeys("g", function (_event, _handler) {
-      focusManager.focus({ type: "ProjectNav" });
+      focusManager.focusProjectNav();
     });
 
     // hotkeys("g+e", function (_event, _handler) {
@@ -52,42 +52,47 @@ export default class Keyboard {
     projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone();
     });
 
     projectNavScope.hotkeys("c", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone()
     });
 
     projectNavScope.hotkeys("f", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectFunctionList);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone()
     });
 
     projectNavScope.hotkeys("l", () => {
-      ctx.focusManager.focus({ type: "LibraryNav" });
+      ctx.focusManager.focusLibraryNav();
     });
 
     projectNavScope.hotkeys("x", () => {
       ctx.viewCtx.navCollapsed$.next(!ctx.viewCtx.navCollapsed$.value);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone();
     });
 
     const libraryNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav")));
     libraryNavScope.hotkeys("p", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone();
     });
 
     libraryNavScope.hotkeys("c", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryComponentList);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone();
     });
 
     libraryNavScope.hotkeys("f", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryFunctionList);
-      ctx.focusManager.focus({ type: "None" });
+      ctx.focusManager.focusNone();
+    });
+
+    const editorScope = new KeyboardScope(ctx.viewCtx.activeWindow$.pipe(map((window) => window === Window.ProjectEditor)));
+    editorScope.hotkeys("shift+n", () => {
+      ctx.projectManager.addProjectNew();
     });
 
     document.addEventListener("keydown", (event) => {

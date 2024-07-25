@@ -26,7 +26,7 @@ export default class MainContext {
   public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
-  public readonly focusManager = new FocusManager();
+  public readonly focusManager = new FocusManager(this);
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
 
@@ -44,8 +44,9 @@ export default class MainContext {
           if (focus.type !== "ExObject") {
             return;
           }
+
           if (focus.exObject === oldExpr) {
-            this.focusManager.focus({ type: "ExObject", exObject: newExpr });
+            this.focusManager.focusExObject(newExpr);
           }
         });
     });
@@ -55,15 +56,17 @@ export default class MainContext {
         this.projectManager.addProjectNew();
       } else {
         const project = new Rehydrator(this).rehydrateProject(deProject);
-        (this.projectManager.currentLibraryProject$ as Subject<LibraryProject>).next(project);
+        (
+          this.projectManager.currentLibraryProject$ as Subject<LibraryProject>
+        ).next(project);
       }
     });
 
     const dehydrator = new Dehydrator();
-    this.projectManager.currentProject$.pipe(
-      switchMap((project) => dehydrator.dehydrateProject$(project))
-    ).subscribe((deProject) => {
-      Persistence.writeProject(deProject);
-    });
+    this.projectManager.currentProject$
+      .pipe(switchMap((project) => dehydrator.dehydrateProject$(project)))
+      .subscribe((deProject) => {
+        Persistence.writeProject(deProject);
+      });
   }
 }

@@ -1,6 +1,20 @@
-import { BehaviorSubject, first, map, Observable, ReplaySubject, switchMap } from "rxjs";
+import {
+  BehaviorSubject,
+  first,
+  map,
+  Observable,
+  ReplaySubject,
+  switchMap,
+} from "rxjs";
 import { Component, Project } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
+import {
+  LibraryNavFocus,
+  LibraryProjectFocus,
+  NoneFocus,
+  ProjectNavFocus
+} from "src/utils/utils/FocusManager";
+import { assertUnreachable } from "src/utils/utils/Utils";
 
 export interface LibraryProject {
   id: string;
@@ -9,25 +23,11 @@ export interface LibraryProject {
 }
 
 export class ProjectManager {
-  getNextProject$(project: LibraryProject) : Observable<LibraryProject> {
-    return this.libraryProjects$.pipe(first(), map((projects) => {
-      const index = projects.indexOf(project);
-      if (index === -1) {
-        throw new Error("Project not found");
-      }
-      const nextIndex = (index + 1) % projects.length;
-      const nextProject = projects[nextIndex];
-      if (nextProject === undefined) {
-        throw new Error("No next project");
-      }
-      return nextProject;
-    }));
-  }
   public readonly libraryProjectsSub$ = new BehaviorSubject<
     readonly LibraryProject[]
   >([]);
   public readonly libraryProjects$ = this.libraryProjectsSub$.asObservable();
-  
+
   public readonly currentLibraryProject$ = new ReplaySubject<LibraryProject>(1);
   public readonly currentProject$ = this.currentLibraryProject$.pipe(
     switchMap((libraryProject) => libraryProject.project$)
@@ -66,5 +66,79 @@ export class ProjectManager {
     ]);
     this.currentLibraryProject$.next(libraryProject);
     return libraryProject;
+  }
+
+  public getFirstProject$(): Observable<LibraryProject | null> {
+    return this.libraryProjects$.pipe(
+      first(),
+      map((projects) => {
+        return projects[0] ?? null;
+      })
+    );
+  }
+
+  public getNextProject$(project: LibraryProject): Observable<LibraryProject> {
+    return this.libraryProjects$.pipe(
+      first(),
+      map((projects) => {
+        const index = projects.indexOf(project);
+        if (index === -1) {
+          throw new Error("Project not found");
+        }
+        const nextIndex = (index + 1) % projects.length;
+        const nextProject = projects[nextIndex];
+        if (nextProject === undefined) {
+          throw new Error("No next project");
+        }
+        return nextProject;
+      })
+    );
+  }
+
+  public getPrevProject$(project: LibraryProject): Observable<LibraryProject> {
+    return this.libraryProjects$.pipe(
+      first(),
+      map((projects) => {
+        const index = projects.indexOf(project);
+        if (index === -1) {
+          throw new Error("Project not found");
+        }
+        const prevIndex = (index - 1 + projects.length) % projects.length;
+        const prevProject = projects[prevIndex];
+        if (prevProject === undefined) {
+          throw new Error("No previous project");
+        }
+        return prevProject;
+      })
+    );
+  }
+
+  public navDown(
+    focus: NoneFocus | LibraryProjectFocus | LibraryNavFocus | ProjectNavFocus
+  ) {
+    switch (focus.type) {
+      case "None":
+        this.getFirstProject$()
+          .pipe(first())
+          .subscribe((project) => {
+            if (project === null) {
+              return;
+            }
+            this.ctx.focusManager.focusLibraryProject(project);
+          });
+        return;
+      case "LibraryProject":
+        this.getNextProject$(focus.project)
+          .pipe(first())
+          .subscribe((project) => {
+            this.ctx.focusManager.focusLibraryProject(project);
+          });
+        return;
+      case "LibraryNav":
+      case "ProjectNav":
+        return;
+      default:
+        assertUnreachable(focus);
+    }
   }
 }
