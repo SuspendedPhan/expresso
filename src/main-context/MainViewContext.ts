@@ -30,7 +30,7 @@ export default class MainViewContext {
     const navItems0: NavItem[] = [
       { label: "Editor", window: Window.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
       { label: "Components", window: Window.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
-      { label: "Functions", window: Window.ProjectFunctionList, iconClasses: "fa-solid fa-cogs", section: section0 },
+      { label: "Functions", window: Window.ProjectFunctionList, iconClasses: "fa-solid fa-code", section: section0 },
     ];
 
     (section0 as any).navItems = navItems0;
@@ -44,7 +44,7 @@ export default class MainViewContext {
     const navItems1: NavItem[] = [
       { label: "Projects", window: Window.LibraryProjectList, iconClasses: "fa-solid fa-file", section: section1 },
       { label: "Components", window: Window.LibraryComponentList, iconClasses: "fa-solid fa-cube", section: section1 },
-      { label: "Functions", window: Window.LibraryFunctionList, iconClasses: "fa-solid fa-cogs", section: section1 },
+      { label: "Functions", window: Window.LibraryFunctionList, iconClasses: "fa-solid fa-code", section: section1 },
     ];
 
     (section1 as any).navItems = navItems1;
