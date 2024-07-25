@@ -1,40 +1,71 @@
 import hotkeys from "hotkeys-js";
+import { first } from "rxjs";
+import MainContext from "src/main-context/MainContext";
+import { Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
 
 export default class Keyboard {
   public static SCOPE = "Main";
 
-  private static scopes: string[] = [];
+  // private static 
 
-  public static pushScope(scope: string) {
-    this.scopes.push(scope);
-  }
-
-  public static popScope() {
-    this.scopes.pop();
-  }
-  
-  public static register(selection: FocusManager) {
+  public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
 
     hotkeys("down", this.SCOPE, function (_event, _handler) {
-      selection.down$.next();
+      focusManager.down$.next();
       return false;
     });
 
     hotkeys("up", this.SCOPE, function (_event, _handler) {
-      selection.up$.next();
+      focusManager.up$.next();
       return false;
     });
 
     hotkeys("left", this.SCOPE, function (_event, _handler) {
-      selection.left();
+      focusManager.left();
       return false;
     });
 
     hotkeys("right", this.SCOPE, function (_event, _handler) {
-      selection.right();
+      focusManager.right();
       return false;
+    });
+
+    // document.addEventListener("mousedown", (e: KeyboardEvent) => {
+    //   // switch (e.key)
+    // });
+    hotkeys("g", function (_event, _handler) {
+      focusManager.focus({ type: "ProjectNav" });
+    });
+
+    hotkeys("e", function (_event, _handler) {
+      focusManager.getFocus$().pipe(first()).subscribe((focus) => {
+        if (focus.type !== "ProjectNav") {
+          return;
+        }
+
+        ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
+        focusManager.focus({ type: "None" });
+      });
+    });
+
+    hotkeys("c", function (_event, _handler) {
+      focusManager.getFocus$().pipe(first()).subscribe((focus) => {
+        if (focus.type !== "ProjectNav") {
+          return;
+        }
+        ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
+        focusManager.focus({ type: "None" });
+      });
+    });
+
+    hotkeys("g+e", function (_event, _handler) {
+      ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
+    });
+
+    hotkeys("g+c", function (_event, _handler) {
+      ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
     });
 
     document.addEventListener("keydown", (event) => {

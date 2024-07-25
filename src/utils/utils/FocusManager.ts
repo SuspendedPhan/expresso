@@ -1,10 +1,4 @@
-import {
-  BehaviorSubject,
-  first,
-  map,
-  type Observable,
-  Subject
-} from "rxjs";
+import { BehaviorSubject, first, map, type Observable, Subject } from "rxjs";
 import {
   Component,
   type ExObject,
@@ -15,7 +9,7 @@ import {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
-type Focus = NoneFocus | ExObjectFocus;
+type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus;
 
 interface NoneFocus {
   type: "None";
@@ -26,8 +20,12 @@ interface ExObjectFocus {
   exObject: ExObject;
 }
 
+interface ProjectNavFocus {
+  type: "ProjectNav";
+}
+
 export default class FocusManager {
-  private readonly focus$ = new BehaviorSubject<Focus>({type: "None"});
+  private readonly focus$ = new BehaviorSubject<Focus>({ type: "None" });
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
@@ -63,7 +61,7 @@ export default class FocusManager {
 
   public isSelected$(object: ExObject): Observable<boolean> {
     return this.focus$.pipe(
-      map(focus => {
+      map((focus) => {
         if (focus.type !== "ExObject") {
           return false;
         }
@@ -86,6 +84,8 @@ export default class FocusManager {
       case "ExObject":
         this.downExObject(focus.exObject);
         return;
+      case "ProjectNav":
+        return;
       default:
         assertUnreachable(focus);
     }
@@ -95,7 +95,7 @@ export default class FocusManager {
     switch (focus.objectType) {
       case ExObjectType.Attribute:
         focus.expr$.pipe(first()).subscribe((expr) => {
-          this.focus$.next({type: "ExObject", exObject: expr});
+          this.focus$.next({ type: "ExObject", exObject: expr });
         });
         return;
       case ExObjectType.Expr:
@@ -118,7 +118,7 @@ export default class FocusManager {
       throw new Error("Component must have at least 1 attribute");
     }
 
-    this.focus$.next({type: "ExObject", exObject: attr});
+    this.focus$.next({ type: "ExObject", exObject: attr });
   }
 
   @loggedMethod
@@ -133,7 +133,7 @@ export default class FocusManager {
           if (arg === undefined) {
             throw new Error("CallExpr must have at least 1 args");
           }
-          this.focus$.next({type: "ExObject", exObject: arg});
+          this.focus$.next({ type: "ExObject", exObject: arg });
         });
         return;
       default:
@@ -149,6 +149,8 @@ export default class FocusManager {
       case "ExObject":
         this.upExObject(focus.exObject);
         return;
+      case "ProjectNav":
+        return;
       default:
         assertUnreachable(focus);
     }
@@ -158,7 +160,7 @@ export default class FocusManager {
     const parent$ = focus.parent$;
     parent$.pipe(first()).subscribe((parent) => {
       if (parent !== null) {
-        this.focus$.next({type: "ExObject", exObject: parent});
+        this.focus$.next({ type: "ExObject", exObject: parent });
       }
     });
   }
@@ -175,13 +177,13 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next({type: "ExObject", exObject: arg});
+        this.focus$.next({ type: "ExObject", exObject: arg });
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next({type: "ExObject", exObject: arg});
+        this.focus$.next({ type: "ExObject", exObject: arg });
       }
     });
   }
@@ -198,33 +200,38 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next({type: "ExObject", exObject: arg});
+        this.focus$.next({ type: "ExObject", exObject: arg });
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next({type: "ExObject", exObject: arg});
+        this.focus$.next({ type: "ExObject", exObject: arg });
       }
     });
   }
 
-  private navHorizontal(navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void) {
-    this.focus$
-      .pipe(first())
-      .subscribe((focus) => {
-        switch (focus.type) {
-          case "None":
-            return;
-          case "ExObject":
-            this.navHorizontalExObject(focus, navHorizontal1);
-            return;
-          default:
-            assertUnreachable(focus);
-        }
-      });
+  private navHorizontal(
+    navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void
+  ) {
+    this.focus$.pipe(first()).subscribe((focus) => {
+      switch (focus.type) {
+        case "None":
+          return;
+        case "ExObject":
+          this.navHorizontalExObject(focus, navHorizontal1);
+          return;
+        case "ProjectNav":
+          return;
+        default:
+          assertUnreachable(focus);
+      }
+    });
   }
-  navHorizontalExObject(focus: ExObjectFocus, navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void) {
+  navHorizontalExObject(
+    focus: ExObjectFocus,
+    navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void
+  ) {
     const exObject = focus.exObject;
     exObject.parent$.pipe(first()).subscribe((parent) => {
       if (parent === null) {
