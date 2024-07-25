@@ -1,29 +1,23 @@
 <script lang="ts">
-  import {
-    combineLatestWith,
-    fromEvent,
-    map,
-    type Observable,
-    of,
-    tap,
-  } from "rxjs";
+  import { combineLatestWith, fromEvent, map, of, type Observable } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExObject";
   // biome-ignore lint:
-  import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
+  import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import { onMount } from "svelte";
-  import NodeView from "../layout/NodeView.svelte";
   import { ElementLayout } from "../layout/ElementLayout";
+  import NodeView from "../layout/NodeView.svelte";
 
   export let ctx: MainContext;
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 
-  const exprCommandFocused$ = ctx.focusManager.getFocus$().pipe(
-    map((focus) => focus.type === "ExprReplaceCommand" && focus.expr === expr),
-    tap(console.log)
-  );
+  const exprCommandFocused$ = ctx.focusManager
+    .getFocus$()
+    .pipe(
+      map((focus) => focus.type === "ExprReplaceCommand" && focus.expr === expr)
+    );
 
   let args$: Observable<readonly Expr[]>;
   if (expr.exprType === ExprType.CallExpr) {
