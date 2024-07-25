@@ -34,7 +34,7 @@ export default class Rehydrator {
     const rootComponents = deProject.rootComponents.map((deComponent) =>
       this.rehydrateComponent(deComponent)
     );
-    return this.ctx.libraryProjectManager.addProject(deProject.id, rootComponents);
+    return this.ctx.libraryProjectManager.addProject(deProject.id, deProject.name, rootComponents);
   }
 
   public rehydrateComponent(deComponent: DehydratedComponent): Component {

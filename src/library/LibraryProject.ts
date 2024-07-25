@@ -21,20 +21,21 @@ export class LibraryProjectManager {
     const date = new Date();
     const timestamp = `${date.getFullYear()}:${date.getMonth()}:${date.getDate()}-${date.getHours()}:${date.getMinutes()}`;
     const id = `${timestamp}-${crypto.randomUUID()}`;
-    return this.addProject(id, []);
+    const name = `Project ${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+    return this.addProject(id, name, []);
   }
 
-  addProject(
-    id: string,
-    rootComponents: Component[]
-  ): Project {
+  addProject(id: string, name: string, rootComponents: Component[]): Project {
     const libraryProject: LibraryProject = {
       id,
-      name: `Project ${crypto.randomUUID().slice(0, 4).toUpperCase()}`,
+      name,
       project$: new ReplaySubject<Project>(1),
     };
 
-    const project = this.ctx.objectFactory.createProject(libraryProject, rootComponents);
+    const project = this.ctx.objectFactory.createProject(
+      libraryProject,
+      rootComponents
+    );
     libraryProject.project$.next(project);
     this.projectsSub$.next([...this.projectsSub$.value, libraryProject]);
     return project;

@@ -22,6 +22,7 @@ export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
 export interface DehydratedProject {
   id: string;
+  name: string;
   rootComponents: DehydratedComponent[];
 }
 
@@ -69,7 +70,8 @@ export default class Dehydrator {
     return deComponents$.pipe(
       map((deComponents) => {
         return {
-          id: project.id,
+          id: project.libraryProject.id,
+          name: project.libraryProject.name,
           rootComponents: deComponents,
         };
       })
