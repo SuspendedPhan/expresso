@@ -87,10 +87,12 @@ export default class Keyboard {
     const newActionsScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "NewActions")));
     newActionsScope.hotkeys("p", () => {
       ctx.projectManager.addProjectNew();
+      ctx.focusManager.focusNone();
     });
 
     newActionsScope.hotkeys("c", () => {
       ctx.projectMutator.addRootComponent();
+      ctx.focusManager.focusNone();
     });
 
     document.addEventListener("keydown", (event) => {

@@ -11,7 +11,7 @@
 
   function handleClick(event: MouseEvent) {
     event.stopPropagation();
-    ctx.focusManager.focus({ type: "ExObject", exObject: object });
+    ctx.focusManager.focusExObject(object);
   }
 </script>
 
