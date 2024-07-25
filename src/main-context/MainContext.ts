@@ -7,7 +7,7 @@ import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
 import type GoModule from "src/utils/utils/GoModule";
 import GoBridge from "../evaluation/GoBridge";
-import Selection from "../utils/utils/Selection";
+import FocusManager from "../utils/utils/FocusManager";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
@@ -25,7 +25,7 @@ export default class MainContext {
   public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
-  public readonly focusManager = new Selection();
+  public readonly focusManager = new FocusManager();
   public readonly goBridge: GoBridge;
 
   public constructor(public readonly goModule: GoModule) {

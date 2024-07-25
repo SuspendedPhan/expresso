@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import type Selection from "src/utils/utils/Selection";
+import type FocusManager from "src/utils/utils/FocusManager";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -14,7 +14,7 @@ export default class Keyboard {
     this.scopes.pop();
   }
   
-  public static register(selection: Selection) {
+  public static register(selection: FocusManager) {
     hotkeys.setScope(this.SCOPE);
 
     hotkeys("down", this.SCOPE, function (_event, _handler) {

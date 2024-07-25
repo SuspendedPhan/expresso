@@ -26,7 +26,7 @@ interface ExObjectFocus {
   exObject: ExObject;
 }
 
-export default class Selection {
+export default class FocusManager {
   private readonly focus$ = new BehaviorSubject<Focus>({type: "None"});
 
   public readonly down$ = new Subject<void>();
