@@ -6,6 +6,8 @@ import {
   type Expr,
   ExprType,
 } from "src/ex-object/ExObject";
+import { LibraryProject } from "src/library/LibraryProject";
+import MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
@@ -28,13 +30,18 @@ interface LibraryNavFocus {
   type: "LibraryNav";
 }
 
+interface LibraryProjectFocus {
+  type: "LibraryProject";
+  project: LibraryProject;
+}
+
 export default class FocusManager {
   private readonly focus$ = new BehaviorSubject<Focus>({ type: "None" });
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
 
-  public constructor() {
+  public constructor(private readonly ctx: MainContext) {
     this.down$.subscribe(() => {
       this.getFocus$()
         .pipe(first())
@@ -90,6 +97,10 @@ export default class FocusManager {
         return;
       case "ProjectNav":
       case "LibraryNav":
+        return;
+      case "LibraryProject":
+        const project = this.ctx.projectManager.getNextProject(focus.project);
+        this.focus$.next({ type: "LibraryProject",  });
         return;
       default:
         assertUnreachable(focus);
