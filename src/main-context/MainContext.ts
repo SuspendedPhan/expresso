@@ -12,7 +12,7 @@ import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import MainViewContext from "./MainViewContext";
-import { LibraryProjectManager } from "src/library/LibraryProject";
+import { ProjectManager } from "src/library/LibraryProject";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -20,7 +20,8 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
-  public readonly eventBus = new MainEventBus();
+  public readonly libraryProjectManager = new ProjectManager(this);
+  public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
@@ -28,7 +29,6 @@ export default class MainContext {
   public readonly focusManager = new FocusManager();
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
-  public readonly libraryProjectManager = new LibraryProjectManager();
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);

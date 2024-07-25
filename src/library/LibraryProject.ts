@@ -1,4 +1,4 @@
-import { BehaviorSubject, ReplaySubject } from "rxjs";
+import { BehaviorSubject, ReplaySubject, switchMap } from "rxjs";
 import { Component, Project } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 
@@ -8,11 +8,16 @@ export interface LibraryProject {
   project$: ReplaySubject<Project>;
 }
 
-export class LibraryProjectManager {
-  public readonly projectsSub$ = new BehaviorSubject<readonly LibraryProject[]>(
-    []
+export class ProjectManager {
+  public readonly libraryProjectsSub$ = new BehaviorSubject<
+    readonly LibraryProject[]
+  >([]);
+  public readonly libraryProjects$ = this.libraryProjectsSub$.asObservable();
+  
+  public readonly currentLibraryProject$ = new ReplaySubject<LibraryProject>(1);
+  public readonly currentProject$ = this.currentLibraryProject$.pipe(
+    switchMap((libraryProject) => libraryProject.project$)
   );
-  public readonly projects$ = this.projectsSub$.asObservable();
 
   public constructor(private readonly ctx: MainContext) {}
 
@@ -25,7 +30,11 @@ export class LibraryProjectManager {
     return this.addProject(id, name, []);
   }
 
-  addProject(id: string, name: string, rootComponents: Component[]): Project {
+  public addProject(
+    id: string,
+    name: string,
+    rootComponents: Component[]
+  ): Project {
     const libraryProject: LibraryProject = {
       id,
       name,
@@ -37,7 +46,11 @@ export class LibraryProjectManager {
       rootComponents
     );
     libraryProject.project$.next(project);
-    this.projectsSub$.next([...this.projectsSub$.value, libraryProject]);
+    this.libraryProjectsSub$.next([
+      ...this.libraryProjectsSub$.value,
+      libraryProject,
+    ]);
+    this.currentLibraryProject$.next(libraryProject);
     return project;
   }
 }

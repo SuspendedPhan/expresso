@@ -1,9 +1,9 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
+  import { combineLatest, map, ReplaySubject, switchMap } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { onMount } from "svelte";
   import RootComponentView from "./RootComponentView.svelte";
-  import { combineLatest, map, ReplaySubject, switchMap } from "rxjs";
 
   export let ctx: MainContext;
   const rootComponents$ = ctx.eventBus.rootComponents$;
@@ -55,8 +55,9 @@
       <button on:click={() => ctx.projectMutator.addRootComponent()} class="btn"
         >Add Component</button
       >
-      <button on:click={() => ctx.projectMutator.newProject()} class="btn"
-        >New Project</button
+      <button
+        on:click={() => ctx.libraryProjectManager.addProjectNew()}
+        class="btn">New Project</button
       >
     </div>
     <div class="grid grid-flow-row">
