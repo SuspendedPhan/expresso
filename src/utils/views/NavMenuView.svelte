@@ -20,12 +20,17 @@
       ctx.viewCtx.navCollapsed$.next(!collapsed);
     });
   }
+
+  const navCollapsed$ = ctx.viewCtx.navCollapsed$;
 </script>
 
-<ul class="menu bg-base-200 h-full {clazz}">
+<ul class:menu={!$navCollapsed$} class="menu bg-base-200 h-full {clazz}">
   <div class="p-2" class:ring={$projectNavFocused$}>
     <div class=" w-full flex justify-between pr-0 items-center gap-2">
-      <span class="menu-title text-base-content font-normal">Hello World</span>
+      {#if !$navCollapsed$}
+        <span class="menu-title text-base-content font-normal">Hello World</span
+        >
+      {/if}
 
       {#if $projectNavFocused$}
         <button class="kdb bg-base-300 w-6 h-6 underline">X</button>
@@ -34,7 +39,9 @@
       {/if}
     </div>
     <div class="divider m-0"></div>
-    <div class="menu-title">Project</div>
+    {#if !$navCollapsed$}
+      <div class="menu-title">Project</div>
+    {/if}
     <li>
       <NavItemView
         {ctx}
@@ -63,9 +70,11 @@
 
   <div class="divider my-0"></div>
   <div class="p-2" class:ring={$libraryNavFocused$}>
-    <div class="menu-title">
-      <span class:underline={$projectNavFocused$}>L</span>ibrary
-    </div>
+    {#if !$navCollapsed$}
+      <div class="menu-title">
+        <span class:underline={$projectNavFocused$}>L</span>ibrary
+      </div>
+    {/if}
     <li>
       <NavItemView
         {ctx}
