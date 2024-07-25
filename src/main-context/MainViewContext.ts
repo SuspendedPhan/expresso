@@ -22,7 +22,7 @@ export default class MainViewContext {
 
   public constructor(ctx: MainContext) {
     const section0: NavSection = {
-      title: "Projects",
+      title: "Project",
       navItems: [],
       focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "ProjectNav")),
     };
@@ -36,7 +36,7 @@ export default class MainViewContext {
     (section0 as any).navItems = navItems0;
 
     const section1: NavSection = {
-      title: "Libraries",
+      title: "Library",
       navItems: [],
       focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "LibraryNav")),
     };
