@@ -10,6 +10,14 @@
   const focused$ = ctx.focusManager
     .getFocus$()
     .pipe(map((focus) => focus.type === "ProjectNav"));
+
+  const projectNavFocused$ = ctx.focusManager
+    .getFocus$()
+    .pipe(map((focus) => focus.type === "ProjectNav"));
+
+  const libraryNavFocused$ = ctx.focusManager
+    .getFocus$()
+    .pipe(map((focus) => focus.type === "LibraryNav"));
 </script>
 
 <ul class="menu bg-base-200 h-full {clazz}">
@@ -18,33 +26,57 @@
       <span>Hello World</span>
     </div>
     <li>
-      <NavItemView {ctx} window={Window.ProjectEditor}>Editor</NavItemView>
+      <NavItemView
+        {ctx}
+        window={Window.ProjectEditor}
+        label="Editor"
+        sectionFocused={$projectNavFocused$}
+      ></NavItemView>
     </li>
     <li>
-      <NavItemView {ctx} window={Window.ProjectComponentList}
-        >Components</NavItemView
-      >
+      <NavItemView
+        {ctx}
+        window={Window.ProjectComponentList}
+        label="Components"
+        sectionFocused={$projectNavFocused$}
+      ></NavItemView>
     </li>
     <li>
-      <NavItemView {ctx} window={Window.ProjectFunctionList}
-        >Functions</NavItemView
-      >
+      <NavItemView
+        {ctx}
+        window={Window.ProjectFunctionList}
+        label="Functions"
+        sectionFocused={$projectNavFocused$}
+      ></NavItemView>
     </li>
   </div>
 
   <div class="divider my-0"></div>
-  <div class="menu-title">Library</div>
-  <li>
-    <NavItemView {ctx} window={Window.LibraryProjectList}>Projects</NavItemView>
-  </li>
-  <li>
-    <NavItemView {ctx} window={Window.LibraryComponentList}
-      >Components</NavItemView
-    >
-  </li>
-  <li>
-    <NavItemView {ctx} window={Window.LibraryFunctionList}
-      >Functions</NavItemView
-    >
-  </li>
+  <div class="p-2">
+    <div class="menu-title">Library</div>
+    <li>
+      <NavItemView
+        {ctx}
+        window={Window.LibraryProjectList}
+        label="Projects"
+        sectionFocused={$libraryNavFocused$}
+      ></NavItemView>
+    </li>
+    <li>
+      <NavItemView
+        {ctx}
+        window={Window.LibraryComponentList}
+        label="Components"
+        sectionFocused={$libraryNavFocused$}
+      ></NavItemView>
+    </li>
+    <li>
+      <NavItemView
+        {ctx}
+        window={Window.LibraryFunctionList}
+        label="Functions"
+        sectionFocused={$libraryNavFocused$}
+      ></NavItemView>
+    </li>
+  </div>
 </ul>

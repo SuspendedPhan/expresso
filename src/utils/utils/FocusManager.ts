@@ -9,7 +9,7 @@ import {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
-type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus;
+type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus | LibraryNavFocus;
 
 interface NoneFocus {
   type: "None";
@@ -22,6 +22,10 @@ interface ExObjectFocus {
 
 interface ProjectNavFocus {
   type: "ProjectNav";
+}
+
+interface LibraryNavFocus {
+  type: "LibraryNav";
 }
 
 export default class FocusManager {
@@ -85,6 +89,7 @@ export default class FocusManager {
         this.downExObject(focus.exObject);
         return;
       case "ProjectNav":
+      case "LibraryNav":
         return;
       default:
         assertUnreachable(focus);
@@ -150,6 +155,7 @@ export default class FocusManager {
         this.upExObject(focus.exObject);
         return;
       case "ProjectNav":
+      case "LibraryNav":
         return;
       default:
         assertUnreachable(focus);
@@ -222,6 +228,7 @@ export default class FocusManager {
           this.navHorizontalExObject(focus, navHorizontal1);
           return;
         case "ProjectNav":
+        case "LibraryNav":
           return;
         default:
           assertUnreachable(focus);

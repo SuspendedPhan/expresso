@@ -1,8 +1,9 @@
 import hotkeys from "hotkeys-js";
-import { first } from "rxjs";
+import { map } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
+import { KeyboardScope } from "./KeyboardScope";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -39,33 +40,48 @@ export default class Keyboard {
       focusManager.focus({ type: "ProjectNav" });
     });
 
-    hotkeys("e", function (_event, _handler) {
-      focusManager.getFocus$().pipe(first()).subscribe((focus) => {
-        if (focus.type !== "ProjectNav") {
-          return;
-        }
-
-        ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
-        focusManager.focus({ type: "None" });
-      });
-    });
-
-    hotkeys("c", function (_event, _handler) {
-      focusManager.getFocus$().pipe(first()).subscribe((focus) => {
-        if (focus.type !== "ProjectNav") {
-          return;
-        }
-        ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
-        focusManager.focus({ type: "None" });
-      });
-    });
-
     hotkeys("g+e", function (_event, _handler) {
       ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
     });
 
     hotkeys("g+c", function (_event, _handler) {
       ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
+    });
+
+    const projectNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav")));
+    projectNavScope.hotkeys("e", () => {
+      ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
+    projectNavScope.hotkeys("c", () => {
+      ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
+    projectNavScope.hotkeys("f", () => {
+      ctx.viewCtx.activeWindow$.next(Window.ProjectFunctionList);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
+    projectNavScope.hotkeys("l", () => {
+      ctx.focusManager.focus({ type: "LibraryNav" });
+    });
+
+    const libraryNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav")));
+    libraryNavScope.hotkeys("p", () => {
+      ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
+    libraryNavScope.hotkeys("c", () => {
+      ctx.viewCtx.activeWindow$.next(Window.LibraryComponentList);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
+    libraryNavScope.hotkeys("f", () => {
+      ctx.viewCtx.activeWindow$.next(Window.LibraryFunctionList);
+      ctx.focusManager.focus({ type: "None" });
     });
 
     document.addEventListener("keydown", (event) => {
