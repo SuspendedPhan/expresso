@@ -1,7 +1,7 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
   import NavItemView from "./NavItemView.svelte";
-  import { type NavSection } from "../utils/NavUtils";
+  import { type NavSection } from "../utils/Nav";
   import { map } from "rxjs";
 
   export let ctx: MainContext;

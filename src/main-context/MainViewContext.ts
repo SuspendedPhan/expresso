@@ -1,7 +1,7 @@
 import { BehaviorSubject, map } from "rxjs";
 import { ElementLayout } from "src/utils/layout/ElementLayout";
 import MainContext from "./MainContext";
-import { NavItem, NavSection } from "src/utils/utils/NavUtils";
+import { NavItem, NavSection } from "src/utils/utils/Nav";
 
 export enum Window {
   ProjectEditor,

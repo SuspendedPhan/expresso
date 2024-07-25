@@ -1,7 +1,7 @@
 <script lang="ts">
   import { map } from "rxjs";
   import MainContext from "src/main-context/MainContext";
-  import { type NavItem } from "../utils/NavUtils";
+  import { type NavItem } from "../utils/Nav";
   export let ctx: MainContext;
   export let item: NavItem;
 
