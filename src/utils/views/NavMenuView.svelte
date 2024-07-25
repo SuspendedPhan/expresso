@@ -14,10 +14,12 @@
 
 {#if $navCollapsed$}
   <div class="p-2 bg-base-200 flex flex-col">
-    <button
-      class="fa-solid fa-bars block btn btn-sm w-8 h-8 p-0 shadow-none"
-      on:click={toggleNav}
-    ></button>
+    <div class="p-1">
+      <button
+        class="fa-solid fa-bars block btn btn-sm w-8 h-8 p-0 shadow-none"
+        on:click={toggleNav}
+      ></button>
+    </div>
 
     {#each ctx.viewCtx.navSections as section}
       <div class="divider m-0"></div>
