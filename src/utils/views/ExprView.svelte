@@ -50,7 +50,7 @@
           keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
         const targetIsInput = keyEvent.target instanceof HTMLInputElement;
         if (printable && !modifiers && !targetIsInput) {
-          ctx.focusManager.focusExprReplaceCommand(expr);
+          // ctx.focusManager.focusExprReplaceCommand(expr);
         }
       });
 

@@ -34,10 +34,9 @@
   }
 
   onMount(() => {
-    tick().then(() => {
+    setTimeout(() => {
       input.focus();
-    });
-    // input.focus();
+    }, 0);
   });
 </script>
 

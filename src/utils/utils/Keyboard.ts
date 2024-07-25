@@ -1,14 +1,15 @@
 import hotkeys from "hotkeys-js";
-import { map } from "rxjs";
+import { first, map } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
 import { KeyboardScope } from "./KeyboardScope";
+import { ExObjectType } from "src/ex-object/ExObject";
 
 export default class Keyboard {
   public static SCOPE = "Main";
 
-  // private static 
+  // private static
 
   public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
@@ -37,7 +38,9 @@ export default class Keyboard {
       focusManager.focusProjectNav();
     });
 
-    const projectNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav")));
+    const projectNavScope = new KeyboardScope(
+      focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav"))
+    );
     projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
@@ -46,12 +49,12 @@ export default class Keyboard {
 
     projectNavScope.hotkeys("c", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
-      ctx.focusManager.focusNone()
+      ctx.focusManager.focusNone();
     });
 
     projectNavScope.hotkeys("f", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectFunctionList);
-      ctx.focusManager.focusNone()
+      ctx.focusManager.focusNone();
     });
 
     projectNavScope.hotkeys("l", () => {
@@ -63,7 +66,9 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    const libraryNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav")));
+    const libraryNavScope = new KeyboardScope(
+      focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav"))
+    );
     libraryNavScope.hotkeys("p", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);
       ctx.focusManager.focusNone();
@@ -79,12 +84,18 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    const editorScope = new KeyboardScope(ctx.viewCtx.activeWindow$.pipe(map((window) => window === Window.ProjectEditor)));
+    const editorScope = new KeyboardScope(
+      ctx.viewCtx.activeWindow$.pipe(
+        map((window) => window === Window.ProjectEditor)
+      )
+    );
     editorScope.hotkeys("n", () => {
       ctx.focusManager.focusNewActions();
     });
 
-    const newActionsScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "NewActions")));
+    const newActionsScope = new KeyboardScope(
+      focusManager.getFocus$().pipe(map((focus) => focus.type === "NewActions"))
+    );
     newActionsScope.hotkeys("p", () => {
       ctx.projectManager.addProjectNew();
       ctx.focusManager.focusNone();
@@ -93,6 +104,29 @@ export default class Keyboard {
     newActionsScope.hotkeys("c", () => {
       ctx.projectMutator.addRootComponent();
       ctx.focusManager.focusNone();
+    });
+
+    const focusedExpr$ = ctx.focusManager.getFocus$().pipe(
+      map((focus) => {
+        if (
+          focus.type !== "ExObject" ||
+          focus.exObject.objectType !== ExObjectType.Expr
+        ) {
+          return null;
+        }
+        return focus.exObject;
+      })
+    );
+    const exprScope = new KeyboardScope(
+      focusedExpr$.pipe(map((expr) => expr !== null))
+    );
+
+    exprScope.hotkeys("r", () => {
+      focusedExpr$.pipe(first()).subscribe((expr) => {
+        if (expr) {
+          ctx.focusManager.focusExprReplaceCommand(expr);
+        }
+      });
     });
 
     document.addEventListener("keydown", (event) => {
