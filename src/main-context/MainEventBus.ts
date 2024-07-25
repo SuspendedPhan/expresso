@@ -13,6 +13,7 @@ export class MainEventBus {
   public readonly onAttributeAdded$: OBS<Attribute>;
   public readonly onExprAdded$: OBS<Expr>;
   public readonly onExprReplaced$: OBS<ExprReplacement>;
+  public readonly submitExprReplaceCommand$ = new Subject<void>();
 
   public constructor(ctx: MainContext) {
     this.rootComponents$ = ctx.projectManager.currentLibraryProject$.pipe(

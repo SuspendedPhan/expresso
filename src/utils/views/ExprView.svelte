@@ -37,26 +37,6 @@
     }
   }
 
-  onMount(() => {
-    const isSelected$ = ctx.focusManager.isSelected$(expr);
-    const sub = fromEvent(document, "keydown")
-      .pipe(combineLatestWith(isSelected$))
-      .subscribe(([event, selected]) => {
-        if (!selected) return;
-
-        const keyEvent = event as KeyboardEvent;
-        const printable = keyEvent.key.length === 1;
-        const modifiers =
-          keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
-        const targetIsInput = keyEvent.target instanceof HTMLInputElement;
-        if (printable && !modifiers && !targetIsInput) {
-          // ctx.focusManager.focusExprReplaceCommand(expr);
-        }
-      });
-
-    return () => sub.unsubscribe();
-  });
-
   let tooltipVisible = false;
   function handleMouseOver(event: MouseEvent) {
     event.stopPropagation();

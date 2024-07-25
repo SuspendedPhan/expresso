@@ -13,6 +13,7 @@ export default class Keyboard {
 
   public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
+    hotkeys.filter = () => true;
 
     hotkeys("down,s", this.SCOPE, function (_event, _handler) {
       focusManager.down$.next();
@@ -127,6 +128,29 @@ export default class Keyboard {
           ctx.focusManager.focusExprReplaceCommand(expr);
         }
       });
+    });
+
+    const exprReplaceCommand$ = ctx.focusManager.getFocus$().pipe(
+      map((focus) => {
+        if (focus.type === "ExprReplaceCommand") {
+          return focus.expr;
+        }
+        return null;
+      })
+    );
+    const exprReplaceCommandScope = new KeyboardScope(
+      exprReplaceCommand$.pipe(map((expr) => expr !== null))
+    );
+    exprReplaceCommandScope.hotkeys("Esc", () => {
+      exprReplaceCommand$.pipe(first()).subscribe((expr) => {
+        if (expr) {
+          ctx.focusManager.focusExObject(expr);
+        }
+      });
+    });
+
+    exprReplaceCommandScope.hotkeys("Enter", () => {
+      ctx.eventBus.submitExprReplaceCommand$.next();
     });
 
     document.addEventListener("keydown", (event) => {

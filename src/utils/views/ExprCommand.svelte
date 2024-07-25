@@ -10,10 +10,8 @@
 
   let input: HTMLInputElement;
 
-  function handleKeydown(
-    event: KeyboardEvent & { currentTarget: HTMLInputElement }
-  ) {
-    if (event.key === "Enter") {
+  onMount(() => {
+    const sub = ctx.eventBus.submitExprReplaceCommand$.subscribe(() => {
       const text = input.value;
       const value = parseFloat(text);
       if (!isNaN(value)) {
@@ -23,8 +21,12 @@
         ctx.focusManager.focusExObject(expr);
         ctx.mutator.replaceWithCallExpr(expr);
       }
-    }
-  }
+    });
+
+    return () => {
+      sub.unsubscribe();
+    };
+  });
 
   let query$ = new BehaviorSubject<string>("");
   function handleInput(
@@ -46,7 +48,6 @@
     type="text"
     value={$query$}
     on:input={handleInput}
-    on:keydown={handleKeydown}
     bind:this={input}
   />
 </div>
