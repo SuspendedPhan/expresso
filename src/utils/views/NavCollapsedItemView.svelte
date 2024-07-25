@@ -13,7 +13,7 @@
 <div class="indicator">
   <span
     class:hidden={!$sectionFocused$}
-    class="indicator-item indicator-right indicator-middle badge underline text-xs"
+    class="indicator-item indicator-right indicator-bottom badge underline text-xs"
     >{item.label[0]}</span
   >
   <button

@@ -16,7 +16,7 @@
 <div class="indicator">
   <span
     class:hidden={!$showL$}
-    class="indicator-item indicator-center indicator-bottom badge text-xs underline"
+    class="indicator-item indicator-right indicator-bottom badge text-xs underline"
     >L</span
   >
   <div class:ring={$focused$} class="flex flex-col p-1">

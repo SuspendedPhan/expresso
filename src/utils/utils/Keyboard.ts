@@ -69,6 +69,11 @@ export default class Keyboard {
       ctx.focusManager.focus({ type: "LibraryNav" });
     });
 
+    projectNavScope.hotkeys("x", () => {
+      ctx.viewCtx.navCollapsed$.next(!ctx.viewCtx.navCollapsed$.value);
+      ctx.focusManager.focus({ type: "None" });
+    });
+
     const libraryNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav")));
     libraryNavScope.hotkeys("p", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);
