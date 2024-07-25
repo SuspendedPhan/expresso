@@ -116,6 +116,10 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
+    newActionsScope.hotkeys("Esc", () => {
+      ctx.focusManager.popFocus();
+    });
+
     const focusedExpr$ = ctx.focusManager.getFocus$().pipe(
       map((focus) => {
         if (
