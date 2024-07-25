@@ -3,7 +3,7 @@
 
   export let ctx: MainContext;
 
-  const projects$ = ctx.libraryProjectManager.libraryProjects$;
+  const projects$ = ctx.projectManager.libraryProjects$;
   $: console.log($projects$);
 </script>
 

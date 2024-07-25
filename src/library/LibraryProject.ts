@@ -21,7 +21,7 @@ export class ProjectManager {
 
   public constructor(private readonly ctx: MainContext) {}
 
-  public addProjectNew(): Project {
+  public addProjectNew(): LibraryProject {
     // Get date/time with YYYY:MM:DD-HH:MM format
     const date = new Date();
     const timestamp = `${date.getFullYear()}:${date.getMonth()}:${date.getDate()}-${date.getHours()}:${date.getMinutes()}`;
@@ -34,7 +34,7 @@ export class ProjectManager {
     id: string,
     name: string,
     rootComponents: Component[]
-  ): Project {
+  ): LibraryProject {
     const libraryProject: LibraryProject = {
       id,
       name,
@@ -51,6 +51,6 @@ export class ProjectManager {
       libraryProject,
     ]);
     this.currentLibraryProject$.next(libraryProject);
-    return project;
+    return libraryProject;
   }
 }

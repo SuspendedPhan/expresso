@@ -1,8 +1,10 @@
 import { first, Subject, switchMap } from "rxjs";
-import type { Expr, Project } from "src/ex-object/ExObject";
+import type { Expr } from "src/ex-object/ExObject";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
+import { LibraryProject, ProjectManager } from "src/library/LibraryProject";
 import ComponentMutator from "src/mutator/ComponentMutator";
 import ProjectMutator from "src/mutator/ProjectMutator";
+import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
 import type GoModule from "src/utils/utils/GoModule";
@@ -10,9 +12,7 @@ import GoBridge from "../evaluation/GoBridge";
 import FocusManager from "../utils/utils/FocusManager";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
-import Dehydrator from "src/utils/hydration/Dehydrator";
 import MainViewContext from "./MainViewContext";
-import { ProjectManager } from "src/library/LibraryProject";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -20,7 +20,7 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
-  public readonly libraryProjectManager = new ProjectManager(this);
+  public readonly projectManager = new ProjectManager(this);
   public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
@@ -52,15 +52,15 @@ export default class MainContext {
 
     Persistence.readProject$.subscribe((deProject) => {
       if (deProject === null) {
-        this.libraryProjectManager.addProjectNew();
+        this.projectManager.addProjectNew();
       } else {
         const project = new Rehydrator(this).rehydrateProject(deProject);
-        (this.eventBus.currentProject$ as Subject<Project>).next(project);
+        (this.projectManager.currentLibraryProject$ as Subject<LibraryProject>).next(project);
       }
     });
 
     const dehydrator = new Dehydrator();
-    this.eventBus.currentProject$.pipe(
+    this.projectManager.currentProject$.pipe(
       switchMap((project) => dehydrator.dehydrateProject$(project))
     ).subscribe((deProject) => {
       Persistence.writeProject(deProject);

@@ -2,8 +2,7 @@ import type {
   CallExpr,
   Component,
   Expr,
-  NumberExpr,
-  Project
+  NumberExpr
 } from "src/ex-object/ExObject";
 import type ExObjectFactory from "src/ex-object/ExObjectFactory";
 import {
@@ -13,6 +12,7 @@ import {
   getProtoSceneAttributeById,
   SceneAttribute,
 } from "src/ex-object/SceneAttribute";
+import { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import type {
   DehydratedCallExpr,
@@ -30,11 +30,11 @@ export default class Rehydrator {
     this.exprFactory = ctx.objectFactory;
   }
 
-  public rehydrateProject(deProject: DehydratedProject): Project {
+  public rehydrateProject(deProject: DehydratedProject): LibraryProject {
     const rootComponents = deProject.rootComponents.map((deComponent) =>
       this.rehydrateComponent(deComponent)
     );
-    return this.ctx.libraryProjectManager.addProject(deProject.id, deProject.name, rootComponents);
+    return this.ctx.projectManager.addProject(deProject.id, deProject.name, rootComponents);
   }
 
   public rehydrateComponent(deComponent: DehydratedComponent): Component {

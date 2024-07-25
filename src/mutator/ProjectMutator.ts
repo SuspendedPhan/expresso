@@ -16,7 +16,7 @@ export default class ProjectMutator {
       ProtoComponentStore.circle
     );
 
-    this.ctx.eventBus.currentProject$.pipe(first()).subscribe((project) => {
+    this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
       project.rootComponents$.pipe(first()).subscribe((rootComponents) => {
         const projectMut = project as unknown as ProjectMut;
         projectMut.rootComponentsSub$.next([...rootComponents, component]);

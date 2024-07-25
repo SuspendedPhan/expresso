@@ -1,8 +1,7 @@
-import { BehaviorSubject, map, ReplaySubject } from "rxjs";
+import { BehaviorSubject, map } from "rxjs";
 import { ElementLayout } from "src/utils/layout/ElementLayout";
-import MainContext from "./MainContext";
 import { NavItem, NavSection } from "src/utils/utils/Nav";
-import { LibraryProject } from "src/library/LibraryProject";
+import MainContext from "./MainContext";
 
 export enum Window {
   ProjectEditor,

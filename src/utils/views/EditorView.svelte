@@ -55,9 +55,8 @@
       <button on:click={() => ctx.projectMutator.addRootComponent()} class="btn"
         >Add Component</button
       >
-      <button
-        on:click={() => ctx.libraryProjectManager.addProjectNew()}
-        class="btn">New Project</button
+      <button on:click={() => ctx.projectManager.addProjectNew()} class="btn"
+        >New Project</button
       >
     </div>
     <div class="grid grid-flow-row">

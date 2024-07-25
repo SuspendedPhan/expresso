@@ -32,7 +32,7 @@ import { LibraryProject } from "src/library/LibraryProject";
 export default class ExObjectFactory {
   private currentOrdinal = 0;
   public constructor(private readonly ctx: MainContext) {
-    this.ctx.libraryProjectManager.currentProject$.subscribe((project) => {
+    this.ctx.projectManager.currentProject$.subscribe((project) => {
       project.currentOrdinal$.subscribe((ordinal) => {
         this.currentOrdinal = ordinal;
       });
@@ -262,7 +262,7 @@ export default class ExObjectFactory {
       parent$: mutBase.parentSub$,
       destroy$: mutBase.destroySub$,
     };
-    this.ctx.eventBus.currentProject$.pipe(first()).subscribe((project) => {
+    this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
       (project as ProjectMut).currentOrdinalSub$.next(this.currentOrdinal + 1);
     });
     return exObjectBase;

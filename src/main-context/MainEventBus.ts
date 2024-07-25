@@ -1,6 +1,6 @@
 import type { Attribute } from "pixi.js";
 import { ReplaySubject, Subject, switchMap } from "rxjs";
-import type { Component, Expr, Project } from "src/ex-object/ExObject";
+import type { Component, Expr } from "src/ex-object/ExObject";
 import type { OBS } from "src/utils/utils/Utils";
 import type { SceneAttribute } from "../ex-object/SceneAttribute";
 import type { ExprReplacement } from "./MainContext";
@@ -15,7 +15,7 @@ export class MainEventBus {
   public readonly onExprReplaced$: OBS<ExprReplacement>;
 
   public constructor(ctx: MainContext) {
-    this.rootComponents$ = ctx.libraryProjectManager.currentLibraryProject$.pipe(
+    this.rootComponents$ = ctx.projectManager.currentLibraryProject$.pipe(
       switchMap((project) => project.project$),
       switchMap((project) => project.rootComponents$)
     );
