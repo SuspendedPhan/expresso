@@ -1,10 +1,10 @@
 import hotkeys from "hotkeys-js";
-import { first, map } from "rxjs";
+import { map } from "rxjs";
+import { ExObjectType } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
-import { KeyboardScope } from "./KeyboardScope";
-import { ExObjectType } from "src/ex-object/ExObject";
+import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -67,6 +67,10 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
+    projectNavScope.hotkeys("Esc", () => {
+      ctx.focusManager.popFocus();
+    });
+
     const libraryNavScope = new KeyboardScope(
       focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav"))
     );
@@ -83,6 +87,11 @@ export default class Keyboard {
     libraryNavScope.hotkeys("f", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryFunctionList);
       ctx.focusManager.focusNone();
+    });
+
+    libraryNavScope.hotkeys("Esc", () => {
+      ctx.focusManager.popFocus();
+      ctx.focusManager.popFocus();
     });
 
     const editorScope = new KeyboardScope(
@@ -113,40 +122,28 @@ export default class Keyboard {
           focus.type !== "ExObject" ||
           focus.exObject.objectType !== ExObjectType.Expr
         ) {
-          return null;
+          return KeyboardScopeResult.OutOfScope;
         }
         return focus.exObject;
       })
     );
-    const exprScope = new KeyboardScope(
-      focusedExpr$.pipe(map((expr) => expr !== null))
-    );
 
-    exprScope.hotkeys("r", () => {
-      focusedExpr$.pipe(first()).subscribe((expr) => {
-        if (expr) {
-          ctx.focusManager.focusExprReplaceCommand(expr);
-        }
-      });
+    const exprScope = new KeyboardScope(focusedExpr$);
+    exprScope.hotkeys("r", (expr) => {
+      ctx.focusManager.focusExprReplaceCommand(expr);
     });
 
     const exprReplaceCommand$ = ctx.focusManager.getFocus$().pipe(
       map((focus) => {
         if (focus.type === "ExprReplaceCommand") {
-          return focus.expr;
+          return focus;
         }
-        return null;
+        return KeyboardScopeResult.OutOfScope;
       })
     );
-    const exprReplaceCommandScope = new KeyboardScope(
-      exprReplaceCommand$.pipe(map((expr) => expr !== null))
-    );
-    exprReplaceCommandScope.hotkeys("Esc", () => {
-      exprReplaceCommand$.pipe(first()).subscribe((expr) => {
-        if (expr) {
-          ctx.focusManager.focusExObject(expr);
-        }
-      });
+    const exprReplaceCommandScope = new KeyboardScope(exprReplaceCommand$);
+    exprReplaceCommandScope.hotkeys("Esc", (focus) => {
+      ctx.focusManager.focusExObject(focus.expr);
     });
 
     exprReplaceCommandScope.hotkeys("Enter", () => {

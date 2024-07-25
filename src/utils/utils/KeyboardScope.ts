@@ -2,31 +2,26 @@ import hotkeys from "hotkeys-js";
 import { OBS } from "./Utils";
 import { first } from "rxjs";
 
-export class KeyboardScope {
-  private prefix: string | null = null;
-  public constructor(private readonly condition: OBS<boolean>) {}
+export enum KeyboardScopeResult {
+  OutOfScope,
+}
 
-  public hotkeys(key: string, callback: () => void) {
-    hotkeys(key, (_event, _handler) => {
+export class KeyboardScope<T> {
+  public constructor(
+    private readonly condition: OBS<T | KeyboardScopeResult.OutOfScope>
+  ) {}
+
+  public hotkeys(key: string, callback: (value: T) => void) {
+    hotkeys(key, { keydown: true, keyup: true }, (_event, _handler) => {
       this.condition.pipe(first()).subscribe((value) => {
-        if (value) {
-          callback();
+        if (value !== KeyboardScopeResult.OutOfScope && value !== false) {
+          callback(value);
         }
       });
     });
-
-    if (this.prefix) {
-      hotkeys(this.prefix + "+" + key, (_event, _handler) => {
-        this.condition.pipe(first()).subscribe((value) => {
-          if (value) {
-            callback();
-          }
-        });
-      });
-    }
   }
 
-  public setChordPrefix(prefix: string) {
-    this.prefix = prefix;
+  public setChordPrefix(_prefix: string) {
+    // this.prefix = prefix;
   }
 }

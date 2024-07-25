@@ -142,6 +142,10 @@ export default class FocusManager {
     });
   }
 
+  public popFocus() {
+    this.focusNone();
+  }
+
   @loggedMethod
   private down(focus: Focus) {
     if (focus.window === Window.LibraryProjectList) {
@@ -176,7 +180,7 @@ export default class FocusManager {
     }
   }
 
-  downComponent(selectedObject: Component) {
+  private downComponent(selectedObject: Component) {
     const sceneAttributes = Array.from(
       selectedObject.sceneAttributeByProto.values()
     );

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   // import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
   import type { Expr } from "src/ex-object/ExObject";
