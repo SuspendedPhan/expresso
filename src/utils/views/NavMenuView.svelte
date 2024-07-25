@@ -18,7 +18,7 @@
     <div class="p-1 indicator">
       <span
         class="indicator-item indicator-right indicator-bottom badge underline text-xs"
-        class:hidden={!$projectNavFocused$}>X</span
+        class:hidden={!$projectNavFocused$}>H</span
       >
       <button
         class="fa-solid fa-bars block btn btn-sm w-8 h-8 p-0 shadow-none"
@@ -38,7 +38,7 @@
       <div class="indicator">
         <span
           class="indicator-item indicator-right indicator-bottom badge underline text-xs"
-          class:hidden={!$projectNavFocused$}>X</span
+          class:hidden={!$projectNavFocused$}>H</span
         >
         <button
           class="fa-solid fa-bars btn btn-sm shadow-none"

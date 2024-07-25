@@ -13,40 +13,29 @@ export default class Keyboard {
   public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
 
-    hotkeys("down", this.SCOPE, function (_event, _handler) {
+    hotkeys("down,s", this.SCOPE, function (_event, _handler) {
       focusManager.down$.next();
       return false;
     });
 
-    hotkeys("up", this.SCOPE, function (_event, _handler) {
+    hotkeys("up,w", this.SCOPE, function (_event, _handler) {
       focusManager.up$.next();
       return false;
     });
 
-    hotkeys("left", this.SCOPE, function (_event, _handler) {
+    hotkeys("left,a", this.SCOPE, function (_event, _handler) {
       focusManager.left();
       return false;
     });
 
-    hotkeys("right", this.SCOPE, function (_event, _handler) {
+    hotkeys("right,d", this.SCOPE, function (_event, _handler) {
       focusManager.right();
       return false;
     });
 
-    // document.addEventListener("mousedown", (e: KeyboardEvent) => {
-    //   // switch (e.key)
-    // });
     hotkeys("g", function (_event, _handler) {
       focusManager.focusProjectNav();
     });
-
-    // hotkeys("g+e", function (_event, _handler) {
-    //   ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
-    // });
-
-    // hotkeys("g+c", function (_event, _handler) {
-    //   ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
-    // });
 
     const projectNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav")));
     projectNavScope.setChordPrefix("g");
@@ -69,7 +58,7 @@ export default class Keyboard {
       ctx.focusManager.focusLibraryNav();
     });
 
-    projectNavScope.hotkeys("x", () => {
+    projectNavScope.hotkeys("h", () => {
       ctx.viewCtx.navCollapsed$.next(!ctx.viewCtx.navCollapsed$.value);
       ctx.focusManager.focusNone();
     });
@@ -91,8 +80,17 @@ export default class Keyboard {
     });
 
     const editorScope = new KeyboardScope(ctx.viewCtx.activeWindow$.pipe(map((window) => window === Window.ProjectEditor)));
-    editorScope.hotkeys("shift+n", () => {
+    editorScope.hotkeys("n", () => {
+      ctx.focusManager.focusNewActions();
+    });
+
+    const newActionsScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "NewActions")));
+    newActionsScope.hotkeys("p", () => {
       ctx.projectManager.addProjectNew();
+    });
+
+    newActionsScope.hotkeys("c", () => {
+      ctx.projectMutator.addRootComponent();
     });
 
     document.addEventListener("keydown", (event) => {

@@ -17,7 +17,8 @@ export type Focus =
   | ExObjectFocus
   | ProjectNavFocus
   | LibraryNavFocus
-  | LibraryProjectFocus;
+  | LibraryProjectFocus
+  | NewActionsFocus;
 
 export interface NoneFocus {
   type: "None";
@@ -44,6 +45,11 @@ export interface LibraryProjectFocus {
   type: "LibraryProject";
   project: LibraryProject;
   window: Window.LibraryProjectList;
+}
+
+export interface NewActionsFocus {
+  type: "NewActions";
+  window: Window.ProjectEditor;
 }
 
 export default class FocusManager {
@@ -117,6 +123,10 @@ export default class FocusManager {
     });
   }
 
+  public focusNewActions() {
+    this.focus$.next({ type: "NewActions", window: Window.ProjectEditor });
+  }
+
   @loggedMethod
   private down(focus: Focus) {
     if (focus.window === Window.LibraryProjectList) {
@@ -132,6 +142,7 @@ export default class FocusManager {
         return;
       case "ProjectNav":
       case "LibraryNav":
+      case "NewActions":
         return;
       default:
         assertUnreachable(focus);
@@ -198,6 +209,7 @@ export default class FocusManager {
         return;
       case "ProjectNav":
       case "LibraryNav":
+        case "NewActions":
         return;
       case "LibraryProject":
         this.ctx.projectManager
@@ -284,6 +296,7 @@ export default class FocusManager {
         case "ProjectNav":
         case "LibraryNav":
         case "LibraryProject":
+        case "NewActions":
           return;
         default:
           assertUnreachable(focus);
