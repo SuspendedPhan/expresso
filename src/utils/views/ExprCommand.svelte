@@ -1,25 +1,28 @@
 <script lang="ts">
-  import { createEventDispatcher, tick } from "svelte";
+  import { onMount, tick } from "svelte";
   // import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
-  const dispatch = createEventDispatcher<{ select: string }>();
+  import type { Expr } from "src/ex-object/ExObject";
+  import MainContext from "src/main-context/MainContext";
+
+  export let expr: Expr;
+  export let ctx: MainContext;
 
   let input: HTMLInputElement;
-  let displayClass = "hidden";
-
-  export function startEditing(key: string) {
-    displayClass = "";
-    // input.value = key;
-    tick().then(() => {
-      input.focus();
-    });
-  }
 
   function handleKeydown(
     event: KeyboardEvent & { currentTarget: HTMLInputElement }
   ) {
     if (event.key === "Enter") {
-      dispatch("select", event.currentTarget.value);
+      const text = input.value;
+      const value = parseFloat(text);
+      if (!isNaN(value)) {
+        ctx.focusManager.focusExObject(expr);
+        ctx.mutator.replaceWithNumberExpr(expr, value);
+      } else if (text === "+") {
+        ctx.focusManager.focusExObject(expr);
+        ctx.mutator.replaceWithCallExpr(expr);
+      }
     }
   }
 
@@ -29,11 +32,16 @@
   ) {
     query$.next(event.currentTarget.value);
   }
+
+  onMount(() => {
+    tick().then(() => {
+      input.focus();
+    });
+    // input.focus();
+  });
 </script>
 
-<div
-  class="absolute top-full left-0 mt-2 p-2 bg-white {displayClass} ring rounded-sm"
->
+<div class="absolute top-full left-0 mt-2 p-2 bg-white ring rounded-sm">
   <input
     class="outline-none"
     type="text"

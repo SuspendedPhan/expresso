@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { combineLatestWith, fromEvent, type Observable, of } from "rxjs";
+  import {
+    combineLatestWith,
+    fromEvent,
+    map,
+    type Observable,
+    of,
+    tap,
+  } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExObject";
   // biome-ignore lint:
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
@@ -12,6 +19,11 @@
   export let ctx: MainContext;
   export let expr: Expr;
   export let elementLayout: ElementLayout;
+
+  const exprCommandFocused$ = ctx.focusManager.getFocus$().pipe(
+    map((focus) => focus.type === "ExprReplaceCommand" && focus.expr === expr),
+    tap(console.log)
+  );
 
   let args$: Observable<readonly Expr[]>;
   if (expr.exprType === ExprType.CallExpr) {
@@ -31,18 +43,6 @@
     }
   }
 
-  function handleSelect(e: CustomEvent<string>) {
-    const text = e.detail;
-    const value = parseFloat(text);
-    if (!isNaN(value)) {
-      ctx.mutator.replaceWithNumberExpr(expr, value);
-    } else if (text === "+") {
-      ctx.mutator.replaceWithCallExpr(expr);
-    }
-  }
-
-  let exprCommand: ExprCommand;
-
   onMount(() => {
     const isSelected$ = ctx.focusManager.isSelected$(expr);
     const sub = fromEvent(document, "keydown")
@@ -56,7 +56,7 @@
           keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
         const targetIsInput = keyEvent.target instanceof HTMLInputElement;
         if (printable && !modifiers && !targetIsInput) {
-          exprCommand.startEditing(keyEvent.key);
+          ctx.focusManager.focusExprReplaceCommand(expr);
         }
       });
 
@@ -89,7 +89,10 @@
         class:invisible={!tooltipVisible}>Expr {expr.ordinal}</span
       >
       <span>{getText()}</span>
-      <ExprCommand on:select={handleSelect} bind:this={exprCommand} />
+
+      {#if $exprCommandFocused$}
+        <ExprCommand {ctx} {expr} />
+      {/if}
 
       <div class="pl-2">
         {#each $args$ as arg (arg.id)}

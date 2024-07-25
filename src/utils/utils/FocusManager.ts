@@ -18,7 +18,8 @@ export type Focus =
   | ProjectNavFocus
   | LibraryNavFocus
   | LibraryProjectFocus
-  | NewActionsFocus;
+  | NewActionsFocus
+  | ExprReplaceCommandFocus;
 
 export interface NoneFocus {
   type: "None";
@@ -49,6 +50,12 @@ export interface LibraryProjectFocus {
 
 export interface NewActionsFocus {
   type: "NewActions";
+  window: Window.ProjectEditor;
+}
+
+export interface ExprReplaceCommandFocus {
+  type: "ExprReplaceCommand";
+  expr: Expr;
   window: Window.ProjectEditor;
 }
 
@@ -127,6 +134,14 @@ export default class FocusManager {
     this.focus$.next({ type: "NewActions", window: Window.ProjectEditor });
   }
 
+  public focusExprReplaceCommand(expr: Expr) {
+    this.focus$.next({
+      type: "ExprReplaceCommand",
+      expr,
+      window: Window.ProjectEditor,
+    });
+  }
+
   @loggedMethod
   private down(focus: Focus) {
     if (focus.window === Window.LibraryProjectList) {
@@ -135,17 +150,11 @@ export default class FocusManager {
     }
 
     switch (focus.type) {
-      case "None":
-        return;
       case "ExObject":
         this.downExObject(focus.exObject);
         return;
-      case "ProjectNav":
-      case "LibraryNav":
-      case "NewActions":
-        return;
       default:
-        assertUnreachable(focus);
+        return;
     }
   }
 
@@ -202,14 +211,8 @@ export default class FocusManager {
   @loggedMethod
   private up(focus: Focus) {
     switch (focus.type) {
-      case "None":
-        return;
       case "ExObject":
         this.upExObject(focus.exObject);
-        return;
-      case "ProjectNav":
-      case "LibraryNav":
-        case "NewActions":
         return;
       case "LibraryProject":
         this.ctx.projectManager
@@ -224,7 +227,7 @@ export default class FocusManager {
           });
         return;
       default:
-        assertUnreachable(focus);
+        return;
     }
   }
 
@@ -288,18 +291,11 @@ export default class FocusManager {
   ) {
     this.focus$.pipe(first()).subscribe((focus) => {
       switch (focus.type) {
-        case "None":
-          return;
         case "ExObject":
           this.navHorizontalExObject(focus, navHorizontal1);
           return;
-        case "ProjectNav":
-        case "LibraryNav":
-        case "LibraryProject":
-        case "NewActions":
-          return;
         default:
-          assertUnreachable(focus);
+          return;
       }
     });
   }
