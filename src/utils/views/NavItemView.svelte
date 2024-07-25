@@ -14,13 +14,18 @@
 
   const activeWindow$ = ctx.viewCtx.activeWindow$;
   const isActive$ = activeWindow$.pipe(map((w) => w === window));
+  const navCollapsed$ = ctx.viewCtx.navCollapsed$;
 
   function handleClick() {
     ctx.viewCtx.activeWindow$.next(window);
   }
 </script>
 
-<button class:active={$isActive$} class="block" on:click={handleClick}>
-  {firstChars}<span class:underline={sectionFocused}>{underlinedChar}</span
-  >{restChars}
-</button>
+{#if $navCollapsed$}
+  <button class="fa-solid fa-bars" on:click={handleClick}> </button>
+{:else}
+  <button class:active={$isActive$} class="block" on:click={handleClick}>
+    {firstChars}<span class:underline={sectionFocused}>{underlinedChar}</span
+    >{restChars}
+  </button>
+{/if}

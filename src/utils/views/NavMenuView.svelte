@@ -2,7 +2,7 @@
   import { Window } from "src/main-context/MainViewContext";
   import NavItemView from "./NavItemView.svelte";
   import MainContext from "src/main-context/MainContext";
-  import { map } from "rxjs";
+  import { first, map } from "rxjs";
   export let ctx: MainContext;
   let clazz: string = "";
   export { clazz as class };
@@ -14,6 +14,12 @@
   const libraryNavFocused$ = ctx.focusManager
     .getFocus$()
     .pipe(map((focus) => focus.type === "LibraryNav"));
+
+  function toggleNav() {
+    ctx.viewCtx.navCollapsed$.pipe(first()).subscribe((collapsed) => {
+      ctx.viewCtx.navCollapsed$.next(!collapsed);
+    });
+  }
 </script>
 
 <ul class="menu bg-base-200 h-full {clazz}">
@@ -24,7 +30,7 @@
       {#if $projectNavFocused$}
         <button class="kdb bg-base-300 w-6 h-6 underline">X</button>
       {:else}
-        <button class="fa-solid fa-bars w-6 h-6"></button>
+        <button class="fa-solid fa-bars w-6 h-6" on:click={toggleNav}></button>
       {/if}
     </div>
     <div class="divider m-0"></div>

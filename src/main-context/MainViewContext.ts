@@ -15,4 +15,5 @@ export default class MainViewContext {
   >([]);
 
   public readonly activeWindow$ = new BehaviorSubject<Window>(Window.ProjectEditor);
+  public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
 }
