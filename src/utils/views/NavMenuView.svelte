@@ -6,8 +6,9 @@
 </script>
 
 <ul class="bg-base-200 h-full menu">
-  <div class="px-4 py-2">
+  <div class="p-4 py-2 flex items-center gap-8">
     <div class="text-lg w-max">Hello World</div>
+    <button class="fa-solid fa-bars"></button>
   </div>
 
   {#each ctx.viewCtx.navSections as section}
