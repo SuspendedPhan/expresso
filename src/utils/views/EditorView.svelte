@@ -4,6 +4,7 @@
   import MainContext from "src/main-context/MainContext";
   import { onMount } from "svelte";
   import RootComponentView from "./RootComponentView.svelte";
+  import { Constants } from "../utils/ViewUtils";
 
   export let ctx: MainContext;
   const rootComponents$ = ctx.eventBus.rootComponents$;
@@ -48,7 +49,7 @@
 
 <div bind:this={rootElement}>
   <div
-    class="flex flex-col items-center p-8"
+    class="flex flex-col items-center {Constants.WindowPaddingClass}"
     style:transform="translateX({$xTranslation$})"
   >
     <div class="flex gap-4">

@@ -24,3 +24,8 @@ export function activeWindowToSvelteComponent(activeWindow: Window): any {
       assertUnreachable(activeWindow);
   }
 }
+
+export const Constants = {
+  WindowPaddingClass: "p-8",
+};
+
