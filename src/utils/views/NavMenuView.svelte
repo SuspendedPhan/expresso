@@ -1,6 +1,7 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
   import NavSectionView from "./NavSectionView.svelte";
+  import NavItemCollapsedView from "./NavItemCollapsedView.svelte";
 
   export let ctx: MainContext;
 
@@ -12,16 +13,17 @@
 </script>
 
 {#if $navCollapsed$}
-  <div class="p-2 bg-base-200 flex flex-col gap-2">
+  <div class="p-2 bg-base-200 flex flex-col">
+    <button
+      class="fa-solid fa-bars block btn btn-sm w-8 h-8 p-0 shadow-none"
+      on:click={toggleNav}
+    ></button>
+
     {#each ctx.viewCtx.navSections as section}
       <div class="divider m-0"></div>
-      <div class="join join-vertical">
-        {#each section.navItems as item}
-          <button
-            class="join-item {item.iconClasses} block btn btn-sm w-8 h-8 p-0"
-          ></button>
-        {/each}
-      </div>
+      {#each section.navItems as item}
+        <NavItemCollapsedView {ctx} {item} />
+      {/each}
     {/each}
   </div>
 {:else}
