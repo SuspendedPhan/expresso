@@ -27,6 +27,7 @@ import type {
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
+import { LibraryProject } from "src/library/LibraryProject";
 
 export default class ExObjectFactory {
   private currentOrdinal = 0;
@@ -38,7 +39,7 @@ export default class ExObjectFactory {
     });
   }
 
-  public createProject(id: string, rootComponents: readonly Component[]): Project {
+  public createProject(libraryProject: LibraryProject, rootComponents: readonly Component[]): Project {
     const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>(
       rootComponents
     );
@@ -46,7 +47,7 @@ export default class ExObjectFactory {
     const currentOrdinalSub$ = new BehaviorSubject<number>(0);
 
     const project: ProjectMut = {
-      id,
+      libraryProject,
       rootComponents$: rootComponentsSub$,
       rootComponentsSub$,
       currentOrdinal$: currentOrdinalSub$,
@@ -55,11 +56,6 @@ export default class ExObjectFactory {
 
     (this.ctx.eventBus.currentProject$ as Subject<Project>).next(project);
     return project;
-  }
-
-  public createProjectNew(): Project {
-    const id = `project-${crypto.randomUUID()}`;
-    return this.createProject(id, []);
   }
 
   public createComponent(id: string, sceneAttributes: readonly SceneAttribute[], children: readonly Component[], proto: ProtoComponent): Component {

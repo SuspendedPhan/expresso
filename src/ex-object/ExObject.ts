@@ -2,6 +2,7 @@ import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
 import { OBS } from "src/utils/utils/Utils";
+import { LibraryProject } from "src/library/LibraryProject";
 
 export type ExObject = Component | Attribute | Expr;
 export type Parent = Component | Attribute | CallExpr | null;
@@ -30,7 +31,7 @@ export interface ExObjectBase {
 }
 
 export interface Project {
-  readonly id: string;
+  readonly libraryProject: LibraryProject;
   readonly rootComponents$: Observable<readonly Component[]>;
   readonly currentOrdinal$: OBS<number>;
 }

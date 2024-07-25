@@ -12,6 +12,7 @@ import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import MainViewContext from "./MainViewContext";
+import { LibraryProjectManager } from "src/library/LibraryProject";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -27,6 +28,7 @@ export default class MainContext {
   public readonly focusManager = new FocusManager();
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
+  public readonly libraryProjectManager = new LibraryProjectManager();
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
@@ -50,7 +52,7 @@ export default class MainContext {
 
     Persistence.readProject$.subscribe((deProject) => {
       if (deProject === null) {
-        this.objectFactory.createProjectNew();
+        this.libraryProjectManager.addProjectNew();
       } else {
         const project = new Rehydrator(this).rehydrateProject(deProject);
         (this.eventBus.currentProject$ as Subject<Project>).next(project);
