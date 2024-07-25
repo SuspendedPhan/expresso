@@ -9,8 +9,14 @@
 </script>
 
 <div class={Constants.WindowPaddingClass}>
-  {#each $projects$ as project}
-    <div>{project.id}</div>
-    <div>{project.name}</div>
-  {/each}
+  <table class="table">
+    <tbody
+      >{#each $projects$ as project}
+        <tr>
+          <td>{project.id}</td>
+          <td>{project.name}</td>
+        </tr>
+      {/each}</tbody
+    >
+  </table>
 </div>
