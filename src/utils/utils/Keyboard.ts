@@ -40,15 +40,16 @@ export default class Keyboard {
       focusManager.focus({ type: "ProjectNav" });
     });
 
-    hotkeys("g+e", function (_event, _handler) {
-      ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
-    });
+    // hotkeys("g+e", function (_event, _handler) {
+    //   ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
+    // });
 
-    hotkeys("g+c", function (_event, _handler) {
-      ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
-    });
+    // hotkeys("g+c", function (_event, _handler) {
+    //   ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
+    // });
 
     const projectNavScope = new KeyboardScope(focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav")));
+    projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
       ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
       ctx.focusManager.focus({ type: "None" });

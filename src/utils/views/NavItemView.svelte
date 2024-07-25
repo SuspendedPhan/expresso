@@ -6,9 +6,11 @@
   export let window: Window;
   export let label: string;
   export let sectionFocused: boolean;
+  export let underlineCharIndex: number = 0; // The index of the character that will be underlined when the section is focused
 
-  const firstChar = label[0];
-  const restChars = label.slice(1);
+  const firstChars = label.slice(0, underlineCharIndex);
+  const underlinedChar = label[underlineCharIndex];
+  const restChars = label.slice(underlineCharIndex + 1);
 
   const activeWindow$ = ctx.viewCtx.activeWindow$;
   const isActive$ = activeWindow$.pipe(map((w) => w === window));
@@ -18,7 +20,7 @@
   }
 </script>
 
-<button class:active={$isActive$} class="gap-0" on:click={handleClick}>
-  <span class:underline={sectionFocused} class="m-0">{firstChar}</span
+<button class:active={$isActive$} class="block" on:click={handleClick}>
+  {firstChars}<span class:underline={sectionFocused}>{underlinedChar}</span
   >{restChars}
 </button>

@@ -7,10 +7,6 @@
   let clazz: string = "";
   export { clazz as class };
 
-  const focused$ = ctx.focusManager
-    .getFocus$()
-    .pipe(map((focus) => focus.type === "ProjectNav"));
-
   const projectNavFocused$ = ctx.focusManager
     .getFocus$()
     .pipe(map((focus) => focus.type === "ProjectNav"));
@@ -21,7 +17,7 @@
 </script>
 
 <ul class="menu bg-base-200 h-full {clazz}">
-  <div class="p-2" class:ring={$focused$}>
+  <div class="p-2" class:ring={$projectNavFocused$}>
     <div class="menu-title">
       <span>Hello World</span>
     </div>
@@ -52,8 +48,10 @@
   </div>
 
   <div class="divider my-0"></div>
-  <div class="p-2">
-    <div class="menu-title">Library</div>
+  <div class="p-2" class:ring={$libraryNavFocused$}>
+    <div class="menu-title">
+      <span class:underline={$projectNavFocused$}>L</span>ibrary
+    </div>
     <li>
       <NavItemView
         {ctx}
