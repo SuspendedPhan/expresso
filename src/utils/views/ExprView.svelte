@@ -44,7 +44,7 @@
   let exprCommand: ExprCommand;
 
   onMount(() => {
-    const isSelected$ = ctx.selection.isSelected$(expr);
+    const isSelected$ = ctx.focusManager.isSelected$(expr);
     const sub = fromEvent(document, "keydown")
       .pipe(combineLatestWith(isSelected$))
       .subscribe(([event, selected]) => {

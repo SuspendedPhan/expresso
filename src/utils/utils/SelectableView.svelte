@@ -1,17 +1,17 @@
 <script lang="ts">
+  import { type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
-  import type { Selectable } from "src/utils/utils/Selection";
 
-  export let object: Selectable;
+  export let object: ExObject;
   export let ctx: MainContext;
   let clazz: string = "";
   export { clazz as class };
 
-  const selected$ = ctx.selection.isSelected$(object);
+  const selected$ = ctx.focusManager.isSelected$(object);
 
   function handleClick(event: MouseEvent) {
     event.stopPropagation();
-    ctx.selection.select(object);
+    ctx.focusManager.focus({ type: "ExObject", exObject: object });
   }
 </script>
 

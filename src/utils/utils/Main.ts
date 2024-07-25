@@ -19,10 +19,10 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    Keyboard.register(ctx.selection);
+    Keyboard.register(ctx.focusManager);
 
     document.addEventListener("mousedown", () => {
-      ctx?.selection.select(null);
+      ctx?.focusManager.focus({ type: "None" });
     });
   }
 }

@@ -3,10 +3,7 @@ import {
   first,
   map,
   type Observable,
-  of,
-  ReplaySubject,
-  Subject,
-  switchMap,
+  Subject
 } from "rxjs";
 import {
   Component,
@@ -15,34 +12,36 @@ import {
   type Expr,
   ExprType,
 } from "src/ex-object/ExObject";
-import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
-enum SelectedObjectType {
-  Root,
+type Focus = NoneFocus | ExObjectFocus;
+
+interface NoneFocus {
+  type: "None";
 }
 
-export type Selectable = ExObject | null;
-type SelectedObject = Selectable | SelectedObjectType;
+interface ExObjectFocus {
+  type: "ExObject";
+  exObject: ExObject;
+}
 
 export default class Selection {
-  private readonly selectedObject$ = new BehaviorSubject<SelectedObject>(null);
-  public readonly root$ = new ReplaySubject<Selectable>(1);
+  private readonly focus$ = new BehaviorSubject<Focus>({type: "None"});
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
 
   public constructor() {
     this.down$.subscribe(() => {
-      this.getSelectedObject$()
+      this.getFocus$()
         .pipe(first())
         .subscribe((selectedObject) => {
           this.down(selectedObject);
         });
     });
     this.up$.subscribe(() => {
-      this.getSelectedObject$()
+      this.getFocus$()
         .pipe(first())
         .subscribe((selectedObject) => {
           this.up(selectedObject);
@@ -52,60 +51,64 @@ export default class Selection {
 
   @loggedMethod
   public debug() {
-    const logger = Logger.logger();
-    this.getSelectedObject$().subscribe((selectedObject) => {
-      logger.log("selectedObject", selectedObject?.id ?? "null");
-    });
+    // const logger = Logger.logger();
+    // this.getFocus$().subscribe((selectedObject) => {
+    //   logger.log("selectedObject", (selectedObject as any).id ?? "null");
+    // });
   }
 
-  public getSelectedObject$(): Observable<Selectable> {
-    return this.selectedObject$.pipe(
-      switchMap((selectedObject) => {
-        if (selectedObject === SelectedObjectType.Root) {
-          return this.root$;
+  public getFocus$(): Observable<Focus> {
+    return this.focus$;
+  }
+
+  public isSelected$(object: ExObject): Observable<boolean> {
+    return this.focus$.pipe(
+      map(focus => {
+        if (focus.type !== "ExObject") {
+          return false;
         }
-        return of(selectedObject);
+        return focus.exObject === object;
       })
     );
   }
 
-  public isSelected$(object: Selectable): Observable<boolean> {
-    return this.getSelectedObject$().pipe(
-      map((selectedObject) => selectedObject === object)
-    );
-  }
-
-  public select(object: Selectable) {
-    this.selectedObject$.next(object);
+  public focus(object: Focus) {
+    this.focus$.next(object);
   }
 
   @loggedMethod
-  private down(selectedObject: Selectable) {
-    const logger = Logger.logger();
-    if (selectedObject === null) {
-      logger.log("", "selectedObject is null");
-      this.selectedObject$.next(SelectedObjectType.Root);
-      return;
+  private down(focus: Focus) {
+    // const logger = Logger.logger();
+
+    switch (focus.type) {
+      case "None":
+        return;
+      case "ExObject":
+        this.downExObject(focus.exObject);
+        return;
+      default:
+        assertUnreachable(focus);
     }
+  }
 
-    logger.log("selectedObject", selectedObject.id);
-
-    switch (selectedObject.objectType) {
+  private downExObject(focus: ExObject) {
+    switch (focus.objectType) {
       case ExObjectType.Attribute:
-        selectedObject.expr$.pipe(first()).subscribe((expr) => {
-          this.selectedObject$.next(expr);
+        focus.expr$.pipe(first()).subscribe((expr) => {
+          this.focus$.next({type: "ExObject", exObject: expr});
         });
         return;
       case ExObjectType.Expr:
-        this.downExpr(selectedObject);
+        this.downExpr(focus);
         return;
       case ExObjectType.Component:
-        this.downComponent(selectedObject);
+        this.downComponent(focus);
         return;
       default:
-        assertUnreachable(selectedObject);
+        assertUnreachable(focus);
     }
   }
+
   downComponent(selectedObject: Component) {
     const sceneAttributes = Array.from(
       selectedObject.sceneAttributeByProto.values()
@@ -115,7 +118,7 @@ export default class Selection {
       throw new Error("Component must have at least 1 attribute");
     }
 
-    this.selectedObject$.next(attr);
+    this.focus$.next({type: "ExObject", exObject: attr});
   }
 
   @loggedMethod
@@ -130,7 +133,7 @@ export default class Selection {
           if (arg === undefined) {
             throw new Error("CallExpr must have at least 1 args");
           }
-          this.selectedObject$.next(arg);
+          this.focus$.next({type: "ExObject", exObject: arg});
         });
         return;
       default:
@@ -139,91 +142,107 @@ export default class Selection {
   }
 
   @loggedMethod
-  private up(selectedObject: Selectable) {
-    if (selectedObject === null) {
-      return;
+  private up(focus: Focus) {
+    switch (focus.type) {
+      case "None":
+        return;
+      case "ExObject":
+        this.upExObject(focus.exObject);
+        return;
+      default:
+        assertUnreachable(focus);
     }
+  }
 
-    const parent$ = selectedObject.parent$;
+  private upExObject(focus: ExObject) {
+    const parent$ = focus.parent$;
     parent$.pipe(first()).subscribe((parent) => {
       if (parent !== null) {
-        this.selectedObject$.next(parent);
+        this.focus$.next({type: "ExObject", exObject: parent});
       }
     });
   }
 
   public left() {
-    this.navHorizontal((selectedObject: SelectedObject, args: readonly Expr[]) => {
-      const index = args.indexOf(selectedObject as Expr);
+    this.navHorizontal((exObject: ExObject, args: readonly Expr[]) => {
+      const index = args.indexOf(exObject as Expr);
       if (index === -1) {
         throw new Error("selectedObject is not in args");
       }
 
       if (index === args.length - 1) {
-        const selectedObject = args[0];
-        if (selectedObject === undefined) {
+        const arg = args[0];
+        if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.selectedObject$.next(selectedObject);
+        this.focus$.next({type: "ExObject", exObject: arg});
       } else {
-        const selectedObject = args[index + 1];
-        if (selectedObject === undefined) {
+        const arg = args[index + 1];
+        if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.selectedObject$.next(selectedObject);
+        this.focus$.next({type: "ExObject", exObject: arg});
       }
     });
   }
 
   public right() {
-    this.navHorizontal((selectedObject: SelectedObject, args: readonly Expr[]) => {
-      const index = args.indexOf(selectedObject as Expr);
+    this.navHorizontal((focus: ExObject, args: readonly Expr[]) => {
+      const index = args.indexOf(focus as Expr);
       if (index === -1) {
         throw new Error("selectedObject is not in args");
       }
 
       if (index === args.length - 1) {
-        const selectedObject = args[0];
-        if (selectedObject === undefined) {
+        const arg = args[0];
+        if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.selectedObject$.next(selectedObject);
+        this.focus$.next({type: "ExObject", exObject: arg});
       } else {
-        const selectedObject = args[index + 1];
-        if (selectedObject === undefined) {
+        const arg = args[index + 1];
+        if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.selectedObject$.next(selectedObject);
+        this.focus$.next({type: "ExObject", exObject: arg});
       }
     });
   }
 
-  private navHorizontal(navHorizontal1: (selectedObject: SelectedObject, args: readonly Expr[]) => void) {
-    this.getSelectedObject$()
+  private navHorizontal(navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void) {
+    this.focus$
       .pipe(first())
-      .subscribe((selectedObject) => {
-        if (selectedObject === null) {
-          return;
+      .subscribe((focus) => {
+        switch (focus.type) {
+          case "None":
+            return;
+          case "ExObject":
+            this.navHorizontalExObject(focus, navHorizontal1);
+            return;
+          default:
+            assertUnreachable(focus);
         }
-
-        selectedObject.parent$.pipe(first()).subscribe((parent) => {
-          if (parent === null) {
-            return;
-          }
-
-          if (parent.objectType !== ExObjectType.Expr) {
-            return;
-          }
-
-          if (parent.exprType !== ExprType.CallExpr) {
-            return;
-          }
-
-          const args$ = parent.args$;
-          args$.pipe(first()).subscribe((args) => {
-            navHorizontal1(selectedObject, args);
-          });
-        });
       });
+  }
+  navHorizontalExObject(focus: ExObjectFocus, navHorizontal1: (focus: ExObject, args: readonly Expr[]) => void) {
+    const exObject = focus.exObject;
+    exObject.parent$.pipe(first()).subscribe((parent) => {
+      if (parent === null) {
+        return;
+      }
+
+      if (parent.objectType !== ExObjectType.Expr) {
+        return;
+      }
+
+      if (parent.exprType !== ExprType.CallExpr) {
+        return;
+      }
+
+      const args$ = parent.args$;
+      args$.pipe(first()).subscribe((args) => {
+        navHorizontal1(exObject, args);
+      });
+    });
   }
 }

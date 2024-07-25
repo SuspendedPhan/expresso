@@ -25,7 +25,7 @@ export default class MainContext {
   public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
-  public readonly selection = new Selection();
+  public readonly focusManager = new Selection();
   public readonly goBridge: GoBridge;
 
   public constructor(public readonly goModule: GoModule) {
@@ -35,21 +35,18 @@ export default class MainContext {
     this.eventBus.onExprReplaced$.subscribe((replacement) => {
       const oldExpr = replacement.oldExpr;
       const newExpr = replacement.newExpr;
-      this.selection
-        .getSelectedObject$()
+      this.focusManager
+        .getFocus$()
         .pipe(first())
-        .subscribe((selectedObject) => {
-          if (selectedObject === oldExpr) {
-            this.selection.select(newExpr);
+        .subscribe((focus) => {
+          if (focus.type !== "ExObject") {
+            return;
+          }
+          if (focus.exObject === oldExpr) {
+            this.focusManager.focus({ type: "ExObject", exObject: newExpr });
           }
         });
     });
-
-    this.eventBus.currentProject$
-      .pipe(switchMap((project) => project.rootComponents$))
-      .subscribe((rootComponents) => {
-        this.selection.root$.next(rootComponents[0] ?? null);
-      });
 
     Persistence.readProject$.subscribe((deProject) => {
       if (deProject === null) {
