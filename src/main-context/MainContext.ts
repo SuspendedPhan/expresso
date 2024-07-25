@@ -19,13 +19,13 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
-  public readonly viewCtx = new MainViewContext();
   public readonly eventBus = new MainEventBus();
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
   public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly focusManager = new FocusManager();
+  public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
 
   public constructor(public readonly goModule: GoModule) {

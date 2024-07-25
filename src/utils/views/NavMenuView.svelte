@@ -7,8 +7,9 @@
 
 <ul class:menu={true} class="bg-base-200 h-full">
   {#each ctx.viewCtx.navSections as section}
-    <div class="menu-title text-base-content font-normal">{section.title}</div>
     <div class="divider m-0"></div>
+    <div class="menu-title">{section.title}</div>
+
     {#each section.navItems as item}
       <li>
         <NavItemView {ctx} {item}></NavItemView>
