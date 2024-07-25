@@ -18,9 +18,17 @@
 
 <ul class="menu bg-base-200 h-full {clazz}">
   <div class="p-2" class:ring={$projectNavFocused$}>
-    <div class="menu-title">
-      <span>Hello World</span>
+    <div class=" w-full flex justify-between pr-0 items-center gap-2">
+      <span class="menu-title text-base-content font-normal">Hello World</span>
+
+      {#if $projectNavFocused$}
+        <button class="kdb bg-base-300 w-6 h-6 underline">X</button>
+      {:else}
+        <button class="fa-solid fa-bars w-6 h-6"></button>
+      {/if}
     </div>
+    <div class="divider m-0"></div>
+    <div class="menu-title">Project</div>
     <li>
       <NavItemView
         {ctx}
