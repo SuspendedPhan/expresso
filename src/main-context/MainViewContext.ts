@@ -28,6 +28,7 @@ export default class MainViewContext {
     };
     
     const navItems0: NavItem[] = [
+      { label: "Editor", window: Window.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
       { label: "Components", window: Window.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
       { label: "Functions", window: Window.ProjectFunctionList, iconClasses: "fa-solid fa-cogs", section: section0 },
     ];
