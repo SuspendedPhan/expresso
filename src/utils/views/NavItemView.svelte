@@ -12,7 +12,6 @@
 
   const activeWindow$ = ctx.viewCtx.activeWindow$;
   const isActive$ = activeWindow$.pipe(map((w) => w === item.window));
-  const navCollapsed$ = ctx.viewCtx.navCollapsed$;
 
   const sectionFocused$ = item.section.focused$;
 
@@ -21,11 +20,11 @@
   }
 </script>
 
-{#if $navCollapsed$}
-  <button class="{item.iconClasses} block p-2" on:click={handleClick}> </button>
-{:else}
-  <button class:active={$isActive$} class="block" on:click={handleClick}>
-    {firstChars}<span class:underline={$sectionFocused$}>{underlinedChar}</span
-    >{restChars}
-  </button>
-{/if}
+<button
+  class:active={$isActive$}
+  class="block focus:bg-transparent"
+  on:click={handleClick}
+>
+  {firstChars}<span class:underline={$sectionFocused$}>{underlinedChar}</span
+  >{restChars}
+</button>

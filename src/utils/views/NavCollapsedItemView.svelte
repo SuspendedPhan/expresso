@@ -10,7 +10,7 @@
 </script>
 
 <button
-  class="{item.iconClasses} block btn btn-sm w-8 h-8 p-0 shadow-none"
+  class="{item.iconClasses} block btn btn-sm w-8 h-8 p-0 shadow-none focus:outline-none"
   class:bg-neutral={$active$}
   class:text-neutral-content={$active$}
   class:hover:bg-neutral={$active$}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
+  import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
-  import NavItemCollapsedView from "./NavItemCollapsedView.svelte";
 
   export let ctx: MainContext;
 
@@ -21,9 +21,7 @@
 
     {#each ctx.viewCtx.navSections as section}
       <div class="divider m-0"></div>
-      {#each section.navItems as item}
-        <NavItemCollapsedView {ctx} {item} />
-      {/each}
+      <NavCollapsedSectionView {ctx} {section}></NavCollapsedSectionView>
     {/each}
   </div>
 {:else}
