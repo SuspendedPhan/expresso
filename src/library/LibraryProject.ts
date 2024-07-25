@@ -1,4 +1,4 @@
-import { BehaviorSubject, ReplaySubject, switchMap } from "rxjs";
+import { BehaviorSubject, first, map, Observable, ReplaySubject, switchMap } from "rxjs";
 import { Component, Project } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 
@@ -9,6 +9,20 @@ export interface LibraryProject {
 }
 
 export class ProjectManager {
+  getNextProject$(project: LibraryProject) : Observable<LibraryProject> {
+    return this.libraryProjects$.pipe(first(), map((projects) => {
+      const index = projects.indexOf(project);
+      if (index === -1) {
+        throw new Error("Project not found");
+      }
+      const nextIndex = (index + 1) % projects.length;
+      const nextProject = projects[nextIndex];
+      if (nextProject === undefined) {
+        throw new Error("No next project");
+      }
+      return nextProject;
+    }));
+  }
   public readonly libraryProjectsSub$ = new BehaviorSubject<
     readonly LibraryProject[]
   >([]);

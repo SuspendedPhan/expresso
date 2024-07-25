@@ -11,7 +11,7 @@ import MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
-type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus | LibraryNavFocus;
+type Focus = NoneFocus | ExObjectFocus | ProjectNavFocus | LibraryNavFocus | LibraryProjectFocus;
 
 interface NoneFocus {
   type: "None";
@@ -100,7 +100,7 @@ export default class FocusManager {
         return;
       case "LibraryProject":
         const project = this.ctx.projectManager.getNextProject(focus.project);
-        this.focus$.next({ type: "LibraryProject",  });
+        this.focus$.next({ type: "LibraryProject",  project});
         return;
       default:
         assertUnreachable(focus);
