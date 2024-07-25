@@ -1,7 +1,7 @@
 import { BehaviorSubject, map } from "rxjs";
 import { ElementLayout } from "src/utils/layout/ElementLayout";
 import MainContext from "./MainContext";
-import { NavItem, Section } from "src/utils/utils/NavUtils";
+import { NavItem, NavSection } from "src/utils/utils/NavUtils";
 
 export enum Window {
   ProjectEditor,
@@ -18,10 +18,10 @@ export default class MainViewContext {
 
   public readonly activeWindow$ = new BehaviorSubject<Window>(Window.ProjectEditor);
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
-  public readonly navSections: readonly Section[];
+  public readonly navSections: readonly NavSection[];
 
   public constructor(ctx: MainContext) {
-    const section0: Section = {
+    const section0: NavSection = {
       title: "Projects",
       navItems: [],
       focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "ProjectNav")),
@@ -35,7 +35,7 @@ export default class MainViewContext {
 
     (section0 as any).navItems = navItems0;
 
-    const section1: Section = {
+    const section1: NavSection = {
       title: "Libraries",
       navItems: [],
       focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "LibraryNav")),
