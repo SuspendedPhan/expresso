@@ -1,33 +1,27 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
 import {
-  type Attribute,
   type CallExpr,
   type Component,
-  type ExObjectBase,
+  type ExItemBase,
   ExItemType,
   type Expr,
   ExprType,
   type NumberExpr,
   type Parent,
-  type Project,
-} from "src/ex-object/ExObject";
-import type { ProtoComponent } from "src/ex-object/ProtoComponent";
+  type Project
+} from "src/ex-object/ExItem";
+import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
+import type { ProjectMut } from "src/mutator/ProjectMutator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import {
-  createBehaviorSubjectWithLifetime,
-  createSubjectWithLifetime,
+  createBehaviorSubjectWithLifetime
 } from "src/utils/utils/Utils";
 import type {
-  AttributeMut,
   CallExprMut,
   ExItemMut,
-  ExItemMutBase,
+  ExItemMutBase
 } from "../main-context/MainMutator";
-import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
-import type { ComponentMut } from "src/mutator/ComponentMutator";
-import type { ProjectMut } from "src/mutator/ProjectMutator";
-import type { LibraryProject } from "src/library/LibraryProject";
 
 export default class ExObjectFactory {
   private currentOrdinal = 0;
@@ -55,73 +49,6 @@ export default class ExObjectFactory {
     };
 
     return project;
-  }
-
-  public createComponent(id: string, sceneAttributes: readonly SceneProperty[], children: readonly Component[], proto: ProtoComponent): Component {
-    const mutBase = this.createExObjectBaseMut();
-    const base = this.createExObjectBase(mutBase, id);
-    const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
-    const childrenSub$ = createBehaviorSubjectWithLifetime<readonly Component[]>(base.destroy$, []);
-    const sceneAttributeAdded$ = createSubjectWithLifetime<SceneProperty>(
-      base.destroy$
-    );
-
-    const sceneAttributeByProto = new Map<
-      ProtoSceneProperty,
-      SceneProperty
-    >();
-
-    if (proto.protoAttributes.length !== sceneAttributes.length) {
-      throw new Error("Scene attributes length does not match component proto");
-    }
-
-    for (const sceneAttribute of sceneAttributes) {
-      sceneAttributeByProto.set(sceneAttribute.proto, sceneAttribute);
-      if (!proto.protoAttributes.includes(sceneAttribute.proto)) {
-        console.log(proto.protoAttributes);
-        console.log(sceneAttribute.proto);
-        throw new Error("Scene attribute proto not in component proto");
-      }
-    }
-
-    const component: ComponentMut = {
-      objectType: ExItemType.Component,
-      proto,
-      sceneAttributeByProto,
-      cloneCount$: cloneCountSub$,
-      children$: childrenSub$,
-      childrenSub$,
-      sceneAttributeAdded$,
-      ...base,
-      ...mutBase,
-    };
-
-    for (const sceneAttribute of sceneAttributeByProto.values()) {
-      const sceneAttributeMut = sceneAttribute as unknown as AttributeMut;
-      sceneAttributeMut.parentSub$.next(component);
-    }
-
-    childrenSub$.next(children);
-    for (const child of children) {
-      const childMut = child as unknown as ComponentMut;
-      childMut.parentSub$.next(component);
-    }
-
-    (this.ctx.eventBus.componentAdded$ as Subject<Component>).next(component);
-    return component;
-  }
-
-  public createComponentNew(proto: ProtoComponent): Component {
-    const id = `component-${crypto.randomUUID()}`;
-
-    const sceneAttributes: SceneProperty[] = [];
-    for (const protoAttribute of proto.protoAttributes) {
-      const sceneAttribute = this.createSceneAttributeNew(protoAttribute);
-      sceneAttributes.push(sceneAttribute);
-    }
-
-    const component = this.createComponent(id, sceneAttributes, [], proto);
-    return component;
   }
 
 
@@ -200,7 +127,7 @@ export default class ExObjectFactory {
   public createExObjectBase(
     mutBase: ExItemMutBase,
     id: string
-  ): ExObjectBase {
+  ): ExItemBase {
     const exObjectBase = {
       id,
       ordinal: this.currentOrdinal,

@@ -22,7 +22,6 @@ export enum ExprType {
 }
 
 export interface ExItemBase {
-  readonly objectType: ExItemType;
   readonly id: string;
   readonly ordinal: number;
   readonly parent$: Observable<Parent>;
