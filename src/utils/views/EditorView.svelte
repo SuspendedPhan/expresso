@@ -59,7 +59,7 @@
   >
     <div class="flex gap-4">
       <button
-        on:click={() => ctx.projectMutator.addRootComponent()}
+        on:click={() => ctx.projectMutator.addRootObject()}
         class="btn block"
         ><KbdShortcutSpan
           label="Add Component"

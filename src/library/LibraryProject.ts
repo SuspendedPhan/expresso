@@ -6,7 +6,8 @@ import {
   ReplaySubject,
   switchMap,
 } from "rxjs";
-import type { Component, Project } from "src/ex-object/ExObject";
+import type { Project } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import type {
   Focus
@@ -43,7 +44,7 @@ export class ProjectManager {
   public addProject(
     id: string,
     name: string,
-    rootComponents: Component[]
+    rootObjects: ExObject[]
   ): LibraryProject {
     const libraryProject: LibraryProject = {
       id,
@@ -53,7 +54,7 @@ export class ProjectManager {
 
     const project = this.ctx.objectFactory.createProject(
       libraryProject,
-      rootComponents
+      rootObjects
     );
     libraryProject.project$.next(project);
     this.libraryProjectsSub$.next([

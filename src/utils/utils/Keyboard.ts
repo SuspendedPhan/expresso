@@ -116,7 +116,7 @@ export default class Keyboard {
     });
 
     newActionsScope.hotkeys("c", () => {
-      ctx.projectMutator.addRootComponent();
+      ctx.projectMutator.addRootObject();
       ctx.focusManager.focusNone();
     });
 
@@ -128,11 +128,11 @@ export default class Keyboard {
       map((focus) => {
         if (
           focus.type !== "ExObject" ||
-          focus.exObject.objectType !== ExItemType.Expr
+          focus.exItem.objectType !== ExItemType.Expr
         ) {
           return KeyboardScopeResult.OutOfScope;
         }
-        return focus.exObject;
+        return focus.exItem;
       })
     );
 

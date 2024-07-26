@@ -42,7 +42,7 @@ export const SceneComponentStore = {
         sceneSetter: (pixiObject, value) => {
           pixiObject.x = value;
         },
-      } as SceneComponentInput,
+      },
     ],
   },
-} as Record<string, SceneComponent>;
+} satisfies Record<string, SceneComponent>;

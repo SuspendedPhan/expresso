@@ -1,5 +1,4 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
-import type { Component } from "src/ex-object/Component";
 import {
   type CallExpr,
   type ExItemBase,
@@ -10,6 +9,7 @@ import {
   type Parent,
   type Project
 } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import type { ProjectMut } from "src/mutator/ProjectMutator";
@@ -29,19 +29,14 @@ export default class ExObjectFactory {
     });
   }
 
-  public createProject(libraryProject: LibraryProject, rootComponents: readonly Component[]): Project {
-    const rootComponentsSub$ = new BehaviorSubject<readonly Component[]>(
-      rootComponents
-    );
+  public createProject(libraryProject: LibraryProject, rootObjects: readonly ExObject[]): Project {
+    const destroy$ = new Subject<void>();
 
-    const currentOrdinalSub$ = new BehaviorSubject<number>(0);
-
-    const project: ProjectMut = {
+    const project: Project = {
+      destroy$,
       libraryProject,
-      rootComponents$: rootComponentsSub$,
-      rootComponentsSub$,
-      currentOrdinal$: currentOrdinalSub$,
-      currentOrdinalSub$,
+      rootObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
+      currentOrdinal$: new BehaviorSubject<number>(0),
     };
 
     return project;

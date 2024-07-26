@@ -28,3 +28,7 @@ export function createBehaviorSubjectWithLifetime<T>(complete$: Observable<void>
   });
   return subject;
 }
+
+export interface Destroyable {
+  destroy$: SUB<void>;
+}
