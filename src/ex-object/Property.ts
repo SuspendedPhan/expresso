@@ -7,33 +7,37 @@ import {
 } from "src/utils/utils/Utils";
 import { ExItemType, type ExObjectBase, type Expr } from "./ExObject";
 import type { ProtoSceneProperty } from "./SceneAttribute";
+import type { ComponentInput } from "./Component";
 
 export enum PropertyType {
+  ComponentProperty,
   SceneProperty,
   ObjectProperty,
 }
-
 export interface PropertyBase extends ExObjectBase {
   expr$: OBS<Expr>;
 }
 
-export type PropertyBaseMut = PropertyBase &
-  ExObjectMut & {
-    exprSub$: SUB<Expr>;
-  };
+export interface ComponentProperty extends PropertyBase {
+  objectType: ExItemType.Property;
+  propertyType: PropertyType.ComponentProperty;
+  componentInput: ComponentInput;
+}
 
-export interface SceneProperty extends PropertyBase {
-  objectType: ExItemType.SceneProperty;
-  propertyType: PropertyType.SceneProperty;
+export interface SceneProperty extends ComponentProperty {
   proto: ProtoSceneProperty;
 }
 
-export type ScenePropertyMut = SceneProperty & PropertyBaseMut;
 export interface ObjectProperty extends PropertyBase {
   propertyType: PropertyType.ObjectProperty;
   name$: OBS<string>;
 }
 
+export type PropertyBaseMut = ExObjectMut & {
+  exprSub$: SUB<Expr>;
+};
+export type ComponentPropertyMut = ComponentProperty & PropertyBaseMut;
+export type ScenePropertyMut = SceneProperty & PropertyBaseMut;
 export type ObjectPropertyMut = ObjectProperty &
   PropertyBaseMut & {
     nameSub$: SUB<string>;

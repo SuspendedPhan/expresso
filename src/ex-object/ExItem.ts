@@ -4,8 +4,8 @@ import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type { OBS } from "src/utils/utils/Utils";
 
-export type ExObject = Component | SceneProperty | Attribute | Expr;
-export type Parent = Exclude<ExObject, NumberExpr>;
+export type ExItem = Component | SceneProperty | Attribute | Expr;
+export type Parent = Exclude<ExItem, NumberExpr>;
 export type Expr = NumberExpr | CallExpr;
 
 export enum ExItemType {
