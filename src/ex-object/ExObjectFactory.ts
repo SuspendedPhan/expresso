@@ -1,4 +1,5 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
+import type { Component } from "src/ex-object/Component";
 import {
   type CallExpr,
   type ExItemBase,
@@ -16,11 +17,6 @@ import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import {
   createBehaviorSubjectWithLifetime
 } from "src/utils/utils/Utils";
-import type {
-  CallExprMut,
-  ExItemMut
-} from "../main-context/MainMutator";
-import type { Component } from "src/ex-object/Component";
 
 export default class ExObjectFactory {
   private currentOrdinal = 0;
@@ -64,14 +60,14 @@ export default class ExObjectFactory {
 
     const base = this.createExItemBase(id);
 
-    const expr: NumberExpr & ExItemMut = {
-      objectType: ExItemType.Expr,
+    const expr: NumberExpr = {
+      itemType: ExItemType.Expr,
       exprType: ExprType.NumberExpr,
       value,
       ...base,
     };
 
-    (this.ctx.eventBus.onExprAdded$ as Subject<Expr>).next(expr);
+    (this.ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 
@@ -90,20 +86,18 @@ export default class ExObjectFactory {
     const base = this.createExItemBase(id);
     const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
 
-    const expr: CallExprMut = {
+    const expr: CallExpr = {
       ...base,
-      objectType: ExItemType.Expr,
+      itemType: ExItemType.Expr,
       exprType: ExprType.CallExpr,
       args$: argsSub$,
-      argsSub$,
     };
 
     for (const arg of args) {
-      const argMut = arg as ExItemMut;
-      argMut.parentSub$.next(expr);
+      arg.parent$.next(expr);
     }
 
-    (this.ctx.eventBus.onExprAdded$ as Subject<Expr>).next(expr);
+    (this.ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
     return expr;
   }
 

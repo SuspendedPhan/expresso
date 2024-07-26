@@ -7,10 +7,11 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 
-export type Property = ComponentProperty | ObjectProperty;
+export type Property = ComponentProperty | ObjectProperty | CloneCountProperty;
 export enum PropertyType {
   ComponentProperty,
   ObjectProperty,
+  CloneCountProperty,
 }
 
 export interface PropertyBase extends ExItemBase {
@@ -26,6 +27,10 @@ export interface ComponentProperty extends PropertyBase {
 export interface ObjectProperty extends PropertyBase {
   propertyType: PropertyType.ObjectProperty;
   name$: OBS<string>;
+}
+
+export interface CloneCountProperty extends PropertyBase {
+  propertyType: PropertyType.CloneCountProperty;
 }
 
 export function createComponentPropertyNew(
@@ -80,4 +85,27 @@ export function createObjectProperty(
     propertyType: PropertyType.ObjectProperty,
   };
   return property;
+}
+
+export function createCloneCountPropertyNew(
+  ctx: MainContext
+): CloneCountProperty {
+  const id = `clone-count-property-${crypto.randomUUID()}`;
+  const expr = ctx.objectFactory.createNumberExpr();
+  return createCloneCountProperty(ctx, id, expr);
+}
+
+export function createCloneCountProperty(
+  ctx: MainContext,
+  id: string,
+  expr: Expr
+): CloneCountProperty {
+  const itemBase = ctx.objectFactory.createExItemBase(id);
+  const cloneCountProperty: CloneCountProperty = {
+    ...itemBase,
+    itemType: ExItemType.Property,
+    expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
+    propertyType: PropertyType.CloneCountProperty,
+  };
+  return cloneCountProperty;
 }

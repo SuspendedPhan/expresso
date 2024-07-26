@@ -7,7 +7,7 @@ export default class ComponentLayout {
   public static create(ctx: MainContext, rootExpr: Expr): ElementLayout {
     const childrenByExpr = new Map<Expr, readonly Expr[]>();
 
-    ctx.eventBus.onExprAdded$.subscribe((expr) => {
+    ctx.eventBus.exprAdded$.subscribe((expr) => {
       switch (expr.exprType) {
         case ExprType.NumberExpr:
           break;

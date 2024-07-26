@@ -8,7 +8,7 @@
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
 
   export let ctx: MainContext;
-  const rootComponents$ = ctx.eventBus.rootComponents$;
+  const rootComponents$ = ctx.eventBus.rootObjects$;
 
   let rootElement: HTMLElement;
   const editorViewWidth$ = new ReplaySubject<number>(1);

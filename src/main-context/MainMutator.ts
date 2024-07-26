@@ -1,5 +1,10 @@
 import { type BehaviorSubject, first, type Subject } from "rxjs";
-import { ExItemType, type Expr, ExprType, type Parent } from "src/ex-object/ExItem";
+import {
+  ExItemType,
+  type Expr,
+  ExprType,
+  type Parent,
+} from "src/ex-object/ExItem";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import Logger from "../utils/logger/Logger";
@@ -40,20 +45,21 @@ export default class MainMutator {
       throw new Error("oldExpr.parent$ is null");
     }
 
-    switch (parent) {
+    switch (parent.itemType) {
       case ExItemType.Property: {
-        attrMut.expr$.next(newExpr);
+        parent.expr$.next(newExpr);
         break;
       }
       case ExItemType.Expr: {
         switch (parent.exprType) {
           case ExprType.CallExpr: {
-            const callExprMut = parent as CallExprMut;
-            const args = callExprMut.argsSub$.value;
-            const newArgs = args.map((arg) =>
-              arg === oldExpr ? newExpr : arg
-            );
-            callExprMut.argsSub$.next(newArgs);
+            const expr = parent;
+            expr.args$.pipe(first()).subscribe((args) => {
+              const newArgs = args.map((arg) =>
+                arg === oldExpr ? newExpr : arg
+              );
+              expr.args$.next(newArgs);
+            });
             break;
           }
           default:
@@ -65,10 +71,11 @@ export default class MainMutator {
         assertUnreachable;
     }
 
-    const oldExprMut = oldExpr as ExItemMut;
-    const newExprMut = newExpr as ExItemMut;
-    newExprMut.parentSub$.next(parent);
-    oldExprMut.destroySub$.complete();
-    (this.ctx.eventBus.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
+    newExpr.parent$.next(parent);
+    oldExpr.destroy$.complete();
+    (this.ctx.eventBus.exprReplaced$ as Subject<ExprReplacement>).next({
+      oldExpr,
+      newExpr,
+    });
   }
 }

@@ -14,7 +14,7 @@ export default class GoBridge {
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
-    ctx.eventBus.componentAdded$.subscribe((component) => {
+    ctx.eventBus.objectAdded$.subscribe((component) => {
       goModule.Component.create(component.id);
       component.cloneCount$.subscribe((cloneCount) => {
         goModule.Component.setCloneCount(component.id, cloneCount);
@@ -28,7 +28,7 @@ export default class GoBridge {
       }
     });
 
-    ctx.eventBus.onExprAdded$.subscribe((expr) => {
+    ctx.eventBus.exprAdded$.subscribe((expr) => {
       switch (expr.exprType) {
         case ExprType.NumberExpr:
           goModule.NumberExpr.create(expr.id);

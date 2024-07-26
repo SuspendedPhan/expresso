@@ -34,7 +34,7 @@ export default class MainContext {
     this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
 
-    this.eventBus.onExprReplaced$.subscribe((replacement) => {
+    this.eventBus.exprReplaced$.subscribe((replacement) => {
       const oldExpr = replacement.oldExpr;
       const newExpr = replacement.newExpr;
       this.focusManager

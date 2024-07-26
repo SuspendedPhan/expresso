@@ -9,7 +9,7 @@ export default class ComponentLayout {
   ): ElementLayout {
     const childrenByComponent = new Map<Component, readonly Component[]>();
     
-    ctx.eventBus.componentAdded$.subscribe((component) => {
+    ctx.eventBus.objectAdded$.subscribe((component) => {
       component.children$.subscribe((children) => {
         childrenByComponent.set(component, children);
       });

@@ -9,9 +9,7 @@ export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr = NumberExpr | CallExpr;
 
 export enum ExItemType {
-  SceneProperty,
-
-  Component,
+  ExObject,
   Property,
   Expr,
 }
@@ -37,13 +35,13 @@ export interface Project {
 }
 
 export interface NumberExpr extends ExItemBase {
-  readonly itemType: ExprType;
+  readonly itemType: ExItemType.Expr;
   readonly exprType: ExprType.NumberExpr;
   readonly value: number;
 }
 
 export interface CallExpr extends ExItemBase {
-  readonly itemType: ExprType;
+  readonly itemType: ExItemType.Expr;
   readonly exprType: ExprType.CallExpr;
-  readonly args$: SUB<readonly Expr[]>;
+  readonly args$: SUB<Expr[]>;
 }
