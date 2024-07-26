@@ -1,8 +1,8 @@
 import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
-import { OBS } from "src/utils/utils/Utils";
-import { LibraryProject } from "src/library/LibraryProject";
+import type { LibraryProject } from "src/library/LibraryProject";
+import type { OBS } from "src/utils/utils/Utils";
 
 export type ExObject = Component | Attribute | Expr;
 export type Parent = Component | Attribute | CallExpr | null;
