@@ -1,9 +1,5 @@
-// @ts-nocheck
-
-import * as PIXI from "pixi.js";
-
 import deePool from "deepool";
-import { SceneObject } from "./SceneContext";
+import type { SceneObject } from "./SceneContext";
 
 export default class ScenePool {
   private circlePool;
