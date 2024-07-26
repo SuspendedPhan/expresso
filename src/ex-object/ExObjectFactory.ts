@@ -9,7 +9,7 @@ import {
   ExprType,
   type NumberExpr,
   type Parent,
-  Project,
+  type Project,
 } from "src/ex-object/ExObject";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
 import type MainContext from "src/main-context/MainContext";
@@ -25,9 +25,9 @@ import type {
   ExObjectMutBase,
 } from "../main-context/MainMutator";
 import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
-import { ComponentMut } from "src/mutator/ComponentMutator";
-import { ProjectMut } from "src/mutator/ProjectMutator";
-import { LibraryProject } from "src/library/LibraryProject";
+import type { ComponentMut } from "src/mutator/ComponentMutator";
+import type { ProjectMut } from "src/mutator/ProjectMutator";
+import type { LibraryProject } from "src/library/LibraryProject";
 
 export default class ExObjectFactory {
   private currentOrdinal = 0;
