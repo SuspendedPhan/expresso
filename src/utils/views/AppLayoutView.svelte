@@ -38,9 +38,21 @@
     </div>
   </div>
 {:else if $viewMode$ === ViewMode.MainWindowMaximized}
-  <div>hi</div>
+  <div class="flex h-full">
+    <NavMenuView {ctx} />
+
+    <div class="grow-1 w-full" style="overflow: auto;">
+      <svelte:component this={$activeWindow$} {ctx} />
+    </div>
+  </div>
 {:else if $viewMode$ === ViewMode.SceneWindowMaximized}
-  <div>hi2</div>
+  <div class="flex h-full">
+    <NavMenuView {ctx} />
+
+    <div class="grow-1">
+      <SceneView {ctx} />
+    </div>
+  </div>
 {/if}
 
 <style></style>
