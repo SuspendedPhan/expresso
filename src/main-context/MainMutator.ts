@@ -4,7 +4,7 @@ import {
   type CallExpr,
   type Component,
   type ExObject,
-  ExObjectType,
+  ExItemType,
   type Expr,
   ExprType,
   type Parent,
@@ -68,12 +68,12 @@ export default class MainMutator {
     }
 
     switch (parent.objectType) {
-      case ExObjectType.Attribute: {
+      case ExItemType.Property: {
         const attrMut = parent as AttributeMut;
         attrMut.exprSub$.next(newExpr);
         break;
       }
-      case ExObjectType.Expr: {
+      case ExItemType.Expr: {
         switch (parent.exprType) {
           case ExprType.CallExpr: {
             const callExprMut = parent as CallExprMut;

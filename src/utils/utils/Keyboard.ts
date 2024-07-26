@@ -1,6 +1,6 @@
 import hotkeys from "hotkeys-js";
 import { map } from "rxjs";
-import { ExObjectType } from "src/ex-object/ExObject";
+import { ExItemType } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
@@ -128,7 +128,7 @@ export default class Keyboard {
       map((focus) => {
         if (
           focus.type !== "ExObject" ||
-          focus.exObject.objectType !== ExObjectType.Expr
+          focus.exObject.objectType !== ExItemType.Expr
         ) {
           return KeyboardScopeResult.OutOfScope;
         }

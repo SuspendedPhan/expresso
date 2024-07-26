@@ -1,6 +1,6 @@
 import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
-import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import type { ProtoSceneAttribute, SceneProperty } from "./SceneAttribute";
 import { OBS } from "src/utils/utils/Utils";
 import { LibraryProject } from "src/library/LibraryProject";
 
@@ -8,11 +8,11 @@ export type ExObject = Component | Attribute | Expr;
 export type Parent = Component | Attribute | CallExpr | null;
 export type Expr = NumberExpr | CallExpr;
 
-export enum ExObjectType {
-  SceneAttribute,
+export enum ExItemType {
+  SceneProperty,
 
-  Component,
-  Attribute,
+  ExObject,
+  Property,
   Expr,
 }
 
@@ -37,27 +37,27 @@ export interface Project {
 }
 
 export interface Component extends ExObjectBase {
-  readonly objectType: ExObjectType.Component;
+  readonly objectType: ExItemType.ExObject;
   readonly proto: ProtoComponent;
-  readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneAttribute, SceneAttribute>;
+  readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneAttribute, SceneProperty>;
   readonly cloneCount$: Observable<number>;
   readonly children$: Observable<readonly Component[]>;
-  readonly sceneAttributeAdded$: Observable<SceneAttribute>;
+  readonly sceneAttributeAdded$: Observable<SceneProperty>;
 }
 
 export interface Attribute extends ExObjectBase {
-  readonly objectType: ExObjectType.Attribute;
+  readonly objectType: ExItemType.Property;
   readonly expr$: Observable<Expr>;
 }
 
 export interface NumberExpr extends ExObjectBase {
-  readonly objectType: ExObjectType.Expr;
+  readonly objectType: ExItemType.Expr;
   readonly exprType: ExprType.NumberExpr;
   readonly value: number;
 }
 
 export interface CallExpr extends ExObjectBase {
-  readonly objectType: ExObjectType.Expr;
+  readonly objectType: ExItemType.Expr;
   readonly exprType: ExprType.CallExpr;
   readonly args$: Observable<readonly Expr[]>;
 }

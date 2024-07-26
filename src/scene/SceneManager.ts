@@ -2,7 +2,7 @@ import { withLatestFrom } from "rxjs";
 import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstancePathToString } from "./SceneInstance";
 import type { Component } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import type { SceneAttribute } from "../ex-object/SceneAttribute";
+import type { SceneProperty } from "../ex-object/SceneAttribute";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import type { SceneContext, SceneObject } from "./SceneContext";
 import Logger from "../utils/logger/Logger";
@@ -87,7 +87,7 @@ export class SceneManager {
   @loggedMethod
   private updateAttributeSceneInstance(
     sceneObject: SceneObject,
-    sceneAttr: SceneAttribute,
+    sceneAttr: SceneProperty,
     path: SceneInstancePath,
     evaluation: Evaluation
   ): void {

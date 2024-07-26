@@ -1,14 +1,14 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import type { SceneAttribute } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExprLayout from "../layout/ExprLayout";
   import TreeView from "../layout/TreeView.svelte";
   import ExprView from "./ExprView.svelte";
+  import type { SceneProperty } from "src/ex-object/SceneAttribute";
 
   export let ctx: MainContext;
-  export let attribute: SceneAttribute;
+  export let attribute: SceneProperty;
   let name = attribute.proto.name;
 
   let expr$ = attribute.expr$;

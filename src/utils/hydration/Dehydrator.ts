@@ -9,7 +9,7 @@ import {
 } from "src/ex-object/ExObject";
 import {
   ProtoSceneAttribute,
-  SceneAttribute,
+  SceneProperty,
 } from "src/ex-object/SceneAttribute";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
@@ -134,7 +134,7 @@ export default class Dehydrator {
 
   @loggedMethod
   public dehydrateAttribute$(
-    attribute: SceneAttribute
+    attribute: SceneProperty
   ): Observable<DehydratedSceneAttribute> {
     const logger = Logger.logger();
 

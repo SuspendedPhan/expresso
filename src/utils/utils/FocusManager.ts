@@ -2,7 +2,7 @@ import { BehaviorSubject, first, map, type Observable, Subject } from "rxjs";
 import {
   Component,
   type ExObject,
-  ExObjectType,
+  ExItemType,
   type Expr,
   ExprType,
 } from "src/ex-object/ExObject";
@@ -176,15 +176,15 @@ export default class FocusManager {
 
   private downExObject(focus: ExObject) {
     switch (focus.objectType) {
-      case ExObjectType.Attribute:
+      case ExItemType.Property:
         focus.expr$.pipe(first()).subscribe((expr) => {
           this.focus$.next(FocusManager.createExObjectFocus(expr));
         });
         return;
-      case ExObjectType.Expr:
+      case ExItemType.Expr:
         this.downExpr(focus);
         return;
-      case ExObjectType.Component:
+      case ExItemType.ExObject:
         this.downComponent(focus);
         return;
       default:
@@ -325,7 +325,7 @@ export default class FocusManager {
         return;
       }
 
-      if (parent.objectType !== ExObjectType.Expr) {
+      if (parent.objectType !== ExItemType.Expr) {
         return;
       }
 

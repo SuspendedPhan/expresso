@@ -4,7 +4,7 @@ import {
   type CallExpr,
   type Component,
   type ExObjectBase,
-  ExObjectType,
+  ExItemType,
   type Expr,
   ExprType,
   type NumberExpr,
@@ -24,7 +24,7 @@ import type {
   ExObjectMut,
   ExObjectMutBase,
 } from "../main-context/MainMutator";
-import type { ProtoSceneAttribute, SceneAttribute } from "./SceneAttribute";
+import type { ProtoSceneAttribute, SceneProperty } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
 import { LibraryProject } from "src/library/LibraryProject";
@@ -57,18 +57,18 @@ export default class ExObjectFactory {
     return project;
   }
 
-  public createComponent(id: string, sceneAttributes: readonly SceneAttribute[], children: readonly Component[], proto: ProtoComponent): Component {
+  public createComponent(id: string, sceneAttributes: readonly SceneProperty[], children: readonly Component[], proto: ProtoComponent): Component {
     const mutBase = this.createExObjectMutBase();
     const base = this.createExObjectBase(mutBase, id);
     const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
     const childrenSub$ = createBehaviorSubjectWithLifetime<readonly Component[]>(base.destroy$, []);
-    const sceneAttributeAdded$ = createSubjectWithLifetime<SceneAttribute>(
+    const sceneAttributeAdded$ = createSubjectWithLifetime<SceneProperty>(
       base.destroy$
     );
 
     const sceneAttributeByProto = new Map<
       ProtoSceneAttribute,
-      SceneAttribute
+      SceneProperty
     >();
 
     if (proto.protoAttributes.length !== sceneAttributes.length) {
@@ -85,7 +85,7 @@ export default class ExObjectFactory {
     }
 
     const component: ComponentMut = {
-      objectType: ExObjectType.Component,
+      objectType: ExItemType.ExObject,
       proto,
       sceneAttributeByProto,
       cloneCount$: cloneCountSub$,
@@ -114,7 +114,7 @@ export default class ExObjectFactory {
   public createComponentNew(proto: ProtoComponent): Component {
     const id = `component-${crypto.randomUUID()}`;
 
-    const sceneAttributes: SceneAttribute[] = [];
+    const sceneAttributes: SceneProperty[] = [];
     for (const protoAttribute of proto.protoAttributes) {
       const sceneAttribute = this.createSceneAttributeNew(protoAttribute);
       sceneAttributes.push(sceneAttribute);
@@ -124,9 +124,9 @@ export default class ExObjectFactory {
     return component;
   }
 
-  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneAttribute): SceneAttribute {
+  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneAttribute): SceneProperty {
     const attribute = this.createAttributeBase(id, expr);
-    const sceneAttribute: SceneAttribute = {
+    const sceneAttribute: SceneProperty = {
       proto,
       ...attribute,
     };
@@ -134,14 +134,14 @@ export default class ExObjectFactory {
     const exprMut = expr as unknown as ExObjectMut;
     exprMut.parentSub$.next(sceneAttribute);
 
-    (this.ctx.eventBus.onSceneAttributeAdded$ as Subject<SceneAttribute>).next(
+    (this.ctx.eventBus.onSceneAttributeAdded$ as Subject<SceneProperty>).next(
       sceneAttribute
     );
 
     return sceneAttribute;
   }
 
-  private createSceneAttributeNew(proto: ProtoSceneAttribute): SceneAttribute {
+  private createSceneAttributeNew(proto: ProtoSceneAttribute): SceneProperty {
     const id = `scene-attribute-${crypto.randomUUID()}`;
     const expr = this.createNumberExpr();
     return this.createSceneAttribute(id, expr, proto);
@@ -169,7 +169,7 @@ export default class ExObjectFactory {
     const attribute: AttributeMut = {
       ...base,
       ...mutBase,
-      objectType: ExObjectType.Attribute,
+      objectType: ExItemType.Property,
       expr$: exprSub$,
       exprSub$,
     };
@@ -194,7 +194,7 @@ export default class ExObjectFactory {
     const base = this.createExObjectBase(mutBase, id);
 
     const expr: NumberExpr & ExObjectMut = {
-      objectType: ExObjectType.Expr,
+      objectType: ExItemType.Expr,
       exprType: ExprType.NumberExpr,
       value,
       ...base,
@@ -224,7 +224,7 @@ export default class ExObjectFactory {
     const expr: CallExprMut = {
       ...base,
       ...mutBase,
-      objectType: ExObjectType.Expr,
+      objectType: ExItemType.Expr,
       exprType: ExprType.CallExpr,
       args$: argsSub$,
       argsSub$,

@@ -1,4 +1,4 @@
-import type { SceneAttribute } from "src/ex-object/SceneAttribute";
+import type { SceneProperty } from "src/ex-object/SceneAttribute";
 import type GoModule from "src/utils/utils/GoModule";
 
 export type SceneInstancePath = readonly ComponentSceneInstance[];
@@ -21,7 +21,7 @@ export function sceneInstancePathToString(path: SceneInstancePath): string {
   return sceneInstancePath;
 }
 
-export function attributeSceneInstancePathToString(goModule: GoModule, attr: SceneAttribute, path: SceneInstancePath): string {
+export function attributeSceneInstancePathToString(goModule: GoModule, attr: SceneProperty, path: SceneInstancePath): string {
   const sceneInstancePath = sceneInstancePathToString(path);
   const result = goModule.Evaluator.createAttributeSceneInstancePath(attr.id, sceneInstancePath);
   return result;

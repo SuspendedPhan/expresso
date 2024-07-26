@@ -10,7 +10,7 @@ import {
 } from "src/ex-object/ProtoComponent";
 import {
   getProtoSceneAttributeById,
-  SceneAttribute,
+  SceneProperty,
 } from "src/ex-object/SceneAttribute";
 import { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
@@ -53,7 +53,7 @@ export default class Rehydrator {
   @loggedMethod
   public rehydrateSceneAttribute(
     deAttribute: DehydratedSceneAttribute
-  ): SceneAttribute {
+  ): SceneProperty {
     const expr = this.rehydrateExpr(deAttribute.expr);
     const proto = getProtoSceneAttributeById(deAttribute.protoSceneAttributeId);
     return this.ctx.objectFactory.createSceneAttribute(

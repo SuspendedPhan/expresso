@@ -9,7 +9,7 @@ export interface ProtoSceneAttribute {
   readonly sceneAttributeSetter: SceneAttributeSetter;
 }
 
-export interface SceneAttribute extends Attribute {
+export interface SceneProperty extends Attribute {
   readonly proto: ProtoSceneAttribute;
 }
 
