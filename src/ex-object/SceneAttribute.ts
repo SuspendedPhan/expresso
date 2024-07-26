@@ -13,7 +13,7 @@ export interface SceneProperty extends Attribute {
   readonly proto: ProtoSceneProperty;
 }
 
-export const ProtoSceneComponentInputStore = {
+export const ProtoScenePropertyStore = {
   x: {
     name: "x",
     id: "x",
@@ -24,5 +24,5 @@ export const ProtoSceneComponentInputStore = {
 };
 
 export function getProtoSceneAttributeById(id: string): ProtoSceneProperty {
-  return (ProtoSceneComponentInputStore as any)[id];
+  return (ProtoScenePropertyStore as any)[id];
 }
