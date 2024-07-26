@@ -6,6 +6,7 @@
   import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
   import { activeWindowToSvelteComponent } from "../utils/ViewUtils";
   import NavMenuView from "./NavMenuView.svelte";
+  import { ViewMode } from "src/main-context/MainViewContext";
 
   export let ctx: MainContext;
 
@@ -19,19 +20,27 @@
   onMount(() => {
     FirebaseAuthentication.init();
   });
+
+  const viewMode$ = ctx.viewCtx.viewMode$;
 </script>
 
 <div id="firebaseui-auth-container"></div>
 
-<div class="flex h-full">
-  <NavMenuView {ctx} />
+{#if $viewMode$ === ViewMode.Default}
+  <div class="flex h-full">
+    <NavMenuView {ctx} />
 
-  <div class="shrink-1 basis-1/2" style="overflow: auto;">
-    <svelte:component this={$activeWindow$} {ctx} />
+    <div class="shrink-1 basis-1/2" style="overflow: auto;">
+      <svelte:component this={$activeWindow$} {ctx} />
+    </div>
+    <div class="shrink-1 basis-1/2">
+      <SceneView {ctx} />
+    </div>
   </div>
-  <div class="shrink-1 basis-1/2">
-    <SceneView {ctx} />
-  </div>
-</div>
+{:else if $viewMode$ === ViewMode.MainWindowMaximized}
+  <div>hi</div>
+{:else if $viewMode$ === ViewMode.SceneWindowMaximized}
+  <div>hi2</div>
+{/if}
 
 <style></style>

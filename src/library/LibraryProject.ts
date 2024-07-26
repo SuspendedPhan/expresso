@@ -9,12 +9,8 @@ import {
 import { Component, Project } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import {
-  LibraryNavFocus,
-  LibraryProjectFocus,
-  NoneFocus,
-  ProjectNavFocus
+  Focus
 } from "src/utils/utils/FocusManager";
-import { assertUnreachable } from "src/utils/utils/Utils";
 
 export interface LibraryProject {
   id: string;
@@ -113,9 +109,7 @@ export class ProjectManager {
     );
   }
 
-  public navDown(
-    focus: NoneFocus | LibraryProjectFocus | LibraryNavFocus | ProjectNavFocus
-  ) {
+  public navDown(focus: Focus) {
     switch (focus.type) {
       case "None":
         this.getFirstProject$()
@@ -134,11 +128,8 @@ export class ProjectManager {
             this.ctx.focusManager.focusLibraryProject(project);
           });
         return;
-      case "LibraryNav":
-      case "ProjectNav":
-        return;
       default:
-        assertUnreachable(focus);
+        return;
     }
   }
 }

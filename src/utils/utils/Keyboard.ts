@@ -2,7 +2,7 @@ import hotkeys from "hotkeys-js";
 import { map } from "rxjs";
 import { ExObjectType } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
-import { Window } from "src/main-context/MainViewContext";
+import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 
@@ -37,6 +37,10 @@ export default class Keyboard {
 
     hotkeys("g", function (_event, _handler) {
       focusManager.focusProjectNav();
+    });
+
+    hotkeys("v", function (_event, _handler) {
+      focusManager.focusViewActions();
     });
 
     const projectNavScope = new KeyboardScope(
@@ -152,6 +156,27 @@ export default class Keyboard {
 
     exprReplaceCommandScope.hotkeys("Enter", () => {
       ctx.eventBus.submitExprReplaceCommand$.next();
+    });
+
+    const viewActionsScope = new KeyboardScope(
+      focusManager.getFocus$().pipe(map((focus) => focus.type === "ViewActions"))
+    );
+    viewActionsScope.hotkeys("m", () => {
+      ctx.viewCtx.viewMode$.next(ViewMode.MainWindowMaximized);
+      ctx.focusManager.popFocus();
+      ctx.focusManager.popFocus();
+    });
+
+    viewActionsScope.hotkeys("s", () => {
+      ctx.viewCtx.viewMode$.next(ViewMode.SceneWindowMaximized);
+      ctx.focusManager.popFocus();
+      ctx.focusManager.popFocus();
+    });
+
+    viewActionsScope.hotkeys("r", () => {
+      ctx.viewCtx.viewMode$.next(ViewMode.Default);
+      ctx.focusManager.popFocus();
+      ctx.focusManager.popFocus();
     });
 
     document.addEventListener("keydown", (event) => {

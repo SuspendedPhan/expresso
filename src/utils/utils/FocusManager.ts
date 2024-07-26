@@ -19,6 +19,7 @@ export type Focus =
   | LibraryNavFocus
   | LibraryProjectFocus
   | NewActionsFocus
+  | ViewActionsFocus
   | ExprReplaceCommandFocus;
 
 export interface NoneFocus {
@@ -51,6 +52,11 @@ export interface LibraryProjectFocus {
 export interface NewActionsFocus {
   type: "NewActions";
   window: Window.ProjectEditor;
+}
+
+export interface ViewActionsFocus {
+  type: "ViewActions";
+  window: Window;
 }
 
 export interface ExprReplaceCommandFocus {
@@ -132,6 +138,12 @@ export default class FocusManager {
 
   public focusNewActions() {
     this.focus$.next({ type: "NewActions", window: Window.ProjectEditor });
+  }
+
+  public focusViewActions() {
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
+      this.focus$.next({ type: "ViewActions", window });
+    });
   }
 
   public focusExprReplaceCommand(expr: Expr) {

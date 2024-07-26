@@ -11,6 +11,13 @@ export enum Window {
   LibraryComponentList,
   LibraryFunctionList,
 }
+
+export enum ViewMode {
+  Default,
+  MainWindowMaximized,
+  SceneWindowMaximized,
+}
+
 export default class MainViewContext {
   public readonly componentLayouts$ = new BehaviorSubject<
     readonly ElementLayout[]
@@ -19,6 +26,7 @@ export default class MainViewContext {
   public readonly activeWindow$ = new BehaviorSubject<Window>(Window.ProjectEditor);
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
   public readonly navSections: readonly NavSection[];
+  public readonly viewMode$ = new BehaviorSubject<ViewMode>(ViewMode.Default);
 
   public constructor(ctx: MainContext) {
     const section0: NavSection = {
