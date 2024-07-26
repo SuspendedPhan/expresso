@@ -5,6 +5,7 @@ import type { ProtoSceneProperty } from "./SceneAttribute";
 
 export enum PropertyType {
     SceneProperty,
+    ObjectProperty,
 }
 
 export interface PropertyBase extends ExObjectBase {
@@ -18,4 +19,13 @@ export type PropertyBaseMut = PropertyBase & ExObjectMut & {
 export interface SceneProperty extends PropertyBase {
     propertyType: PropertyType.SceneProperty;
     proto: ProtoSceneProperty;
+}
+
+export interface ObjectProperty extends PropertyBase {
+    propertyType: PropertyType.ObjectProperty;
+    name$: OBS<string>;
+}
+
+export type ObjectPropertyMut = ObjectProperty & ExObjectMut & {
+    nameSub$: SUB<string>;
 }
