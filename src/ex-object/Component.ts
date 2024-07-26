@@ -1,13 +1,37 @@
-import type { CustomComponentInput, SceneComponentInput } from "src/ex-object/ComponentInput";
 import type { SUB } from "src/utils/utils/Utils";
 
 export type Component = SceneComponent | CustomComponent;
+export type ComponentInput = SceneComponentInput | CustomComponentInput;
+export enum ComponentType {
+  SceneComponent,
+  CustomComponent,
+}
 
 export interface SceneComponent {
-  inputs: SceneComponentInput[];
+  componentType: ComponentType.SceneComponent;
+  inputs: ComponentInput[];
 }
 
 export interface CustomComponent {
+  componentType: ComponentType.CustomComponent;
   nameSub$: SUB<string>;
-  inputSub$: SUB<CustomComponentInput[]>;
+  inputSub$: SUB<ComponentInput[]>;
 }
+
+export interface SceneComponentInput {
+  readonly id: string;
+  readonly name: string;
+}
+
+export interface CustomComponentInput {
+  readonly id: string;
+  readonly nameSub$: SUB<string>;
+}
+
+export const SceneComponentStore = {
+  circle: {
+    inputs: [
+      { name: "x", id: "x" },
+    ],
+  },
+};
