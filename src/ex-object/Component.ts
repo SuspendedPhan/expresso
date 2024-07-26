@@ -1,5 +1,8 @@
 import type { ExItemBase } from "src/ex-object/ExItem";
+import type { SceneObject } from "src/scene/SceneContext";
 import type { SUB } from "src/utils/utils/Utils";
+
+type SceneSetter = (sceneObject: SceneObject, value: number) => void;
 
 export type Component = SceneComponent | CustomComponent;
 export type ComponentInput = SceneComponentInput | CustomComponentInput;
@@ -8,16 +11,12 @@ export enum ComponentType {
   CustomComponent,
 }
 
-export interface ComponentBase extends ExItemBase {
-  children$: SUB<Component[]>;
-}
-
-export interface SceneComponent extends ComponentBase {
+export interface SceneComponent {
   componentType: ComponentType.SceneComponent;
   inputs: ComponentInput[];
 }
 
-export interface CustomComponent extends ComponentBase{
+export interface CustomComponent {
   componentType: ComponentType.CustomComponent;
   name$: SUB<string>;
   inputs$: SUB<ComponentInput[]>;
@@ -26,6 +25,7 @@ export interface CustomComponent extends ComponentBase{
 export interface SceneComponentInput {
   readonly id: string;
   readonly name: string;
+  readonly sceneSetter: SceneSetter;
 }
 
 export interface CustomComponentInput {
@@ -35,8 +35,15 @@ export interface CustomComponentInput {
 
 export const SceneComponentStore = {
   circle: {
+    componentType: ComponentType.SceneComponent,
     inputs: [
-      { name: "x", id: "x" },
+      {
+        name: "x",
+        id: "x",
+        sceneSetter: (pixiObject, value) => {
+          pixiObject.x = value;
+        },
+      } as SceneComponentInput,
     ],
   },
-};
+} as Record<string, SceneComponent>;

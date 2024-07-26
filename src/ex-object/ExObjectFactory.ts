@@ -1,7 +1,6 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
 import {
   type CallExpr,
-  type Component,
   type ExItemBase,
   ExItemType,
   type Expr,
@@ -21,11 +20,13 @@ import type {
   CallExprMut,
   ExItemMut
 } from "../main-context/MainMutator";
+import type { Component } from "src/ex-object/Component";
 
 export default class ExObjectFactory {
   private currentOrdinal = 0;
   public constructor(private readonly ctx: MainContext) {
     this.ctx.projectManager.currentProject$.subscribe((project) => {
+      // @ts-ignore
       project.currentOrdinal$.subscribe((ordinal) => {
         this.currentOrdinal = ordinal;
       });

@@ -1,15 +1,5 @@
 import { type BehaviorSubject, first, type Subject } from "rxjs";
-import {
-  type Attribute,
-  type CallExpr,
-  type Component,
-  type ExObject,
-  ExItemType,
-  type Expr,
-  ExprType,
-  type Parent,
-  type ExObjectBase,
-} from "src/ex-object/ExObject";
+import { ExItemType, type Expr, ExprType, type Parent } from "src/ex-object/ExItem";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import Logger from "../utils/logger/Logger";
@@ -20,24 +10,6 @@ export type ExItemMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
   readonly destroySub$: Subject<void>;
 };
-
-export type ExItemMut = ExObjectBase & ExItemMutBase;
-
-export type ComponentMut = Component & ExItemMut & {
-  // cloneCountSub$: BehaviorSubject<number>;
-  // childrenSub$: BehaviorSubject<readonly Component[]>;
-  // sceneAttributeAddedSub$: Subject<SceneAttribute>;
-};
-
-export type AttributeMut = Attribute &
-  ExItemMut & {
-    exprSub$: BehaviorSubject<Expr>;
-  };
-
-export type CallExprMut = CallExpr &
-  ExItemMut & {
-    argsSub$: BehaviorSubject<Expr[]>;
-  };
 
 export default class MainMutator {
   public constructor(private readonly ctx: MainContext) {}
@@ -68,10 +40,9 @@ export default class MainMutator {
       throw new Error("oldExpr.parent$ is null");
     }
 
-    switch (parent.objectType) {
+    switch (parent) {
       case ExItemType.Property: {
-        const attrMut = parent as AttributeMut;
-        attrMut.exprSub$.next(newExpr);
+        attrMut.expr$.next(newExpr);
         break;
       }
       case ExItemType.Expr: {

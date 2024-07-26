@@ -37,13 +37,13 @@ export interface Project {
 }
 
 export interface NumberExpr extends ExItemBase {
-  readonly objectType: ExItemType.Expr;
+  readonly itemType: ExprType;
   readonly exprType: ExprType.NumberExpr;
   readonly value: number;
 }
 
 export interface CallExpr extends ExItemBase {
-  readonly objectType: ExItemType.Expr;
+  readonly itemType: ExprType;
   readonly exprType: ExprType.CallExpr;
   readonly args$: SUB<readonly Expr[]>;
 }

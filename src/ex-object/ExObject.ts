@@ -14,6 +14,7 @@ import type { OBS, SUB } from "src/utils/utils/Utils";
 
 export interface ExObject {
   component: Component;
+  children$: SUB<ExObject[]>;
   componentProperties: Property[];
   customPropertiesSub$: SUB<Property[]>;
 }
