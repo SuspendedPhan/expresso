@@ -8,6 +8,7 @@ import {
   type Expr,
   ExprType,
   type Parent,
+  type ExObjectBase,
 } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -20,7 +21,7 @@ export type ExObjectMutBase = {
   readonly destroySub$: Subject<void>;
 };
 
-export type ExObjectMut = ExObject & ExObjectMutBase;
+export type ExObjectMut = ExObjectBase & ExObjectMutBase;
 
 export type ComponentMut = Component & ExObjectMut & {
   // cloneCountSub$: BehaviorSubject<number>;

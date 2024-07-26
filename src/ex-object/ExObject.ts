@@ -4,14 +4,14 @@ import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type { OBS } from "src/utils/utils/Utils";
 
-export type ExObject = Component | Attribute | Expr;
-export type Parent = Component | Attribute | CallExpr | null;
+export type ExObject = Component | SceneProperty | Attribute | Expr;
+export type Parent = Exclude<ExObject, NumberExpr>;
 export type Expr = NumberExpr | CallExpr;
 
 export enum ExItemType {
   SceneProperty,
 
-  ExObject,
+  Component,
   Property,
   Expr,
 }
@@ -22,6 +22,7 @@ export enum ExprType {
 }
 
 export interface ExObjectBase {
+  readonly objectType: ExItemType;
   readonly id: string;
   readonly ordinal: number;
   readonly parent$: Observable<Parent>;
@@ -37,7 +38,7 @@ export interface Project {
 }
 
 export interface Component extends ExObjectBase {
-  readonly objectType: ExItemType.ExObject;
+  readonly objectType: ExItemType.Component;
   readonly proto: ProtoComponent;
   readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneProperty, SceneProperty>;
   readonly cloneCount$: Observable<number>;

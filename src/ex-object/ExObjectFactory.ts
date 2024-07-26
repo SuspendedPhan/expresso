@@ -58,7 +58,7 @@ export default class ExObjectFactory {
   }
 
   public createComponent(id: string, sceneAttributes: readonly SceneProperty[], children: readonly Component[], proto: ProtoComponent): Component {
-    const mutBase = this.createExObjectMutBase();
+    const mutBase = this.createExObjectBaseMut();
     const base = this.createExObjectBase(mutBase, id);
     const cloneCountSub$ = createBehaviorSubjectWithLifetime(base.destroy$, 10);
     const childrenSub$ = createBehaviorSubjectWithLifetime<readonly Component[]>(base.destroy$, []);
@@ -85,7 +85,7 @@ export default class ExObjectFactory {
     }
 
     const component: ComponentMut = {
-      objectType: ExItemType.ExObject,
+      objectType: ExItemType.Component,
       proto,
       sceneAttributeByProto,
       cloneCount$: cloneCountSub$,
@@ -124,61 +124,6 @@ export default class ExObjectFactory {
     return component;
   }
 
-  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneProperty): SceneProperty {
-    const attribute = this.createAttributeBase(id, expr);
-    const sceneAttribute: SceneProperty = {
-      proto,
-      ...attribute,
-    };
-
-    const exprMut = expr as unknown as ExObjectMut;
-    exprMut.parentSub$.next(sceneAttribute);
-
-    (this.ctx.eventBus.onSceneAttributeAdded$ as Subject<SceneProperty>).next(
-      sceneAttribute
-    );
-
-    return sceneAttribute;
-  }
-
-  private createSceneAttributeNew(proto: ProtoSceneProperty): SceneProperty {
-    const id = `scene-attribute-${crypto.randomUUID()}`;
-    const expr = this.createNumberExpr();
-    return this.createSceneAttribute(id, expr, proto);
-  }
-
-  public createAttribute(): Attribute {
-    const id = `attribute-${crypto.randomUUID()}`;
-    const expr = this.createNumberExpr();
-    return this.createAttribute1(id, expr);
-  }
-
-  private createAttribute1(id: string, expr: Expr): Attribute {
-    const attribute = this.createAttributeBase(id, expr);
-    const exprMut = expr as ExObjectMut;
-    exprMut.parentSub$.next(attribute);
-    return attribute;
-  }
-
-  @loggedMethod
-  private createAttributeBase(id: string, expr: Expr): Attribute {
-    const mutBase = this.createExObjectMutBase();
-    const base = this.createExObjectBase(mutBase, id);
-    const exprSub$ = createBehaviorSubjectWithLifetime(base.destroy$, expr);
-
-    const attribute: AttributeMut = {
-      ...base,
-      ...mutBase,
-      objectType: ExItemType.Property,
-      expr$: exprSub$,
-      exprSub$,
-    };
-
-    (this.ctx.eventBus.onAttributeAdded$ as unknown as Subject<Attribute>).next(
-      attribute
-    );
-    return attribute;
-  }
 
   @loggedMethod
   public createNumberExpr(value?: number, id?: string): NumberExpr {
@@ -190,7 +135,7 @@ export default class ExObjectFactory {
       value = 0;
     }
 
-    const mutBase = this.createExObjectMutBase();
+    const mutBase = this.createExObjectBaseMut();
     const base = this.createExObjectBase(mutBase, id);
 
     const expr: NumberExpr & ExObjectMut = {
@@ -217,7 +162,7 @@ export default class ExObjectFactory {
       args = [arg0, arg1];
     }
 
-    const mutBase = this.createExObjectMutBase();
+    const mutBase = this.createExObjectBaseMut();
     const base = this.createExObjectBase(mutBase, id);
     const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
 
@@ -239,7 +184,7 @@ export default class ExObjectFactory {
     return expr;
   }
 
-  private createExObjectMutBase(): ExObjectMutBase {
+  public createExObjectBaseMut(): ExObjectMutBase {
     const destroySub$ = new Subject<void>();
     const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(
       destroySub$,
@@ -252,7 +197,7 @@ export default class ExObjectFactory {
     };
   }
 
-  private createExObjectBase(
+  public createExObjectBase(
     mutBase: ExObjectMutBase,
     id: string
   ): ExObjectBase {

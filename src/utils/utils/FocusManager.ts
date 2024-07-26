@@ -184,7 +184,7 @@ export default class FocusManager {
       case ExItemType.Expr:
         this.downExpr(focus);
         return;
-      case ExItemType.ExObject:
+      case ExItemType.Component:
         this.downComponent(focus);
         return;
       default:
