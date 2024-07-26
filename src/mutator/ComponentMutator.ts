@@ -1,6 +1,5 @@
 import { first, Subject } from "rxjs";
 import type { Component } from "src/ex-object/ExObject";
-import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
 import MainContext from "src/main-context/MainContext";
 import type { ExItemMut } from "src/main-context/MainMutator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";

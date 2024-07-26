@@ -7,6 +7,10 @@ export enum ComponentType {
   CustomComponent,
 }
 
+export interface ComponentBase {
+  
+}
+
 export interface SceneComponent {
   componentType: ComponentType.SceneComponent;
   inputs: ComponentInput[];
@@ -14,8 +18,8 @@ export interface SceneComponent {
 
 export interface CustomComponent {
   componentType: ComponentType.CustomComponent;
-  nameSub$: SUB<string>;
-  inputSub$: SUB<ComponentInput[]>;
+  name$: SUB<string>;
+  inputs$: SUB<ComponentInput[]>;
 }
 
 export interface SceneComponentInput {

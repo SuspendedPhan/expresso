@@ -57,7 +57,7 @@ function createCustomComponentProperties$(
   ctx: MainContext,
   component: CustomComponent
 ): Observable<Property[]> {
-  return component.inputSub$.pipe(
+  return component.inputs$.pipe(
     first(),
     map((inputs) =>
       inputs.map((input) => createComponentPropertyNew(ctx, input))
