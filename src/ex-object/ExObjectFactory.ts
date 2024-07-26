@@ -21,8 +21,8 @@ import {
 import type {
   AttributeMut,
   CallExprMut,
-  ExObjectMut,
-  ExObjectMutBase,
+  ExItemMut,
+  ExItemMutBase,
 } from "../main-context/MainMutator";
 import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
 import type { ComponentMut } from "src/mutator/ComponentMutator";
@@ -138,7 +138,7 @@ export default class ExObjectFactory {
     const mutBase = this.createExObjectBaseMut();
     const base = this.createExObjectBase(mutBase, id);
 
-    const expr: NumberExpr & ExObjectMut = {
+    const expr: NumberExpr & ExItemMut = {
       objectType: ExItemType.Expr,
       exprType: ExprType.NumberExpr,
       value,
@@ -176,7 +176,7 @@ export default class ExObjectFactory {
     };
 
     for (const arg of args) {
-      const argMut = arg as ExObjectMut;
+      const argMut = arg as ExItemMut;
       argMut.parentSub$.next(expr);
     }
 
@@ -184,7 +184,7 @@ export default class ExObjectFactory {
     return expr;
   }
 
-  public createExObjectBaseMut(): ExObjectMutBase {
+  public createExObjectBaseMut(): ExItemMutBase {
     const destroySub$ = new Subject<void>();
     const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(
       destroySub$,
@@ -198,7 +198,7 @@ export default class ExObjectFactory {
   }
 
   public createExObjectBase(
-    mutBase: ExObjectMutBase,
+    mutBase: ExItemMutBase,
     id: string
   ): ExObjectBase {
     const exObjectBase = {

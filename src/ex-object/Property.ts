@@ -1,20 +1,20 @@
+import type { ComponentInput } from "src/ex-object/Component";
+import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
-import type { ExObjectMut } from "src/main-context/MainMutator";
+import type { ExItemMut } from "src/main-context/MainMutator";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
   type SUB,
 } from "src/utils/utils/Utils";
-import { ExItemType, type ExObjectBase, type Expr } from "./ExObject";
-import type { ProtoSceneProperty } from "./SceneAttribute";
-import type { ComponentInput } from "./Component";
 
+export type Property = ComponentProperty | ObjectProperty;
 export enum PropertyType {
   ComponentProperty,
-  SceneProperty,
   ObjectProperty,
 }
-export interface PropertyBase extends ExObjectBase {
+
+export interface PropertyBase extends ExItemBase {
   expr$: OBS<Expr>;
 }
 
@@ -24,53 +24,44 @@ export interface ComponentProperty extends PropertyBase {
   componentInput: ComponentInput;
 }
 
-export interface SceneProperty extends ComponentProperty {
-  proto: ProtoSceneProperty;
-}
-
 export interface ObjectProperty extends PropertyBase {
   propertyType: PropertyType.ObjectProperty;
   name$: OBS<string>;
 }
 
-export type PropertyBaseMut = ExObjectMut & {
+export type PropertyBaseMut = ExItemMut & {
   exprSub$: SUB<Expr>;
 };
 export type ComponentPropertyMut = ComponentProperty & PropertyBaseMut;
-export type ScenePropertyMut = SceneProperty & PropertyBaseMut;
 export type ObjectPropertyMut = ObjectProperty &
   PropertyBaseMut & {
     nameSub$: SUB<string>;
   };
 
-export function createScenePropertyNew(
+export function createComponentPropertyNew(
   ctx: MainContext,
-  proto: ProtoSceneProperty
-): SceneProperty {
-  const id = `scene-property-${crypto.randomUUID()}`;
-  const expr = ctx.objectFactory.createNumberExpr(0);
-  return createSceneProperty(ctx, id, expr, proto);
+  componentInput: ComponentInput
+): ComponentProperty {
+  const id = `component-property-${crypto.randomUUID()}`;
+  return createComponentProperty(ctx, id, componentInput);
 }
 
-export function createSceneProperty(
+export function createComponentProperty(
   ctx: MainContext,
   id: string,
-  expr: Expr,
-  proto: ProtoSceneProperty
-): SceneProperty {
+  componentInput: ComponentInput
+): ComponentProperty {
   const itemBaseMut = ctx.objectFactory.createExObjectBaseMut();
   const itemBase = ctx.objectFactory.createExObjectBase(itemBaseMut, id);
-  const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
-  const property: ScenePropertyMut = {
+  const componentProperty: ComponentPropertyMut = {
     ...itemBase,
     ...itemBaseMut,
-    objectType: ExItemType.SceneProperty,
-    expr$: exprSub$,
-    exprSub$,
-    proto,
-    propertyType: PropertyType.SceneProperty,
+    objectType: ExItemType.Property,
+    expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, componentInput),
+    propertyType: PropertyType.ComponentProperty,
+    componentInput,
   };
-  return property;
+  return componentProperty;
 }
 
 export function createObjectPropertyNew(

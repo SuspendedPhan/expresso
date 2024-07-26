@@ -21,7 +21,7 @@ export enum ExprType {
   CallExpr,
 }
 
-export interface ExObjectBase {
+export interface ExItemBase {
   readonly objectType: ExItemType;
   readonly id: string;
   readonly ordinal: number;
@@ -37,7 +37,7 @@ export interface Project {
   readonly currentOrdinal$: OBS<number>;
 }
 
-export interface Component extends ExObjectBase {
+export interface Component extends ExItemBase {
   readonly objectType: ExItemType.Component;
   readonly proto: ProtoComponent;
   readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneProperty, SceneProperty>;
@@ -46,18 +46,18 @@ export interface Component extends ExObjectBase {
   readonly sceneAttributeAdded$: Observable<SceneProperty>;
 }
 
-export interface Attribute extends ExObjectBase {
+export interface Attribute extends ExItemBase {
   readonly objectType: ExItemType.Property;
   readonly expr$: Observable<Expr>;
 }
 
-export interface NumberExpr extends ExObjectBase {
+export interface NumberExpr extends ExItemBase {
   readonly objectType: ExItemType.Expr;
   readonly exprType: ExprType.NumberExpr;
   readonly value: number;
 }
 
-export interface CallExpr extends ExObjectBase {
+export interface CallExpr extends ExItemBase {
   readonly objectType: ExItemType.Expr;
   readonly exprType: ExprType.CallExpr;
   readonly args$: Observable<readonly Expr[]>;

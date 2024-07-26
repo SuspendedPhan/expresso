@@ -16,26 +16,26 @@ import Logger from "../utils/logger/Logger";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
 
-export type ExObjectMutBase = {
+export type ExItemMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
   readonly destroySub$: Subject<void>;
 };
 
-export type ExObjectMut = ExObjectBase & ExObjectMutBase;
+export type ExItemMut = ExObjectBase & ExItemMutBase;
 
-export type ComponentMut = Component & ExObjectMut & {
+export type ComponentMut = Component & ExItemMut & {
   // cloneCountSub$: BehaviorSubject<number>;
   // childrenSub$: BehaviorSubject<readonly Component[]>;
   // sceneAttributeAddedSub$: Subject<SceneAttribute>;
 };
 
 export type AttributeMut = Attribute &
-  ExObjectMut & {
+  ExItemMut & {
     exprSub$: BehaviorSubject<Expr>;
   };
 
 export type CallExprMut = CallExpr &
-  ExObjectMut & {
+  ExItemMut & {
     argsSub$: BehaviorSubject<Expr[]>;
   };
 
@@ -94,8 +94,8 @@ export default class MainMutator {
         assertUnreachable;
     }
 
-    const oldExprMut = oldExpr as ExObjectMut;
-    const newExprMut = newExpr as ExObjectMut;
+    const oldExprMut = oldExpr as ExItemMut;
+    const newExprMut = newExpr as ExItemMut;
     newExprMut.parentSub$.next(parent);
     oldExprMut.destroySub$.complete();
     (this.ctx.eventBus.onExprReplaced$ as Subject<ExprReplacement>).next({ oldExpr, newExpr });
