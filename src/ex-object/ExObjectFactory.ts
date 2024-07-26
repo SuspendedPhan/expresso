@@ -24,7 +24,7 @@ import type {
   ExObjectMut,
   ExObjectMutBase,
 } from "../main-context/MainMutator";
-import type { ProtoSceneAttribute, SceneProperty } from "./SceneAttribute";
+import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
 import { ComponentMut } from "src/mutator/ComponentMutator";
 import { ProjectMut } from "src/mutator/ProjectMutator";
 import { LibraryProject } from "src/library/LibraryProject";
@@ -67,7 +67,7 @@ export default class ExObjectFactory {
     );
 
     const sceneAttributeByProto = new Map<
-      ProtoSceneAttribute,
+      ProtoSceneProperty,
       SceneProperty
     >();
 
@@ -124,7 +124,7 @@ export default class ExObjectFactory {
     return component;
   }
 
-  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneAttribute): SceneProperty {
+  public createSceneAttribute(id: string, expr: Expr, proto: ProtoSceneProperty): SceneProperty {
     const attribute = this.createAttributeBase(id, expr);
     const sceneAttribute: SceneProperty = {
       proto,
@@ -141,7 +141,7 @@ export default class ExObjectFactory {
     return sceneAttribute;
   }
 
-  private createSceneAttributeNew(proto: ProtoSceneAttribute): SceneProperty {
+  private createSceneAttributeNew(proto: ProtoSceneProperty): SceneProperty {
     const id = `scene-attribute-${crypto.randomUUID()}`;
     const expr = this.createNumberExpr();
     return this.createSceneAttribute(id, expr, proto);

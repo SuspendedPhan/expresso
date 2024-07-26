@@ -8,7 +8,7 @@ import {
   Project
 } from "src/ex-object/ExObject";
 import {
-  ProtoSceneAttribute,
+  ProtoSceneProperty,
   SceneProperty,
 } from "src/ex-object/SceneAttribute";
 import Logger from "src/utils/logger/Logger";
@@ -86,7 +86,7 @@ export default class Dehydrator {
 
     const protoAttributeBySceneAttributeId = new Map<
       string,
-      ProtoSceneAttribute
+      ProtoSceneProperty
     >();
     for (const [
       protoAttribute,

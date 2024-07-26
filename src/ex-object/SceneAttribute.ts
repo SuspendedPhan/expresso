@@ -3,26 +3,26 @@ import type { SceneObject } from "src/scene/SceneContext";
 
 type SceneAttributeSetter = (sceneObject: SceneObject, value: number) => void;
 
-export interface ProtoSceneAttribute {
+export interface ProtoSceneProperty {
   readonly id: string;
   readonly name: string;
   readonly sceneAttributeSetter: SceneAttributeSetter;
 }
 
 export interface SceneProperty extends Attribute {
-  readonly proto: ProtoSceneAttribute;
+  readonly proto: ProtoSceneProperty;
 }
 
-export const ProtoSceneAttributeStore = {
+export const ProtoSceneComponentInputStore = {
   x: {
     name: "x",
     id: "x",
     sceneAttributeSetter: (pixiObject, value) => {
       pixiObject.x = value;
     },
-  } as ProtoSceneAttribute,
+  } as ProtoSceneProperty,
 };
 
-export function getProtoSceneAttributeById(id: string): ProtoSceneAttribute {
-  return (ProtoSceneAttributeStore as any)[id];
+export function getProtoSceneAttributeById(id: string): ProtoSceneProperty {
+  return (ProtoSceneComponentInputStore as any)[id];
 }

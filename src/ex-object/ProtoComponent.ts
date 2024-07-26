@@ -1,9 +1,9 @@
-import { type ProtoSceneAttribute, ProtoSceneAttributeStore } from "src/ex-object/SceneAttribute";
+import { type ProtoSceneProperty, ProtoSceneComponentInputStore } from "src/ex-object/SceneAttribute";
 
 export interface ProtoComponent {
   id: string;
   name: string;
-  protoAttributes: readonly ProtoSceneAttribute[];
+  protoAttributes: readonly ProtoSceneProperty[];
 }
 
 export const ProtoComponentStore = {
@@ -11,7 +11,7 @@ export const ProtoComponentStore = {
     id: "circle",
     name: "Circle",
     protoAttributes: [
-      ProtoSceneAttributeStore.x,
+      ProtoSceneComponentInputStore.x,
     ],
   } as ProtoComponent,
 };

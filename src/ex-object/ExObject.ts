@@ -1,6 +1,6 @@
 import type { Observable } from "rxjs";
 import type { ProtoComponent } from "src/ex-object/ProtoComponent";
-import type { ProtoSceneAttribute, SceneProperty } from "./SceneAttribute";
+import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
 import { OBS } from "src/utils/utils/Utils";
 import { LibraryProject } from "src/library/LibraryProject";
 
@@ -39,7 +39,7 @@ export interface Project {
 export interface Component extends ExObjectBase {
   readonly objectType: ExItemType.ExObject;
   readonly proto: ProtoComponent;
-  readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneAttribute, SceneProperty>;
+  readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneProperty, SceneProperty>;
   readonly cloneCount$: Observable<number>;
   readonly children$: Observable<readonly Component[]>;
   readonly sceneAttributeAdded$: Observable<SceneProperty>;
