@@ -1,6 +1,6 @@
 import { BehaviorSubject, map } from "rxjs";
 import { ElementLayout } from "src/utils/layout/ElementLayout";
-import { NavItem, NavSection } from "src/utils/utils/Nav";
+import type { NavItem, NavSection } from "src/utils/utils/Nav";
 import MainContext from "./MainContext";
 
 export enum Window {

@@ -1,9 +1,10 @@
-import { Layout, Output, Point } from "src/utils/layout/Layout";
 import * as rxjs from "rxjs";
 import { Observable } from "rxjs";
 import { share } from "rxjs/operators";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
+import type { Point } from "./Layout";
+import { type Output, Layout } from "./Layout";
 
 export class ElementLayout {
   private layout;

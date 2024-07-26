@@ -1,12 +1,12 @@
 import { BehaviorSubject, first, map, type Observable, Subject } from "rxjs";
 import {
-  Component,
   type ExObject,
   ExItemType,
   type Expr,
   ExprType,
+  type Component,
 } from "src/ex-object/ExObject";
-import { LibraryProject } from "src/library/LibraryProject";
+import type { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";

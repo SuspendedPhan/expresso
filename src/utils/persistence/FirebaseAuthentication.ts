@@ -1,7 +1,7 @@
 import firebase from "firebase/compat/app";
 import { auth } from "firebaseui";
 import { Subject } from "rxjs";
-import { OBS } from "../utils/Utils";
+import type { OBS } from "../utils/Utils";
 
 export class FirebaseAuthentication {
   private static readonly userLoggedIn$_ = new Subject<void>();

@@ -10,9 +10,9 @@ import {
 } from "src/ex-object/ProtoComponent";
 import {
   getProtoSceneAttributeById,
-  SceneProperty,
+  type SceneProperty,
 } from "src/ex-object/SceneAttribute";
-import { LibraryProject } from "src/library/LibraryProject";
+import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import type {
   DehydratedCallExpr,

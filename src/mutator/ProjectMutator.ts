@@ -1,5 +1,5 @@
 import { first, Subject } from "rxjs";
-import { Project, Component } from "src/ex-object/ExObject";
+import type { Project, Component } from "src/ex-object/ExObject";
 import { ProtoComponentStore } from "src/ex-object/ProtoComponent";
 import MainContext from "src/main-context/MainContext";
 

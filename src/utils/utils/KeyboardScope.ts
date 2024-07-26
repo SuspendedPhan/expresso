@@ -1,6 +1,6 @@
 import hotkeys from "hotkeys-js";
-import { OBS } from "./Utils";
 import { first } from "rxjs";
+import type { OBS } from "./Utils";
 
 export enum KeyboardScopeResult {
   OutOfScope,

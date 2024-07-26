@@ -1,4 +1,4 @@
-import { Component } from "src/ex-object/ExObject";
+import type { Component } from "src/ex-object/ExObject";
 import { ElementLayout } from "./ElementLayout";
 import MainContext from "src/main-context/MainContext";
 

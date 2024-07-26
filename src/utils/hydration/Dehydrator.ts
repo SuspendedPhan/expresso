@@ -1,16 +1,13 @@
 import { combineLatest, map, type Observable, of, switchMap } from "rxjs";
 import {
   type CallExpr,
-  Component,
+  type Component,
   type Expr,
   ExprType,
   type NumberExpr,
-  Project
+  type Project,
 } from "src/ex-object/ExObject";
-import {
-  ProtoSceneProperty,
-  SceneProperty,
-} from "src/ex-object/SceneAttribute";
+import { type ProtoSceneProperty, type SceneProperty } from "src/ex-object/SceneAttribute";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";

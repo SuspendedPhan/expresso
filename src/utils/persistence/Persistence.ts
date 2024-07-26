@@ -1,12 +1,10 @@
 import { Observable } from "rxjs";
-import { DehydratedLoggerConfig } from "src/utils/utils/LoggerConfigHydrator";
-import { DehydratedProject } from "../hydration/Dehydrator";
-import { OBS } from "../utils/Utils";
+import type { DehydratedProject } from "../hydration/Dehydrator";
+import type { OBS } from "../utils/Utils";
 import { FirebaseAuthentication } from "./FirebaseAuthentication";
 import GCloudPersistence from "./GCloudPersistence";
 
 const service: PersistService = new GCloudPersistence();
-const debugOverlayFilename = "debug-overlay.json";
 const projectFilename = "project.json";
 
 export interface PersistService {
@@ -15,16 +13,6 @@ export interface PersistService {
 }
 
 export default class Persistence {
-  public static async readLoggerConfig(): Promise<DehydratedLoggerConfig | null> {
-    return this.readObject(debugOverlayFilename);
-  }
-
-  public static async writeLoggerConfig(
-    cfg: DehydratedLoggerConfig
-  ): Promise<void> {
-    return this.writeObject(debugOverlayFilename, cfg);
-  }
-
   public static readProject$: OBS<DehydratedProject | null> =
     new Observable<DehydratedProject | null>((subscriber) => {
       FirebaseAuthentication.userLoggedIn$.subscribe({

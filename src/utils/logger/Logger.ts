@@ -1,6 +1,6 @@
 import {
   LoggerDecorator,
-  RuntimeFunctionCall
+  type RuntimeFunctionCall
 } from "./LoggerDecorator";
 
 export default class Logger {

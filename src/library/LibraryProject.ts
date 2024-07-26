@@ -6,9 +6,9 @@ import {
   ReplaySubject,
   switchMap,
 } from "rxjs";
-import { Component, Project } from "src/ex-object/ExObject";
+import type { Component, Project } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
-import {
+import type {
   Focus
 } from "src/utils/utils/FocusManager";
 

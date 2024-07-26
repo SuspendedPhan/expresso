@@ -1,5 +1,5 @@
 import { Window } from "src/main-context/MainViewContext";
-import { OBS } from "./Utils";
+import type { OBS } from "./Utils";
 
 export interface NavSection {
     readonly title: string;
