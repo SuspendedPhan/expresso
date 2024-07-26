@@ -52,7 +52,7 @@ export function createComponentProperty(
   componentInput: ComponentInput
 ): ComponentProperty {
   const itemBaseMut = ctx.objectFactory.createExObjectBaseMut();
-  const itemBase = ctx.objectFactory.createExObjectBase(itemBaseMut, id);
+  const itemBase = ctx.objectFactory.createExItemBase(itemBaseMut, id);
   const componentProperty: ComponentPropertyMut = {
     ...itemBase,
     ...itemBaseMut,
@@ -80,7 +80,7 @@ export function createObjectProperty(
   expr: Expr
 ): ObjectProperty {
   const itemBaseMut = ctx.objectFactory.createExObjectBaseMut();
-  const itemBase = ctx.objectFactory.createExObjectBase(itemBaseMut, id);
+  const itemBase = ctx.objectFactory.createExItemBase(itemBaseMut, id);
   const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
   const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
   const property: ObjectPropertyMut = {

@@ -19,8 +19,7 @@ import {
 } from "src/utils/utils/Utils";
 import type {
   CallExprMut,
-  ExItemMut,
-  ExItemMutBase
+  ExItemMut
 } from "../main-context/MainMutator";
 
 export default class ExObjectFactory {
@@ -62,15 +61,13 @@ export default class ExObjectFactory {
       value = 0;
     }
 
-    const mutBase = this.createExObjectBaseMut();
-    const base = this.createExObjectBase(mutBase, id);
+    const base = this.createExItemBase(id);
 
     const expr: NumberExpr & ExItemMut = {
       objectType: ExItemType.Expr,
       exprType: ExprType.NumberExpr,
       value,
       ...base,
-      ...mutBase,
     };
 
     (this.ctx.eventBus.onExprAdded$ as Subject<Expr>).next(expr);
@@ -89,13 +86,11 @@ export default class ExObjectFactory {
       args = [arg0, arg1];
     }
 
-    const mutBase = this.createExObjectBaseMut();
-    const base = this.createExObjectBase(mutBase, id);
+    const base = this.createExItemBase(id);
     const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
 
     const expr: CallExprMut = {
       ...base,
-      ...mutBase,
       objectType: ExItemType.Expr,
       exprType: ExprType.CallExpr,
       args$: argsSub$,
@@ -111,28 +106,15 @@ export default class ExObjectFactory {
     return expr;
   }
 
-  public createExObjectBaseMut(): ExItemMutBase {
-    const destroySub$ = new Subject<void>();
-    const parentSub$ = createBehaviorSubjectWithLifetime<Parent>(
-      destroySub$,
-      null
-    );
-
-    return {
-      parentSub$,
-      destroySub$,
-    };
-  }
-
-  public createExObjectBase(
-    mutBase: ExItemMutBase,
+  public createExItemBase(
     id: string
   ): ExItemBase {
-    const exObjectBase = {
+    const destroy$ = new Subject<void>();
+    const exObjectBase: ExItemBase = {
       id,
       ordinal: this.currentOrdinal,
-      parent$: mutBase.parentSub$,
-      destroy$: mutBase.destroySub$,
+      parent$: createBehaviorSubjectWithLifetime<Parent>(destroy$, null),
+      destroy$,
     };
     this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
       (project as ProjectMut).currentOrdinalSub$.next(this.currentOrdinal + 1);

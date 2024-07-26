@@ -1,11 +1,11 @@
-import type { Observable } from "rxjs";
-import type { ProtoComponent } from "src/ex-object/ProtoComponent";
-import type { ProtoSceneProperty, SceneProperty } from "./SceneAttribute";
+import type { Attribute } from "pixi.js";
+import type { Component } from "src/ex-object/Component";
 import type { LibraryProject } from "src/library/LibraryProject";
-import type { OBS } from "src/utils/utils/Utils";
+import type { SUB } from "src/utils/utils/Utils";
+import type { SceneProperty } from "./SceneAttribute";
 
 export type ExItem = Component | SceneProperty | Attribute | Expr;
-export type Parent = Exclude<ExItem, NumberExpr>;
+export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr = NumberExpr | CallExpr;
 
 export enum ExItemType {
@@ -24,30 +24,16 @@ export enum ExprType {
 export interface ExItemBase {
   readonly id: string;
   readonly ordinal: number;
-  readonly parent$: Observable<Parent>;
+  readonly parent$: SUB<Parent>;
 
   // Completes when destroyed.
-  readonly destroy$: Observable<void>;
+  readonly destroy$: SUB<void>;
 }
 
 export interface Project {
   readonly libraryProject: LibraryProject;
-  readonly rootComponents$: Observable<readonly Component[]>;
-  readonly currentOrdinal$: OBS<number>;
-}
-
-export interface Component extends ExItemBase {
-  readonly objectType: ExItemType.Component;
-  readonly proto: ProtoComponent;
-  readonly sceneAttributeByProto: ReadonlyMap<ProtoSceneProperty, SceneProperty>;
-  readonly cloneCount$: Observable<number>;
-  readonly children$: Observable<readonly Component[]>;
-  readonly sceneAttributeAdded$: Observable<SceneProperty>;
-}
-
-export interface Attribute extends ExItemBase {
-  readonly objectType: ExItemType.Property;
-  readonly expr$: Observable<Expr>;
+  readonly rootComponents$: SUB<readonly Component[]>;
+  readonly currentOrdinal$: SUB<number>;
 }
 
 export interface NumberExpr extends ExItemBase {
@@ -59,5 +45,5 @@ export interface NumberExpr extends ExItemBase {
 export interface CallExpr extends ExItemBase {
   readonly objectType: ExItemType.Expr;
   readonly exprType: ExprType.CallExpr;
-  readonly args$: Observable<readonly Expr[]>;
+  readonly args$: SUB<readonly Expr[]>;
 }
