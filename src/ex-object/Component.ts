@@ -1,7 +1,7 @@
 import type { SceneObject } from "src/scene/SceneContext";
 import type { SUB } from "src/utils/utils/Utils";
 
-type SceneSetter = (sceneObject: SceneObject, value: number) => void;
+export type SceneSetter = (sceneObject: SceneObject, value: number) => void;
 
 export type Component = SceneComponent | CustomComponent;
 export type ComponentInput = SceneComponentInput | CustomComponentInput;
@@ -12,7 +12,7 @@ export enum ComponentType {
 
 export interface SceneComponent {
   componentType: ComponentType.SceneComponent;
-  inputs: ComponentInput[];
+  inputs: SceneComponentInput[];
 }
 
 export interface CustomComponent {

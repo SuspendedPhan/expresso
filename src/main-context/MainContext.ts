@@ -1,7 +1,6 @@
 import { first, Subject, switchMap } from "rxjs";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import { type LibraryProject, ProjectManager } from "src/library/LibraryProject";
-import ComponentMutator from "src/mutator/ComponentMutator";
 import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
@@ -24,7 +23,6 @@ export default class MainContext {
   public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
-  public readonly componentMutator = new ComponentMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly focusManager = new FocusManager(this);
   public readonly viewCtx = new MainViewContext(this);
@@ -41,12 +39,12 @@ export default class MainContext {
         .getFocus$()
         .pipe(first())
         .subscribe((focus) => {
-          if (focus.type !== "ExObject") {
+          if (focus.type !== "ExItem") {
             return;
           }
 
           if (focus.exItem === oldExpr) {
-            this.focusManager.focusExObject(newExpr);
+            this.focusManager.focusExItem(newExpr);
           }
         });
     });

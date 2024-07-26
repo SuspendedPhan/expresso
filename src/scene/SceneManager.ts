@@ -1,11 +1,11 @@
 import { withLatestFrom } from "rxjs";
 import { attributeSceneInstancePathToString, type SceneInstancePath, sceneInstancePathToString } from "./SceneInstance";
-import type { Component } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import type { SceneProperty } from "../ex-object/SceneAttribute";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import type { SceneContext, SceneObject } from "./SceneContext";
 import Logger from "../utils/logger/Logger";
+import type { ExObject } from "src/ex-object/ExObject";
+import { ComponentType, type SceneSetter } from "src/ex-object/Component";
 
 export class SceneManager {
   private readonly sceneObjectBySceneInstancePath = new Map<string, SceneObject>();
@@ -18,32 +18,32 @@ export class SceneManager {
   private setup() {
     this.ctx.evaluator.eval$
       .pipe(withLatestFrom(this.ctx.mainCtx.eventBus.rootObjects$))
-      .subscribe(([evaluation, rootComponents]) => {
-        this.updateRootComponents(evaluation, rootComponents);
+      .subscribe(([evaluation, rootExObjects]) => {
+        this.updateRootExObjects(evaluation, rootExObjects);
       });
   }
 
-  private updateRootComponents(
+  private updateRootExObjects(
     evaluation: Evaluation,
-    rootComponents: readonly Component[]
+    rootExObjects: readonly ExObject[]
   ): void {
-    for (const component of rootComponents) {
-      this.updateComponent(component, evaluation, []);
+    for (const exObject of rootExObjects) {
+      this.updateExObject(exObject, evaluation, []);
     }
   }
 
-  private updateComponent(
-    component: Component,
+  private updateExObject(
+    exObject: ExObject,
     evaluation: Evaluation,
     parentPath: SceneInstancePath
   ): void {
-    component.cloneCount$.subscribe((cloneCount) => {
-      this.updateComponent1(component, evaluation, parentPath, cloneCount);
+    exObject.cloneCount$.subscribe((cloneCount) => {
+      this.updateExObject1(exObject, evaluation, parentPath, cloneCount);
     });
   }
 
-  private updateComponent1(
-    component: Component,
+  private updateExObject1(
+    exObject: ExObject,
     evaluation: Evaluation,
     parentPath: SceneInstancePath,
     cloneCount: number
@@ -51,15 +51,15 @@ export class SceneManager {
     for (let i = 0; i < cloneCount; i++) {
       const path = [
         ...parentPath,
-        { componentId: component.id, cloneId: i.toString() },
+        { exObjectId: exObject.id, cloneId: i.toString() },
       ];
-      this.updateComponentSceneInstance(component, evaluation, path);
+      this.updateExObjectSceneInstance(exObject, evaluation, path);
     }
   }
 
   @loggedMethod
-  private updateComponentSceneInstance(
-    component: Component,
+  private updateExObjectSceneInstance(
+    exObject: ExObject,
     evaluation: Evaluation,
     path: SceneInstancePath
   ): void {
@@ -71,13 +71,16 @@ export class SceneManager {
       this.sceneObjectBySceneInstancePath.set(pathString, sceneObject);
     }
 
-    const sceneAttributes = Array.from(
-      component.sceneAttributeByProto.values()
-    );
-    for (const sceneAttr of sceneAttributes) {
+    const component = exObject.component;
+    if (component.componentType !== ComponentType.SceneComponent) {
+      return;
+    }
+
+    for (const input of component.inputs) {
       this.updateAttributeSceneInstance(
         sceneObject,
-        sceneAttr,
+        input.id,
+        input.sceneSetter,
         path,
         evaluation
       );
@@ -87,17 +90,17 @@ export class SceneManager {
   @loggedMethod
   private updateAttributeSceneInstance(
     sceneObject: SceneObject,
-    sceneAttr: SceneProperty,
+    propertyId: string,
+    sceneSetter: SceneSetter,
     path: SceneInstancePath,
     evaluation: Evaluation
   ): void {
-    const pathString = attributeSceneInstancePathToString(this.ctx.mainCtx.goModule, sceneAttr, path);
+    const pathString = attributeSceneInstancePathToString(this.ctx.mainCtx.goModule, propertyId, path);
     const result = evaluation.getResult(pathString);
     
     sceneObject.visible = true;
     sceneObject.scale.x = 100;
     sceneObject.scale.y = 100;
-    const setter = sceneAttr.proto.sceneAttributeSetter;
-    setter(sceneObject, result);
+    sceneSetter(sceneObject, result);
   }
 }
