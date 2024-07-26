@@ -1,7 +1,6 @@
 import type { ComponentInput } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
-import type { ExItemMut } from "src/main-context/MainMutator";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
@@ -15,11 +14,11 @@ export enum PropertyType {
 }
 
 export interface PropertyBase extends ExItemBase {
-  expr$: OBS<Expr>;
+  itemType: ExItemType.Property;
+  expr$: SUB<Expr>;
 }
 
 export interface ComponentProperty extends PropertyBase {
-  objectType: ExItemType.Property;
   propertyType: PropertyType.ComponentProperty;
   componentInput: ComponentInput;
 }
@@ -29,35 +28,26 @@ export interface ObjectProperty extends PropertyBase {
   name$: OBS<string>;
 }
 
-export type PropertyBaseMut = ExItemMut & {
-  exprSub$: SUB<Expr>;
-};
-export type ComponentPropertyMut = ComponentProperty & PropertyBaseMut;
-export type ObjectPropertyMut = ObjectProperty &
-  PropertyBaseMut & {
-    nameSub$: SUB<string>;
-  };
-
 export function createComponentPropertyNew(
   ctx: MainContext,
   componentInput: ComponentInput
 ): ComponentProperty {
   const id = `component-property-${crypto.randomUUID()}`;
-  return createComponentProperty(ctx, id, componentInput);
+  const expr = ctx.objectFactory.createNumberExpr();
+  return createComponentProperty(ctx, id, componentInput, expr);
 }
 
 export function createComponentProperty(
   ctx: MainContext,
   id: string,
-  componentInput: ComponentInput
+  componentInput: ComponentInput,
+  expr: Expr
 ): ComponentProperty {
-  const itemBaseMut = ctx.objectFactory.createExObjectBaseMut();
-  const itemBase = ctx.objectFactory.createExItemBase(itemBaseMut, id);
-  const componentProperty: ComponentPropertyMut = {
+  const itemBase = ctx.objectFactory.createExItemBase(id);
+  const componentProperty: ComponentProperty = {
     ...itemBase,
-    ...itemBaseMut,
-    objectType: ExItemType.Property,
-    expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, componentInput),
+    itemType: ExItemType.Property,
+    expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
     propertyType: PropertyType.ComponentProperty,
     componentInput,
   };
@@ -79,18 +69,14 @@ export function createObjectProperty(
   name: string,
   expr: Expr
 ): ObjectProperty {
-  const itemBaseMut = ctx.objectFactory.createExObjectBaseMut();
-  const itemBase = ctx.objectFactory.createExItemBase(itemBaseMut, id);
+  const itemBase = ctx.objectFactory.createExItemBase(id);
   const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
   const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
-  const property: ObjectPropertyMut = {
+  const property: ObjectProperty = {
     ...itemBase,
-    ...itemBaseMut,
-    objectType: ExItemType.Property,
+    itemType: ExItemType.Property,
     expr$: exprSub$,
-    exprSub$,
     name$: nameSub$,
-    nameSub$,
     propertyType: PropertyType.ObjectProperty,
   };
   return property;

@@ -1,4 +1,3 @@
-import type { ExItemBase } from "src/ex-object/ExItem";
 import type { SceneObject } from "src/scene/SceneContext";
 import type { SUB } from "src/utils/utils/Utils";
 

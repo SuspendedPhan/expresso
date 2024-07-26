@@ -1,10 +1,10 @@
-import type { Attribute } from "pixi.js";
 import type { Component } from "src/ex-object/Component";
+import type { ExObject } from "src/ex-object/ExObject";
+import type { Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type { SUB } from "src/utils/utils/Utils";
-import type { SceneProperty } from "./SceneAttribute";
 
-export type ExItem = Component | SceneProperty | Attribute | Expr;
+export type ExItem = ExObject | Property | Expr;
 export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr = NumberExpr | CallExpr;
 

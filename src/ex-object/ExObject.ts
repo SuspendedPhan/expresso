@@ -5,14 +5,15 @@ import {
   type CustomComponent,
   type SceneComponent
 } from "src/ex-object/Component";
+import type { ExItemBase } from "src/ex-object/ExItem";
 import {
   createComponentPropertyNew,
   type Property,
 } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import type { OBS, SUB } from "src/utils/utils/Utils";
+import { createBehaviorSubjectWithLifetime, type OBS, type SUB } from "src/utils/utils/Utils";
 
-export interface ExObject {
+export interface ExObject extends ExItemBase {
   component: Component;
   children$: SUB<ExObject[]>;
   componentProperties: Property[];
@@ -22,10 +23,14 @@ export interface ExObject {
 export function createExObjectNew$(ctx: MainContext, component: Component): OBS<ExObject> {
   return createProperties$(ctx, component).pipe(
     map((componentProperties) => {
+      const id = `ex-object-${crypto.randomUUID()}`;
+      const base = ctx.objectFactory.createExItemBase(id);
       const object: ExObject = {
+        ...base,
         component,
         componentProperties,
         customPropertiesSub$: new Subject(),
+        children$: createBehaviorSubjectWithLifetime<ExObject[]>(base.destroy$, []),
       };
       return object;
     })
