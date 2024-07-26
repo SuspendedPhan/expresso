@@ -1,9 +1,9 @@
 import { first, Subject } from "rxjs";
-import { type Expr, ExprType } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type MainContext from "src/main-context/MainContext";
 import type GoModule from "src/utils/utils/GoModule";
 import { assertUnreachable } from "src/utils/utils/Utils";
+import { type Expr, ExprType } from "src/ex-object/ExItem";
 
 export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
@@ -14,16 +14,16 @@ export default class GoBridge {
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
-    ctx.eventBus.objectAdded$.subscribe((component) => {
-      goModule.Component.create(component.id);
-      component.cloneCount$.subscribe((cloneCount) => {
-        goModule.Component.setCloneCount(component.id, cloneCount);
+    ctx.eventBus.objectAdded$.subscribe((object) => {
+      goModule.Component.create(object.id);
+      object.cloneCount$.subscribe((cloneCount) => {
+        goModule.Component.setCloneCount(object.id, cloneCount);
       });
 
-      for (const attribute of component.sceneAttributeByProto.values()) {
-        goModule.Component.addAttribute(component.id, attribute.id);
-        attribute.expr$.subscribe((expr) => {
-          goModule.Attribute.setExpr(component.id, attribute.id, expr.id);
+      for (const property of object.componentProperties) {
+        goModule.Component.addAttribute(object.id, property.id);
+        property.expr$.subscribe((expr) => {
+          goModule.Attribute.setExpr(object.id, property.id, expr.id);
         });
       }
     });

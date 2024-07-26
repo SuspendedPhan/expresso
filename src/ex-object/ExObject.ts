@@ -1,6 +1,5 @@
 import { first, map, of, Subject, type Observable } from "rxjs";
 import {
-  CloneCountInput,
   ComponentType,
   type Component,
   type CustomComponent,
@@ -8,9 +7,8 @@ import {
 } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
 import {
-  createCloneCountPropertyNew,
   createComponentPropertyNew,
-  type Property,
+  type Property
 } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { createBehaviorSubjectWithLifetime, type OBS, type SUB } from "src/utils/utils/Utils";
@@ -21,7 +19,7 @@ export interface ExObject extends ExItemBase {
   children$: SUB<ExObject[]>;
   componentProperties: Property[];
   customProperties$: SUB<Property[]>;
-  cloneCount$: SUB<Property>;
+  cloneCount$: SUB<number>;
 }
 
 export function createExObjectNew$(ctx: MainContext, component: Component): OBS<ExObject> {
@@ -29,7 +27,6 @@ export function createExObjectNew$(ctx: MainContext, component: Component): OBS<
     map((componentProperties) => {
       const id = `ex-object-${crypto.randomUUID()}`;
       const base = ctx.objectFactory.createExItemBase(id);
-      const cloneCount = createCloneCountPropertyNew(ctx);
       const object: ExObject = {
         ...base,
         itemType: ExItemType.ExObject,
@@ -37,7 +34,7 @@ export function createExObjectNew$(ctx: MainContext, component: Component): OBS<
         componentProperties,
         customProperties$: new Subject(),
         children$: createBehaviorSubjectWithLifetime<ExObject[]>(base.destroy$, []),
-        cloneCount$: createBehaviorSubjectWithLifetime<Property>(base.destroy$, cloneCount),
+        cloneCount$: createBehaviorSubjectWithLifetime<number>(base.destroy$, 0),
       };
       return object;
     })
