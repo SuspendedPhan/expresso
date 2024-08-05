@@ -151,8 +151,9 @@ export default class Rehydrator {
   private async rehydrateCallExpr(
     deExpr: DehydratedCallExpr
   ): Promise<CallExpr> {
-    const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
-    return this.ctx.objectFactory.createCallExpr(deExpr.id, args);
+    const argPL = deExpr.args.map((arg) => this.rehydrateExpr(arg));
+    const argL = await Promise.all(argPL);
+    return this.ctx.objectFactory.createCallExpr(deExpr.id, argL);
   }
 
   private getComponent(
