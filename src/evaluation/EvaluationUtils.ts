@@ -1,4 +1,3 @@
-import { firstValueFrom } from "rxjs";
 import {
   CanvasObjectUtils,
   type CanvasObjectPath,
@@ -9,13 +8,13 @@ import type MainContext from "src/main-context/MainContext";
 import type { Evaluation } from "src/utils/utils/GoModule";
 
 export namespace EvaluationUtils {
-  export async function getCloneCount(
+  export function getCloneCount(
     ctx: MainContext,
     evaluation: Evaluation,
     exObject: ExObject,
     parentPath: CanvasObjectPath
-  ): Promise<number> {
-    const property = await firstValueFrom(exObject.cloneCountProperty$);
+  ): number {
+    const property = exObject.cloneCountProperty;
     const cloneCountCanvasPropertyPath: CloneCountCanvasPropertyPath = {
       parentCanvasObjectPath: parentPath,
       exObjectId: exObject.id,

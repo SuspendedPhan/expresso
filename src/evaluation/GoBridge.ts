@@ -17,11 +17,7 @@ export default class GoBridge {
     ctx.eventBus.objectAdded$.subscribe((object) => {
       goModule.Object.create(object.id);
 
-      object.cloneCountProperty$.pipe(
-        switchMap((cloneCountProperty) => {
-          return cloneCountProperty.expr$;
-        })
-      ).subscribe((expr) => {
+      object.cloneCountProperty.expr$.subscribe((expr) => {
         goModule.Object.setCloneCount(object.id, expr.id);
       });
 

@@ -33,12 +33,12 @@ export class CanvasManager {
     }
   }
 
-  private async updateExObject(
+  private updateExObject(
     exObject: ExObject,
     evaluation: Evaluation,
     parentPath: CanvasObjectPath
   ) {
-    const cloneCount = await EvaluationUtils.getCloneCount(
+    const cloneCount = EvaluationUtils.getCloneCount(
       this.ctx.mainCtx,
       evaluation,
       exObject,

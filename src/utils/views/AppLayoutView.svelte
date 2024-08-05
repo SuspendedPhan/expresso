@@ -1,7 +1,7 @@
 <script lang="ts">
   import { map } from "rxjs";
   import MainContext from "src/main-context/MainContext";
-  import SceneView from "src/scene/SceneView.svelte";
+  import CanvasView from "src/canvas/CanvasView.svelte";
   import { onMount } from "svelte";
   import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
   import { activeWindowToSvelteComponent } from "../utils/ViewUtils";
@@ -34,7 +34,7 @@
       <svelte:component this={$activeWindow$} {ctx} />
     </div>
     <div class="shrink-1 basis-1/2">
-      <SceneView {ctx} />
+      <CanvasView {ctx} />
     </div>
   </div>
 {:else if $viewMode$ === ViewMode.MainWindowMaximized}
@@ -45,12 +45,12 @@
       <svelte:component this={$activeWindow$} {ctx} />
     </div>
   </div>
-{:else if $viewMode$ === ViewMode.SceneWindowMaximized}
+{:else if $viewMode$ === ViewMode.CanvasWindowMaximized}
   <div class="flex h-full">
     <NavMenuView {ctx} />
 
     <div class="grow-1">
-      <SceneView {ctx} />
+      <CanvasView {ctx} />
     </div>
   </div>
 {/if}

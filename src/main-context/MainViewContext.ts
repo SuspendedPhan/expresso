@@ -15,7 +15,7 @@ export enum Window {
 export enum ViewMode {
   Default,
   MainWindowMaximized,
-  SceneWindowMaximized,
+  CanvasWindowMaximized,
 }
 
 export default class MainViewContext {
