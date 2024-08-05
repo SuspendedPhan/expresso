@@ -2,7 +2,7 @@ import { combineLatest, combineLatestWith, map, type Observable, of, switchMap }
 import { ComponentType } from "src/ex-object/Component";
 import { type Project, type Expr, ExprType, type NumberExpr, type CallExpr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import { PropertyType, type ComponentProperty, type ObjectProperty } from "src/ex-object/Property";
+import { PropertyType, type ComponentParameterProperty, type ObjectProperty } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -118,7 +118,7 @@ export default class Dehydrator {
 
   @loggedMethod
   public dehydrateComponentProperty$(
-    property: ComponentProperty
+    property: ComponentParameterProperty
   ): Observable<DehydratedComponentProperty> {
     const logger = Logger.logger();
     return property.expr$.pipe(

@@ -7,7 +7,7 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 
-export type Property = ComponentProperty | ObjectProperty | CloneCountProperty;
+export type Property = ComponentParameterProperty | ObjectProperty | CloneCountProperty;
 export enum PropertyType {
   ComponentProperty,
   ObjectProperty,
@@ -19,9 +19,9 @@ export interface PropertyBase extends ExItemBase {
   expr$: SUB<Expr>;
 }
 
-export interface ComponentProperty extends PropertyBase {
+export interface ComponentParameterProperty extends PropertyBase {
   propertyType: PropertyType.ComponentProperty;
-  componentInput: ComponentParameter;
+  componentParameter: ComponentParameter;
 }
 
 export interface ObjectProperty extends PropertyBase {
@@ -37,7 +37,7 @@ export namespace CreateProperty {
   export function componentBlank(
     ctx: MainContext,
     componentInput: ComponentParameter
-  ): ComponentProperty {
+  ): ComponentParameterProperty {
     const id = `component-property-${crypto.randomUUID()}`;
     const expr = ctx.objectFactory.createNumberExpr();
     return component(ctx, id, componentInput, expr);
@@ -48,14 +48,14 @@ export namespace CreateProperty {
     id: string,
     componentInput: ComponentParameter,
     expr: Expr
-  ): ComponentProperty {
+  ): ComponentParameterProperty {
     const itemBase = ctx.objectFactory.createExItemBase(id);
-    const componentProperty: ComponentProperty = {
+    const componentProperty: ComponentParameterProperty = {
       ...itemBase,
       itemType: ExItemType.Property,
       expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
       propertyType: PropertyType.ComponentProperty,
-      componentInput,
+      componentParameter: componentInput,
     };
     return componentProperty;
   }
