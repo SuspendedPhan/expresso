@@ -27,24 +27,57 @@ export interface ExObject extends ExItemBase {
   cloneCountProperty: CloneCountProperty;
 }
 
-export async function createExObjectNew(
-  ctx: MainContext,
-  component: Component
-): Promise<ExObject> {
-  const id = `ex-object-${crypto.randomUUID()}`;
-  const base = ctx.objectFactory.createExItemBase(id);
-  const componentProperties = await createComponentProperties(ctx, component);
+export namespace CreateExObject {
+  export async function blank(
+    ctx: MainContext,
+    component: Component
+  ): Promise<ExObject> {
+    const id = `ex-object-${crypto.randomUUID()}`;
+    const base = ctx.objectFactory.createExItemBase(id);
+    const componentProperties = await createComponentProperties(ctx, component);
 
-  const object: ExObject = {
-    ...base,
-    itemType: ExItemType.ExObject,
-    component,
-    componentParameterProperties: componentProperties,
-    basicProperties$: new Subject(),
-    children$: createBehaviorSubjectWithLifetime<ExObject[]>(base.destroy$, []),
-    cloneCountProperty: Create.Property.cloneCountBlank(ctx),
-  };
-  return object;
+    const object: ExObject = {
+      ...base,
+      itemType: ExItemType.ExObject,
+      component,
+      componentParameterProperties: componentProperties,
+      basicProperties$: new Subject(),
+      children$: createBehaviorSubjectWithLifetime<ExObject[]>(
+        base.destroy$,
+        []
+      ),
+      cloneCountProperty: Create.Property.cloneCountBlank(ctx),
+    };
+    return object;
+  }
+
+  export async function from(
+    ctx: MainContext,
+    component: Component,
+    id: string,
+    componentProperties: ComponentParameterProperty[],
+    basicProperties: BasicProperty[],
+    cloneCountProperty: CloneCountProperty,
+    children: ExObject[]
+  ): Promise<ExObject> {
+    const base = ctx.objectFactory.createExItemBase(id);
+    const object: ExObject = {
+      ...base,
+      itemType: ExItemType.ExObject,
+      component,
+      componentParameterProperties: componentProperties,
+      basicProperties$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        basicProperties
+      ),
+      children$: createBehaviorSubjectWithLifetime<ExObject[]>(
+        base.destroy$,
+        children
+      ),
+      cloneCountProperty,
+    };
+    return object;
+  }
 }
 
 async function createComponentProperties(

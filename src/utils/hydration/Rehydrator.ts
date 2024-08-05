@@ -1,19 +1,27 @@
+import type { Component, ComponentParameter, CustomComponent } from "src/ex-object/Component";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { Property } from "src/ex-object/Property";
+import type { ComponentParameterProperty, Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import type {
+  DehydratedBasicProperty,
   DehydratedCallExpr,
+  DehydratedCloneCountProperty,
+  DehydratedComponentProperty,
   DehydratedExObject,
   DehydratedExpr,
   DehydratedNumberExpr,
   DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { Assert } from "src/utils/utils/Assert";
 
 export default class Rehydrator {
+  private customComponentById = new Map<string, CustomComponent>();
+  private componentParameterById = new Map<string, ComponentParameter>();
+
   public constructor(private readonly ctx: MainContext) {}
 
   public rehydrateProject(deProject: DehydratedProject): LibraryProject {
@@ -27,14 +35,18 @@ export default class Rehydrator {
     );
   }
 
-  public rehydrateExObject(deExObject: DehydratedExObject): ExObject {
+  public rehydrateExObject(
+    deExObject: DehydratedExObject,
+    customComponentById: Map<string, CustomComponent>
+  ): ExObject {
     const component = this.getComponent(
       deExObject.componentId,
-      deExObject.componentType
+      deExObject.componentType,
+      customComponentById
     );
     const componentProperties = deExObject.componentProperties.map(
       (componentProperty) => {
-        this.rehydrateComponentProperty(componentProperty);
+        return this.rehydrateComponentProperty(componentProperty);
       }
     );
 
@@ -42,29 +54,47 @@ export default class Rehydrator {
       this.rehydrateBasicProperty(deProperty)
     );
 
-    const cloneProperty = this.rehydrateCloneProperty(deExObject.cloneProperty);
-
-    const children = deExObject.children.map((child) =>
-      this.rehydrateExObject(child)
+    const cloneCountProperty = this.rehydrateCloneCountProperty(
+      deExObject.cloneProperty
     );
 
-    return this.ctx.objectFactory.createExObject(
+    const children = deExObject.children.map((child) =>
+      this.rehydrateExObject(child, customComponentById)
+    );
+
+    return Create.ExObject.from(
+      this.ctx,
+      component,
       deExObject.id,
-      canvasPropertys,
-      children,
-      proto
+      componentProperties,
+      basicProperties,
+      cloneCountProperty,
+      children
     );
   }
 
   @loggedMethod
-  public rehydrateProperty(deProperty: DehydratedProperty): Property {
+  public rehydrateComponentProperty(
+    deProperty: DehydratedComponentProperty
+  ): ComponentParameterProperty {
+    const parameter = this.componentParameterById.get(deProperty.componentParameterId);
+    Assert.notUndefined(parameter, `Component parameter not found: ${deProperty.componentParameterId}`);
     const expr = this.rehydrateExpr(deProperty.expr);
-    return Create.Property.object(
-      this.ctx,
-      deProperty.id,
-      deProperty.name,
-      expr
-    );
+    return Create.Property.component(this.ctx, deProperty.id, parameter, expr);
+  }
+
+  @loggedMethod
+  public rehydrateBasicProperty(deProperty: DehydratedBasicProperty): Property {
+    const expr = this.rehydrateExpr(deProperty.expr);
+    return Create.Property.basic(this.ctx, deProperty.id, expr);
+  }
+
+  @loggedMethod
+  public rehydrateCloneCountProperty(
+    deProperty: DehydratedCloneCountProperty
+  ): Property {
+    const expr = this.rehydrateExpr(deProperty.expr);
+    return Create.Property.cloneCount(this.ctx, deProperty.id, expr);
   }
 
   @loggedMethod
@@ -90,7 +120,11 @@ export default class Rehydrator {
     return this.exprFactory.createCallExpr(deExpr.id, args);
   }
 
-  private getComponent(componentId: string, componentType: string) {
+  private getComponent(
+    componentId: string,
+    componentType: string,
+    customComponentById: Map<string, CustomComponent>
+  ): Component {
     throw new Error("Method not implemented.");
   }
 }

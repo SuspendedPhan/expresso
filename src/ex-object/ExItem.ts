@@ -1,3 +1,4 @@
+import type { Component } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
@@ -30,6 +31,7 @@ export interface ExItemBase {
 export interface Project extends Destroyable {
   readonly libraryProject: LibraryProject;
   readonly rootExObjects$: SUB<readonly ExObject[]>;
+  readonly components$: SUB<readonly Component[]>;
   readonly currentOrdinal$: SUB<number>;
 }
 

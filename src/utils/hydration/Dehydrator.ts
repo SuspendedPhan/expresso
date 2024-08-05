@@ -38,12 +38,13 @@ export interface DehydratedExObject {
   componentType: string;
   componentProperties: DehydratedComponentProperty[];
   basicProperties: DehydratedBasicProperty[];
-  cloneProperty: DehydratedCloneProperty;
+  cloneProperty: DehydratedCloneCountProperty;
   children: DehydratedExObject[];
 }
 
 export interface DehydratedComponentProperty {
   id: string;
+  componentParameterId: string;
   expr: DehydratedExpr;
 }
 
@@ -53,7 +54,7 @@ export interface DehydratedBasicProperty {
   expr: DehydratedExpr;
 }
 
-export interface DehydratedCloneProperty {
+export interface DehydratedCloneCountProperty {
   id: string;
   expr: DehydratedExpr;
 }
@@ -182,6 +183,7 @@ export default class Dehydrator {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
         const deProperty: DehydratedComponentProperty = {
           id: property.id,
+          componentParameterId: property.componentParameter.id,
           expr: dehydratedExpr,
         };
         return deProperty;
@@ -214,7 +216,7 @@ export default class Dehydrator {
   @loggedMethod
   public dehydrateCloneProperty$(
     property: CloneCountProperty
-  ): Observable<DehydratedCloneProperty> {
+  ): Observable<DehydratedCloneCountProperty> {
     const logger = Logger.logger();
     return property.expr$.pipe(
       switchMap((expr) => {
@@ -222,7 +224,7 @@ export default class Dehydrator {
       }),
       map((dehydratedExpr) => {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
-        const deProperty: DehydratedCloneProperty = {
+        const deProperty: DehydratedCloneCountProperty = {
           id: property.id,
           expr: dehydratedExpr,
         };

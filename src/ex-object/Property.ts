@@ -10,7 +10,7 @@ import {
 export type Property = ComponentParameterProperty | BasicProperty | CloneCountProperty;
 export enum PropertyType {
   ComponentProperty,
-  ObjectProperty,
+  BasicProperty,
   CloneCountProperty,
 }
 
@@ -25,7 +25,7 @@ export interface ComponentParameterProperty extends PropertyBase {
 }
 
 export interface BasicProperty extends PropertyBase {
-  propertyType: PropertyType.ObjectProperty;
+  propertyType: PropertyType.BasicProperty;
   name$: OBS<string>;
 }
 
@@ -60,16 +60,16 @@ export namespace CreateProperty {
     return componentProperty;
   }
   
-  export function objectBlank(
+  export function basicBlank(
     ctx: MainContext,
     expr: Expr
   ): BasicProperty {
-    const id = `object-property-${crypto.randomUUID()}`;
-    const name = `Object Property`;
-    return object(ctx, id, name, expr);
+    const id = `basic-property-${crypto.randomUUID()}`;
+    const name = `Basic Property`;
+    return basic(ctx, id, name, expr);
   }
   
-  export function object(
+  export function basic(
     ctx: MainContext,
     id: string,
     name: string,
@@ -83,7 +83,7 @@ export namespace CreateProperty {
       itemType: ExItemType.Property,
       expr$: exprSub$,
       name$: nameSub$,
-      propertyType: PropertyType.ObjectProperty,
+      propertyType: PropertyType.BasicProperty,
     };
     return property;
   }
