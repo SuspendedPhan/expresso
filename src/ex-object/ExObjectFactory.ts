@@ -1,4 +1,5 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
+import { Component } from "src/ex-object/Component";
 import {
   type CallExpr,
   type ExItemBase,
@@ -22,7 +23,6 @@ export default class ExObjectFactory {
   private currentOrdinal = 0;
   public constructor(private readonly ctx: MainContext) {
     this.ctx.projectManager.currentProject$.subscribe((project) => {
-      // @ts-ignore
       project.currentOrdinal$.subscribe((ordinal) => {
         this.currentOrdinal = ordinal;
       });
@@ -36,6 +36,7 @@ export default class ExObjectFactory {
       destroy$,
       libraryProject,
       rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
+      components$: new BehaviorSubject<Component[]>([]),
       currentOrdinal$: new BehaviorSubject<number>(0),
     };
 

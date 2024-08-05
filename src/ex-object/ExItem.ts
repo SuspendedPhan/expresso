@@ -31,7 +31,7 @@ export interface ExItemBase {
 export interface Project extends Destroyable {
   readonly libraryProject: LibraryProject;
   readonly rootExObjects$: SUB<readonly ExObject[]>;
-  readonly components$: SUB<readonly Component[]>;
+  readonly components$: SUB<Component[]>;
   readonly currentOrdinal$: SUB<number>;
 }
 

@@ -1,4 +1,4 @@
-import { first, Subject, switchMap } from "rxjs";
+import { first, Subject } from "rxjs";
 import { type Expr, ExprType } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
