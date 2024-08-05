@@ -1,5 +1,5 @@
 import { first, Subject } from "rxjs";
-import { SceneComponentStore, type Component } from "src/ex-object/Component";
+import { CanvasComponentStore, type Component } from "src/ex-object/Component";
 import type { Project } from "src/ex-object/ExItem";
 import { createExObjectNew } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
@@ -13,7 +13,7 @@ export default class ProjectMutator {
   public constructor(private readonly ctx: MainContext) {}
 
   public async addRootObject() {
-    const object = await createExObjectNew(this.ctx, SceneComponentStore.circle);
+    const object = await createExObjectNew(this.ctx, CanvasComponentStore.circle);
 
     this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
       project.rootExObjects$.pipe(first()).subscribe((rootObjects) => {

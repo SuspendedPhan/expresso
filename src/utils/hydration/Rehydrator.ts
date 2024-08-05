@@ -10,41 +10,61 @@ import type {
   DehydratedExpr,
   DehydratedNumberExpr,
   DehydratedProject,
-  DehydratedProperty,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
 export default class Rehydrator {
-  public constructor(private readonly ctx: MainContext) {
-  }
+  public constructor(private readonly ctx: MainContext) {}
 
   public rehydrateProject(deProject: DehydratedProject): LibraryProject {
     const rootExObjects = deProject.rootExObjects.map((deExObject) =>
       this.rehydrateExObject(deExObject)
     );
-    return this.ctx.projectManager.addProject(deProject.id, deProject.name, rootExObjects);
+    return this.ctx.projectManager.addProject(
+      deProject.id,
+      deProject.name,
+      rootExObjects
+    );
   }
 
   public rehydrateExObject(deExObject: DehydratedExObject): ExObject {
-    const component = this.getComponent(deExObject.componentId, deExObject.componentType);
-    const sceneAttributes = deExObject.map((sceneAttribute) =>
-      this.rehydrateProperty(sceneAttribute)
+    const component = this.getComponent(
+      deExObject.componentId,
+      deExObject.componentType
     );
+    const componentProperties = deExObject.componentProperties.map(
+      (componentProperty) => {
+        this.rehydrateComponentProperty(componentProperty);
+      }
+    );
+
+    const basicProperties = deExObject.basicProperties.map((deProperty) =>
+      this.rehydrateBasicProperty(deProperty)
+    );
+
+    const cloneProperty = this.rehydrateCloneProperty(deExObject.cloneProperty);
 
     const children = deExObject.children.map((child) =>
       this.rehydrateExObject(child)
     );
 
-    return this.ctx.objectFactory.createExObject(deExObject.id, sceneAttributes, children, proto);
+    return this.ctx.objectFactory.createExObject(
+      deExObject.id,
+      canvasPropertys,
+      children,
+      proto
+    );
   }
-  
 
   @loggedMethod
-  public rehydrateProperty(
-    deProperty: DehydratedProperty
-  ): Property {
+  public rehydrateProperty(deProperty: DehydratedProperty): Property {
     const expr = this.rehydrateExpr(deProperty.expr);
-    return Create.Property.object(this.ctx, deProperty.id, deProperty.name, expr);
+    return Create.Property.object(
+      this.ctx,
+      deProperty.id,
+      deProperty.name,
+      expr
+    );
   }
 
   @loggedMethod
@@ -61,19 +81,13 @@ export default class Rehydrator {
 
   @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
-    return this.exprFactory.createNumberExpr(
-      deExpr.value,
-      deExpr.id
-    );
+    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id);
   }
 
   @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
-    return this.exprFactory.createCallExpr(
-      deExpr.id,
-      args
-    );
+    return this.exprFactory.createCallExpr(deExpr.id, args);
   }
 
   private getComponent(componentId: string, componentType: string) {

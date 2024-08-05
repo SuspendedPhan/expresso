@@ -9,7 +9,7 @@ import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
 import {
   type BasicProperty,
   type CloneCountProperty,
-  type ComponentParameterProperty
+  type ComponentParameterProperty,
 } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
@@ -24,7 +24,7 @@ export interface ExObject extends ExItemBase {
   children$: SUB<ExObject[]>;
   componentParameterProperties: ComponentParameterProperty[];
   basicProperties$: SUB<BasicProperty[]>;
-  cloneCountProperty$: SUB<CloneCountProperty>;
+  cloneCountProperty: CloneCountProperty;
 }
 
 export async function createExObjectNew(
@@ -42,10 +42,7 @@ export async function createExObjectNew(
     componentParameterProperties: componentProperties,
     basicProperties$: new Subject(),
     children$: createBehaviorSubjectWithLifetime<ExObject[]>(base.destroy$, []),
-    cloneCountProperty$: createBehaviorSubjectWithLifetime<CloneCountProperty>(
-      base.destroy$,
-      Create.Property.cloneCountBlank(ctx)
-    ),
+    cloneCountProperty: Create.Property.cloneCountBlank(ctx),
   };
   return object;
 }

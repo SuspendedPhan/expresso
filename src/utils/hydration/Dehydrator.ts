@@ -4,7 +4,7 @@ import {
   type Observable,
   of,
   switchMap,
-  withLatestFrom
+  withLatestFrom,
 } from "rxjs";
 import { ComponentType } from "src/ex-object/Component";
 import {
@@ -17,7 +17,8 @@ import {
 import type { ExObject } from "src/ex-object/ExObject";
 import {
   type BasicProperty,
-  type ComponentParameterProperty
+  type CloneCountProperty,
+  type ComponentParameterProperty,
 } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
@@ -37,6 +38,7 @@ export interface DehydratedExObject {
   componentType: string;
   componentProperties: DehydratedComponentProperty[];
   basicProperties: DehydratedBasicProperty[];
+  cloneProperty: DehydratedCloneProperty;
   children: DehydratedExObject[];
 }
 
@@ -48,6 +50,11 @@ export interface DehydratedComponentProperty {
 export interface DehydratedBasicProperty {
   id: string;
   name: string;
+  expr: DehydratedExpr;
+}
+
+export interface DehydratedCloneProperty {
+  id: string;
   expr: DehydratedExpr;
 }
 
@@ -112,6 +119,10 @@ export default class Dehydrator {
       })
     );
 
+    const deCloneProperty$ = this.dehydrateCloneProperty$(
+      exObject.cloneCountProperty
+    );
+
     const deChildren$ = exObject.children$.pipe(
       switchMap((children) => {
         logger.log("switchMap", "children", children);
@@ -131,19 +142,28 @@ export default class Dehydrator {
     const result = combineLatest([
       deComponentProperties$,
       deBasicProperties$,
+      deCloneProperty$,
       deChildren$,
     ]).pipe(
-      map(([deComponentProperties, deBasicProperties, deChildren]) => {
-        const deExObject: DehydratedExObject = {
-          id: exObject.id,
-          componentId: exObject.component.id,
-          componentType: ComponentType[exObject.component.componentType],
-          componentProperties: deComponentProperties,
-          basicProperties: deBasicProperties,
-          children: deChildren,
-        };
-        return deExObject;
-      })
+      map(
+        ([
+          deComponentProperties,
+          deBasicProperties,
+          deCloneProperty,
+          deChildren,
+        ]) => {
+          const deExObject: DehydratedExObject = {
+            id: exObject.id,
+            componentId: exObject.component.id,
+            componentType: ComponentType[exObject.component.componentType],
+            componentProperties: deComponentProperties,
+            basicProperties: deBasicProperties,
+            cloneProperty: deCloneProperty,
+            children: deChildren,
+          };
+          return deExObject;
+        }
+      )
     );
 
     return result;
@@ -184,6 +204,26 @@ export default class Dehydrator {
         const deProperty: DehydratedBasicProperty = {
           id: property.id,
           name,
+          expr: dehydratedExpr,
+        };
+        return deProperty;
+      })
+    );
+  }
+
+  @loggedMethod
+  public dehydrateCloneProperty$(
+    property: CloneCountProperty
+  ): Observable<DehydratedCloneProperty> {
+    const logger = Logger.logger();
+    return property.expr$.pipe(
+      switchMap((expr) => {
+        return this.dehydrateExpr$(expr);
+      }),
+      map((dehydratedExpr) => {
+        logger.log("map", "dehydratedExpr", dehydratedExpr);
+        const deProperty: DehydratedCloneProperty = {
+          id: property.id,
           expr: dehydratedExpr,
         };
         return deProperty;
