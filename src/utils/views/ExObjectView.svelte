@@ -4,7 +4,7 @@
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import AttributeView from "./AttributeView.svelte";
+  import AttributeView from "./PropertyView.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;

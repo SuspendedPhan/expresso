@@ -111,7 +111,7 @@ export default class Rehydrator {
   public async rehydrateBasicProperty(
     deProperty: DehydratedBasicProperty
   ): Promise<BasicProperty> {
-    const expr = this.rehydrateExpr(deProperty.expr);
+    const expr = await this.rehydrateExpr(deProperty.expr);
     return Create.Property.basic(
       this.ctx,
       deProperty.id,
@@ -124,7 +124,7 @@ export default class Rehydrator {
   public async rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
   ): Promise<CloneCountProperty> {
-    const expr = this.rehydrateExpr(deProperty.expr);
+    const expr = await this.rehydrateExpr(deProperty.expr);
     return Create.Property.cloneCount(this.ctx, deProperty.id, expr);
   }
 

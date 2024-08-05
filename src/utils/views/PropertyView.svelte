@@ -5,13 +5,14 @@
   import ExprLayout from "../layout/ExprLayout";
   import TreeView from "../layout/TreeView.svelte";
   import ExprView from "./ExprView.svelte";
-  import type { SceneProperty } from "src/ex-object/SceneAttribute";
+  import { PropertyUtils, type Property } from "src/ex-object/Property";
 
   export let ctx: MainContext;
-  export let attribute: SceneProperty;
-  let name = attribute.proto.name;
+  export let property: Property;
 
-  let expr$ = attribute.expr$;
+  const name = PropertyUtils.getName(property);
+
+  let expr$ = property.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
 
   // Hmmm... this seems inefficient
@@ -21,7 +22,7 @@
 </script>
 
 <div>
-  <SelectableView {ctx} object={attribute} class="mb-4">
+  <SelectableView {ctx} object={property} class="mb-4">
     <div class="text-center">{name}</div>
   </SelectableView>
   {#key $exprId$}

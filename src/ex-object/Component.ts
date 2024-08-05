@@ -1,13 +1,24 @@
+import { firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import type { SUB } from "src/utils/utils/Utils";
+import type { OBS, SUB } from "src/utils/utils/Utils";
 
-export type CanvasSetter = (canvasObject: LibCanvasObject, value: number) => void;
+export type CanvasSetter = (
+  canvasObject: LibCanvasObject,
+  value: number
+) => void;
 
 export type Component = CanvasComponent | CustomComponent;
-export type ComponentParameter = CanvasComponentParameter | CustomComponentParameter;
+export type ComponentParameter =
+  | CanvasComponentParameter
+  | CustomComponentParameter;
 export enum ComponentType {
   CanvasComponent,
   CustomComponent,
+}
+
+export enum ComponentParameterType {
+  CanvasComponentParameter,
+  CustomComponentParameter,
 }
 
 export interface CanvasComponent {
@@ -26,11 +37,13 @@ export interface CustomComponent {
 export interface CanvasComponentParameter {
   readonly id: string;
   readonly name: string;
+  readonly componentParameterType: ComponentParameterType.CanvasComponentParameter;
   readonly canvasSetter: CanvasSetter;
 }
 
 export interface CustomComponentParameter {
   readonly id: string;
+  readonly componentParameterType: ComponentParameterType.CustomComponentParameter;
   readonly nameSub$: SUB<string>;
 }
 
@@ -40,6 +53,7 @@ export const CanvasComponentStore = {
     componentType: ComponentType.CanvasComponent,
     parameters: [
       {
+        componentParameterType: ComponentParameterType.CanvasComponentParameter,
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {
@@ -51,7 +65,20 @@ export const CanvasComponentStore = {
 } satisfies Record<string, CanvasComponent>;
 
 export namespace CreateComponent {
-  export function component() {
+  export function component() {}
+}
 
+export namespace ComponentParameterUtils {
+  export function getName$(
+    componentParameter: ComponentParameter
+  ): OBS<string> {
+    switch (componentParameter.componentParameterType) {
+      case ComponentParameterType.CanvasComponentParameter:
+        return of(componentParameter.name);
+      case ComponentParameterType.CustomComponentParameter:
+        return componentParameter.nameSub$;
+      default:
+        throw new Error("unknown component parameter type");
+    }
   }
 }

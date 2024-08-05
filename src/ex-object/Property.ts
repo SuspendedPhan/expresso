@@ -1,4 +1,5 @@
-import type { ComponentParameter } from "src/ex-object/Component";
+import { of } from "rxjs";
+import { ComponentParameterUtils, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import {
@@ -112,5 +113,20 @@ export namespace CreateProperty {
       propertyType: PropertyType.CloneCountProperty,
     };
     return cloneCountProperty;
+  }
+}
+
+export namespace PropertyUtils {
+  export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
+
+  export function getName$(property: Property): OBS<string> {
+    switch (property.propertyType) {
+      case PropertyType.ComponentProperty:
+        return ComponentParameterUtils.getName$(property.componentParameter);
+      case PropertyType.BasicProperty:
+        return property.name$;
+      case PropertyType.CloneCountProperty:
+        return of(CLONE_COUNT_PROPERTY_NAME);
+    }
   }
 }
