@@ -60,7 +60,7 @@ function createSceneComponentProperties(
   ctx: MainContext,
   component: SceneComponent
 ): Property[] {
-  return component.inputs.map((input) => {
+  return component.parameters.map((input) => {
     return createComponentPropertyNew(ctx, input);
   });
 }
@@ -69,7 +69,7 @@ async function createCustomComponentProperties(
   ctx: MainContext,
   component: CustomComponent
 ): Promise<Property[]> {
-  return firstValueFrom(component.inputs$).then((inputs) => {
+  return firstValueFrom(component.parameters$).then((inputs) => {
     return inputs.map((input) => {
       return createComponentPropertyNew(ctx, input);
     });

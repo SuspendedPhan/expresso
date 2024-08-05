@@ -76,7 +76,7 @@ export class SceneManager {
       return;
     }
 
-    for (const input of component.inputs) {
+    for (const input of component.parameters) {
       this.updateAttributeSceneInstance(
         sceneObject,
         input.id,

@@ -1,22 +1,12 @@
-import type {
-  CallExpr,
-  Component,
-  Expr,
-  NumberExpr
-} from "src/ex-object/ExObject";
-import type ExObjectFactory from "src/ex-object/ExObjectFactory";
-import {
-  getProtoComponentById
-} from "src/ex-object/ProtoComponent";
-import {
-  getProtoSceneAttributeById,
-  type SceneProperty,
-} from "src/ex-object/SceneAttribute";
+import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
+import type { Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
+import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import type {
   DehydratedCallExpr,
-  DehydratedComponent,
+  DehydratedExObject,
   DehydratedExpr,
   DehydratedNumberExpr,
   DehydratedProject,
@@ -25,42 +15,36 @@ import type {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
 export default class Rehydrator {
-  private readonly exprFactory: ExObjectFactory;
   public constructor(private readonly ctx: MainContext) {
-    this.exprFactory = ctx.objectFactory;
   }
 
   public rehydrateProject(deProject: DehydratedProject): LibraryProject {
-    const rootComponents = deProject.rootComponents.map((deComponent) =>
-      this.rehydrateComponent(deComponent)
+    const rootExObjects = deProject.rootExObjects.map((deExObject) =>
+      this.rehydrateExObject(deExObject)
     );
-    return this.ctx.projectManager.addProject(deProject.id, deProject.name, rootComponents);
+    return this.ctx.projectManager.addProject(deProject.id, deProject.name, rootExObjects);
   }
 
-  public rehydrateComponent(deComponent: DehydratedComponent): Component {
-    const proto = getProtoComponentById(deComponent.protoComponentId);
-    const sceneAttributes = deComponent.sceneAttributes.map((sceneAttribute) =>
-      this.rehydrateSceneAttribute(sceneAttribute)
+  public rehydrateExObject(deExObject: DehydratedExObject): ExObject {
+    const component = this.getComponent(deExObject.componentId, deExObject.componentType);
+    const sceneAttributes = deExObject.map((sceneAttribute) =>
+      this.rehydrateProperty(sceneAttribute)
     );
 
-    const children = deComponent.children.map((child) =>
-      this.rehydrateComponent(child)
+    const children = deExObject.children.map((child) =>
+      this.rehydrateExObject(child)
     );
 
-    return this.ctx.objectFactory.createComponent(deComponent.id, sceneAttributes, children, proto);
+    return this.ctx.objectFactory.createExObject(deExObject.id, sceneAttributes, children, proto);
   }
+  
 
   @loggedMethod
-  public rehydrateSceneAttribute(
-    deAttribute: DehydratedProperty
-  ): SceneProperty {
-    const expr = this.rehydrateExpr(deAttribute.expr);
-    const proto = getProtoSceneAttributeById(deAttribute.protoSceneAttributeId);
-    return this.ctx.objectFactory.createSceneAttribute(
-      deAttribute.id,
-      expr,
-      proto
-    );
+  public rehydrateProperty(
+    deProperty: DehydratedProperty
+  ): Property {
+    const expr = this.rehydrateExpr(deProperty.expr);
+    return Create.Property.object(this.ctx, deProperty.id, deProperty.name, expr);
   }
 
   @loggedMethod
@@ -90,5 +74,9 @@ export default class Rehydrator {
       deExpr.id,
       args
     );
+  }
+
+  private getComponent(componentId: string, componentType: string) {
+    throw new Error("Method not implemented.");
   }
 }

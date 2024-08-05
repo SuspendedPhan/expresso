@@ -4,7 +4,7 @@ import type { SUB } from "src/utils/utils/Utils";
 export type SceneSetter = (sceneObject: SceneObject, value: number) => void;
 
 export type Component = SceneComponent | CustomComponent;
-export type ComponentInput = SceneComponentInput | CustomComponentInput;
+export type ComponentParameter = SceneComponentParameter | CustomComponentParameter;
 export enum ComponentType {
   SceneComponent,
   CustomComponent,
@@ -13,31 +13,32 @@ export enum ComponentType {
 export interface SceneComponent {
   id: string;
   componentType: ComponentType.SceneComponent;
-  inputs: SceneComponentInput[];
+  parameters: SceneComponentParameter[];
 }
 
 export interface CustomComponent {
   id: string;
   componentType: ComponentType.CustomComponent;
   name$: SUB<string>;
-  inputs$: SUB<ComponentInput[]>;
+  parameters$: SUB<ComponentParameter[]>;
 }
 
-export interface SceneComponentInput {
+export interface SceneComponentParameter {
   readonly id: string;
   readonly name: string;
   readonly sceneSetter: SceneSetter;
 }
 
-export interface CustomComponentInput {
+export interface CustomComponentParameter {
   readonly id: string;
   readonly nameSub$: SUB<string>;
 }
 
 export const SceneComponentStore = {
   circle: {
+    id: "circle",
     componentType: ComponentType.SceneComponent,
-    inputs: [
+    parameters: [
       {
         name: "x",
         id: "x",
@@ -48,3 +49,9 @@ export const SceneComponentStore = {
     ],
   },
 } satisfies Record<string, SceneComponent>;
+
+export namespace CreateComponent {
+  export function component() {
+
+  }
+}
