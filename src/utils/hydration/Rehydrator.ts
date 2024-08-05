@@ -20,7 +20,7 @@ import type {
   DehydratedExpr,
   DehydratedNumberExpr,
   DehydratedProject,
-  DehydratedSceneAttribute,
+  DehydratedProperty,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
@@ -52,7 +52,7 @@ export default class Rehydrator {
 
   @loggedMethod
   public rehydrateSceneAttribute(
-    deAttribute: DehydratedSceneAttribute
+    deAttribute: DehydratedProperty
   ): SceneProperty {
     const expr = this.rehydrateExpr(deAttribute.expr);
     const proto = getProtoSceneAttributeById(deAttribute.protoSceneAttributeId);

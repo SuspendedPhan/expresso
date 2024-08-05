@@ -11,11 +11,13 @@ export enum ComponentType {
 }
 
 export interface SceneComponent {
+  id: string;
   componentType: ComponentType.SceneComponent;
   inputs: SceneComponentInput[];
 }
 
 export interface CustomComponent {
+  id: string;
   componentType: ComponentType.CustomComponent;
   name$: SUB<string>;
   inputs$: SUB<ComponentInput[]>;

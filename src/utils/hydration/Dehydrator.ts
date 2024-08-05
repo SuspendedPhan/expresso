@@ -1,6 +1,8 @@
 import { combineLatest, map, type Observable, of, switchMap } from "rxjs";
+import { ComponentType } from "src/ex-object/Component";
 import { type Project, type Expr, ExprType, type NumberExpr, type CallExpr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
+import { PropertyType, type ObjectProperty } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -18,14 +20,15 @@ export interface DehydratedProject {
 
 export interface DehydratedExObject {
   id: string;
-  protoExObjectId: string;
-  sceneAttributes: DehydratedSceneAttribute[];
+  componentId: string;
+  componentType: string;
+  sceneAttributes: DehydratedProperty[];
   children: DehydratedExObject[];
 }
 
-export interface DehydratedSceneAttribute {
+export interface DehydratedProperty {
   id: string;
-  protoSceneAttributeId: string;
+  propertyType: string;
   expr: DehydratedExpr;
 }
 
@@ -112,33 +115,36 @@ export default class Dehydrator {
 
     return combineLatest([deAttrs$, deChildren$]).pipe(
       map(([deAttrs, deChildren]) => {
-        return {
+        const deExObject: DehydratedExObject = {
           id: exObject.id,
-          protoExObjectId: exObject.proto.id,
+          componentId: exObject.component.id,
+          componentType: ComponentType[exObject.component.componentType],
           sceneAttributes: deAttrs,
           children: deChildren,
         };
+        return deExObject;
       })
     );
   }
 
   @loggedMethod
   public dehydrateAttribute$(
-    attribute: SceneProperty
-  ): Observable<DehydratedSceneAttribute> {
+    property: ObjectProperty
+  ): Observable<DehydratedProperty> {
     const logger = Logger.logger();
 
-    return attribute.expr$.pipe(
+    return property.expr$.pipe(
       switchMap((expr) => {
         return this.dehydrateExpr$(expr);
       }),
       map((dehydratedExpr) => {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
-        return {
-          id: attribute.id,
+        const deProperty: DehydratedProperty = {
+          id: property.id,
+          propertyType: PropertyType[property.propertyType],
           expr: dehydratedExpr,
-          protoSceneAttributeId: attribute.proto.id,
         };
+        return deProperty;
       })
     );
   }
