@@ -18,7 +18,7 @@ export class MainEventBus {
   public constructor(ctx: MainContext) {
     this.rootObjects$ = ctx.projectManager.currentLibraryProject$.pipe(
       switchMap((project) => project.project$),
-      switchMap((project) => project.rootObjects$)
+      switchMap((project) => project.rootExObjects$)
     );
   }
 }

@@ -16,8 +16,8 @@ export default class ProjectMutator {
     const object = await createExObjectNew(this.ctx, SceneComponentStore.circle);
 
     this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
-      project.rootObjects$.pipe(first()).subscribe((rootObjects) => {
-        project.rootObjects$.next([...rootObjects, object]);
+      project.rootExObjects$.pipe(first()).subscribe((rootObjects) => {
+        project.rootExObjects$.next([...rootObjects, object]);
       });
     });
   }

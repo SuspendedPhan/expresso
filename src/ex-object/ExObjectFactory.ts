@@ -35,7 +35,7 @@ export default class ExObjectFactory {
     const project: Project = {
       destroy$,
       libraryProject,
-      rootObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
+      rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
       currentOrdinal$: new BehaviorSubject<number>(0),
     };
 

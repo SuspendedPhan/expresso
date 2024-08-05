@@ -1,13 +1,6 @@
 import { combineLatest, map, type Observable, of, switchMap } from "rxjs";
-import {
-  type CallExpr,
-  type Component,
-  type Expr,
-  ExprType,
-  type NumberExpr,
-  type Project,
-} from "src/ex-object/ExObject";
-import { type ProtoSceneProperty, type SceneProperty } from "src/ex-object/SceneAttribute";
+import { type Project, type Expr, ExprType, type NumberExpr, type CallExpr } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -20,14 +13,14 @@ export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 export interface DehydratedProject {
   id: string;
   name: string;
-  rootComponents: DehydratedComponent[];
+  rootExObjects: DehydratedExObject[];
 }
 
-export interface DehydratedComponent {
+export interface DehydratedExObject {
   id: string;
-  protoComponentId: string;
+  protoExObjectId: string;
   sceneAttributes: DehydratedSceneAttribute[];
-  children: DehydratedComponent[];
+  children: DehydratedExObject[];
 }
 
 export interface DehydratedSceneAttribute {
@@ -50,35 +43,35 @@ export interface DehydratedCallExpr {
 
 export default class Dehydrator {
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
-    const deComponents$ = project.rootComponents$.pipe(
-      switchMap((components) => {
-        if (components.length === 0) {
+    const deExObjects$ = project.rootExObjects$.pipe(
+      switchMap((exObjects) => {
+        if (exObjects.length === 0) {
           return of([]);
         }
 
         return combineLatest(
-          components.map((component) => {
-            return this.dehydrateComponent$(component);
+          exObjects.map((exObject) => {
+            return this.dehydrateExObject$(exObject);
           })
         );
       })
     );
 
-    return deComponents$.pipe(
-      map((deComponents) => {
+    return deExObjects$.pipe(
+      map((deExObjects) => {
         return {
           id: project.libraryProject.id,
           name: project.libraryProject.name,
-          rootComponents: deComponents,
+          rootExObjects: deExObjects,
         };
       })
     );
   }
 
   @loggedMethod
-  public dehydrateComponent$(
-    component: Component
-  ): Observable<DehydratedComponent> {
+  public dehydrateExObject$(
+    exObject: ExObject
+  ): Observable<DehydratedExObject> {
     const logger = Logger.logger();
 
     const protoAttributeBySceneAttributeId = new Map<
@@ -88,11 +81,11 @@ export default class Dehydrator {
     for (const [
       protoAttribute,
       sceneAttribute,
-    ] of component.sceneAttributeByProto) {
+    ] of exObject.sceneAttributeByProto) {
       protoAttributeBySceneAttributeId.set(sceneAttribute.id, protoAttribute);
     }
 
-    const deAttr$s = Array.from(component.sceneAttributeByProto.values()).map(
+    const deAttr$s = Array.from(exObject.sceneAttributeByProto.values()).map(
       (sceneAttribute) => {
         logger.log("map", "sceneAttribute", sceneAttribute);
         return this.dehydrateAttribute$(sceneAttribute);
@@ -101,7 +94,7 @@ export default class Dehydrator {
 
     const deAttrs$ = combineLatest(deAttr$s);
 
-    const deChildren$ = component.children$.pipe(
+    const deChildren$ = exObject.children$.pipe(
       switchMap((children) => {
         logger.log("switchMap", "children", children);
         if (children.length === 0) {
@@ -111,7 +104,7 @@ export default class Dehydrator {
         return combineLatest(
           children.map((child) => {
             logger.log("map", "child", child);
-            return this.dehydrateComponent$(child);
+            return this.dehydrateExObject$(child);
           })
         );
       })
@@ -120,8 +113,8 @@ export default class Dehydrator {
     return combineLatest([deAttrs$, deChildren$]).pipe(
       map(([deAttrs, deChildren]) => {
         return {
-          id: component.id,
-          protoComponentId: component.proto.id,
+          id: exObject.id,
+          protoExObjectId: exObject.proto.id,
           sceneAttributes: deAttrs,
           children: deChildren,
         };
