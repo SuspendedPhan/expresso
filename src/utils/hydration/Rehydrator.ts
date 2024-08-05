@@ -1,7 +1,16 @@
-import type { Component, ComponentParameter, CustomComponent } from "src/ex-object/Component";
+import assert from "assert-ts";
+import type {
+  Component,
+  ComponentParameter,
+  CustomComponent,
+} from "src/ex-object/Component";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { ComponentParameterProperty, Property } from "src/ex-object/Property";
+import type {
+  BasicProperty,
+  CloneCountProperty,
+  ComponentParameterProperty
+} from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
@@ -16,7 +25,6 @@ import type {
   DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { Assert } from "src/utils/utils/Assert";
 
 export default class Rehydrator {
   private customComponentById = new Map<string, CustomComponent>();
@@ -24,10 +32,16 @@ export default class Rehydrator {
 
   public constructor(private readonly ctx: MainContext) {}
 
-  public rehydrateProject(deProject: DehydratedProject): LibraryProject {
-    const rootExObjects = deProject.rootExObjects.map((deExObject) =>
+  public async rehydrateProject(
+    deProject: DehydratedProject
+  ): Promise<LibraryProject> {
+    const rootExObjects$P = deProject.rootExObjects.map((deExObject) =>
       this.rehydrateExObject(deExObject)
     );
+    const rootExObjects = await Promise.all(rootExObjects$P);
+
+    console.error("need to hydrate the parameters and components");
+
     return this.ctx.projectManager.addProject(
       deProject.id,
       deProject.name,
@@ -35,14 +49,12 @@ export default class Rehydrator {
     );
   }
 
-  public rehydrateExObject(
-    deExObject: DehydratedExObject,
-    customComponentById: Map<string, CustomComponent>
-  ): ExObject {
+  public async rehydrateExObject(
+    deExObject: DehydratedExObject
+  ): Promise<ExObject> {
     const component = this.getComponent(
       deExObject.componentId,
       deExObject.componentType,
-      customComponentById
     );
     const componentProperties = deExObject.componentProperties.map(
       (componentProperty) => {
@@ -58,11 +70,12 @@ export default class Rehydrator {
       deExObject.cloneProperty
     );
 
-    const children = deExObject.children.map((child) =>
-      this.rehydrateExObject(child, customComponentById)
-    );
+    const children$P = deExObject.children.map((child) => {
+      return this.rehydrateExObject(child);
+    });
+    const children = await Promise.all(children$P);
 
-    return Create.ExObject.from(
+    const exObject: ExObject = await Create.ExObject.from(
       this.ctx,
       component,
       deExObject.id,
@@ -71,28 +84,37 @@ export default class Rehydrator {
       cloneCountProperty,
       children
     );
+    return exObject;
   }
 
   @loggedMethod
   public rehydrateComponentProperty(
     deProperty: DehydratedComponentProperty
   ): ComponentParameterProperty {
-    const parameter = this.componentParameterById.get(deProperty.componentParameterId);
-    Assert.notUndefined(parameter, `Component parameter not found: ${deProperty.componentParameterId}`);
+    const parameter = this.componentParameterById.get(
+      deProperty.componentParameterId
+    );
+    assert(
+      parameter !== undefined,
+      `Component parameter not found: ${deProperty.componentParameterId}`
+    );
+
     const expr = this.rehydrateExpr(deProperty.expr);
     return Create.Property.component(this.ctx, deProperty.id, parameter, expr);
   }
 
   @loggedMethod
-  public rehydrateBasicProperty(deProperty: DehydratedBasicProperty): Property {
+  public rehydrateBasicProperty(
+    deProperty: DehydratedBasicProperty
+  ): BasicProperty {
     const expr = this.rehydrateExpr(deProperty.expr);
-    return Create.Property.basic(this.ctx, deProperty.id, expr);
+    return Create.Property.basic(this.ctx, deProperty.id, deProperty.name, expr);
   }
 
   @loggedMethod
   public rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
-  ): Property {
+  ): CloneCountProperty {
     const expr = this.rehydrateExpr(deProperty.expr);
     return Create.Property.cloneCount(this.ctx, deProperty.id, expr);
   }
@@ -111,19 +133,18 @@ export default class Rehydrator {
 
   @loggedMethod
   private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
-    return this.exprFactory.createNumberExpr(deExpr.value, deExpr.id);
+    return this.ctx.objectFactory.createNumberExpr(deExpr.value, deExpr.id);
   }
 
   @loggedMethod
   private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
     const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
-    return this.exprFactory.createCallExpr(deExpr.id, args);
+    return this.ctx.objectFactory.createCallExpr(deExpr.id, args);
   }
 
   private getComponent(
     componentId: string,
     componentType: string,
-    customComponentById: Map<string, CustomComponent>
   ): Component {
     throw new Error("Method not implemented.");
   }
