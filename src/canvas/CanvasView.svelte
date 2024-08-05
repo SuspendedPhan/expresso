@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { SceneMain } from "./CanvasMain";
+  import { CanvasMain } from "./CanvasMain";
   import PixiFactory from "./PixiFactory";
   import MainContext from "src/main-context/MainContext";
   export let ctx: MainContext;
@@ -9,7 +9,7 @@
 
   onMount(() => {
     const pixiFactory = new PixiFactory(viewportElement, canvasElement);
-    new SceneMain(ctx, pixiFactory);
+    new CanvasMain(ctx, pixiFactory);
   });
 </script>
 

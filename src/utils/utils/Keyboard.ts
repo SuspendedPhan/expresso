@@ -1,10 +1,10 @@
 import hotkeys from "hotkeys-js";
 import { map } from "rxjs";
-import { ExItemType } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
+import { ExItemType } from "src/ex-object/ExItem";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -127,8 +127,8 @@ export default class Keyboard {
     const focusedExpr$ = ctx.focusManager.getFocus$().pipe(
       map((focus) => {
         if (
-          focus.type !== "ExObject" ||
-          focus.exItem.objectType !== ExItemType.Expr
+          focus.type !== "ExItem" ||
+          focus.exItem.itemType !== ExItemType.Expr
         ) {
           return KeyboardScopeResult.OutOfScope;
         }
@@ -151,7 +151,7 @@ export default class Keyboard {
     );
     const exprReplaceCommandScope = new KeyboardScope(exprReplaceCommand$);
     exprReplaceCommandScope.hotkeys("Esc", (focus) => {
-      ctx.focusManager.focusExObject(focus.expr);
+      ctx.focusManager.focusExItem(focus.expr);
     });
 
     exprReplaceCommandScope.hotkeys("Enter", () => {
@@ -168,7 +168,7 @@ export default class Keyboard {
     });
 
     viewActionsScope.hotkeys("s", () => {
-      ctx.viewCtx.viewMode$.next(ViewMode.SceneWindowMaximized);
+      ctx.viewCtx.viewMode$.next(ViewMode.CanvasWindowMaximized);
       ctx.focusManager.popFocus();
       ctx.focusManager.popFocus();
     });
