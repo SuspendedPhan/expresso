@@ -1,9 +1,9 @@
 import { firstValueFrom, Subject } from "rxjs";
 import {
   ComponentType,
+  type CanvasComponent,
   type Component,
   type CustomComponent,
-  type SceneComponent,
 } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
 import {
@@ -55,15 +55,15 @@ async function createComponentProperties(
   component: Component
 ): Promise<ComponentParameterProperty[]> {
   switch (component.componentType) {
-    case ComponentType.SceneComponent:
-      return createSceneComponentProperties(ctx, component);
+    case ComponentType.CanvasComponent:
+      return createCanvasComponentProperties(ctx, component);
     case ComponentType.CustomComponent:
       return createCustomComponentProperties(ctx, component);
   }
 }
-function createSceneComponentProperties(
+function createCanvasComponentProperties(
   ctx: MainContext,
-  component: SceneComponent
+  component: CanvasComponent
 ): ComponentParameterProperty[] {
   return component.parameters.map((input) => {
     return Create.Property.componentBlank(ctx, input);
