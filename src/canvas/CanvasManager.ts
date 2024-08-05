@@ -50,14 +50,6 @@ export class CanvasManager {
   private updateExObject1(
     exObject: ExObject,
     evaluation: Evaluation,
-    path: CanvasObjectPath
-  ) {
-
-  }
-
-  private updateExObject2(
-    exObject: ExObject,
-    evaluation: Evaluation,
     parentPath: CanvasObjectPath,
     cloneCount: number
   ) {
