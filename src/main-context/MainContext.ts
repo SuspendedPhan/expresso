@@ -1,6 +1,9 @@
 import { first, Subject, switchMap } from "rxjs";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
-import { type LibraryProject, ProjectManager } from "src/library/LibraryProject";
+import {
+  type LibraryProject,
+  ProjectManager,
+} from "src/library/LibraryProject";
 import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";

@@ -1,30 +1,30 @@
-import type { Component } from "src/ex-object/ExObject";
+import type { ExObject } from "src/ex-object/ExObject";
 import { ElementLayout } from "./ElementLayout";
 import MainContext from "src/main-context/MainContext";
 
-export default class ComponentLayout {
+export default class ExObjectLayout {
   public static create(
     ctx: MainContext,
-    rootComponent: Component
+    rootExObject: ExObject
   ): ElementLayout {
-    const childrenByComponent = new Map<Component, readonly Component[]>();
+    const childrenByExObject = new Map<ExObject, readonly ExObject[]>();
     
-    ctx.eventBus.objectAdded$.subscribe((component) => {
-      component.children$.subscribe((children) => {
-        childrenByComponent.set(component, children);
+    ctx.eventBus.objectAdded$.subscribe((exObject) => {
+      exObject.children$.subscribe((children) => {
+        childrenByExObject.set(exObject, children);
       });
     });
 
     return new ElementLayout(
-      () => rootComponent,
-      (component) => this.getChildren(component, childrenByComponent),
-      (component) => component.id,
+      () => rootExObject,
+      (exObject) => this.getChildren(exObject, childrenByExObject),
+      (exObject) => exObject.id,
       16,
       16
     );
   }
 
-  static getChildren(component: Component, childrenByComponent: Map<Component, readonly Component[]>): readonly Component[] {
-    return childrenByComponent.get(component) ?? [];
+  static getChildren(exObject: ExObject, childrenByExObject: Map<ExObject, readonly ExObject[]>): readonly ExObject[] {
+    return childrenByExObject.get(exObject) ?? [];
   }
 }

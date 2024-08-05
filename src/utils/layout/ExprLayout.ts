@@ -1,7 +1,7 @@
-import { type Expr, ExprType } from "src/ex-object/ExObject";
 import MainContext from "src/main-context/MainContext";
 import { ElementLayout } from "./ElementLayout";
 import { assertUnreachable } from "../utils/Utils";
+import { type Expr, ExprType } from "src/ex-object/ExItem";
 
 export default class ComponentLayout {
   public static create(ctx: MainContext, rootExpr: Expr): ElementLayout {
