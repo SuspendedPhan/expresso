@@ -52,16 +52,18 @@ export default class MainContext {
         });
     });
 
-    // Persistence.readProject$.subscribe(async (deProject) => {
-    //   if (deProject === null) {
-    //     this.projectManager.addProjectNew();
-    //   } else {
-    //     const project = await new Rehydrator(this).rehydrateProject(deProject);
-    //     (
-    //       this.projectManager.currentLibraryProject$ as Subject<LibraryProject>
-    //     ).next(project);
-    //   }
-    // });
+    Persistence.readProject$.subscribe(async (deProject) => {
+      // if (deProject === null) {
+      if (true) {
+        this.projectManager.addProjectNew();
+      } else {
+        // @ts-ignore
+        const project = await new Rehydrator(this).rehydrateProject(deProject);
+        (
+          this.projectManager.currentLibraryProject$ as Subject<LibraryProject>
+        ).next(project);
+      }
+    });
 
     const dehydrator = new Dehydrator();
     this.projectManager.currentProject$

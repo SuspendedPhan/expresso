@@ -1,4 +1,4 @@
-import { BehaviorSubject, first, Subject } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
 import type { Component } from "src/ex-object/Component";
 import {
   type CallExpr,
@@ -11,22 +11,16 @@ import {
   type Project
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
+import { ProjectUtils } from "src/ex-object/Project";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
-import type { ProjectMut } from "src/mutator/ProjectMutator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import {
   createBehaviorSubjectWithLifetime
 } from "src/utils/utils/Utils";
 
 export default class ExObjectFactory {
-  private currentOrdinal = 0;
   public constructor(private readonly ctx: MainContext) {
-    this.ctx.projectManager.currentProject$.subscribe((project) => {
-      project.currentOrdinal$.subscribe((ordinal) => {
-        this.currentOrdinal = ordinal;
-      });
-    });
   }
 
   public createProject(libraryProject: LibraryProject, rootObjects: readonly ExObject[]): Project {
@@ -45,7 +39,7 @@ export default class ExObjectFactory {
 
 
   @loggedMethod
-  public createNumberExpr(value?: number, id?: string): NumberExpr {
+  public async createNumberExpr(value?: number, id?: string): Promise<NumberExpr> {
     if (id === undefined) {
       id = `expr-${crypto.randomUUID()}`;
     }
@@ -54,7 +48,7 @@ export default class ExObjectFactory {
       value = 0;
     }
 
-    const base = this.createExItemBase(id);
+    const base = await this.createExItemBase(id);
 
     const expr: NumberExpr = {
       itemType: ExItemType.Expr,
@@ -68,18 +62,18 @@ export default class ExObjectFactory {
   }
 
   @loggedMethod
-  public createCallExpr(id?: string, args?: Expr[]): CallExpr {
+  public async createCallExpr(id?: string, args?: Expr[]): Promise<CallExpr> {
     if (id === undefined) {
       id = `expr-${crypto.randomUUID()}`;
     }
 
     if (args === undefined) {
-      const arg0 = this.createNumberExpr();
-      const arg1 = this.createNumberExpr();
+      const arg0 = await this.createNumberExpr();
+      const arg1 = await this.createNumberExpr();
       args = [arg0, arg1];
     }
 
-    const base = this.createExItemBase(id);
+    const base = await this.createExItemBase(id);
     const argsSub$ = createBehaviorSubjectWithLifetime(base.destroy$, args);
 
     const expr: CallExpr = {
@@ -97,19 +91,19 @@ export default class ExObjectFactory {
     return expr;
   }
 
-  public createExItemBase(
+  public async createExItemBase(
     id: string
-  ): ExItemBase {
+  ): Promise<ExItemBase> {
     const destroy$ = new Subject<void>();
+    const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
+    const ordinal = await ProjectUtils.getAndIncrementOrdinal(project);
+
     const exObjectBase: ExItemBase = {
       id,
-      ordinal: this.currentOrdinal,
+      ordinal,
       parent$: createBehaviorSubjectWithLifetime<Parent>(destroy$, null),
       destroy$,
     };
-    this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
-      (project as ProjectMut).currentOrdinalSub$.next(this.currentOrdinal + 1);
-    });
     return exObjectBase;
   }
 }

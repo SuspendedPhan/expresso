@@ -27,13 +27,24 @@ export interface ExObject extends ExItemBase {
   cloneCountProperty: CloneCountProperty;
 }
 
+export namespace MutateExObject {
+  export async function addChild(
+    exObject: ExObject,
+    child: ExObject
+  ) {
+    const children = await firstValueFrom(exObject.children$);
+    const newChildren = [...children, child];
+    exObject.children$.next(newChildren);
+  }
+}
+
 export namespace CreateExObject {
   export async function blank(
     ctx: MainContext,
     component: Component
   ): Promise<ExObject> {
     const id = `ex-object-${crypto.randomUUID()}`;
-    const base = ctx.objectFactory.createExItemBase(id);
+    const base = await ctx.objectFactory.createExItemBase(id);
     const componentProperties = await createComponentProperties(ctx, component);
 
     const object: ExObject = {
@@ -46,7 +57,7 @@ export namespace CreateExObject {
         base.destroy$,
         []
       ),
-      cloneCountProperty: Create.Property.cloneCountBlank(ctx),
+      cloneCountProperty: await Create.Property.cloneCountBlank(ctx),
     };
     return object;
   }
@@ -60,7 +71,7 @@ export namespace CreateExObject {
     cloneCountProperty: CloneCountProperty,
     children: ExObject[]
   ): Promise<ExObject> {
-    const base = ctx.objectFactory.createExItemBase(id);
+    const base = await ctx.objectFactory.createExItemBase(id);
     const object: ExObject = {
       ...base,
       itemType: ExItemType.ExObject,
@@ -91,22 +102,25 @@ async function createComponentProperties(
       return createCustomComponentProperties(ctx, component);
   }
 }
-function createCanvasComponentProperties(
+async function createCanvasComponentProperties(
   ctx: MainContext,
   component: CanvasComponent
-): ComponentParameterProperty[] {
-  return component.parameters.map((input) => {
+): Promise<ComponentParameterProperty[]> {
+  const parameter$Ps = component.parameters.map((input) => {
     return Create.Property.componentBlank(ctx, input);
   });
+  const parameters$P = await Promise.all(parameter$Ps);
+  return parameters$P;
 }
 
 async function createCustomComponentProperties(
   ctx: MainContext,
   component: CustomComponent
 ): Promise<ComponentParameterProperty[]> {
-  return firstValueFrom(component.parameters$).then((inputs) => {
-    return inputs.map((input) => {
-      return Create.Property.componentBlank(ctx, input);
-    });
+  const parameterL = await firstValueFrom(component.parameters$);
+  const propertyPL = parameterL.map((input) => {
+    return Create.Property.componentBlank(ctx, input);
   });
+  const propertyLP = await Promise.all(propertyPL); 
+  return propertyLP;
 }

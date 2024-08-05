@@ -7,7 +7,10 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 
-export type Property = ComponentParameterProperty | BasicProperty | CloneCountProperty;
+export type Property =
+  | ComponentParameterProperty
+  | BasicProperty
+  | CloneCountProperty;
 export enum PropertyType {
   ComponentProperty,
   BasicProperty,
@@ -34,22 +37,22 @@ export interface CloneCountProperty extends PropertyBase {
 }
 
 export namespace CreateProperty {
-  export function componentBlank(
+  export async function componentBlank(
     ctx: MainContext,
     componentInput: ComponentParameter
-  ): ComponentParameterProperty {
+  ): Promise<ComponentParameterProperty> {
     const id = `component-property-${crypto.randomUUID()}`;
-    const expr = ctx.objectFactory.createNumberExpr();
+    const expr = await ctx.objectFactory.createNumberExpr();
     return component(ctx, id, componentInput, expr);
   }
-  
-  export function component(
+
+  export async function component(
     ctx: MainContext,
     id: string,
     componentInput: ComponentParameter,
     expr: Expr
-  ): ComponentParameterProperty {
-    const itemBase = ctx.objectFactory.createExItemBase(id);
+  ): Promise<ComponentParameterProperty> {
+    const itemBase = await ctx.objectFactory.createExItemBase(id);
     const componentProperty: ComponentParameterProperty = {
       ...itemBase,
       itemType: ExItemType.Property,
@@ -59,23 +62,23 @@ export namespace CreateProperty {
     };
     return componentProperty;
   }
-  
-  export function basicBlank(
+
+  export async function basicBlank(
     ctx: MainContext,
     expr: Expr
-  ): BasicProperty {
+  ): Promise<BasicProperty> {
     const id = `basic-property-${crypto.randomUUID()}`;
     const name = `Basic Property`;
-    return basic(ctx, id, name, expr);
+    return await basic(ctx, id, name, expr);
   }
-  
-  export function basic(
+
+  export async function basic(
     ctx: MainContext,
     id: string,
     name: string,
     expr: Expr
-  ): BasicProperty {
-    const itemBase = ctx.objectFactory.createExItemBase(id);
+  ): Promise<BasicProperty> {
+    const itemBase = await ctx.objectFactory.createExItemBase(id);
     const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
     const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
     const property: BasicProperty = {
@@ -87,21 +90,21 @@ export namespace CreateProperty {
     };
     return property;
   }
-  
-  export function cloneCountBlank(
+
+  export async function cloneCountBlank(
     ctx: MainContext
-  ): CloneCountProperty {
+  ): Promise<CloneCountProperty> {
     const id = `clone-count-property-${crypto.randomUUID()}`;
-    const expr = ctx.objectFactory.createNumberExpr();
+    const expr = await ctx.objectFactory.createNumberExpr();
     return cloneCount(ctx, id, expr);
   }
-  
-  export function cloneCount(
+
+  export async function cloneCount(
     ctx: MainContext,
     id: string,
     expr: Expr
-  ): CloneCountProperty {
-    const itemBase = ctx.objectFactory.createExItemBase(id);
+  ): Promise<CloneCountProperty> {
+    const itemBase = await ctx.objectFactory.createExItemBase(id);
     const cloneCountProperty: CloneCountProperty = {
       ...itemBase,
       itemType: ExItemType.Property,

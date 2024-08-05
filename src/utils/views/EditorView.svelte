@@ -3,9 +3,9 @@
   import { combineLatest, map, ReplaySubject, switchMap } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { onMount } from "svelte";
-  import RootExObjectView from "./RootExObjectView.svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -62,7 +62,7 @@
         on:click={() => ctx.projectMutator.addRootObject()}
         class="btn block"
         ><KbdShortcutSpan
-          label="Add ExObject"
+          label="Add Object"
           showShortcut={$newActionsFocused$}
           underlineCharIndex={4}
         /></button

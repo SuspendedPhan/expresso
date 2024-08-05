@@ -6,6 +6,7 @@
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
   import ExObjectLayout from "src/utils/layout/ExObjectLayout";
+  import ExObjectView from "src/utils/views/ExObjectView.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
