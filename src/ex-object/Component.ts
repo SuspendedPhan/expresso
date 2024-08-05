@@ -1,7 +1,7 @@
-import type { CanvasObject } from "src/canvas/CanvasContext";
+import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import type { SUB } from "src/utils/utils/Utils";
 
-export type CanvasSetter = (canvasObject: CanvasObject, value: number) => void;
+export type CanvasSetter = (canvasObject: LibCanvasObject, value: number) => void;
 
 export type Component = CanvasComponent | CustomComponent;
 export type ComponentParameter = CanvasComponentParameter | CustomComponentParameter;

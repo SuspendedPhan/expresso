@@ -5,8 +5,8 @@ import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import Logger from "../utils/logger/Logger";
 import type { CanvasContext, LibCanvasObject } from "./CanvasContext";
-import { type CanvasObjectPath, canvasObjectPathToString } from "src/canvas/CanvasObject";
 import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
+import { CanvasObjectUtils, type CanvasObjectPath } from "src/canvas/CanvasObject";
 
 export class CanvasManager {
   private readonly canvasObjectByCanvasObjectPath = new Map<string, LibCanvasObject>();
@@ -69,7 +69,7 @@ export class CanvasManager {
     path: CanvasObjectPath
   ): void {
     Logger.arg("path", path);
-    const pathString = canvasObjectPathToString(path);
+    const pathString = CanvasObjectUtils.canvasObjectPathToString(path);
     let canvasObject = this.canvasObjectByCanvasObjectPath.get(pathString);
     if (!canvasObject) {
       canvasObject = this.ctx.pool.takeObject();
@@ -81,7 +81,7 @@ export class CanvasManager {
       return;
     }
 
-    for (const input of component) {
+    for (const input of component.parameters) {
       this.updateCanvasProperty(
         canvasObject,
         input.id,
@@ -100,7 +100,7 @@ export class CanvasManager {
     path: CanvasObjectPath,
     evaluation: Evaluation
   ): void {
-    const pathString = attributeCanvasObjectPathToString(this.ctx.mainCtx.goModule, propertyId, path);
+    const pathString = CanvasObjectUtils.canvasPropertyPathToString(this.ctx.mainCtx.goModule, propertyId, path);
     const result = evaluation.getResult(pathString);
     
     canvasObject.visible = true;
