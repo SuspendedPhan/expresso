@@ -20,14 +20,14 @@ export default class MainMutator {
   public constructor(private readonly ctx: MainContext) {}
 
   @loggedMethod
-  public replaceWithNumberExpr(oldExpr: Expr, value: number) {
-    const expr = this.ctx.objectFactory.createNumberExpr(value);
+  public async replaceWithNumberExpr(oldExpr: Expr, value: number) {
+    const expr = await this.ctx.objectFactory.createNumberExpr(value);
     this.replaceWithExpr(oldExpr, expr);
   }
 
   @loggedMethod
-  public replaceWithCallExpr(oldExpr: Expr) {
-    const expr = this.ctx.objectFactory.createCallExpr();
+  public async replaceWithCallExpr(oldExpr: Expr) {
+    const expr = await this.ctx.objectFactory.createCallExpr();
     this.replaceWithExpr(oldExpr, expr);
   }
 

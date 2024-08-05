@@ -9,7 +9,7 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type {
   BasicProperty,
   CloneCountProperty,
-  ComponentParameterProperty
+  ComponentParameterProperty,
 } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
@@ -55,19 +55,22 @@ export default class Rehydrator {
   ): Promise<ExObject> {
     const component = this.getComponent(
       deExObject.componentId,
-      deExObject.componentType,
+      deExObject.componentType
     );
-    const componentProperties = deExObject.componentProperties.map(
+    const componentPropertyPL = deExObject.componentProperties.map(
       (componentProperty) => {
         return this.rehydrateComponentProperty(componentProperty);
       }
     );
 
-    const basicProperties = deExObject.basicProperties.map((deProperty) =>
+    const basicPropertyPL = deExObject.basicProperties.map((deProperty) =>
       this.rehydrateBasicProperty(deProperty)
     );
 
-    const cloneCountProperty = this.rehydrateCloneCountProperty(
+    const componentPropertyL = await Promise.all(componentPropertyPL);
+    const basicPropertyL = await Promise.all(basicPropertyPL);
+
+    const cloneCountProperty = await this.rehydrateCloneCountProperty(
       deExObject.cloneProperty
     );
 
@@ -80,8 +83,8 @@ export default class Rehydrator {
       this.ctx,
       component,
       deExObject.id,
-      componentProperties,
-      basicProperties,
+      componentPropertyL,
+      basicPropertyL,
       cloneCountProperty,
       children
     );
@@ -89,9 +92,9 @@ export default class Rehydrator {
   }
 
   @loggedMethod
-  public rehydrateComponentProperty(
+  public async rehydrateComponentProperty(
     deProperty: DehydratedComponentProperty
-  ): ComponentParameterProperty {
+  ): Promise<ComponentParameterProperty> {
     const parameter = this.componentParameterById.get(
       deProperty.componentParameterId
     );
@@ -100,28 +103,33 @@ export default class Rehydrator {
       `Component parameter not found: ${deProperty.componentParameterId}`
     );
 
-    const expr = this.rehydrateExpr(deProperty.expr);
+    const expr = await this.rehydrateExpr(deProperty.expr);
     return Create.Property.component(this.ctx, deProperty.id, parameter, expr);
   }
 
   @loggedMethod
-  public rehydrateBasicProperty(
+  public async rehydrateBasicProperty(
     deProperty: DehydratedBasicProperty
-  ): BasicProperty {
+  ): Promise<BasicProperty> {
     const expr = this.rehydrateExpr(deProperty.expr);
-    return Create.Property.basic(this.ctx, deProperty.id, deProperty.name, expr);
+    return Create.Property.basic(
+      this.ctx,
+      deProperty.id,
+      deProperty.name,
+      expr
+    );
   }
 
   @loggedMethod
-  public rehydrateCloneCountProperty(
+  public async rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
-  ): CloneCountProperty {
+  ): Promise<CloneCountProperty> {
     const expr = this.rehydrateExpr(deProperty.expr);
     return Create.Property.cloneCount(this.ctx, deProperty.id, expr);
   }
 
   @loggedMethod
-  private rehydrateExpr(deExpr: DehydratedExpr): Expr {
+  private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
     switch (deExpr.type) {
       case "NumberExpr":
         return this.rehydrateNumberExpr(deExpr);
@@ -133,12 +141,16 @@ export default class Rehydrator {
   }
 
   @loggedMethod
-  private rehydrateNumberExpr(deExpr: DehydratedNumberExpr): NumberExpr {
+  private async rehydrateNumberExpr(
+    deExpr: DehydratedNumberExpr
+  ): Promise<NumberExpr> {
     return this.ctx.objectFactory.createNumberExpr(deExpr.value, deExpr.id);
   }
 
   @loggedMethod
-  private rehydrateCallExpr(deExpr: DehydratedCallExpr): CallExpr {
+  private async rehydrateCallExpr(
+    deExpr: DehydratedCallExpr
+  ): Promise<CallExpr> {
     const args = deExpr.args.map((arg) => this.rehydrateExpr(arg));
     return this.ctx.objectFactory.createCallExpr(deExpr.id, args);
   }
@@ -147,7 +159,7 @@ export default class Rehydrator {
     // @ts-ignore
     componentId: string,
     // @ts-ignore
-    componentType: string,
+    componentType: string
   ): Component {
     throw new Error("Method not implemented.");
   }
