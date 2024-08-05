@@ -1,14 +1,14 @@
-import { SceneInstancePath } from "src/scene/SceneInstance";
+import { CanvasObjectPath } from "src/scene/CanvasObject";
 
 export default interface GoModule {
-  Component: {
-    create(componentId: string): void;
-    setCloneCount(componentId: string, count: number): void;
-    addAttribute(componentId: string, attributeId: string): void;
+  Object: {
+    create(objectId: string): void;
+    setCloneCount(objectId: string, exprId: string): void;
+    addProperty(objectId: string, propertyId: string): void;
   };
 
-  Attribute: {
-    setExpr(componentId: string, attributeId: string, exprId: string): void;
+  Property: {
+    setExpr(objectId: string, propertyId: string, exprId: string): void;
   };
 
   NumberExpr: {
@@ -24,20 +24,26 @@ export default interface GoModule {
 
   Evaluator: {
     eval(): EvaluationMut;
-    sceneInstancePathAppend(
+    canvasObjectPathAppend(
       basePath: string,
-      componentId: string,
+      objectId: string,
       cloneId: string
     ): string;
-    createAttributeSceneInstancePath(
-      attributeId: string,
-      sceneInstancePath: string
+    createCanvasPropertyPath(
+      propertyId: string,
+      canvasObjectPath: string
+    ): string;
+
+    createCloneCountCanvasPropertyPath(
+      parentCanvasObjectPath: string,
+      exObjectId: string,
+      cloneCountPropertyId: string
     ): string;
   };
 }
 
 export interface Evaluation {
-  getResult(attributeSceneInstancePath: string): number;
+  getResult(canvasPropertyPath: string): number;
 }
 
 export interface EvaluationMut extends Evaluation {

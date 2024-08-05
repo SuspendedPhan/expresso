@@ -1,5 +1,5 @@
 import deePool from "deepool";
-import type { SceneObject } from "./SceneContext";
+import type { LibCanvasObject } from "./CanvasContext";
 
 export default class ScenePool {
   private circlePool;
@@ -10,13 +10,13 @@ export default class ScenePool {
     this.circlePool.grow(20);
   }
 
-  public takeObject(): SceneObject {
+  public takeObject(): LibCanvasObject {
     const circle = this.circlePool.use();
     this.usedCircles.push(circle);
     return circle;
   }
 
-  public releaseObject(circle: SceneObject): void {
+  public releaseObject(circle: LibCanvasObject): void {
     this.circlePool.recycle(circle);
   }
 }

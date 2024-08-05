@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { SceneMain } from "./SceneMain";
+  import { SceneMain } from "./CanvasMain";
   import PixiFactory from "./PixiFactory";
   import MainContext from "src/main-context/MainContext";
   export let ctx: MainContext;

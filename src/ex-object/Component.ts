@@ -1,19 +1,19 @@
-import type { SceneObject } from "src/scene/SceneContext";
+import type { CanvasObject } from "src/canvas/CanvasContext";
 import type { SUB } from "src/utils/utils/Utils";
 
-export type SceneSetter = (sceneObject: SceneObject, value: number) => void;
+export type CanvasSetter = (canvasObject: CanvasObject, value: number) => void;
 
-export type Component = SceneComponent | CustomComponent;
-export type ComponentParameter = SceneComponentParameter | CustomComponentParameter;
+export type Component = CanvasComponent | CustomComponent;
+export type ComponentParameter = CanvasComponentParameter | CustomComponentParameter;
 export enum ComponentType {
-  SceneComponent,
+  CanvasComponent,
   CustomComponent,
 }
 
-export interface SceneComponent {
+export interface CanvasComponent {
   id: string;
-  componentType: ComponentType.SceneComponent;
-  parameters: SceneComponentParameter[];
+  componentType: ComponentType.CanvasComponent;
+  parameters: CanvasComponentParameter[];
 }
 
 export interface CustomComponent {
@@ -23,10 +23,10 @@ export interface CustomComponent {
   parameters$: SUB<ComponentParameter[]>;
 }
 
-export interface SceneComponentParameter {
+export interface CanvasComponentParameter {
   readonly id: string;
   readonly name: string;
-  readonly sceneSetter: SceneSetter;
+  readonly canvasSetter: CanvasSetter;
 }
 
 export interface CustomComponentParameter {
@@ -34,21 +34,21 @@ export interface CustomComponentParameter {
   readonly nameSub$: SUB<string>;
 }
 
-export const SceneComponentStore = {
+export const CanvasComponentStore = {
   circle: {
     id: "circle",
-    componentType: ComponentType.SceneComponent,
+    componentType: ComponentType.CanvasComponent,
     parameters: [
       {
         name: "x",
         id: "x",
-        sceneSetter: (pixiObject, value) => {
+        canvasSetter: (pixiObject, value) => {
           pixiObject.x = value;
         },
       },
     ],
   },
-} satisfies Record<string, SceneComponent>;
+} satisfies Record<string, CanvasComponent>;
 
 export namespace CreateComponent {
   export function component() {
