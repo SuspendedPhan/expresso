@@ -1,5 +1,5 @@
 import { BehaviorSubject, first, Subject } from "rxjs";
-import { Component } from "src/ex-object/Component";
+import type { Component } from "src/ex-object/Component";
 import {
   type CallExpr,
   type ExItemBase,

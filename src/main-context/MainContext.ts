@@ -49,11 +49,11 @@ export default class MainContext {
         });
     });
 
-    Persistence.readProject$.subscribe((deProject) => {
+    Persistence.readProject$.subscribe(async (deProject) => {
       if (deProject === null) {
         this.projectManager.addProjectNew();
       } else {
-        const project = new Rehydrator(this).rehydrateProject(deProject);
+        const project = await new Rehydrator(this).rehydrateProject(deProject);
         (
           this.projectManager.currentLibraryProject$ as Subject<LibraryProject>
         ).next(project);
