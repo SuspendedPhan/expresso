@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Component } from "src/ex-object/ExObject";
+  import type { ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import { ElementLayout } from "../layout/ElementLayout";
@@ -7,36 +7,36 @@
   import AttributeView from "./AttributeView.svelte";
 
   export let ctx: MainContext;
-  export let component: Component;
+  export let exObject: ExObject;
   export let elementLayout: ElementLayout;
-  const attributes = component.sceneAttributeByProto.values();
-  const children$ = component.children$;
+  const componentParameterProperties = exObject.componentParameterProperties;
+  const children$ = exObject.children$;
 </script>
 
-<NodeView elementKey={component.id} {elementLayout}>
+<NodeView elementKey={exObject.id} {elementLayout}>
   <div>
     <SelectableView
       {ctx}
-      object={component}
+      object={exObject}
       class="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
     >
-      <div class="">Component {component.ordinal}</div>
+      <div class="">ExObject {exObject.ordinal}</div>
       <div class="divider"></div>
       <div class="flex flex-col items-center">
-        {#each attributes as attribute (attribute.id)}
+        {#each componentParameterProperties as attribute (attribute.id)}
           <div>
             <AttributeView {ctx} {attribute} />
           </div>
         {/each}
         <button
-          on:click={() => ctx.componentMutator.addChild(component)}
+          on:click={() => ctx.exObjectMutator.addChild(exObject)}
           class="btn mt-6">Add Child</button
         >
       </div>
     </SelectableView>
     {#if $children$}
       {#each $children$ as child (child.id)}
-        <svelte:self {ctx} component={child} {elementLayout} />
+        <svelte:self {ctx} exObject={child} {elementLayout} />
       {/each}
     {/if}
   </div>

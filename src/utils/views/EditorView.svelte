@@ -3,12 +3,12 @@
   import { combineLatest, map, ReplaySubject, switchMap } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { onMount } from "svelte";
-  import RootComponentView from "./RootComponentView.svelte";
+  import RootExObjectView from "./RootExObjectView.svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
 
   export let ctx: MainContext;
-  const rootComponents$ = ctx.eventBus.rootObjects$;
+  const rootExObjects$ = ctx.eventBus.rootObjects$;
 
   let rootElement: HTMLElement;
   const editorViewWidth$ = new ReplaySubject<number>(1);
@@ -26,7 +26,7 @@
     .getFocus$()
     .pipe(map((focus) => focus.type === "NewActions"));
 
-  const xTranslation$ = ctx.viewCtx.componentLayouts$.pipe(
+  const xTranslation$ = ctx.viewCtx.exObjectLayouts$.pipe(
     map((layouts) => {
       return combineLatest(layouts.map((layout) => layout.onCalculated));
     }),
@@ -62,7 +62,7 @@
         on:click={() => ctx.projectMutator.addRootObject()}
         class="btn block"
         ><KbdShortcutSpan
-          label="Add Component"
+          label="Add ExObject"
           showShortcut={$newActionsFocused$}
           underlineCharIndex={4}
         /></button
@@ -79,10 +79,10 @@
       </button>
     </div>
     <div class="grid grid-flow-row">
-      {#if $rootComponents$}
-        {#each $rootComponents$ as component (component.id)}
+      {#if $rootExObjects$}
+        {#each $rootExObjects$ as exObject (exObject.id)}
           <div class="divider"></div>
-          <RootComponentView {ctx} {component} />
+          <RootExObjectView {ctx} {exObject} />
         {/each}
       {/if}
     </div>

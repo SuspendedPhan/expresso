@@ -19,7 +19,7 @@ export enum ViewMode {
 }
 
 export default class MainViewContext {
-  public readonly componentLayouts$ = new BehaviorSubject<
+  public readonly exObjectLayouts$ = new BehaviorSubject<
     readonly ElementLayout[]
   >([]);
 

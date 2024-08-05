@@ -1,19 +1,18 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
   import { first } from "rxjs";
-  import type { Component } from "src/ex-object/ExObject";
+  import type { ExObject } from "src/ex-object/ExObject";
   import MainContext from "src/main-context/MainContext";
   import { onMount, tick } from "svelte";
-  import ComponentLayout from "../layout/ComponentLayout";
   import TreeView from "../layout/TreeView.svelte";
-  import ComponentView from "./ComponentView.svelte";
+  import ExObjectLayout from "src/utils/layout/ExObjectLayout";
 
   export let ctx: MainContext;
-  export let component: Component;
+  export let exObject: ExObject;
   let clazz = "";
   export { clazz as class };
 
-  const elementLayout = ComponentLayout.create(ctx, component);
+  const elementLayout = ExObjectLayout.create(ctx, exObject);
 
   let element: HTMLElement;
 
@@ -24,13 +23,13 @@
       });
     });
 
-    ctx.viewCtx.componentLayouts$.pipe(first()).subscribe((layouts) => {
-      ctx.viewCtx.componentLayouts$.next([...layouts, elementLayout]);
+    ctx.viewCtx.exObjectLayouts$.pipe(first()).subscribe((layouts) => {
+      ctx.viewCtx.exObjectLayouts$.next([...layouts, elementLayout]);
     });
 
     return () => {
-      ctx.viewCtx.componentLayouts$.pipe(first()).subscribe((layouts) => {
-        ctx.viewCtx.componentLayouts$.next(
+      ctx.viewCtx.exObjectLayouts$.pipe(first()).subscribe((layouts) => {
+        ctx.viewCtx.exObjectLayouts$.next(
           layouts.filter((layout) => layout !== elementLayout)
         );
       });
@@ -41,7 +40,7 @@
 <div class={clazz}>
   <TreeView {elementLayout} {ctx}>
     <div bind:this={element}>
-      <ComponentView {ctx} {component} {elementLayout} />
+      <ExObjectView {ctx} {exObject} {elementLayout} />
     </div>
   </TreeView>
 </div>
