@@ -7,7 +7,7 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 
-export type Property = ComponentParameterProperty | ObjectProperty | CloneCountProperty;
+export type Property = ComponentParameterProperty | BasicProperty | CloneCountProperty;
 export enum PropertyType {
   ComponentProperty,
   ObjectProperty,
@@ -24,7 +24,7 @@ export interface ComponentParameterProperty extends PropertyBase {
   componentParameter: ComponentParameter;
 }
 
-export interface ObjectProperty extends PropertyBase {
+export interface BasicProperty extends PropertyBase {
   propertyType: PropertyType.ObjectProperty;
   name$: OBS<string>;
 }
@@ -63,7 +63,7 @@ export namespace CreateProperty {
   export function objectBlank(
     ctx: MainContext,
     expr: Expr
-  ): ObjectProperty {
+  ): BasicProperty {
     const id = `object-property-${crypto.randomUUID()}`;
     const name = `Object Property`;
     return object(ctx, id, name, expr);
@@ -74,11 +74,11 @@ export namespace CreateProperty {
     id: string,
     name: string,
     expr: Expr
-  ): ObjectProperty {
+  ): BasicProperty {
     const itemBase = ctx.objectFactory.createExItemBase(id);
     const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
     const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
-    const property: ObjectProperty = {
+    const property: BasicProperty = {
       ...itemBase,
       itemType: ExItemType.Property,
       expr$: exprSub$,

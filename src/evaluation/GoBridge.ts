@@ -16,11 +16,11 @@ export default class GoBridge {
   private setup(goModule: GoModule, ctx: MainContext) {
     ctx.eventBus.objectAdded$.subscribe((object) => {
       goModule.Component.create(object.id);
-      object.cloneCount$.subscribe((cloneCount) => {
+      object.cloneCountProperty$.subscribe((cloneCount) => {
         goModule.Component.setCloneCount(object.id, cloneCount);
       });
 
-      for (const property of object.componentProperties) {
+      for (const property of object.componentParameterProperties) {
         goModule.Component.addAttribute(object.id, property.id);
         property.expr$.subscribe((expr) => {
           goModule.Attribute.setExpr(object.id, property.id, expr.id);

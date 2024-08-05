@@ -189,7 +189,7 @@ export default class FocusManager {
 
   private downExObject(selectedObject: ExObject) {
     const sceneAttributes = Array.from(
-      selectedObject.componentProperties
+      selectedObject.componentParameterProperties
     );
     const attr = sceneAttributes[0];
     if (attr === undefined) {

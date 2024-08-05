@@ -37,7 +37,7 @@ export class SceneManager {
     evaluation: Evaluation,
     parentPath: SceneInstancePath
   ): void {
-    exObject.cloneCount$.subscribe((cloneCount) => {
+    exObject.cloneCountProperty$.subscribe((cloneCount) => {
       this.updateExObject1(exObject, evaluation, parentPath, cloneCount);
     });
   }

@@ -7,22 +7,24 @@ import {
 } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
 import {
-  createComponentPropertyNew,
-  type Property,
+  type BasicProperty,
+  type CloneCountProperty,
+  type ComponentParameterProperty
 } from "src/ex-object/Property";
+import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import {
   createBehaviorSubjectWithLifetime,
-  type SUB
+  type SUB,
 } from "src/utils/utils/Utils";
 
 export interface ExObject extends ExItemBase {
   itemType: ExItemType.ExObject;
   component: Component;
   children$: SUB<ExObject[]>;
-  componentProperties: Property[];
-  customProperties$: SUB<Property[]>;
-  cloneCount$: SUB<number>;
+  componentParameterProperties: ComponentParameterProperty[];
+  basicProperties$: SUB<BasicProperty[]>;
+  cloneCountProperty$: SUB<CloneCountProperty>;
 }
 
 export async function createExObjectNew(
@@ -37,10 +39,13 @@ export async function createExObjectNew(
     ...base,
     itemType: ExItemType.ExObject,
     component,
-    componentProperties,
-    customProperties$: new Subject(),
+    componentParameterProperties: componentProperties,
+    basicProperties$: new Subject(),
     children$: createBehaviorSubjectWithLifetime<ExObject[]>(base.destroy$, []),
-    cloneCount$: createBehaviorSubjectWithLifetime<number>(base.destroy$, 0),
+    cloneCountProperty$: createBehaviorSubjectWithLifetime<CloneCountProperty>(
+      base.destroy$,
+      Create.Property.cloneCountBlank(ctx)
+    ),
   };
   return object;
 }
@@ -48,7 +53,7 @@ export async function createExObjectNew(
 async function createComponentProperties(
   ctx: MainContext,
   component: Component
-): Promise<Property[]> {
+): Promise<ComponentParameterProperty[]> {
   switch (component.componentType) {
     case ComponentType.SceneComponent:
       return createSceneComponentProperties(ctx, component);
@@ -59,19 +64,19 @@ async function createComponentProperties(
 function createSceneComponentProperties(
   ctx: MainContext,
   component: SceneComponent
-): Property[] {
+): ComponentParameterProperty[] {
   return component.parameters.map((input) => {
-    return createComponentPropertyNew(ctx, input);
+    return Create.Property.componentBlank(ctx, input);
   });
 }
 
 async function createCustomComponentProperties(
   ctx: MainContext,
   component: CustomComponent
-): Promise<Property[]> {
+): Promise<ComponentParameterProperty[]> {
   return firstValueFrom(component.parameters$).then((inputs) => {
     return inputs.map((input) => {
-      return createComponentPropertyNew(ctx, input);
+      return Create.Property.componentBlank(ctx, input);
     });
   });
 }
