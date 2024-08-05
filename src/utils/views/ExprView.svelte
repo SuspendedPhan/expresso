@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { combineLatestWith, fromEvent, map, of, type Observable } from "rxjs";
-  import { ExprType, type Expr } from "src/ex-object/ExObject";
-  // biome-ignore lint:
+  import { map, of, type Observable } from "rxjs";
+  import { ExprType, type Expr } from "src/ex-object/ExItem";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
-  import { onMount } from "svelte";
   import { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
 
