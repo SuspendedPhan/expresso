@@ -11,43 +11,33 @@ func bootstrapGoModule() {
 
 	ev := evaluator.NewEvaluator()
 
-	goModule.Set("Object", js.ValueOf(map[string]interface{}{
+	goModule.Set("ExObject", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			objectId := args[0].String()
-			ev.ObjectCreate(objectId)
+			exObjectId := args[0].String()
+			ev.ExObjectCreate(exObjectId)
 			return nil
 		}),
 
 		"setCloneCount": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			objectId := args[0].String()
+			exObjectId := args[0].String()
 			exprId := args[1].String()
-			ev.ObjectSetCloneCount(objectId, exprId)
+			ev.ExObjectSetCloneCount(exObjectId, exprId)
 			return nil
 		}),
 		"addProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			objectId := args[0].String()
+			exObjectId := args[0].String()
 			propertyId := args[1].String()
-			ev.ObjectAddProperty(objectId, propertyId)
+			ev.ExObjectAddProperty(exObjectId, propertyId)
 			return nil
 		}),
 	}))
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{
 		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			objectId := args[0].String()
+			exObjectId := args[0].String()
 			propertyId := args[1].String()
 			exprId := args[2].String()
-			ev.PropertySetExpr(objectId, propertyId, exprId)
-			return nil
-		}),
-	}))
-
-	goModule.Set("Attribute", js.ValueOf(map[string]interface{}{
-		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			componentId := args[0].String()
-			attributeId := args[1].String()
-			exprId := args[2].String()
-			ev.AttributeSetExpr(componentId, attributeId, exprId)
+			ev.PropertySetExpr(exObjectId, propertyId, exprId)
 			return nil
 		}),
 	}))
@@ -107,24 +97,24 @@ func bootstrapGoModule() {
 			})
 		}),
 
-		"canvasObjectPathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		"canvasExObjectPathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			basePath := args[0].String()
-			objectId := args[1].String()
+			exObjectId := args[1].String()
 			cloneId := args[2].String()
-			return evaluator.CanvasObjectPathAppend(basePath, objectId, cloneId)
+			return evaluator.CanvasObjectPathAppend(basePath, exObjectId, cloneId)
 		}),
 
 		"createCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			propertyId := args[0].String()
-			canvasObjectPath := args[1].String()
-			return evaluator.CreateCanvasPropertyPath(propertyId, canvasObjectPath)
+			canvasExObjectPath := args[1].String()
+			return evaluator.CreateCanvasPropertyPath(propertyId, canvasExObjectPath)
 		}),
 
 		"createCloneCountCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			parentCanvasObjectPath := args[0].String()
-			exObjectId := args[1].String()
+			parentCanvasExObjectPath := args[0].String()
+			exExObjectId := args[1].String()
 			cloneCountPropertyId := args[2].String()
-			return evaluator.CreateCloneCountCanvasPropertyPath(parentCanvasObjectPath, exObjectId, cloneCountPropertyId)
+			return evaluator.CreateCloneCountCanvasPropertyPath(parentCanvasExObjectPath, exExObjectId, cloneCountPropertyId)
 		}),
 	}))
 
