@@ -31,6 +31,7 @@
     "google-auth-library": "^9.11.0",
     "hotkeys-js": "^3.13.7",
     "pixi.js": "^8.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "svelte-check": "^3.8.5"
   }
 }

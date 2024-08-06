@@ -1,5 +1,6 @@
 import { firstValueFrom, Subject } from "rxjs";
 import {
+  CanvasComponentStore,
   ComponentType,
   type CanvasComponent,
   type Component,
@@ -28,6 +29,16 @@ export interface ExObject extends ExItemBase {
 }
 
 export namespace MutateExObject {
+  export async function addChildBlank(
+    ctx: MainContext,
+    exObject: ExObject
+  ) {
+    const child = await Create.ExObject.blank(ctx, CanvasComponentStore.circle);
+    const children = await firstValueFrom(exObject.children$);
+    const newChildren = [...children, child];
+    exObject.children$.next(newChildren);
+  }
+
   export async function addChild(
     exObject: ExObject,
     child: ExObject

@@ -1,10 +1,9 @@
 <script lang="ts">
+  import ResizeSensor from "css-element-queries/src/ResizeSensor";
+  import MainContext from "src/main-context/MainContext";
+  import type { Line } from "src/utils/layout/Layout";
   import { onMount, tick } from "svelte";
   import { ElementLayout } from "./ElementLayout";
-  import ResizeSensor from "css-element-queries/src/ResizeSensor";
-  import type { Line } from "src/utils/layout/Layout";
-  import MainContext from "src/main-context/MainContext";
-  import { first } from "rxjs";
 
   export let elementLayout: ElementLayout;
   export let ctx: MainContext;

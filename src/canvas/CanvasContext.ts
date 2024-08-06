@@ -8,7 +8,9 @@ export type LibCanvasObject = Graphics;
 
 export class CanvasContext {
   public readonly pool = new ScenePool(() => this.pixiFactory.makeCircle());
-  public readonly evaluator = new Evaluator(this.mainCtx);
+  public readonly evaluator;
 
-  constructor(public readonly mainCtx: MainContext, public readonly pixiFactory: PixiFactory) {}
+  constructor(public readonly mainCtx: MainContext, public readonly pixiFactory: PixiFactory) {
+    this.evaluator = new Evaluator(mainCtx);
+  }
 }

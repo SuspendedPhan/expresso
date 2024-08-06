@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ExObject } from "src/ex-object/ExObject";
+  import { MutateExObject, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import NodeView from "../layout/NodeView.svelte";
@@ -29,7 +29,7 @@
           </div>
         {/each}
         <button
-          on:click={() => ctx.exObjectMutator.addChild(exObject)}
+          on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
           class="btn mt-6">Add Child</button
         >
       </div>

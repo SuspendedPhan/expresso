@@ -11,22 +11,33 @@ func bootstrapGoModule() {
 
 	ev := evaluator.NewEvaluator()
 
-	goModule.Set("Component", js.ValueOf(map[string]interface{}{
+	goModule.Set("Object", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			id := args[0].String()
-			ev.ComponentCreate(id)
+			objectId := args[0].String()
+			ev.ObjectCreate(objectId)
 			return nil
 		}),
+
 		"setCloneCount": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			id := args[0].String()
-			cloneCount := args[1].Int()
-			ev.ComponentSetCloneCount(id, cloneCount)
+			objectId := args[0].String()
+			exprId := args[1].String()
+			ev.ObjectSetCloneCount(objectId, exprId)
 			return nil
 		}),
-		"addAttribute": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			componentId := args[0].String()
-			attributeId := args[1].String()
-			ev.ComponentAddAttribute(componentId, attributeId)
+		"addProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			objectId := args[0].String()
+			propertyId := args[1].String()
+			ev.ObjectAddProperty(objectId, propertyId)
+			return nil
+		}),
+	}))
+
+	goModule.Set("Property", js.ValueOf(map[string]interface{}{
+		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			objectId := args[0].String()
+			propertyId := args[1].String()
+			exprId := args[2].String()
+			ev.PropertySetExpr(objectId, propertyId, exprId)
 			return nil
 		}),
 	}))
