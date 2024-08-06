@@ -7,8 +7,9 @@ var logger = NewLogger("evaluator.go")
 type Float = float64
 
 type Evaluator struct {
-	ExObjectById map[string]*ExObject
-	ExprById     map[string]*Expr
+	RootExObjectIds []string
+	ExObjectById    map[string]*ExObject
+	ExprById        map[string]*Expr
 }
 
 type Expr struct {
@@ -28,8 +29,9 @@ type CallExpr struct {
 
 func NewEvaluator() *Evaluator {
 	return &Evaluator{
-		ExObjectById: map[string]*ExObject{},
-		ExprById:     map[string]*Expr{},
+		RootExObjectIds: []string{},
+		ExObjectById:    map[string]*ExObject{},
+		ExprById:        map[string]*Expr{},
 	}
 }
 

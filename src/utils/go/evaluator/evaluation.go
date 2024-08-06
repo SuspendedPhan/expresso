@@ -6,16 +6,18 @@ import (
 
 func (e *Evaluator) Eval() *Evaluation {
 	evaluation := &Evaluation{
-		resultByAttributeSceneInstancePath: make(map[string]Float),
+		resultByCanvasPropertyPath: make(map[string]Float),
 	}
 
-	for _, component := range e.RootComponentById {
-		for i := 0; i < component.CloneCount; i++ {
-			sceneInstancePath := CanvasObjectPathAppend("", component.Id, strconv.Itoa(i))
-			for _, attribute := range component.AttributeById {
-				value := e.EvalExpr(attribute.ExprId)
-				attributeSceneInstancePath := CreateCanvasPropertyPath(attribute.Id, sceneInstancePath)
-				evaluation.resultByAttributeSceneInstancePath[attributeSceneInstancePath] = value + value*Float(i)
+	for _, exObjectId := range e.RootExObjectIds {
+		exObject := e.ExObjectById[exObjectId]
+		cloneCount := e.evalCloneCount(exObject)
+		for i := 0; i < exObject.CloneCount; i++ {
+			canvasObjectPath := CanvasObjectPathAppend("", exObject.Id, strconv.Itoa(i))
+			for _, property := range exObject.PropertyById {
+				value := e.EvalExpr(property.ExprId)
+				canvasPropertyPath := CreateCanvasPropertyPath(property.Id, canvasObjectPath)
+				evaluation.resultByCanvasPropertyPath[canvasPropertyPath] = value + value*Float(i)
 			}
 		}
 	}
@@ -23,14 +25,18 @@ func (e *Evaluator) Eval() *Evaluation {
 	return evaluation
 }
 
-type Evaluation struct {
-	resultByAttributeSceneInstancePath map[string]Float
+func (e *Evaluator) evalCloneCount(exObject *ExObject) *Evaluation {
+
 }
 
-func (e *Evaluation) GetResult(attributeSceneInstancePath string) Float {
-	v, ok := e.resultByAttributeSceneInstancePath[attributeSceneInstancePath]
+type Evaluation struct {
+	resultByCanvasPropertyPath map[string]Float
+}
+
+func (e *Evaluation) GetResult(canvasPropertyPath string) Float {
+	v, ok := e.resultByCanvasPropertyPath[canvasPropertyPath]
 	if !ok {
-		panic("No value for attributeSceneInstancePath: " + attributeSceneInstancePath)
+		panic("No value for canvasPropertyPath: " + canvasPropertyPath)
 	}
 	return v
 }
