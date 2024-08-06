@@ -1,10 +1,10 @@
 import {
   combineLatest,
+  combineLatestWith,
   map,
   type Observable,
   of,
-  switchMap,
-  withLatestFrom,
+  switchMap
 } from "rxjs";
 import { ComponentType } from "src/ex-object/Component";
 import {
@@ -200,7 +200,7 @@ export default class Dehydrator {
       switchMap((expr) => {
         return this.dehydrateExpr$(expr);
       }),
-      withLatestFrom(property.name$),
+      combineLatestWith(property.name$),
       map(([dehydratedExpr, name]) => {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
         const deProperty: DehydratedBasicProperty = {

@@ -36,6 +36,7 @@ func NewEvaluator() *Evaluator {
 }
 
 func (e *Evaluator) AddRootExObject(exObjectId string) {
+	logger.Log("AddRootExObject", exObjectId)
 	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
 }
 
