@@ -11,10 +11,10 @@ func (e *Evaluator) Eval() *Evaluation {
 
 	for _, component := range e.RootComponentById {
 		for i := 0; i < component.CloneCount; i++ {
-			sceneInstancePath := SceneInstancePathAppend("", component.Id, strconv.Itoa(i))
+			sceneInstancePath := CanvasObjectPathAppend("", component.Id, strconv.Itoa(i))
 			for _, attribute := range component.AttributeById {
 				value := e.EvalExpr(attribute.ExprId)
-				attributeSceneInstancePath := CreateAttributeSceneInstancePath(attribute.Id, sceneInstancePath)
+				attributeSceneInstancePath := CreateCanvasPropertyPath(attribute.Id, sceneInstancePath)
 				evaluation.resultByAttributeSceneInstancePath[attributeSceneInstancePath] = value + value*Float(i)
 			}
 		}

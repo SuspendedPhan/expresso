@@ -4,8 +4,8 @@
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
-  import { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import type { ElementLayout } from "../layout/ElementLayout";
 
   export let ctx: MainContext;
   export let expr: Expr;

@@ -96,17 +96,24 @@ func bootstrapGoModule() {
 			})
 		}),
 
-		"sceneInstancePathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		"canvasObjectPathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			basePath := args[0].String()
-			componentId := args[1].String()
+			objectId := args[1].String()
 			cloneId := args[2].String()
-			return evaluator.SceneInstancePathAppend(basePath, componentId, cloneId)
+			return evaluator.CanvasObjectPathAppend(basePath, objectId, cloneId)
 		}),
 
-		"createAttributeSceneInstancePath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			attributeId := args[0].String()
-			sceneInstancePath := args[1].String()
-			return evaluator.CreateAttributeSceneInstancePath(attributeId, sceneInstancePath)
+		"createCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			propertyId := args[0].String()
+			canvasObjectPath := args[1].String()
+			return evaluator.CreateCanvasPropertyPath(propertyId, canvasObjectPath)
+		}),
+
+		"createCloneCountCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			parentCanvasObjectPath := args[0].String()
+			exObjectId := args[1].String()
+			cloneCountPropertyId := args[2].String()
+			return evaluator.CreateCloneCountCanvasPropertyPath(parentCanvasObjectPath, exObjectId, cloneCountPropertyId)
 		}),
 	}))
 
