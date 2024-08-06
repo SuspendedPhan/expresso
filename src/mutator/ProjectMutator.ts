@@ -14,6 +14,7 @@ export default class ProjectMutator {
 
   public async addRootObject() {
     const object = await Create.ExObject.blank(this.ctx, CanvasComponentStore.circle);
+    this.ctx.eventBus.rootExObjectAdded$.next(object);
 
     this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {
       project.rootExObjects$.pipe(first()).subscribe((rootObjects) => {

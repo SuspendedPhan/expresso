@@ -1,9 +1,9 @@
 package evaluator
 
 type ExObject struct {
-	Id                 string
-	PropertyById       map[string]*Property
-	CloneCountProperty *Property
+	Id               string
+	PropertyById     map[string]*Property
+	CloneCountExprId string
 }
 
 func (e *Evaluator) ExObjectCreate(id string) {
@@ -13,19 +13,14 @@ func (e *Evaluator) ExObjectCreate(id string) {
 	}
 }
 
-func (e *Evaluator) ExObjectSetCloneCount(id string, cloneCountPropertyId string) {
+func (e *Evaluator) ExObjectSetCloneCount(id string, cloneCountExprId string) {
 	exObject, found := e.ExObjectById[id]
 
 	if !found {
 		panic("exObject not found")
 	}
 
-	cloneCountProperty, found := exObject.PropertyById[cloneCountPropertyId]
-	if !found {
-		panic("cloneCountProperty not found")
-	}
-
-	exObject.CloneCountProperty = cloneCountProperty
+	exObject.CloneCountExprId = cloneCountExprId
 }
 
 func (e *Evaluator) ExObjectAddProperty(exObjectId string, propertyId string) {

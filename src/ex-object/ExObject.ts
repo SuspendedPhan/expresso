@@ -70,6 +70,7 @@ export namespace CreateExObject {
       ),
       cloneCountProperty: await Create.Property.cloneCountBlank(ctx),
     };
+    ctx.eventBus.objectAdded$.next(object);
     return object;
   }
 
@@ -98,6 +99,7 @@ export namespace CreateExObject {
       ),
       cloneCountProperty,
     };
+    ctx.eventBus.objectAdded$.next(object);
     return object;
   }
 }

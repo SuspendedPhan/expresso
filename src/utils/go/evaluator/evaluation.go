@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
 	"strconv"
 )
 
@@ -10,11 +9,12 @@ func (e *Evaluator) Eval() *Evaluation {
 		resultByCanvasPropertyPath: make(map[string]Float),
 	}
 
-	fmt.Println("evaluation.go")
-
 	for _, exObjectId := range e.RootExObjectIds {
-		fmt.Println("exObjectId", exObjectId)
-		exObject := e.ExObjectById[exObjectId]
+		exObject, found := e.ExObjectById[exObjectId]
+		if !found {
+			panic("exObject not found " + exObjectId)
+		}
+
 		cloneCount := e.evalCloneCount(exObject)
 		cloneCountCanvasPropertyPath := CreateCloneCountCanvasPropertyPath("", exObject.Id, exObject.CloneCountProperty.Id)
 		evaluation.resultByCanvasPropertyPath[cloneCountCanvasPropertyPath] = cloneCount
