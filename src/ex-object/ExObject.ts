@@ -6,10 +6,10 @@ import {
   type CustomComponent,
 } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
-import {
-  type BasicProperty,
-  type CloneCountProperty,
-  type ComponentParameterProperty,
+import type {
+  BasicProperty,
+  CloneCountProperty,
+  ComponentParameterProperty,
 } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";

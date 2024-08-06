@@ -2,9 +2,9 @@
   import type { ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
-  import { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import AttributeView from "./PropertyView.svelte";
+  import PropertyView from "./PropertyView.svelte";
+  import type { ElementLayout } from "../layout/ElementLayout";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -17,15 +17,15 @@
   <div>
     <SelectableView
       {ctx}
-      object={exObject}
+      item={exObject}
       class="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
     >
       <div class="">ExObject {exObject.ordinal}</div>
       <div class="divider"></div>
       <div class="flex flex-col items-center">
-        {#each componentParameterProperties as attribute (attribute.id)}
+        {#each componentParameterProperties as property (property.id)}
           <div>
-            <AttributeView {ctx} {attribute} />
+            <PropertyView {ctx} {property} />
           </div>
         {/each}
         <button

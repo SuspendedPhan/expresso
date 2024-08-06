@@ -12,7 +12,7 @@
 
   const name$ = PropertyUtils.getName$(property);
 
-  let expr$ = property.expr$;
+  const expr$ = property.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
 
   // Hmmm... this seems inefficient

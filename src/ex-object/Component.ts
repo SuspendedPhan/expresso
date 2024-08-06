@@ -1,4 +1,4 @@
-import { firstValueFrom, of } from "rxjs";
+import { of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
