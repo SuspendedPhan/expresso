@@ -47,7 +47,7 @@
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>
-  <SelectableView {ctx} object={expr}>
+  <SelectableView {ctx} item={expr}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div

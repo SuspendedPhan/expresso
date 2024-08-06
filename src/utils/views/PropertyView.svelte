@@ -10,7 +10,7 @@
   export let ctx: MainContext;
   export let property: Property;
 
-  const name = PropertyUtils.getName(property);
+  const name$ = PropertyUtils.getName$(property);
 
   let expr$ = property.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
@@ -22,8 +22,8 @@
 </script>
 
 <div>
-  <SelectableView {ctx} object={property} class="mb-4">
-    <div class="text-center">{name}</div>
+  <SelectableView {ctx} item={property} class="mb-4">
+    <div class="text-center">{$name$}</div>
   </SelectableView>
   {#key $exprId$}
     {#if $elementLayout$}
