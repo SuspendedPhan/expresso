@@ -14,15 +14,19 @@ export default class GoBridge {
 
   @loggedMethod
   private setup(goModule: GoModule, ctx: MainContext) {
+    ctx.eventBus.rootExObjectAdded$.subscribe((rootExObject) => {
+      goModule.Evaluator.addRootExObject(rootExObject.id);
+    });
+
     ctx.eventBus.objectAdded$.subscribe((object) => {
-      goModule.Object.create(object.id);
+      goModule.ExObject.create(object.id);
 
       object.cloneCountProperty.expr$.subscribe((expr) => {
-        goModule.Object.setCloneCount(object.id, expr.id);
+        goModule.ExObject.setCloneCount(object.id, expr.id);
       });
 
       for (const property of object.componentParameterProperties) {
-        goModule.Object.addProperty(object.id, property.id);
+        goModule.ExObject.addProperty(object.id, property.id);
         property.expr$.subscribe((expr) => {
           goModule.Property.setExpr(object.id, property.id, expr.id);
         });

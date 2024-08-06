@@ -35,6 +35,10 @@ func NewEvaluator() *Evaluator {
 	}
 }
 
+func (e *Evaluator) AddRootExObject(exObjectId string) {
+	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
+}
+
 func (e *Evaluator) EvalExpr(exprId string) Float {
 	expr, found := e.ExprById[exprId]
 	if !found {

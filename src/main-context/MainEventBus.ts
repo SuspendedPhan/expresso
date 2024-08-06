@@ -14,6 +14,7 @@ export class MainEventBus {
   public readonly exprAdded$ = new ReplaySubject<Expr>(10);
   public readonly exprReplaced$ = new Subject<ExprReplacement>();
   public readonly submitExprReplaceCommand$ = new Subject<void>();
+  public readonly rootExObjectAdded$ = new ReplaySubject<ExObject>(10);
 
   public constructor(ctx: MainContext) {
     this.rootObjects$ = ctx.projectManager.currentLibraryProject$.pipe(

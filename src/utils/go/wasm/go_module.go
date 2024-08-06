@@ -77,6 +77,12 @@ func bootstrapGoModule() {
 	}))
 
 	goModule.Set("Evaluator", js.ValueOf(map[string]interface{}{
+		"addRootExObject": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			exObjectId := args[0].String()
+			ev.AddRootExObject(exObjectId)
+			return nil
+		}),
+
 		"eval": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			evaluation := ev.Eval()
 			getResultFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {

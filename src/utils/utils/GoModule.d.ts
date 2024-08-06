@@ -23,12 +23,15 @@ export default interface GoModule {
   };
 
   Evaluator: {
+    addRootExObject(id: string): void;
     eval(): EvaluationMut;
+
     canvasObjectPathAppend(
       basePath: string,
       objectId: string,
       cloneId: string
     ): string;
+
     createCanvasPropertyPath(
       propertyId: string,
       canvasObjectPath: string
