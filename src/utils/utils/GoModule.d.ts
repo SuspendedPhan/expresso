@@ -43,6 +43,8 @@ export default interface GoModule {
       exObjectId: string,
       cloneCountPropertyId: string
     ): string;
+
+    debug(): void;
   };
 }
 

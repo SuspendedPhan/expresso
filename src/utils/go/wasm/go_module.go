@@ -4,6 +4,7 @@ import (
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func bootstrapGoModule() {
@@ -127,6 +128,11 @@ func bootstrapGoModule() {
 			exExObjectId := args[1].String()
 			cloneCountPropertyId := args[2].String()
 			return evaluator.CreateCloneCountCanvasPropertyPath(parentCanvasExObjectPath, exExObjectId, cloneCountPropertyId)
+		}),
+
+		"debug": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			spew.Dump(ev)
+			return nil
 		}),
 	}))
 

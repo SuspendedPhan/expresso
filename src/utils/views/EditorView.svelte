@@ -77,6 +77,10 @@
           underlineCharIndex={4}
         />
       </button>
+
+      <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
+        Debug Evaluator
+      </button>
     </div>
     <div class="grid grid-flow-row">
       {#if $rootExObjects$}

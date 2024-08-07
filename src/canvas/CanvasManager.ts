@@ -1,15 +1,25 @@
 import { withLatestFrom } from "rxjs";
-import { ComponentType, type CanvasSetter } from "src/ex-object/Component";
+import {
+  CanvasObjectUtils,
+  type CanvasObjectPath,
+} from "src/canvas/CanvasObject";
+import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
+import {
+  ComponentParameterType,
+  ComponentType,
+  type CanvasSetter,
+} from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import Logger from "../utils/logger/Logger";
 import type { CanvasContext, LibCanvasObject } from "./CanvasContext";
-import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
-import { CanvasObjectUtils, type CanvasObjectPath } from "src/canvas/CanvasObject";
 
 export class CanvasManager {
-  private readonly canvasObjectByCanvasObjectPath = new Map<string, LibCanvasObject>();
+  private readonly canvasObjectByCanvasObjectPath = new Map<
+    string,
+    LibCanvasObject
+  >();
 
   public constructor(private readonly ctx: CanvasContext) {
     this.setup();
@@ -81,15 +91,25 @@ export class CanvasManager {
       return;
     }
 
-    for (const input of component.parameters) {
-      this.updateCanvasProperty(
-        canvasObject,
-        input.id,
-        input.canvasSetter,
-        path,
-        evaluation
-      );
-    }
+    exObject.componentParameterProperties.forEach(
+      (componentParameterProperty) => {
+        if (
+          componentParameterProperty.componentParameter
+            .componentParameterType !==
+          ComponentParameterType.CanvasComponentParameter
+        ) {
+          return;
+        }
+
+        this.updateCanvasProperty(
+          canvasObject,
+          componentParameterProperty.id,
+          componentParameterProperty.componentParameter.canvasSetter,
+          path,
+          evaluation
+        );
+      }
+    );
   }
 
   @loggedMethod
@@ -100,9 +120,13 @@ export class CanvasManager {
     path: CanvasObjectPath,
     evaluation: Evaluation
   ): void {
-    const pathString = CanvasObjectUtils.canvasPropertyPathToString(this.ctx.mainCtx.goModule, propertyId, path);
+    const pathString = CanvasObjectUtils.canvasPropertyPathToString(
+      this.ctx.mainCtx.goModule,
+      propertyId,
+      path
+    );
     const result = evaluation.getResult(pathString);
-    
+
     canvasObject.visible = true;
     canvasObject.scale.x = 100;
     canvasObject.scale.y = 100;

@@ -98,7 +98,7 @@ export namespace CreateProperty {
     ctx: MainContext
   ): Promise<CloneCountProperty> {
     const id = `clone-count-property-${crypto.randomUUID()}`;
-    const expr = await ctx.objectFactory.createNumberExpr();
+    const expr = await ctx.objectFactory.createNumberExpr(1);
     return cloneCount(ctx, id, expr);
   }
 
