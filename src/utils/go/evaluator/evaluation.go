@@ -20,7 +20,7 @@ func (e *Evaluator) Eval() *Evaluation {
 		evaluation.resultByCanvasPropertyPath[cloneCountCanvasPropertyPath] = cloneCount
 		for i := 0; i < int(cloneCount); i++ {
 			canvasObjectPath := CanvasObjectPathAppend("", exObject.Id, strconv.Itoa(i))
-			for _, property := range exObject.PropertyById {
+			for _, property := range exObject.ComponentParameterProperties {
 				value := e.EvalExpr(property.ExprId)
 				canvasPropertyPath := CreateCanvasPropertyPath(property.Id, canvasObjectPath)
 				evaluation.resultByCanvasPropertyPath[canvasPropertyPath] = value + value*Float(i)
@@ -32,10 +32,10 @@ func (e *Evaluator) Eval() *Evaluation {
 }
 
 func (e *Evaluator) evalCloneCount(exObject *ExObject) Float {
-	if exObject.CloneCountExprId == "" {
+	if exObject.CloneCountProperty == nil {
 		panic("CloneCountProperty not set for exObject: " + exObject.Id)
 	}
-	count := e.EvalExpr(exObject.CloneCountExprId)
+	count := e.EvalExpr(exObject.CloneCountProperty.ExprId)
 	return count
 }
 

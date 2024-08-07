@@ -18,26 +18,32 @@ func bootstrapGoModule() {
 			return nil
 		}),
 
-		"setCloneCount": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		"setCloneCountProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			exObjectId := args[0].String()
 			exprId := args[1].String()
-			ev.ExObjectSetCloneCount(exObjectId, exprId)
+			ev.ExObjectSetCloneCountProperty(exObjectId, exprId)
 			return nil
 		}),
-		"addProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+
+		"addComponentParameterProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			exObjectId := args[0].String()
 			propertyId := args[1].String()
-			ev.ExObjectAddProperty(exObjectId, propertyId)
+			ev.ExObjectAddComponentParameterProperty(exObjectId, propertyId)
 			return nil
 		}),
 	}))
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			propertyId := args[0].String()
+			ev.PropertyCreate(propertyId)
+			return nil
+		}),
+
 		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			exObjectId := args[0].String()
-			propertyId := args[1].String()
-			exprId := args[2].String()
-			ev.PropertySetExpr(exObjectId, propertyId, exprId)
+			propertyId := args[0].String()
+			exprId := args[1].String()
+			ev.PropertySetExpr(propertyId, exprId)
 			return nil
 		}),
 	}))

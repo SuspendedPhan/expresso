@@ -21,16 +21,18 @@ export default class GoBridge {
     ctx.eventBus.objectAdded$.subscribe((object) => {
       goModule.ExObject.create(object.id);
 
-      object.cloneCountProperty.expr$.subscribe((expr) => {
-        goModule.ExObject.setCloneCount(object.id, expr.id);
-      });
+      goModule.ExObject.setCloneCountProperty(object.id, object.cloneCountProperty.id);
 
       for (const property of object.componentParameterProperties) {
-        goModule.ExObject.addProperty(object.id, property.id);
-        property.expr$.subscribe((expr) => {
-          goModule.Property.setExpr(object.id, property.id, expr.id);
-        });
+        goModule.ExObject.addComponentParameterProperty(object.id, property.id);
       }
+    });
+
+    ctx.eventBus.propertyAdded$.subscribe((property) => {
+      goModule.Property.create(property.id);
+      property.expr$.subscribe((expr) => {
+        goModule.Property.setExpr(property.id, expr.id);
+      });
     });
 
     ctx.eventBus.exprAdded$.subscribe((expr) => {

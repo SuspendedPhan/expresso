@@ -6,6 +6,12 @@ type Property struct {
 	PropertyType string
 }
 
+func (e *Evaluator) PropertyCreate(propertyId string) {
+	e.PropertyById[propertyId] = &Property{
+		Id: propertyId,
+	}
+}
+
 func (e *Evaluator) PropertySetExpr(propertyId string, exprId string) {
 	property, found := e.PropertyById[propertyId]
 

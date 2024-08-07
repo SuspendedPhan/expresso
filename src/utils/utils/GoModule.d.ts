@@ -3,12 +3,13 @@ import { CanvasObjectPath } from "src/scene/CanvasObject";
 export default interface GoModule {
   ExObject: {
     create(exObjectId: string): void;
-    setCloneCount(exObjectId: string, exprId: string): void;
-    addProperty(exObjectId: string, propertyId: string): void;
+    setCloneCountProperty(exObjectId: string, propertyId: string): void;
+    addComponentParameterProperty(exObjectId: string, propertyId: string): void;
   };
 
   Property: {
-    setExpr(exObjectId: string, propertyId: string, exprId: string): void;
+    create(propertyId: string): void;
+    setExpr(propertyId: string, exprId: string): void;
   };
 
   NumberExpr: {
