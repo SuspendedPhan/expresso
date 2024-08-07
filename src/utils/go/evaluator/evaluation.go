@@ -32,10 +32,10 @@ func (e *Evaluator) Eval() *Evaluation {
 }
 
 func (e *Evaluator) evalCloneCount(exObject *ExObject) Float {
-	if exObject.CloneCountProperty == nil {
+	if exObject.CloneCountExprId == "" {
 		panic("CloneCountProperty not set for exObject: " + exObject.Id)
 	}
-	count := e.EvalExpr(exObject.CloneCountProperty.ExprId)
+	count := e.EvalExpr(exObject.CloneCountExprId)
 	return count
 }
 

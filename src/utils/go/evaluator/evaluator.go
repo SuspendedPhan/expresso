@@ -9,6 +9,7 @@ type Float = float64
 type Evaluator struct {
 	RootExObjectIds []string
 	ExObjectById    map[string]*ExObject
+	PropertyById    map[string]*Property
 	ExprById        map[string]*Expr
 }
 
@@ -31,6 +32,7 @@ func NewEvaluator() *Evaluator {
 	return &Evaluator{
 		RootExObjectIds: []string{},
 		ExObjectById:    map[string]*ExObject{},
+		PropertyById:    map[string]*Property{},
 		ExprById:        map[string]*Expr{},
 	}
 }
