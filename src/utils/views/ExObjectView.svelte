@@ -27,7 +27,7 @@
     >
       <div class="">ExObject {exObject.ordinal}</div>
       <div class="divider"></div>
-      <div class="">
+      <div class="flex flex-col">
         <div class="flex flex-col gap-4">
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
@@ -38,10 +38,15 @@
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
+        <button
+          on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
+          class="btn self-center justify-self-center">Add Property</button
+        >
+        <div class="divider"></div>
 
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
-          class="btn mt-6">Add Child</button
+          class="btn">Add Child</button
         >
       </div>
     </SelectableView>
