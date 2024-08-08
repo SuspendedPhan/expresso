@@ -6,6 +6,7 @@
   import PropertyView from "./PropertyView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import { ComponentUtils } from "src/ex-object/Component";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -25,18 +26,28 @@
     <SelectableView
       {ctx}
       item={exObject}
-      class="card bg-white rounded-sm card-bordered card-compact w-max flex flex-col"
+      class="card bg-white rounded-sm card-bordered border-2 border-base-content/10 card-compact w-max flex flex-col"
     >
-      <div class="p-4">
-        <div class="text-lg">ExObject {exObject.ordinal}</div>
+      <div class="p-4 flex flex-col gap-2">
+        <ExObjectHeaderView>Basics</ExObjectHeaderView>
+        <div class="flex flex-row gap-4">
+          <div class="flex flex-col gap-2">
+            <div>Name:</div>
+            <div>Component:</div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <div class="font-semibold">ExObject {exObject.ordinal}</div>
+            <div class="font-semibold">{$componentName$}</div>
+          </div>
+        </div>
       </div>
 
       <!-- Divider -->
-      <div class="divider m-0" style="min-width: 200px;">Component</div>
+      <div class="divider m-0 h-0"></div>
       <div class="p-4">
-        <div class="mb-4">
-          {$componentName$}
-        </div>
+        <ExObjectHeaderView
+          >Component Properties Properties Properties Properties</ExObjectHeaderView
+        >
         <div class="flex flex-col gap-2">
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
@@ -46,8 +57,9 @@
       </div>
 
       <!-- Divider -->
-      <div class="divider m-0">Properties</div>
+      <div class="divider m-0 h-0"></div>
       <div class="flex flex-col gap-2 p-4">
+        <ExObjectHeaderView>Standard Properties</ExObjectHeaderView>
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
@@ -57,9 +69,9 @@
         >
       </div>
 
-      <div class="divider m-0"></div>
+      <div class="divider m-0 h-0"></div>
 
-      <div class="self-center">
+      <div class="self-center p-4">
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
           class="btn">Add Child</button
