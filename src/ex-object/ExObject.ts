@@ -47,6 +47,16 @@ export namespace MutateExObject {
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
   }
+
+  export async function addBasicPropertyBlank(
+    ctx: MainContext,
+    exObject: ExObject
+  ) {
+    const property = await Create.Property.basicBlank(ctx);
+    const properties = await firstValueFrom(exObject.basicProperties$);
+    const newProperties = [...properties, property];
+    exObject.basicProperties$.next(newProperties);
+  }
 }
 
 export namespace CreateExObject {

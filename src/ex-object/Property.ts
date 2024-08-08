@@ -68,9 +68,9 @@ export namespace CreateProperty {
 
   export async function basicBlank(
     ctx: MainContext,
-    expr: Expr
   ): Promise<BasicProperty> {
     const id = `basic-property-${crypto.randomUUID()}`;
+    const expr = await ctx.objectFactory.createNumberExpr();
     const name = `Basic Property`;
     return await basic(ctx, id, name, expr);
   }

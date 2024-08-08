@@ -82,3 +82,16 @@ export namespace ComponentParameterUtils {
     }
   }
 }
+
+export namespace ComponentUtils {
+  export function getName$(component: Component): OBS<string> {
+    switch (component.componentType) {
+      case ComponentType.CanvasComponent:
+        return of(component.id);
+      case ComponentType.CustomComponent:
+        return component.name$;
+      default:
+        throw new Error("unknown component type");
+    }
+  }
+}

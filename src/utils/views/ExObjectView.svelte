@@ -5,6 +5,7 @@
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
+  import { ComponentUtils } from "src/ex-object/Component";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -15,6 +16,7 @@
   exObject.basicProperties$.subscribe((basicProperties) => {
     console.log("basicProperties", basicProperties);
   });
+  const componentName$ = ComponentUtils.getName$(exObject.component);
   const children$ = exObject.children$;
 </script>
 
@@ -29,6 +31,7 @@
       <div class="divider"></div>
       <div class="flex flex-col">
         <div class="flex flex-col gap-4">
+          <div>{$componentName$}</div>
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
           {/each}
