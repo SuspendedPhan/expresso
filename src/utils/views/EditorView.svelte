@@ -43,10 +43,10 @@
       }
 
       if (largestWidth < width) {
-        return `0`;
+        return `${Constants.WindowPaddingRem}rem`;
       } else {
         const translation = largestWidth / 2 - width / 2;
-        return `calc(${translation}px + 1rem)`;
+        return `calc(${translation}px + ${Constants.WindowPaddingRem}rem)`;
       }
     })
   );
@@ -54,10 +54,10 @@
 
 <div bind:this={rootElement}>
   <div
-    class="flex flex-col items-center {Constants.WindowPaddingClass}"
+    class="flex flex-col items-center"
     style:transform="translateX({$xTranslation$})"
   >
-    <div class="flex gap-4">
+    <div class="flex gap-4 {Constants.WindowPaddingClass}">
       <button
         on:click={() => ctx.projectMutator.addRootObject()}
         class="btn block"
@@ -85,7 +85,7 @@
     <div class="grid grid-flow-row">
       {#if $rootExObjects$}
         {#each $rootExObjects$ as exObject (exObject.id)}
-          <div class="divider"></div>
+          <div class="divider m-0 h-0"></div>
           <RootExObjectView {ctx} {exObject} />
         {/each}
       {/if}

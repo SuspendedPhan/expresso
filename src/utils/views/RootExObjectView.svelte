@@ -7,6 +7,7 @@
   import TreeView from "../layout/TreeView.svelte";
   import ExObjectLayout from "src/utils/layout/ExObjectLayout";
   import ExObjectView from "src/utils/views/ExObjectView.svelte";
+  import { Constants } from "src/utils/utils/ViewUtils";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -38,7 +39,7 @@
   });
 </script>
 
-<div class={clazz}>
+<div class="{clazz} {Constants.WindowPaddingClass}">
   <TreeView {elementLayout} {ctx}>
     <div bind:this={element}>
       <ExObjectView {ctx} {exObject} {elementLayout} />
