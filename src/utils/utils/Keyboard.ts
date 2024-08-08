@@ -137,7 +137,7 @@ export default class Keyboard {
     );
 
     const exprScope = new KeyboardScope(focusedExpr$);
-    exprScope.hotkeys("r", (expr) => {
+    exprScope.hotkeys("e", (expr) => {
       ctx.focusManager.focusExprReplaceCommand(expr);
     });
 

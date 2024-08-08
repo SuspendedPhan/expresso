@@ -61,6 +61,7 @@ export namespace CreateProperty {
       propertyType: PropertyType.ComponentProperty,
       componentParameter: componentInput,
     };
+    expr.parent$.next(componentProperty);
     ctx.eventBus.propertyAdded$.next(componentProperty);
     return componentProperty;
   }
@@ -90,6 +91,7 @@ export namespace CreateProperty {
       name$: nameSub$,
       propertyType: PropertyType.BasicProperty,
     };
+    expr.parent$.next(property);
     ctx.eventBus.propertyAdded$.next(property);
     return property;
   }
@@ -114,6 +116,7 @@ export namespace CreateProperty {
       expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
       propertyType: PropertyType.CloneCountProperty,
     };
+    expr.parent$.next(cloneCountProperty);
     ctx.eventBus.propertyAdded$.next(cloneCountProperty);
     return cloneCountProperty;
   }

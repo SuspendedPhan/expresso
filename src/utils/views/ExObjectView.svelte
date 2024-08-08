@@ -10,6 +10,11 @@
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
   const componentParameterProperties = exObject.componentParameterProperties;
+  const cloneCountProperty = exObject.cloneCountProperty;
+  const basicProperties$ = exObject.basicProperties$;
+  exObject.basicProperties$.subscribe((basicProperties) => {
+    console.log("basicProperties", basicProperties);
+  });
   const children$ = exObject.children$;
 </script>
 
@@ -22,12 +27,18 @@
     >
       <div class="">ExObject {exObject.ordinal}</div>
       <div class="divider"></div>
-      <div class="flex flex-col items-center">
-        {#each componentParameterProperties as property (property.id)}
-          <div>
+      <div class="">
+        <div class="flex flex-col gap-4">
+          {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
-          </div>
+          {/each}
+          <PropertyView {ctx} property={cloneCountProperty} />
+        </div>
+        <div class="divider"></div>
+        {#each $basicProperties$ as property (property.id)}
+          <PropertyView {ctx} {property} />
         {/each}
+
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
           class="btn mt-6">Add Child</button

@@ -1,4 +1,4 @@
-import { firstValueFrom, Subject } from "rxjs";
+import { firstValueFrom } from "rxjs";
 import {
   CanvasComponentStore,
   ComponentType,
@@ -63,7 +63,7 @@ export namespace CreateExObject {
       itemType: ExItemType.ExObject,
       component,
       componentParameterProperties: componentProperties,
-      basicProperties$: new Subject(),
+      basicProperties$: createBehaviorSubjectWithLifetime<BasicProperty[]>(base.destroy$, []),
       children$: createBehaviorSubjectWithLifetime<ExObject[]>(
         base.destroy$,
         []
