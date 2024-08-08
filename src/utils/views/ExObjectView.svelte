@@ -25,23 +25,29 @@
     <SelectableView
       {ctx}
       item={exObject}
-      class="card p-6 bg-white rounded-sm card-bordered card-compact w-max flex flex-col gap-2"
+      class="card bg-white rounded-sm card-bordered card-compact w-max flex flex-col"
     >
-      <div>
-        <div class="mb-2 text-lg">ExObject {exObject.ordinal}</div>
-        <div class="flex items-center gap-2">
-          Component: {$componentName$}
+      <div class="p-4">
+        <div class="text-lg">ExObject {exObject.ordinal}</div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider m-0" style="min-width: 200px;">Component</div>
+      <div class="p-4">
+        <div class="mb-4">
+          {$componentName$}
+        </div>
+        <div class="flex flex-col gap-2">
+          {#each componentParameterProperties as property (property.id)}
+            <PropertyView {ctx} {property} />
+          {/each}
+          <PropertyView {ctx} property={cloneCountProperty} />
         </div>
       </div>
-      <div class="divider m-0"></div>
-      <div class="flex flex-col gap-2">
-        {#each componentParameterProperties as property (property.id)}
-          <PropertyView {ctx} {property} />
-        {/each}
-        <PropertyView {ctx} property={cloneCountProperty} />
-      </div>
-      <div class="divider m-0"></div>
-      <div class="flex flex-col gap-2">
+
+      <!-- Divider -->
+      <div class="divider m-0">Properties</div>
+      <div class="flex flex-col gap-2 p-4">
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
@@ -50,6 +56,7 @@
           class="btn self-center justify-self-center">Add Property</button
         >
       </div>
+
       <div class="divider m-0"></div>
 
       <div class="self-center">
