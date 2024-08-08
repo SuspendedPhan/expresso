@@ -25,19 +25,23 @@
     <SelectableView
       {ctx}
       item={exObject}
-      class="card p-6 bg-white rounded-sm card-bordered card-compact w-max"
+      class="card p-6 bg-white rounded-sm card-bordered card-compact w-max flex flex-col gap-2"
     >
-      <div class="">ExObject {exObject.ordinal}</div>
-      <div class="divider"></div>
-      <div class="flex flex-col">
-        <div class="flex flex-col gap-4">
-          <div>{$componentName$}</div>
-          {#each componentParameterProperties as property (property.id)}
-            <PropertyView {ctx} {property} />
-          {/each}
-          <PropertyView {ctx} property={cloneCountProperty} />
+      <div>
+        <div class="mb-2 text-lg">ExObject {exObject.ordinal}</div>
+        <div class="flex items-center gap-2">
+          Component: {$componentName$}
         </div>
-        <div class="divider"></div>
+      </div>
+      <div class="divider m-0"></div>
+      <div class="flex flex-col gap-2">
+        {#each componentParameterProperties as property (property.id)}
+          <PropertyView {ctx} {property} />
+        {/each}
+        <PropertyView {ctx} property={cloneCountProperty} />
+      </div>
+      <div class="divider m-0"></div>
+      <div class="flex flex-col gap-2">
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
@@ -45,8 +49,10 @@
           on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
           class="btn self-center justify-self-center">Add Property</button
         >
-        <div class="divider"></div>
+      </div>
+      <div class="divider m-0"></div>
 
+      <div class="self-center">
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
           class="btn">Add Child</button
