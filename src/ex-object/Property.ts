@@ -30,7 +30,7 @@ export interface ComponentParameterProperty extends PropertyBase {
 
 export interface BasicProperty extends PropertyBase {
   propertyType: PropertyType.BasicProperty;
-  name$: OBS<string>;
+  name$: SUB<string>;
 }
 
 export interface CloneCountProperty extends PropertyBase {

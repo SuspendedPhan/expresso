@@ -65,6 +65,7 @@ export default class MainContext {
       }
     });
 
+    return;
     const dehydrator = new Dehydrator();
     this.projectManager.currentProject$
       .pipe(switchMap((project) => dehydrator.dehydrateProject$(project)))

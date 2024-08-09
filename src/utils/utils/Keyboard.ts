@@ -199,15 +199,20 @@ export default class Keyboard {
       ctx.focusManager.focus(focus);
     });
 
-    // document.addEventListener("keydown", (event) => {
-    //   switch (event.key) {
-    //     case "ArrowDown":
-    //     case "ArrowUp":
-    //     case "ArrowLeft":
-    //     case "ArrowRight":
-    //       event.preventDefault();
-    //       break;
-    //   }
-    // });
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      const element: Element = event.target as Element;
+      if (element.tagName.toLowerCase() === "input") {
+        return;
+      }
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "ArrowUp":
+        case "ArrowLeft":
+        case "ArrowRight":
+          event.preventDefault();
+          break;
+      }
+    });
   }
 }
