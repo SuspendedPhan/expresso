@@ -7,3 +7,11 @@
 html, body, #app {
     height: 100%;
 }
+
+.text-emphatic {
+}
+
+
+.text-style-secondary {
+    @apply text-base-content/40;
+}

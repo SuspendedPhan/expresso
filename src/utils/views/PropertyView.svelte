@@ -52,16 +52,16 @@
   <SelectableView {ctx} item={property} class="w-max grow-0">
     <div class="text-left relative" class:mb-2={!$isNumberExpr$}>
       <input
-        class="font-semibold outline-none absolute left-0 w-full"
+        class="text-emphatic outline-none absolute left-0 w-full"
         class:ring={$editingName$}
         value={$name$}
         readonly={!$editingName$}
         on:input={handleNameInput}
       />
-      <div class="font-semibold">{$name$}</div>
+      <div class="text-emphatic">{$name$}</div>
     </div>
   </SelectableView>
-  <pre> = </pre>
+  <pre class="text-style-secondary"> = </pre>
   {#key $exprId$}
     {#if $elementLayout$}
       <TreeView elementLayout={$elementLayout$} {ctx}>

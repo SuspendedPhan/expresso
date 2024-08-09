@@ -28,16 +28,16 @@
       item={exObject}
       class="card bg-white rounded-sm card-bordered border-2 border-base-content/10 card-compact w-max flex flex-col"
     >
-      <div class="p-4 flex flex-col gap-2">
+      <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
-        <div class="flex flex-row gap-4">
-          <div class="flex flex-col gap-2">
-            <div>Name:</div>
-            <div>Component:</div>
+        <div class="flex flex-col gap-2 font-mono">
+          <div class="flex flex-row">
+            <pre class="text-style-secondary">Name: </pre>
+            <div class="text-emphatic">ExObject {exObject.ordinal}</div>
           </div>
-          <div class="flex flex-col gap-2">
-            <div class="font-semibold">ExObject {exObject.ordinal}</div>
-            <div class="font-semibold">{$componentName$}</div>
+          <div class="flex flex-row">
+            <pre class="text-style-secondary">Component: </pre>
+            <div class="text-emphatic">{$componentName$}</div>
           </div>
         </div>
       </div>
