@@ -7,6 +7,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import { ComponentUtils } from "src/ex-object/Component";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
+  import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -61,18 +62,18 @@
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
-        <button
+        <ExObjectButton
           on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
-          class="btn btn-sm text-sm w-max self-center mt-2">Add Property</button
+          class="mt-2">Add Property</ExObjectButton
         >
       </div>
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-4 self-center">
-        <button
+        <ExObjectButton
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
-          class="btn btn-sm text-sm w-max">Add Child Object</button
+          >Add Child Object</ExObjectButton
         >
       </div>
     </SelectableView>

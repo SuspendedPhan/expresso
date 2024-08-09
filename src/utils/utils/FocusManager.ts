@@ -191,10 +191,10 @@ export default class FocusManager {
   private async downNone() {
     const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
     const objs = await firstValueFrom(project.rootExObjects$);
-    if (objsq === 0) {
+    const obj = objs[0];
+    if (obj === undefined) {
       return;
     }
-    const obj = objs[0];
     this.focus$.next(FocusManager.createExItemFocus(obj));
   }
 
