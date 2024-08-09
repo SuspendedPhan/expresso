@@ -92,6 +92,8 @@ export default class FocusManager {
     })
   );
 
+  private readonly focusStack = new Array<Focus>();
+
   public constructor(private readonly ctx: MainContext) {
     this.down$.subscribe(() => {
       this.getFocus$()
@@ -125,46 +127,39 @@ export default class FocusManager {
   }
 
   public focus(focus: Focus) {
+    this.focusStack.push(focus);
     this.focus$.next(focus);
   }
 
   public focusExItem(exItem: ExItem) {
-    this.focus$.next(FocusManager.createExItemFocus(exItem));
+    this.focus(FocusManager.createExItemFocus(exItem));
   }
 
   public focusProjectNav() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
-      this.focus$.next({ type: "ProjectNav" });
-    });
+    this.focus({ type: "ProjectNav" });
   }
 
   public focusLibraryNav() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
-      this.focus$.next({ type: "LibraryNav" });
-    });
+    this.focus({ type: "LibraryNav" });
   }
 
   public focusLibraryProject(project: LibraryProject) {
-    this.focus$.next({
+    this.focus({
       type: "LibraryProject",
       project,
     });
   }
 
   public focusNone() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
-      this.focus$.next({ type: "None" });
-    });
+    this.focus({ type: "None" });
   }
 
   public focusNewActions() {
-    this.focus$.next({ type: "NewActions" });
+    this.focus({ type: "NewActions" });
   }
 
   public focusViewActions() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
-      this.focus$.next({ type: "ViewActions" });
-    });
+    this.focus({ type: "ViewActions" });
   }
 
   public focusExprReplaceCommand(expr: Expr) {
@@ -175,7 +170,17 @@ export default class FocusManager {
   }
 
   public popFocus() {
-    this.focusNone();
+    this.focusStack.pop();
+    const focus = this.focusStack.pop();
+    if (focus === undefined) {
+      console.log("focusStack is empty");
+
+      this.focus$.next({ type: "None" });
+    } else {
+      console.log("popFocus");
+
+      this.focus$.next(focus);
+    }
   }
 
   @loggedMethod
@@ -311,7 +316,9 @@ export default class FocusManager {
     ) {
       assert(parent !== null, "parent is null");
       assert(parent.itemType === ExItemType.ExObject, "parent is not ExObject");
-      this.focus(new ExObjectFocus.Component({ exObject: parent, isEditing: false }));
+      this.focus(
+        new ExObjectFocus.Component({ exObject: parent, isEditing: false })
+      );
       return;
     }
 
