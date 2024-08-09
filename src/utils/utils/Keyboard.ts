@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import { map } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
@@ -199,9 +199,9 @@ export default class Keyboard {
       ctx.focusManager.focus(focus);
     });
 
-    document.addEventListener("keydown", (event: KeyboardEvent) => {
-      const element: Element = event.target as Element;
-      if (element.tagName.toLowerCase() === "input") {
+    document.addEventListener("keydown", async (event: KeyboardEvent) => {
+      const isEditing = await firstValueFrom(ctx.focusManager.isEditing$);
+      if (isEditing) {
         return;
       }
 

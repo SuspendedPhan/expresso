@@ -78,7 +78,7 @@ export default class FocusManager {
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
   public readonly isEditing$ = this.focus$.pipe(
-    map((focus) => focus.type === "EditPropertyName")
+    map((focus) => focus.type === "EditPropertyName" || focus.type === "ExprReplaceCommand")
   );
 
   public constructor(private readonly ctx: MainContext) {
