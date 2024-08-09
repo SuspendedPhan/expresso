@@ -49,19 +49,22 @@
 </script>
 
 <div class:flex={$isNumberExpr$} class="items-center font-mono">
-  <SelectableView {ctx} item={property} class="w-max grow-0">
-    <div class="text-left relative" class:mb-2={!$isNumberExpr$}>
-      <input
-        class="text-emphatic outline-none absolute left-0 w-full"
-        class:ring={$editingName$}
-        value={$name$}
-        readonly={!$editingName$}
-        on:input={handleNameInput}
-      />
-      <div class="text-emphatic">{$name$}</div>
-    </div>
-  </SelectableView>
-  <pre class="text-style-secondary"> = </pre>
+  <div class="flex flex-row">
+    <SelectableView {ctx} item={property} class="w-max grow-0">
+      <div class="text-left relative">
+        <input
+          class="text-emphatic outline-none absolute left-0 w-full"
+          class:ring={$editingName$}
+          value={$name$}
+          readonly={!$editingName$}
+          on:input={handleNameInput}
+        />
+        <div class="text-emphatic">{$name$}</div>
+      </div>
+    </SelectableView>
+    <pre class="text-style-secondary"> = </pre>
+  </div>
+
   {#key $exprId$}
     {#if $elementLayout$}
       <TreeView elementLayout={$elementLayout$} {ctx}>
