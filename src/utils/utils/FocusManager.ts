@@ -172,10 +172,8 @@ export default class FocusManager {
   public popFocus() {
     this.focusStack.pop();
     if (this.focusStack.length === 0) {
-      console.log("focusStack is empty");
       this.focus$.next({ type: "None" });
     } else {
-      console.log("popFocus");
       this.focus$.next(this.focusStack[this.focusStack.length - 1]!);
     }
   }

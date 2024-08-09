@@ -50,7 +50,7 @@ export default class Keyboard {
         if (focus instanceof FocusBase) {
           return focus.isCancelable;
         }
-        if (focus.type === "ExprReplaceCommand") {
+        if (focus.type === "ExprReplaceCommand" || focus.type === "NewActions") {
           return true;
         }
         return false;
@@ -111,8 +111,11 @@ export default class Keyboard {
         map((window) => window === Window.ProjectEditor)
       )
     );
-    editorScope.hotkeys("n", () => {
-      ctx.focusManager.focusNewActions();
+    editorScope.hotkeys("n", async () => {
+      const focus = await firstValueFrom(focusManager.getFocus$());
+      if (focus.type !== "NewActions") {
+        ctx.focusManager.focusNewActions();
+      }
     });
 
     const newActionsScope = new KeyboardScope(
