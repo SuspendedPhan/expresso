@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import { firstValueFrom, map, of } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import { ExItemType } from "src/ex-object/ExItem";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
@@ -45,16 +45,18 @@ export default class Keyboard {
       focusManager.focusViewActions();
     });
 
-    const editingScope = new KeyboardScope(
-      focusManager.isEditing$.pipe(map((isEditing) => isEditing))
+    const isCancelableScope = new KeyboardScope(
+      focusManager.getFocus$().pipe(map((focus) => {
+        if (focus instanceof FocusBase) {
+          return focus.isCancelable;
+        }
+        if (focus.type === "ExprReplaceCommand") {
+          return true;
+        }
+        return false;
+      }))
     );
-
-    editingScope.hotkeys("Enter", () => {
-      focusManager.popFocus();
-    });
-
-    const globalScope = new KeyboardScope(of(true));
-    globalScope.hotkeys("Escape", () => {
+    isCancelableScope.hotkeys("Escape", () => {
       ctx.focusManager.popFocus();
     });
 

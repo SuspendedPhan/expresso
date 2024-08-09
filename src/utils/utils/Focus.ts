@@ -10,6 +10,10 @@ export class FocusBase {
   public get isEditable() {
     return this.startEditing !== null;
   }
+
+  public get isCancelable() {
+    return this.isEditing;
+  }
 }
 
 export namespace ExObjectFocus {

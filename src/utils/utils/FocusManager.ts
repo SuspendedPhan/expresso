@@ -163,7 +163,7 @@ export default class FocusManager {
   }
 
   public focusExprReplaceCommand(expr: Expr) {
-    this.focus$.next({
+    this.focus({
       type: "ExprReplaceCommand",
       expr,
     });
@@ -171,15 +171,12 @@ export default class FocusManager {
 
   public popFocus() {
     this.focusStack.pop();
-    const focus = this.focusStack.pop();
-    if (focus === undefined) {
+    if (this.focusStack.length === 0) {
       console.log("focusStack is empty");
-
       this.focus$.next({ type: "None" });
     } else {
       console.log("popFocus");
-
-      this.focus$.next(focus);
+      this.focus$.next(this.focusStack[this.focusStack.length - 1]!);
     }
   }
 
@@ -239,7 +236,7 @@ export default class FocusManager {
     if (obj === undefined) {
       return;
     }
-    this.focus$.next(FocusManager.createExItemFocus(obj));
+    this.focus(FocusManager.createExItemFocus(obj));
   }
 
   private downExItem(focus: ExItem) {
@@ -254,7 +251,7 @@ export default class FocusManager {
         return;
       case ExItemType.Property:
         focus.expr$.pipe(first()).subscribe((expr) => {
-          this.focus$.next(FocusManager.createExItemFocus(expr));
+          this.focus(FocusManager.createExItemFocus(expr));
         });
         return;
       case ExItemType.Expr:
@@ -277,7 +274,7 @@ export default class FocusManager {
           if (arg === undefined) {
             throw new Error("CallExpr must have at least 1 args");
           }
-          this.focus$.next(FocusManager.createExItemFocus(arg));
+          this.focus(FocusManager.createExItemFocus(arg));
         });
         return;
       default:
@@ -296,7 +293,7 @@ export default class FocusManager {
           .getPrevProject$(focus.project)
           .pipe(first())
           .subscribe((project) => {
-            this.focus$.next({
+            this.focus({
               type: "LibraryProject",
               project,
             });
@@ -325,7 +322,7 @@ export default class FocusManager {
     const parent$ = focus.parent$;
     parent$.pipe(first()).subscribe((parent) => {
       if (parent !== null) {
-        this.focus$.next(FocusManager.createExItemFocus(parent));
+        this.focus(FocusManager.createExItemFocus(parent));
       }
     });
   }
@@ -342,13 +339,13 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next(FocusManager.createExItemFocus(arg));
+        this.focus(FocusManager.createExItemFocus(arg));
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next(FocusManager.createExItemFocus(arg));
+        this.focus(FocusManager.createExItemFocus(arg));
       }
     });
   }
@@ -365,13 +362,13 @@ export default class FocusManager {
         if (arg === undefined) {
           throw new Error("Index error trying to select first arg");
         }
-        this.focus$.next(FocusManager.createExItemFocus(arg));
+        this.focus(FocusManager.createExItemFocus(arg));
       } else {
         const arg = args[index + 1];
         if (arg === undefined) {
           throw new Error("Index error trying to select next arg");
         }
-        this.focus$.next(FocusManager.createExItemFocus(arg));
+        this.focus(FocusManager.createExItemFocus(arg));
       }
     });
   }
