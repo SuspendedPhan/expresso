@@ -6,6 +6,6 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div on:mousedown class={clazz} class:ring={focused}>
+<div on:mousedown|stopPropagation class={clazz} class:ring={focused}>
   <slot />
 </div>

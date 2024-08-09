@@ -10,6 +10,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { tap } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -22,12 +23,40 @@
   });
   const children$ = exObject.children$;
 
-  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
+  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(
+    ctx,
+    exObject
+  ).pipe(tap());
+
+  ctx.focusManager.getFocus$().subscribe((focus) => {
+    console.log("focus", focus);
+  });
+
   const componentName$ = ComponentUtils.getName$(exObject.component);
   const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
     ctx,
     exObject
   );
+
+  function handleClickExObjectName() {
+    console.log("handleClickExObjectName");
+
+    ctx.focusManager.focus(
+      new ExObjectFocus.Name({
+        exObject,
+        isEditing: false,
+      })
+    );
+  }
+
+  function handleClickComponentName() {
+    ctx.focusManager.focus(
+      new ExObjectFocus.Component({
+        exObject,
+        isEditing: false,
+      })
+    );
+  }
 </script>
 
 <NodeView elementKey={exObject.id} {elementLayout}>
@@ -42,14 +71,18 @@
         <div class="flex flex-col gap-2 font-mono">
           <div class="flex flex-row">
             <pre class="text-style-secondary">Name: </pre>
-            <FocusView focused={$exObjectNameFocused$} class="text-emphatic"
-              >ExObject {exObject.ordinal}</FocusView
+            <FocusView
+              on:mousedown={handleClickExObjectName}
+              focused={$exObjectNameFocused$}
+              class="text-emphatic">ExObject {exObject.ordinal}</FocusView
             >
           </div>
           <div class="flex flex-row">
             <pre class="text-style-secondary">Component: </pre>
-            <FocusView focused={$componentNameFocused$} class="text-emphatic"
-              >{$componentName$}</FocusView
+            <FocusView
+              on:mousedown={handleClickComponentName}
+              focused={$componentNameFocused$}
+              class="text-emphatic">{$componentName$}</FocusView
             >
           </div>
         </div>

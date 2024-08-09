@@ -190,6 +190,17 @@ export default class FocusManager {
     }
   }
 
+  private async upMisc(focus: Focus) {
+    if (focus instanceof ExObjectFocus.Name) {
+      this.focusExItem(focus.exObject);
+    } else if (focus instanceof ExObjectFocus.Component) {
+      this.focus(new ExObjectFocus.Name({
+        exObject: focus.exObject,
+        isEditing: false,
+      }));
+    }
+  }
+
   private async downNone() {
     const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
     const objs = await firstValueFrom(project.rootExObjects$);
@@ -259,6 +270,7 @@ export default class FocusManager {
           });
         return;
       default:
+        this.upMisc(focus);
         return;
     }
   }
