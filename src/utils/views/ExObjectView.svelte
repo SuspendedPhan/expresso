@@ -10,7 +10,6 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { tap } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -23,15 +22,7 @@
   });
   const children$ = exObject.children$;
 
-  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(
-    ctx,
-    exObject
-  ).pipe(tap());
-
-  ctx.focusManager.getFocus$().subscribe((focus) => {
-    console.log("focus", focus);
-  });
-
+  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
   const componentName$ = ComponentUtils.getName$(exObject.component);
   const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
     ctx,

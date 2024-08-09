@@ -11,6 +11,7 @@
     type Property,
   } from "src/ex-object/Property";
   import { ExprType } from "src/ex-object/ExItem";
+  import HugInput from "src/utils/views/HugInput.svelte";
 
   export let ctx: MainContext;
   export let property: Property;
@@ -38,8 +39,9 @@
       )
     );
 
-  function handleNameInput(event: Event & { currentTarget: HTMLInputElement }) {
-    const name = event.currentTarget.value;
+  function handleNameInput(event: Event) {
+    const currentTarget = event.currentTarget as HTMLInputElement;
+    const name = currentTarget.value;
     if (property.propertyType !== PropertyType.BasicProperty) {
       throw new Error("Cannot edit name of non-basic property");
     }
@@ -51,16 +53,11 @@
 <div class:flex={$isNumberExpr$} class="items-center font-mono">
   <div class="flex flex-row">
     <SelectableView {ctx} item={property} class="w-max grow-0">
-      <div class="text-left relative">
-        <input
-          class="text-emphatic outline-none absolute left-0 w-full"
-          class:ring={$editingName$}
-          value={$name$}
-          readonly={!$editingName$}
-          on:input={handleNameInput}
-        />
-        <div class="text-emphatic">{$name$}</div>
-      </div>
+      <HugInput
+        value={$name$}
+        isEditing={$editingName$}
+        on:input={handleNameInput}
+      />
     </SelectableView>
     <pre class="text-style-secondary"> = </pre>
   </div>
