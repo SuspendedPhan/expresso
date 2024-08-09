@@ -112,7 +112,7 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    newActionsScope.hotkeys("c", () => {
+    newActionsScope.hotkeys("o", () => {
       ctx.projectMutator.addRootObject();
       ctx.focusManager.focusNone();
     });
@@ -196,8 +196,6 @@ export default class Keyboard {
     });
 
     document.addEventListener("keydown", async (event: KeyboardEvent) => {
-      console.log("keydown", event.key);
-      
       const isEditing = await firstValueFrom(ctx.focusManager.isEditing$);
       if (isEditing) {
         return;

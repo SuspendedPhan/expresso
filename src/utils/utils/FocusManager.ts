@@ -1,4 +1,4 @@
-import { BehaviorSubject, first, map, type Observable, Subject } from "rxjs";
+import { BehaviorSubject, first, firstValueFrom, map, type Observable, Subject } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import { type ExItem, type Expr, ExItemType, ExprType } from "src/ex-object/ExItem";
 import type { LibraryProject } from "src/library/LibraryProject";
@@ -177,12 +177,25 @@ export default class FocusManager {
     }
 
     switch (focus.type) {
+      case "None":
+        this.downNone();
+        return;
       case "ExItem":
         this.downExItem(focus.exItem);
         return;
       default:
         return;
     }
+  }
+
+  private async downNone() {
+    const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
+    const objs = await firstValueFrom(project.rootExObjects$);
+    if (objsq === 0) {
+      return;
+    }
+    const obj = objs[0];
+    this.focus$.next(FocusManager.createExItemFocus(obj));
   }
 
   private downExItem(focus: ExItem) {
@@ -204,15 +217,8 @@ export default class FocusManager {
   }
 
   private downExObject(selectedObject: ExObject) {
-    const sceneAttributes = Array.from(
-      selectedObject.componentParameterProperties
-    );
-    const attr = sceneAttributes[0];
-    if (attr === undefined) {
-      throw new Error("ExObject must have at least 1 attribute");
-    }
-
-    this.focus$.next(FocusManager.createExItemFocus(attr));
+    const property = selectedObject.cloneCountProperty;
+    this.focus$.next(FocusManager.createExItemFocus(property));
   }
 
   @loggedMethod
