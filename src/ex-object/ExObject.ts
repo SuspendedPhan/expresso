@@ -30,20 +30,14 @@ export interface ExObject extends ExItemBase {
 }
 
 export namespace MutateExObject {
-  export async function addChildBlank(
-    ctx: MainContext,
-    exObject: ExObject
-  ) {
+  export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
     const child = await Create.ExObject.blank(ctx, CanvasComponentStore.circle);
     const children = await firstValueFrom(exObject.children$);
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
   }
 
-  export async function addChild(
-    exObject: ExObject,
-    child: ExObject
-  ) {
+  export async function addChild(exObject: ExObject, child: ExObject) {
     const children = await firstValueFrom(exObject.children$);
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
@@ -66,23 +60,19 @@ export namespace CreateExObject {
     component: Component
   ): Promise<ExObject> {
     const id = `ex-object-${crypto.randomUUID()}`;
-    const base = await ctx.objectFactory.createExItemBase(id);
     const componentProperties = await createComponentProperties(ctx, component);
+    const cloneCountProperty = await Create.Property.cloneCountBlank(ctx);
 
-    const object: ExObject = {
-      ...base,
-      itemType: ExItemType.ExObject,
-      name$: createBehaviorSubjectWithLifetime(base.destroy$, "Object " + base.ordinal),
+    const object = from(
+      ctx,
       component,
-      componentParameterProperties: componentProperties,
-      basicProperties$: createBehaviorSubjectWithLifetime<BasicProperty[]>(base.destroy$, []),
-      children$: createBehaviorSubjectWithLifetime<ExObject[]>(
-        base.destroy$,
-        []
-      ),
-      cloneCountProperty: await Create.Property.cloneCountBlank(ctx),
-    };
-    ctx.eventBus.objectAdded$.next(object);
+      id,
+      "Object",
+      componentProperties,
+      [],
+      cloneCountProperty,
+      []
+    );
     return object;
   }
 
@@ -113,6 +103,14 @@ export namespace CreateExObject {
       ),
       cloneCountProperty,
     };
+
+    componentProperties.forEach((property) => {
+      property.parent$.next(object);
+    });
+    basicProperties.forEach((property) => {
+      property.parent$.next(object);
+    });
+    cloneCountProperty.parent$.next(object);
     ctx.eventBus.objectAdded$.next(object);
     return object;
   }
@@ -148,6 +146,6 @@ async function createCustomComponentProperties(
   const propertyPL = parameterL.map((input) => {
     return Create.Property.componentBlank(ctx, input);
   });
-  const propertyLP = await Promise.all(propertyPL); 
+  const propertyLP = await Promise.all(propertyPL);
   return propertyLP;
 }

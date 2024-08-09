@@ -1,11 +1,12 @@
 import hotkeys from "hotkeys-js";
 import { firstValueFrom, map, of } from "rxjs";
+import { ExItemType } from "src/ex-object/ExItem";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
+import { FocusBase } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
-import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
-import { ExItemType } from "src/ex-object/ExItem";
 import type { EditPropertyNameFocus } from "src/utils/utils/FocusManager";
+import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -42,6 +43,14 @@ export default class Keyboard {
 
     notEditingScope.hotkeys("v", () => {
       focusManager.focusViewActions();
+    });
+
+    const editingScope = new KeyboardScope(
+      focusManager.isEditing$.pipe(map((isEditing) => isEditing))
+    );
+
+    editingScope.hotkeys("Enter", () => {
+      focusManager.popFocus();
     });
 
     const globalScope = new KeyboardScope(of(true));
@@ -192,6 +201,21 @@ export default class Keyboard {
         property,
       };
       ctx.focusManager.focus(focus);
+    });
+
+    const editableScope = new KeyboardScope(
+      ctx.focusManager.getFocus$().pipe(
+        map((focus) => {
+          if (focus instanceof FocusBase && focus.isEditable && !focus.isEditing) {
+            return focus;
+          }
+          return KeyboardScopeResult.OutOfScope;
+        })
+      )
+    );
+
+    editableScope.hotkeys("e", (focus) => {
+      focus.startEditing!(ctx);
     });
 
     document.addEventListener("keydown", async (event: KeyboardEvent) => {

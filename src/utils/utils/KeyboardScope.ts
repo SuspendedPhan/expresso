@@ -20,6 +20,8 @@ export class KeyboardScope<T> {
       this.condition.pipe(first()).subscribe((value) => {
         if (value !== KeyboardScopeResult.OutOfScope && value !== false) {
           callback(value);
+          event.stopPropagation();
+          event.preventDefault();
         }
       });
     });

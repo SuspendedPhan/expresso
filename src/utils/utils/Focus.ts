@@ -6,6 +6,10 @@ import type { OBS } from "src/utils/utils/Utils";
 export class FocusBase {
   public type = typeof this;
   public isEditing: boolean = false;
+  public startEditing: ((ctx: MainContext) => void) | null = null;
+  public get isEditable() {
+    return this.startEditing !== null;
+  }
 }
 
 export namespace ExObjectFocus {
@@ -27,13 +31,40 @@ export namespace ExObjectFocus {
   export class Name extends Base {
     constructor(data: Data) {
       super(data);
+      this.startEditing = (ctx: MainContext) => {
+        console.log("startEditing");
+        
+        ctx.focusManager.focus(
+          new Name({
+            exObject: this.exObject,
+            isEditing: true,
+          })
+        );
+      };
     }
 
-    public static isFocused$(ctx: MainContext, exObject: ExObject): OBS<boolean> {
+    public static isFocused$(
+      ctx: MainContext,
+      exObject: ExObject
+    ): OBS<boolean> {
       return ctx.focusManager.getFocus$().pipe(
         map((focus) => {
           if (focus instanceof ExObjectFocus.Name) {
             return focus.exObject === exObject;
+          }
+          return false;
+        })
+      );
+    }
+    
+    public static isEditing$(
+      ctx: MainContext,
+      exObject: ExObject
+    ): OBS<boolean> {
+      return ctx.focusManager.getFocus$().pipe(
+        map((focus) => {
+          if (focus instanceof ExObjectFocus.Name) {
+            return focus.exObject === exObject && focus.isEditing;
           }
           return false;
         })
@@ -46,7 +77,10 @@ export namespace ExObjectFocus {
       super(data);
     }
 
-    public static isFocused$(ctx: MainContext, exObject: ExObject): OBS<boolean> {
+    public static isFocused$(
+      ctx: MainContext,
+      exObject: ExObject
+    ): OBS<boolean> {
       return ctx.focusManager.getFocus$().pipe(
         map((focus) => {
           if (focus instanceof ExObjectFocus.Component) {

@@ -1,11 +1,24 @@
-import { BehaviorSubject, first, firstValueFrom, map, type Observable, Subject } from "rxjs";
-import { type ExItem, ExItemType, type Expr, ExprType } from "src/ex-object/ExItem";
-import type { Property } from "src/ex-object/Property";
+import assert from "assert-ts";
+import {
+  BehaviorSubject,
+  first,
+  firstValueFrom,
+  map,
+  type Observable,
+  Subject,
+} from "rxjs";
+import {
+  type ExItem,
+  ExItemType,
+  type Expr,
+  ExprType,
+} from "src/ex-object/ExItem";
+import { PropertyType, type Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { ExObjectFocus, type FocusBase } from "src/utils/utils/Focus";
+import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
 import { assertUnreachable } from "src/utils/utils/Utils";
 
 export type Focus =
@@ -18,8 +31,7 @@ export type Focus =
   | ViewActionsFocus
   | ExprReplaceCommandFocus
   | EditPropertyNameFocus
-  | FocusBase
-  ;
+  | FocusBase;
 
 export interface NoneFocus {
   type: "None";
@@ -69,7 +81,15 @@ export default class FocusManager {
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
   public readonly isEditing$ = this.focus$.pipe(
-    map((focus) => focus.type === "EditPropertyName" || focus.type === "ExprReplaceCommand")
+    map((focus) => {
+      if (focus instanceof FocusBase) {
+        return focus.isEditing;
+      }
+
+      return (
+        focus.type === "EditPropertyName" || focus.type === "ExprReplaceCommand"
+      );
+    })
   );
 
   public constructor(private readonly ctx: MainContext) {
@@ -181,10 +201,12 @@ export default class FocusManager {
 
   private async downMisc(focus: Focus) {
     if (focus instanceof ExObjectFocus.Name) {
-      this.focus(new ExObjectFocus.Component({
-        exObject: focus.exObject,
-        isEditing: false,
-      }));
+      this.focus(
+        new ExObjectFocus.Component({
+          exObject: focus.exObject,
+          isEditing: false,
+        })
+      );
     } else if (focus instanceof ExObjectFocus.Component) {
       this.focusExItem(focus.exObject.cloneCountProperty);
     }
@@ -194,15 +216,19 @@ export default class FocusManager {
     if (focus instanceof ExObjectFocus.Name) {
       this.focusExItem(focus.exObject);
     } else if (focus instanceof ExObjectFocus.Component) {
-      this.focus(new ExObjectFocus.Name({
-        exObject: focus.exObject,
-        isEditing: false,
-      }));
+      this.focus(
+        new ExObjectFocus.Name({
+          exObject: focus.exObject,
+          isEditing: false,
+        })
+      );
     }
   }
 
   private async downNone() {
-    const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
+    const project = await firstValueFrom(
+      this.ctx.projectManager.currentProject$
+    );
     const objs = await firstValueFrom(project.rootExObjects$);
     const obj = objs[0];
     if (obj === undefined) {
@@ -214,10 +240,12 @@ export default class FocusManager {
   private downExItem(focus: ExItem) {
     switch (focus.itemType) {
       case ExItemType.ExObject:
-        this.focus(new ExObjectFocus.Name({
-          exObject: focus,
-          isEditing: false,
-        }));
+        this.focus(
+          new ExObjectFocus.Name({
+            exObject: focus,
+            isEditing: false,
+          })
+        );
         return;
       case ExItemType.Property:
         focus.expr$.pipe(first()).subscribe((expr) => {
@@ -275,7 +303,18 @@ export default class FocusManager {
     }
   }
 
-  private upExItem(focus: ExItem) {
+  private async upExItem(focus: ExItem) {
+    const parent = await firstValueFrom(focus.parent$);
+    if (
+      focus.itemType === ExItemType.Property &&
+      focus.propertyType === PropertyType.CloneCountProperty
+    ) {
+      assert(parent !== null, "parent is null");
+      assert(parent.itemType === ExItemType.ExObject, "parent is not ExObject");
+      this.focus(new ExObjectFocus.Component({ exObject: parent, isEditing: false }));
+      return;
+    }
+
     const parent$ = focus.parent$;
     parent$.pipe(first()).subscribe((parent) => {
       if (parent !== null) {

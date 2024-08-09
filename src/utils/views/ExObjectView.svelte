@@ -10,6 +10,8 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import HugInput from "src/utils/views/HugInput.svelte";
+  import { firstValueFrom } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -22,12 +24,24 @@
   });
   const children$ = exObject.children$;
 
+  const exObjectName$ = exObject.name$;
   const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
+  const isEditingExObjectName$ = ExObjectFocus.Name.isEditing$(ctx, exObject);
   const componentName$ = ComponentUtils.getName$(exObject.component);
   const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
     ctx,
     exObject
   );
+
+  async function handleExObjectNameInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+    if (value === "") {
+      target.value = await firstValueFrom(exObjectName$);
+      return;
+    }
+    exObject.name$.next(target.value);
+  }
 
   function handleClickExObjectName() {
     console.log("handleClickExObjectName");
@@ -65,8 +79,14 @@
             <FocusView
               on:mousedown={handleClickExObjectName}
               focused={$exObjectNameFocused$}
-              class="text-emphatic">ExObject {exObject.ordinal}</FocusView
+              class="text-emphatic"
             >
+              <HugInput
+                isEditing={$isEditingExObjectName$}
+                on:input={handleExObjectNameInput}
+                value={$exObjectName$}
+              ></HugInput>
+            </FocusView>
           </div>
           <div class="flex flex-row">
             <pre class="text-style-secondary">Component: </pre>
