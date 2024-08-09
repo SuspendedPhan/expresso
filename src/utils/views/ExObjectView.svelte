@@ -63,13 +63,13 @@
         {/each}
         <button
           on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
-          class="btn btn-sm text-sm w-max">Add Property</button
+          class="btn btn-sm text-sm w-max self-center mt-2">Add Property</button
         >
       </div>
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-      <div class="p-4">
+      <div class="p-4 self-center">
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
           class="btn btn-sm text-sm w-max">Add Child Object</button

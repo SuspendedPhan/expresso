@@ -38,9 +38,8 @@
       )
     );
 
-  function handleNameInput(event: InputEvent) {
-    const target = event.target as HTMLInputElement;
-    const name = target.value;
+  function handleNameInput(event: Event & { currentTarget: HTMLInputElement }) {
+    const name = event.currentTarget.value;
     if (property.propertyType !== PropertyType.BasicProperty) {
       throw new Error("Cannot edit name of non-basic property");
     }
@@ -49,7 +48,7 @@
   }
 </script>
 
-<div class:flex={$isNumberExpr$} class="items-center gap-1 font-mono">
+<div class:flex={$isNumberExpr$} class="items-center font-mono">
   <SelectableView {ctx} item={property} class="w-max grow-0">
     <div class="text-left relative" class:mb-2={!$isNumberExpr$}>
       <input
@@ -62,7 +61,7 @@
       <div class="font-semibold">{$name$}</div>
     </div>
   </SelectableView>
-  <span>= </span>
+  <pre> = </pre>
   {#key $exprId$}
     {#if $elementLayout$}
       <TreeView elementLayout={$elementLayout$} {ctx}>
