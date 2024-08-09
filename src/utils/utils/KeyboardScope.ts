@@ -1,4 +1,3 @@
-import hotkeys from "hotkeys-js";
 import { first } from "rxjs";
 import type { OBS } from "./Utils";
 
@@ -12,13 +11,27 @@ export class KeyboardScope<T> {
   ) {}
 
   public hotkeys(key: string, callback: (value: T) => void) {
-    hotkeys(key, { keydown: true, keyup: true }, (_event, _handler) => {
+    window.addEventListener("keydown", (event) => {
+      const keys = key.split(",");
+      if (!keys.includes(event.key)) {
+        return;
+      }
+
       this.condition.pipe(first()).subscribe((value) => {
         if (value !== KeyboardScopeResult.OutOfScope && value !== false) {
           callback(value);
         }
       });
     });
+    // hotkeys(key, { keydown: true }, (_event, _handler) => {
+    //   console.log("hotkeys", key);
+      
+    //   this.condition.pipe(first()).subscribe((value) => {
+    //     if (value !== KeyboardScopeResult.OutOfScope && value !== false) {
+    //       callback(value);
+    //     }
+    //   });
+    // });
   }
 
   public setChordPrefix(_prefix: string) {

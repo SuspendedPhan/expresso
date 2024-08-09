@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import { firstValueFrom, map } from "rxjs";
+import { firstValueFrom, map, of } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
@@ -20,19 +20,19 @@ export default class Keyboard {
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
     );
 
-    notEditingScope.hotkeys("down,s", () => {
+    notEditingScope.hotkeys("ArrowDown,s", () => {
       focusManager.down$.next();
     });
 
-    notEditingScope.hotkeys("up,w", () => {
+    notEditingScope.hotkeys("ArrowUp,w", () => {
       focusManager.up$.next();
     });
 
-    notEditingScope.hotkeys("left,a", () => {
+    notEditingScope.hotkeys("ArrowLeft,a", () => {
       focusManager.left();
     });
 
-    notEditingScope.hotkeys("right,d", () => {
+    notEditingScope.hotkeys("ArrowRight,d", () => {
       focusManager.right();
     });
 
@@ -42,6 +42,11 @@ export default class Keyboard {
 
     notEditingScope.hotkeys("v", () => {
       focusManager.focusViewActions();
+    });
+
+    const globalScope = new KeyboardScope(of(true));
+    globalScope.hotkeys("Escape", () => {
+      ctx.focusManager.popFocus();
     });
 
     const projectNavScope = new KeyboardScope(
@@ -72,10 +77,6 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    projectNavScope.hotkeys("Esc", () => {
-      ctx.focusManager.popFocus();
-    });
-
     const libraryNavScope = new KeyboardScope(
       focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav"))
     );
@@ -92,11 +93,6 @@ export default class Keyboard {
     libraryNavScope.hotkeys("f", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryFunctionList);
       ctx.focusManager.focusNone();
-    });
-
-    libraryNavScope.hotkeys("Esc", () => {
-      ctx.focusManager.popFocus();
-      ctx.focusManager.popFocus();
     });
 
     const editorScope = new KeyboardScope(
@@ -200,6 +196,8 @@ export default class Keyboard {
     });
 
     document.addEventListener("keydown", async (event: KeyboardEvent) => {
+      console.log("keydown", event.key);
+      
       const isEditing = await firstValueFrom(ctx.focusManager.isEditing$);
       if (isEditing) {
         return;
