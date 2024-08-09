@@ -1,4 +1,7 @@
+import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
+import type MainContext from "src/main-context/MainContext";
+import type { OBS } from "src/utils/utils/Utils";
 
 export class FocusBase {
   public type = typeof this;
@@ -25,11 +28,33 @@ export namespace ExObjectFocus {
     constructor(data: Data) {
       super(data);
     }
+
+    public static isFocused$(ctx: MainContext, exObject: ExObject): OBS<boolean> {
+      return ctx.focusManager.getFocus$().pipe(
+        map((focus) => {
+          if (focus instanceof ExObjectFocus.Name) {
+            return focus.exObject === exObject;
+          }
+          return false;
+        })
+      );
+    }
   }
 
   export class Component extends Base {
     constructor(data: Data) {
       super(data);
+    }
+
+    public static isFocused$(ctx: MainContext, exObject: ExObject): OBS<boolean> {
+      return ctx.focusManager.getFocus$().pipe(
+        map((focus) => {
+          if (focus instanceof ExObjectFocus.Component) {
+            return focus.exObject === exObject;
+          }
+          return false;
+        })
+      );
     }
   }
 }

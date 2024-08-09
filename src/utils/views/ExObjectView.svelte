@@ -1,13 +1,15 @@
 <script lang="ts">
+  import { ComponentUtils } from "src/ex-object/Component";
   import { MutateExObject, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
+  import { ExObjectFocus } from "src/utils/utils/Focus";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
+  import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
+  import FocusView from "src/utils/views/FocusView.svelte";
+  import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import type { ElementLayout } from "../layout/ElementLayout";
-  import { ComponentUtils } from "src/ex-object/Component";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -18,8 +20,14 @@
   exObject.basicProperties$.subscribe((basicProperties) => {
     console.log("basicProperties", basicProperties);
   });
-  const componentName$ = ComponentUtils.getName$(exObject.component);
   const children$ = exObject.children$;
+
+  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
+  const componentName$ = ComponentUtils.getName$(exObject.component);
+  const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
+    ctx,
+    exObject
+  );
 </script>
 
 <NodeView elementKey={exObject.id} {elementLayout}>
@@ -34,11 +42,15 @@
         <div class="flex flex-col gap-2 font-mono">
           <div class="flex flex-row">
             <pre class="text-style-secondary">Name: </pre>
-            <div class="text-emphatic">ExObject {exObject.ordinal}</div>
+            <FocusView focused={$exObjectNameFocused$} class="text-emphatic"
+              >ExObject {exObject.ordinal}</FocusView
+            >
           </div>
           <div class="flex flex-row">
             <pre class="text-style-secondary">Component: </pre>
-            <div class="text-emphatic">{$componentName$}</div>
+            <FocusView focused={$componentNameFocused$} class="text-emphatic"
+              >{$componentName$}</FocusView
+            >
           </div>
         </div>
       </div>
