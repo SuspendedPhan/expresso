@@ -47,10 +47,10 @@
       <div class="p-4">
         <ExObjectHeaderView>Component Properties</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
+          <PropertyView {ctx} property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
           {/each}
-          <PropertyView {ctx} property={cloneCountProperty} />
         </div>
       </div>
 
