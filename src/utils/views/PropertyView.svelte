@@ -28,7 +28,9 @@
 
 <div class:flex={$isNumberExpr$} class="items-center gap-1">
   <SelectableView {ctx} item={property}>
-    <div class="text-left" class:mb-2={!$isNumberExpr$}>{$name$} =</div>
+    <div class="text-left" class:mb-2={!$isNumberExpr$}>
+      <span class="font-semibold">{$name$}</span> =
+    </div>
   </SelectableView>
   {#key $exprId$}
     {#if $elementLayout$}

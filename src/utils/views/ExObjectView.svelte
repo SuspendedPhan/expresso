@@ -45,9 +45,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-4">
-        <ExObjectHeaderView
-          >Component Properties Properties Properties Properties</ExObjectHeaderView
-        >
+        <ExObjectHeaderView>Component Properties</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {ctx} {property} />
@@ -65,16 +63,16 @@
         {/each}
         <button
           on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
-          class="btn self-center justify-self-center">Add Property</button
+          class="btn btn-sm text-sm w-max">Add Property</button
         >
       </div>
 
+      <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-
-      <div class="self-center p-4">
+      <div class="p-4">
         <button
           on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
-          class="btn">Add Child</button
+          class="btn btn-sm text-sm w-max">Add Child Object</button
         >
       </div>
     </SelectableView>
