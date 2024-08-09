@@ -34,6 +34,7 @@ export interface DehydratedProject {
 
 export interface DehydratedExObject {
   id: string;
+  name: string;
   componentId: string;
   componentType: string;
   componentProperties: DehydratedComponentProperty[];
@@ -145,6 +146,7 @@ export default class Dehydrator {
       deBasicProperties$,
       deCloneProperty$,
       deChildren$,
+      exObject.name$,
     ]).pipe(
       map(
         ([
@@ -152,9 +154,11 @@ export default class Dehydrator {
           deBasicProperties,
           deCloneProperty,
           deChildren,
+          name
         ]) => {
           const deExObject: DehydratedExObject = {
             id: exObject.id,
+            name,
             componentId: exObject.component.id,
             componentType: ComponentType[exObject.component.componentType],
             componentProperties: deComponentProperties,

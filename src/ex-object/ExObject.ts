@@ -21,6 +21,7 @@ import {
 
 export interface ExObject extends ExItemBase {
   itemType: ExItemType.ExObject;
+  name$: SUB<string>;
   component: Component;
   children$: SUB<ExObject[]>;
   componentParameterProperties: ComponentParameterProperty[];
@@ -71,6 +72,7 @@ export namespace CreateExObject {
     const object: ExObject = {
       ...base,
       itemType: ExItemType.ExObject,
+      name$: createBehaviorSubjectWithLifetime(base.destroy$, "Object " + base.ordinal),
       component,
       componentParameterProperties: componentProperties,
       basicProperties$: createBehaviorSubjectWithLifetime<BasicProperty[]>(base.destroy$, []),
@@ -88,6 +90,7 @@ export namespace CreateExObject {
     ctx: MainContext,
     component: Component,
     id: string,
+    name: string,
     componentProperties: ComponentParameterProperty[],
     basicProperties: BasicProperty[],
     cloneCountProperty: CloneCountProperty,
@@ -96,6 +99,7 @@ export namespace CreateExObject {
     const base = await ctx.objectFactory.createExItemBase(id);
     const object: ExObject = {
       ...base,
+      name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
       itemType: ExItemType.ExObject,
       component,
       componentParameterProperties: componentProperties,

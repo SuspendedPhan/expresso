@@ -83,6 +83,7 @@ export default class Rehydrator {
       this.ctx,
       component,
       deExObject.id,
+      deExObject.name,
       componentPropertyL,
       basicPropertyL,
       cloneCountProperty,
