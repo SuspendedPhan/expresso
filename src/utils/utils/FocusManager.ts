@@ -77,6 +77,9 @@ export default class FocusManager {
 
   public readonly down$ = new Subject<void>();
   public readonly up$ = new Subject<void>();
+  public readonly isEditing$ = this.focus$.pipe(
+    map((focus) => focus.type === "EditPropertyName")
+  );
 
   public constructor(private readonly ctx: MainContext) {
     this.down$.subscribe(() => {
@@ -108,6 +111,10 @@ export default class FocusManager {
         return focus.exItem === object;
       })
     );
+  }
+
+  public focus(focus: Focus) {
+    this.focus$.next(focus);
   }
 
   public focusExItem(exItem: ExItem) {

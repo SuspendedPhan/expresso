@@ -51,8 +51,7 @@
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div
-      class="rounded-sm card card-compact card-bordered p-2 container bg-base-100"
-      style="min-width: 24px;"
+      class="rounded-sm card card-compact card-bordered px-2 container bg-base-100 font-mono"
       on:mouseover={handleMouseOver}
       on:mouseleave={handleMouseLeave}
     >

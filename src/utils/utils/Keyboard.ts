@@ -5,6 +5,7 @@ import { ViewMode, Window } from "src/main-context/MainViewContext";
 import type FocusManager from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 import { ExItemType } from "src/ex-object/ExItem";
+import type { EditPropertyNameFocus } from "src/utils/utils/FocusManager";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -15,31 +16,31 @@ export default class Keyboard {
     hotkeys.setScope(this.SCOPE);
     hotkeys.filter = () => true;
 
-    hotkeys("down,s", this.SCOPE, function (_event, _handler) {
+    const notEditingScope = new KeyboardScope(
+      focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
+    );
+
+    notEditingScope.hotkeys("down,s", () => {
       focusManager.down$.next();
-      return false;
     });
 
-    hotkeys("up,w", this.SCOPE, function (_event, _handler) {
+    notEditingScope.hotkeys("up,w", () => {
       focusManager.up$.next();
-      return false;
     });
 
-    hotkeys("left,a", this.SCOPE, function (_event, _handler) {
+    notEditingScope.hotkeys("left,a", () => {
       focusManager.left();
-      return false;
     });
 
-    hotkeys("right,d", this.SCOPE, function (_event, _handler) {
+    notEditingScope.hotkeys("right,d", () => {
       focusManager.right();
-      return false;
     });
 
-    hotkeys("g", function (_event, _handler) {
+    notEditingScope.hotkeys("g", () => {
       focusManager.focusProjectNav();
     });
 
-    hotkeys("v", function (_event, _handler) {
+    notEditingScope.hotkeys("v", () => {
       focusManager.focusViewActions();
     });
 
@@ -181,20 +182,32 @@ export default class Keyboard {
 
     const propertyScope = new KeyboardScope(
       ctx.focusManager.getFocus$().pipe(
-        map((focus) => focus.type === "ExItem" && focus.exItem.itemType === ExItemType.Property)
+        map((focus) => {
+          if (focus.type === "ExItem" && focus.exItem.itemType === ExItemType.Property) {
+            return focus.exItem;
+          }
+          return KeyboardScopeResult.OutOfScope;
+        })
       )
     );
-    propertyScope.hotkeys("e", () => {
-
-    document.addEventListener("keydown", (event) => {
-      switch (event.key) {
-        case "ArrowDown":
-        case "ArrowUp":
-        case "ArrowLeft":
-        case "ArrowRight":
-          event.preventDefault();
-          break;
-      }
+    propertyScope.hotkeys("e", (property) => {
+      const focus: EditPropertyNameFocus = {
+        type: "EditPropertyName",
+        property,
+        window: Window.ProjectEditor,
+      };
+      ctx.focusManager.focus(focus);
     });
+
+    // document.addEventListener("keydown", (event) => {
+    //   switch (event.key) {
+    //     case "ArrowDown":
+    //     case "ArrowUp":
+    //     case "ArrowLeft":
+    //     case "ArrowRight":
+    //       event.preventDefault();
+    //       break;
+    //   }
+    // });
   }
 }

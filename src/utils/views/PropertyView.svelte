@@ -24,14 +24,30 @@
   const elementLayout$ = expr$.pipe(
     map((expr) => ExprLayout.create(ctx, expr))
   );
+
+  const editingName$ = ctx.focusManager
+    .getFocus$()
+    .pipe(
+      map(
+        (focus) =>
+          focus.type === "EditPropertyName" && focus.property === property
+      )
+    );
 </script>
 
-<div class:flex={$isNumberExpr$} class="items-center gap-1">
-  <SelectableView {ctx} item={property}>
-    <div class="text-left" class:mb-2={!$isNumberExpr$}>
-      <input class="font-semibold" value={$name$} /> =
+<div class:flex={$isNumberExpr$} class="items-center gap-1 font-mono">
+  <SelectableView {ctx} item={property} class="w-max grow-0">
+    <div class="text-left relative" class:mb-2={!$isNumberExpr$}>
+      <input
+        class="font-semibold outline-none"
+        class:ring={$editingName$}
+        value={$name$}
+        readonly={!$editingName$}
+      />
+      <!-- <div class="absolute top-0 left-0 font-semibold">{$name$}</div> -->
     </div>
   </SelectableView>
+  <span>= </span>
   {#key $exprId$}
     {#if $elementLayout$}
       <TreeView elementLayout={$elementLayout$} {ctx}>
