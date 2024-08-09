@@ -190,7 +190,6 @@ export default class Keyboard {
       const focus: EditPropertyNameFocus = {
         type: "EditPropertyName",
         property,
-        window: Window.ProjectEditor,
       };
       ctx.focusManager.focus(focus);
     });

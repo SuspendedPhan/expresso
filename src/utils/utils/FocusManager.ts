@@ -1,12 +1,12 @@
 import { BehaviorSubject, first, firstValueFrom, map, type Observable, Subject } from "rxjs";
-import type { ExObject } from "src/ex-object/ExObject";
-import { type ExItem, type Expr, ExItemType, ExprType } from "src/ex-object/ExItem";
+import { type ExItem, ExItemType, type Expr, ExprType } from "src/ex-object/ExItem";
+import type { Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { ExObjectFocus, type FocusBase } from "src/utils/utils/Focus";
 import { assertUnreachable } from "src/utils/utils/Utils";
-import type { Property } from "src/ex-object/Property";
 
 export type Focus =
   | NoneFocus
@@ -18,61 +18,52 @@ export type Focus =
   | ViewActionsFocus
   | ExprReplaceCommandFocus
   | EditPropertyNameFocus
+  | FocusBase
   ;
 
 export interface NoneFocus {
   type: "None";
-  window: Window;
 }
 
 export interface ExItemFocus {
   type: "ExItem";
   exItem: ExItem;
-  window: Window.ProjectEditor;
 }
 
 export interface ProjectNavFocus {
   type: "ProjectNav";
-  window: Window;
 }
 
 export interface LibraryNavFocus {
   type: "LibraryNav";
-  window: Window;
 }
 
 export interface LibraryProjectFocus {
   type: "LibraryProject";
   project: LibraryProject;
-  window: Window.LibraryProjectList;
 }
 
 export interface NewActionsFocus {
   type: "NewActions";
-  window: Window.ProjectEditor;
 }
 
 export interface ViewActionsFocus {
   type: "ViewActions";
-  window: Window;
 }
 
 export interface ExprReplaceCommandFocus {
   type: "ExprReplaceCommand";
   expr: Expr;
-  window: Window.ProjectEditor;
 }
 
 export interface EditPropertyNameFocus {
   type: "EditPropertyName";
   property: Property;
-  window: Window.ProjectEditor;
 }
 
 export default class FocusManager {
   private readonly focus$ = new BehaviorSubject<Focus>({
     type: "None",
-    window: Window.ProjectEditor,
   });
 
   public readonly down$ = new Subject<void>();
@@ -122,14 +113,14 @@ export default class FocusManager {
   }
 
   public focusProjectNav() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
-      this.focus$.next({ type: "ProjectNav", window });
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
+      this.focus$.next({ type: "ProjectNav" });
     });
   }
 
   public focusLibraryNav() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
-      this.focus$.next({ type: "LibraryNav", window });
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
+      this.focus$.next({ type: "LibraryNav" });
     });
   }
 
@@ -137,23 +128,22 @@ export default class FocusManager {
     this.focus$.next({
       type: "LibraryProject",
       project,
-      window: Window.LibraryProjectList,
     });
   }
 
   public focusNone() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
-      this.focus$.next({ type: "None", window });
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
+      this.focus$.next({ type: "None" });
     });
   }
 
   public focusNewActions() {
-    this.focus$.next({ type: "NewActions", window: Window.ProjectEditor });
+    this.focus$.next({ type: "NewActions" });
   }
 
   public focusViewActions() {
-    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe((window) => {
-      this.focus$.next({ type: "ViewActions", window });
+    this.ctx.viewCtx.activeWindow$.pipe(first()).subscribe(() => {
+      this.focus$.next({ type: "ViewActions" });
     });
   }
 
@@ -161,7 +151,6 @@ export default class FocusManager {
     this.focus$.next({
       type: "ExprReplaceCommand",
       expr,
-      window: Window.ProjectEditor,
     });
   }
 
@@ -170,8 +159,9 @@ export default class FocusManager {
   }
 
   @loggedMethod
-  private down(focus: Focus) {
-    if (focus.window === Window.LibraryProjectList) {
+  private async down(focus: Focus) {
+    const activeWindow = await firstValueFrom(this.ctx.viewCtx.activeWindow$);
+    if (activeWindow === Window.LibraryProjectList) {
       this.ctx.projectManager.navDown(focus);
       return;
     }
@@ -184,7 +174,19 @@ export default class FocusManager {
         this.downExItem(focus.exItem);
         return;
       default:
+        this.downMisc(focus);
         return;
+    }
+  }
+
+  private async downMisc(focus: Focus) {
+    if (focus instanceof ExObjectFocus.Name) {
+      this.focus(new ExObjectFocus.Component({
+        exObject: focus.exObject,
+        isEditing: false,
+      }));
+    } else if (focus instanceof ExObjectFocus.Component) {
+      this.focusExItem(focus.exObject.cloneCountProperty);
     }
   }
 
@@ -200,6 +202,12 @@ export default class FocusManager {
 
   private downExItem(focus: ExItem) {
     switch (focus.itemType) {
+      case ExItemType.ExObject:
+        this.focus(new ExObjectFocus.Name({
+          exObject: focus,
+          isEditing: false,
+        }));
+        return;
       case ExItemType.Property:
         focus.expr$.pipe(first()).subscribe((expr) => {
           this.focus$.next(FocusManager.createExItemFocus(expr));
@@ -208,17 +216,9 @@ export default class FocusManager {
       case ExItemType.Expr:
         this.downExpr(focus);
         return;
-      case ExItemType.ExObject:
-        this.downExObject(focus);
-        return;
       default:
         assertUnreachable(focus);
     }
-  }
-
-  private downExObject(selectedObject: ExObject) {
-    const property = selectedObject.cloneCountProperty;
-    this.focus$.next(FocusManager.createExItemFocus(property));
   }
 
   @loggedMethod
@@ -255,7 +255,6 @@ export default class FocusManager {
             this.focus$.next({
               type: "LibraryProject",
               project,
-              window: Window.LibraryProjectList,
             });
           });
         return;
@@ -358,6 +357,9 @@ export default class FocusManager {
   }
 
   public static createExItemFocus(exItem: ExItem): ExItemFocus {
-    return { type: "ExItem", exItem: exItem, window: Window.ProjectEditor };
+    return {
+      type: "ExItem",
+      exItem,
+    };
   }
 }
