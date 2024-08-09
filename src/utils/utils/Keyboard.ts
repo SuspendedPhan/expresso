@@ -179,6 +179,13 @@ export default class Keyboard {
       ctx.focusManager.popFocus();
     });
 
+    const propertyScope = new KeyboardScope(
+      ctx.focusManager.getFocus$().pipe(
+        map((focus) => focus.type === "ExItem" && focus.exItem.itemType === ExItemType.Property)
+      )
+    );
+    propertyScope.hotkeys("e", () => {
+
     document.addEventListener("keydown", (event) => {
       switch (event.key) {
         case "ArrowDown":

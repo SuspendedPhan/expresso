@@ -6,6 +6,7 @@ import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
+import type { Property } from "src/ex-object/Property";
 
 export type Focus =
   | NoneFocus
@@ -15,7 +16,9 @@ export type Focus =
   | LibraryProjectFocus
   | NewActionsFocus
   | ViewActionsFocus
-  | ExprReplaceCommandFocus;
+  | ExprReplaceCommandFocus
+  | EditPropertyNameFocus
+  ;
 
 export interface NoneFocus {
   type: "None";
@@ -57,6 +60,12 @@ export interface ViewActionsFocus {
 export interface ExprReplaceCommandFocus {
   type: "ExprReplaceCommand";
   expr: Expr;
+  window: Window.ProjectEditor;
+}
+
+export interface EditPropertyNameFocus {
+  type: "EditPropertyName";
+  property: Property;
   window: Window.ProjectEditor;
 }
 
