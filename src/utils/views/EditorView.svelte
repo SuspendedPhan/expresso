@@ -1,11 +1,12 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { combineLatest, map, ReplaySubject, switchMap } from "rxjs";
+  import { map, ReplaySubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
+  import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
+  import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -25,37 +26,13 @@
   const newActionsFocused$ = ctx.focusManager
     .getFocus$()
     .pipe(map((focus) => focus.type === "NewActions"));
-
-  const xTranslation$ = ctx.viewCtx.exObjectLayouts$.pipe(
-    map((layouts) => {
-      return combineLatest(layouts.map((layout) => layout.onCalculated));
-    }),
-    switchMap((outputs) => {
-      return combineLatest([editorViewWidth$, outputs]);
-    }),
-    map(([width, outputs]) => {
-      // Get the largest width
-      let largestWidth = 0;
-      for (const output of outputs) {
-        if (output.totalWidth > largestWidth) {
-          largestWidth = output.totalWidth;
-        }
-      }
-
-      if (largestWidth < width) {
-        return `${Constants.WindowPaddingRem}rem`;
-      } else {
-        const translation = largestWidth / 2 - width / 2;
-        return `calc(${translation}px + ${Constants.WindowPaddingRem}rem)`;
-      }
-    })
-  );
 </script>
 
 <div bind:this={rootElement}>
-  <div
+  <TreeListContainer
     class="flex flex-col items-center"
-    style:transform="translateX({$xTranslation$})"
+    containerPadding={Constants.WindowPadding}
+    layouts$={ctx.viewCtx.exObjectLayouts$}
   >
     <div class="flex gap-4 {Constants.WindowPaddingClass}">
       <button
@@ -90,7 +67,7 @@
         {/each}
       {/if}
     </div>
-  </div>
+  </TreeListContainer>
 </div>
 
 <style></style>

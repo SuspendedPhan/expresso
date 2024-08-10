@@ -9,13 +9,13 @@ The container will be translated so that x=0 aligns with the left edge of the la
   import type { OBS } from "src/utils/utils/Utils";
   import { onMount } from "svelte";
 
-  export let layouts$: OBS<ElementLayout[]>;
   let clazz = "";
+
+  export let layouts$: OBS<readonly ElementLayout[]>;
   export { clazz as class };
   export let containerPadding: string; // For example, "1rem"
 
   let rootElement: HTMLElement;
-
   const containerWidth$ = new ReplaySubject<number>(1);
   onMount(() => {
     const sensor = new ResizeSensor(rootElement, ({ width }) => {

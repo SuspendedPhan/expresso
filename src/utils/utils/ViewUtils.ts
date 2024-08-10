@@ -27,6 +27,6 @@ export function activeWindowToSvelteComponent(activeWindow: Window): any {
 
 export const Constants = {
   WindowPaddingClass: "p-8",
-  WindowPaddingRem: 2,
+  WindowPadding: "2rem",
 };
 
