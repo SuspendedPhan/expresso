@@ -1,10 +1,12 @@
+import type { ExObject } from "src/ex-object/ExObject";
 import { Window } from "src/main-context/MainViewContext";
-import { assertUnreachable } from "./Utils";
-import EditorView from "../views/EditorView.svelte";
-import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
-import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
+import type { ElementLayout } from "src/utils/layout/ElementLayout";
 import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
+import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
+import EditorView from "../views/EditorView.svelte";
 import ProjectComponentListView from "../views/ProjectComponentListView.svelte";
+import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
+import { assertUnreachable } from "./Utils";
 
 export function activeWindowToSvelteComponent(activeWindow: Window): any {
   switch (activeWindow) {
@@ -30,3 +32,13 @@ export const Constants = {
   WindowPadding: "2rem",
 };
 
+export namespace ViewUtils {
+  export function asdf() {
+
+  }
+}
+
+export interface RootExObjectViewProps {
+  exObject: ExObject;
+  elementLayout: ElementLayout;
+}

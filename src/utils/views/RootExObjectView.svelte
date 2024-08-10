@@ -3,18 +3,18 @@
   import { first } from "rxjs";
   import type { ExObject } from "src/ex-object/ExObject";
   import MainContext from "src/main-context/MainContext";
+  import type { ElementLayout } from "src/utils/layout/ElementLayout";
+  import { Constants } from "src/utils/utils/ViewUtils";
+  import ExObjectView from "src/utils/views/ExObjectView.svelte";
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
-  import ExObjectLayout from "src/utils/layout/ExObjectLayout";
-  import ExObjectView from "src/utils/views/ExObjectView.svelte";
-  import { Constants } from "src/utils/utils/ViewUtils";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
   let clazz = "";
   export { clazz as class };
 
-  const elementLayout = ExObjectLayout.create(ctx, exObject);
+  export let elementLayout: ElementLayout;
 
   let element: HTMLElement;
 
