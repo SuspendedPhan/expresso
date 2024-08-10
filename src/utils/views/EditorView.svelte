@@ -59,7 +59,7 @@
         Debug Evaluator
       </button>
     </div>
-    <div class="grid grid-flow-row">
+    <div class="flex flex-col w-full items-center">
       {#if $rootExObjects$}
         {#each $rootExObjects$ as exObject (exObject.id)}
           <div class="divider m-0 h-0"></div>

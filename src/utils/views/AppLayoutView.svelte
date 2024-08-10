@@ -32,7 +32,7 @@
 
     <div
       class="shrink-1 basis-1/2"
-      style="overflow: auto; scrollbar-gutter: stable both-edges;"
+      style="overflow: auto; scrollbar-gutter: stable;"
     >
       <svelte:component this={$activeWindow$} {ctx} />
     </div>
