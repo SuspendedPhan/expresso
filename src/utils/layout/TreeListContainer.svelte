@@ -42,11 +42,8 @@ The container will be translated so that x=0 aligns with the left edge of the la
         }
       }
 
-      // if (true) {
-      //   return `0px`;
-      // }
       if (largestWidth < width) {
-        return `${containerPadding}`;
+        return `0px`;
       } else {
         const translation = largestWidth / 2 - width / 2;
         return `calc(${translation}px + ${containerPadding})`;

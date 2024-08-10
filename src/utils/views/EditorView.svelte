@@ -28,7 +28,7 @@
     .pipe(map((focus) => focus.type === "NewActions"));
 </script>
 
-<div bind:this={rootElement} style:left={Constants.WindowPadding}>
+<div bind:this={rootElement}>
   <TreeListContainer
     class="flex flex-col items-center"
     containerPadding={Constants.WindowPadding}
