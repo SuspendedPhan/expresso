@@ -46,7 +46,7 @@ The container will be translated so that x=0 aligns with the left edge of the la
         return `0px`;
       } else {
         const translation = largestWidth / 2 - width / 2;
-        return `calc(${translation}px + ${containerPadding})`;
+        return `calc(${translation}px + ${containerPadding} / 2)`;
       }
     })
   );

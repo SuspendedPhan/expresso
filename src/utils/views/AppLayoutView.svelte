@@ -30,7 +30,10 @@
   <div class="flex h-full">
     <NavMenuView {ctx} />
 
-    <div class="shrink-1 basis-1/2" style="overflow: auto;">
+    <div
+      class="shrink-1 basis-1/2"
+      style="overflow: auto; scrollbar-gutter: stable both-edges;"
+    >
       <svelte:component this={$activeWindow$} {ctx} />
     </div>
     <div class="shrink-1 basis-1/2">
