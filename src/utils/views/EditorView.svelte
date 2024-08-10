@@ -28,13 +28,13 @@
     .pipe(map((focus) => focus.type === "NewActions"));
 </script>
 
-<div bind:this={rootElement}>
+<div bind:this={rootElement} style:left={Constants.WindowPadding}>
   <TreeListContainer
     class="flex flex-col items-center"
     containerPadding={Constants.WindowPadding}
     layouts$={ctx.viewCtx.exObjectLayouts$}
   >
-    <div class="flex gap-4 {Constants.WindowPaddingClass}">
+    <div class="flex gap-4">
       <button
         on:click={() => ctx.projectMutator.addRootObject()}
         class="btn block"
@@ -59,6 +59,7 @@
         Debug Evaluator
       </button>
     </div>
+    <div class="divider"></div>
     <div class="grid grid-flow-row">
       {#if $rootExObjects$}
         {#each $rootExObjects$ as exObject (exObject.id)}
