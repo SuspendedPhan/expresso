@@ -1,5 +1,6 @@
 import { of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
+import type { ExObject } from "src/ex-object/ExObject";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
 export type CanvasSetter = (
@@ -32,6 +33,7 @@ export interface CustomComponent {
   componentType: ComponentType.CustomComponent;
   name$: SUB<string>;
   parameters$: SUB<ComponentParameter[]>;
+  rootExObjects$: SUB<ExObject[]>;
 }
 
 export interface CanvasComponentParameter {
