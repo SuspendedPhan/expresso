@@ -1,5 +1,4 @@
-import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
-import type { Component } from "src/ex-object/Component";
+import { firstValueFrom, Subject } from "rxjs";
 import {
   type CallExpr,
   type ExItemBase,
@@ -9,9 +8,7 @@ import {
   type NumberExpr,
   type Parent,
 } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
-import { ProjectFns, type Project } from "src/ex-object/Project";
-import type { LibraryProject } from "src/library/LibraryProject";
+import { ProjectFns } from "src/ex-object/Project";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import {
@@ -20,20 +17,6 @@ import {
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {
-  }
-
-  public createProject(libraryProject: LibraryProject, rootObjects: readonly ExObject[]): Project {
-    const destroy$ = new Subject<void>();
-
-    const project: Project = {
-      destroy$,
-      libraryProject,
-      rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
-      components$: new BehaviorSubject<Component[]>([]),
-      currentOrdinal$: new BehaviorSubject<number>(0),
-    };
-
-    return project;
   }
 
 

@@ -7,7 +7,7 @@ import {
   switchMap,
 } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { Project } from "src/ex-object/Project";
+import { CreateProject, type Project } from "src/ex-object/Project";
 import MainContext from "src/main-context/MainContext";
 import type {
   Focus
@@ -52,7 +52,7 @@ export class ProjectManager {
       project$: new ReplaySubject<Project>(1),
     };
 
-    const project = this.ctx.objectFactory.createProject(
+    const project = CreateProject.from(
       libraryProject,
       rootObjects
     );
