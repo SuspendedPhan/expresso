@@ -1,5 +1,5 @@
 import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
-import type { Component } from "src/ex-object/Component";
+import type { CustomComponent } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import { createBehaviorSubjectWithLifetime, type Destroyable, type SUB } from "src/utils/utils/Utils";
@@ -7,7 +7,7 @@ import { createBehaviorSubjectWithLifetime, type Destroyable, type SUB } from "s
 export interface Project extends Destroyable {
   readonly libraryProject: LibraryProject;
   readonly rootExObjects$: SUB<readonly ExObject[]>;
-  readonly components$: SUB<Component[]>;
+  readonly customComponentL$: SUB<CustomComponent[]>;
   readonly currentOrdinal$: SUB<number>;
 }
 
@@ -29,7 +29,7 @@ export namespace CreateProject {
       destroy$,
       libraryProject,
       rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
-      components$: new BehaviorSubject<Component[]>([]),
+      customComponentL$: new BehaviorSubject<CustomComponent[]>([]),
       currentOrdinal$: new BehaviorSubject<number>(0),
     };
 
