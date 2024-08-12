@@ -12,9 +12,9 @@ import {
   type Expr,
   ExprType,
   type NumberExpr,
-  type Project,
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
+import type { Project } from "src/ex-object/Project";
 import {
   type BasicProperty,
   type CloneCountProperty,

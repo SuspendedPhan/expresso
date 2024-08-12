@@ -1,6 +1,6 @@
 import { first, Subject } from "rxjs";
 import { CanvasComponentStore, type Component } from "src/ex-object/Component";
-import type { Project } from "src/ex-object/ExItem";
+import type { Project } from "src/ex-object/Project";
 import { Create } from "src/main-context/Create";
 import MainContext from "src/main-context/MainContext";
 

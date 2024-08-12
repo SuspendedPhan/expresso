@@ -1,8 +1,6 @@
-import type { Component } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
-import type { LibraryProject } from "src/library/LibraryProject";
-import type { Destroyable, SUB } from "src/utils/utils/Utils";
+import type { SUB } from "src/utils/utils/Utils";
 
 export type ExItem = ExObject | Property | Expr;
 export type Parent = Exclude<ExItem, NumberExpr> | null;
@@ -26,13 +24,6 @@ export interface ExItemBase {
 
   // Completes when destroyed.
   readonly destroy$: SUB<void>;
-}
-
-export interface Project extends Destroyable {
-  readonly libraryProject: LibraryProject;
-  readonly rootExObjects$: SUB<readonly ExObject[]>;
-  readonly components$: SUB<Component[]>;
-  readonly currentOrdinal$: SUB<number>;
 }
 
 export interface NumberExpr extends ExItemBase {

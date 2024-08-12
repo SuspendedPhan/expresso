@@ -8,10 +8,9 @@ import {
   ExprType,
   type NumberExpr,
   type Parent,
-  type Project
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import { ProjectUtils } from "src/ex-object/Project";
+import { ProjectFns, type Project } from "src/ex-object/Project";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
@@ -96,7 +95,7 @@ export default class ExObjectFactory {
   ): Promise<ExItemBase> {
     const destroy$ = new Subject<void>();
     const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
-    const ordinal = await ProjectUtils.getAndIncrementOrdinal(project);
+    const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
 
     const exObjectBase: ExItemBase = {
       id,
