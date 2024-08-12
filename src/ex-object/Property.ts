@@ -122,7 +122,7 @@ export namespace CreateProperty {
   }
 }
 
-export namespace PropertyUtils {
+export namespace PropertyFns {
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
 
   export function getName$(property: Property): OBS<string> {

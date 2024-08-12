@@ -7,7 +7,7 @@
   import ExprView from "./ExprView.svelte";
   import {
     PropertyType,
-    PropertyUtils,
+    PropertyFns,
     type Property,
   } from "src/ex-object/Property";
   import { ExprType } from "src/ex-object/ExItem";
@@ -16,7 +16,7 @@
   export let ctx: MainContext;
   export let property: Property;
 
-  const name$ = PropertyUtils.getName$(property);
+  const name$ = PropertyFns.getName$(property);
 
   const expr$ = property.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
