@@ -10,7 +10,7 @@ export interface RootExObjectViewProps {
   elementLayout: ElementLayout;
 }
 
-export namespace RootExObjectViewPropsFns {
+export namespace RootExObjectViewFns {
     export function get$(ctx: MainContext, rootExObjects$: OBS<readonly ExObject[]>): OBS<RootExObjectViewProps[]> {
         const props$ = rootExObjects$.pipe(map((rootExObjects) => {
         return rootExObjects.map((exObject) => {

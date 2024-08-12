@@ -1,30 +1,20 @@
 <script lang="ts">
-  import { map } from "rxjs";
   import {
     ComponentUtils,
     type CustomComponent,
   } from "src/ex-object/Component";
   import MainContext from "src/main-context/MainContext";
-  import ExObjectLayout from "src/utils/layout/ExObjectLayout";
   import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
-  import {
-    Constants
-  } from "src/utils/utils/ViewUtils";
+  import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
+  import { Constants } from "src/utils/utils/ViewUtils";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   export let ctx: MainContext;
   export let component: CustomComponent;
 
   const name$ = ComponentUtils.getName$(component);
-  const rootExObjectPropsL$ = component.rootExObjects$.pipe(
-    map((rootExObjects) =>
-      rootExObjects.map((rootExObject) => {
-        const elementLayout = ExObjectLayout.create(ctx, rootExObject);
-        return {
-          exObject: rootExObject,
-          elementLayout,
-        };
-      }
-    )
+  const rootExObjectViewPropL$ = RootExObjectViewFns.get$(
+    ctx,
+    ctx.eventBus.rootObjects$
   );
 </script>
 
@@ -34,7 +24,7 @@
   containerPadding={Constants.WindowPadding}
   layouts$={ctx.viewCtx.exObjectLayouts$}
 >
-  {#each $rootExObjectPropsL$ as props (props.exObject.id)}
+  {#each $rootExObjectViewPropL$ as props (props.exObject.id)}
     <RootExObjectView
       {ctx}
       exObject={props.exObject}
