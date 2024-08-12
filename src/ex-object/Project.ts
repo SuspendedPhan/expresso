@@ -1,13 +1,14 @@
 import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
-import type { CustomComponent } from "src/ex-object/Component";
+import { CreateComponent, type CustomComponent } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
+import type MainContext from "src/main-context/MainContext";
 import { createBehaviorSubjectWithLifetime, type Destroyable, type SUB } from "src/utils/utils/Utils";
 
 export interface Project extends Destroyable {
   readonly libraryProject: LibraryProject;
   readonly rootExObjects$: SUB<readonly ExObject[]>;
-  readonly customComponentL$: SUB<CustomComponent[]>;
+  readonly componentL$: SUB<CustomComponent[]>;
   readonly currentOrdinal$: SUB<number>;
 }
 
@@ -19,6 +20,13 @@ export namespace ProjectFns {
     project.currentOrdinal$.next(ordinal + 1);
     return ordinal;
   }
+
+  export async function addComponentBlank(ctx: MainContext, project: Project) {
+    const componentL = await firstValueFrom(project.componentL$);
+    const component = await CreateComponent.customBlank(ctx);
+    componentL.push(component);
+    project.componentL$.next(componentL);
+  }
 }
 
 export namespace CreateProject {
@@ -29,7 +37,7 @@ export namespace CreateProject {
       destroy$,
       libraryProject,
       rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
-      customComponentL$: new BehaviorSubject<CustomComponent[]>([]),
+      componentL$: new BehaviorSubject<CustomComponent[]>([]),
       currentOrdinal$: new BehaviorSubject<number>(0),
     };
 

@@ -1,6 +1,8 @@
-import { of } from "rxjs";
+import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import type { ExObject } from "src/ex-object/ExObject";
+import { ProjectFns } from "src/ex-object/Project";
+import type MainContext from "src/main-context/MainContext";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
 export type CanvasSetter = (
@@ -67,7 +69,18 @@ export const CanvasComponentStore = {
 } satisfies Record<string, CanvasComponent>;
 
 export namespace CreateComponent {
-  export function component() {}
+  export async function customBlank(ctx: MainContext): Promise<CustomComponent> {
+    const project = await firstValueFrom(ctx.projectManager.currentProject$);
+    const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
+    const id = `custom-${crypto.randomUUID()}`;
+    return {
+      id,
+      componentType: ComponentType.CustomComponent,
+      name$: new BehaviorSubject(`Component ${ordinal}`),
+      parameters$: new BehaviorSubject<ComponentParameter[]>([]),
+      rootExObjects$: new BehaviorSubject<ExObject[]>([]),
+    };
+  }
 }
 
 export namespace ComponentParameterFns {

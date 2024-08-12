@@ -1,10 +1,11 @@
-import { type BehaviorSubject, first, type Subject } from "rxjs";
+import { type BehaviorSubject, first, firstValueFrom, type Subject } from "rxjs";
 import {
   ExItemType,
   type Expr,
   ExprType,
   type Parent,
 } from "src/ex-object/ExItem";
+import { ProjectFns } from "src/ex-object/Project";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import Logger from "../utils/logger/Logger";
@@ -77,5 +78,10 @@ export default class MainMutator {
       oldExpr,
       newExpr,
     });
+  }
+
+  public async addBlankProjectComponent() {
+    const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
+    ProjectFns.addComponentBlank(this.ctx, project);
   }
 }

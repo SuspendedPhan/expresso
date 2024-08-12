@@ -59,4 +59,8 @@ export default class MainViewContext {
 
     this.navSections = [section0, section1];
   }
+
+  public activeWindowEqualTo$(window: Window) {
+    return this.activeWindow$.pipe(map((w) => w === window));
+  }
 }

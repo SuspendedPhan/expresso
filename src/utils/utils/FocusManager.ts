@@ -13,13 +13,17 @@ import {
   type Expr,
   ExprType,
 } from "src/ex-object/ExItem";
-import { PropertyType, type Property } from "src/ex-object/Property";
+import { type Property, PropertyType } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
+import {
+  type ProjectComponentListFocus
+} from "src/utils/utils/KeyboardComponentList";
 import { assertUnreachable } from "src/utils/utils/Utils";
+import unionize, { ofType, type UnionOf } from "unionize";
 
 export type Focus =
   | NoneFocus
@@ -31,7 +35,19 @@ export type Focus =
   | ViewActionsFocus
   | ExprReplaceCommandFocus
   | EditPropertyNameFocus
-  | FocusBase;
+  | FocusBase
+  | Focus2Wrapper;
+
+export const Focus2Union = unionize({
+  ProjectComponentList: ofType<{ pclFocus: ProjectComponentListFocus }>(),
+});
+
+type Focus2 = UnionOf<typeof Focus2Union>;
+
+export interface Focus2Wrapper {
+  type: "Focus2";
+  focus2: Focus2;
+}
 
 export interface NoneFocus {
   type: "None";

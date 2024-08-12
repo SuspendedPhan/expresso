@@ -16,6 +16,7 @@
 </script>
 
 <div>{$name$}</div>
+<button>Add Object</button>
 <TreeListContainer
   class="flex flex-col items-center"
   containerPadding={Constants.WindowPadding}
