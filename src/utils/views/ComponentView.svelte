@@ -1,8 +1,5 @@
 <script lang="ts">
-  import {
-    ComponentUtils,
-    type CustomComponent,
-  } from "src/ex-object/Component";
+  import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import MainContext from "src/main-context/MainContext";
   import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
   import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
@@ -11,7 +8,7 @@
   export let ctx: MainContext;
   export let component: CustomComponent;
 
-  const name$ = ComponentUtils.getName$(component);
+  const name$ = ComponentFns.getName$(component);
   const rootExObjectViewPropL$ = RootExObjectViewFns.get$(
     ctx,
     ctx.eventBus.rootObjects$

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ComponentUtils } from "src/ex-object/Component";
+  import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import { ExObjectFocus } from "src/utils/utils/Focus";
@@ -27,7 +27,7 @@
   const exObjectName$ = exObject.name$;
   const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
   const isEditingExObjectName$ = ExObjectFocus.Name.isEditing$(ctx, exObject);
-  const componentName$ = ComponentUtils.getName$(exObject.component);
+  const componentName$ = ComponentFns.getName$(exObject.component);
   const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
     ctx,
     exObject

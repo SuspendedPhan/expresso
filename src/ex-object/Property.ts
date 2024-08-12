@@ -1,5 +1,5 @@
 import { of } from "rxjs";
-import { ComponentParameterUtils, type ComponentParameter } from "src/ex-object/Component";
+import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import {
@@ -128,7 +128,7 @@ export namespace PropertyFns {
   export function getName$(property: Property): OBS<string> {
     switch (property.propertyType) {
       case PropertyType.ComponentProperty:
-        return ComponentParameterUtils.getName$(property.componentParameter);
+        return ComponentParameterFns.getName$(property.componentParameter);
       case PropertyType.BasicProperty:
         return property.name$;
       case PropertyType.CloneCountProperty:

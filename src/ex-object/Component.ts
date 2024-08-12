@@ -70,7 +70,7 @@ export namespace CreateComponent {
   export function component() {}
 }
 
-export namespace ComponentParameterUtils {
+export namespace ComponentParameterFns {
   export function getName$(
     componentParameter: ComponentParameter
   ): OBS<string> {
@@ -85,7 +85,7 @@ export namespace ComponentParameterUtils {
   }
 }
 
-export namespace ComponentUtils {
+export namespace ComponentFns {
   export function getName$(component: Component): OBS<string> {
     switch (component.componentType) {
       case ComponentType.CanvasComponent:
