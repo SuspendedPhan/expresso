@@ -7,6 +7,7 @@
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import { RootExObjectViewPropsFns } from "src/utils/utils/RootExObjectView";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -26,6 +27,11 @@
   const newActionsFocused$ = ctx.focusManager
     .getFocus$()
     .pipe(map((focus) => focus.type === "NewActions"));
+
+  const rootExObjectViewProps$ = RootExObjectViewPropsFns.get$(
+    ctx,
+    ctx.eventBus.rootObjects$
+  );
 </script>
 
 <div bind:this={rootElement}>
@@ -61,9 +67,13 @@
     </div>
     <div class="flex flex-col w-full items-center">
       {#if $rootExObjects$}
-        {#each $rootExObjects$ as exObject (exObject.id)}
+        {#each $rootExObjectViewProps$ as prop (prop.exObject.id)}
           <div class="divider m-0 h-0"></div>
-          <RootExObjectView {ctx} {exObject} />
+          <RootExObjectView
+            {ctx}
+            exObject={prop.exObject}
+            elementLayout={prop.elementLayout}
+          />
         {/each}
       {/if}
     </div>

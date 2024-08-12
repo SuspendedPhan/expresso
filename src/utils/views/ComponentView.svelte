@@ -5,7 +5,7 @@
     type CustomComponent,
   } from "src/ex-object/Component";
   import MainContext from "src/main-context/MainContext";
-  import { ElementLayout } from "src/utils/layout/ElementLayout";
+  import ExObjectLayout from "src/utils/layout/ExObjectLayout";
   import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
   import {
     Constants
@@ -18,7 +18,7 @@
   const rootExObjectPropsL$ = component.rootExObjects$.pipe(
     map((rootExObjects) =>
       rootExObjects.map((rootExObject) => {
-        const elementLayout = new ElementLayout();
+        const elementLayout = ExObjectLayout.create(ctx, rootExObject);
         return {
           exObject: rootExObject,
           elementLayout,

@@ -1,6 +1,4 @@
-import type { ExObject } from "src/ex-object/ExObject";
 import { Window } from "src/main-context/MainViewContext";
-import type { ElementLayout } from "src/utils/layout/ElementLayout";
 import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
 import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
 import EditorView from "../views/EditorView.svelte";
@@ -31,14 +29,3 @@ export const Constants = {
   WindowPaddingClass: "p-8",
   WindowPadding: "2rem",
 };
-
-export namespace ViewUtils {
-  export function asdf() {
-
-  }
-}
-
-export interface RootExObjectViewProps {
-  exObject: ExObject;
-  elementLayout: ElementLayout;
-}
