@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ComponentUtils } from "src/ex-object/Component";
-  import { MutateExObject, type ExObject } from "src/ex-object/ExObject";
+  import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import { ExObjectFocus } from "src/utils/utils/Focus";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
@@ -119,7 +119,7 @@
           <PropertyView {ctx} {property} />
         {/each}
         <ExObjectButton
-          on:click={() => MutateExObject.addBasicPropertyBlank(ctx, exObject)}
+          on:click={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
           class="mt-2">Add Property</ExObjectButton
         >
       </div>
@@ -128,7 +128,7 @@
       <div class="divider m-0 h-0"></div>
       <div class="p-4 self-center">
         <ExObjectButton
-          on:click={() => MutateExObject.addChildBlank(ctx, exObject)}
+          on:click={() => ExObjectFns.addChildBlank(ctx, exObject)}
           >Add Child Object</ExObjectButton
         >
       </div>

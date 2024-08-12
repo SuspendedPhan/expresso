@@ -29,7 +29,7 @@ export interface ExObject extends ExItemBase {
   cloneCountProperty: CloneCountProperty;
 }
 
-export namespace MutateExObject {
+export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
     const child = await Create.ExObject.blank(ctx, CanvasComponentStore.circle);
     const children = await firstValueFrom(exObject.children$);
