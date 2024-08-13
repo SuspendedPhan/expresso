@@ -60,11 +60,18 @@ export default class Keyboard {
           if (focus instanceof FocusBase) {
             return focus.isCancelable;
           }
-          if (
-            focus.type === "ExprReplaceCommand" ||
-            (focus.type === "Focus2" &&
-              Focus2Union.is.EditorNewActions(focus.focus2))
-          ) {
+          const isCancelableFocus2 =
+            focus.type === "Focus2" &&
+            Focus2Union.match(focus.focus2, {
+              ViewActions: () => true,
+              ProjectNav: () => true,
+              LibraryNav: () => true,
+              EditorNewActions: () => true,
+              default: () => false,
+            });
+          const isCancelableFocus =
+            focus.type === "ExprReplaceCommand" || isCancelableFocus2;
+          if (isCancelableFocus) {
             return true;
           }
           return false;
