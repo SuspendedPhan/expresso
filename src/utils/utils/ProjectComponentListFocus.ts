@@ -1,6 +1,7 @@
 import { map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
+import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { Focus2Union, type Focus2Wrapper } from "src/utils/utils/FocusManager";
 import { KeyboardScope } from "src/utils/utils/KeyboardScope";
 import unionize, { type UnionOf } from "unionize";
@@ -31,20 +32,25 @@ export namespace ProjectComponentListFocusFns {
       focusManager.focus(wrapper);
     });
 
-    const newActionsScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(
-        map((focus) => {
-          return (
-            focus.type === "Focus2" &&
-            Focus2Union.is.ProjectComponentList(focus.focus2) &&
-            ProjectComponentListFocusUnion.is.NewActionsFocus(
-              focus.focus2.pclFocus
-            )
-          );
-        })
-      )
+    const isNewActionsFocused$ = focusManager.getFocus$().pipe(
+      map((focus) => {
+        return (
+          focus.type === "Focus2" &&
+          Focus2Union.is.ProjectComponentList(focus.focus2) &&
+          ProjectComponentListFocusUnion.is.NewActionsFocus(
+            focus.focus2.pclFocus
+          )
+        );
+      })
     );
 
+    CommandCardFns.add(ctx, {
+      title: "New Actions",
+      commands: ["Add Component"],
+      visible$: isNewActionsFocused$,
+    });
+
+    const newActionsScope = new KeyboardScope(isNewActionsFocused$);
     newActionsScope.hotkeys("c", () => {
       ctx.mutator.addBlankProjectComponent();
     });

@@ -11,6 +11,7 @@ import {
 } from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 import { EditorFocus } from "src/utils/utils/EditorFocus";
+import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentListFocus";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -22,6 +23,7 @@ export default class Keyboard {
     hotkeys.filter = () => true;
 
     EditorFocus.register(ctx);
+    ProjectComponentListFocusFns.register(ctx);
 
     const notEditingScope = new KeyboardScope(
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
