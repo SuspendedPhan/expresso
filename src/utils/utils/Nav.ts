@@ -1,4 +1,4 @@
-import { Window } from "src/main-context/MainViewContext";
+import { DexWindow } from "src/main-context/MainViewContext";
 import type { OBS } from "./Utils";
 
 export interface NavSection {
@@ -10,6 +10,6 @@ export interface NavSection {
 export interface NavItem {
     readonly section: NavSection;
     readonly label: string;
-    readonly window: Window;
+    readonly window: DexWindow;
     readonly iconClasses: string;
 }

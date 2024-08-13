@@ -2,7 +2,7 @@ import hotkeys from "hotkeys-js";
 import { firstValueFrom, map } from "rxjs";
 import { ExItemType } from "src/ex-object/ExItem";
 import MainContext from "src/main-context/MainContext";
-import { ViewMode, Window } from "src/main-context/MainViewContext";
+import { ViewMode, DexWindow } from "src/main-context/MainViewContext";
 import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
 import {
@@ -10,6 +10,7 @@ import {
   type EditPropertyNameFocus,
 } from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
+import { EditorFocus } from "src/utils/utils/EditorFocus";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -19,6 +20,8 @@ export default class Keyboard {
   public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
     hotkeys.filter = () => true;
+
+    EditorFocus.register(ctx);
 
     const notEditingScope = new KeyboardScope(
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
@@ -48,7 +51,7 @@ export default class Keyboard {
       focusManager.focus({
         type: "Focus2",
         focus2: Focus2Union.ViewActions({}),
-      })
+      });
     });
 
     const isCancelableScope = new KeyboardScope(
@@ -77,17 +80,17 @@ export default class Keyboard {
     );
     projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
-      ctx.viewCtx.activeWindow$.next(Window.ProjectEditor);
+      ctx.viewCtx.activeWindow$.next(DexWindow.ProjectEditor);
       ctx.focusManager.focusNone();
     });
 
     projectNavScope.hotkeys("c", () => {
-      ctx.viewCtx.activeWindow$.next(Window.ProjectComponentList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.ProjectComponentList);
       ctx.focusManager.focusNone();
     });
 
     projectNavScope.hotkeys("f", () => {
-      ctx.viewCtx.activeWindow$.next(Window.ProjectFunctionList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.ProjectFunctionList);
       ctx.focusManager.focusNone();
     });
 
@@ -104,55 +107,18 @@ export default class Keyboard {
       FocusFns.isFocus2Focused$(ctx, Focus2Union.is.LibraryNav)
     );
     libraryNavScope.hotkeys("p", () => {
-      ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.LibraryProjectList);
       ctx.focusManager.focusNone();
     });
 
     libraryNavScope.hotkeys("c", () => {
-      ctx.viewCtx.activeWindow$.next(Window.LibraryComponentList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.LibraryComponentList);
       ctx.focusManager.focusNone();
     });
 
     libraryNavScope.hotkeys("f", () => {
-      ctx.viewCtx.activeWindow$.next(Window.LibraryFunctionList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.LibraryFunctionList);
       ctx.focusManager.focusNone();
-    });
-
-    const editorScope = new KeyboardScope(
-      ctx.viewCtx.activeWindow$.pipe(
-        map((window) => window === Window.ProjectEditor)
-      )
-    );
-    editorScope.hotkeys("n", async () => {
-      const focus = await firstValueFrom(focusManager.getFocus$());
-      if (
-        focus.type === "Focus2" &&
-        Focus2Union.is.EditorNewActions(focus.focus2)
-      ) {
-        return;
-      }
-
-      ctx.focusManager.focus({
-        type: "Focus2",
-        focus2: Focus2Union.EditorNewActions({}),
-      });
-    });
-
-    const newActionsScope = new KeyboardScope(
-      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.EditorNewActions)
-    );
-    newActionsScope.hotkeys("p", () => {
-      ctx.projectManager.addProjectNew();
-      ctx.focusManager.focusNone();
-    });
-
-    newActionsScope.hotkeys("o", () => {
-      ctx.projectMutator.addRootObject();
-      ctx.focusManager.focusNone();
-    });
-
-    newActionsScope.hotkeys("Esc", () => {
-      ctx.focusManager.popFocus();
     });
 
     const focusedExpr$ = ctx.focusManager.getFocus$().pipe(

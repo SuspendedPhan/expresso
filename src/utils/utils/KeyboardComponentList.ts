@@ -1,6 +1,6 @@
 import { map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import { Window } from "src/main-context/MainViewContext";
+import { DexWindow } from "src/main-context/MainViewContext";
 import { Focus2Union, type Focus2Wrapper } from "src/utils/utils/FocusManager";
 import { KeyboardScope } from "src/utils/utils/KeyboardScope";
 import unionize, { type UnionOf } from "unionize";
@@ -18,7 +18,7 @@ export namespace KeyboardComponentList {
     const focusManager = ctx.focusManager;
 
     const windowScope = new KeyboardScope(
-      ctx.viewCtx.activeWindowEqualTo$(Window.ProjectComponentList)
+      ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectComponentList)
     );
 
     windowScope.hotkeys("n", () => {

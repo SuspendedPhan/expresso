@@ -16,7 +16,7 @@ import {
 import { type Property, PropertyType } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import MainContext from "src/main-context/MainContext";
-import { Window } from "src/main-context/MainViewContext";
+import { DexWindow } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
 import { type ProjectComponentListFocus } from "src/utils/utils/KeyboardComponentList";
@@ -167,7 +167,7 @@ export default class FocusManager {
   @loggedMethod
   private async down(focus: Focus) {
     const activeWindow = await firstValueFrom(this.ctx.viewCtx.activeWindow$);
-    if (activeWindow === Window.LibraryProjectList) {
+    if (activeWindow === DexWindow.LibraryProjectList) {
       this.ctx.projectManager.navDown(focus);
       return;
     }

@@ -6,7 +6,7 @@ import MainContext from "./MainContext";
 import { Focus2Union } from "src/utils/utils/FocusManager";
 import { FocusFns } from "src/utils/utils/Focus";
 
-export enum Window {
+export enum DexWindow {
   ProjectEditor,
   ProjectComponentList,
   ProjectFunctionList,
@@ -26,7 +26,7 @@ export default class MainViewContext {
     readonly ElementLayout[]
   >([]);
 
-  public readonly activeWindow$ = new BehaviorSubject<Window>(Window.ProjectEditor);
+  public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor);
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
   public readonly navSections: readonly NavSection[];
   public readonly viewMode$ = new BehaviorSubject<ViewMode>(ViewMode.Default);
@@ -43,9 +43,9 @@ export default class MainViewContext {
     };
     
     const navItems0: NavItem[] = [
-      { label: "Editor", window: Window.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
-      { label: "Components", window: Window.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
-      { label: "Functions", window: Window.ProjectFunctionList, iconClasses: "fa-solid fa-code", section: section0 },
+      { label: "Editor", window: DexWindow.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
+      { label: "Components", window: DexWindow.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
+      { label: "Functions", window: DexWindow.ProjectFunctionList, iconClasses: "fa-solid fa-code", section: section0 },
     ];
 
     (section0 as any).navItems = navItems0;
@@ -57,9 +57,9 @@ export default class MainViewContext {
     };
 
     const navItems1: NavItem[] = [
-      { label: "Projects", window: Window.LibraryProjectList, iconClasses: "fa-solid fa-file", section: section1 },
-      { label: "Components", window: Window.LibraryComponentList, iconClasses: "fa-solid fa-cube", section: section1 },
-      { label: "Functions", window: Window.LibraryFunctionList, iconClasses: "fa-solid fa-code", section: section1 },
+      { label: "Projects", window: DexWindow.LibraryProjectList, iconClasses: "fa-solid fa-file", section: section1 },
+      { label: "Components", window: DexWindow.LibraryComponentList, iconClasses: "fa-solid fa-cube", section: section1 },
+      { label: "Functions", window: DexWindow.LibraryFunctionList, iconClasses: "fa-solid fa-code", section: section1 },
     ];
 
     (section1 as any).navItems = navItems1;
@@ -67,7 +67,7 @@ export default class MainViewContext {
     this.navSections = [section0, section1];
   }
 
-  public activeWindowEqualTo$(window: Window) {
+  public activeWindowEqualTo$(window: DexWindow) {
     return this.activeWindow$.pipe(map((w) => w === window));
   }
 }

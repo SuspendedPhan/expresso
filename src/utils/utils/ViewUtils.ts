@@ -1,4 +1,4 @@
-import { Window } from "src/main-context/MainViewContext";
+import { DexWindow } from "src/main-context/MainViewContext";
 import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
 import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
 import EditorView from "../views/EditorView.svelte";
@@ -6,19 +6,19 @@ import ProjectComponentListView from "../views/ProjectComponentListView.svelte";
 import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
 import { assertUnreachable } from "./Utils";
 
-export function activeWindowToSvelteComponent(activeWindow: Window): any {
+export function activeWindowToSvelteComponent(activeWindow: DexWindow): any {
   switch (activeWindow) {
-    case Window.ProjectEditor:
+    case DexWindow.ProjectEditor:
       return EditorView;
-    case Window.ProjectComponentList:
+    case DexWindow.ProjectComponentList:
       return ProjectComponentListView;
-    case Window.ProjectFunctionList:
+    case DexWindow.ProjectFunctionList:
       return ProjectFunctionListView;
-    case Window.LibraryProjectList:
+    case DexWindow.LibraryProjectList:
       return LibraryProjectListView;
-    case Window.LibraryComponentList:
+    case DexWindow.LibraryComponentList:
       return LibraryProjectListView;
-    case Window.LibraryFunctionList:
+    case DexWindow.LibraryFunctionList:
       return LibraryFunctionListView;
     default:
       assertUnreachable(activeWindow);
