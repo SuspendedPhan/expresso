@@ -27,7 +27,6 @@ export type Focus =
   | NoneFocus
   | ExItemFocus
   | LibraryProjectFocus
-  | ViewActionsFocus
   | ExprReplaceCommandFocus
   | EditPropertyNameFocus
   | FocusBase
@@ -37,6 +36,7 @@ export const Focus2Union = unionize({
   ProjectNav: {},
   LibraryNav: {},
   EditorNewActions: {},
+  ViewActions: {},
   ProjectComponentList: ofType<{ pclFocus: ProjectComponentListFocus }>(),
 });
 
@@ -60,10 +60,6 @@ export interface LibraryProjectFocus {
   type: "LibraryProject";
   project: LibraryProject;
 }
-export interface ViewActionsFocus {
-  type: "ViewActions";
-}
-
 export interface ExprReplaceCommandFocus {
   type: "ExprReplaceCommand";
   expr: Expr;
@@ -153,10 +149,6 @@ export default class FocusManager {
 
   public focusNone() {
     this.focus({ type: "None" });
-  }
-
-  public focusViewActions() {
-    this.focus({ type: "ViewActions" });
   }
 
   public focusExprReplaceCommand(expr: Expr) {

@@ -1,15 +1,15 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { map, ReplaySubject } from "rxjs";
+  import { ReplaySubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
+  import { FocusFns } from "src/utils/utils/Focus";
+  import { Focus2Union } from "src/utils/utils/FocusManager";
+  import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
-  import { FocusFns } from "src/utils/utils/Focus";
-  import { Focus2Union } from "src/utils/utils/FocusManager";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;

@@ -45,7 +45,10 @@ export default class Keyboard {
     });
 
     notEditingScope.hotkeys("v", () => {
-      focusManager.focusViewActions();
+      focusManager.focus({
+        type: "Focus2",
+        focus2: Focus2Union.ViewActions({}),
+      })
     });
 
     const isCancelableScope = new KeyboardScope(
@@ -187,9 +190,7 @@ export default class Keyboard {
     });
 
     const viewActionsScope = new KeyboardScope(
-      focusManager
-        .getFocus$()
-        .pipe(map((focus) => focus.type === "ViewActions"))
+      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ViewActions)
     );
     viewActionsScope.hotkeys("m", () => {
       ctx.viewCtx.viewMode$.next(ViewMode.MainWindowMaximized);
