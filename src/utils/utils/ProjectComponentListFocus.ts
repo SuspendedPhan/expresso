@@ -13,7 +13,7 @@ export type ProjectComponentListFocus = UnionOf<
   typeof ProjectComponentListFocusUnion
 >;
 
-export namespace KeyboardComponentList {
+export namespace ProjectComponentListFocusFns {
   export function register(ctx: MainContext) {
     const focusManager = ctx.focusManager;
 

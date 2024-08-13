@@ -19,7 +19,7 @@ import MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
-import { type ProjectComponentListFocus } from "src/utils/utils/KeyboardComponentList";
+import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
