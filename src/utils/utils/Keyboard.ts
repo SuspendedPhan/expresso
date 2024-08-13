@@ -5,7 +5,10 @@ import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
 import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
-import { Focus2Union, type EditPropertyNameFocus } from "src/utils/utils/FocusManager";
+import {
+  Focus2Union,
+  type EditPropertyNameFocus,
+} from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 
 export default class Keyboard {
@@ -46,15 +49,21 @@ export default class Keyboard {
     });
 
     const isCancelableScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(map((focus) => {
-        if (focus instanceof FocusBase) {
-          return focus.isCancelable;
-        }
-        if (focus.type === "ExprReplaceCommand" || focus.type === "NewActions") {
-          return true;
-        }
-        return false;
-      }))
+      focusManager.getFocus$().pipe(
+        map((focus) => {
+          if (focus instanceof FocusBase) {
+            return focus.isCancelable;
+          }
+          if (
+            focus.type === "ExprReplaceCommand" ||
+            (focus.type === "Focus2" &&
+              Focus2Union.is.EditorNewActions(focus.focus2))
+          ) {
+            return true;
+          }
+          return false;
+        })
+      )
     );
     isCancelableScope.hotkeys("Escape", () => {
       ctx.focusManager.popFocus();
@@ -113,13 +122,21 @@ export default class Keyboard {
     );
     editorScope.hotkeys("n", async () => {
       const focus = await firstValueFrom(focusManager.getFocus$());
-      if (focus.type !== "NewActions") {
-        ctx.focusManager.focusNewActions();
+      if (
+        focus.type === "Focus2" &&
+        Focus2Union.is.EditorNewActions(focus.focus2)
+      ) {
+        return;
       }
+
+      ctx.focusManager.focus({
+        type: "Focus2",
+        focus2: Focus2Union.EditorNewActions({}),
+      });
     });
 
     const newActionsScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(map((focus) => focus.type === "NewActions"))
+      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.EditorNewActions)
     );
     newActionsScope.hotkeys("p", () => {
       ctx.projectManager.addProjectNew();
@@ -170,7 +187,9 @@ export default class Keyboard {
     });
 
     const viewActionsScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(map((focus) => focus.type === "ViewActions"))
+      focusManager
+        .getFocus$()
+        .pipe(map((focus) => focus.type === "ViewActions"))
     );
     viewActionsScope.hotkeys("m", () => {
       ctx.viewCtx.viewMode$.next(ViewMode.MainWindowMaximized);
@@ -193,7 +212,10 @@ export default class Keyboard {
     const propertyScope = new KeyboardScope(
       ctx.focusManager.getFocus$().pipe(
         map((focus) => {
-          if (focus.type === "ExItem" && focus.exItem.itemType === ExItemType.Property) {
+          if (
+            focus.type === "ExItem" &&
+            focus.exItem.itemType === ExItemType.Property
+          ) {
             return focus.exItem;
           }
           return KeyboardScopeResult.OutOfScope;
@@ -211,7 +233,11 @@ export default class Keyboard {
     const editableScope = new KeyboardScope(
       ctx.focusManager.getFocus$().pipe(
         map((focus) => {
-          if (focus instanceof FocusBase && focus.isEditable && !focus.isEditing) {
+          if (
+            focus instanceof FocusBase &&
+            focus.isEditable &&
+            !focus.isEditing
+          ) {
             return focus;
           }
           return KeyboardScopeResult.OutOfScope;

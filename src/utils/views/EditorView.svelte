@@ -8,6 +8,8 @@
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
   import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
+  import { FocusFns } from "src/utils/utils/Focus";
+  import { Focus2Union } from "src/utils/utils/FocusManager";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -24,9 +26,10 @@
     };
   });
 
-  const newActionsFocused$ = ctx.focusManager
-    .getFocus$()
-    .pipe(map((focus) => focus.type === "NewActions"));
+  const newActionsFocused$ = FocusFns.isFocus2Focused$(
+    ctx,
+    Focus2Union.is.EditorNewActions
+  );
 
   const rootExObjectViewPropsL$ = RootExObjectViewFns.get$(
     ctx,
