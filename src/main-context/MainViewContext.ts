@@ -1,5 +1,6 @@
 import { BehaviorSubject, map } from "rxjs";
 import { ElementLayout } from "src/utils/layout/ElementLayout";
+import { CommandCardFns, type CommandCardContext } from "src/utils/utils/CommandCard";
 import type { NavItem, NavSection } from "src/utils/utils/Nav";
 import MainContext from "./MainContext";
 
@@ -27,8 +28,12 @@ export default class MainViewContext {
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
   public readonly navSections: readonly NavSection[];
   public readonly viewMode$ = new BehaviorSubject<ViewMode>(ViewMode.Default);
+  
+  public commandCardCtx: CommandCardContext;
 
   public constructor(ctx: MainContext) {
+    this.commandCardCtx = CommandCardFns.createContext(ctx);
+
     const section0: NavSection = {
       title: "Project",
       navItems: [],

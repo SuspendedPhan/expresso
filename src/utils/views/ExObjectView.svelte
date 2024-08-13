@@ -66,11 +66,7 @@
 
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
-    <SelectableView
-      {ctx}
-      item={exObject}
-      class="card bg-white rounded-sm card-bordered border-2 border-base-content/10 card-compact w-max flex flex-col"
-    >
+    <SelectableView {ctx} item={exObject} class="ex-card w-max flex flex-col">
       <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">

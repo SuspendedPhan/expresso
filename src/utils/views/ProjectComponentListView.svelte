@@ -10,13 +10,10 @@
   const componentL$ = project$.pipe(
     switchMap((project) => project.componentL$)
   );
-  componentL$.subscribe((componentL) => {
-    console.log("componentL", componentL);
-  });
 </script>
 
 <ActionBar>
-  <ActionBarButton on:click={ctx.mutator.addBlankProjectComponent}
+  <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
     >Add Component</ActionBarButton
   >
 </ActionBar>
