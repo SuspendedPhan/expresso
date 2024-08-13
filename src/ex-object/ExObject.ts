@@ -31,7 +31,7 @@ export interface ExObject extends ExItemBase {
 
 export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
-    const child = await Create.ExObject.blank(ctx, CanvasComponentStore.circle);
+    const child = await CreateExObject.blank(ctx);
     const children = await firstValueFrom(exObject.children$);
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
@@ -57,9 +57,9 @@ export namespace ExObjectFns {
 export namespace CreateExObject {
   export async function blank(
     ctx: MainContext,
-    component: Component
   ): Promise<ExObject> {
     const id = `ex-object-${crypto.randomUUID()}`;
+    const component = CanvasComponentStore.circle;
     const componentProperties = await createComponentProperties(ctx, component);
     const cloneCountProperty = await Create.Property.cloneCountBlank(ctx);
 

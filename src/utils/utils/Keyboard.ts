@@ -16,8 +16,6 @@ import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentLi
 export default class Keyboard {
   public static SCOPE = "Main";
 
-  // private static
-
   public static register(ctx: MainContext, focusManager: FocusManager) {
     hotkeys.setScope(this.SCOPE);
     hotkeys.filter = () => true;
@@ -59,24 +57,7 @@ export default class Keyboard {
     const isCancelableScope = new KeyboardScope(
       focusManager.getFocus$().pipe(
         map((focus) => {
-          if (focus instanceof FocusBase) {
-            return focus.isCancelable;
-          }
-          const isCancelableFocus2 =
-            focus.type === "Focus2" &&
-            Focus2Union.match(focus.focus2, {
-              ViewActions: () => true,
-              ProjectNav: () => true,
-              LibraryNav: () => true,
-              EditorNewActions: () => true,
-              default: () => false,
-            });
-          const isCancelableFocus =
-            focus.type === "ExprReplaceCommand" || isCancelableFocus2;
-          if (isCancelableFocus) {
-            return true;
-          }
-          return false;
+          return FocusFns.isCancelable(focus);
         })
       )
     );

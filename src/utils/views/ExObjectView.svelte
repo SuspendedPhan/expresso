@@ -19,9 +19,6 @@
   const componentParameterProperties = exObject.componentParameterProperties;
   const cloneCountProperty = exObject.cloneCountProperty;
   const basicProperties$ = exObject.basicProperties$;
-  exObject.basicProperties$.subscribe((basicProperties) => {
-    console.log("basicProperties", basicProperties);
-  });
   const children$ = exObject.children$;
 
   const exObjectName$ = exObject.name$;

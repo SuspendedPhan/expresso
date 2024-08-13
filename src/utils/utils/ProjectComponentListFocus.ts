@@ -53,6 +53,7 @@ export namespace ProjectComponentListFocusFns {
     const newActionsScope = new KeyboardScope(isNewActionsFocused$);
     newActionsScope.hotkeys("c", () => {
       ctx.mutator.addBlankProjectComponent();
+      ctx.focusManager.popFocus();
     });
   }
 }

@@ -11,12 +11,16 @@
   const name$ = ComponentFns.getName$(component);
   const rootExObjectViewPropL$ = RootExObjectViewFns.get$(
     ctx,
-    ctx.eventBus.rootObjects$
+    component.rootExObjects$
   );
+
+  function addExObject() {
+    ComponentFns.addRootExObjectBlank(ctx, component);
+  }
 </script>
 
 <div>{$name$}</div>
-<button>Add Object</button>
+<button class="btn btn-sm" on:click={addExObject}>Add Object</button>
 <TreeListContainer
   class="flex flex-col items-center"
   containerPadding={Constants.WindowPadding}

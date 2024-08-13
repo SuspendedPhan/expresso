@@ -1,7 +1,12 @@
 import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
-import type { Focus2 } from "src/utils/utils/FocusManager";
+import {
+  Focus2Union,
+  type Focus,
+  type Focus2,
+} from "src/utils/utils/FocusManager";
+import { ProjectComponentListFocusUnion } from "src/utils/utils/ProjectComponentListFocus";
 import type { OBS } from "src/utils/utils/Utils";
 
 export class FocusBase {
@@ -28,6 +33,33 @@ export namespace FocusFns {
       })
     );
   }
+
+  export function isCancelable(focus: Focus) {
+    if (focus instanceof FocusBase) {
+      return focus.isCancelable;
+    }
+    const isCancelableFocus2 =
+      focus.type === "Focus2" &&
+      Focus2Union.match(focus.focus2, {
+        ViewActions: () => true,
+        ProjectNav: () => true,
+        LibraryNav: () => true,
+        EditorNewActions: () => true,
+        ProjectComponentList: (focus2) => {
+          return ProjectComponentListFocusUnion.match(focus2.pclFocus, {
+            NewActionsFocus: () => true,
+            default: () => false,
+          });
+        },
+        default: () => false,
+      });
+    const isCancelableFocus =
+      focus.type === "ExprReplaceCommand" || isCancelableFocus2;
+    if (isCancelableFocus) {
+      return true;
+    }
+    return false;
+  }
 }
 
 export namespace ExObjectFocus {
@@ -51,7 +83,7 @@ export namespace ExObjectFocus {
       super(data);
       this.startEditing = (ctx: MainContext) => {
         console.log("startEditing");
-        
+
         ctx.focusManager.focus(
           new Name({
             exObject: this.exObject,
@@ -74,7 +106,7 @@ export namespace ExObjectFocus {
         })
       );
     }
-    
+
     public static isEditing$(
       ctx: MainContext,
       exObject: ExObject

@@ -1,6 +1,6 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import type { ExObject } from "src/ex-object/ExObject";
+import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { ProjectFns } from "src/ex-object/Project";
 import type MainContext from "src/main-context/MainContext";
 import type { OBS, SUB } from "src/utils/utils/Utils";
@@ -108,5 +108,14 @@ export namespace ComponentFns {
       default:
         throw new Error("unknown component type");
     }
+  }
+
+  export async function addRootExObjectBlank(
+    _ctx: MainContext,
+    component: CustomComponent,
+  ): Promise<void> {
+    const exObject = await CreateExObject.blank(_ctx);
+    const rootExObjects = await firstValueFrom(component.rootExObjects$);
+    component.rootExObjects$.next([...rootExObjects, exObject]);
   }
 }

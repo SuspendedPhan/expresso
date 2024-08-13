@@ -1,8 +1,7 @@
 import * as rxjs from "rxjs";
 import { Observable } from "rxjs";
-import { share } from "rxjs/operators";
-import { loggedMethod } from "../logger/LoggerDecorator";
 import Logger from "../logger/Logger";
+import { loggedMethod } from "../logger/LoggerDecorator";
 import type { Point } from "./Layout";
 import { type Output, Layout } from "./Layout";
 
@@ -12,11 +11,7 @@ export class ElementLayout {
   private getRootNode;
 
   // onCalculated is a useful event for redrawing the connecting lines and resizing the container.
-  public onCalculated = new Observable<Output>(
-    (subscriber) => (this.onCalculatedSubscriber = subscriber)
-  ).pipe(share());
-
-  private onCalculatedSubscriber: any;
+  public onCalculated = new rxjs.ReplaySubject<Output>(1);
 
   private onLocalPositionSubscriberByElementId = new Map<
     string,
@@ -65,11 +60,7 @@ export class ElementLayout {
     logger.log("output", JSON.stringify(output));
     logger.log("localPositionsByKey", JSON.stringify(Array.from(output.localPositionsByKey.entries())));
 
-    console.assert(
-      this.onCalculatedSubscriber,
-      "Failed assertion means nobody subscribed yet."
-    );
-    this.onCalculatedSubscriber.next(output);
+    this.onCalculated.next(output);
   }
 
   // registerElement must be called so that the layout knows how to get the width and height of your elements.
