@@ -9,9 +9,7 @@ import {
 import type { ExObject } from "src/ex-object/ExObject";
 import { CreateProject, type Project } from "src/ex-object/Project";
 import MainContext from "src/main-context/MainContext";
-import type {
-  Focus
-} from "src/utils/utils/FocusManager";
+import { Focus2Union, type Focus } from "src/utils/utils/FocusManager";
 
 export interface LibraryProject {
   id: string;
@@ -52,10 +50,7 @@ export class ProjectManager {
       project$: new ReplaySubject<Project>(1),
     };
 
-    const project = CreateProject.from(
-      libraryProject,
-      rootObjects
-    );
+    const project = CreateProject.from(libraryProject, rootObjects);
     libraryProject.project$.next(project);
     this.libraryProjectsSub$.next([
       ...this.libraryProjectsSub$.value,
@@ -112,7 +107,11 @@ export class ProjectManager {
 
   public navDown(focus: Focus) {
     switch (focus.type) {
-      case "None":
+      case "Focus2":
+        if (!Focus2Union.is.None(focus.focus2)) {
+          return;
+        }
+
         this.getFirstProject$()
           .pipe(first())
           .subscribe((project) => {

@@ -24,7 +24,6 @@ import { assertUnreachable } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
 export type Focus =
-  | NoneFocus
   | ExItemFocus
   | LibraryProjectFocus
   | ExprReplaceCommandFocus
@@ -33,6 +32,7 @@ export type Focus =
   | Focus2Wrapper;
 
 export const Focus2Union = unionize({
+  None: {},
   ProjectNav: {},
   LibraryNav: {},
   EditorNewActions: {},
@@ -45,10 +45,6 @@ export type Focus2 = UnionOf<typeof Focus2Union>;
 export interface Focus2Wrapper {
   type: "Focus2";
   focus2: Focus2;
-}
-
-export interface NoneFocus {
-  type: "None";
 }
 
 export interface ExItemFocus {
@@ -72,7 +68,8 @@ export interface EditPropertyNameFocus {
 
 export default class FocusManager {
   private readonly focus$ = new BehaviorSubject<Focus>({
-    type: "None",
+    type: "Focus2",
+    focus2: Focus2Union.None(),
   });
 
   public readonly down$ = new Subject<void>();
@@ -128,6 +125,10 @@ export default class FocusManager {
     this.focus$.next(focus);
   }
 
+  public focusNone() {
+    this.focus({ type: "Focus2", focus2: Focus2Union.None() });
+  }
+
   public focusExItem(exItem: ExItem) {
     this.focus(FocusManager.createExItemFocus(exItem));
   }
@@ -147,10 +148,6 @@ export default class FocusManager {
     });
   }
 
-  public focusNone() {
-    this.focus({ type: "None" });
-  }
-
   public focusExprReplaceCommand(expr: Expr) {
     this.focus({
       type: "ExprReplaceCommand",
@@ -161,7 +158,7 @@ export default class FocusManager {
   public popFocus() {
     this.focusStack.pop();
     if (this.focusStack.length === 0) {
-      this.focus$.next({ type: "None" });
+      this.focus$.next({ type: "Focus2", focus2: Focus2Union.None() });
     } else {
       this.focus$.next(this.focusStack[this.focusStack.length - 1]!);
     }
@@ -176,8 +173,10 @@ export default class FocusManager {
     }
 
     switch (focus.type) {
-      case "None":
-        this.downNone();
+      case "Focus2":
+        if (Focus2Union.is.None(focus.focus2)) {
+          this.downNone();
+        }
         return;
       case "ExItem":
         this.downExItem(focus.exItem);
