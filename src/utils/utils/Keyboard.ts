@@ -3,9 +3,9 @@ import { firstValueFrom, map } from "rxjs";
 import { ExItemType } from "src/ex-object/ExItem";
 import MainContext from "src/main-context/MainContext";
 import { ViewMode, Window } from "src/main-context/MainViewContext";
-import { FocusBase } from "src/utils/utils/Focus";
+import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
-import type { EditPropertyNameFocus } from "src/utils/utils/FocusManager";
+import { Focus2Union, type EditPropertyNameFocus } from "src/utils/utils/FocusManager";
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 
 export default class Keyboard {
@@ -61,7 +61,7 @@ export default class Keyboard {
     });
 
     const projectNavScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(map((focus) => focus.type === "ProjectNav"))
+      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ProjectNav)
     );
     projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
@@ -89,7 +89,7 @@ export default class Keyboard {
     });
 
     const libraryNavScope = new KeyboardScope(
-      focusManager.getFocus$().pipe(map((focus) => focus.type === "LibraryNav"))
+      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.LibraryNav)
     );
     libraryNavScope.hotkeys("p", () => {
       ctx.viewCtx.activeWindow$.next(Window.LibraryProjectList);

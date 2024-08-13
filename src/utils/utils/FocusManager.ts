@@ -19,17 +19,13 @@ import MainContext from "src/main-context/MainContext";
 import { Window } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
-import {
-  type ProjectComponentListFocus
-} from "src/utils/utils/KeyboardComponentList";
+import { type ProjectComponentListFocus } from "src/utils/utils/KeyboardComponentList";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
 export type Focus =
   | NoneFocus
   | ExItemFocus
-  | ProjectNavFocus
-  | LibraryNavFocus
   | LibraryProjectFocus
   | NewActionsFocus
   | ViewActionsFocus
@@ -39,10 +35,12 @@ export type Focus =
   | Focus2Wrapper;
 
 export const Focus2Union = unionize({
+  ProjectNav: {},
+  LibraryNav: {},
   ProjectComponentList: ofType<{ pclFocus: ProjectComponentListFocus }>(),
 });
 
-type Focus2 = UnionOf<typeof Focus2Union>;
+export type Focus2 = UnionOf<typeof Focus2Union>;
 
 export interface Focus2Wrapper {
   type: "Focus2";
@@ -56,14 +54,6 @@ export interface NoneFocus {
 export interface ExItemFocus {
   type: "ExItem";
   exItem: ExItem;
-}
-
-export interface ProjectNavFocus {
-  type: "ProjectNav";
-}
-
-export interface LibraryNavFocus {
-  type: "LibraryNav";
 }
 
 export interface LibraryProjectFocus {
@@ -152,11 +142,11 @@ export default class FocusManager {
   }
 
   public focusProjectNav() {
-    this.focus({ type: "ProjectNav" });
+    this.focus({ type: "Focus2", focus2: Focus2Union.ProjectNav() });
   }
 
   public focusLibraryNav() {
-    this.focus({ type: "LibraryNav" });
+    this.focus({ type: "Focus2", focus2: Focus2Union.LibraryNav() });
   }
 
   public focusLibraryProject(project: LibraryProject) {

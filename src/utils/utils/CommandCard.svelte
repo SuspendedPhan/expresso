@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { CommandCardData } from "src/utils/utils/CommandCard";
-  import { Constants } from "src/utils/utils/ViewUtils";
 
   export let data: CommandCardData;
   const visible$ = data.visible$;

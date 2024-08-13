@@ -3,6 +3,8 @@ import { ElementLayout } from "src/utils/layout/ElementLayout";
 import { CommandCardFns, type CommandCardContext } from "src/utils/utils/CommandCard";
 import type { NavItem, NavSection } from "src/utils/utils/Nav";
 import MainContext from "./MainContext";
+import { Focus2Union } from "src/utils/utils/FocusManager";
+import { FocusFns } from "src/utils/utils/Focus";
 
 export enum Window {
   ProjectEditor,
@@ -37,7 +39,7 @@ export default class MainViewContext {
     const section0: NavSection = {
       title: "Project",
       navItems: [],
-      focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "ProjectNav")),
+      focused$: FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ProjectNav),
     };
     
     const navItems0: NavItem[] = [
@@ -51,7 +53,7 @@ export default class MainViewContext {
     const section1: NavSection = {
       title: "Library",
       navItems: [],
-      focused$: ctx.focusManager.getFocus$().pipe(map((f) => f.type === "LibraryNav")),
+      focused$: FocusFns.isFocus2Focused$(ctx, Focus2Union.is.LibraryNav),
     };
 
     const navItems1: NavItem[] = [

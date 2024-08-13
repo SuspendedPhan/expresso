@@ -1,6 +1,7 @@
 import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
+import type { Focus2 } from "src/utils/utils/FocusManager";
 import type { OBS } from "src/utils/utils/Utils";
 
 export class FocusBase {
@@ -13,6 +14,19 @@ export class FocusBase {
 
   public get isCancelable() {
     return this.isEditing;
+  }
+}
+
+export namespace FocusFns {
+  export function isFocus2Focused$(
+    ctx: MainContext,
+    predicate: (focus2: Focus2) => boolean
+  ): OBS<boolean> {
+    return ctx.focusManager.getFocus$().pipe(
+      map((focus) => {
+        return focus.type === "Focus2" && predicate(focus.focus2);
+      })
+    );
   }
 }
 
