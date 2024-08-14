@@ -96,7 +96,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-4">
-        <ExObjectHeaderView>Component Properties</ExObjectHeaderView>
+        <ExObjectHeaderView>Component Arguments</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           <PropertyView {ctx} property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
@@ -108,13 +108,17 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="flex flex-col gap-2 p-4">
-        <ExObjectHeaderView>Standard Properties</ExObjectHeaderView>
+        <!-- if len 0 -->
+        {#if $basicProperties$.length > 0}
+          <ExObjectHeaderView>Properties</ExObjectHeaderView>
+        {/if}
         {#each $basicProperties$ as property (property.id)}
           <PropertyView {ctx} {property} />
         {/each}
         <ExObjectButton
           on:click={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
-          class="mt-2">Add Property</ExObjectButton
+          class={$basicProperties$.length > 0 ? "mt-2" : ""}
+          >Add Property</ExObjectButton
         >
       </div>
 
