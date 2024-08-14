@@ -34,35 +34,9 @@ export interface ArrayEvent<T> {
 }
 
 export namespace ObservableArray {
-  export function emitItemsOnSubscribe<T>(): OBS<ArrayEvent<T>> {
-
-  }
-
-  export function replayCurrentItems<T>(): UnaryFunction<
-    OBS<ArrayEvent<T>>,
-    OBS<ArrayEvent<T>>
-  > {
-    return connect((eventArr$) => {
-      const [first$, rest$] = partition(eventArr$, (_event, index) => {
-        return index === 0;
-      });
-
-      const replay$ = first$.pipe(
-        mergeMap((event) => {
-          const events = event.items.map((item) => {
-            const itemAddedEvent: ArrayEvent<T> = {
-              items: [item],
-              change: { type: "ItemAdded", item },
-            };
-            return itemAddedEvent;
-          });
-          const eventArr$ = of(...events);
-          return eventArr$;
-        })
-      );
-      const result = concat(replay$, rest$);
-      return result;
-    });
+  export function create<T>(): SUB<ArrayEvent<T>> {
+    const subject = new Subject<ArrayEvent<T>>();
+    return subject;
   }
 
   export function toArray<T>(): UnaryFunction<OBS<ArrayEvent<T>>, OBS<T[]>> {
@@ -80,15 +54,19 @@ export namespace ObservableArray {
       const itemrARR: R[] = [];
       const itemrByItemt = new Map<T, R>();
       const result$ = events$.pipe(
-        replayCurrentItems(),
         map((event) => {
           switch (event.change.type) {
+            case "InitialSubscription": {
+              itemrARR.push(...event.items.map(fn));
+              break;
+            }
+
             case "ItemAdded": {
               const itemt = event.change.item;
               const itemr = fn(itemt);
               itemrARR.push(itemr);
               itemrByItemt.set(itemt, itemr);
-              return itemrARR;
+              break;
             }
             case "ItemRemoved": {
               const itemt = event.change.item;
@@ -102,9 +80,10 @@ export namespace ObservableArray {
               }
               itemrARR.splice(index, 1);
               itemrByItemt.delete(itemt);
-              return itemrARR;
+              break;
             }
           }
+          return itemrARR;
         })
       );
       return result$;
