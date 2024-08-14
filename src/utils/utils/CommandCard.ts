@@ -20,10 +20,8 @@ export namespace CommandCardFns {
   }
 
   export async function add(ctx: MainContext, data: CommandCardData) {
-    console.log("add", data);
     const ccCtx = ctx.viewCtx.commandCardCtx;
     const commandCards = await firstValueFrom(ccCtx.commandCards$);
-    console.log("commandCards", commandCards);
     commandCards.push(data);
     ccCtx.commandCards$.next(commandCards);
   }

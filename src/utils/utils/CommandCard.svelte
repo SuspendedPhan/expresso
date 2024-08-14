@@ -3,12 +3,7 @@
   import FocusView from "src/utils/views/FocusView.svelte";
 
   export let data: CommandCardData;
-  console.log("CommandCard", data);
   const visible$ = data.visible$;
-
-  visible$.subscribe((v) => {
-    console.log("visible", v);
-  });
 </script>
 
 {#if $visible$}

@@ -13,7 +13,7 @@
   );
 </script>
 
-<FlexContainer class="p-window">
+<FlexContainer class="p-window gap-y-8">
   <ActionBar>
     <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
       >Add Component</ActionBarButton

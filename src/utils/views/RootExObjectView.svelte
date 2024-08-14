@@ -4,11 +4,10 @@
   import type { ExObject } from "src/ex-object/ExObject";
   import MainContext from "src/main-context/MainContext";
   import ExObjectLayout from "src/utils/layout/ExObjectLayout";
-  import { Constants } from "src/utils/utils/ViewUtils";
   import ExObjectView from "src/utils/views/ExObjectView.svelte";
+  import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
-  import FlexContainer from "src/utils/views/FlexContainer.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;

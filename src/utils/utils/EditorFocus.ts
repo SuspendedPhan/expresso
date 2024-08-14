@@ -37,15 +37,11 @@ export namespace EditorFocus {
       ctx,
       Focus2Union.is.EditorNewActions
     );
-    isNewActionsFocused$.subscribe((isFocused) => {
-      console.log("isFocused", isFocused);
-    });
     CommandCardFns.add(ctx, {
       title: "New Actions",
       commands: ["Add Object", "New Project"],
       visible$: isNewActionsFocused$,
     });
-    console.log("isNewActionsFocused$", isNewActionsFocused$);
 
     const newActionsScope = new KeyboardScope(isNewActionsFocused$);
     newActionsScope.hotkeys("p", () => {
