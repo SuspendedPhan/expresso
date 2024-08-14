@@ -7,12 +7,10 @@
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import FocusView from "src/utils/views/FocusView.svelte";
-  import HugInput from "src/utils/views/HugInput.svelte";
+  import Field from "src/utils/views/Field.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import Field from "src/utils/views/Field.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -32,19 +30,7 @@
     exObject
   );
 
-  async function handleExObjectNameInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const value = target.value;
-    if (value === "") {
-      target.value = await firstValueFrom(exObjectName$);
-      return;
-    }
-    exObject.name$.next(target.value);
-  }
-
   function handleClickExObjectName() {
-    console.log("handleClickExObjectName");
-
     ctx.focusManager.focus(
       new ExObjectFocus.Name({
         exObject,
@@ -69,24 +55,20 @@
       <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
-          <div class="flex flex-row">
-            <pre class="text-style-secondary">Name: </pre>
-            <Field
-              value={$exObjectName$}
-              isFocused={$exObjectNameFocused$}
-              isEditing={$isEditingExObjectName$}
-              on:mousedown={handleClickExObjectName}
-              on:input={handleExObjectNameInput}
-            />
-          </div>
-          <div class="flex flex-row">
-            <pre class="text-style-secondary">Component: </pre>
-            <FocusView
-              on:mousedown={handleClickComponentName}
-              focused={$componentNameFocused$}
-              class="text-emphatic">{$componentName$}</FocusView
-            >
-          </div>
+          <Field
+            label="Name"
+            value$={exObjectName$}
+            isFocused={$exObjectNameFocused$}
+            isEditing={$isEditingExObjectName$}
+            on:mousedown={handleClickExObjectName}
+          />
+          <Field
+            label="Component"
+            value$={componentName$}
+            isFocused={$componentNameFocused$}
+            isEditing={false}
+            on:mousedown={handleClickComponentName}
+          />
         </div>
       </div>
 
