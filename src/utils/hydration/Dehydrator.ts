@@ -6,7 +6,7 @@ import {
   of,
   switchMap
 } from "rxjs";
-import { ComponentType } from "src/ex-object/Component";
+import { ComponentKind } from "src/ex-object/Component";
 import {
   type CallExpr,
   type Expr,
@@ -160,7 +160,7 @@ export default class Dehydrator {
             id: exObject.id,
             name,
             componentId: exObject.component.id,
-            componentType: ComponentType[exObject.component.componentType],
+            componentType: ComponentKind[exObject.component.componentKind],
             componentProperties: deComponentProperties,
             basicProperties: deBasicProperties,
             cloneProperty: deCloneProperty,

@@ -14,25 +14,26 @@ export type Component = CanvasComponent | CustomComponent;
 export type ComponentParameter =
   | CanvasComponentParameter
   | CustomComponentParameter;
-export enum ComponentType {
+
+export enum ComponentKind {
   CanvasComponent,
   CustomComponent,
 }
 
-export enum ComponentParameterType {
+export enum ComponentParameterKind {
   CanvasComponentParameter,
   CustomComponentParameter,
 }
 
 export interface CanvasComponent {
   id: string;
-  componentType: ComponentType.CanvasComponent;
+  componentKind: ComponentKind.CanvasComponent;
   parameters: CanvasComponentParameter[];
 }
 
 export interface CustomComponent {
   id: string;
-  componentType: ComponentType.CustomComponent;
+  componentKind: ComponentKind.CustomComponent;
   name$: SUB<string>;
   parameters$: SUB<ComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
@@ -41,23 +42,23 @@ export interface CustomComponent {
 export interface CanvasComponentParameter {
   readonly id: string;
   readonly name: string;
-  readonly componentParameterType: ComponentParameterType.CanvasComponentParameter;
+  readonly componentParameterType: ComponentParameterKind.CanvasComponentParameter;
   readonly canvasSetter: CanvasSetter;
 }
 
 export interface CustomComponentParameter {
   readonly id: string;
-  readonly componentParameterType: ComponentParameterType.CustomComponentParameter;
+  readonly componentParameterType: ComponentParameterKind.CustomComponentParameter;
   readonly nameSub$: SUB<string>;
 }
 
 export const CanvasComponentStore = {
   circle: {
     id: "circle",
-    componentType: ComponentType.CanvasComponent,
+    componentKind: ComponentKind.CanvasComponent,
     parameters: [
       {
-        componentParameterType: ComponentParameterType.CanvasComponentParameter,
+        componentParameterType: ComponentParameterKind.CanvasComponentParameter,
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {
@@ -75,7 +76,7 @@ export namespace CreateComponent {
     const id = `custom-${crypto.randomUUID()}`;
     return {
       id,
-      componentType: ComponentType.CustomComponent,
+      componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(`Component ${ordinal}`),
       parameters$: new BehaviorSubject<ComponentParameter[]>([]),
       rootExObjects$: new BehaviorSubject<ExObject[]>([]),
@@ -88,9 +89,9 @@ export namespace ComponentParameterFns {
     componentParameter: ComponentParameter
   ): OBS<string> {
     switch (componentParameter.componentParameterType) {
-      case ComponentParameterType.CanvasComponentParameter:
+      case ComponentParameterKind.CanvasComponentParameter:
         return of(componentParameter.name);
-      case ComponentParameterType.CustomComponentParameter:
+      case ComponentParameterKind.CustomComponentParameter:
         return componentParameter.nameSub$;
       default:
         throw new Error("unknown component parameter type");
@@ -100,10 +101,10 @@ export namespace ComponentParameterFns {
 
 export namespace ComponentFns {
   export function getName$(component: Component): OBS<string> {
-    switch (component.componentType) {
-      case ComponentType.CanvasComponent:
+    switch (component.componentKind) {
+      case ComponentKind.CanvasComponent:
         return of(component.id);
-      case ComponentType.CustomComponent:
+      case ComponentKind.CustomComponent:
         return component.name$;
       default:
         throw new Error("unknown component type");

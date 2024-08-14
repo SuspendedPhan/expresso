@@ -5,8 +5,8 @@ import {
 } from "src/canvas/CanvasObject";
 import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
 import {
-  ComponentParameterType,
-  ComponentType,
+  ComponentParameterKind,
+  ComponentKind,
   type CanvasSetter,
 } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
@@ -87,7 +87,7 @@ export class CanvasManager {
     }
 
     const component = exObject.component;
-    if (component.componentType !== ComponentType.CanvasComponent) {
+    if (component.componentKind !== ComponentKind.CanvasComponent) {
       return;
     }
 
@@ -96,7 +96,7 @@ export class CanvasManager {
         if (
           componentParameterProperty.componentParameter
             .componentParameterType !==
-          ComponentParameterType.CanvasComponentParameter
+          ComponentParameterKind.CanvasComponentParameter
         ) {
           return;
         }

@@ -1,7 +1,7 @@
 import { firstValueFrom } from "rxjs";
 import {
   CanvasComponentStore,
-  ComponentType,
+  ComponentKind,
   type CanvasComponent,
   type Component,
   type CustomComponent,
@@ -120,10 +120,10 @@ async function createComponentProperties(
   ctx: MainContext,
   component: Component
 ): Promise<ComponentParameterProperty[]> {
-  switch (component.componentType) {
-    case ComponentType.CanvasComponent:
+  switch (component.componentKind) {
+    case ComponentKind.CanvasComponent:
       return createCanvasComponentProperties(ctx, component);
-    case ComponentType.CustomComponent:
+    case ComponentKind.CustomComponent:
       return createCustomComponentProperties(ctx, component);
   }
 }
