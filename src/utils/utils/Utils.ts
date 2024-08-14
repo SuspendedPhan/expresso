@@ -32,3 +32,9 @@ export function createBehaviorSubjectWithLifetime<T>(complete$: Observable<void>
 export interface Destroyable {
   destroy$: SUB<void>;
 }
+
+export namespace ArrayFns {
+  export function getFromBack<T>(arr: T[], index: number): T | undefined{
+    return arr[arr.length - 1 - index];
+  }
+}

@@ -15,7 +15,7 @@ import {
 } from "src/ex-object/ExItem";
 import { type Property, PropertyType } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
-import MainContext from "src/main-context/MainContext";
+import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
@@ -86,7 +86,7 @@ export default class FocusManager {
     })
   );
 
-  private readonly focusStack = new Array<Focus>();
+  public readonly focusStack = new Array<Focus>();
 
   public constructor(private readonly ctx: MainContext) {
     this.down$.subscribe(() => {

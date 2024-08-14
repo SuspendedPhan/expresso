@@ -11,7 +11,7 @@ import type { OBS } from "src/utils/utils/Utils";
 
 export class FocusBase {
   public type = typeof this;
-  public isEditing: boolean = false;
+  public isEditing = false;
   public startEditing: ((ctx: MainContext) => void) | null = null;
   public get isEditable() {
     return this.startEditing !== null;
