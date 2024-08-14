@@ -17,5 +17,5 @@ html, body, #app {
 }
 
 .ex-card {
-    @apply card bg-white rounded-sm card-bordered border-2 border-base-content/10 card-compact
+    @apply card bg-white rounded-sm card-bordered border-2 border-base-content/10 card-compact;
 }

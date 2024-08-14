@@ -40,7 +40,7 @@
   });
 </script>
 
-<div class="{clazz} {Constants.WindowPaddingClass} w-max">
+<div class="{clazz} {Constants.WindowPaddingClass} p-window-padding w-max">
   <TreeView {elementLayout} {ctx}>
     <div bind:this={element}>
       <ExObjectView {ctx} {exObject} {elementLayout} />

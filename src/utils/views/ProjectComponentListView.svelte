@@ -1,6 +1,6 @@
 <script lang="ts">
   import { switchMap } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+  import type MainContext from "src/main-context/MainContext";
   import ActionBar from "src/utils/views/ActionBar.svelte";
   import ActionBarButton from "src/utils/views/ActionBarButton.svelte";
   import ComponentView from "src/utils/views/ComponentView.svelte";
@@ -12,11 +12,13 @@
   );
 </script>
 
-<ActionBar>
-  <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
-    >Add Component</ActionBarButton
-  >
-</ActionBar>
-{#each $componentL$ as component}
-  <ComponentView {ctx} {component} />
-{/each}
+<div class="p-window">
+  <ActionBar>
+    <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
+      >Add Component</ActionBarButton
+    >
+  </ActionBar>
+  {#each $componentL$ as component}
+    <ComponentView {ctx} {component} />
+  {/each}
+</div>
