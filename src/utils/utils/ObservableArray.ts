@@ -1,52 +1,113 @@
-import { concat, of, Subject } from "rxjs";
-import type { OBS } from "src/utils/utils/Utils";
+import {
+  concat,
+  connect,
+  first,
+  map,
+  mergeMap,
+  of,
+  partition,
+  pipe,
+  Subject,
+  type UnaryFunction,
+} from "rxjs";
+import type { OBS, SUB } from "src/utils/utils/Utils";
 
-export type ItemChange<T> = ItemAdded<T> | InitialSubscription;
+export type ItemChange<T> = ItemAdded<T> | ItemRemoved<T> | InitialSubscription;
 
 export interface ItemAdded<T> {
-    readonly type: "ItemAdded";
-    readonly item: T;
-    readonly index: number;
+  readonly type: "ItemAdded";
+  readonly item: T;
+}
+
+export interface ItemRemoved<T> {
+  readonly type: "ItemRemoved";
+  readonly item: T;
 }
 
 export interface InitialSubscription {
-    readonly type: "InitialSubscription";
+  readonly type: "InitialSubscription";
 }
 
 export interface ArrayEvent<T> {
-    readonly items: readonly T[];
-    readonly change: ItemChange<T>;
+  readonly items: T[];
+  readonly change: ItemChange<T>;
 }
 
-export default class ObservableArray<T> {
-    private items: T[] = [];
-    private onChange$_ = new Subject<ArrayEvent<T>>();
+export namespace ObservableArray {
+  export function emitItemsOnSubscribe<T>(): OBS<ArrayEvent<T>> {
 
-    public push(value: T): void {
-        this.items.push(value);
-        const change: ItemAdded<T> = { type: "ItemAdded", item: value, index: this.items.length - 1};
-        this.onChange$_.next({items: this.items, change: change});
-    }
+  }
 
-    public onChange$(): OBS<ArrayEvent<T>> {
-        const initial: InitialSubscription = { type: "InitialSubscription" };
-        const event: ArrayEvent<T> = { items: this.items, change: initial };
-        return concat(of(event), this.onChange$_);
-    }
+  export function replayCurrentItems<T>(): UnaryFunction<
+    OBS<ArrayEvent<T>>,
+    OBS<ArrayEvent<T>>
+  > {
+    return connect((eventArr$) => {
+      const [first$, rest$] = partition(eventArr$, (_event, index) => {
+        return index === 0;
+      });
 
-    public map<U>(fn: (value: T) => U): ObservableArray<U> {
-        const result = new ObservableArray<U>();
-        this.onChange$().subscribe((event) => {
-            switch (event.change.type) {
-                case "InitialSubscription":
-                    const items = event.items.map(fn);
-                    items.forEach((item) => result.push(item));
-                    break;
-                case "ItemAdded":
-                    result.push(fn(event.change.item));
-                    break;
+      const replay$ = first$.pipe(
+        mergeMap((event) => {
+          const events = event.items.map((item) => {
+            const itemAddedEvent: ArrayEvent<T> = {
+              items: [item],
+              change: { type: "ItemAdded", item },
+            };
+            return itemAddedEvent;
+          });
+          const eventArr$ = of(...events);
+          return eventArr$;
+        })
+      );
+      const result = concat(replay$, rest$);
+      return result;
+    });
+  }
+
+  export function toArray<T>(): UnaryFunction<OBS<ArrayEvent<T>>, OBS<T[]>> {
+    return pipe(
+      map((event) => {
+        return event.items;
+      })
+    );
+  }
+
+  export function mapToArray<T, R>(
+    fn: (item: T) => R
+  ): UnaryFunction<OBS<ArrayEvent<T>>, OBS<R[]>> {
+    return connect((events$) => {
+      const itemrARR: R[] = [];
+      const itemrByItemt = new Map<T, R>();
+      const result$ = events$.pipe(
+        replayCurrentItems(),
+        map((event) => {
+          switch (event.change.type) {
+            case "ItemAdded": {
+              const itemt = event.change.item;
+              const itemr = fn(itemt);
+              itemrARR.push(itemr);
+              itemrByItemt.set(itemt, itemr);
+              return itemrARR;
             }
-        });
-        return result;
-    }
+            case "ItemRemoved": {
+              const itemt = event.change.item;
+              const itemr = itemrByItemt.get(itemt);
+              if (itemr === undefined) {
+                throw new Error("Item not found");
+              }
+              const index = itemrARR.indexOf(itemr);
+              if (index === -1) {
+                throw new Error("Item not found");
+              }
+              itemrARR.splice(index, 1);
+              itemrByItemt.delete(itemt);
+              return itemrARR;
+            }
+          }
+        })
+      );
+      return result$;
+    });
+  }
 }
