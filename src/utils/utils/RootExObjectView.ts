@@ -1,4 +1,3 @@
-import { BehaviorSubject, connect, map, reduce, share } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import type { ElementLayout } from "src/utils/layout/ElementLayout";

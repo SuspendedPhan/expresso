@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { firstValueFrom } from "rxjs";
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
@@ -7,15 +8,15 @@
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
+  import HugInput from "src/utils/views/HugInput.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import HugInput from "src/utils/views/HugInput.svelte";
-  import { firstValueFrom } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
+
   const componentParameterProperties = exObject.componentParameterProperties;
   const cloneCountProperty = exObject.cloneCountProperty;
   const basicProperties$ = exObject.basicProperties$;

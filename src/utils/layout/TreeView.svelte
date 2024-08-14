@@ -53,7 +53,7 @@
 </script>
 
 <div
-  class="relative"
+  class="relative w-max"
   bind:this={rootElement}
   style={treeLayoutStyle}
   style:transform="translateX({xTranslation}px)"

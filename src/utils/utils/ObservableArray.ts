@@ -1,14 +1,9 @@
 import {
-  concat,
   connect,
-  first,
   map,
-  mergeMap,
-  of,
-  partition,
   pipe,
   Subject,
-  type UnaryFunction,
+  type UnaryFunction
 } from "rxjs";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
@@ -35,7 +30,7 @@ export interface ArrayEvent<T> {
 
 export namespace ObservableArray {
   export function create<T>(): SUB<ArrayEvent<T>> {
-    const subject = new Subject<ArrayEvent<T>>();
+    const subject = new Subject<ArrayEvent<T>>(); 
     return subject;
   }
 

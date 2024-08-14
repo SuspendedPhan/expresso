@@ -34,6 +34,7 @@ The container will be translated so that x=0 aligns with the left edge of the la
       return combineLatest([containerWidth$, outputs]);
     }),
     map(([width, outputs]) => {
+      return 0;
       // Get the largest width
       let largestWidth = 0;
       for (const output of outputs) {

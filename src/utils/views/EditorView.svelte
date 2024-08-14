@@ -31,15 +31,15 @@
     Focus2Union.is.EditorNewActions
   );
 
-  const rootExObjectViewPropsL$ = RootExObjectViewFns.get$(
-    ctx,
-    ctx.eventBus.rootObjects$
-  );
+  // const rootExObjectViewPropsL$ = RootExObjectViewFns.get$(
+  //   ctx,
+  //   ctx.eventBus.rootObjects$
+  // );
 </script>
 
 <div bind:this={rootElement}>
   <TreeListContainer
-    class="flex flex-col items-center"
+    class="flex flex-col items-center w-max"
     containerPadding={Constants.WindowPadding}
     layouts$={ctx.viewCtx.exObjectLayouts$}
   >
@@ -68,16 +68,21 @@
         Debug Evaluator
       </button>
     </div>
-    <div class="flex flex-col w-full items-center">
+    <div class="flex flex-col w-max items-center">
       {#if $rootExObjects$}
-        {#each $rootExObjectViewPropsL$ as props (props.exObject.id)}
+        {#each $rootExObjects$ as exObject (exObject.id)}
+          <div class="divider m-0 h-0"></div>
+          <RootExObjectView {ctx} {exObject} />
+        {/each}
+
+        <!-- {#each $rootExObjectViewPropsL$ as props (props.exObject.id)}
           <div class="divider m-0 h-0"></div>
           <RootExObjectView
             {ctx}
             exObject={props.exObject}
             elementLayout={props.elementLayout}
           />
-        {/each}
+        {/each} -->
       {/if}
     </div>
   </TreeListContainer>
