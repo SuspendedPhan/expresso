@@ -1,30 +1,36 @@
-import { BehaviorSubject, type Observable } from "rxjs";
+import { concat, of, Subject } from "rxjs";
+import type { OBS } from "src/utils/utils/Utils";
 
-export type ItemChange<T> = ItemAdded<T> | null;
+export type ItemChange<T> = ItemAdded<T> | InitialSubscription;
 
 export interface ItemAdded<T> {
-    readonly type: "added";
+    readonly type: "ItemAdded";
     readonly item: T;
     readonly index: number;
 }
 
-export interface ArrayChange<T> {
+export interface InitialSubscription {
+    readonly type: "InitialSubscription";
+}
+
+export interface ArrayEvent<T> {
     readonly items: readonly T[];
-    readonly changed: ItemChange<T>;
+    readonly change: ItemChange<T>;
 }
 
 export default class ObservableArray<T> {
     private items: T[] = [];
-    private lastChange: ItemChange<T> = null;
-    private items$ = new BehaviorSubject<ArrayChange<T>>({items: this.items, changed: this.lastChange});
+    private onChange$_ = new Subject<ArrayEvent<T>>();
 
     public push(value: T): void {
         this.items.push(value);
-        this.lastChange = { type: "added", item: value, index: this.items.length - 1};
-        this.items$.next({items: this.items, changed: this.lastChange});
+        const change: ItemAdded<T> = { type: "ItemAdded", item: value, index: this.items.length - 1};
+        this.onChange$_.next({items: this.items, change: change});
     }
-    
-    public onChange$(): Observable<ArrayChange<T>> {
-        return this.items$;
+
+    public onChange$(): OBS<ArrayEvent<T>> {
+        const initial: InitialSubscription = { type: "InitialSubscription" };
+        const event: ArrayEvent<T> = { items: this.items, change: initial };
+        return concat(of(event), this.onChange$_);
     }
 }
