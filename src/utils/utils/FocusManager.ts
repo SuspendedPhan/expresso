@@ -18,6 +18,7 @@ import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { ComponentFocusKind, type ComponentFocus } from "src/utils/utils/ComponentFocus";
 import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
 import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
 import { assertUnreachable } from "src/utils/utils/Utils";
@@ -38,6 +39,8 @@ export const Focus2Union = unionize({
   EditorNewActions: {},
   ViewActions: {},
   ProjectComponentList: ofType<{ pclFocus: ProjectComponentListFocus }>(),
+  ...ComponentFocusKind
+  // Component: ofType<{cFocus: ComponentFocus}>(),
 });
 
 export type Focus2 = UnionOf<typeof Focus2Union>;

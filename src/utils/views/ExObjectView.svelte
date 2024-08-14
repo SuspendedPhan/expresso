@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { firstValueFrom } from "rxjs";
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
