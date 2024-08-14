@@ -30,6 +30,8 @@
     "gapi-script": "^1.2.0",
     "google-auth-library": "^9.11.0",
     "hotkeys-js": "^3.13.7",
+    "overlayscrollbars": "^2.10.0",
+    "overlayscrollbars-svelte": "^0.5.4",
     "pixi.js": "^8.2.2",
     "rxjs": "^7.8.1",
     "svelte-check": "^3.8.5",

@@ -8,6 +8,7 @@
   import NavMenuView from "./NavMenuView.svelte";
   import { ViewMode } from "src/main-context/MainViewContext";
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
+  import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
 
   export let ctx: MainContext;
 
@@ -31,12 +32,9 @@
   <div class="flex h-full">
     <NavMenuView {ctx} />
 
-    <div
-      class="shrink-1 basis-1/2"
-      style="overflow: auto; scrollbar-gutter: stable;"
-    >
+    <OverlayScrollbarsComponent defer class="shrink-1 basis-1/2">
       <svelte:component this={$activeWindow$} {ctx} />
-    </div>
+    </OverlayScrollbarsComponent>
     <div class="shrink-1 basis-1/2">
       <CanvasView {ctx} />
     </div>
