@@ -8,6 +8,7 @@
   import ExObjectView from "src/utils/views/ExObjectView.svelte";
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
+  import FlexContainer from "src/utils/views/FlexContainer.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -40,12 +41,12 @@
   });
 </script>
 
-<div class="{clazz} p-window grid grid-cols-1 justify-items-center">
+<FlexContainer class="p-window">
   <TreeView {elementLayout} {ctx}>
     <div bind:this={element}>
       <ExObjectView {ctx} {exObject} {elementLayout} />
     </div>
   </TreeView>
-</div>
+</FlexContainer>
 
 <style></style>

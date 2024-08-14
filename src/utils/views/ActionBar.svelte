@@ -1,1 +1,3 @@
-<slot></slot>
+<div class="p-window">
+  <slot></slot>
+</div>

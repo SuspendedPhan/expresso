@@ -1,9 +1,11 @@
 <script lang="ts">
+  let clazz = "";
+  export { clazz as class };
 </script>
 
 <div
-  class="grid justify-items-center justify-center min-w-full"
-  style="grid-template-columns: minmax(100%, max-content)"
+  class="grid justify-items-center justify-center min-w-max {clazz}"
+  style="grid-template-columns: minmax(auto, 1fr)"
 >
   <slot></slot>
 </div>

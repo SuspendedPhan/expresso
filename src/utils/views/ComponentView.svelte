@@ -1,6 +1,7 @@
 <script lang="ts">
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
+  import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   export let ctx: MainContext;
   export let component: CustomComponent;
@@ -13,10 +14,12 @@
   }
 </script>
 
-<div>{$name$}</div>
-<button class="btn btn-sm" on:click={addExObject}>Add Object</button>
-<div class="ex-card w-max flex flex-col">
-  {#each $rootExObjects$ as rootExObject}
-    <RootExObjectView {ctx} exObject={rootExObject} />
-  {/each}
-</div>
+<FlexContainer class="p-window ex-card">
+  <div>{$name$}</div>
+  <button class="btn btn-sm w-max" on:click={addExObject}>Add Object</button>
+  <FlexContainer>
+    {#each $rootExObjects$ as rootExObject}
+      <RootExObjectView {ctx} exObject={rootExObject} />
+    {/each}
+  </FlexContainer>
+</FlexContainer>
