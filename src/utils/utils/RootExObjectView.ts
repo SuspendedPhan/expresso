@@ -3,7 +3,7 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import type { ElementLayout } from "src/utils/layout/ElementLayout";
 import ExObjectLayout from "src/utils/layout/ExObjectLayout";
-import type ObservableArray from "src/utils/utils/ObservableArray";
+import ObservableArray from "src/utils/utils/ObservableArray";
 import type { OBS } from "src/utils/utils/Utils";
 
 export interface RootExObjectViewProps {
@@ -16,8 +16,7 @@ export namespace RootExObjectViewFns {
     ctx: MainContext,
     rootExObjectsOArr: ObservableArray<ExObject>
   ): OBS<RootExObjectViewProps[]> {
-    const rootExObjectProps: RootExObjectViewProps[] = [];
-    const rootExObjectProps$ = new ReplaySubject<RootExObjectViewProps[]>(1);
+    const rootExObjectPropsOArr = new ObservableArray<RootExObjectViewProps>();
     rootExObjectsOArr.onChange$().pipe(
       map((event) => {
         switch (event.change.type) {

@@ -33,4 +33,20 @@ export default class ObservableArray<T> {
         const event: ArrayEvent<T> = { items: this.items, change: initial };
         return concat(of(event), this.onChange$_);
     }
+
+    public map<U>(fn: (value: T) => U): ObservableArray<U> {
+        const result = new ObservableArray<U>();
+        this.onChange$().subscribe((event) => {
+            switch (event.change.type) {
+                case "InitialSubscription":
+                    const items = event.items.map(fn);
+                    items.forEach((item) => result.push(item));
+                    break;
+                case "ItemAdded":
+                    result.push(fn(event.change.item));
+                    break;
+            }
+        });
+        return result;
+    }
 }
