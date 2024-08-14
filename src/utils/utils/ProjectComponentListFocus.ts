@@ -40,9 +40,7 @@ export namespace ProjectComponentListFocusFns {
         return (
           focus.type === "Focus2" &&
           Focus2Union.is.ProjectComponentList(focus.focus2) &&
-          ProjectComponentListFocusKind.is.NewActions(
-            focus.focus2.pclFocus
-          )
+          ProjectComponentListFocusKind.is.NewActions(focus.focus2.pclFocus)
         );
       })
     );
@@ -70,8 +68,9 @@ export namespace ProjectComponentListFocusFns {
       }
 
       const focus = Focus2Union.ProjectComponentList({
-        pclFocus: ProjectComponentListFocusKind.NewActions({}),
+        pclFocus: ProjectComponentListFocusKind.Component({ component }),
       });
+      focusManager.focus({ type: "Focus2", focus2: focus });
     });
   }
 }
