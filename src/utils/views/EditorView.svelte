@@ -8,6 +8,7 @@
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import FlexContainer from "./FlexContainer.svelte";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -30,12 +31,8 @@
   );
 </script>
 
-<div class="flex">
-  <div
-    class="flex flex-col items-center grow"
-    bind:this={rootElement}
-    style:flex-basis="max-content"
-  >
+<div bind:this={rootElement} class="w-max min-w-full">
+  <FlexContainer>
     <div class="flex gap-4 {Constants.WindowPaddingClass}">
       <button
         on:click={() => ctx.projectMutator.addRootObject()}
@@ -61,13 +58,13 @@
         Debug Evaluator
       </button>
     </div>
-    <div class="flex flex-col basis-max grow items-center">
+    <FlexContainer>
       {#if $rootExObjects$}
         {#each $rootExObjects$ as exObject (exObject.id)}
           <div class="divider m-0 h-0"></div>
           <RootExObjectView {ctx} {exObject} />
         {/each}
       {/if}
-    </div>
-  </div>
+    </FlexContainer>
+  </FlexContainer>
 </div>
