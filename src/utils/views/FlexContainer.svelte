@@ -7,4 +7,3 @@
 >
   <slot></slot>
 </div>
-<!-- style="grid-template-columns: max(max-content, 1fr)" -->

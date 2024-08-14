@@ -8,7 +8,7 @@
   export let ctx: MainContext;
   const project$ = ctx.projectManager.currentProject$;
   const componentL$ = project$.pipe(
-    switchMap((project) => project.componentL$)
+    switchMap((project) => project.componentArr$)
   );
 </script>
 

@@ -6,8 +6,12 @@ import {
   type Focus,
   type Focus2,
 } from "src/utils/utils/FocusManager";
-import { ProjectComponentListFocusUnion } from "src/utils/utils/ProjectComponentListFocus";
+import { ProjectComponentListFocusKind } from "src/utils/utils/ProjectComponentListFocus";
 import type { OBS } from "src/utils/utils/Utils";
+
+export enum FocusKeys {
+  Down = "ArrowDown,s",
+}
 
 export class FocusBase {
   public type = typeof this;
@@ -46,8 +50,8 @@ export namespace FocusFns {
         LibraryNav: () => true,
         EditorNewActions: () => true,
         ProjectComponentList: (focus2) => {
-          return ProjectComponentListFocusUnion.match(focus2.pclFocus, {
-            NewActionsFocus: () => true,
+          return ProjectComponentListFocusKind.match(focus2.pclFocus, {
+            NewActions: () => true,
             default: () => false,
           });
         },

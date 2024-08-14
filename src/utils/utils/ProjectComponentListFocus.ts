@@ -1,17 +1,20 @@
-import { map } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { Focus2Union, type Focus2Wrapper } from "src/utils/utils/FocusManager";
 import { KeyboardScope } from "src/utils/utils/KeyboardScope";
-import unionize, { type UnionOf } from "unionize";
+import unionize, { ofType, type UnionOf } from "unionize";
+import { FocusFns, FocusKeys } from "./Focus";
+import type { CustomComponent } from "src/ex-object/Component";
 
-export const ProjectComponentListFocusUnion = unionize({
-  NewActionsFocus: {},
+export const ProjectComponentListFocusKind = unionize({
+  NewActions: {},
+  Component: ofType<{ component: CustomComponent }>(),
 });
 
 export type ProjectComponentListFocus = UnionOf<
-  typeof ProjectComponentListFocusUnion
+  typeof ProjectComponentListFocusKind
 >;
 
 export namespace ProjectComponentListFocusFns {
@@ -23,7 +26,7 @@ export namespace ProjectComponentListFocusFns {
     );
 
     windowScope.hotkeys("n", () => {
-      const detail = ProjectComponentListFocusUnion.NewActionsFocus({});
+      const detail = ProjectComponentListFocusKind.NewActions({});
       const focus = Focus2Union.ProjectComponentList({ pclFocus: detail });
       const wrapper: Focus2Wrapper = {
         type: "Focus2",
@@ -37,7 +40,7 @@ export namespace ProjectComponentListFocusFns {
         return (
           focus.type === "Focus2" &&
           Focus2Union.is.ProjectComponentList(focus.focus2) &&
-          ProjectComponentListFocusUnion.is.NewActionsFocus(
+          ProjectComponentListFocusKind.is.NewActions(
             focus.focus2.pclFocus
           )
         );
@@ -54,6 +57,21 @@ export namespace ProjectComponentListFocusFns {
     newActionsScope.hotkeys("c", () => {
       ctx.mutator.addBlankProjectComponent();
       ctx.focusManager.popFocus();
+    });
+
+    const noneScope = new KeyboardScope(FocusFns.isNoneFocused$(ctx));
+    noneScope.hotkeys(FocusKeys.Down, async () => {
+      // select first component
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      const componentArr = await firstValueFrom(project.componentArr$);
+      const component = componentArr[0];
+      if (component === undefined) {
+        return;
+      }
+
+      const focus = Focus2Union.ProjectComponentList({
+        pclFocus: ProjectComponentListFocusKind.NewActions({}),
+      });
     });
   }
 }

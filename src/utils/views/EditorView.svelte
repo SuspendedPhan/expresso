@@ -61,7 +61,7 @@
     <FlexContainer>
       {#if $rootExObjects$}
         {#each $rootExObjects$ as exObject (exObject.id)}
-          <div class="divider m-0 h-0"></div>
+          <div class="divider w-full m-0 h-0"></div>
           <RootExObjectView {ctx} {exObject} />
         {/each}
       {/if}
