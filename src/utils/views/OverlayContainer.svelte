@@ -4,6 +4,9 @@
 
   export let ctx: MainContext;
   const commandCards$ = ctx.viewCtx.commandCardCtx.commandCards$;
+  commandCards$.subscribe((commandCards) => {
+    console.log("commandCards", commandCards);
+  });
 </script>
 
 {#each $commandCards$ as commandCard}

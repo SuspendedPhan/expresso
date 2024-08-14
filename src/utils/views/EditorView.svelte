@@ -30,40 +30,44 @@
   );
 </script>
 
-<div class="flex flex-col items-center w-max" bind:this={rootElement}>
-  <div class="flex gap-4 {Constants.WindowPaddingClass}">
-    <button
-      on:click={() => ctx.projectMutator.addRootObject()}
-      class="btn block"
-      ><KbdShortcutSpan
-        label="Add Object"
-        showShortcut={$newActionsFocused$}
-        underlineCharIndex={4}
-      /></button
-    >
-    <button
-      on:click={() => ctx.projectManager.addProjectNew()}
-      class="btn block"
-    >
-      <KbdShortcutSpan
-        label="New Project"
-        showShortcut={$newActionsFocused$}
-        underlineCharIndex={4}
-      />
-    </button>
+<div class="flex">
+  <div
+    class="flex flex-col items-center grow"
+    bind:this={rootElement}
+    style:flex-basis="max-content"
+  >
+    <div class="flex gap-4 {Constants.WindowPaddingClass}">
+      <button
+        on:click={() => ctx.projectMutator.addRootObject()}
+        class="btn block"
+        ><KbdShortcutSpan
+          label="Add Object"
+          showShortcut={$newActionsFocused$}
+          underlineCharIndex={4}
+        /></button
+      >
+      <button
+        on:click={() => ctx.projectManager.addProjectNew()}
+        class="btn block"
+      >
+        <KbdShortcutSpan
+          label="New Project"
+          showShortcut={$newActionsFocused$}
+          underlineCharIndex={4}
+        />
+      </button>
 
-    <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
-      Debug Evaluator
-    </button>
-  </div>
-  <div class="flex flex-col w-max items-center">
-    {#if $rootExObjects$}
-      {#each $rootExObjects$ as exObject (exObject.id)}
-        <div class="divider m-0 h-0"></div>
-        <RootExObjectView {ctx} {exObject} />
-      {/each}
-    {/if}
+      <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
+        Debug Evaluator
+      </button>
+    </div>
+    <div class="flex flex-col basis-max grow items-center">
+      {#if $rootExObjects$}
+        {#each $rootExObjects$ as exObject (exObject.id)}
+          <div class="divider m-0 h-0"></div>
+          <RootExObjectView {ctx} {exObject} />
+        {/each}
+      {/if}
+    </div>
   </div>
 </div>
-
-<style></style>

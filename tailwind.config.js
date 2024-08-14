@@ -10,6 +10,11 @@ export default {
         return {
           "window": theme("spacing.8"),
         };
+      },
+      flexBasis: {
+        "max": "max-content",
+        "min": "min-content",
+        "fit": "fit-content",
       }
     },
   },

@@ -37,11 +37,15 @@ export namespace EditorFocus {
       ctx,
       Focus2Union.is.EditorNewActions
     );
+    isNewActionsFocused$.subscribe((isFocused) => {
+      console.log("isFocused", isFocused);
+    });
     CommandCardFns.add(ctx, {
       title: "New Actions",
       commands: ["Add Object", "New Project"],
       visible$: isNewActionsFocused$,
     });
+    console.log("isNewActionsFocused$", isNewActionsFocused$);
 
     const newActionsScope = new KeyboardScope(isNewActionsFocused$);
     newActionsScope.hotkeys("p", () => {
@@ -65,9 +69,11 @@ export namespace EditorFocus {
       if (focus.type !== "ExItem") {
         return;
       }
-      if (focus.exItem.itemType === ExItemType.ExObject) {
-        ExObjectFns.addChildBlank(ctx, focus.exItem);
+      if (focus.exItem.itemType !== ExItemType.ExObject) {
+        return;
       }
+
+      ExObjectFns.addChildBlank(ctx, focus.exItem);
       ctx.focusManager.popFocus();
     });
   }

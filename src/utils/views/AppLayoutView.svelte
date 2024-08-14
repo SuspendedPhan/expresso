@@ -1,6 +1,6 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+  import type MainContext from "src/main-context/MainContext";
   import CanvasView from "src/canvas/CanvasView.svelte";
   import { onMount } from "svelte";
   import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
