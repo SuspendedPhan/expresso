@@ -70,7 +70,7 @@ export namespace ProjectComponentListFocusFns {
       const focus = Focus2Union.ProjectComponentList({
         pclFocus: ProjectComponentListFocusKind.Component({ component }),
       });
-      focusManager.focus({ type: "Focus2", focus2: focus });
+      FocusFns.focus(ctx, focus);
     });
   }
 }

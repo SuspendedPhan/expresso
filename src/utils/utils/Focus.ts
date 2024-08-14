@@ -2,7 +2,7 @@ import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import {
-  Focus2Union,
+  Focus2Union as Focus2Kind,
   type Focus,
   type Focus2,
 } from "src/utils/utils/FocusManager";
@@ -27,6 +27,10 @@ export class FocusBase {
 }
 
 export namespace FocusFns {
+  export function focus(ctx: MainContext, focus2: Focus2) {
+    ctx.focusManager.focus({ type: "Focus2", focus2 });
+  }
+
   export function isFocus2Focused$(
     ctx: MainContext,
     predicate: (focus2: Focus2) => boolean
@@ -38,13 +42,21 @@ export namespace FocusFns {
     );
   }
 
+  export function isNoneFocused$(ctx: MainContext): OBS<boolean> {
+    return ctx.focusManager.getFocus$().pipe(
+      map((focus) => {
+        return focus.type === "Focus2" && Focus2Kind.is.None(focus.focus2);
+      })
+    );
+  }
+
   export function isCancelable(focus: Focus) {
     if (focus instanceof FocusBase) {
       return focus.isCancelable;
     }
     const isCancelableFocus2 =
       focus.type === "Focus2" &&
-      Focus2Union.match(focus.focus2, {
+      Focus2Kind.match(focus.focus2, {
         ViewActions: () => true,
         ProjectNav: () => true,
         LibraryNav: () => true,
