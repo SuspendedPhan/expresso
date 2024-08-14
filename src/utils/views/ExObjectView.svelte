@@ -12,6 +12,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import Field from "src/utils/views/Field.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -70,17 +71,13 @@
         <div class="flex flex-col gap-2 font-mono">
           <div class="flex flex-row">
             <pre class="text-style-secondary">Name: </pre>
-            <FocusView
+            <Field
+              value={$exObjectName$}
+              isFocused={$exObjectNameFocused$}
+              isEditing={$isEditingExObjectName$}
               on:mousedown={handleClickExObjectName}
-              focused={$exObjectNameFocused$}
-              class="text-emphatic"
-            >
-              <HugInput
-                isEditing={$isEditingExObjectName$}
-                on:input={handleExObjectNameInput}
-                value={$exObjectName$}
-              ></HugInput>
-            </FocusView>
+              on:input={handleExObjectNameInput}
+            />
           </div>
           <div class="flex flex-row">
             <pre class="text-style-secondary">Component: </pre>

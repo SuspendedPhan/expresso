@@ -4,7 +4,7 @@
 </script>
 
 <div
-  class="grid justify-items-center justify-center min-w-max {clazz}"
+  class="grid justify-items-center justify-center min-w-full w-max {clazz}"
   style="grid-template-columns: minmax(auto, 1fr)"
 >
   <slot></slot>
