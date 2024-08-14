@@ -2,10 +2,8 @@
   import { ResizeSensor } from "css-element-queries";
   import { ReplaySubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
-  import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
   import { FocusFns } from "src/utils/utils/Focus";
   import { Focus2Union } from "src/utils/utils/FocusManager";
-  import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
@@ -30,19 +28,10 @@
     ctx,
     Focus2Union.is.EditorNewActions
   );
-
-  // const rootExObjectViewPropsL$ = RootExObjectViewFns.get$(
-  //   ctx,
-  //   ctx.eventBus.rootObjects$
-  // );
 </script>
 
 <div bind:this={rootElement}>
-  <TreeListContainer
-    class="flex flex-col items-center w-max"
-    containerPadding={Constants.WindowPadding}
-    layouts$={ctx.viewCtx.exObjectLayouts$}
-  >
+  <div class="flex flex-col items-center w-max">
     <div class="flex gap-4 {Constants.WindowPaddingClass}">
       <button
         on:click={() => ctx.projectMutator.addRootObject()}
@@ -74,18 +63,9 @@
           <div class="divider m-0 h-0"></div>
           <RootExObjectView {ctx} {exObject} />
         {/each}
-
-        <!-- {#each $rootExObjectViewPropsL$ as props (props.exObject.id)}
-          <div class="divider m-0 h-0"></div>
-          <RootExObjectView
-            {ctx}
-            exObject={props.exObject}
-            elementLayout={props.elementLayout}
-          />
-        {/each} -->
       {/if}
     </div>
-  </TreeListContainer>
+  </div>
 </div>
 
 <style></style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { first, map } from "rxjs";
+  import { first } from "rxjs";
   import type { ExObject } from "src/ex-object/ExObject";
   import MainContext from "src/main-context/MainContext";
   import ExObjectLayout from "src/utils/layout/ExObjectLayout";
@@ -38,19 +38,9 @@
       });
     };
   });
-
-  const xTranslation$ = elementLayout.onCalculated.pipe(
-    map((output) => {
-      // return output.totalWidth / 2;
-      return 0;
-    })
-  );
 </script>
 
-<div
-  class="{clazz} {Constants.WindowPaddingClass} w-max"
-  style:transform="translateX({$xTranslation$}px)"
->
+<div class="{clazz} {Constants.WindowPaddingClass} w-max">
   <TreeView {elementLayout} {ctx}>
     <div bind:this={element}>
       <ExObjectView {ctx} {exObject} {elementLayout} />

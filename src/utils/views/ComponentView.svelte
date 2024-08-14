@@ -1,7 +1,6 @@
 <script lang="ts">
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import MainContext from "src/main-context/MainContext";
-  import TreeListContainer from "src/utils/layout/TreeListContainer.svelte";
   import { RootExObjectViewFns } from "src/utils/utils/RootExObjectView";
   import { Constants } from "src/utils/utils/ViewUtils";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";

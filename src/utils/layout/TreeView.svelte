@@ -14,16 +14,11 @@
   let rootElement: HTMLElement;
   let canvasWidth: number;
   let canvasHeight: number;
-  let xTranslation = 0;
 
   elementLayout.onCalculated.subscribe((output) => {
     treeLayoutStyle = `left: 0px; width: ${output.totalWidth}px; height: ${output.totalHeight}px`;
     lines = output.lines;
     drawLines(canvas, output.lines);
-
-    // ctx.viewCtx.editorViewWidth$.pipe(first()).subscribe((width) => {
-    //   xTranslation = output.totalWidth / 2 - width / 2;
-    // });
   });
 
   onMount(() => {
@@ -52,12 +47,7 @@
   }
 </script>
 
-<div
-  class="relative w-max"
-  bind:this={rootElement}
-  style={treeLayoutStyle}
-  style:transform="translateX({xTranslation}px)"
->
+<div class="relative w-max" bind:this={rootElement} style={treeLayoutStyle}>
   <canvas
     bind:this={canvas}
     width={canvasWidth}
