@@ -9,11 +9,11 @@ import {
   Focus2Union,
   type EditPropertyNameFocus,
 } from "src/utils/utils/FocusManager";
-import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 import { EditorFocus } from "src/utils/utils/EditorFocus";
 import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentListFocus";
 import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
+import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusSCope";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -27,7 +27,7 @@ export default class Keyboard {
     ExObjectFocusFuncs.register(ctx);
     ExprFocusFuncs.register(ctx);
 
-    const notEditingScope = new KeyboardScope(
+    const notEditingScope = new FocusScope(
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
     );
 
@@ -58,7 +58,7 @@ export default class Keyboard {
       });
     });
 
-    const isCancelableScope = new KeyboardScope(
+    const isCancelableScope = new FocusScope(
       focusManager.getFocus$().pipe(
         map((focus) => {
           return FocusFns.isCancelable(focus);
@@ -69,7 +69,7 @@ export default class Keyboard {
       ctx.focusManager.popFocus();
     });
 
-    const projectNavScope = new KeyboardScope(
+    const projectNavScope = new FocusScope(
       FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ProjectNav)
     );
     projectNavScope.setChordPrefix("g");
@@ -97,7 +97,7 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    const libraryNavScope = new KeyboardScope(
+    const libraryNavScope = new FocusScope(
       FocusFns.isFocus2Focused$(ctx, Focus2Union.is.LibraryNav)
     );
     libraryNavScope.hotkeys("p", () => {
@@ -121,13 +121,13 @@ export default class Keyboard {
           focus.type !== "ExItem" ||
           focus.exItem.itemType !== ExItemType.Expr
         ) {
-          return KeyboardScopeResult.OutOfScope;
+          return FocusScopeResult.OutOfScope;
         }
         return focus.exItem;
       })
     );
 
-    const exprScope = new KeyboardScope(focusedExpr$);
+    const exprScope = new FocusScope(focusedExpr$);
     exprScope.hotkeys("e", (expr) => {
       ctx.focusManager.focusExprReplaceCommand(expr);
     });
@@ -137,10 +137,10 @@ export default class Keyboard {
         if (focus.type === "ExprReplaceCommand") {
           return focus;
         }
-        return KeyboardScopeResult.OutOfScope;
+        return FocusScopeResult.OutOfScope;
       })
     );
-    const exprReplaceCommandScope = new KeyboardScope(exprReplaceCommand$);
+    const exprReplaceCommandScope = new FocusScope(exprReplaceCommand$);
     exprReplaceCommandScope.hotkeys("Esc", (focus) => {
       ctx.focusManager.focusExItem(focus.expr);
     });
@@ -149,7 +149,7 @@ export default class Keyboard {
       ctx.eventBus.submitExprReplaceCommand$.next();
     });
 
-    const viewActionsScope = new KeyboardScope(
+    const viewActionsScope = new FocusScope(
       FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ViewActions)
     );
     viewActionsScope.hotkeys("m", () => {
@@ -170,7 +170,7 @@ export default class Keyboard {
       ctx.focusManager.popFocus();
     });
 
-    const propertyScope = new KeyboardScope(
+    const propertyScope = new FocusScope(
       ctx.focusManager.getFocus$().pipe(
         map((focus) => {
           if (
@@ -179,7 +179,7 @@ export default class Keyboard {
           ) {
             return focus.exItem;
           }
-          return KeyboardScopeResult.OutOfScope;
+          return FocusScopeResult.OutOfScope;
         })
       )
     );
@@ -191,7 +191,7 @@ export default class Keyboard {
       ctx.focusManager.focus(focus);
     });
 
-    const editableScope = new KeyboardScope(
+    const editableScope = new FocusScope(
       ctx.focusManager.getFocus$().pipe(
         map((focus) => {
           if (
@@ -201,7 +201,7 @@ export default class Keyboard {
           ) {
             return focus;
           }
-          return KeyboardScopeResult.OutOfScope;
+          return FocusScopeResult.OutOfScope;
         })
       )
     );

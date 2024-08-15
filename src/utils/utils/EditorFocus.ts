@@ -7,13 +7,13 @@ import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { FocusFns } from "src/utils/utils/Focus";
 import { Focus2Union } from "src/utils/utils/FocusManager";
-import { KeyboardScope } from "src/utils/utils/KeyboardScope";
 import { ArrayFns } from "./Utils";
+import { FocusScope } from "src/utils/utils/FocusSCope";
 
 export namespace EditorFocus {
   export function register(ctx: MainContext) {
     const focusManager = ctx.focusManager;
-    const editorScope = new KeyboardScope(
+    const editorScope = new FocusScope(
       ctx.viewCtx.activeWindow$.pipe(
         map((window) => window === DexWindow.ProjectEditor)
       )
@@ -43,7 +43,7 @@ export namespace EditorFocus {
       visible$: isNewActionsFocused$,
     });
 
-    const newActionsScope = new KeyboardScope(isNewActionsFocused$);
+    const newActionsScope = new FocusScope(isNewActionsFocused$);
     newActionsScope.hotkeys("p", () => {
       ctx.projectManager.addProjectNew();
       ctx.focusManager.popFocus();

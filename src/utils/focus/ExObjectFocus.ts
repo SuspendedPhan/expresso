@@ -12,6 +12,6 @@ export const ExObjectFocusKind = {
 
 export namespace ExObjectFocusFuncs {
     export async function register(_ctx: MainContext) {
-
+        // const exObjectScope = new FocusScope();
     }
 }

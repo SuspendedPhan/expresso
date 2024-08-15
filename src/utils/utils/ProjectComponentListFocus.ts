@@ -3,10 +3,10 @@ import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { Focus2Union, type Focus2Wrapper } from "src/utils/utils/FocusManager";
-import { KeyboardScope } from "src/utils/utils/KeyboardScope";
 import unionize, { ofType, type UnionOf } from "unionize";
 import { FocusFns, FocusKeys } from "./Focus";
 import type { CustomComponent } from "src/ex-object/Component";
+import { FocusScope } from "src/utils/utils/FocusSCope";
 
 export const ProjectComponentListFocusKind = unionize({
   NewActions: {},
@@ -21,7 +21,7 @@ export namespace ProjectComponentListFocusFns {
   export function register(ctx: MainContext) {
     const focusManager = ctx.focusManager;
 
-    const windowScope = new KeyboardScope(
+    const windowScope = new FocusScope(
       ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectComponentList)
     );
 
@@ -51,13 +51,13 @@ export namespace ProjectComponentListFocusFns {
       visible$: isNewActionsFocused$,
     });
 
-    const newActionsScope = new KeyboardScope(isNewActionsFocused$);
+    const newActionsScope = new FocusScope(isNewActionsFocused$);
     newActionsScope.hotkeys("c", () => {
       ctx.mutator.addBlankProjectComponent();
       ctx.focusManager.popFocus();
     });
 
-    const noneScope = new KeyboardScope(FocusFns.isNoneFocused$(ctx));
+    const noneScope = new FocusScope(FocusFns.isNoneFocused$(ctx));
     noneScope.hotkeys(FocusKeys.Down, async () => {
       // select first component
       const project = await firstValueFrom(ctx.projectManager.currentProject$);

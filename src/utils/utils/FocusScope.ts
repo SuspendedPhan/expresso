@@ -1,13 +1,13 @@
 import { first } from "rxjs";
 import type { OBS } from "./Utils";
 
-export enum KeyboardScopeResult {
+export enum FocusScopeResult {
   OutOfScope,
 }
 
-export class KeyboardScope<T> {
+export class FocusScope<T> {
   public constructor(
-    private readonly condition: OBS<T | KeyboardScopeResult.OutOfScope>
+    private readonly condition: OBS<T | FocusScopeResult.OutOfScope>
   ) {}
 
   public hotkeys(key: string, callback: (value: T) => void) {
@@ -18,7 +18,7 @@ export class KeyboardScope<T> {
       }
 
       this.condition.pipe(first()).subscribe((value) => {
-        if (value !== KeyboardScopeResult.OutOfScope && value !== false) {
+        if (value !== FocusScopeResult.OutOfScope && value !== false) {
           callback(value);
           event.stopPropagation();
           event.preventDefault();
