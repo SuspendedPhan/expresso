@@ -1,15 +1,16 @@
 <script lang="ts">
+  import { of } from "rxjs";
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
-  import SelectableView from "src/utils/utils/SelectableView.svelte";
+  import { FocusKind } from "src/utils/utils/Focus";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import Field from "src/utils/views/Field.svelte";
+  import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { of } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -20,6 +21,9 @@
   const basicProperties$ = exObject.basicProperties$;
   const children$ = exObject.children$;
 
+  const exObjectFocused$ = ctx.focusCtx.mapFocus$(
+    (focus) => FocusKind.is.ExObject(focus) && focus.exObject === exObject
+  );
   const exObjectName$ = exObject.name$;
   const exObjectNameFocused$ = of(false);
   const isEditingExObjectName$ = of(false);
@@ -33,7 +37,7 @@
 
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
-    <SelectableView {ctx} item={exObject} class="ex-card w-max flex flex-col">
+    <FocusView focused={$exObjectFocused$} class="ex-card w-max flex flex-col">
       <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
@@ -91,7 +95,7 @@
           >Add Child Object</ExObjectButton
         >
       </div>
-    </SelectableView>
+    </FocusView>
     {#if $children$}
       {#each $children$ as child (child.id)}
         <svelte:self {ctx} exObject={child} {elementLayout} />

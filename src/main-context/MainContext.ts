@@ -9,7 +9,7 @@ import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
-import { createFocusContext } from "src/utils/utils/Focus";
+import { createFocusContext, FocusFns } from "src/utils/utils/Focus";
 import type GoModule from "src/utils/utils/GoModule";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
@@ -34,6 +34,7 @@ export default class MainContext {
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
+    FocusFns.register(this);
 
     this.eventBus.exprReplaced$.subscribe((replacement) => {
       // @ts-ignore

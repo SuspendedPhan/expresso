@@ -3,7 +3,7 @@ import type MainContext from "src/main-context/MainContext";
 import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import { EditorFocusKind } from "src/utils/utils/EditorFocus";
+import { EditorFocusFuncs, EditorFocusKind } from "src/utils/utils/EditorFocus";
 import type { SUB } from "src/utils/utils/Utils";
 import unionize, { type UnionOf } from "unionize";
 
@@ -38,6 +38,11 @@ export function createFocusContext(_ctx: MainContext) {
   return {
     ...data,
 
+    popFocus() {
+      focusStack.pop();
+      data.focus$.next(focusStack[focusStack.length - 1] ?? FocusKind.None());
+    },
+
     mapFocus$<T>(mapperFn: (focus: Focus) => T) {
       return data.focus$.pipe(map(mapperFn));
     },
@@ -51,6 +56,7 @@ export function createFocusContext(_ctx: MainContext) {
 
 export namespace FocusFns {
   export function register(ctx: MainContext) {
+    EditorFocusFuncs.register(ctx);
     ExObjectFocusFuncs.register(ctx);
     ExprFocusFuncs.register(ctx);
 
