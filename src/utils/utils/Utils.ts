@@ -1,4 +1,4 @@
-import { BehaviorSubject, type Observable, Subject } from "rxjs";
+import { BehaviorSubject, type Observable, Subject, type UnaryFunction } from "rxjs";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -37,4 +37,8 @@ export namespace ArrayFns {
   export function getFromBack<T>(arr: T[], index: number): T | undefined{
     return arr[arr.length - 1 - index];
   }
+}
+
+export function mapPredicate<T>(predicate: (value: T) => boolean): UnaryFunction<T, boolean> {
+  return () => true;
 }

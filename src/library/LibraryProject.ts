@@ -9,7 +9,6 @@ import {
 import type { ExObject } from "src/ex-object/ExObject";
 import { CreateProject, type Project } from "src/ex-object/Project";
 import MainContext from "src/main-context/MainContext";
-import { Focus2Kind, type Focus } from "src/utils/utils/FocusManager";
 
 export interface LibraryProject {
   id: string;
@@ -28,7 +27,7 @@ export class ProjectManager {
     switchMap((libraryProject) => libraryProject.project$)
   );
 
-  public constructor(private readonly ctx: MainContext) {}
+  public constructor(private readonly _ctx: MainContext) {}
 
   public addProjectNew(): LibraryProject {
     // Get date/time with YYYY:MM:DD-HH:MM format
@@ -103,33 +102,5 @@ export class ProjectManager {
         return prevProject;
       })
     );
-  }
-
-  public navDown(focus: Focus) {
-    switch (focus.type) {
-      case "Focus2":
-        if (!Focus2Kind.is.None(focus.focus2)) {
-          return;
-        }
-
-        this.getFirstProject$()
-          .pipe(first())
-          .subscribe((project) => {
-            if (project === null) {
-              return;
-            }
-            this.ctx.focusManager.focusLibraryProject(project);
-          });
-        return;
-      case "LibraryProject":
-        this.getNextProject$(focus.project)
-          .pipe(first())
-          .subscribe((project) => {
-            this.ctx.focusManager.focusLibraryProject(project);
-          });
-        return;
-      default:
-        return;
-    }
   }
 }

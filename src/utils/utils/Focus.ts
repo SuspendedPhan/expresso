@@ -1,11 +1,10 @@
-import { map } from "rxjs";
+import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import { ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
-import { ExprFocusKind } from "src/utils/focus/ExprFocus";
+import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
+import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import { type Focus2, Focus2Kind } from "src/utils/utils/FocusManager";
 import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
-import type { OBS } from "src/utils/utils/Utils";
+import type { SUB } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
 export const FocusKind = unionize({
@@ -26,14 +25,38 @@ export enum FocusKeys {
   Down = "ArrowDown,s",
 }
 
-export namespace FocusFns {
-  export function register(_ctx: MainContext) {
-    document.addEventListener("keydown", async (event: KeyboardEvent) => {
-      // const isEditing = await firstValueFrom(ctx.focusManager.isEditing$);
-      // if (isEditing) {
-      //   return;
-      // }
+export interface FocusContextData {
+  focus$: SUB<Focus>;
+}
 
+export type FocusContext = ReturnType<typeof createFocusContext>;
+
+export function createFocusContext(_ctx: MainContext) {
+  const focusStack = new Array<Focus>();
+  const data = {
+    focus$: new BehaviorSubject<Focus>(FocusKind.None()),
+  };
+  return {
+    ...data,
+
+    mapFocus$<T>(mapperFn: (focus: Focus) => T) {
+      return data.focus$.pipe(map(mapperFn));
+    },
+
+    setFocus(focus: Focus) {
+      focusStack.push(focus);
+      data.focus$.next(focus);
+    },
+  };
+}
+
+export namespace FocusFns {
+  export function register(ctx: MainContext) {
+    ExObjectFocusFuncs.register(ctx);
+    ExprFocusFuncs.register(ctx);
+
+    document.addEventListener("keydown", async (event: KeyboardEvent) => {
+      // todp: handle input editing
       switch (event.key) {
         case "ArrowDown":
         case "ArrowUp":
@@ -43,32 +66,5 @@ export namespace FocusFns {
           break;
       }
     });
-  }
-
-  export function getFocus$(ctx: MainContext): OBS<Focus> {
-    return ctx.focusManager.getFocus$();
-  }
-
-  export function focus(ctx: MainContext, focus2: Focus2) {
-    ctx.focusManager.focus({ type: "Focus2", focus2 });
-  }
-
-  export function isFocus2Focused$(
-    ctx: MainContext,
-    predicate: (focus2: Focus2) => boolean
-  ): OBS<boolean> {
-    return ctx.focusManager.getFocus$().pipe(
-      map((focus) => {
-        return focus.type === "Focus2" && predicate(focus.focus2);
-      })
-    );
-  }
-
-  export function isNoneFocused$(ctx: MainContext): OBS<boolean> {
-    return ctx.focusManager.getFocus$().pipe(
-      map((focus) => {
-        return focus.type === "Focus2" && Focus2Kind.is.None(focus.focus2);
-      })
-    );
   }
 }

@@ -11,10 +11,10 @@ import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
 import type GoModule from "src/utils/utils/GoModule";
 import GoBridge from "../evaluation/GoBridge";
-import FocusManager from "../utils/utils/FocusManager";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
+import { createFocusContext } from "src/utils/utils/Focus";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -27,7 +27,7 @@ export default class MainContext {
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
-  public readonly focusManager = new FocusManager(this);
+  public readonly focusCtx = createFocusContext(this);
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
 
