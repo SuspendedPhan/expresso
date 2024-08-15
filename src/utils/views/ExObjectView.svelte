@@ -74,7 +74,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-4">
-        <ExObjectHeaderView>Component Arguments</ExObjectHeaderView>
+        <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           <PropertyView {ctx} property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}

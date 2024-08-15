@@ -12,6 +12,7 @@ import {
 import { KeyboardScope, KeyboardScopeResult } from "./KeyboardScope";
 import { EditorFocus } from "src/utils/utils/EditorFocus";
 import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentListFocus";
+import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -22,6 +23,7 @@ export default class Keyboard {
 
     EditorFocus.register(ctx);
     ProjectComponentListFocusFns.register(ctx);
+    ExObjectFocusFuncs.register(ctx);
 
     const notEditingScope = new KeyboardScope(
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
