@@ -21,13 +21,12 @@ import { ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import { ExObjectFocus, FocusBase } from "src/utils/utils/Focus";
+import { ExObjectFocus, FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
 import { assertUnreachable } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
 export type Focus =
-  | ExItemFocus
   | LibraryProjectFocus
   | ExprReplaceCommandFocus
   | EditPropertyNameFocus
@@ -51,11 +50,6 @@ export type Focus2 = UnionOf<typeof Focus2Kind>;
 export interface Focus2Wrapper {
   type: "Focus2";
   focus2: Focus2;
-}
-
-export interface ExItemFocus {
-  type: "ExItem";
-  exItem: ExItem;
 }
 
 export interface LibraryProjectFocus {
@@ -115,15 +109,18 @@ export default class FocusManager {
     return this.focus$;
   }
 
-  public isSelected$(object: ExItem): Observable<boolean> {
-    return this.focus$.pipe(
-      map((focus) => {
-        if (focus.type !== "ExItem") {
-          return false;
-        }
-        return focus.exItem === object;
-      })
-    );
+  public isSelected$(exItem: ExItem): Observable<boolean> {
+    return FocusFns.isFocus2Focused$(this.ctx, (focus2) => {
+      return Focus2Kind.match(focus2, {
+        ExObject: ({ exObject }) => {
+          return exObject === exItem;
+        },
+        Property: ({ property }) => {
+          return property === exItem;
+        },
+        default: () => false,
+      });
+    });
   }
 
   public focus(focus: Focus) {
@@ -179,11 +176,6 @@ export default class FocusManager {
     }
 
     switch (focus.type) {
-      case "Focus2":
-        if (Focus2Kind.is.None(focus.focus2)) {
-          this.downNone();
-        }
-        return;
       case "ExItem":
         this.downExItem(focus.exItem);
         return;
@@ -217,18 +209,6 @@ export default class FocusManager {
         })
       );
     }
-  }
-
-  private async downNone() {
-    const project = await firstValueFrom(
-      this.ctx.projectManager.currentProject$
-    );
-    const objs = await firstValueFrom(project.rootExObjects$);
-    const obj = objs[0];
-    if (obj === undefined) {
-      return;
-    }
-    this.focus(FocusManager.createExItemFocus(obj));
   }
 
   private downExItem(focus: ExItem) {

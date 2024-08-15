@@ -27,6 +27,10 @@ export class FocusBase {
 }
 
 export namespace FocusFns {
+  export function getFocus$(ctx: MainContext): OBS<Focus> {
+    return ctx.focusManager.getFocus$();
+  }
+
   export function focus(ctx: MainContext, focus2: Focus2) {
     ctx.focusManager.focus({ type: "Focus2", focus2 });
   }
