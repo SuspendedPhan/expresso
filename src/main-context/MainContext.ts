@@ -1,4 +1,5 @@
 import { first, Subject, switchMap } from "rxjs";
+import type { Expr } from "src/ex-object/ExItem";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import {
   type LibraryProject,
@@ -14,7 +15,6 @@ import FocusManager from "../utils/utils/FocusManager";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
-import type { Expr } from "src/ex-object/ExItem";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -36,19 +36,19 @@ export default class MainContext {
     this.mutator = new MainMutator(this);
 
     this.eventBus.exprReplaced$.subscribe((replacement) => {
+      // @ts-ignore
       const oldExpr = replacement.oldExpr;
+      // @ts-ignore
       const newExpr = replacement.newExpr;
       this.focusManager
         .getFocus$()
         .pipe(first())
         .subscribe((focus) => {
-          if (focus.type !== "ExItem") {
+          if (focus.type !== "Focus2") {
             return;
           }
 
-          if (focus.exItem === oldExpr) {
-            this.focusManager.focusExItem(newExpr);
-          }
+          console.error("fix this");
         });
     });
 

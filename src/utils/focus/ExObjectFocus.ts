@@ -4,7 +4,7 @@ import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { FocusFns, FocusKeys } from "src/utils/utils/Focus";
 import { Focus2Kind } from "src/utils/utils/FocusManager";
-import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusSCope";
+import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusScope";
 import { ofType } from "unionize";
 
 export const ExObjectFocusKind = {
@@ -16,6 +16,10 @@ export const ExObjectFocusKind = {
 
 export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
+    FocusFns.getFocus$(ctx).subscribe((focus) => {
+      console.log("focus", focus);
+    });
+
     const noneScope = new FocusScope(FocusFns.isNoneFocused$(ctx));
     noneScope.hotkeys(FocusKeys.Down, async () => {
       console.log("noneScope");

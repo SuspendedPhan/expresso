@@ -11,7 +11,7 @@
 
   function handleClick(event: MouseEvent) {
     event.stopPropagation();
-    ctx.focusManager.focusExItem(item);
+    console.error("fix this");
   }
 </script>
 

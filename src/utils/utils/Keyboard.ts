@@ -1,19 +1,17 @@
 import hotkeys from "hotkeys-js";
 import { firstValueFrom, map } from "rxjs";
-import { ExItemType } from "src/ex-object/ExItem";
 import MainContext from "src/main-context/MainContext";
-import { ViewMode, DexWindow } from "src/main-context/MainViewContext";
+import { DexWindow, ViewMode } from "src/main-context/MainViewContext";
+import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
+import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
+import { EditorFocus } from "src/utils/utils/EditorFocus";
 import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
 import {
-  Focus2Kind,
-  type EditPropertyNameFocus,
+  Focus2Kind
 } from "src/utils/utils/FocusManager";
-import { EditorFocus } from "src/utils/utils/EditorFocus";
+import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusScope";
 import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentListFocus";
-import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
-import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
-import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusSCope";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -30,22 +28,6 @@ export default class Keyboard {
     const notEditingScope = new FocusScope(
       focusManager.isEditing$.pipe(map((isEditing) => !isEditing))
     );
-
-    notEditingScope.hotkeys("ArrowDown,s", () => {
-      focusManager.down$.next();
-    });
-
-    notEditingScope.hotkeys("ArrowUp,w", () => {
-      focusManager.up$.next();
-    });
-
-    notEditingScope.hotkeys("ArrowLeft,a", () => {
-      focusManager.left();
-    });
-
-    notEditingScope.hotkeys("ArrowRight,d", () => {
-      focusManager.right();
-    });
 
     notEditingScope.hotkeys("g", () => {
       focusManager.focusProjectNav();
@@ -115,40 +97,6 @@ export default class Keyboard {
       ctx.focusManager.focusNone();
     });
 
-    const focusedExpr$ = ctx.focusManager.getFocus$().pipe(
-      map((focus) => {
-        if (
-          focus.type !== "ExItem" ||
-          focus.exItem.itemType !== ExItemType.Expr
-        ) {
-          return FocusScopeResult.OutOfScope;
-        }
-        return focus.exItem;
-      })
-    );
-
-    const exprScope = new FocusScope(focusedExpr$);
-    exprScope.hotkeys("e", (expr) => {
-      ctx.focusManager.focusExprReplaceCommand(expr);
-    });
-
-    const exprReplaceCommand$ = ctx.focusManager.getFocus$().pipe(
-      map((focus) => {
-        if (focus.type === "ExprReplaceCommand") {
-          return focus;
-        }
-        return FocusScopeResult.OutOfScope;
-      })
-    );
-    const exprReplaceCommandScope = new FocusScope(exprReplaceCommand$);
-    exprReplaceCommandScope.hotkeys("Esc", (focus) => {
-      ctx.focusManager.focusExItem(focus.expr);
-    });
-
-    exprReplaceCommandScope.hotkeys("Enter", () => {
-      ctx.eventBus.submitExprReplaceCommand$.next();
-    });
-
     const viewActionsScope = new FocusScope(
       FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.ViewActions)
     );
@@ -170,26 +118,6 @@ export default class Keyboard {
       ctx.focusManager.popFocus();
     });
 
-    const propertyScope = new FocusScope(
-      ctx.focusManager.getFocus$().pipe(
-        map((focus) => {
-          if (
-            focus.type === "ExItem" &&
-            focus.exItem.itemType === ExItemType.Property
-          ) {
-            return focus.exItem;
-          }
-          return FocusScopeResult.OutOfScope;
-        })
-      )
-    );
-    propertyScope.hotkeys("e", (property) => {
-      const focus: EditPropertyNameFocus = {
-        type: "EditPropertyName",
-        property,
-      };
-      ctx.focusManager.focus(focus);
-    });
 
     const editableScope = new FocusScope(
       ctx.focusManager.getFocus$().pipe(

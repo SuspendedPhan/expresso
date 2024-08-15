@@ -1,14 +1,12 @@
 import assert from "assert-ts";
-import { map, firstValueFrom } from "rxjs";
-import { ExItemType } from "src/ex-object/ExItem";
-import { ExObjectFns } from "src/ex-object/ExObject";
+import { firstValueFrom, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { FocusFns } from "src/utils/utils/Focus";
 import { Focus2Kind } from "src/utils/utils/FocusManager";
+import { FocusScope } from "src/utils/utils/FocusScope";
 import { ArrayFns } from "./Utils";
-import { FocusScope } from "src/utils/utils/FocusSCope";
 
 export namespace EditorFocus {
   export function register(ctx: MainContext) {
@@ -62,14 +60,9 @@ export namespace EditorFocus {
       const focus = ArrayFns.getFromBack(focusManager.focusStack, 1);
       assert(focus !== undefined);
       
-      if (focus.type !== "ExItem") {
-        return;
-      }
-      if (focus.exItem.itemType !== ExItemType.ExObject) {
-        return;
-      }
-
-      ExObjectFns.addChildBlank(ctx, focus.exItem);
+      console.error("fix this");
+      
+      // ExObjectFns.addChildBlank(ctx, focus.exItem);
       ctx.focusManager.popFocus();
     });
   }

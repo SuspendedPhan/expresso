@@ -2,7 +2,7 @@ import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import {
-  Focus2Kind as Focus2Kind,
+  Focus2Kind,
   type Focus,
   type Focus2,
 } from "src/utils/utils/FocusManager";
@@ -13,18 +13,6 @@ export enum FocusKeys {
   Down = "ArrowDown,s",
 }
 
-export class FocusBase {
-  public type = typeof this;
-  public isEditing = false;
-  public startEditing: ((ctx: MainContext) => void) | null = null;
-  public get isEditable() {
-    return this.startEditing !== null;
-  }
-
-  public get isCancelable() {
-    return this.isEditing;
-  }
-}
 
 export namespace FocusFns {
   export function getFocus$(ctx: MainContext): OBS<Focus> {
@@ -32,6 +20,8 @@ export namespace FocusFns {
   }
 
   export function focus(ctx: MainContext, focus2: Focus2) {
+    // console.error("focus.ts", focus2);
+    
     ctx.focusManager.focus({ type: "Focus2", focus2 });
   }
 
@@ -82,6 +72,19 @@ export namespace FocusFns {
   }
 }
 
+// ---------------------------------------------------------------
+export class FocusBase {
+  public type = typeof this;
+  public isEditing = false;
+  public startEditing: ((ctx: MainContext) => void) | null = null;
+  public get isEditable() {
+    return this.startEditing !== null;
+  }
+
+  public get isCancelable() {
+    return this.isEditing;
+  }
+}
 export namespace ExObjectFocus {
   export interface Data {
     exObject: ExObject;

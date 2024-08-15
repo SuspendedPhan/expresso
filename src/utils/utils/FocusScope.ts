@@ -11,14 +11,21 @@ export class FocusScope<T> {
   ) {}
 
   public hotkeys(key: string, callback: (value: T) => void) {
+    const trace: any = {};
+    Error.captureStackTrace(trace);
+    
+
     window.addEventListener("keydown", (event) => {
       const keys = key.split(",");
       if (!keys.includes(event.key)) {
         return;
       }
 
+
       this.condition.pipe(first()).subscribe((value) => {
         if (value !== FocusScopeResult.OutOfScope && value !== false) {
+          console.log(trace.stack);
+
           callback(value);
           event.stopPropagation();
           event.preventDefault();

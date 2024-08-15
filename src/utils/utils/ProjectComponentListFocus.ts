@@ -1,12 +1,11 @@
-import { firstValueFrom, map } from "rxjs";
+import { map } from "rxjs";
+import type { CustomComponent } from "src/ex-object/Component";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { Focus2Kind, type Focus2Wrapper } from "src/utils/utils/FocusManager";
+import { FocusScope } from "src/utils/utils/FocusScope";
 import unionize, { ofType, type UnionOf } from "unionize";
-import { FocusFns, FocusKeys } from "./Focus";
-import type { CustomComponent } from "src/ex-object/Component";
-import { FocusScope } from "src/utils/utils/FocusSCope";
 
 export const ProjectComponentListFocusKind = unionize({
   NewActions: {},
@@ -57,20 +56,20 @@ export namespace ProjectComponentListFocusFns {
       ctx.focusManager.popFocus();
     });
 
-    const noneScope = new FocusScope(FocusFns.isNoneFocused$(ctx));
-    noneScope.hotkeys(FocusKeys.Down, async () => {
-      // select first component
-      const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const componentArr = await firstValueFrom(project.componentArr$);
-      const component = componentArr[0];
-      if (component === undefined) {
-        return;
-      }
+    // const noneScope = new FocusScope(FocusFns.isNoneFocused$(ctx));
+    // noneScope.hotkeys(FocusKeys.Down, async () => {
+    //   // select first component
+    //   const project = await firstValueFrom(ctx.projectManager.currentProject$);
+    //   const componentArr = await firstValueFrom(project.componentArr$);
+    //   const component = componentArr[0];
+    //   if (component === undefined) {
+    //     return;
+    //   }
 
-      const focus = Focus2Kind.ProjectComponentList({
-        pclFocus: ProjectComponentListFocusKind.Component({ component }),
-      });
-      FocusFns.focus(ctx, focus);
-    });
+    //   const focus = Focus2Kind.ProjectComponentList({
+    //     pclFocus: ProjectComponentListFocusKind.Component({ component }),
+    //   });
+    //   FocusFns.focus(ctx, focus);
+    // });
   }
 }

@@ -1,4 +1,3 @@
-import assert from "assert-ts";
 import {
   BehaviorSubject,
   first,
@@ -9,11 +8,9 @@ import {
 } from "rxjs";
 import {
   type ExItem,
-  ExItemType,
-  type Expr,
-  ExprType,
+  type Expr
 } from "src/ex-object/ExItem";
-import { type Property, PropertyType } from "src/ex-object/Property";
+import { type Property } from "src/ex-object/Property";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
@@ -21,9 +18,8 @@ import { ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import { ExObjectFocus, FocusBase, FocusFns } from "src/utils/utils/Focus";
+import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
-import { assertUnreachable } from "src/utils/utils/Utils";
 import unionize, { ofType, type UnionOf } from "unionize";
 
 export type Focus =
@@ -132,10 +128,6 @@ export default class FocusManager {
     this.focus({ type: "Focus2", focus2: Focus2Kind.None() });
   }
 
-  public focusExItem(exItem: ExItem) {
-    this.focus(FocusManager.createExItemFocus(exItem));
-  }
-
   public focusProjectNav() {
     this.focus({ type: "Focus2", focus2: Focus2Kind.ProjectNav() });
   }
@@ -167,6 +159,10 @@ export default class FocusManager {
     }
   }
 
+  public focusExItem(_exItem: ExItem) {
+    console.error("focusExItem not implemented");
+  }
+
   @loggedMethod
   private async down(focus: Focus) {
     const activeWindow = await firstValueFrom(this.ctx.viewCtx.activeWindow$);
@@ -174,92 +170,32 @@ export default class FocusManager {
       this.ctx.projectManager.navDown(focus);
       return;
     }
-
-    switch (focus.type) {
-      case "ExItem":
-        this.downExItem(focus.exItem);
-        return;
-      default:
-        this.downMisc(focus);
-        return;
-    }
   }
 
-  private async downMisc(focus: Focus) {
-    if (focus instanceof ExObjectFocus.Name) {
-      this.focus(
-        new ExObjectFocus.Component({
-          exObject: focus.exObject,
-          isEditing: false,
-        })
-      );
-    } else if (focus instanceof ExObjectFocus.Component) {
-      this.focusExItem(focus.exObject.cloneCountProperty);
-    }
-  }
-
-  private async upMisc(focus: Focus) {
-    if (focus instanceof ExObjectFocus.Name) {
-      this.focusExItem(focus.exObject);
-    } else if (focus instanceof ExObjectFocus.Component) {
-      this.focus(
-        new ExObjectFocus.Name({
-          exObject: focus.exObject,
-          isEditing: false,
-        })
-      );
-    }
-  }
-
-  private downExItem(focus: ExItem) {
-    switch (focus.itemType) {
-      case ExItemType.ExObject:
-        this.focus(
-          new ExObjectFocus.Name({
-            exObject: focus,
-            isEditing: false,
-          })
-        );
-        return;
-      case ExItemType.Property:
-        focus.expr$.pipe(first()).subscribe((expr) => {
-          this.focus(FocusManager.createExItemFocus(expr));
-        });
-        return;
-      case ExItemType.Expr:
-        this.downExpr(focus);
-        return;
-      default:
-        assertUnreachable(focus);
-    }
-  }
-
-  @loggedMethod
-  private downExpr(selectedObject: Expr) {
-    switch (selectedObject.exprType) {
-      case ExprType.NumberExpr:
-        return;
-      case ExprType.CallExpr:
-        const args$ = selectedObject.args$;
-        args$.pipe(first()).subscribe((args) => {
-          const arg = args[0];
-          if (arg === undefined) {
-            throw new Error("CallExpr must have at least 1 args");
-          }
-          this.focus(FocusManager.createExItemFocus(arg));
-        });
-        return;
-      default:
-        assertUnreachable(selectedObject);
-    }
-  }
+  // @loggedMethod
+  // // @ts-ignore
+  // private downExpr(selectedObject: Expr) {
+  //   switch (selectedObject.exprType) {
+  //     case ExprType.NumberExpr:
+  //       return;
+  //     case ExprType.CallExpr:
+  //       const args$ = selectedObject.args$;
+  //       args$.pipe(first()).subscribe((args) => {
+  //         const arg = args[0];
+  //         if (arg === undefined) {
+  //           throw new Error("CallExpr must have at least 1 args");
+  //         }
+  //         this.focus(FocusManager.createExItemFocus(arg));
+  //       });
+  //       return;
+  //     default:
+  //       assertUnreachable(selectedObject);
+  //   }
+  // }
 
   @loggedMethod
   private up(focus: Focus) {
     switch (focus.type) {
-      case "ExItem":
-        this.upExItem(focus.exItem);
-        return;
       case "LibraryProject":
         this.ctx.projectManager
           .getPrevProject$(focus.project)
@@ -272,121 +208,121 @@ export default class FocusManager {
           });
         return;
       default:
-        this.upMisc(focus);
         return;
     }
   }
 
-  private async upExItem(focus: ExItem) {
-    const parent = await firstValueFrom(focus.parent$);
-    if (
-      focus.itemType === ExItemType.Property &&
-      focus.propertyType === PropertyType.CloneCountProperty
-    ) {
-      assert(parent !== null, "parent is null");
-      assert(parent.itemType === ExItemType.ExObject, "parent is not ExObject");
-      this.focus(
-        new ExObjectFocus.Component({ exObject: parent, isEditing: false })
-      );
-      return;
-    }
+  // // @ts-ignore
+  // private async upExItem(focus: ExItem) {
+  //   const parent = await firstValueFrom(focus.parent$);
+  //   if (
+  //     focus.itemType === ExItemType.Property &&
+  //     focus.propertyType === PropertyType.CloneCountProperty
+  //   ) {
+  //     assert(parent !== null, "parent is null");
+  //     assert(parent.itemType === ExItemType.ExObject, "parent is not ExObject");
+  //     this.focus(
+  //       new ExObjectFocus.Component({ exObject: parent, isEditing: false })
+  //     );
+  //     return;
+  //   }
 
-    const parent$ = focus.parent$;
-    parent$.pipe(first()).subscribe((parent) => {
-      if (parent !== null) {
-        this.focus(FocusManager.createExItemFocus(parent));
-      }
-    });
-  }
+  //   const parent$ = focus.parent$;
+  //   parent$.pipe(first()).subscribe((parent) => {
+  //     if (parent !== null) {
+  //       this.focus(FocusManager.createExItemFocus(parent));
+  //     }
+  //   });
+  // }
 
-  public left() {
-    this.navHorizontal((exItem: ExItem, args: readonly Expr[]) => {
-      const index = args.indexOf(exItem as Expr);
-      if (index === -1) {
-        throw new Error("selectedObject is not in args");
-      }
+  // public left() {
+  //   this.navHorizontal((exItem: ExItem, args: readonly Expr[]) => {
+  //     const index = args.indexOf(exItem as Expr);
+  //     if (index === -1) {
+  //       throw new Error("selectedObject is not in args");
+  //     }
 
-      if (index === args.length - 1) {
-        const arg = args[0];
-        if (arg === undefined) {
-          throw new Error("Index error trying to select first arg");
-        }
-        this.focus(FocusManager.createExItemFocus(arg));
-      } else {
-        const arg = args[index + 1];
-        if (arg === undefined) {
-          throw new Error("Index error trying to select next arg");
-        }
-        this.focus(FocusManager.createExItemFocus(arg));
-      }
-    });
-  }
+  //     if (index === args.length - 1) {
+  //       const arg = args[0];
+  //       if (arg === undefined) {
+  //         throw new Error("Index error trying to select first arg");
+  //       }
+  //       this.focus(FocusManager.createExItemFocus(arg));
+  //     } else {
+  //       const arg = args[index + 1];
+  //       if (arg === undefined) {
+  //         throw new Error("Index error trying to select next arg");
+  //       }
+  //       this.focus(FocusManager.createExItemFocus(arg));
+  //     }
+  //   });
+  // }
 
-  public right() {
-    this.navHorizontal((focus: ExItem, args: readonly Expr[]) => {
-      const index = args.indexOf(focus as Expr);
-      if (index === -1) {
-        throw new Error("selectedObject is not in args");
-      }
+  // public right() {
+  //   this.navHorizontal((focus: ExItem, args: readonly Expr[]) => {
+  //     const index = args.indexOf(focus as Expr);
+  //     if (index === -1) {
+  //       throw new Error("selectedObject is not in args");
+  //     }
 
-      if (index === args.length - 1) {
-        const arg = args[0];
-        if (arg === undefined) {
-          throw new Error("Index error trying to select first arg");
-        }
-        this.focus(FocusManager.createExItemFocus(arg));
-      } else {
-        const arg = args[index + 1];
-        if (arg === undefined) {
-          throw new Error("Index error trying to select next arg");
-        }
-        this.focus(FocusManager.createExItemFocus(arg));
-      }
-    });
-  }
+  //     if (index === args.length - 1) {
+  //       const arg = args[0];
+  //       if (arg === undefined) {
+  //         throw new Error("Index error trying to select first arg");
+  //       }
+  //       this.focus(FocusManager.createExItemFocus(arg));
+  //     } else {
+  //       const arg = args[index + 1];
+  //       if (arg === undefined) {
+  //         throw new Error("Index error trying to select next arg");
+  //       }
+  //       this.focus(FocusManager.createExItemFocus(arg));
+  //     }
+  //   });
+  // }
 
-  private navHorizontal(
-    navHorizontal1: (focus: ExItem, args: readonly Expr[]) => void
-  ) {
-    this.focus$.pipe(first()).subscribe((focus) => {
-      switch (focus.type) {
-        case "ExItem":
-          this.navHorizontalExItem(focus, navHorizontal1);
-          return;
-        default:
-          return;
-      }
-    });
-  }
-  navHorizontalExItem(
-    focus: ExItemFocus,
-    navHorizontal1: (focus: ExItem, args: readonly Expr[]) => void
-  ) {
-    const exItem = focus.exItem;
-    exItem.parent$.pipe(first()).subscribe((parent) => {
-      if (parent === null) {
-        return;
-      }
+  // private navHorizontal(
+  //   navHorizontal1: (focus: ExItem, args: readonly Expr[]) => void
+  // ) {
+    // this.focus$.pipe(first()).subscribe((focus) => {
+    //   switch (focus.type) {
+    //     case "ExItem":
+    //       this.navHorizontalExItem(focus, navHorizontal1);
+    //       return;
+    //     default:
+    //       return;
+    //   }
+    // });
+  // }
+  // navHorizontalExItem(
+  //   focus: ExItemFocus,
+  //   navHorizontal1: (focus: ExItem, args: readonly Expr[]) => void
+  // ) {
+  //   const exItem = focus.exItem;
+  //   exItem.parent$.pipe(first()).subscribe((parent) => {
+  //     if (parent === null) {
+  //       return;
+  //     }
 
-      if (parent.itemType !== ExItemType.Expr) {
-        return;
-      }
+  //     if (parent.itemType !== ExItemType.Expr) {
+  //       return;
+  //     }
 
-      if (parent.exprType !== ExprType.CallExpr) {
-        return;
-      }
+  //     if (parent.exprType !== ExprType.CallExpr) {
+  //       return;
+  //     }
 
-      const args$ = parent.args$;
-      args$.pipe(first()).subscribe((args) => {
-        navHorizontal1(exItem, args);
-      });
-    });
-  }
+  //     const args$ = parent.args$;
+  //     args$.pipe(first()).subscribe((args) => {
+  //       navHorizontal1(exItem, args);
+  //     });
+  //   });
+  // }
 
-  public static createExItemFocus(exItem: ExItem): ExItemFocus {
-    return {
-      type: "ExItem",
-      exItem,
-    };
-  }
+  // public static createExItemFocus(exItem: ExItem): ExItemFocus {
+  //   return {
+  //     type: "ExItem",
+  //     exItem,
+  //   };
+  // }
 }
