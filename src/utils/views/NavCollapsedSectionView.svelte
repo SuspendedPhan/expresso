@@ -1,16 +1,14 @@
 <script lang="ts">
+  import { of } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { type NavSection } from "../utils/Nav";
   import NavCollapsedItemView from "./NavCollapsedItemView.svelte";
-  import { map } from "rxjs";
 
   export let ctx: MainContext;
   export let section: NavSection;
 
-  const focused$ = section.focused$;
-  const showL$ = ctx.viewCtx.navSections[0]?.focused$.pipe(
-    map((f) => f && section === ctx.viewCtx.navSections[1])
-  );
+  const focused$ = of(false);
+  const showL$ = of(false);
 </script>
 
 <div class="indicator">

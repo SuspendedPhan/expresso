@@ -1,10 +1,9 @@
 import { DexWindow } from "src/main-context/MainViewContext";
-import type { OBS } from "./Utils";
 
 export interface NavSection {
     readonly title: string;
     readonly navItems: readonly NavItem[];
-    readonly focused$: OBS<boolean>;
+    // readonly focused$: OBS<boolean>;
 }
 
 export interface NavItem {

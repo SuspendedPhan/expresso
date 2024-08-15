@@ -1,8 +1,7 @@
 <script lang="ts">
+  import { of } from "rxjs";
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusFns } from "src/utils/utils/Focus";
-  import { Focus2Kind } from "src/utils/utils/FocusManager";
   import Divider from "src/utils/views/Divider.svelte";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
@@ -11,31 +10,20 @@
   export let ctx: MainContext;
   export let component: CustomComponent;
 
-  const isComponentFocused$ = FocusFns.isFocus2Focused$(ctx, (focus2) => {
-    return Focus2Kind.is.Component(focus2) && focus2.component === component;
-  });
+  const isComponentFocused$ = of(false);
 
   const name$ = ComponentFns.getName$(component);
-  const isNameFocused$ = FocusFns.isFocus2Focused$(
-    ctx,
-    Focus2Kind.is.ComponentName
-  );
-  const isEditingName$ = FocusFns.isFocus2Focused$(ctx, (focus2) => {
-    return Focus2Kind.is.ComponentName(focus2) && focus2.isEditing;
-  });
+  const isNameFocused$ = of(false);
+  const isEditingName$ = of(false);
   const rootExObjects$ = component.rootExObjects$;
 
   function addExObject() {
     ComponentFns.addRootExObjectBlank(ctx, component);
   }
 
-  function handleMouseDown() {
-    FocusFns.focus(ctx, Focus2Kind.Component({ component }));
-  }
+  function handleMouseDown() {}
 
-  function handleMouseDownName() {
-    FocusFns.focus(ctx, Focus2Kind.ComponentName({ isEditing: false }));
-  }
+  function handleMouseDownName() {}
 </script>
 
 <FlexContainer class="ex-card">

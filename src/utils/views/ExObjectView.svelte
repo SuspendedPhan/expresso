@@ -2,7 +2,6 @@
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
-  import { ExObjectFocus } from "src/utils/utils/Focus";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
@@ -10,6 +9,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { of } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -21,31 +21,14 @@
   const children$ = exObject.children$;
 
   const exObjectName$ = exObject.name$;
-  const exObjectNameFocused$ = ExObjectFocus.Name.isFocused$(ctx, exObject);
-  const isEditingExObjectName$ = ExObjectFocus.Name.isEditing$(ctx, exObject);
+  const exObjectNameFocused$ = of(false);
+  const isEditingExObjectName$ = of(false);
   const componentName$ = ComponentFns.getName$(exObject.component);
-  const componentNameFocused$ = ExObjectFocus.Component.isFocused$(
-    ctx,
-    exObject
-  );
+  const componentNameFocused$ = of(false);
 
-  function handleClickExObjectName() {
-    ctx.focusManager.focus(
-      new ExObjectFocus.Name({
-        exObject,
-        isEditing: false,
-      })
-    );
-  }
+  function handleClickExObjectName() {}
 
-  function handleClickComponentName() {
-    ctx.focusManager.focus(
-      new ExObjectFocus.Component({
-        exObject,
-        isEditing: false,
-      })
-    );
-  }
+  function handleClickComponentName() {}
 </script>
 
 <NodeView elementKey={exObject.id} {elementLayout}>

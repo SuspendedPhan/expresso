@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { map } from "rxjs";
+  import { map, of } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { type NavItem } from "../utils/Nav";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
@@ -9,7 +9,7 @@
   const isActive$ = ctx.viewCtx.activeWindow$.pipe(
     map((w) => w === item.window)
   );
-  const sectionFocused$ = item.section.focused$;
+  const sectionFocused$ = of(false);
 
   function handleClick() {
     ctx.viewCtx.activeWindow$.next(item.window);

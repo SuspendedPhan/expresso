@@ -1,10 +1,6 @@
-import { BehaviorSubject, firstValueFrom } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import type { OBS, SUB } from "src/utils/utils/Utils";
-
-export interface CommandCardContext {
-  commandCards$: SUB<CommandCardData[]>;
-}
+import type { OBS } from "src/utils/utils/Utils";
 
 export interface CommandCardData {
   title: string;
@@ -12,17 +8,21 @@ export interface CommandCardData {
   visible$: OBS<boolean>;
 }
 
-export namespace CommandCardFns {
-  export function createContext(_ctx: MainContext): CommandCardContext {
-    return {
-      commandCards$: new BehaviorSubject<CommandCardData[]>([]),
-    };
-  }
+export type CommandCardContext = ReturnType<typeof createCommandCardContext>;
 
-  export async function add(ctx: MainContext, data: CommandCardData) {
-    const ccCtx = ctx.viewCtx.commandCardCtx;
-    const commandCards = await firstValueFrom(ccCtx.commandCards$);
-    commandCards.push(data);
-    ccCtx.commandCards$.next(commandCards);
-  }
+export function createCommandCardContext(_ctx: MainContext) {
+  const props = {
+    commandCards$: new BehaviorSubject<CommandCardData[]>([]),
+  };
+  
+  return {
+    ...props,
+    
+    async addCommandCard(data: CommandCardData) {
+      const { commandCards$ } = props;
+      const commandCards = commandCards$.value;
+      commandCards.push(data);
+      commandCards$.next(commandCards);
+    },
+  };
 }

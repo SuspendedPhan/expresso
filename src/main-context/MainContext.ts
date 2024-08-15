@@ -1,4 +1,4 @@
-import { first, Subject, switchMap } from "rxjs";
+import { Subject, switchMap } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import {
@@ -9,12 +9,12 @@ import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
+import { createFocusContext } from "src/utils/utils/Focus";
 import type GoModule from "src/utils/utils/GoModule";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
-import { createFocusContext } from "src/utils/utils/Focus";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -40,16 +40,16 @@ export default class MainContext {
       const oldExpr = replacement.oldExpr;
       // @ts-ignore
       const newExpr = replacement.newExpr;
-      this.focusManager
-        .getFocus$()
-        .pipe(first())
-        .subscribe((focus) => {
-          if (focus.type !== "Focus2") {
-            return;
-          }
+      // this.focusManager
+      //   .getFocus$()
+      //   .pipe(first())
+      //   .subscribe((focus) => {
+      //     if (focus.type !== "Focus2") {
+      //       return;
+      //     }
 
-          console.error("fix this");
-        });
+      //     console.error("fix this");
+      //   });
     });
 
     Persistence.readProject$.subscribe(async (deProject) => {

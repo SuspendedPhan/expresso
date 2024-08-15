@@ -2,11 +2,12 @@
   import MainContext from "src/main-context/MainContext";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
+  import { of } from "rxjs";
 
   export let ctx: MainContext;
 
   const navCollapsed$ = ctx.viewCtx.navCollapsed$;
-  const projectNavFocused$ = ctx.viewCtx.navSections[0]?.focused$;
+  const projectNavFocused$ = of(false);
 
   function toggleNav() {
     ctx.viewCtx.navCollapsed$.next(!ctx.viewCtx.navCollapsed$.value);

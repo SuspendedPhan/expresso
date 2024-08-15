@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  // import { NumberExpr, PrimitiveFunctionCallExpr, type Expr } from "./Domain";
   import { BehaviorSubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import type { Expr } from "src/ex-object/ExItem";
@@ -15,10 +14,10 @@
       const text = input.value;
       const value = parseFloat(text);
       if (!isNaN(value)) {
-        ctx.focusManager.focusExItem(expr);
+        // ctx.focusManager.focusExItem(expr);
         ctx.mutator.replaceWithNumberExpr(expr, value);
       } else if (text === "+") {
-        ctx.focusManager.focusExItem(expr);
+        // ctx.focusManager.focusExItem(expr);
         ctx.mutator.replaceWithCallExpr(expr);
       }
     });

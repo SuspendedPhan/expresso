@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { of } from "rxjs";
   import { type ExItem } from "src/ex-object/ExItem";
   import type MainContext from "src/main-context/MainContext";
 
@@ -7,7 +8,7 @@
   let clazz: string = "";
   export { clazz as class };
 
-  const selected$ = ctx.focusManager.isSelected$(item);
+  const selected$ = of(false);
 
   function handleClick(event: MouseEvent) {
     event.stopPropagation();

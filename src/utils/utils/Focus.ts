@@ -3,17 +3,16 @@ import type MainContext from "src/main-context/MainContext";
 import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import type { ProjectComponentListFocus } from "src/utils/utils/ProjectComponentListFocus";
+import { EditorFocusKind } from "src/utils/utils/EditorFocus";
 import type { SUB } from "src/utils/utils/Utils";
-import unionize, { ofType, type UnionOf } from "unionize";
+import unionize, { type UnionOf } from "unionize";
 
 export const FocusKind = unionize({
   None: {},
   ProjectNav: {},
   LibraryNav: {},
-  EditorNewActions: {},
   ViewActions: {},
-  ProjectComponentList: ofType<{ pclFocus: ProjectComponentListFocus }>(),
+  ...EditorFocusKind,
   ...ComponentFocusKind,
   ...ExObjectFocusKind,
   ...ExprFocusKind,

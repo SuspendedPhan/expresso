@@ -1,17 +1,11 @@
 <script lang="ts">
-  import { map } from "rxjs";
+  import { of } from "rxjs";
   import type { LibraryProject } from "src/library/LibraryProject";
   import MainContext from "src/main-context/MainContext";
 
   export let ctx: MainContext;
   export let project: LibraryProject;
-  const selected$ = ctx.focusManager
-    .getFocus$()
-    .pipe(
-      map(
-        (focus) => focus.type === "LibraryProject" && focus.project === project
-      )
-    );
+  const selected$ = of(false);
 </script>
 
 <tr class:ring={$selected$}>

@@ -1,14 +1,12 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { ReplaySubject } from "rxjs";
+  import { of, ReplaySubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
-  import { FocusFns } from "src/utils/utils/Focus";
-  import { Focus2Kind } from "src/utils/utils/FocusManager";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
-  import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
   import FlexContainer from "./FlexContainer.svelte";
+  import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
 
   export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
@@ -25,10 +23,7 @@
     };
   });
 
-  const newActionsFocused$ = FocusFns.isFocus2Focused$(
-    ctx,
-    Focus2Kind.is.EditorNewActions
-  );
+  const newActionsFocused$ = of(false);
 </script>
 
 <div bind:this={rootElement} class="w-max min-w-full">

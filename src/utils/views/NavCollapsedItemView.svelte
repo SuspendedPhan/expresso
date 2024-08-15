@@ -1,13 +1,13 @@
 <script lang="ts">
   import MainContext from "src/main-context/MainContext";
   import { type NavItem } from "../utils/Nav";
-  import { map } from "rxjs";
+  import { map, of } from "rxjs";
 
   export let ctx: MainContext;
   export let item: NavItem;
 
   const active$ = ctx.viewCtx.activeWindow$.pipe(map((w) => w === item.window));
-  const sectionFocused$ = item.section.focused$;
+  const sectionFocused$ = of(false);
 </script>
 
 <div class="indicator">

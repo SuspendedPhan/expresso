@@ -1,21 +1,17 @@
 <script lang="ts">
-  import { map, of, type Observable } from "rxjs";
+  import { of, type Observable } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExItem";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
-  import NodeView from "../layout/NodeView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
+  import NodeView from "../layout/NodeView.svelte";
 
   export let ctx: MainContext;
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 
-  const exprCommandFocused$ = ctx.focusManager
-    .getFocus$()
-    .pipe(
-      map((focus) => focus.type === "ExprReplaceCommand" && focus.expr === expr)
-    );
+  const exprCommandFocused$ = of(false);
 
   let args$: Observable<readonly Expr[]>;
   if (expr.exprType === ExprType.CallExpr) {

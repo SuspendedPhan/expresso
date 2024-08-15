@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { map } from "rxjs";
+  import { map, of } from "rxjs";
   import type MainContext from "src/main-context/MainContext";
   import SelectableView from "src/utils/utils/SelectableView.svelte";
   import ExprLayout from "../layout/ExprLayout";
@@ -30,14 +30,7 @@
     map((expr) => ExprLayout.create(ctx, expr))
   );
 
-  const editingName$ = ctx.focusManager
-    .getFocus$()
-    .pipe(
-      map(
-        (focus) =>
-          focus.type === "EditPropertyName" && focus.property === property
-      )
-    );
+  const editingName$ = of(false);
 
   function handleNameInput(event: Event) {
     const currentTarget = event.currentTarget as HTMLInputElement;

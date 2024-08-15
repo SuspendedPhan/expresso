@@ -2,7 +2,6 @@ import { first, map, type Observable } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import type GoModule from "src/utils/utils/GoModule";
 import GoModuleLoader from "src/utils/utils/GoModuleLoader";
-import Keyboard from "src/utils/utils/Keyboard";
 
 export default class Main {
   public readonly ctx: MainContext;
@@ -19,10 +18,5 @@ export default class Main {
   public constructor(goModule: GoModule) {
     const ctx = new MainContext(goModule);
     this.ctx = ctx;
-    Keyboard.register(ctx, ctx.focusManager);
-
-    document.addEventListener("mousedown", () => {
-      ctx?.focusManager.focusNone();
-    });
   }
 }

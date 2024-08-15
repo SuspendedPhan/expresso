@@ -27,7 +27,8 @@ export class ProjectManager {
     switchMap((libraryProject) => libraryProject.project$)
   );
 
-  public constructor(private readonly _ctx: MainContext) {}
+  // @ts-ignore
+  public constructor(private readonly ctx: MainContext) {}
 
   public addProjectNew(): LibraryProject {
     // Get date/time with YYYY:MM:DD-HH:MM format
