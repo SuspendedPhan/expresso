@@ -1,5 +1,5 @@
 import hotkeys from "hotkeys-js";
-import { firstValueFrom, map } from "rxjs";
+import { filter, firstValueFrom, fromEvent, map, of, switchMap } from "rxjs";
 import MainContext from "src/main-context/MainContext";
 import { DexWindow, ViewMode } from "src/main-context/MainViewContext";
 import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
@@ -10,8 +10,8 @@ import type FocusManager from "src/utils/utils/FocusManager";
 import {
   Focus2Kind
 } from "src/utils/utils/FocusManager";
-import { FocusScope, FocusScopeResult } from "src/utils/utils/FocusScope";
 import { ProjectComponentListFocusFns } from "src/utils/utils/ProjectComponentListFocus";
+import type { OBS } from "src/utils/utils/Utils";
 
 export default class Keyboard {
   public static SCOPE = "Main";
@@ -152,5 +152,23 @@ export default class Keyboard {
           break;
       }
     });
+  }
+}
+
+export namespace KeyboardFuncs {
+  export function onKeydown$<T>(keys: string, data$: OBS<T | null>): OBS<T> {
+    const keyArr = keys.split(",");
+    return data$.pipe(
+      switchMap((data) => {
+        if (data === null) {
+          return of();
+        }
+
+        return fromEvent<KeyboardEvent>(window, "keydown").pipe(
+          filter((event) => keyArr.includes(event.key)),
+          map(() => data)
+        )
+      })
+    )
   }
 }
