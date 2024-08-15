@@ -27,6 +27,24 @@ export enum FocusKeys {
 }
 
 export namespace FocusFns {
+  export function register(_ctx: MainContext) {
+    document.addEventListener("keydown", async (event: KeyboardEvent) => {
+      // const isEditing = await firstValueFrom(ctx.focusManager.isEditing$);
+      // if (isEditing) {
+      //   return;
+      // }
+
+      switch (event.key) {
+        case "ArrowDown":
+        case "ArrowUp":
+        case "ArrowLeft":
+        case "ArrowRight":
+          event.preventDefault();
+          break;
+      }
+    });
+  }
+
   export function getFocus$(ctx: MainContext): OBS<Focus> {
     return ctx.focusManager.getFocus$();
   }
