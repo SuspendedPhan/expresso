@@ -20,8 +20,6 @@ export namespace FocusFns {
   }
 
   export function focus(ctx: MainContext, focus2: Focus2) {
-    // console.error("focus.ts", focus2);
-    
     ctx.focusManager.focus({ type: "Focus2", focus2 });
   }
 

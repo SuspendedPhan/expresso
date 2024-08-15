@@ -16,14 +16,9 @@ export const ExObjectFocusKind = {
 
 export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
-    FocusFns.getFocus$(ctx).subscribe((focus) => {
-      console.log("focus", focus);
-    });
 
     const noneScope = new FocusScope(FocusFns.isNoneFocused$(ctx));
     noneScope.hotkeys(FocusKeys.Down, async () => {
-      console.log("noneScope");
-      
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
       const objs = await firstValueFrom(project.rootExObjects$);
       const obj = objs[0];

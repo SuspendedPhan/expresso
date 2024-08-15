@@ -15,6 +15,7 @@ import FocusManager from "../utils/utils/FocusManager";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
+import { FocusScopeFuncs } from "src/utils/utils/FocusScope";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -30,6 +31,7 @@ export default class MainContext {
   public readonly focusManager = new FocusManager(this);
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
+  public readonly focusScopeCtx = FocusScopeFuncs.create(this);
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
