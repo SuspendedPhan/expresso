@@ -2,7 +2,6 @@ import { firstValueFrom } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { FocusKeys, FocusKind } from "src/utils/utils/Focus";
-import { KeyboardFuncs } from "src/utils/utils/Keyboard";
 
 export const EditorFocusKind = {
   EditorNewActions: {},
@@ -10,9 +9,9 @@ export const EditorFocusKind = {
 
 export namespace EditorFocusFuncs {
   export async function register(ctx: MainContext) {
-    const { focusCtx } = ctx;
+    const { focusCtx, keyboardCtx } = ctx;
 
-    KeyboardFuncs.onKeydown$(
+    keyboardCtx.onKeydown$(
       "n",
       ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor)
     ).subscribe(() => {
@@ -29,7 +28,7 @@ export namespace EditorFocusFuncs {
       visible$: focusIsEditorNewActions$,
     });
 
-    KeyboardFuncs.onKeydown$(
+    keyboardCtx.onKeydown$(
       "o",
       focusIsEditorNewActions$
     ).subscribe(() => {
@@ -37,7 +36,7 @@ export namespace EditorFocusFuncs {
       focusCtx.popFocus();
     });
 
-    KeyboardFuncs.onKeydown$(
+    keyboardCtx.onKeydown$(
       FocusKeys.Down,
       focusCtx.mapFocus$(FocusKind.is.None)
     ).subscribe(async () => {

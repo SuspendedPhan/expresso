@@ -3,7 +3,6 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKeys, FocusKind } from "src/utils/utils/Focus";
-import { KeyboardFuncs } from "src/utils/utils/Keyboard";
 import { ofType } from "unionize";
 
 export const ExObjectFocusKind = {
@@ -15,17 +14,21 @@ export const ExObjectFocusKind = {
 
 export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
-    const {focusCtx} = ctx;
+    const { focusCtx, keyboardCtx } = ctx;
 
-    KeyboardFuncs.onKeydown$(FocusKeys.Down, focusCtx.mapFocus$(FocusKind.is.None)).subscribe(async () => {
-      const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const objs = await firstValueFrom(project.rootExObjects$);
-      const obj = objs[0];
-      if (obj === undefined) {
-        return;
-      }
+    keyboardCtx
+      .onKeydown$(FocusKeys.Down, focusCtx.mapFocus$(FocusKind.is.None))
+      .subscribe(async () => {
+        const project = await firstValueFrom(
+          ctx.projectManager.currentProject$
+        );
+        const objs = await firstValueFrom(project.rootExObjects$);
+        const obj = objs[0];
+        if (obj === undefined) {
+          return;
+        }
 
-      focusCtx.setFocus(FocusKind.ExObject({ exObject: obj }));
-    });
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: obj }));
+      });
   }
 }
