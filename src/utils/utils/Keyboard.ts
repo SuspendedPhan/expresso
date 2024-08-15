@@ -54,7 +54,6 @@ export default class Keyboard {
     const projectNavScope = new FocusScope(
       FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.ProjectNav)
     );
-    projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
       ctx.viewCtx.activeWindow$.next(DexWindow.ProjectEditor);
       ctx.focusManager.focusNone();

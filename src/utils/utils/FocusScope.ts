@@ -1,27 +1,51 @@
-import { first, of } from "rxjs";
+import { BehaviorSubject, filter, first, fromEvent, map, of, switchMap } from "rxjs";
 import type { OBS } from "./Utils";
 import type MainContext from "src/main-context/MainContext";
 
+export namespace KeyboardFuncs {
+  export function onKeydown$<T>(keys: string, data$: OBS<T | null>): OBS<T> {
+    const keyArr = keys.split(",");
+    return data$.pipe(
+      switchMap((data) => {
+        if (data === null) {
+          return of();
+        }
 
-// Add event listener when condition is true
-// Remove event listener when condition is false
-
-export namespace KeyboardN {
-  export interface Context {
-
-  }
-
-  export type HaltStream = "HaltStream";
-  
-  export function onKeydown$<T>(data$: OBS<T | HaltStream>) {
+        return fromEvent<KeyboardEvent>(window, "keydown").pipe(
+          filter((event) => keyArr.includes(event.key)),
+          map(() => data)
+        )
+      })
+    )
   }
 }
 
-function test() {
-  KeyboardN.onKeydown$(of(true)).subscribe(() => {
-
-  });
+enum Focus {
+  A,
+  B,
+  C
 }
+const focus$ = new BehaviorSubject<Focus>(Focus.A);
+KeyboardFuncs.onKeydown$("t", focus$.pipe(
+  map((focus) => focus === Focus.A ? focus : null)
+)).subscribe((focus) => {
+  console.log("t", focus);
+  focus$.next(Focus.B);
+});
+
+KeyboardFuncs.onKeydown$("y", focus$.pipe(
+  map((focus) => focus === Focus.B ? focus : null)
+)).subscribe((focus) => {
+  console.log("y", focus);
+  focus$.next(Focus.C);
+});
+
+KeyboardFuncs.onKeydown$("u", focus$.pipe(
+  map((focus) => focus === Focus.C ? focus : null)
+)).subscribe((focus) => {
+  console.log("u", focus);
+  focus$.next(Focus.A);
+});
 
 
 
