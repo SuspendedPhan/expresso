@@ -9,7 +9,7 @@ import {
 import type { ExObject } from "src/ex-object/ExObject";
 import { CreateProject, type Project } from "src/ex-object/Project";
 import MainContext from "src/main-context/MainContext";
-import { Focus2Union, type Focus } from "src/utils/utils/FocusManager";
+import { Focus2Kind, type Focus } from "src/utils/utils/FocusManager";
 
 export interface LibraryProject {
   id: string;
@@ -108,7 +108,7 @@ export class ProjectManager {
   public navDown(focus: Focus) {
     switch (focus.type) {
       case "Focus2":
-        if (!Focus2Union.is.None(focus.focus2)) {
+        if (!Focus2Kind.is.None(focus.focus2)) {
           return;
         }
 

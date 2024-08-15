@@ -3,7 +3,7 @@
   import { ReplaySubject } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import { FocusFns } from "src/utils/utils/Focus";
-  import { Focus2Union } from "src/utils/utils/FocusManager";
+  import { Focus2Kind } from "src/utils/utils/FocusManager";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
@@ -27,7 +27,7 @@
 
   const newActionsFocused$ = FocusFns.isFocus2Focused$(
     ctx,
-    Focus2Union.is.EditorNewActions
+    Focus2Kind.is.EditorNewActions
   );
 </script>
 

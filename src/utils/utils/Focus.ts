@@ -2,7 +2,7 @@ import { map } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import {
-  Focus2Union as Focus2Kind,
+  Focus2Kind as Focus2Kind,
   type Focus,
   type Focus2,
 } from "src/utils/utils/FocusManager";

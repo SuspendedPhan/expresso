@@ -2,7 +2,7 @@
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
   import { FocusFns } from "src/utils/utils/Focus";
-  import { Focus2Union } from "src/utils/utils/FocusManager";
+  import { Focus2Kind } from "src/utils/utils/FocusManager";
   import Divider from "src/utils/views/Divider.svelte";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
@@ -12,16 +12,16 @@
   export let component: CustomComponent;
 
   const isComponentFocused$ = FocusFns.isFocus2Focused$(ctx, (focus2) => {
-    return Focus2Union.is.Component(focus2) && focus2.component === component;
+    return Focus2Kind.is.Component(focus2) && focus2.component === component;
   });
 
   const name$ = ComponentFns.getName$(component);
   const isNameFocused$ = FocusFns.isFocus2Focused$(
     ctx,
-    Focus2Union.is.ComponentName
+    Focus2Kind.is.ComponentName
   );
   const isEditingName$ = FocusFns.isFocus2Focused$(ctx, (focus2) => {
-    return Focus2Union.is.ComponentName(focus2) && focus2.isEditing;
+    return Focus2Kind.is.ComponentName(focus2) && focus2.isEditing;
   });
   const rootExObjects$ = component.rootExObjects$;
 
@@ -30,11 +30,11 @@
   }
 
   function handleMouseDown() {
-    FocusFns.focus(ctx, Focus2Union.Component({ component }));
+    FocusFns.focus(ctx, Focus2Kind.Component({ component }));
   }
 
   function handleMouseDownName() {
-    FocusFns.focus(ctx, Focus2Union.ComponentName({ isEditing: false }));
+    FocusFns.focus(ctx, Focus2Kind.ComponentName({ isEditing: false }));
   }
 </script>
 

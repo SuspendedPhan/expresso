@@ -6,7 +6,7 @@ import { ViewMode, DexWindow } from "src/main-context/MainViewContext";
 import { FocusBase, FocusFns } from "src/utils/utils/Focus";
 import type FocusManager from "src/utils/utils/FocusManager";
 import {
-  Focus2Union,
+  Focus2Kind,
   type EditPropertyNameFocus,
 } from "src/utils/utils/FocusManager";
 import { EditorFocus } from "src/utils/utils/EditorFocus";
@@ -54,7 +54,7 @@ export default class Keyboard {
     notEditingScope.hotkeys("v", () => {
       focusManager.focus({
         type: "Focus2",
-        focus2: Focus2Union.ViewActions({}),
+        focus2: Focus2Kind.ViewActions({}),
       });
     });
 
@@ -70,7 +70,7 @@ export default class Keyboard {
     });
 
     const projectNavScope = new FocusScope(
-      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ProjectNav)
+      FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.ProjectNav)
     );
     projectNavScope.setChordPrefix("g");
     projectNavScope.hotkeys("e", () => {
@@ -98,7 +98,7 @@ export default class Keyboard {
     });
 
     const libraryNavScope = new FocusScope(
-      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.LibraryNav)
+      FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.LibraryNav)
     );
     libraryNavScope.hotkeys("p", () => {
       ctx.viewCtx.activeWindow$.next(DexWindow.LibraryProjectList);
@@ -150,7 +150,7 @@ export default class Keyboard {
     });
 
     const viewActionsScope = new FocusScope(
-      FocusFns.isFocus2Focused$(ctx, Focus2Union.is.ViewActions)
+      FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.ViewActions)
     );
     viewActionsScope.hotkeys("m", () => {
       ctx.viewCtx.viewMode$.next(ViewMode.MainWindowMaximized);

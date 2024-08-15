@@ -6,7 +6,7 @@ import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { CommandCardFns } from "src/utils/utils/CommandCard";
 import { FocusFns } from "src/utils/utils/Focus";
-import { Focus2Union } from "src/utils/utils/FocusManager";
+import { Focus2Kind } from "src/utils/utils/FocusManager";
 import { ArrayFns } from "./Utils";
 import { FocusScope } from "src/utils/utils/FocusSCope";
 
@@ -22,20 +22,20 @@ export namespace EditorFocus {
       const focus = await firstValueFrom(focusManager.getFocus$());
       if (
         focus.type === "Focus2" &&
-        Focus2Union.is.EditorNewActions(focus.focus2)
+        Focus2Kind.is.EditorNewActions(focus.focus2)
       ) {
         return;
       }
 
       ctx.focusManager.focus({
         type: "Focus2",
-        focus2: Focus2Union.EditorNewActions({}),
+        focus2: Focus2Kind.EditorNewActions({}),
       });
     });
 
     const isNewActionsFocused$ = FocusFns.isFocus2Focused$(
       ctx,
-      Focus2Union.is.EditorNewActions
+      Focus2Kind.is.EditorNewActions
     );
     CommandCardFns.add(ctx, {
       title: "New Actions",

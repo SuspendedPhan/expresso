@@ -34,7 +34,7 @@ export type Focus =
   | FocusBase
   | Focus2Wrapper;
 
-export const Focus2Union = unionize({
+export const Focus2Kind = unionize({
   None: {},
   ProjectNav: {},
   LibraryNav: {},
@@ -46,7 +46,7 @@ export const Focus2Union = unionize({
   ...ExprFocusKind,
 });
 
-export type Focus2 = UnionOf<typeof Focus2Union>;
+export type Focus2 = UnionOf<typeof Focus2Kind>;
 
 export interface Focus2Wrapper {
   type: "Focus2";
@@ -75,7 +75,7 @@ export interface EditPropertyNameFocus {
 export default class FocusManager {
   private readonly focus$ = new BehaviorSubject<Focus>({
     type: "Focus2",
-    focus2: Focus2Union.None(),
+    focus2: Focus2Kind.None(),
   });
 
   public readonly down$ = new Subject<void>();
@@ -132,7 +132,7 @@ export default class FocusManager {
   }
 
   public focusNone() {
-    this.focus({ type: "Focus2", focus2: Focus2Union.None() });
+    this.focus({ type: "Focus2", focus2: Focus2Kind.None() });
   }
 
   public focusExItem(exItem: ExItem) {
@@ -140,11 +140,11 @@ export default class FocusManager {
   }
 
   public focusProjectNav() {
-    this.focus({ type: "Focus2", focus2: Focus2Union.ProjectNav() });
+    this.focus({ type: "Focus2", focus2: Focus2Kind.ProjectNav() });
   }
 
   public focusLibraryNav() {
-    this.focus({ type: "Focus2", focus2: Focus2Union.LibraryNav() });
+    this.focus({ type: "Focus2", focus2: Focus2Kind.LibraryNav() });
   }
 
   public focusLibraryProject(project: LibraryProject) {
@@ -164,7 +164,7 @@ export default class FocusManager {
   public popFocus() {
     this.focusStack.pop();
     if (this.focusStack.length === 0) {
-      this.focus$.next({ type: "Focus2", focus2: Focus2Union.None() });
+      this.focus$.next({ type: "Focus2", focus2: Focus2Kind.None() });
     } else {
       this.focus$.next(this.focusStack[this.focusStack.length - 1]!);
     }
@@ -180,7 +180,7 @@ export default class FocusManager {
 
     switch (focus.type) {
       case "Focus2":
-        if (Focus2Union.is.None(focus.focus2)) {
+        if (Focus2Kind.is.None(focus.focus2)) {
           this.downNone();
         }
         return;
