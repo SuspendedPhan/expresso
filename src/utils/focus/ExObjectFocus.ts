@@ -2,7 +2,7 @@ import { firstValueFrom } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { FocusKeys, FocusKind } from "src/utils/utils/Focus";
+import { Hotkeys, FocusKind } from "src/utils/utils/Focus";
 import { ofType } from "unionize";
 
 export const ExObjectFocusKind = {
@@ -17,7 +17,7 @@ export namespace ExObjectFocusFuncs {
     const { focusCtx, keyboardCtx } = ctx;
 
     keyboardCtx
-      .onKeydown$(FocusKeys.Down, focusCtx.mapFocus$(FocusKind.is.None))
+      .onKeydown$(Hotkeys.Down, focusCtx.mapFocus$(FocusKind.is.None))
       .subscribe(async () => {
         const project = await firstValueFrom(
           ctx.projectManager.currentProject$
@@ -29,6 +29,13 @@ export namespace ExObjectFocusFuncs {
         }
 
         focusCtx.setFocus(FocusKind.ExObject({ exObject: obj }));
+      });
+
+    const focusIsExObject$ = focusCtx.mapFocus$(FocusKind.is.ExObject);
+    keyboardCtx
+      .onKeydown$(Hotkeys.Down, focusIsExObject$)
+      .subscribe(() => {
+        focusCtx.setFocus(FocusKind.ExObjectName());
       });
   }
 }

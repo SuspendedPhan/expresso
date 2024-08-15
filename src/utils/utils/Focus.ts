@@ -20,7 +20,7 @@ export const FocusKind = unionize({
 
 export type Focus = UnionOf<typeof FocusKind>;
 
-export enum FocusKeys {
+export enum Hotkeys {
   Down = "ArrowDown,s",
 }
 

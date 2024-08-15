@@ -1,7 +1,7 @@
 import { firstValueFrom } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
-import { FocusKeys, FocusKind } from "src/utils/utils/Focus";
+import { Hotkeys, FocusKind } from "src/utils/utils/Focus";
 
 export const EditorFocusKind = {
   EditorNewActions: {},
@@ -37,7 +37,7 @@ export namespace EditorFocusFuncs {
     });
 
     keyboardCtx.onKeydown$(
-      FocusKeys.Down,
+      Hotkeys.Down,
       focusCtx.mapFocus$(FocusKind.is.None)
     ).subscribe(async () => {
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
