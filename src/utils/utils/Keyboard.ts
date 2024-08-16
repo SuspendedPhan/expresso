@@ -8,26 +8,17 @@ export enum KeyboardResult {
 
 export function createKeyboardContext(_ctx: MainContext) {
   return {
-    onKeydown$: <T>(keys: string, data$: OBS<T | null> | OBS<boolean>, tag = "") => {
+    onKeydown$: <T>(keys: string, data$: OBS<T | false>, _tag = "") => {
       const keyArr = keys.split(",");
-      console.log("keyArr", keyArr);
 
       return data$.pipe(
         switchMap((data) => {
-          if (data === null) {
+          if (data === false) {
             return of();
-          }
-
-          if (tag === "hi") {
-            console.log("data", data);
           }
 
           return fromEvent<KeyboardEvent>(window, "keydown").pipe(
             filter((event) => {
-              if (tag === "hi") {
-                console.log("data2", data);
-              }
-
               const newLocal = keyArr.includes(event.key);
               return newLocal;
             }),

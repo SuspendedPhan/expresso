@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { of } from "rxjs";
+  import { map, of, pipe } from "rxjs";
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/utils/Focus";
+  import { createFocusContext, FocusKind } from "src/utils/utils/Focus";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import Field from "src/utils/views/Field.svelte";
@@ -11,6 +11,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { rxEquals } from "src/utils/utils/Utils";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -21,11 +22,14 @@
   const basicProperties$ = exObject.basicProperties$;
   const children$ = exObject.children$;
 
-  const exObjectFocused$ = ctx.focusCtx.mapFocus$(
-    (focus) => FocusKind.is.ExObject(focus) && focus.exObject === exObject
+  const exObjectFocused$ = ctx.focusCtx.exObjectFocusCtx.exObjectFocus$.pipe(
+    rxEquals(exObject)
   );
   const exObjectName$ = exObject.name$;
-  const exObjectNameFocused$ = of(false);
+
+  const exObjectNameFocused$ =
+    ctx.focusCtx.exObjectFocusCtx.exObjectNameFocus$.pipe(rxEquals(exObject));
+
   const isEditingExObjectName$ = of(false);
   const componentName$ = ComponentFns.getName$(exObject.component);
   const componentNameFocused$ = of(false);

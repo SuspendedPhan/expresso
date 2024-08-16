@@ -1,6 +1,6 @@
 import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
+import { createExObjectFocusContext, ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
 import { EditorFocusFuncs, EditorFocusKind } from "src/utils/utils/EditorFocus";
@@ -22,6 +22,7 @@ export type Focus = UnionOf<typeof FocusKind>;
 
 export enum Hotkeys {
   Down = "ArrowDown,s",
+  Up = "ArrowUp,w",
 }
 
 export interface FocusContextData {
@@ -30,10 +31,11 @@ export interface FocusContextData {
 
 export type FocusContext = ReturnType<typeof createFocusContext>;
 
-export function createFocusContext(_ctx: MainContext) {
+export function createFocusContext(ctx: MainContext) {
   const focusStack = new Array<Focus>();
   const data = {
     focus$: new BehaviorSubject<Focus>(FocusKind.None()),
+    exObjectFocusCtx: createExObjectFocusContext(ctx),
   };
   return {
     ...data,
@@ -48,8 +50,6 @@ export function createFocusContext(_ctx: MainContext) {
     },
 
     setFocus(focus: Focus) {
-      console.error("setFocus", focus);
-      
       focusStack.push(focus);
       data.focus$.next(focus);
     },

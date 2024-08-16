@@ -55,9 +55,7 @@ export namespace ExObjectFns {
 }
 
 export namespace CreateExObject {
-  export async function blank(
-    ctx: MainContext,
-  ): Promise<ExObject> {
+  export async function blank(ctx: MainContext): Promise<ExObject> {
     const id = `ex-object-${crypto.randomUUID()}`;
     const component = CanvasComponentStore.circle;
     const componentProperties = await createComponentProperties(ctx, component);

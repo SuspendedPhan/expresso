@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject, type Observable } from "rxjs";
+import { BehaviorSubject, map, pipe, Subject, type Observable } from "rxjs";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -37,4 +37,12 @@ export namespace ArrayFns {
   export function getFromBack<T>(arr: T[], index: number): T | undefined{
     return arr[arr.length - 1 - index];
   }
+}
+
+export function rxEquals(obj: any) {
+  return pipe(
+    map((other) => {
+      return obj === other;
+    })
+  );
 }
