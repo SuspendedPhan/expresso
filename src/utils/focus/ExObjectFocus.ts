@@ -31,11 +31,21 @@ export namespace ExObjectFocusFuncs {
         focusCtx.setFocus(FocusKind.ExObject({ exObject: obj }));
       });
 
-    const focusIsExObject$ = focusCtx.mapFocus$(FocusKind.is.ExObject);
+    const exObjectFocus$ = focusCtx.mapFocus$((focus) => {
+      console.log("focus", focus);
+
+      const newLocal = FocusKind.is.ExObject(focus) ? focus.exObject : null;
+      // console.log("newLocal", newLocal);
+      
+      return newLocal;
+    });
+
     keyboardCtx
-      .onKeydown$(Hotkeys.Down, focusIsExObject$)
-      .subscribe(() => {
-        focusCtx.setFocus(FocusKind.ExObjectName());
+      .onKeydown$(Hotkeys.Down, exObjectFocus$, "hi")
+      .subscribe((exObject) => {
+        console.log("yay!", exObject);
+
+        focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
       });
   }
 }

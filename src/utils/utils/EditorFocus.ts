@@ -38,7 +38,7 @@ export namespace EditorFocusFuncs {
 
     keyboardCtx.onKeydown$(
       Hotkeys.Down,
-      focusCtx.mapFocus$(FocusKind.is.None)
+      focusCtx.mapFocus$(focus => FocusKind.is.None(focus) ? true : null)
     ).subscribe(async () => {
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
       const rootExObjects = await firstValueFrom(project.rootExObjects$);

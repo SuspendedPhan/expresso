@@ -48,6 +48,8 @@ export function createFocusContext(_ctx: MainContext) {
     },
 
     setFocus(focus: Focus) {
+      console.error("setFocus", focus);
+      
       focusStack.push(focus);
       data.focus$.next(focus);
     },
