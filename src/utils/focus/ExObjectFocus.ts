@@ -1,4 +1,6 @@
+import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
+import { ExItemType } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -87,13 +89,6 @@ export namespace ExObjectFocusFuncs {
         focusCtx.setFocus(FocusKind.Property({ property }));
       });
 
-    keyboardCtx
-      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
-      .subscribe(async (property) => {
-        const expr = await firstValueFrom(property.expr$);
-        focusCtx.setFocus(FocusKind.Expr({ expr }));
-      });
-
     // Up
 
     keyboardCtx
@@ -106,6 +101,14 @@ export namespace ExObjectFocusFuncs {
       .onKeydown$(Hotkeys.Up, exObjectFocusCtx.componentFocus$)
       .subscribe((exObject) => {
         focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Up, exObjectFocusCtx.propertyFocus$)
+      .subscribe(async (property) => {
+        const exObject = await firstValueFrom(property.parent$);
+        assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+        focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
       });
   }
 }

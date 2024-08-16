@@ -1,6 +1,8 @@
-import type { Expr } from "src/ex-object/ExItem";
+import assert from "assert-ts";
+import { firstValueFrom } from "rxjs";
+import { ExItemType, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
-import { FocusKind } from "src/utils/utils/Focus";
+import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
 import type { OBS } from "src/utils/utils/Utils";
 import { ofType } from "unionize";
 
@@ -28,5 +30,26 @@ export namespace ExprFocusFuncs {
     };
   }
 
-  export async function register(_ctx: MainContext) {}
+  export async function register(ctx: MainContext) {
+    const { focusCtx, keyboardCtx } = ctx;
+    const { exObjectFocusCtx, exprFocusCtx } = focusCtx;
+    keyboardCtx
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
+      .subscribe(async (property) => {
+        const expr = await firstValueFrom(property.expr$);
+        focusCtx.setFocus(FocusKind.Expr({ expr }));
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Up, exprFocusCtx.exprFocus$)
+      .subscribe(async (expr) => {
+        const parent = await firstValueFrom(expr.parent$);
+        assert(parent !== null);
+
+        if (parent.itemType === ExItemType.Property) {
+          const property = parent;
+          focusCtx.setFocus(FocusKind.Property({ property }));
+        }
+      });
+  }
 }
