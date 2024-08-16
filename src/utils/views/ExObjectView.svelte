@@ -21,7 +21,7 @@
   const basicProperties$ = exObject.basicProperties$;
   const children$ = exObject.children$;
 
-  function equals$(exObject$: OBS<ExObject>) {
+  function equals$(exObject$: OBS<ExObject | false>) {
     return exObject$.pipe(rxEquals(exObject));
   }
 

@@ -39,9 +39,9 @@ export namespace ArrayFns {
   }
 }
 
-export function rxEquals(obj: any) {
+export function rxEquals<T>(obj: T) {
   return pipe(
-    map((other) => {
+    map((other: T | false) => {
       return obj === other;
     })
   );

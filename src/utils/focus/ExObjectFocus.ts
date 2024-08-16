@@ -3,6 +3,7 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
+import type { OBS } from "src/utils/utils/Utils";
 import { ofType } from "unionize";
 
 export const ExObjectFocusKind = {
@@ -13,7 +14,9 @@ export const ExObjectFocusKind = {
 };
 
 export function createExObjectFocusContext(ctx: MainContext) {
-  function mapExObjectFocus$(focusKindCheck: (obj: any) => boolean) {
+  function mapExObjectFocus$(
+    focusKindCheck: (obj: any) => boolean
+  ): OBS<ExObject | false> {
     return ctx.focusCtx.mapFocus$((focus) => {
       if (!focusKindCheck(focus)) {
         return false;
@@ -33,6 +36,12 @@ export function createExObjectFocusContext(ctx: MainContext) {
 
     get componentFocus$() {
       return mapExObjectFocus$(FocusKind.is.ExObjectComponent);
+    },
+
+    get propertyFocus$() {
+      return ctx.focusCtx.mapFocus$((focus) => {
+        return FocusKind.is.Property(focus) ? focus.property : false;
+      });
     },
   };
 }
@@ -74,7 +83,15 @@ export namespace ExObjectFocusFuncs {
     keyboardCtx
       .onKeydown$(Hotkeys.Down, exObjectFocusCtx.componentFocus$)
       .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+        const property = exObject.cloneCountProperty;
+        focusCtx.setFocus(FocusKind.Property({ property }));
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
+      .subscribe(async (property) => {
+        const expr = await firstValueFrom(property.expr$);
+        focusCtx.setFocus(FocusKind.Expr({ expr }));
       });
 
     // Up

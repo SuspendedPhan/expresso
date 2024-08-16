@@ -12,6 +12,8 @@
   } from "src/ex-object/Property";
   import { ExprType } from "src/ex-object/ExItem";
   import HugInput from "src/utils/views/HugInput.svelte";
+  import FocusView from "src/utils/views/FocusView.svelte";
+  import { rxEquals } from "src/utils/utils/Utils";
 
   export let ctx: MainContext;
   export let property: Property;
@@ -30,6 +32,9 @@
     map((expr) => ExprLayout.create(ctx, expr))
   );
 
+  const isFocused$ = ctx.focusCtx.exObjectFocusCtx.propertyFocus$.pipe(
+    rxEquals(property)
+  );
   const editingName$ = of(false);
 
   function handleNameInput(event: Event) {
@@ -45,13 +50,13 @@
 
 <div class:flex={$isNumberExpr$} class="items-center font-mono">
   <div class="flex flex-row">
-    <SelectableView {ctx} item={property} class="w-max grow-0">
+    <FocusView focused={$isFocused$} class="w-max grow-0">
       <HugInput
         value={$name$}
         isEditing={$editingName$}
         on:input={handleNameInput}
       />
-    </SelectableView>
+    </FocusView>
     <pre class="text-style-secondary"> = </pre>
   </div>
 

@@ -36,6 +36,7 @@ export function createFocusContext(ctx: MainContext) {
   const data = {
     focus$: new BehaviorSubject<Focus>(FocusKind.None()),
     exObjectFocusCtx: createExObjectFocusContext(ctx),
+    exprFocusCtx: ExprFocusFuncs.createContext(ctx),
   };
   return {
     ...data,
