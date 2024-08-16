@@ -2,24 +2,8 @@ import { firstValueFrom } from "rxjs";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { Hotkeys, FocusKind } from "src/utils/utils/Focus";
+import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
 import { ofType } from "unionize";
-
-export const createExObjectFocusContext = (ctx: MainContext) => {
-  return {
-    get exObjectFocus$() {
-      return ctx.focusCtx.mapFocus$((focus) => {
-        return FocusKind.is.ExObject(focus) ? focus.exObject : false;
-      });
-    },
-
-    get exObjectNameFocus$() {
-      return ctx.focusCtx.mapFocus$((focus) => {
-        return FocusKind.is.ExObjectName(focus) ? focus.exObject : false;
-      });
-    }
-  }
-};
 
 export const ExObjectFocusKind = {
   ExObject: ofType<{ exObject: ExObject }>(),
@@ -28,9 +12,35 @@ export const ExObjectFocusKind = {
   Property: ofType<{ property: Property }>(),
 };
 
+export function createExObjectFocusContext(ctx: MainContext) {
+  function mapExObjectFocus$(focusKindCheck: (obj: any) => boolean) {
+    return ctx.focusCtx.mapFocus$((focus) => {
+      if (!focusKindCheck(focus)) {
+        return false;
+      }
+      return (focus as any).exObject;
+    });
+  }
+
+  return {
+    get exObjectFocus$() {
+      return mapExObjectFocus$(FocusKind.is.ExObject);
+    },
+
+    get nameFocus$() {
+      return mapExObjectFocus$(FocusKind.is.ExObjectName);
+    },
+
+    get componentFocus$() {
+      return mapExObjectFocus$(FocusKind.is.ExObjectComponent);
+    },
+  };
+}
+
 export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
     const { focusCtx, keyboardCtx } = ctx;
+    const { exObjectFocusCtx } = focusCtx;
 
     keyboardCtx
       .onKeydown$(Hotkeys.Down, focusCtx.mapFocus$(FocusKind.is.None))
@@ -47,21 +57,38 @@ export namespace ExObjectFocusFuncs {
         focusCtx.setFocus(FocusKind.ExObject({ exObject: obj }));
       });
 
-    const exObjectFocus$ = focusCtx.mapFocus$((focus) => {
-      return FocusKind.is.ExObject(focus) ? focus.exObject : false;
-    });
+    // Down
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Down, focusCtx.exObjectFocusCtx.exObjectFocus$, "hi")
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.exObjectFocus$, "hi")
       .subscribe((exObject) => {
-
         focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
       });
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Up, exObjectFocus$)
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.nameFocus$)
       .subscribe((exObject) => {
         focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.componentFocus$)
+      .subscribe((exObject) => {
+        focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+      });
+
+    // Up
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Up, exObjectFocusCtx.nameFocus$)
+      .subscribe((exObject) => {
+        focusCtx.setFocus(FocusKind.ExObject({ exObject }));
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Up, exObjectFocusCtx.componentFocus$)
+      .subscribe((exObject) => {
+        focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
       });
   }
 }
