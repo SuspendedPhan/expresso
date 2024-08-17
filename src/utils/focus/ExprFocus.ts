@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { filter, firstValueFrom, map } from "rxjs";
+import { filter, firstValueFrom } from "rxjs";
 import { ExItemType, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
@@ -28,7 +28,7 @@ export namespace ExprFocusFuncs {
       editing$() {
         return ctx.focusCtx.mapFocus$((focus) => {
           return FocusKind.is.Expr(focus) && focus.isEditing;
-        }
+        });
       },
     };
   }
@@ -37,19 +37,29 @@ export namespace ExprFocusFuncs {
     const { focusCtx, keyboardCtx } = ctx;
     const { exObjectFocusCtx, exprFocusCtx } = focusCtx;
 
-    // keyboardCtx
-    //   .onKeydown$(
-    //     "e",
-    //     focusCtx.focus$.pipe(
-    //     filter((focus) => {return FocusKind.is.Expr(focus) && !focus.isEditing}),
+    keyboardCtx
+      .onKeydown$(
+        "e",
+        exprFocusCtx.exprFocus$.pipe(
+          filter((focus) => focus !== false && !focus.isEditing)
+        )
+      )
+      .subscribe(async (focus) => {
+        focusCtx.setFocus(
+          FocusKind.Expr({ expr: focus.expr, isEditing: true })
+        );
+      });
 
-    //     )
-    //   )
-    //   .subscribe(async (expr) => {
-    //     // focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: true }));
-    //   });
-
-    // keyboardCtx.onKeydown$("Enter",
+    keyboardCtx
+      .onKeydown$(
+        "Enter",
+        exprFocusCtx.exprFocus$.pipe(
+          filter((focus) => focus !== false && focus.isEditing)
+        )
+      )
+      .subscribe(async () => {
+        ctx.eventBus.submitExprReplaceCommand$.next();
+      });
 
     keyboardCtx
       .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)

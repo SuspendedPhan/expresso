@@ -9,13 +9,13 @@ import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
-import { createFocusContext, FocusFns } from "src/utils/utils/Focus";
+import { createFocusContext, FocusFns, FocusKind } from "src/utils/utils/Focus";
 import type GoModule from "src/utils/utils/GoModule";
+import { createKeyboardContext } from "src/utils/utils/Keyboard";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
-import { createKeyboardContext } from "src/utils/utils/Keyboard";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -38,21 +38,13 @@ export default class MainContext {
     this.mutator = new MainMutator(this);
     FocusFns.register(this);
 
-    this.eventBus.exprReplaced$.subscribe((replacement) => {
+    this.eventBus.exprReplaced$.subscribe(async (replacement) => {
       // @ts-ignore
       const oldExpr = replacement.oldExpr;
       // @ts-ignore
       const newExpr = replacement.newExpr;
-      // this.focusManager
-      //   .getFocus$()
-      //   .pipe(first())
-      //   .subscribe((focus) => {
-      //     if (focus.type !== "Focus2") {
-      //       return;
-      //     }
 
-      //     console.error("fix this");
-      //   });
+      this.focusCtx.setFocus(FocusKind.Expr({ expr: newExpr, isEditing: false }));
     });
 
     Persistence.readProject$.subscribe(async (deProject) => {
