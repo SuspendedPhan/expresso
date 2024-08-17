@@ -9,7 +9,9 @@ export function assertUnreachable(_: never): never {
   throw new Error("Didn't expect to get here");
 }
 
-export function createSubjectWithLifetime<T>(complete$: Observable<void>): Subject<T> {
+export function createSubjectWithLifetime<T>(
+  complete$: Observable<void>
+): Subject<T> {
   const subject = new Subject<T>();
   complete$.subscribe({
     complete: () => {
@@ -19,7 +21,10 @@ export function createSubjectWithLifetime<T>(complete$: Observable<void>): Subje
   return subject;
 }
 
-export function createBehaviorSubjectWithLifetime<T>(complete$: Observable<void>, initialValue: T): BehaviorSubject<T> {
+export function createBehaviorSubjectWithLifetime<T>(
+  complete$: Observable<void>,
+  initialValue: T
+): BehaviorSubject<T> {
   const subject = new BehaviorSubject<T>(initialValue);
   complete$.subscribe({
     complete: () => {
@@ -34,7 +39,7 @@ export interface Destroyable {
 }
 
 export namespace ArrayFns {
-  export function getFromBack<T>(arr: T[], index: number): T | undefined{
+  export function getFromBack<T>(arr: T[], index: number): T | undefined {
     return arr[arr.length - 1 - index];
   }
 }
