@@ -61,12 +61,21 @@ export namespace ExprFocusFuncs {
         ctx.eventBus.submitExprReplaceCommand$.next();
       });
 
+    ctx.eventBus.exprReplaced$.subscribe(async (replacement) => {
+      const newExpr = replacement.newExpr;
+      focusCtx.setFocus(FocusKind.Expr({ expr: newExpr, isEditing: false }));
+    });
+
+    // Down
+
     keyboardCtx
       .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
       .subscribe(async (property) => {
         const expr = await firstValueFrom(property.expr$);
         focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
       });
+
+    // Up
 
     keyboardCtx
       .onKeydown$(Hotkeys.Up, exprFocusCtx.exprFocus$)

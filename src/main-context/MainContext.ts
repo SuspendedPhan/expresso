@@ -38,15 +38,6 @@ export default class MainContext {
     this.mutator = new MainMutator(this);
     FocusFns.register(this);
 
-    this.eventBus.exprReplaced$.subscribe(async (replacement) => {
-      // @ts-ignore
-      const oldExpr = replacement.oldExpr;
-      // @ts-ignore
-      const newExpr = replacement.newExpr;
-
-      this.focusCtx.setFocus(FocusKind.Expr({ expr: newExpr, isEditing: false }));
-    });
-
     Persistence.readProject$.subscribe(async (deProject) => {
       // if (deProject === null) {
       if (true) {
