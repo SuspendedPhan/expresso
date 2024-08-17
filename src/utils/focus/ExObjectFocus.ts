@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { ExItemType } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { Property } from "src/ex-object/Property";
+import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
 import type { OBS } from "src/utils/utils/Utils";
@@ -27,6 +27,17 @@ export function createExObjectFocusContext(ctx: MainContext) {
     });
   }
 
+  async function* getProperties(exObject: ExObject): AsyncGenerator<Property> {
+    const basicProperties = await firstValueFrom(exObject.basicProperties$);
+    yield exObject.cloneCountProperty;
+    for (const property of exObject.componentParameterProperties) {
+      yield property;
+    }
+    for (const property of basicProperties) {
+      yield property;
+    }
+  }
+
   return {
     get exObjectFocus$() {
       return mapExObjectFocus$(FocusKind.is.ExObject);
@@ -44,6 +55,34 @@ export function createExObjectFocusContext(ctx: MainContext) {
       return ctx.focusCtx.mapFocus$((focus) => {
         return FocusKind.is.Property(focus) ? focus.property : false;
       });
+    },
+
+    async nextProperty(property: Property): Promise<Property | null> {
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+      let found = false;
+      for await (const p of getProperties(exObject)) {
+        if (found) {
+          return p;
+        }
+        if (p === property) {
+          found = true;
+        }
+      }
+      return null;
+    },
+
+    async prevProperty(property: Property): Promise<Property | null> {
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+      let prev = null;
+      for await (const p of getProperties(exObject)) {
+        if (p === property) {
+          return prev;
+        }
+        prev = p;
+      }
+      return null;
     },
   };
 }

@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { filter, firstValueFrom } from "rxjs";
 import { ExItemType, ExprType, type Expr } from "src/ex-object/ExItem";
+import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
 import type { OBS } from "src/utils/utils/Utils";
@@ -90,6 +91,11 @@ export namespace ExprFocusFuncs {
             focusCtx.setFocus(FocusKind.Expr({ expr: arg, isEditing: false }));
             break;
           case ExprType.NumberExpr:
+            const property = await ExprFuncs.getProperty(expr);
+            const nextProperty = await exObjectFocusCtx.nextProperty(property);
+            if (nextProperty !== null) {
+              focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
+            }
             break;
         }
       });
