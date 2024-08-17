@@ -9,7 +9,7 @@ import ProjectMutator from "src/mutator/ProjectMutator";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
-import { createFocusContext, FocusFns, FocusKind } from "src/utils/utils/Focus";
+import { createFocusContext, FocusFns } from "src/utils/utils/Focus";
 import type GoModule from "src/utils/utils/GoModule";
 import { createKeyboardContext } from "src/utils/utils/Keyboard";
 import GoBridge from "../evaluation/GoBridge";
