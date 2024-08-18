@@ -1,6 +1,6 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
-import { ExItemType } from "src/ex-object/ExItem";
+import { ExItemType, type ExItem } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -84,6 +84,20 @@ export function createExObjectFocusContext(ctx: MainContext) {
       }
       return null;
     },
+
+    get exItemFocus$() {
+      return ctx.focusCtx.mapFocus$((focus) => {
+        const exItem: ExItem | false = FocusKind.match(focus, {
+          ExObject: ({ exObject }) => exObject as ExItem | false,
+          ExObjectName: ({ exObject }) => exObject,
+          ExObjectComponent: ({ exObject }) => exObject,
+          Property: ({ property }) => property,
+          Expr: ({ expr }) => expr,
+          default: () => false,
+        });
+        return exItem;
+      });
+    },
   };
 }
 
@@ -91,6 +105,8 @@ export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
     const { focusCtx, keyboardCtx } = ctx;
     const { exObjectFocusCtx } = focusCtx;
+
+    // Down Root
 
     keyboardCtx
       .onKeydown$(Hotkeys.Down, focusCtx.mapFocus$(FocusKind.is.None))
@@ -147,7 +163,13 @@ export namespace ExObjectFocusFuncs {
       .subscribe(async (property) => {
         const exObject = await firstValueFrom(property.parent$);
         assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-        focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+
+        const prevProperty = await exObjectFocusCtx.prevProperty(property);
+        if (prevProperty === null) {
+          focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+        } else {
+          focusCtx.setFocus(FocusKind.Property({ property: prevProperty }));
+        }
       });
   }
 }

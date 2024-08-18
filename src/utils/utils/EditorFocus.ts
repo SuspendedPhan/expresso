@@ -1,10 +1,13 @@
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
+import type { ExItem } from "src/ex-object/ExItem";
+import { ExObjectFns } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
-import { Hotkeys, FocusKind } from "src/utils/utils/Focus";
+import { FocusKind } from "src/utils/utils/Focus";
+import { ofType } from "unionize";
 
 export const EditorFocusKind = {
-  EditorNewActions: {},
+  EditorNewActions: ofType<{ exItem: ExItem | null }>(),
 };
 
 export namespace EditorFocusFuncs {
@@ -14,18 +17,23 @@ export namespace EditorFocusFuncs {
     keyboardCtx.onKeydown$(
       "n",
       ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor)
-    ).subscribe(() => {
-      focusCtx.setFocus(FocusKind.EditorNewActions());
+    ).subscribe(async () => {
+      const exItem = await firstValueFrom(ctx.focusCtx.exObjectFocusCtx.exItemFocus$);
+      focusCtx.setFocus(FocusKind.EditorNewActions({
+        exItem: exItem === false ? null : exItem,
+      }));
     });
 
     const focusIsEditorNewActions$ = focusCtx.mapFocus$(
-      FocusKind.is.EditorNewActions
+      (focus) => {
+        return FocusKind.is.EditorNewActions(focus) ? focus : false;
+      }
     );
 
     ctx.viewCtx.commandCardCtx.addCommandCard({
       title: "Editor",
       commands: ["n"],
-      visible$: focusIsEditorNewActions$,
+      visible$: focusIsEditorNewActions$.pipe(map((focus) => focus !== false)),
     });
 
     keyboardCtx.onKeydown$(
@@ -37,17 +45,17 @@ export namespace EditorFocusFuncs {
     });
 
     keyboardCtx.onKeydown$(
-      Hotkeys.Down,
-      focusCtx.mapFocus$(FocusKind.is.None)
-    ).subscribe(async () => {
-      const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const rootExObjects = await firstValueFrom(project.rootExObjects$);
-      const exObject = rootExObjects[0];
-      if (exObject === undefined) {
+      "r",
+      focusIsEditorNewActions$
+    ).subscribe(async (focus) => {
+      const exItem = focus.exItem;
+      if (exItem === null) {
         return;
       }
-
-      focusCtx.setFocus(FocusKind.ExObject({ exObject }));
+      
+      const exObject = await ExObjectFns.getExObject(exItem);
+      ExObjectFns.addBasicPropertyBlank(ctx, exObject);
+      focusCtx.popFocus();
     });
   }
 }

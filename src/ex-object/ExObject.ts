@@ -6,7 +6,7 @@ import {
   type Component,
   type CustomComponent,
 } from "src/ex-object/Component";
-import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
+import { ExItemType, type ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
 import type {
   BasicProperty,
   CloneCountProperty,
@@ -48,9 +48,22 @@ export namespace ExObjectFns {
     exObject: ExObject
   ) {
     const property = await Create.Property.basicBlank(ctx);
+    property.parent$.next(exObject);
     const properties = await firstValueFrom(exObject.basicProperties$);
     const newProperties = [...properties, property];
     exObject.basicProperties$.next(newProperties);
+  }
+
+  export async function getExObject(exItem: ExItem): Promise<ExObject> {
+    let item: ExItem | null = exItem;
+    while (item !== null) {
+      if (item.itemType === ExItemType.ExObject) {
+        return item;
+      }
+      const parent: Parent = await firstValueFrom(item.parent$);
+      item = parent;
+    }
+    throw new Error("ExObject not found");
   }
 }
 
