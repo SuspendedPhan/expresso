@@ -37,6 +37,14 @@ export namespace EditorFocusFuncs {
     });
 
     keyboardCtx.onKeydown$(
+      "p",
+      focusIsEditorNewActions$
+    ).subscribe(() => {
+      ctx.projectManager.addProjectNew();
+      focusCtx.popFocus();
+    });
+
+    keyboardCtx.onKeydown$(
       "o",
       focusIsEditorNewActions$
     ).subscribe(() => {
@@ -55,6 +63,20 @@ export namespace EditorFocusFuncs {
       
       const exObject = await ExObjectFns.getExObject(exItem);
       ExObjectFns.addBasicPropertyBlank(ctx, exObject);
+      focusCtx.popFocus();
+    });
+
+    keyboardCtx.onKeydown$(
+      "c",
+      focusIsEditorNewActions$
+    ).subscribe(async (focus) => {
+      const exItem = focus.exItem;
+      if (exItem === null) {
+        return;
+      }
+      
+      const exObject = await ExObjectFns.getExObject(exItem);
+      ExObjectFns.addChildBlank(ctx, exObject);
       focusCtx.popFocus();
     });
   }
