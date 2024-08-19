@@ -77,17 +77,6 @@ export namespace ExObjectFns {
       parent = nextParent;
     }
   }
-
-  // export async function getNextSibling(
-  //   exObject: ExObject,
-  // ): Promise<ExObject | null> {
-  //   const children = await firstValueFrom(exObject.children$);
-  //   const index = children.indexOf(child);
-  //   if (index === -1) {
-  //     return null;
-  //   }
-  //   return children[index + 1] || null;
-  // }
 }
 
 export namespace CreateExObject {
