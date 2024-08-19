@@ -35,8 +35,8 @@ export namespace ExprFocusFuncs {
   }
 
   export async function register(ctx: MainContext) {
-    const { focusCtx, keyboardCtx } = ctx;
-    const { exObjectFocusCtx, exprFocusCtx } = focusCtx;
+    const { focusCtx, keyboardCtx, exObjectFocusCtx } = ctx;
+    const { exprFocusCtx } = focusCtx;
 
     // Replace Command
 
@@ -75,7 +75,11 @@ export namespace ExprFocusFuncs {
       .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
       .subscribe(async (property) => {
         const expr = await firstValueFrom(property.expr$);
-        focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
+        if (expr.exprType === ExprType.NumberExpr) {
+          exObjectFocusCtx.focusNextExItem(property);
+        } else {
+          focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
+        }
       });
 
     keyboardCtx
@@ -92,10 +96,7 @@ export namespace ExprFocusFuncs {
             break;
           case ExprType.NumberExpr:
             const property = await ExprFuncs.getProperty(expr);
-            const nextProperty = await exObjectFocusCtx.nextProperty(property);
-            if (nextProperty !== null) {
-              focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
-            }
+            exObjectFocusCtx.focusNextExItem(property);
             break;
         }
       });

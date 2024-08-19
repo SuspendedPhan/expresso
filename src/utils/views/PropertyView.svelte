@@ -32,7 +32,7 @@
     map((expr) => ExprLayout.create(ctx, expr))
   );
 
-  const isFocused$ = ctx.focusCtx.exObjectFocusCtx.propertyFocus$.pipe(
+  const isFocused$ = ctx.exObjectFocusCtx.propertyFocus$.pipe(
     rxEquals(property)
   );
   const editingName$ = of(false);

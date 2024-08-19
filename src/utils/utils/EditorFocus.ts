@@ -18,7 +18,7 @@ export namespace EditorFocusFuncs {
       "n",
       ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor)
     ).subscribe(async () => {
-      const exItem = await firstValueFrom(ctx.focusCtx.exObjectFocusCtx.exItemFocus$);
+      const exItem = await firstValueFrom(ctx.exObjectFocusCtx.exItemFocus$);
       focusCtx.setFocus(FocusKind.EditorNewActions({
         exItem: exItem === false ? null : exItem,
       }));

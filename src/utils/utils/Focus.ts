@@ -1,6 +1,6 @@
 import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import { createExObjectFocusContext, ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
+import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
 import { EditorFocusFuncs, EditorFocusKind } from "src/utils/utils/EditorFocus";
@@ -35,7 +35,6 @@ export function createFocusContext(ctx: MainContext) {
   const focusStack = new Array<Focus>();
   const data = {
     focus$: new BehaviorSubject<Focus>(FocusKind.None()),
-    exObjectFocusCtx: createExObjectFocusContext(ctx),
     exprFocusCtx: ExprFocusFuncs.createContext(ctx),
   };
   return {

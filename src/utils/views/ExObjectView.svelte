@@ -25,20 +25,14 @@
     return exObject$.pipe(rxEquals(exObject));
   }
 
-  const exObjectFocused$ = equals$(
-    ctx.focusCtx.exObjectFocusCtx.exObjectFocus$
-  );
+  const exObjectFocused$ = equals$(ctx.exObjectFocusCtx.exObjectFocus$);
   const exObjectName$ = exObject.name$;
 
-  const exObjectNameFocused$ = equals$(
-    ctx.focusCtx.exObjectFocusCtx.nameFocus$
-  );
+  const exObjectNameFocused$ = equals$(ctx.exObjectFocusCtx.nameFocus$);
 
   const isEditingExObjectName$ = of(false);
   const componentName$ = ComponentFns.getName$(exObject.component);
-  const componentNameFocused$ = equals$(
-    ctx.focusCtx.exObjectFocusCtx.componentFocus$
-  );
+  const componentNameFocused$ = equals$(ctx.exObjectFocusCtx.componentFocus$);
 
   function handleClickExObjectName() {}
 

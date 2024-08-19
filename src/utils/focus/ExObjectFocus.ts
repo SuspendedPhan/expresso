@@ -16,6 +16,8 @@ export const ExObjectFocusKind = {
 };
 
 export function createExObjectFocusContext(ctx: MainContext) {
+  const { focusCtx } = ctx;
+
   function mapExObjectFocus$(
     focusKindCheck: (obj: any) => boolean
   ): OBS<ExObject | false> {
@@ -38,6 +40,21 @@ export function createExObjectFocusContext(ctx: MainContext) {
     }
   }
 
+  async function getNextProperty(property: Property): Promise<Property | null> {
+    const exObject = await firstValueFrom(property.parent$);
+    assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+    let found = false;
+    for await (const p of getProperties(exObject)) {
+      if (found) {
+        return p;
+      }
+      if (p === property) {
+        found = true;
+      }
+    }
+    return null;
+  };
+
   return {
     get exObjectFocus$() {
       return mapExObjectFocus$(FocusKind.is.ExObject);
@@ -57,20 +74,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
       });
     },
 
-    async nextProperty(property: Property): Promise<Property | null> {
-      const exObject = await firstValueFrom(property.parent$);
-      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-      let found = false;
-      for await (const p of getProperties(exObject)) {
-        if (found) {
-          return p;
-        }
-        if (p === property) {
-          found = true;
-        }
-      }
-      return null;
-    },
+    getNextProperty,
 
     async prevProperty(property: Property): Promise<Property | null> {
       const exObject = await firstValueFrom(property.parent$);
@@ -83,6 +87,18 @@ export function createExObjectFocusContext(ctx: MainContext) {
         prev = p;
       }
       return null;
+    },
+
+    async focusNextExItem(property: Property) {
+      const nextProperty = await getNextProperty(property);
+      if (nextProperty !== null) {
+        focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
+      }
+    },
+
+    async getNextExItem(property: Property): Promise<ExItem | null> {
+      const nextProperty = await getNextProperty(property);
+      return nextProperty;
     },
 
     get exItemFocus$() {
@@ -104,7 +120,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
 export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
     const { focusCtx, keyboardCtx } = ctx;
-    const { exObjectFocusCtx } = focusCtx;
+    const { exObjectFocusCtx } = ctx;
 
     // Down Root
 

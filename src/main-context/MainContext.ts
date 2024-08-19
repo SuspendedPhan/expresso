@@ -16,6 +16,7 @@ import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
+import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -29,6 +30,7 @@ export default class MainContext {
   public readonly projectMutator = new ProjectMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly focusCtx = createFocusContext(this);
+  public readonly exObjectFocusCtx = createExObjectFocusContext(this);
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
   public readonly keyboardCtx = createKeyboardContext(this);
