@@ -23,6 +23,8 @@ export type Focus = UnionOf<typeof FocusKind>;
 export enum Hotkeys {
   Down = "ArrowDown,s",
   Up = "ArrowUp,w",
+  Left = "ArrowLeft,a",
+  Right = "ArrowRight,d",
 }
 
 export interface FocusContextData {

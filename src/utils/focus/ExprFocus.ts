@@ -4,7 +4,7 @@ import { ExItemType, ExprType, type Expr } from "src/ex-object/ExItem";
 import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
-import type { OBS } from "src/utils/utils/Utils";
+import { ArrayFns, type OBS } from "src/utils/utils/Utils";
 import { ofType } from "unionize";
 
 export const ExprFocusKind = {
@@ -106,8 +106,6 @@ export namespace ExprFocusFuncs {
     keyboardCtx
       .onKeydown$(Hotkeys.Up, exprFocusCtx.exprFocus$)
       .subscribe(async (focus) => {
-        console.log("Up");
-        
         const expr = focus.expr;
         const parent = await firstValueFrom(expr.parent$);
         assert(parent !== null);
@@ -123,5 +121,68 @@ export namespace ExprFocusFuncs {
             break;
         }
       });
+
+    // Left
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Left, exprFocusCtx.exprFocus$)
+      .subscribe(async (focus) => {
+        const expr = focus.expr;
+        const parent = await firstValueFrom(expr.parent$);
+        assert(parent !== null);
+
+        if (
+          parent.itemType === ExItemType.Property &&
+          expr.exprType === ExprType.NumberExpr
+        ) {
+          const property = parent;
+          focusCtx.setFocus(FocusKind.Property({ property }));
+          return;
+        }
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Left, exprFocusCtx.exprFocus$)
+      .subscribe(async (focus) => {
+        const direction = -1;
+        focusHorizontal(focus, direction);
+      });
+
+    // Right
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Right, exObjectFocusCtx.propertyFocus$)
+      .subscribe(async (property) => {
+        const expr = await firstValueFrom(property.expr$);
+        if (expr.exprType === ExprType.NumberExpr) {
+          focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
+        }
+      });
+
+    keyboardCtx
+      .onKeydown$(Hotkeys.Right, exprFocusCtx.exprFocus$)
+      .subscribe(async (focus) => {
+        const direction = 1;
+        focusHorizontal(focus, direction);
+      });
+
+    async function focusHorizontal(
+      focus: { tag: "Expr" } & { expr: Expr; isEditing: boolean },
+      direction: number
+    ) {
+      const expr = focus.expr;
+      const parent = await firstValueFrom(expr.parent$);
+      assert(parent !== null);
+
+      if (parent.itemType !== ExItemType.Expr) return;
+
+      const callExpr = parent;
+      const args = await firstValueFrom(callExpr.args$);
+      const index = args.indexOf(expr);
+      assert(index !== -1);
+
+      const arg = ArrayFns.getWrapped(args, index + direction);
+      focusCtx.setFocus(FocusKind.Expr({ expr: arg, isEditing: false }));
+    }
   }
 }

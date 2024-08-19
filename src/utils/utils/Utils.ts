@@ -1,3 +1,4 @@
+import assert from "assert-ts";
 import { BehaviorSubject, map, pipe, Subject, type Observable } from "rxjs";
 
 export type OBS<T> = Observable<T>;
@@ -41,6 +42,24 @@ export interface Destroyable {
 export namespace ArrayFns {
   export function getFromBack<T>(arr: T[], index: number): T | undefined {
     return arr[arr.length - 1 - index];
+  }
+
+  export function getWrapped<T>(arr: T[], index: number): T {
+    if (index < 0) {
+      const val = arr[arr.length + index];
+      assert(val !== undefined);
+      return val;
+    }
+
+    if (index >= arr.length) {
+      const val = arr[index % arr.length];
+      assert(val !== undefined);
+      return val;
+    }
+
+    const val = arr[index];
+    assert(val !== undefined);
+    return val;
   }
 }
 
