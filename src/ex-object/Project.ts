@@ -12,6 +12,12 @@ export interface Project extends Destroyable {
   readonly currentOrdinal$: SUB<number>;
 }
 
+export function createProjectContext(ctx: MainContext) {
+  return {
+    currentProject$: ctx.projectManager.currentProject$,
+  };
+}
+
 export namespace ProjectFns {
   export async function getAndIncrementOrdinal(
     project: Project
@@ -26,6 +32,7 @@ export namespace ProjectFns {
     const component = await CreateComponent.customBlank(ctx);
     componentL.push(component);
     project.componentArr$.next(componentL);
+    return component;
   }
 }
 

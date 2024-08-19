@@ -71,6 +71,11 @@ export const CanvasComponentStore = {
 
 export namespace CreateComponent {
   export async function customBlank(ctx: MainContext): Promise<CustomComponent> {
+    const rootExObjects: ExObject[] = [];
+    return await customFrom(ctx, rootExObjects);
+  }
+
+  async function customFrom(ctx: MainContext, rootExObjects: ExObject[]): Promise<CustomComponent> {
     const project = await firstValueFrom(ctx.projectManager.currentProject$);
     const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
     const id = `custom-${crypto.randomUUID()}`;
@@ -79,7 +84,7 @@ export namespace CreateComponent {
       componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(`Component ${ordinal}`),
       parameters$: new BehaviorSubject<ComponentParameter[]>([]),
-      rootExObjects$: new BehaviorSubject<ExObject[]>([]),
+      rootExObjects$: new BehaviorSubject<ExObject[]>(rootExObjects),
     };
   }
 }

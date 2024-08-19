@@ -17,6 +17,7 @@ import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
 import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
+import { createProjectContext } from "src/ex-object/Project";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -25,6 +26,7 @@ export interface ExprReplacement {
 
 export default class MainContext {
   public readonly projectManager = new ProjectManager(this);
+  public readonly projectCtx = createProjectContext(this);
   public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
   public readonly projectMutator = new ProjectMutator(this);
