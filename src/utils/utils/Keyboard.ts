@@ -6,26 +6,33 @@ export enum KeyboardResult {
   OutOfScope,
 }
 
-export function createKeyboardContext(_ctx: MainContext) {
+export function createKeyboardContext(ctx: MainContext) {
+  function onKeydown$<T>(keys: string, data$: OBS<T | false>, _tag = "") {
+    const keyArr = keys.split(",");
+
+    return data$.pipe(
+      switchMap((data) => {
+        if (data === false) {
+          return of();
+        }
+
+        return fromEvent<KeyboardEvent>(window, "keydown").pipe(
+          filter((event) => {
+            const newLocal = keyArr.includes(event.key);
+            return newLocal;
+          }),
+          map(() => data)
+        );
+      })
+    );
+  }
+
   return {
-    onKeydown$: <T>(keys: string, data$: OBS<T | false>, _tag = "") => {
-      const keyArr = keys.split(",");
-
-      return data$.pipe(
-        switchMap((data) => {
-          if (data === false) {
-            return of();
-          }
-
-          return fromEvent<KeyboardEvent>(window, "keydown").pipe(
-            filter((event) => {
-              const newLocal = keyArr.includes(event.key);
-              return newLocal;
-            }),
-            map(() => data)
-          );
-        })
-      );
+    onKeydown$,
+    registerCancel: <T>(data$: OBS<T | false>) => {
+      onKeydown$("Escape", data$).subscribe(() => {
+        ctx.focusCtx.popFocus();
+      });
     },
   };
 }

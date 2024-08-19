@@ -79,5 +79,7 @@ export namespace EditorFocusFuncs {
       ExObjectFns.addChildBlank(ctx, exObject);
       focusCtx.popFocus();
     });
+
+    keyboardCtx.registerCancel(focusIsEditorNewActions$);
   }
 }
