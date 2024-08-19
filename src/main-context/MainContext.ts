@@ -18,6 +18,7 @@ import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
 import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
 import { createProjectContext } from "src/ex-object/Project";
+import { createRefactorContext } from "src/utils/utils/Refactor";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -36,6 +37,7 @@ export default class MainContext {
   public readonly viewCtx = new MainViewContext(this);
   public readonly goBridge: GoBridge;
   public readonly keyboardCtx = createKeyboardContext(this);
+  public readonly refactorCtx = createRefactorContext(this);
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);

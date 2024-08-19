@@ -70,12 +70,17 @@ export const CanvasComponentStore = {
 } satisfies Record<string, CanvasComponent>;
 
 export namespace CreateComponent {
-  export async function customBlank(ctx: MainContext): Promise<CustomComponent> {
+  export async function customBlank(
+    ctx: MainContext
+  ): Promise<CustomComponent> {
     const rootExObjects: ExObject[] = [];
     return await customFrom(ctx, rootExObjects);
   }
 
-  export async function customFrom(ctx: MainContext, rootExObjects: ExObject[]): Promise<CustomComponent> {
+  export async function customFrom(
+    ctx: MainContext,
+    rootExObjects: ExObject[]
+  ): Promise<CustomComponent> {
     const project = await firstValueFrom(ctx.projectManager.currentProject$);
     const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
     const id = `custom-${crypto.randomUUID()}`;
@@ -118,9 +123,11 @@ export namespace ComponentFns {
 
   export async function addRootExObjectBlank(
     _ctx: MainContext,
-    component: CustomComponent,
+    component: CustomComponent
   ): Promise<void> {
-    const exObject = await CreateExObject.blank(_ctx);
+    const exObject = await CreateExObject.blank(_ctx, {
+      component,
+    });
     const rootExObjects = await firstValueFrom(component.rootExObjects$);
     component.rootExObjects$.next([...rootExObjects, exObject]);
   }

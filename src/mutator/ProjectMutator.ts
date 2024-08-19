@@ -13,7 +13,7 @@ export default class ProjectMutator {
   public constructor(private readonly ctx: MainContext) {}
 
   public async addRootObject() {
-    const object = await CreateExObject.blank(this.ctx);
+    const object = await CreateExObject.blank(this.ctx, {});
     this.ctx.eventBus.rootExObjectAdded$.next(object);
 
     this.ctx.projectManager.currentProject$.pipe(first()).subscribe((project) => {

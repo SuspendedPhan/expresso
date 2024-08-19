@@ -32,7 +32,7 @@ export interface ExObject extends ExItemBase {
 
 export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
-    const child = await CreateExObject.blank(ctx);
+    const child = await CreateExObject.blank(ctx, {});
     addChild(exObject, child);
   }
 
@@ -112,42 +112,37 @@ export namespace ExObjectFns {
     const newRootObjects = [...rootObjects];
     newRootObjects[index] = newExObject;
     project.rootExObjects$.next(newRootObjects);
+    ctx.eventBus.rootExObjectAdded$.next(newExObject);
 
     exObject.destroy$.next();
   }
 }
 
 export namespace CreateExObject {
-  export async function blank(ctx: MainContext): Promise<ExObject> {
-    const id = `ex-object-${crypto.randomUUID()}`;
-    const component = CanvasComponentStore.circle;
-    const componentProperties = await createComponentProperties(ctx, component);
-    const cloneCountProperty = await Create.Property.cloneCountBlank(ctx);
 
-    const object = from(
-      ctx,
-      component,
-      id,
-      "Object",
-      componentProperties,
-      [],
-      cloneCountProperty,
-      []
-    );
-    return object;
-  }
-
-  export async function from(
+  export async function blank(
     ctx: MainContext,
-    component: Component,
-    id: string,
-    name: string,
-    componentProperties: ComponentParameterProperty[],
-    basicProperties: BasicProperty[],
-    cloneCountProperty: CloneCountProperty,
-    children: ExObject[]
+    data: {
+      id?: string;
+      component?: Component;
+      name?: string;
+      componentProperties?: ComponentParameterProperty[];
+      basicProperties?: BasicProperty[];
+      cloneCountProperty?: CloneCountProperty;
+      children?: ExObject[];
+    },
   ): Promise<ExObject> {
+    const ordinal = await ctx.projectCtx.getOrdinalProm();
+
+    const id = data.id ?? `ex-object-${crypto.randomUUID()}`;
     const base = await ctx.objectFactory.createExItemBase(id);
+    const component = data.component ?? CanvasComponentStore.circle;
+    const name = data.name ?? `Object ${ordinal}`;
+    const componentProperties = data.componentProperties ?? await createComponentProperties(ctx, component);
+    const basicProperties = data.basicProperties ?? [];
+    const cloneCountProperty = data.cloneCountProperty ?? await Create.Property.cloneCountBlank(ctx);
+    const children = data.children ?? [];
+
     const object: ExObject = {
       ...base,
       name$: createBehaviorSubjectWithLifetime(base.destroy$, name),

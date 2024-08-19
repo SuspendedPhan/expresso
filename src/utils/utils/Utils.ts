@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { BehaviorSubject, map, pipe, Subject, type Observable } from "rxjs";
+import { BehaviorSubject, map, partition, pipe, Subject, type Observable } from "rxjs";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -69,4 +69,10 @@ export function rxEquals<T>(obj: T) {
       return obj === other;
     })
   );
+}
+
+export function partitionFirst<T>(
+  observable: OBS<T>
+): [OBS<T>, OBS<T>] {
+  return partition(observable, (_, index) => index === 0);
 }

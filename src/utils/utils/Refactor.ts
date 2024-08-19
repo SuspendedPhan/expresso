@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { CreateComponent } from "src/ex-object/Component";
-import type { ExObject } from "src/ex-object/ExObject";
+import { CreateExObject, ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { ProjectFns } from "src/ex-object/Project";
 import type MainContext from "src/main-context/MainContext";
 
@@ -11,6 +11,12 @@ export function createRefactorContext(ctx: MainContext) {
       const component = await CreateComponent.customFrom(ctx, [exObject]);
       ProjectFns.addComponent(ctx, project, component);
       
+      const name = await firstValueFrom(exObject.name$);
+      const newExObject = await CreateExObject.blank(ctx, {
+        component,
+        name,
+      });
+      ExObjectFns.replaceExObject(ctx, exObject, newExObject);
     },
   };
 }

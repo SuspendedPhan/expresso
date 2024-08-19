@@ -13,7 +13,9 @@ export const ExObjectFocusKind = {
   ExObjectName: ofType<{ exObject: ExObject }>(),
   ExObjectComponent: ofType<{ exObject: ExObject }>(),
   Property: ofType<{ property: Property }>(),
+  
   ExItemNewActions: ofType<{ exItem: ExItem }>(),
+  ExObjectRefactor: ofType<{ exObject: ExObject }>(),
 };
 
 export function createExObjectFocusContext(ctx: MainContext) {
@@ -211,6 +213,32 @@ export namespace ExObjectFocusFuncs {
     });
 
     keyboardCtx.registerCancel(newActionsFocus$);
+
+    // Refactor
+
+    keyboardCtx
+      .onKeydown$("r", exObjectFocusCtx.exObjectFocus$)
+      .subscribe(async (exObject) => {
+        focusCtx.setFocus(FocusKind.ExObjectRefactor({ exObject }));
+      });
+
+    const refactorFocus$ = focusCtx.mapFocus$((focus) =>
+      FocusKind.is.ExObjectRefactor(focus) ? focus : false
+    );
+
+    keyboardCtx.onKeydown$("c", refactorFocus$).subscribe(async (focus) => {
+      const exObject = focus.exObject;
+      ctx.refactorCtx.extractComponent(exObject);
+      focusCtx.popFocus();
+    });
+
+    ctx.viewCtx.commandCardCtx.addCommandCard({
+      title: "ExObject Refactor",
+      commands: ["Extract Component"],
+      visible$: focusCtx.mapFocus$(FocusKind.is.ExObjectRefactor),
+    });
+
+    keyboardCtx.registerCancel(refactorFocus$);
 
     // Down Root
 

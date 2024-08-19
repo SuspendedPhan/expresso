@@ -79,15 +79,17 @@ export default class Rehydrator {
     });
     const children = await Promise.all(children$P);
 
-    const exObject: ExObject = await Create.ExObject.from(
+    const exObject: ExObject = await Create.ExObject.blank(
       this.ctx,
-      component,
-      deExObject.id,
-      deExObject.name,
-      componentPropertyL,
-      basicPropertyL,
-      cloneCountProperty,
-      children
+      {
+        component,
+        id: deExObject.id,
+        name: deExObject.name,
+        componentProperties: componentPropertyL,
+        basicProperties: basicPropertyL,
+        cloneCountProperty,
+        children,
+      }
     );
     return exObject;
   }

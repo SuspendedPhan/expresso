@@ -13,15 +13,44 @@ export default class GoBridge {
   }
 
   @loggedMethod
-  private setup(goModule: GoModule, ctx: MainContext) {
+  private async setup(goModule: GoModule, ctx: MainContext) {
     ctx.eventBus.rootExObjectAdded$.subscribe((rootExObject) => {
       goModule.Evaluator.addRootExObject(rootExObject.id);
     });
 
+    // const project = await ctx.projectCtx.getCurrentProjectProm();
+    // const [first$, rest$] = partitionFirst(project.rootExObjectArrEvt$);
+
+    // first$.subscribe((evt) => {
+    //   evt.items.forEach((rootExObject) => {
+    //     goModule.Evaluator.addRootExObject(rootExObject.id);
+    //   });
+    // });
+
+    // rest$.subscribe((evt) => {
+    //   switch (evt.change.type) {
+    //     case "ItemAdded":
+    //       evt.items.forEach((rootExObject) => {
+    //         goModule.Evaluator.addRootExObject(rootExObject.id);
+    //       });
+    //       break;
+    //     case "ItemRemoved":
+    //       evt.items.forEach((rootExObject) => {
+    //         goModule.Evaluator.removeRootExObject(rootExObject.id);
+    //       });
+    //       break;
+    //     default:
+    //       console.error("Unexpected change type", evt.change);
+    //   }
+    // });
+
     ctx.eventBus.objectAdded$.subscribe((object) => {
       goModule.ExObject.create(object.id);
 
-      goModule.ExObject.setCloneCountProperty(object.id, object.cloneCountProperty.id);
+      goModule.ExObject.setCloneCountProperty(
+        object.id,
+        object.cloneCountProperty.id
+      );
 
       for (const property of object.componentParameterProperties) {
         goModule.ExObject.addComponentParameterProperty(object.id, property.id);
