@@ -65,6 +65,17 @@ export namespace ExObjectFns {
     }
     throw new Error("ExObject not found");
   }
+
+  // export async function getNextSibling(
+  //   exObject: ExObject,
+  // ): Promise<ExObject | null> {
+  //   const children = await firstValueFrom(exObject.children$);
+  //   const index = children.indexOf(child);
+  //   if (index === -1) {
+  //     return null;
+  //   }
+  //   return children[index + 1] || null;
+  // }
 }
 
 export namespace CreateExObject {

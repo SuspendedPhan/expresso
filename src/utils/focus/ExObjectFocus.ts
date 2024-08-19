@@ -93,7 +93,21 @@ export function createExObjectFocusContext(ctx: MainContext) {
       const nextProperty = await getNextProperty(property);
       if (nextProperty !== null) {
         focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
+        return;
       }
+
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+
+      // Find the first child exObject
+      const children = await firstValueFrom(exObject.children$);
+      const child = children[0];
+      if (child !== undefined) {
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: child }));
+        return;
+      }
+
+      // Find the next root object
     },
 
     async getNextExItem(property: Property): Promise<ExItem | null> {
