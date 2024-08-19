@@ -50,10 +50,14 @@
   function handleMouseLeave() {
     tooltipVisible = false;
   }
+
+  function handleMousedown() {
+    ctx.focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
+  }
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>
-  <FocusView focused={$exprFocused$}>
+  <FocusView focused={$exprFocused$} on:mousedown={handleMousedown}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div

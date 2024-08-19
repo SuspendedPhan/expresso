@@ -65,7 +65,16 @@ export namespace FocusFns {
     ExprFocusFuncs.register(ctx);
 
     document.addEventListener("keydown", async (event: KeyboardEvent) => {
-      // todp: handle input editing
+      if (event.target !== null && "tagName" in event.target) {
+        if (event.target.tagName === "INPUT") {
+          return;
+        }
+      }
+
+      console.log("keydown", event.key);
+      
+      
+
       switch (event.key) {
         case "ArrowDown":
         case "ArrowUp":
@@ -74,6 +83,10 @@ export namespace FocusFns {
           event.preventDefault();
           break;
       }
+    });
+
+    document.addEventListener("mousedown", async () => {
+      ctx.focusCtx.setFocus(FocusKind.None());
     });
   }
 }

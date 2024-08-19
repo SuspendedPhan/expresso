@@ -11,6 +11,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { FocusKind } from "src/utils/utils/Focus";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -34,14 +35,26 @@
   const componentName$ = ComponentFns.getName$(exObject.component);
   const componentNameFocused$ = equals$(ctx.exObjectFocusCtx.componentFocus$);
 
-  function handleClickExObjectName() {}
+  function handleClick() {
+    ctx.focusCtx.setFocus(FocusKind.ExObject({ exObject }));
+  }
 
-  function handleClickComponentName() {}
+  function handleClickExObjectName() {
+    ctx.focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
+  }
+
+  function handleClickComponentName() {
+    ctx.focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+  }
 </script>
 
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
-    <FocusView focused={$exObjectFocused$} class="ex-card w-max flex flex-col">
+    <FocusView
+      focused={$exObjectFocused$}
+      on:mousedown={handleClick}
+      class="ex-card w-max flex flex-col"
+    >
       <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">

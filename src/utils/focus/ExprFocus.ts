@@ -20,6 +20,21 @@ export namespace ExprFocusFuncs {
         });
       },
 
+      getExprFocus$(
+        isEditing: boolean
+      ): OBS<typeof FocusKind._TaggedRecord.Expr | false> {
+        return ctx.focusCtx.mapFocus$((focus) => {
+          if (
+            FocusKind.is.Expr(focus) &&
+            focus.isEditing === isEditing
+          ) {
+            return focus;
+          } else {
+            return false;
+          }
+        });
+      },
+
       exprFocused$(expr: Expr): OBS<boolean> {
         return ctx.focusCtx.mapFocus$((focus) => {
           return FocusKind.is.Expr(focus) && focus.expr === expr;
@@ -69,6 +84,8 @@ export namespace ExprFocusFuncs {
       focusCtx.setFocus(FocusKind.Expr({ expr: newExpr, isEditing: false }));
     });
 
+    keyboardCtx.registerCancel(exprFocusCtx.getExprFocus$(true));
+
     // Down
 
     keyboardCtx
@@ -83,7 +100,7 @@ export namespace ExprFocusFuncs {
       });
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Down, exprFocusCtx.exprFocus$)
+      .onKeydown$(Hotkeys.Down, exprFocusCtx.getExprFocus$(false))
       .subscribe(async (focus) => {
         const expr = focus.expr;
         switch (expr.exprType) {
@@ -104,7 +121,7 @@ export namespace ExprFocusFuncs {
     // Up
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Up, exprFocusCtx.exprFocus$)
+      .onKeydown$(Hotkeys.Up, exprFocusCtx.getExprFocus$(false))
       .subscribe(async (focus) => {
         const expr = focus.expr;
         const parent = await firstValueFrom(expr.parent$);
@@ -125,7 +142,7 @@ export namespace ExprFocusFuncs {
     // Left
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Left, exprFocusCtx.exprFocus$)
+      .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
       .subscribe(async (focus) => {
         const expr = focus.expr;
         const parent = await firstValueFrom(expr.parent$);
@@ -142,7 +159,7 @@ export namespace ExprFocusFuncs {
       });
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Left, exprFocusCtx.exprFocus$)
+      .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
       .subscribe(async (focus) => {
         const direction = -1;
         focusHorizontal(focus, direction);

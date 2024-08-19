@@ -112,12 +112,43 @@ export function createExObjectFocusContext(ctx: MainContext) {
       const rootExObject = await ExObjectFns.getRootExObject(exObject);
       const rootExObjects = await firstValueFrom(project.rootExObjects$);
       const index = rootExObjects.indexOf(rootExObject);
-      // debugger;
       assert(index !== -1);
       const nextIndex = index + 1;
       const nextRootExObject = rootExObjects[nextIndex];
       if (nextRootExObject !== undefined) {
         focusCtx.setFocus(FocusKind.ExObject({ exObject: nextRootExObject }));
+        return;
+      }
+    },
+
+    async focusPrevExItem(property: Property) {
+      const prevProperty = await this.prevProperty(property);
+      if (prevProperty !== null) {
+        focusCtx.setFocus(FocusKind.Property({ property: prevProperty }));
+        return;
+      }
+
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
+
+      // Find the parent exObject
+      const parent = await firstValueFrom(exObject.parent$);
+      if (parent !== null) {
+        assert(parent.itemType === ExItemType.ExObject);
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: parent }));
+        return;
+      }
+
+      // Find the previous root object
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      const rootExObject = await ExObjectFns.getRootExObject(exObject);
+      const rootExObjects = await firstValueFrom(project.rootExObjects$);
+      const index = rootExObjects.indexOf(rootExObject);
+      assert(index !== -1);
+      const prevIndex = index - 1;
+      const prevRootExObject = rootExObjects[prevIndex];
+      if (prevRootExObject !== undefined) {
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: prevRootExObject }));
         return;
       }
     },
