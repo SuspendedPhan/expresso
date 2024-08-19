@@ -1,7 +1,7 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { ExItemType, type ExItem } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
+import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
@@ -108,6 +108,18 @@ export function createExObjectFocusContext(ctx: MainContext) {
       }
 
       // Find the next root object
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      const rootExObject = await ExObjectFns.getRootExObject(exObject);
+      const rootExObjects = await firstValueFrom(project.rootExObjects$);
+      const index = rootExObjects.indexOf(rootExObject);
+      // debugger;
+      assert(index !== -1);
+      const nextIndex = index + 1;
+      const nextRootExObject = rootExObjects[nextIndex];
+      if (nextRootExObject !== undefined) {
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: nextRootExObject }));
+        return;
+      }
     },
 
     async getNextExItem(property: Property): Promise<ExItem | null> {

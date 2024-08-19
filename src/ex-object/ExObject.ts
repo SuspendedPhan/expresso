@@ -1,3 +1,4 @@
+import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import {
   CanvasComponentStore,
@@ -32,13 +33,12 @@ export interface ExObject extends ExItemBase {
 export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
     const child = await CreateExObject.blank(ctx);
-    const children = await firstValueFrom(exObject.children$);
-    const newChildren = [...children, child];
-    exObject.children$.next(newChildren);
+    addChild(exObject, child);
   }
 
   export async function addChild(exObject: ExObject, child: ExObject) {
     const children = await firstValueFrom(exObject.children$);
+    child.parent$.next(exObject);
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
   }
@@ -64,6 +64,18 @@ export namespace ExObjectFns {
       item = parent;
     }
     throw new Error("ExObject not found");
+  }
+
+  export async function getRootExObject(exObject: ExObject): Promise<ExObject> {
+    let parent: Parent = exObject;
+    while (true) {
+      const nextParent: Parent = await firstValueFrom(parent.parent$);
+      if (nextParent === null) {
+        assert(parent.itemType === ExItemType.ExObject);
+        return parent;
+      }
+      parent = nextParent;
+    }
   }
 
   // export async function getNextSibling(
