@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { BehaviorSubject } from "rxjs";
+  import { BehaviorSubject, firstValueFrom, of } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import type { Expr } from "src/ex-object/ExItem";
 
@@ -10,15 +10,17 @@
   let input: HTMLInputElement;
 
   onMount(() => {
-    const sub = ctx.eventBus.submitExprReplaceCommand$.subscribe(() => {
+    const sub = ctx.eventBus.submitExprReplaceCommand$.subscribe(async () => {
       const text = input.value;
-      const value = parseFloat(text);
-      if (!isNaN(value)) {
-        // ctx.focusManager.focusExItem(expr);
-        ctx.mutator.replaceWithNumberExpr(expr, value);
-      } else if (text === "+") {
-        // ctx.focusManager.focusExItem(expr);
-        ctx.mutator.replaceWithCallExpr(expr);
+      const cmds$ = await ctx.exprCommandCtx.getReplacementCommands$Prom(
+        expr,
+        of(text)
+      );
+
+      const cmds = await firstValueFrom(cmds$);
+      const cmd = cmds[0];
+      if (cmd) {
+        cmd.execute();
       }
     });
 

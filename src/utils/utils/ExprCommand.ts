@@ -15,14 +15,19 @@ export function createExprCommandCtx(ctx: MainContext) {
     async getReplacementCommands$Prom(expr: Expr, query$: OBS<string>) {
       return query$.pipe(
         map((query) => {
-          const value = parseFloat(query);
-          if (!isNaN(value)) {
-            // ctx.focusManager.focusExItem(expr);
-            ctx.mutator.replaceWithNumberExpr(expr, value);
-          } else if (query === "+") {
-            // ctx.focusManager.focusExItem(expr);
-            ctx.mutator.replaceWithCallExpr(expr);
-          }
+          return [
+            {
+              label: `Replace with ${query}`,
+              execute: () => {
+                const value = parseFloat(query);
+                if (!isNaN(value)) {
+                  ctx.mutator.replaceWithNumberExpr(expr, value);
+                } else if (query === "+") {
+                  ctx.mutator.replaceWithCallExpr(expr);
+                }
+              },
+            },
+          ];
         })
       );
     },
