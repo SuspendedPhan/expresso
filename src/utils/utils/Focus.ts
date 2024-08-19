@@ -71,10 +71,6 @@ export namespace FocusFns {
         }
       }
 
-      console.log("keydown", event.key);
-      
-      
-
       switch (event.key) {
         case "ArrowDown":
         case "ArrowUp":

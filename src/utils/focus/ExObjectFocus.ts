@@ -13,6 +13,7 @@ export const ExObjectFocusKind = {
   ExObjectName: ofType<{ exObject: ExObject }>(),
   ExObjectComponent: ofType<{ exObject: ExObject }>(),
   Property: ofType<{ property: Property }>(),
+  ExItemNewActions: ofType<{ exItem: ExItem }>(),
 };
 
 export function createExObjectFocusContext(ctx: MainContext) {
@@ -53,7 +54,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
       }
     }
     return null;
-  };
+  }
 
   return {
     get exObjectFocus$() {
@@ -178,6 +179,38 @@ export namespace ExObjectFocusFuncs {
   export async function register(ctx: MainContext) {
     const { focusCtx, keyboardCtx } = ctx;
     const { exObjectFocusCtx } = ctx;
+
+    // New Actions
+
+    keyboardCtx
+      .onKeydown$("n", exObjectFocusCtx.exItemFocus$)
+      .subscribe(async (exItem) => {
+        focusCtx.setFocus(FocusKind.ExItemNewActions({ exItem }));
+      });
+
+    const newActionsFocus$ = focusCtx.mapFocus$((focus) =>
+      FocusKind.is.ExItemNewActions(focus) ? focus : false
+    );
+
+    keyboardCtx.onKeydown$("p", newActionsFocus$).subscribe(async (focus) => {
+      const exObject = await ExObjectFns.getExObject(focus.exItem);
+      ExObjectFns.addBasicPropertyBlank(ctx, exObject);
+      focusCtx.popFocus();
+    });
+
+    keyboardCtx.onKeydown$("c", newActionsFocus$).subscribe(async (focus) => {
+      const exObject = await ExObjectFns.getExObject(focus.exItem);
+      ExObjectFns.addChildBlank(ctx, exObject);
+      focusCtx.popFocus();
+    });
+
+    ctx.viewCtx.commandCardCtx.addCommandCard({
+      title: "ExObject Commands",
+      commands: ["New Property", "New Child"],
+      visible$: focusCtx.mapFocus$(FocusKind.is.ExItemNewActions),
+    });
+
+    keyboardCtx.registerCancel(newActionsFocus$);
 
     // Down Root
 
