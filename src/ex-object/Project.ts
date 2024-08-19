@@ -28,11 +28,15 @@ export namespace ProjectFns {
   }
 
   export async function addComponentBlank(ctx: MainContext, project: Project) {
-    const componentL = await firstValueFrom(project.componentArr$);
     const component = await CreateComponent.customBlank(ctx);
+    addComponent(ctx, project, component);
+    return component;
+  }
+
+  export async function addComponent(_ctx: MainContext, project: Project, component: CustomComponent) {
+    const componentL = await firstValueFrom(project.componentArr$);
     componentL.push(component);
     project.componentArr$.next(componentL);
-    return component;
   }
 }
 

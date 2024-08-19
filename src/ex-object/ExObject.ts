@@ -77,6 +77,44 @@ export namespace ExObjectFns {
       parent = nextParent;
     }
   }
+
+  export async function replaceExObject(
+    ctx: MainContext,
+    exObject: ExObject,
+    newExObject: ExObject
+  ) {
+    const parent = await firstValueFrom(exObject.parent$);
+    if (parent === null) {
+      replaceRootExObject(ctx, exObject, newExObject);
+      return;
+    }
+
+    assert(parent.itemType === ExItemType.ExObject);
+    const children = await firstValueFrom(parent.children$);
+    const index = children.indexOf(exObject);
+    assert(index !== -1);
+    newExObject.parent$.next(parent);
+    children[index] = newExObject;
+    parent.children$.next(children);
+    
+    exObject.destroy$.next();
+  }
+
+  async function replaceRootExObject(
+    ctx: MainContext,
+    exObject: ExObject,
+    newExObject: ExObject,
+  ) {
+    const project = await firstValueFrom(ctx.projectCtx.currentProject$);
+    const rootObjects = await firstValueFrom(project.rootExObjects$);
+    const index = rootObjects.indexOf(exObject);
+    assert(index !== -1);
+    const newRootObjects = [...rootObjects];
+    newRootObjects[index] = newExObject;
+    project.rootExObjects$.next(newRootObjects);
+
+    exObject.destroy$.next();
+  }
 }
 
 export namespace CreateExObject {

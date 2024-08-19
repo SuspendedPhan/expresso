@@ -75,7 +75,7 @@ export namespace CreateComponent {
     return await customFrom(ctx, rootExObjects);
   }
 
-  async function customFrom(ctx: MainContext, rootExObjects: ExObject[]): Promise<CustomComponent> {
+  export async function customFrom(ctx: MainContext, rootExObjects: ExObject[]): Promise<CustomComponent> {
     const project = await firstValueFrom(ctx.projectManager.currentProject$);
     const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
     const id = `custom-${crypto.randomUUID()}`;
