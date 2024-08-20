@@ -48,8 +48,9 @@ export namespace EditorFocusFuncs {
       focusCtx.popFocus();
     });
 
-    keyboardCtx.onKeydown$("o", focusIsEditorNewActions$).subscribe(() => {
-      ctx.projectMutator.addRootObject();
+    keyboardCtx.onKeydown$("o", focusIsEditorNewActions$).subscribe(async() => {
+      const project = await ctx.projectCtx.getCurrentProjectProm();
+      project.addRootExObjectBlank();
       focusCtx.popFocus();
     });
 

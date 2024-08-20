@@ -24,6 +24,11 @@
   });
 
   const newActionsFocused$ = of(false);
+
+  async function handleClickNewProject() {
+    const library = await ctx.getLibraryProm();
+    library.addProjectBlank();
+  }
 </script>
 
 <div bind:this={rootElement} class="w-max min-w-full">
@@ -38,10 +43,7 @@
           underlineCharIndex={4}
         /></button
       >
-      <button
-        on:click={() => ctx.projectManager.addProjectNew()}
-        class="btn block"
-      >
+      <button on:click={handleClickNewProject} class="btn block">
         <KbdShortcutSpan
           label="New Project"
           showShortcut={$newActionsFocused$}

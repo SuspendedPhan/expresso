@@ -106,13 +106,7 @@ export namespace ExObjectFns {
     newExObject: ExObject,
   ) {
     const project = await firstValueFrom(ctx.projectCtx.currentProject$);
-    const rootObjects = await firstValueFrom(project.rootExObjects$);
-    const index = rootObjects.indexOf(exObject);
-    assert(index !== -1);
-    const newRootObjects = [...rootObjects];
-    newRootObjects[index] = newExObject;
-    project.rootExObjects$.next(newRootObjects);
-    ctx.eventBus.rootExObjectAdded$.next(newExObject);
+    project.rootExObjectObsArr.replaceItem(exObject, newExObject);
 
     exObject.destroy$.next();
   }

@@ -1,4 +1,4 @@
-import { ReplaySubject } from "rxjs";
+import { firstValueFrom, ReplaySubject } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import { createProjectContext } from "src/ex-object/Project";
@@ -6,7 +6,6 @@ import { createLibrary, type Library } from "src/library/Library";
 import {
   ProjectManager
 } from "src/library/LibraryProject";
-import ProjectMutator from "src/mutator/ProjectMutator";
 import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
 import { createFocusContext, FocusFns } from "src/utils/focus/Focus";
 import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
@@ -30,7 +29,6 @@ export default class MainContext {
   public readonly projectCtx = createProjectContext(this);
   public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
-  public readonly projectMutator = new ProjectMutator(this);
   public readonly objectFactory = new ExObjectFactory(this);
   public readonly focusCtx = createFocusContext(this);
   public readonly exObjectFocusCtx = createExObjectFocusContext(this);
@@ -42,6 +40,10 @@ export default class MainContext {
   public readonly persistCtx = createPersistCtx(this);
   public readonly library$ = new ReplaySubject<Library>(1);
   public readonly componentCtx = createComponentCtx(this);
+
+  public async getLibraryProm() {
+    return firstValueFrom(this.library$);
+  }
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);

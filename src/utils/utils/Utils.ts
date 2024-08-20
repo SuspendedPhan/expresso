@@ -1,6 +1,5 @@
 import assert from "assert-ts";
 import { BehaviorSubject, combineLatest, map, of, partition, pipe, Subject, type Observable } from "rxjs";
-import type { ArrayEvent } from "src/utils/utils/ObservableArray";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -94,30 +93,4 @@ export namespace Utils {
   export function createId(label: string): string {
     return `${label}-${crypto.randomUUID()}`;
   }
-}
-
-export function createObservableArrayWithLifetime<T>(destroy$: OBS<void>, initialItems: T[] = []) {
-  const event: ArrayEvent<T> = {
-    change: { type: "InitialSubscription" },
-    items: initialItems,
-  };
-  return {
-    event$: createBehaviorSubjectWithLifetime<ArrayEvent<T>>(destroy$, event),
-
-    get itemArr() {
-      return this.event$.getValue().items;
-    },
-
-    get itemArr$() {
-      return this.event$.pipe(map((evt) => evt.items));
-    },
-
-    push(item: T) {
-      this.itemArr.push(item);
-      this.event$.next({
-        change: { type: "ItemAdded", item },
-        items: this.itemArr,
-      });
-    },
-  };
 }

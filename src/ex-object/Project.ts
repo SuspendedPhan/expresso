@@ -4,11 +4,11 @@ import {
   Subject
 } from "rxjs";
 import { CreateComponent, type CustomComponent } from "src/ex-object/Component";
-import type { ExObject } from "src/ex-object/ExObject";
+import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
+import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
 import {
-  createObservableArrayWithLifetime,
   Utils
 } from "src/utils/utils/Utils";
 
@@ -55,7 +55,7 @@ export namespace ProjectFns {
 
 export namespace CreateProject {
   export function from(
-    _ctx: MainContext,
+    ctx: MainContext,
     data?: {
       rootExObjects?: ExObject[];
       componentArr?: CustomComponent[];
@@ -82,6 +82,11 @@ export namespace CreateProject {
 
       rootExObjects$: rootExObjectObsArr.itemArr$,
       destroy$,
+
+      async addRootExObjectBlank() {
+        const exObject = await CreateExObject.blank(ctx, {});
+        this.rootExObjectObsArr.push(exObject);
+      },
     };
 
     return project;
