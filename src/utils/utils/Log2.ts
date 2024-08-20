@@ -1,3 +1,5 @@
+import { tap } from "rxjs";
+
 const level_limit = 5;
 
 export function log3(level: number, ...args: any[]) {
@@ -26,6 +28,16 @@ export function log5(topic: string) {
         },
         log3(level: number, ...args: any[]) {
             log3(level, `[${topic}]`, ...args);
-        }
+        },
+        tapInfo<T>(...args: any[]) {
+            return tap<T>(() => {
+                log4.info(`[${topic}]`, ...args);
+            });
+        },
+        tapDebug<T>(...args: any[]) {
+            return tap<T>(() => {
+                log4.debug(`[${topic}]`, ...args);
+            });
+        },
     }
 }
