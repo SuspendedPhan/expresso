@@ -2,7 +2,7 @@ import { of } from "rxjs";
 import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,

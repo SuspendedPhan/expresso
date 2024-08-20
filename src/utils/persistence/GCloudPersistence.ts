@@ -1,5 +1,5 @@
 import { getBlob, getStorage, ref, uploadString } from "firebase/storage";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 import Firebase from "./Firebase";
 import type { PersistService } from "./Persistence";
 

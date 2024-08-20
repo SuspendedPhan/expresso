@@ -4,7 +4,7 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import type { ExprReplacement } from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 import type { OBS } from "src/utils/utils/Utils";
 
 const log55 = log5("MainEventBus.ts");
@@ -17,7 +17,6 @@ export class MainEventBus {
   public readonly exprAdded$ = new ReplaySubject<Expr>(10);
   public readonly exprReplaced$ = new Subject<ExprReplacement>();
   public readonly submitExprReplaceCommand$ = new Subject<void>();
-  public readonly rootExObjectAdded$ = new ReplaySubject<ExObject>(10);
 
   public constructor(ctx: MainContext) {
     this.rootObjects$ = ctx.projectManager.currentLibraryProject$.pipe(

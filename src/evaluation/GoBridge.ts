@@ -3,7 +3,10 @@ import { type Expr, ExprType } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type GoModule from "src/utils/utils/GoModule";
-import { assertUnreachable } from "src/utils/utils/Utils";
+import { log5 } from "src/utils/utils/Log3";
+import { assertUnreachable, partitionFirst } from "src/utils/utils/Utils";
+
+const log55 = log5("GoBridge.ts");
 
 export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
@@ -14,35 +17,29 @@ export default class GoBridge {
 
   @loggedMethod
   private async setup(goModule: GoModule, ctx: MainContext) {
-    ctx.eventBus.rootExObjectAdded$.subscribe((rootExObject) => {
-      goModule.Evaluator.addRootExObject(rootExObject.id);
+    const project = await ctx.projectCtx.getCurrentProjectProm();
+    const [first$, rest$] = partitionFirst(project.rootExObjectObsArr.event$);
+
+    first$.subscribe((evt) => {
+      evt.items.forEach((rootExObject) => {
+        log55.debug("Adding initial rootExObject", rootExObject.id);
+        goModule.Evaluator.addRootExObject(rootExObject.id);
+      });
     });
 
-    // const project = await ctx.projectCtx.getCurrentProjectProm();
-    // const [first$, rest$] = partitionFirst(project.rootExObjectArrEvt$);
-
-    // first$.subscribe((evt) => {
-    //   evt.items.forEach((rootExObject) => {
-    //     goModule.Evaluator.addRootExObject(rootExObject.id);
-    //   });
-    // });
-
-    // rest$.subscribe((evt) => {
-    //   switch (evt.change.type) {
-    //     case "ItemAdded":
-    //       evt.items.forEach((rootExObject) => {
-    //         goModule.Evaluator.addRootExObject(rootExObject.id);
-    //       });
-    //       break;
-    //     case "ItemRemoved":
-    //       evt.items.forEach((rootExObject) => {
-    //         goModule.Evaluator.removeRootExObject(rootExObject.id);
-    //       });
-    //       break;
-    //     default:
-    //       console.error("Unexpected change type", evt.change);
-    //   }
-    // });
+    rest$.subscribe((evt) => {
+      switch (evt.change.type) {
+        case "ItemAdded":
+          log55.debug("Adding rootExObject", evt.change.item.id);
+          goModule.Evaluator.addRootExObject(evt.change.item.id);
+          break;
+        case "ItemReplaced":
+          goModule.Evaluator.addRootExObject(evt.change.newItem.id);
+          break;
+        default:
+          console.error("Unexpected change type", evt.change);
+      }
+    });
 
     ctx.eventBus.objectAdded$.subscribe((object) => {
       goModule.ExObject.create(object.id);

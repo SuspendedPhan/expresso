@@ -35,7 +35,7 @@ import type {
   DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 
 const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {

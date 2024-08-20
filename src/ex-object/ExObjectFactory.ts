@@ -10,7 +10,7 @@ import {
 } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 import {
   createBehaviorSubjectWithLifetime
 } from "src/utils/utils/Utils";

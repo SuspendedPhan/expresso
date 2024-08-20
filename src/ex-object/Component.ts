@@ -2,7 +2,7 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log3";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
 const log55 = log5("Component.ts");
