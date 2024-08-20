@@ -3,13 +3,9 @@ import { filter, firstValueFrom } from "rxjs";
 import { ExItemType, ExprType, type Expr } from "src/ex-object/ExItem";
 import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
-import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
+import { Hotkeys } from "src/utils/utils/Focus";
 import { ArrayFns, type OBS } from "src/utils/utils/Utils";
-import { ofType } from "unionize";
-
-export const ExprFocusKind = {
-  Expr: ofType<{ expr: Expr; isEditing: boolean }>(),
-};
+import { FocusKind } from "../utils/FocusKind.1";
 
 export namespace ExprFocusFuncs {
   export function createContext(ctx: MainContext) {

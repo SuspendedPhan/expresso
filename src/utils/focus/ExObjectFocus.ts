@@ -4,19 +4,9 @@ import { ExItemType, type ExItem } from "src/ex-object/ExItem";
 import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { FocusKind, Hotkeys } from "src/utils/utils/Focus";
+import { Hotkeys } from "src/utils/utils/Focus";
+import { FocusKind } from "../utils/FocusKind.1";
 import type { OBS } from "src/utils/utils/Utils";
-import { ofType } from "unionize";
-
-export const ExObjectFocusKind = {
-  ExObject: ofType<{ exObject: ExObject }>(),
-  ExObjectName: ofType<{ exObject: ExObject }>(),
-  ExObjectComponent: ofType<{ exObject: ExObject }>(),
-  Property: ofType<{ property: Property }>(),
-  
-  ExItemNewActions: ofType<{ exItem: ExItem }>(),
-  ExObjectRefactor: ofType<{ exObject: ExObject }>(),
-};
 
 export function createExObjectFocusContext(ctx: MainContext) {
   const { focusCtx } = ctx;

@@ -1,22 +1,11 @@
 import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
-import { ExObjectFocusFuncs, ExObjectFocusKind } from "src/utils/focus/ExObjectFocus";
-import { ExprFocusFuncs, ExprFocusKind } from "src/utils/focus/ExprFocus";
-import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
-import { EditorFocusFuncs, EditorFocusKind } from "src/utils/utils/EditorFocus";
+import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
+import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
+import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
 import type { SUB } from "src/utils/utils/Utils";
-import unionize, { type UnionOf } from "unionize";
-
-export const FocusKind = unionize({
-  None: {},
-  ProjectNav: {},
-  LibraryNav: {},
-  ViewActions: {},
-  ...EditorFocusKind,
-  ...ComponentFocusKind,
-  ...ExObjectFocusKind,
-  ...ExprFocusKind,
-});
+import { type UnionOf } from "unionize";
+import { FocusKind } from "./FocusKind.1";
 
 export type Focus = UnionOf<typeof FocusKind>;
 

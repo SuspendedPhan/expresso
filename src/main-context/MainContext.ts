@@ -1,25 +1,21 @@
-import { Subject, switchMap } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
+import { createProjectContext } from "src/ex-object/Project";
 import {
-  type LibraryProject,
-  ProjectManager,
+  ProjectManager
 } from "src/library/LibraryProject";
 import ProjectMutator from "src/mutator/ProjectMutator";
-import Dehydrator from "src/utils/hydration/Dehydrator";
-import Rehydrator from "src/utils/hydration/Rehydrator";
-import Persistence from "src/utils/persistence/Persistence";
+import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
+import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
 import { createFocusContext, FocusFns } from "src/utils/utils/Focus";
 import type GoModule from "src/utils/utils/GoModule";
 import { createKeyboardContext } from "src/utils/utils/Keyboard";
+import { createPersistCtx } from "src/utils/utils/PersistCtx";
+import { createRefactorContext } from "src/utils/utils/Refactor";
 import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
-import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
-import { createProjectContext } from "src/ex-object/Project";
-import { createRefactorContext } from "src/utils/utils/Refactor";
-import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -40,31 +36,11 @@ export default class MainContext {
   public readonly keyboardCtx = createKeyboardContext(this);
   public readonly refactorCtx = createRefactorContext(this);
   public readonly exprCommandCtx = createExprCommandCtx(this);
+  public readonly persistCtx = createPersistCtx(this);
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
     FocusFns.register(this);
-
-    Persistence.readProject$.subscribe(async (deProject) => {
-      // if (deProject === null) {
-      if (true) {
-        this.projectManager.addProjectNew();
-      } else {
-        // @ts-ignore
-        const project = await new Rehydrator(this).rehydrateProject(deProject);
-        (
-          this.projectManager.currentLibraryProject$ as Subject<LibraryProject>
-        ).next(project);
-      }
-    });
-
-    return;
-    const dehydrator = new Dehydrator();
-    this.projectManager.currentProject$
-      .pipe(switchMap((project) => dehydrator.dehydrateProject$(project)))
-      .subscribe((deProject) => {
-        Persistence.writeProject(deProject);
-      });
   }
 }
