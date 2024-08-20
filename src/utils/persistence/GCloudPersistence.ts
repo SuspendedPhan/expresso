@@ -1,7 +1,9 @@
 import { getBlob, getStorage, ref, uploadString } from "firebase/storage";
-import { log3 } from "src/utils/utils/Log2";
+import { log5 } from "src/utils/utils/Log2";
 import Firebase from "./Firebase";
 import type { PersistService } from "./Persistence";
+
+const log55 = log5("GCloudPersistence.ts");
 
 Firebase.init();
 const storage = getStorage();
@@ -27,7 +29,7 @@ export default class GCloudPersistence implements PersistService {
 
     // Raw string is the default if no format is provided
     return uploadString(storageRef, content).then((_snapshot) => {
-      log3.debug("Uploaded a blob or file");
+      log55.debug("Uploaded a blob or file");
     });
   }
 }
