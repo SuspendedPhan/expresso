@@ -132,12 +132,15 @@ export namespace CreateExObject {
       children?: ExObject[];
     },
   ): Promise<ExObject> {
-    const ordinal = await ctx.projectCtx.getOrdinalProm();
+    let name = data.name;
+    if (name === undefined) {
+      const ordinal = await ctx.projectCtx.getOrdinalProm();
+      name = `Object ${ordinal}`;
+    }
 
     const id = data.id ?? `ex-object-${crypto.randomUUID()}`;
     const base = await ctx.objectFactory.createExItemBase(id);
     const component = data.component ?? CanvasComponentStore.circle;
-    const name = data.name ?? `Object ${ordinal}`;
     const componentProperties = data.componentProperties ?? await createComponentProperties(ctx, component);
     const basicProperties = data.basicProperties ?? [];
     const cloneCountProperty = data.cloneCountProperty ?? await Create.Property.cloneCountBlank(ctx);

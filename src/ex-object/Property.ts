@@ -2,11 +2,14 @@ import { of } from "rxjs";
 import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
+import { log5 } from "src/utils/utils/Log2";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
   type SUB,
 } from "src/utils/utils/Utils";
+
+const log55 = log5("Property.ts");
 
 export type Property =
   | ComponentParameterProperty
@@ -54,6 +57,8 @@ export namespace CreateProperty {
     expr: Expr
   ): Promise<ComponentParameterProperty> {
     const itemBase = await ctx.objectFactory.createExItemBase(id);
+    log55.debug(`CreateProperty.component.itemBase.end ${id}`);
+
     const componentProperty: ComponentParameterProperty = {
       ...itemBase,
       itemType: ExItemType.Property,
@@ -63,6 +68,8 @@ export namespace CreateProperty {
     };
     expr.parent$.next(componentProperty);
     ctx.eventBus.propertyAdded$.next(componentProperty);
+
+    log55.debug(`CreateProperty.component.end`);
     return componentProperty;
   }
 

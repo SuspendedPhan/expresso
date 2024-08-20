@@ -2,7 +2,10 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
+import { log5 } from "src/utils/utils/Log2";
 import type { OBS, SUB } from "src/utils/utils/Utils";
+
+const log55 = log5("Component.ts");
 
 export type CanvasSetter = (
   canvasObject: LibCanvasObject,
@@ -84,6 +87,8 @@ export function createComponentCtx(_ctx: MainContext) {
     },
     getCanvasComponentParameterById(id: string) {
       const parameter = parameterById.get(id);
+      log55.debug("getCanvasComponentParameterById", id, parameter);
+      
       if (!parameter) {
         throw new Error(`Canvas component parameter not found: ${id}`);
       }

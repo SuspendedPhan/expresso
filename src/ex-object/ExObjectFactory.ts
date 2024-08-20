@@ -1,4 +1,4 @@
-import { firstValueFrom, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import {
   type CallExpr,
   type ExItemBase,
@@ -8,12 +8,14 @@ import {
   type NumberExpr,
   type Parent,
 } from "src/ex-object/ExItem";
-import { ProjectFns } from "src/ex-object/Project";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { log5 } from "src/utils/utils/Log2";
 import {
   createBehaviorSubjectWithLifetime
 } from "src/utils/utils/Utils";
+
+const log55 = log5("ExObjectFactory.ts");
 
 export default class ExObjectFactory {
   public constructor(private readonly ctx: MainContext) {
@@ -38,6 +40,8 @@ export default class ExObjectFactory {
       value,
       ...base,
     };
+
+    log55.debug(`created number expr ${expr.id}`);
 
     (this.ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
     return expr;
@@ -77,12 +81,10 @@ export default class ExObjectFactory {
     id: string
   ): Promise<ExItemBase> {
     const destroy$ = new Subject<void>();
-    const project = await firstValueFrom(this.ctx.projectManager.currentProject$);
-    const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
 
     const exObjectBase: ExItemBase = {
       id,
-      ordinal,
+      ordinal: 0,
       parent$: createBehaviorSubjectWithLifetime<Parent>(destroy$, null),
       destroy$,
     };

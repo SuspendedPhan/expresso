@@ -6,17 +6,20 @@ import {
   type Component,
   type ComponentParameter,
   type CustomComponent,
-  type CustomComponentParameter
+  type CustomComponentParameter,
 } from "src/ex-object/Component";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
+import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { CreateProject } from "src/ex-object/Project";
 import type {
   BasicProperty,
   CloneCountProperty,
   ComponentParameterProperty,
 } from "src/ex-object/Property";
-import { createLibraryProject, type LibraryProject } from "src/library/LibraryProject";
+import {
+  createLibraryProject,
+  type LibraryProject,
+} from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import type {
@@ -59,7 +62,7 @@ export default class Rehydrator {
       rootExObjects,
       componentArr: customComponentArr,
     });
-    
+
     log55.debug("Project loaded", project);
 
     const libraryProject = await createLibraryProject(this.ctx, {
@@ -67,7 +70,7 @@ export default class Rehydrator {
       name: deProject.name,
       project,
     });
-    
+
     const library = await firstValueFrom(this.ctx.library$);
     library.addProject(libraryProject);
     return libraryProject;
@@ -119,19 +122,26 @@ export default class Rehydrator {
       this.rehydrateBasicProperty(deProperty)
     );
 
+    
     const componentPropertyL = await Promise.all(componentPropertyPL);
+    log55.debug("rehydrateExObject.componentPropertyL.end");
     const basicPropertyL = await Promise.all(basicPropertyPL);
-
+    log55.debug("rehydrateExObject.basicPropertyL.end");
+    
     const cloneCountProperty = await this.rehydrateCloneCountProperty(
       deExObject.cloneProperty
     );
+
+    log55.debug("rehydrateExObject.cloneCountProperty.end");
 
     const children$P = deExObject.children.map((child) => {
       return this.rehydrateExObject(child);
     });
     const children = await Promise.all(children$P);
 
-    const exObject: ExObject = await Create.ExObject.blank(this.ctx, {
+    log55.debug("rehydrateExObject.children.end");
+
+    const exObject: ExObject = await CreateExObject.blank(this.ctx, {
       component,
       id: deExObject.id,
       name: deExObject.name,
@@ -140,6 +150,8 @@ export default class Rehydrator {
       cloneCountProperty,
       children,
     });
+
+    log55.debug("rehydrateExObject.end");
     return exObject;
   }
 
@@ -147,24 +159,29 @@ export default class Rehydrator {
   public async rehydrateComponentProperty(
     deProperty: DehydratedComponentProperty
   ): Promise<ComponentParameterProperty> {
-    const parameter = this.componentParameterById.get(
-      deProperty.componentParameterId
-    );
-    this.getComponentParameter(deProperty.componentParameterId, deProperty.componentParameterKind);
-    assert(
-      parameter !== undefined,
-      `Component parameter not found: ${deProperty.componentParameterId}`
+    log55.debug("rehydrateComponentProperty.start", deProperty);
+    const parameter = this.getComponentParameter(
+      deProperty.componentParameterId,
+      deProperty.componentParameterKind
     );
 
     const expr = await this.rehydrateExpr(deProperty.expr);
-    return Create.Property.component(this.ctx, deProperty.id, parameter, expr);
+    log55.debug("rehydrateComponentProperty.rehydrateExpr.end");
+    const property = await Create.Property.component(this.ctx, deProperty.id, parameter, expr);
+    log55.debug("rehydrateComponentProperty.end", property);
+    return property;
   }
 
   @loggedMethod
   public async rehydrateBasicProperty(
     deProperty: DehydratedBasicProperty
   ): Promise<BasicProperty> {
+    log55.debug("rehydrateBasicProperty.start", deProperty);
+
     const expr = await this.rehydrateExpr(deProperty.expr);
+    
+    log55.debug("rehydrateBasicProperty", deProperty);
+
     return Create.Property.basic(
       this.ctx,
       deProperty.id,
@@ -183,9 +200,12 @@ export default class Rehydrator {
 
   @loggedMethod
   private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
+    log55.debug("rehydrateExpr", deExpr);
     switch (deExpr.type) {
       case "NumberExpr":
-        return this.rehydrateNumberExpr(deExpr);
+        const newLocal = await this.rehydrateNumberExpr(deExpr);
+        log55.debug("rehydrateExpr.rehydrateNumberExpr", newLocal);
+        return newLocal;
       case "CallExpr":
         return this.rehydrateCallExpr(deExpr);
       default:
@@ -197,7 +217,9 @@ export default class Rehydrator {
   private async rehydrateNumberExpr(
     deExpr: DehydratedNumberExpr
   ): Promise<NumberExpr> {
-    return this.ctx.objectFactory.createNumberExpr(deExpr.value, deExpr.id);
+    const newLocal = this.ctx.objectFactory.createNumberExpr(deExpr.value, deExpr.id);
+    log55.debug("rehydrateNumberExpr", newLocal);
+    return newLocal;
   }
 
   @loggedMethod
@@ -219,14 +241,18 @@ export default class Rehydrator {
         );
         return component;
       case "CanvasComponent":
-        const component2 = this.ctx.componentCtx.getCanvasComponentById(componentId);
+        const component2 =
+          this.ctx.componentCtx.getCanvasComponentById(componentId);
         return component2;
       default:
         throw new Error(`Unknown component type: ${componentType}`);
     }
   }
 
-  private getComponentParameter(parameterId: string, parameterKind: ComponentParameterKind): ComponentParameter {
+  private getComponentParameter(
+    parameterId: string,
+    parameterKind: ComponentParameterKind
+  ): ComponentParameter {
     switch (parameterKind) {
       case ComponentParameterKind.CustomComponentParameter:
         const parameter = this.componentParameterById.get(parameterId);
@@ -236,7 +262,9 @@ export default class Rehydrator {
         );
         return parameter;
       case ComponentParameterKind.CanvasComponentParameter:
-        const parameter2 = this.ctx.componentCtx.getCanvasComponentParameterById(parameterId);
+        log55.debug("getCanvasComponentParameterById", parameterId);
+        const parameter2 =
+          this.ctx.componentCtx.getCanvasComponentParameterById(parameterId);
         return parameter2;
       default:
         throw new Error(`Unknown component parameter type: ${parameterKind}`);
