@@ -51,4 +51,5 @@
     on:input={handleInput}
     bind:this={input}
   />
+  <div></div>
 </div>

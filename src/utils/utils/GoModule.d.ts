@@ -1,6 +1,17 @@
 import { CanvasObjectPath } from "src/scene/CanvasObject";
 
 export default interface GoModule {
+  ExFunc: {
+    create(id: string): void;
+    setExpr(id: string, exprId: string): void;
+    setParameters(id: string, parameterIds: string[]): void;
+  };
+
+  Component: {
+    create(componentId: string): void;
+    setRootExObjects(componentId: string, exObjectIds: string[]): void;
+  };
+
   ExObject: {
     create(exObjectId: string): void;
     setCloneCountProperty(exObjectId: string, propertyId: string): void;
