@@ -2,7 +2,7 @@ import { combineLatestWith, firstValueFrom, map } from "rxjs";
 import type { ExItem } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
-import { FocusKind } from "./FocusKind";
+import { FocusKind } from "../focus/FocusKind";
 import { ofType } from "unionize";
 
 export const EditorFocusKind = {

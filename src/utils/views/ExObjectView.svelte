@@ -11,7 +11,7 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { FocusKind } from "../utils/FocusKind";
+  import { FocusKind } from "src/utils/focus/FocusKind";
 
   export let ctx: MainContext;
   export let exObject: ExObject;

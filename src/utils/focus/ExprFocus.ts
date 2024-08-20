@@ -5,7 +5,7 @@ import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { ArrayFns, type OBS } from "src/utils/utils/Utils";
-import { FocusKind } from "../utils/FocusKind";
+import { FocusKind } from "./FocusKind";
 
 export namespace ExprFocusFuncs {
   export function createContext(ctx: MainContext) {

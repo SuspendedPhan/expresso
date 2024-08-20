@@ -2,7 +2,7 @@
   import { map, of, type Observable } from "rxjs";
   import { ExprType, type Expr } from "src/ex-object/ExItem";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "../utils/FocusKind";
+  import { FocusKind } from "src/utils/focus/FocusKind";
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
