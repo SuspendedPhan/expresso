@@ -27,7 +27,6 @@ import type {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 
 export default class Rehydrator {
-  // @ts-ignore
   private customComponentById = new Map<string, CustomComponent>();
   private componentParameterById = new Map<string, ComponentParameter>();
 
@@ -160,11 +159,10 @@ export default class Rehydrator {
   }
 
   private getComponent(
-    // @ts-ignore
     componentId: string,
-    // @ts-ignore
     componentType: string
   ): Component {
+    console.log("getComponent", componentId, componentType, this.customComponentById);
     throw new Error("Method not implemented.");
   }
 }
