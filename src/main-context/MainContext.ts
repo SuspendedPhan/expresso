@@ -7,7 +7,7 @@ import {
 import ProjectMutator from "src/mutator/ProjectMutator";
 import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
 import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
-import { createFocusContext, FocusFns } from "src/utils/utils/Focus";
+import { createFocusContext, FocusFns } from "src/utils/focus/Focus";
 import type GoModule from "src/utils/utils/GoModule";
 import { createKeyboardContext } from "src/utils/utils/Keyboard";
 import { createPersistCtx } from "src/utils/utils/PersistCtx";

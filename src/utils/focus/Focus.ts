@@ -5,7 +5,7 @@ import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
 import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
 import type { SUB } from "src/utils/utils/Utils";
 import { type UnionOf } from "unionize";
-import { FocusKind } from "./FocusKind";
+import { FocusKind } from "../utils/FocusKind";
 
 export type Focus = UnionOf<typeof FocusKind>;
 
