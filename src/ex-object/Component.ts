@@ -1,7 +1,6 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { ProjectFns } from "src/ex-object/Project";
 import type MainContext from "src/main-context/MainContext";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
@@ -69,27 +68,31 @@ export const CanvasComponentStore = {
   },
 } satisfies Record<string, CanvasComponent>;
 
-export namespace CreateComponent {
-  export async function customBlank(
-    ctx: MainContext
-  ): Promise<CustomComponent> {
-    const rootExObjects: ExObject[] = [];
-    return await customFrom(ctx, rootExObjects);
-  }
+export async function createCustomComponentParameter(_ctx: MainContext, data: {
+  id?: string;
+  name?: string;
+}): Promise<CustomComponentParameter> {
+  return {
+    componentParameterType: ComponentParameterKind.CustomComponentParameter,
+    id: data.id ?? `custom-component-parameter-${crypto.randomUUID()}`,
+    name$: new BehaviorSubject(data.name ?? "Parameter"),
+  };
+}
 
-  export async function customFrom(
-    ctx: MainContext,
-    rootExObjects: ExObject[]
-  ): Promise<CustomComponent> {
-    const project = await firstValueFrom(ctx.projectManager.currentProject$);
-    const ordinal = await ProjectFns.getAndIncrementOrdinal(project);
-    const id = `custom-${crypto.randomUUID()}`;
+export namespace CreateComponent {
+  export async function custom(ctx: MainContext, data: {
+    id?: string;
+    name?: string;
+    parameters?: CustomComponentParameter[];
+    rootExObjects?: ExObject[];
+  }): Promise<CustomComponent> {
+    const ordinal = await ctx.projectCtx.getOrdinalProm();
     return {
-      id,
+      id: data.id ?? `custom-component-${crypto.randomUUID()}`,
       componentKind: ComponentKind.CustomComponent,
-      name$: new BehaviorSubject(`Component ${ordinal}`),
-      parameters$: new BehaviorSubject<CustomComponentParameter[]>([]),
-      rootExObjects$: new BehaviorSubject<ExObject[]>(rootExObjects),
+      name$: new BehaviorSubject(data.name ?? `Component ${ordinal}`),
+      parameters$: new BehaviorSubject(data.parameters ?? []),
+      rootExObjects$: new BehaviorSubject(data.rootExObjects ?? []),
     };
   }
 }

@@ -88,3 +88,9 @@ export namespace RxFns {
     return combineLatest(observables);
   }
 }
+
+export namespace Utils {
+  export function createId(label: string): string {
+    return `${label}-${crypto.randomUUID()}`;
+  }
+}

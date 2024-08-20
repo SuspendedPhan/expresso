@@ -5,7 +5,8 @@ import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import type { ArrayEvent } from "src/utils/utils/ObservableArray";
 import {
-  createBehaviorSubjectWithLifetime
+  createBehaviorSubjectWithLifetime,
+  Utils
 } from "src/utils/utils/Utils";
 
 
@@ -34,7 +35,7 @@ export namespace ProjectFns {
   }
 
   export async function addComponentBlank(ctx: MainContext, project: Project) {
-    const component = await CreateComponent.customBlank(ctx);
+    const component = await CreateComponent.custom(ctx, {});
     addComponent(ctx, project, component);
     return component;
   }
@@ -52,19 +53,25 @@ export namespace ProjectFns {
 
 export namespace CreateProject {
   export function from(
-    libraryProject: LibraryProject,
-    rootObjects: readonly ExObject[]
+    ctx_: MainContext,
+    data?: {
+      rootExObjects?: ExObject[];
+      componentArr?: CustomComponent[];
+      currentOrdinal?: number;
+    }
   ) {
+    data ??= {};
+    
     const destroy$ = new Subject<void>();
-
     const project = {
-      destroy$,
-      libraryProject,
-      rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, rootObjects),
-      componentArr$: new BehaviorSubject<CustomComponent[]>([]),
-      currentOrdinal$: new BehaviorSubject<number>(0),
+      id: Utils.createId("project"),
+      libraryProject: null as LibraryProject | null,
+      rootExObjects$: createBehaviorSubjectWithLifetime(destroy$, data.rootExObjects ?? []),
+      componentArr$: new BehaviorSubject<CustomComponent[]>(data.componentArr ?? []),
+      currentOrdinal$: new BehaviorSubject<number>(data.currentOrdinal ?? 0),
 
       rootExObjectArrEvt$: new ReplaySubject<ArrayEvent<ExObject>>(1),
+      destroy$,
     };
 
     return project;

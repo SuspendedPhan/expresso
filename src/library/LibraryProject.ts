@@ -1,19 +1,37 @@
 import {
   BehaviorSubject,
   first,
+  firstValueFrom,
   map,
   Observable,
   ReplaySubject,
   switchMap,
 } from "rxjs";
-import type { ExObject } from "src/ex-object/ExObject";
-import { CreateProject, type Project } from "src/ex-object/Project";
+import { type Project } from "src/ex-object/Project";
 import MainContext from "src/main-context/MainContext";
+import { Utils } from "src/utils/utils/Utils";
 
 export interface LibraryProject {
   id: string;
   name: string;
   project$: ReplaySubject<Project>;
+}
+
+export async function createLibraryProject(
+  ctx: MainContext,
+  data: {
+    id?: string;
+    name?: string;
+    project?: Project;
+  }
+) {
+  const library = await firstValueFrom(ctx.library$);
+  const ordinal = await firstValueFrom(library.projectOrdinal$);
+  return {
+    id: data.id ?? Utils.createId("library-project"),
+    name: data.name ?? `Project ${ordinal}`,
+    project$: new ReplaySubject<Project>(1),
+  };
 }
 
 export class ProjectManager {
@@ -27,38 +45,7 @@ export class ProjectManager {
     switchMap((libraryProject) => libraryProject.project$)
   );
 
-  // @ts-ignore
-  public constructor(private readonly ctx: MainContext) {}
-
-  public addProjectNew(): LibraryProject {
-    // Get date/time with YYYY:MM:DD-HH:MM format
-    const date = new Date();
-    const timestamp = `${date.getFullYear()}:${date.getMonth()}:${date.getDate()}-${date.getHours()}:${date.getMinutes()}`;
-    const id = `${timestamp}-${crypto.randomUUID()}`;
-    const name = `Project ${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
-    return this.addProject(id, name, []);
-  }
-
-  public addProject(
-    id: string,
-    name: string,
-    rootObjects: ExObject[]
-  ): LibraryProject {
-    const libraryProject: LibraryProject = {
-      id,
-      name,
-      project$: new ReplaySubject<Project>(1),
-    };
-
-    const project = CreateProject.from(libraryProject, rootObjects);
-    libraryProject.project$.next(project);
-    this.libraryProjectsSub$.next([
-      ...this.libraryProjectsSub$.value,
-      libraryProject,
-    ]);
-    this.currentLibraryProject$.next(libraryProject);
-    return libraryProject;
-  }
+  public constructor() {}
 
   public getFirstProject$(): Observable<LibraryProject | null> {
     return this.libraryProjects$.pipe(

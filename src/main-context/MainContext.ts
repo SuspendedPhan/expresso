@@ -16,6 +16,8 @@ import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
+import { firstValueFrom, ReplaySubject } from "rxjs";
+import type { Library } from "src/library/Library";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -23,7 +25,7 @@ export interface ExprReplacement {
 }
 
 export default class MainContext {
-  public readonly projectManager = new ProjectManager(this);
+  public readonly projectManager = new ProjectManager();
   public readonly projectCtx = createProjectContext(this);
   public readonly eventBus = new MainEventBus(this);
   public readonly mutator: MainMutator;
@@ -37,6 +39,7 @@ export default class MainContext {
   public readonly refactorCtx = createRefactorContext(this);
   public readonly exprCommandCtx = createExprCommandCtx(this);
   public readonly persistCtx = createPersistCtx(this);
+  public readonly library$ = new ReplaySubject<Library>(1);
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
