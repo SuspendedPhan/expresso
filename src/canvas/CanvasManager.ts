@@ -95,7 +95,7 @@ export class CanvasManager {
       (componentParameterProperty) => {
         if (
           componentParameterProperty.componentParameter
-            .componentParameterType !==
+            .componentParameterKind !==
           ComponentParameterKind.CanvasComponentParameter
         ) {
           return;

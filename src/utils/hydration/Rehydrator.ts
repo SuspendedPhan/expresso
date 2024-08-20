@@ -1,5 +1,7 @@
 import assert from "assert-ts";
+import { firstValueFrom } from "rxjs";
 import {
+  ComponentParameterKind,
   createCustomComponentParameter,
   type Component,
   type ComponentParameter,
@@ -8,12 +10,13 @@ import {
 } from "src/ex-object/Component";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
+import { CreateProject } from "src/ex-object/Project";
 import type {
   BasicProperty,
   CloneCountProperty,
   ComponentParameterProperty,
 } from "src/ex-object/Property";
-import type { LibraryProject } from "src/library/LibraryProject";
+import { createLibraryProject, type LibraryProject } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import type {
@@ -29,7 +32,9 @@ import type {
   DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { log5 } from "src/utils/utils/Log2";
 
+const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {
   private customComponentById = new Map<string, CustomComponent>();
   private componentParameterById = new Map<string, ComponentParameter>();
@@ -50,11 +55,22 @@ export default class Rehydrator {
       )
     );
 
-    return this.ctx.projectManager.addProject(
-      deProject.id,
-      deProject.name,
+    const project = CreateProject.from(this.ctx, {
       rootExObjects,
-    );
+      componentArr: customComponentArr,
+    });
+    
+    log55.debug("Project loaded", project);
+
+    const libraryProject = await createLibraryProject(this.ctx, {
+      id: deProject.id,
+      name: deProject.name,
+      project,
+    });
+    
+    const library = await firstValueFrom(this.ctx.library$);
+    library.addProject(libraryProject);
+    return libraryProject;
   }
 
   public async rehydrateCustomComponent(
@@ -134,6 +150,7 @@ export default class Rehydrator {
     const parameter = this.componentParameterById.get(
       deProperty.componentParameterId
     );
+    this.getComponentParameter(deProperty.componentParameterId, deProperty.componentParameterKind);
     assert(
       parameter !== undefined,
       `Component parameter not found: ${deProperty.componentParameterId}`
@@ -193,12 +210,36 @@ export default class Rehydrator {
   }
 
   private getComponent(componentId: string, componentType: string): Component {
-    console.log(
-      "getComponent",
-      componentId,
-      componentType,
-      this.customComponentById
-    );
-    throw new Error("Method not implemented.");
+    switch (componentType) {
+      case "CustomComponent":
+        const component = this.customComponentById.get(componentId);
+        assert(
+          component !== undefined,
+          `Component not found: ${componentId} ${componentType}`
+        );
+        return component;
+      case "CanvasComponent":
+        const component2 = this.ctx.componentCtx.getCanvasComponentById(componentId);
+        return component2;
+      default:
+        throw new Error(`Unknown component type: ${componentType}`);
+    }
+  }
+
+  private getComponentParameter(parameterId: string, parameterKind: ComponentParameterKind): ComponentParameter {
+    switch (parameterKind) {
+      case ComponentParameterKind.CustomComponentParameter:
+        const parameter = this.componentParameterById.get(parameterId);
+        assert(
+          parameter !== undefined,
+          `Component parameter not found: ${parameterId} ${parameterKind}`
+        );
+        return parameter;
+      case ComponentParameterKind.CanvasComponentParameter:
+        const parameter2 = this.ctx.componentCtx.getCanvasComponentParameterById(parameterId);
+        return parameter2;
+      default:
+        throw new Error(`Unknown component parameter type: ${parameterKind}`);
+    }
   }
 }

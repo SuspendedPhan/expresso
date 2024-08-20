@@ -41,13 +41,13 @@ export interface CustomComponent {
 export interface CanvasComponentParameter {
   readonly id: string;
   readonly name: string;
-  readonly componentParameterType: ComponentParameterKind.CanvasComponentParameter;
+  readonly componentParameterKind: ComponentParameterKind.CanvasComponentParameter;
   readonly canvasSetter: CanvasSetter;
 }
 
 export interface CustomComponentParameter {
   readonly id: string;
-  readonly componentParameterType: ComponentParameterKind.CustomComponentParameter;
+  readonly componentParameterKind: ComponentParameterKind.CustomComponentParameter;
   readonly name$: SUB<string>;
 }
 
@@ -57,7 +57,7 @@ export const CanvasComponentStore = {
     componentKind: ComponentKind.CanvasComponent,
     parameters: [
       {
-        componentParameterType: ComponentParameterKind.CanvasComponentParameter,
+        componentParameterKind: ComponentParameterKind.CanvasComponentParameter,
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {
@@ -68,24 +68,54 @@ export const CanvasComponentStore = {
   },
 } satisfies Record<string, CanvasComponent>;
 
-export async function createCustomComponentParameter(_ctx: MainContext, data: {
-  id?: string;
-  name?: string;
-}): Promise<CustomComponentParameter> {
+export function createComponentCtx(_ctx: MainContext) {
+  const parameterById = new Map<string, CanvasComponentParameter>();
+  CanvasComponentStore.circle.parameters.forEach((parameter) => {
+    parameterById.set(parameter.id, parameter);
+  });
+
   return {
-    componentParameterType: ComponentParameterKind.CustomComponentParameter,
+    getCanvasComponentById(id: string) {
+      const component = (CanvasComponentStore as any)[id];
+      if (!component) {
+        throw new Error(`Canvas component not found: ${id}`);
+      }
+      return component;
+    },
+    getCanvasComponentParameterById(id: string) {
+      const parameter = parameterById.get(id);
+      if (!parameter) {
+        throw new Error(`Canvas component parameter not found: ${id}`);
+      }
+      return parameter;
+    },
+  };
+}
+
+export async function createCustomComponentParameter(
+  _ctx: MainContext,
+  data: {
+    id?: string;
+    name?: string;
+  }
+): Promise<CustomComponentParameter> {
+  return {
+    componentParameterKind: ComponentParameterKind.CustomComponentParameter,
     id: data.id ?? `custom-component-parameter-${crypto.randomUUID()}`,
     name$: new BehaviorSubject(data.name ?? "Parameter"),
   };
 }
 
 export namespace CreateComponent {
-  export async function custom(ctx: MainContext, data: {
-    id?: string;
-    name?: string;
-    parameters?: CustomComponentParameter[];
-    rootExObjects?: ExObject[];
-  }): Promise<CustomComponent> {
+  export async function custom(
+    ctx: MainContext,
+    data: {
+      id?: string;
+      name?: string;
+      parameters?: CustomComponentParameter[];
+      rootExObjects?: ExObject[];
+    }
+  ): Promise<CustomComponent> {
     const ordinal = await ctx.projectCtx.getOrdinalProm();
     return {
       id: data.id ?? `custom-component-${crypto.randomUUID()}`,
@@ -101,7 +131,7 @@ export namespace ComponentParameterFns {
   export function getName$(
     componentParameter: ComponentParameter
   ): OBS<string> {
-    switch (componentParameter.componentParameterType) {
+    switch (componentParameter.componentParameterKind) {
       case ComponentParameterKind.CanvasComponentParameter:
         return of(componentParameter.name);
       case ComponentParameterKind.CustomComponentParameter:

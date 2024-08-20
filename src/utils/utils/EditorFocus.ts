@@ -42,8 +42,9 @@ export namespace EditorFocusFuncs {
       visible$: focusIsEditorNewActions$.pipe(map((focus) => focus !== false)),
     });
 
-    keyboardCtx.onKeydown$("p", focusIsEditorNewActions$).subscribe(() => {
-      ctx.projectManager.addProjectNew();
+    keyboardCtx.onKeydown$("p", focusIsEditorNewActions$).subscribe(async () => {
+      const library = await firstValueFrom(ctx.library$);
+      library.addProjectBlank();
       focusCtx.popFocus();
     });
 

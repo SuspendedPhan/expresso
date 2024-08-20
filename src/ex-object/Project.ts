@@ -53,7 +53,7 @@ export namespace ProjectFns {
 
 export namespace CreateProject {
   export function from(
-    ctx_: MainContext,
+    _ctx: MainContext,
     data?: {
       rootExObjects?: ExObject[];
       componentArr?: CustomComponent[];

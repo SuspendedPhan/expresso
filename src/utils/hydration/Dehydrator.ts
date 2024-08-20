@@ -7,7 +7,7 @@ import {
   switchMap,
   tap
 } from "rxjs";
-import { ComponentKind, type CustomComponent, type CustomComponentParameter } from "src/ex-object/Component";
+import { ComponentKind, ComponentParameterKind, type CustomComponent, type CustomComponentParameter } from "src/ex-object/Component";
 import {
   type CallExpr,
   type Expr,
@@ -62,6 +62,7 @@ export interface DehydratedExObject {
 
 export interface DehydratedComponentProperty {
   id: string;
+  componentParameterKind: ComponentParameterKind;
   componentParameterId: string;
   expr: DehydratedExpr;
 }
@@ -122,15 +123,13 @@ export default class Dehydrator {
       log55.tapDebug("dehydrateProject$.combineLatest.start"),
       map(([deExObjects, deComponents]) => {
         return {
-          id: project.libraryProject.id,
-          name: project.libraryProject.name,
+          id: project.libraryProject!.id,
+          name: project.libraryProject!.name,
           rootExObjects: deExObjects,
           customComponents: deComponents,
         };
       }),
       tap((deProject) => {
-        console.log("deProject", deProject);
-        
         log55.debug("dehydrateProject$.end", deProject);
       })
     );
@@ -275,6 +274,7 @@ export default class Dehydrator {
         const deProperty: DehydratedComponentProperty = {
           id: property.id,
           componentParameterId: property.componentParameter.id,
+          componentParameterKind: property.componentParameter.componentParameterKind,
           expr: dehydratedExpr,
         };
         return deProperty;

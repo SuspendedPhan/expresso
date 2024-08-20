@@ -1,13 +1,15 @@
+import { ReplaySubject } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import ExObjectFactory from "src/ex-object/ExObjectFactory";
 import { createProjectContext } from "src/ex-object/Project";
+import { createLibrary, type Library } from "src/library/Library";
 import {
   ProjectManager
 } from "src/library/LibraryProject";
 import ProjectMutator from "src/mutator/ProjectMutator";
 import { createExObjectFocusContext } from "src/utils/focus/ExObjectFocus";
-import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
 import { createFocusContext, FocusFns } from "src/utils/focus/Focus";
+import { createExprCommandCtx } from "src/utils/utils/ExprCommand";
 import type GoModule from "src/utils/utils/GoModule";
 import { createKeyboardContext } from "src/utils/utils/Keyboard";
 import { createPersistCtx } from "src/utils/utils/PersistCtx";
@@ -16,8 +18,7 @@ import GoBridge from "../evaluation/GoBridge";
 import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
-import { firstValueFrom, ReplaySubject } from "rxjs";
-import type { Library } from "src/library/Library";
+import { createComponentCtx } from "src/ex-object/Component";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -40,10 +41,13 @@ export default class MainContext {
   public readonly exprCommandCtx = createExprCommandCtx(this);
   public readonly persistCtx = createPersistCtx(this);
   public readonly library$ = new ReplaySubject<Library>(1);
+  public readonly componentCtx = createComponentCtx(this);
 
   public constructor(public readonly goModule: GoModule) {
     this.goBridge = new GoBridge(goModule, this);
     this.mutator = new MainMutator(this);
     FocusFns.register(this);
+    const library = createLibrary(this, {});
+    this.library$.next(library);
   }
 }

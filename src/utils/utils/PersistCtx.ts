@@ -1,20 +1,24 @@
-import { debounceTime, Subject, switchMap } from "rxjs";
-import type { LibraryProject } from "src/library/LibraryProject";
+import { debounceTime, firstValueFrom, Subject, switchMap } from "rxjs";
+import {
+  type LibraryProject
+} from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import Persistence from "src/utils/persistence/Persistence";
 import { log5 } from "src/utils/utils/Log2";
 
-const reset = true;
-// const reset = false;
+// const reset = true;
+const reset = false;
 
 const log55 = log5("PersistCtx.ts");
 
 export function createPersistCtx(ctx: MainContext) {
   Persistence.readProject$.subscribe(async (deProject) => {
     if (deProject === null || reset) {
-      ctx.projectManager.addProjectNew();
+      log55.debug("No project found, creating blank project");
+      const library = await firstValueFrom(ctx.library$);
+      library.addProjectBlank();
       return;
     }
 
@@ -22,6 +26,8 @@ export function createPersistCtx(ctx: MainContext) {
     (ctx.projectManager.currentLibraryProject$ as Subject<LibraryProject>).next(
       project
     );
+
+    log55.debug("Project loaded", project);
   });
 
   const dehydrator = new Dehydrator();

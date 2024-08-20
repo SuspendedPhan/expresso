@@ -27,11 +27,19 @@ export async function createLibraryProject(
 ) {
   const library = await firstValueFrom(ctx.library$);
   const ordinal = await firstValueFrom(library.projectOrdinal$);
-  return {
+  const project$ = new ReplaySubject<Project>(1);
+  const libraryProject = {
     id: data.id ?? Utils.createId("library-project"),
     name: data.name ?? `Project ${ordinal}`,
-    project$: new ReplaySubject<Project>(1),
+    project$,
   };
+
+  if (data.project !== undefined) {
+    project$.next(data.project);
+    data.project.libraryProject = libraryProject;
+  }
+
+  return libraryProject;
 }
 
 export class ProjectManager {
