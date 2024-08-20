@@ -5,7 +5,7 @@ import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/utils/Focus";
-import { FocusKind } from "../utils/FocusKind.1";
+import { FocusKind } from "../utils/FocusKind";
 import type { OBS } from "src/utils/utils/Utils";
 
 export function createExObjectFocusContext(ctx: MainContext) {
