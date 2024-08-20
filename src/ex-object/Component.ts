@@ -35,7 +35,7 @@ export interface CustomComponent {
   id: string;
   componentKind: ComponentKind.CustomComponent;
   name$: SUB<string>;
-  parameters$: SUB<ComponentParameter[]>;
+  parameters$: SUB<CustomComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
 }
 
@@ -49,7 +49,7 @@ export interface CanvasComponentParameter {
 export interface CustomComponentParameter {
   readonly id: string;
   readonly componentParameterType: ComponentParameterKind.CustomComponentParameter;
-  readonly nameSub$: SUB<string>;
+  readonly name$: SUB<string>;
 }
 
 export const CanvasComponentStore = {
@@ -88,7 +88,7 @@ export namespace CreateComponent {
       id,
       componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(`Component ${ordinal}`),
-      parameters$: new BehaviorSubject<ComponentParameter[]>([]),
+      parameters$: new BehaviorSubject<CustomComponentParameter[]>([]),
       rootExObjects$: new BehaviorSubject<ExObject[]>(rootExObjects),
     };
   }
@@ -102,7 +102,7 @@ export namespace ComponentParameterFns {
       case ComponentParameterKind.CanvasComponentParameter:
         return of(componentParameter.name);
       case ComponentParameterKind.CustomComponentParameter:
-        return componentParameter.nameSub$;
+        return componentParameter.name$;
       default:
         throw new Error("unknown component parameter type");
     }

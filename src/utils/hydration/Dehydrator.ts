@@ -4,9 +4,10 @@ import {
   map,
   type Observable,
   of,
-  switchMap
+  switchMap,
+  tap
 } from "rxjs";
-import { ComponentKind } from "src/ex-object/Component";
+import { ComponentKind, type CustomComponent, type CustomComponentParameter } from "src/ex-object/Component";
 import {
   type CallExpr,
   type Expr,
@@ -22,7 +23,10 @@ import {
 } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { assertUnreachable } from "src/utils/utils/Utils";
+import { log5 } from "src/utils/utils/Log2";
+import { assertUnreachable, RxFns } from "src/utils/utils/Utils";
+
+const log55 = log5("Dehydrator.ts");
 
 export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
 
@@ -30,6 +34,19 @@ export interface DehydratedProject {
   id: string;
   name: string;
   rootExObjects: DehydratedExObject[];
+  customComponents: DehydratedCustomComponent[];
+}
+
+export interface DehydratedCustomComponent {
+  id: string;
+  name: string;
+  parameters: DehydratedCustomComponentParameter[];
+  rootExObjects: DehydratedExObject[];
+}
+
+export interface DehydratedCustomComponentParameter {
+  id: string;
+  name: string;
 }
 
 export interface DehydratedExObject {
@@ -75,29 +92,96 @@ export interface DehydratedCallExpr {
 export default class Dehydrator {
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
     const deExObjects$ = project.rootExObjects$.pipe(
+      log55.tapDebug("dehydrateProject$.exObjects.start"),
       switchMap((exObjects) => {
+        log55.debug("dehydrateProject$.exObjects", exObjects);
         if (exObjects.length === 0) {
           return of([]);
         }
 
-        return combineLatest(
+        return RxFns.combineLatestOrEmpty(
           exObjects.map((exObject) => {
+            return this.dehydrateExObject$(exObject);
+          })
+        );
+      }),
+      log55.tapDebug("dehydrateProject$.exObjects.end")
+    );
+
+    const deComponents$ = project.componentArr$.pipe(
+      switchMap((components) => {
+        return RxFns.combineLatestOrEmpty(
+          components.map((component) => {
+            return this.dehydrateCustomComponent$(component);
+          })
+        );
+      })
+    );
+
+    return combineLatest([deExObjects$, deComponents$]).pipe(
+      log55.tapDebug("dehydrateProject$.combineLatest.start"),
+      map(([deExObjects, deComponents]) => {
+        return {
+          id: project.libraryProject.id,
+          name: project.libraryProject.name,
+          rootExObjects: deExObjects,
+          customComponents: deComponents,
+        };
+      }),
+      tap((deProject) => {
+        console.log("deProject", deProject);
+        
+        log55.debug("dehydrateProject$.end", deProject);
+      })
+    );
+  }
+
+  public dehydrateCustomComponent$(component: CustomComponent) {
+    const deParameters$ = component.parameters$.pipe(
+      switchMap((parameters) => {
+        return RxFns.combineLatestOrEmpty(
+          parameters.map((parameter) => {
+            return this.dehydrateCustomComponentParameter$(parameter);
+          })
+        );
+      })
+    );
+
+    const deRootExObjects$ = component.rootExObjects$.pipe(
+      switchMap((rootExObjects) => {
+        return combineLatest(
+          rootExObjects.map((exObject) => {
             return this.dehydrateExObject$(exObject);
           })
         );
       })
     );
 
-    return deExObjects$.pipe(
-      map((deExObjects) => {
+    return combineLatest([deParameters$, deRootExObjects$, component.name$]).pipe(
+      map(([deParameters, deRootExObjects, name]) => {
         return {
-          id: project.libraryProject.id,
-          name: project.libraryProject.name,
-          rootExObjects: deExObjects,
+          id: component.id,
+          name,
+          parameters: deParameters,
+          rootExObjects: deRootExObjects,
         };
       })
     );
   }
+
+  public dehydrateCustomComponentParameter$(
+    parameter: CustomComponentParameter
+  ): Observable<DehydratedCustomComponentParameter> {
+    return parameter.name$.pipe(
+      map((name) => {
+        return {
+          id: parameter.id,
+          name,
+        };
+      })
+    );
+  }
+  
 
   @loggedMethod
   public dehydrateExObject$(
@@ -105,7 +189,7 @@ export default class Dehydrator {
   ): Observable<DehydratedExObject> {
     const logger = Logger.logger();
 
-    const deComponentProperties$ = combineLatest(
+    const deComponentProperties$ = RxFns.combineLatestOrEmpty(
       exObject.componentParameterProperties.map((property) =>
         this.dehydrateComponentProperty$(property)
       )
@@ -113,12 +197,12 @@ export default class Dehydrator {
 
     const deBasicProperties$ = exObject.basicProperties$.pipe(
       switchMap((properties) => {
-        const newLocal = properties.map((property) =>
+        const deProperties = properties.map((property) =>
           this.dehydrateBasicProperty$(property)
         );
-
-        return combineLatest(newLocal);
-      })
+        return RxFns.combineLatestOrEmpty(deProperties);
+      }),
+      log55.tapDebug("dehydrateExObject$.deBasicProperties$.combineLatest.end")
     );
 
     const deCloneProperty$ = this.dehydrateCloneProperty$(
@@ -138,7 +222,8 @@ export default class Dehydrator {
             return this.dehydrateExObject$(child);
           })
         );
-      })
+      }),
+      log55.tapDebug("dehydrateExObject$.deChildren$.combineLatest.end")
     );
 
     const result = combineLatest([
@@ -148,6 +233,7 @@ export default class Dehydrator {
       deChildren$,
       exObject.name$,
     ]).pipe(
+      log55.tapDebug("dehydrateExObject$.combineLatest.start"),
       map(
         ([
           deComponentProperties,
@@ -168,7 +254,8 @@ export default class Dehydrator {
           };
           return deExObject;
         }
-      )
+      ),
+      log55.tapDebug("dehydrateExObject$.combineLatest.end")
     );
 
     return result;
@@ -199,8 +286,10 @@ export default class Dehydrator {
   public dehydrateBasicProperty$(
     property: BasicProperty
   ): Observable<DehydratedBasicProperty> {
+    log55.debug("dehydrateBasicProperty$", property);
     const logger = Logger.logger();
     return property.expr$.pipe(
+      log55.tapDebug("dehydrateBasicProperty$.expr$.start"),
       switchMap((expr) => {
         return this.dehydrateExpr$(expr);
       }),
@@ -213,7 +302,8 @@ export default class Dehydrator {
           expr: dehydratedExpr,
         };
         return deProperty;
-      })
+      }),
+      log55.tapDebug("dehydrateBasicProperty$.expr$.end")
     );
   }
 

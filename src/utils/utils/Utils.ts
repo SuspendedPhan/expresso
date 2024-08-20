@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { BehaviorSubject, map, partition, pipe, Subject, type Observable } from "rxjs";
+import { BehaviorSubject, combineLatest, map, of, partition, pipe, Subject, type Observable } from "rxjs";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -75,4 +75,16 @@ export function partitionFirst<T>(
   observable: OBS<T>
 ): [OBS<T>, OBS<T>] {
   return partition(observable, (_, index) => index === 0);
+}
+
+export namespace RxFns {
+  export function combineLatestOrEmpty<T>(
+    observables: OBS<T>[]
+  ): OBS<T[]> {
+    if (observables.length === 0) {
+      return of([]);
+    }
+
+    return combineLatest(observables);
+  }
 }
