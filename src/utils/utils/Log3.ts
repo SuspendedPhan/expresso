@@ -1,9 +1,9 @@
 import { tap } from "rxjs";
 
-const level_limit = 5;
+const level_minimum = 11;
 
 export function log3(level: number, ...args: any[]) {
-    if (level >= level_limit) {
+    if (level >= level_minimum) {
         console.log(...args);
     }
 }
@@ -25,6 +25,9 @@ export function log5(topic: string) {
         },
         debug(...args: any[]) {
             log4.debug(`[${topic}]`, ...args);
+        },
+        debug2(...args: any[]) {
+            log3(11, `[${topic}]`, ...args);
         },
         log3(level: number, ...args: any[]) {
             log3(level, `[${topic}]`, ...args);

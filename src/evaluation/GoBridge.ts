@@ -22,7 +22,7 @@ export default class GoBridge {
 
     first$.subscribe((evt) => {
       evt.items.forEach((rootExObject) => {
-        log55.debug("Adding initial rootExObject", rootExObject.id);
+        log55.debug2("Adding initial rootExObject", rootExObject.id);
         goModule.Evaluator.addRootExObject(rootExObject.id);
       });
     });
@@ -30,7 +30,7 @@ export default class GoBridge {
     rest$.subscribe((evt) => {
       switch (evt.change.type) {
         case "ItemAdded":
-          log55.debug("Adding rootExObject", evt.change.item.id);
+          log55.debug2("Adding rootExObject", evt.change.item.id);
           goModule.Evaluator.addRootExObject(evt.change.item.id);
           break;
         case "ItemReplaced":
