@@ -18,6 +18,7 @@ import { MainEventBus } from "./MainEventBus";
 import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
 import { createComponentCtx } from "src/ex-object/Component";
+import { createNavFocusCtx } from "src/utils/focus/NavFocus";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -40,6 +41,7 @@ export default class MainContext {
   public readonly persistCtx = createPersistCtx(this);
   public readonly library$ = new ReplaySubject<Library>(1);
   public readonly componentCtx = createComponentCtx(this);
+  public readonly navFocusCtx = createNavFocusCtx(this);
 
   public async getLibraryProm() {
     return firstValueFrom(this.library$);

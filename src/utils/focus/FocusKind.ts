@@ -20,7 +20,8 @@ export const ExprFocusKind = {
 };
 
 export const NavFocusKind = {
-
+  ProjectNav: {},
+  LibraryNav: {},
 };
 
 export const FocusKind = unionize({
