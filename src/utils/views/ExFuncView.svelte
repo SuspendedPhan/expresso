@@ -3,17 +3,16 @@
   import type { ExFunc } from "src/ex-object/ExFunc";
   import type MainContext from "src/main-context/MainContext";
   import Divider from "src/utils/views/Divider.svelte";
-  import ExprView from "src/utils/views/ExprView.svelte";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
-  import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
+  import RootExprView from "src/utils/views/RootExprView.svelte";
   export let ctx: MainContext;
   export let exFunc: ExFunc;
 
   const isExFuncFocused$ = of(false);
 
-  const name$ = ExFuncFns.getName$(exFunc);
+  const name$ = exFunc.name$;
   const isNameFocused$ = of(false);
   const isEditingName$ = of(false);
   const expr$ = exFunc.expr$;
@@ -40,7 +39,7 @@
     </FlexContainer>
 
     <FlexContainer>
-      <ExprView {ctx} {expr} />
+      <RootExprView {ctx} expr={$expr$} />
     </FlexContainer>
     <Divider />
     <FlexContainer class="p-window">

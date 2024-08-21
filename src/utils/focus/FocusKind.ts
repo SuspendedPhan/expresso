@@ -13,6 +13,7 @@ export const ExObjectFocusKind = {
 
   ExItemNewActions: ofType<{ exItem: ExItem }>(),
   ExObjectRefactor: ofType<{ exObject: ExObject }>(),
+  ExprRefactor: ofType<{ expr: Expr }>(),
 };
 
 export const ExprFocusKind = {

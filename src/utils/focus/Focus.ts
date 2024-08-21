@@ -3,7 +3,7 @@ import type MainContext from "src/main-context/MainContext";
 import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
 import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
-import type { SUB } from "src/utils/utils/Utils";
+import type { OBS, SUB } from "src/utils/utils/Utils";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
 
@@ -38,6 +38,15 @@ export function createFocusContext(ctx: MainContext) {
 
     mapFocus$<T>(mapperFn: (focus: Focus) => T) {
       return data.focus$.pipe(map(mapperFn));
+    },
+
+    mapFocus2$<T extends Focus>(predicate: (focus: Focus) => focus is T): OBS<T | false> {
+      return data.focus$.pipe(
+        map((focus) => {
+          const result = predicate(focus);
+          return result === false ? false : focus;
+        })
+      );
     },
 
     setFocus(focus: Focus) {

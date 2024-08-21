@@ -44,6 +44,7 @@ export default class MainContext {
   public readonly navFocusCtx = createNavFocusCtx(this);
 
   public readonly debugCtx: any = {};
+  public disableCanvas = true;
 
   public async getLibraryProm() {
     return firstValueFrom(this.library$);

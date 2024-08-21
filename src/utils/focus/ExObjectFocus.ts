@@ -204,7 +204,7 @@ export namespace ExObjectFocusFuncs {
 
     keyboardCtx.registerCancel(newActionsFocus$);
 
-    // Refactor
+    // Refactor - Extract Component
 
     keyboardCtx
       .onKeydown$("r", exObjectFocusCtx.exObjectFocus$)
@@ -224,11 +224,35 @@ export namespace ExObjectFocusFuncs {
 
     ctx.viewCtx.commandCardCtx.addCommandCard({
       title: "ExObject Refactor",
-      commands: ["Extract Component"],
+      commands: ["Extract Component", "Extract Function"],
       visible$: focusCtx.mapFocus$(FocusKind.is.ExObjectRefactor),
     });
 
     keyboardCtx.registerCancel(refactorFocus$);
+
+    // Refactor - Extract Function
+
+    keyboardCtx
+      .onKeydown$("r", focusCtx.exprFocusCtx.getExprFocus$(false))
+      .subscribe(async (focus) => {
+        focusCtx.setFocus(FocusKind.ExprRefactor({ expr: focus.expr }));
+      });
+
+    const refactorExprFocus$ = focusCtx.mapFocus2$(FocusKind.is.ExprRefactor);
+
+    keyboardCtx.onKeydown$("f", refactorExprFocus$).subscribe(async (focus) => {
+      const expr = focus.expr;
+      ctx.refactorCtx.extractExFunc(expr);
+      focusCtx.popFocus();
+    });
+
+    ctx.viewCtx.commandCardCtx.addCommandCard({
+      title: "Expr Refactor",
+      commands: ["Extract Function"],
+      visible$: focusCtx.mapFocus$(FocusKind.is.ExprRefactor),
+    });
+
+    keyboardCtx.registerCancel(refactorExprFocus$);
 
     // Down Root
 

@@ -7,6 +7,9 @@
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import { log5 } from "src/utils/utils/Log3";
+
+  const log55 = log5("ExprView.svelte");
 
   export let ctx: MainContext;
   export let expr: Expr;
@@ -54,6 +57,8 @@
   function handleMousedown() {
     ctx.focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
   }
+
+  log55.debug2("expr", expr);
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>

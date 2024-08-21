@@ -12,6 +12,7 @@ export default class GoBridge {
   private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
 
   public constructor(goModule: GoModule, ctx: MainContext) {
+    if (ctx.disableCanvas) return;
     this.setup(goModule, ctx);
   }
 
@@ -77,7 +78,9 @@ export default class GoBridge {
             const arg1 = args[1];
 
             if (arg0 === undefined || arg1 === undefined) {
-              throw new Error("CallExpr must have 2 args");
+              // throw new Error("CallExpr must have 2 args");
+              console.error("CallExpr must have 2 args");
+              return;
             }
 
             goModule.CallExpr.setArg0(expr.id, arg0.id);

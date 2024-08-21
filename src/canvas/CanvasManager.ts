@@ -22,6 +22,7 @@ export class CanvasManager {
   >();
 
   public constructor(private readonly ctx: CanvasContext) {
+    if (ctx.mainCtx.disableCanvas) return;
     this.setup();
   }
 
