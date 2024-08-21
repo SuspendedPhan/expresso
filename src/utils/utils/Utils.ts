@@ -1,4 +1,5 @@
 import assert from "assert-ts";
+import { ResizeSensor } from "css-element-queries";
 import { BehaviorSubject, combineLatest, map, Observable, of, partition, pipe, Subject } from "rxjs";
 import { onMount } from "svelte";
 
@@ -99,6 +100,17 @@ export namespace RxFns {
       });
     });
     return obs;
+  }
+
+  export function resizeSensor$(element: HTMLElement): OBS<void> {
+    return new Observable<void>((subscriber) => {
+      const sensor = new ResizeSensor(element, () => {
+        subscriber.next();
+      });
+      return function unsubscribe() {
+        sensor.detach();
+      };
+    });
   }
 }
 
