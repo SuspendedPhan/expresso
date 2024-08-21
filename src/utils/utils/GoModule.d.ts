@@ -36,7 +36,7 @@ export default interface GoModule {
 
   Evaluator: {
     addRootExObject(id: string): void;
-    eval(): EvaluationMut;
+    eval(): Evaluation;
 
     canvasObjectPathAppend(
       basePath: string,
@@ -61,8 +61,5 @@ export default interface GoModule {
 
 export interface Evaluation {
   getResult(canvasPropertyPath: string): number;
-}
-
-export interface EvaluationMut extends Evaluation {
   dispose(): void;
 }
