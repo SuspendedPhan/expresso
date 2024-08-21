@@ -1,9 +1,11 @@
 import {
+  async,
   BehaviorSubject,
   firstValueFrom,
   Subject
 } from "rxjs";
 import { CreateComponent, type CustomComponent } from "src/ex-object/Component";
+import type { ExFunc } from "src/ex-object/ExFunc";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
@@ -59,6 +61,7 @@ export namespace CreateProject {
     data?: {
       rootExObjects?: ExObject[];
       componentArr?: CustomComponent[];
+      exFuncArr?: ExFunc[];
       currentOrdinal?: number;
     }
   ) {
@@ -78,6 +81,7 @@ export namespace CreateProject {
       componentArr$: new BehaviorSubject<CustomComponent[]>(
         data.componentArr ?? []
       ),
+      exFuncObsArr: createObservableArrayWithLifetime<ExFunc>(destroy$, data.exFuncArr ?? []),
       currentOrdinal$: new BehaviorSubject<number>(data.currentOrdinal ?? 0),
 
       rootExObjects$: rootExObjectObsArr.itemArr$,

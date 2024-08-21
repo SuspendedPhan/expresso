@@ -21,7 +21,7 @@ export async function createExFunc(
   const exFuncParameterArr = data.exFuncParameterArr ?? [];
   
   if (name === undefined) {
-    const ordinal = await ctx.projectCtx.getOrdinalProm();
+    const ordinal: number = await ctx.projectCtx.getOrdinalProm();
     name = `Function ${ordinal}`;
   }
 
@@ -46,7 +46,7 @@ export async function createExFuncParameter(
   let name = data.name;
   
   if (name === undefined) {
-    const ordinal = await ctx.projectCtx.getOrdinalProm();
+    const ordinal: number = await ctx.projectCtx.getOrdinalProm();
     name = `Parameter ${ordinal}`;
   }
 
