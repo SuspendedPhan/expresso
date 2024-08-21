@@ -58,8 +58,8 @@ export class ElementLayout {
       }
     }
 
-    log55.debug2("output", JSON.stringify(output));
-    log55.debug2(
+    log55.debug("output", JSON.stringify(output));
+    log55.debug(
       "localPositionsByKey",
       JSON.stringify(Array.from(output.localPositionsByKey.entries()))
     );
@@ -88,8 +88,8 @@ export class ElementLayout {
     //   throw new Error("Element not found for key", key);
     // }
     const width = element?.offsetWidth ?? 0;
-    log55.debug2("key", key);
-    log55.debug2("width", width);
+    log55.debug("key", key);
+    log55.debug("width", width);
     return width;
   }
 

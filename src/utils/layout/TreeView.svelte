@@ -1,12 +1,10 @@
 <script lang="ts">
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
-  import { switchMap } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import type { Line } from "src/utils/layout/Layout";
-  import { RxFns } from "src/utils/utils/Utils";
+  import { log5 } from "src/utils/utils/Log3";
   import { onMount, tick } from "svelte";
   import { ElementLayout } from "./ElementLayout";
-  import { log5 } from "src/utils/utils/Log3";
 
   const log55 = log5("TreeView.svelte");
 
@@ -49,9 +47,9 @@
         drawLines(canvas, lines);
       });
 
-      log55.debug2(debugCtx);
-      log55.debug2("canvasWidth", canvasWidth);
-      log55.debug2("canvasHeight", canvasHeight);
+      log55.debug(debugCtx);
+      log55.debug("canvasWidth", canvasWidth);
+      log55.debug("canvasHeight", canvasHeight);
     });
   });
 

@@ -83,9 +83,9 @@ export class Layout {
       lines
     );
 
-    log55.debug2("left", rootWorldLeft);
-    log55.debug2("top", rootWorldTop);
-    log55.debug2("key", treeRootKey);
+    log55.debug("left", rootWorldLeft);
+    log55.debug("top", rootWorldTop);
+    log55.debug("key", treeRootKey);
 
     return {
       localPositionsByKey,
@@ -124,9 +124,9 @@ export class Layout {
       });
       this.calculateForChildren(child, localPositionsByKey, subtreeWidthsByKey);
 
-      log55.debug2("left", childX);
-      log55.debug2("top", childY);
-      log55.debug2("key", childKey);
+      log55.debug("left", childX);
+      log55.debug("top", childY);
+      log55.debug("key", childKey);
     }
   }
 

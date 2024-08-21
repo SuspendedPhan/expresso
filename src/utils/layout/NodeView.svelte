@@ -15,7 +15,7 @@
     const sub = elementLayout
       .getLocalPositionObservable(elementKey)
       .subscribe((position) => {
-        log55.debug2("elementKey", elementKey);
+        log55.debug("elementKey", elementKey);
         log55.debug("position", position);
 
         element.style.left = `${position.left}px`;
@@ -25,9 +25,9 @@
 
     const handleResize = () => {
       tick().then(() => {
-        log55.debug2("handleResize");
-        log55.debug2("key", elementKey);
-        log55.debug2("width", element.clientWidth);
+        log55.debug("handleResize");
+        log55.debug("key", elementKey);
+        log55.debug("width", element.clientWidth);
         elementLayout.recalculate();
       });
     };
