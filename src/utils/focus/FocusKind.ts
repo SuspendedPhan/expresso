@@ -19,6 +19,10 @@ export const ExprFocusKind = {
   Expr: ofType<{ expr: Expr; isEditing: boolean }>(),
 };
 
+export const NavFocusKind = {
+
+};
+
 export const FocusKind = unionize({
   None: {},
   ProjectNav: {},
