@@ -42,6 +42,7 @@ export default class GoBridge {
     });
 
     ctx.eventBus.objectAdded$.subscribe((object) => {
+      log55.debug2("Adding ExObject", object.id);
       goModule.ExObject.create(object.id);
 
       goModule.ExObject.setCloneCountProperty(
@@ -55,6 +56,7 @@ export default class GoBridge {
     });
 
     ctx.eventBus.propertyAdded$.subscribe((property) => {
+      log55.debug2("Adding Property", property.id);
       goModule.Property.create(property.id);
       property.expr$.subscribe((expr) => {
         goModule.Property.setExpr(property.id, expr.id);

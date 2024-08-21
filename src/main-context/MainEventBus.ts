@@ -24,5 +24,9 @@ export class MainEventBus {
       switchMap((project) => project.project$),
       switchMap((project) => project.rootExObjects$)
     );
+    this.propertyAdded$.subscribe((property) => {
+      log55.debug2("MainEventBus propertyAdded$", property.id);
+      // this.propertyAdded$.next(property);
+    });
   }
 }

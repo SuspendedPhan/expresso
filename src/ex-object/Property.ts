@@ -125,6 +125,7 @@ export namespace CreateProperty {
     };
     expr.parent$.next(cloneCountProperty);
     ctx.eventBus.propertyAdded$.next(cloneCountProperty);
+    log55.debug2(`CreateProperty.cloneCount.end`);
     return cloneCountProperty;
   }
 }
