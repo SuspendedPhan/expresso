@@ -15,6 +15,7 @@
   export { clazz as class };
 
   // export let elementLayout: ElementLayout;
+  ctx.debugCtx.treeRoot = "object " + exObject.id;
   const elementLayout = ExObjectLayout.create(ctx, exObject);
 
   let element: HTMLElement;

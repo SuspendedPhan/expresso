@@ -1,6 +1,6 @@
 import { tap } from "rxjs";
 
-const level_minimum = 10;
+const level_minimum = 11;
 
 export function log3(level: number, ...args: any[]) {
     if (level >= level_minimum) {

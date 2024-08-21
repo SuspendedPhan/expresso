@@ -1,19 +1,17 @@
 <script lang="ts">
   import { map, of } from "rxjs";
-  import type MainContext from "src/main-context/MainContext";
-  import SelectableView from "src/utils/utils/SelectableView.svelte";
-  import ExprLayout from "../layout/ExprLayout";
-  import TreeView from "../layout/TreeView.svelte";
-  import ExprView from "./ExprView.svelte";
+  import { ExprType } from "src/ex-object/ExItem";
   import {
-    PropertyType,
     PropertyFns,
+    PropertyType,
     type Property,
   } from "src/ex-object/Property";
-  import { ExprType } from "src/ex-object/ExItem";
-  import HugInput from "src/utils/views/HugInput.svelte";
-  import FocusView from "src/utils/views/FocusView.svelte";
+  import type MainContext from "src/main-context/MainContext";
   import { rxEquals } from "src/utils/utils/Utils";
+  import FocusView from "src/utils/views/FocusView.svelte";
+  import HugInput from "src/utils/views/HugInput.svelte";
+  import RootExprView from "src/utils/views/RootExprView.svelte";
+  import ExprLayout from "../layout/ExprLayout";
 
   export let ctx: MainContext;
   export let property: Property;
@@ -61,10 +59,6 @@
   </div>
 
   {#key $exprId$}
-    {#if $elementLayout$}
-      <TreeView elementLayout={$elementLayout$} {ctx}>
-        <ExprView {ctx} expr={$expr$} elementLayout={$elementLayout$} />
-      </TreeView>
-    {/if}
+    <RootExprView expr={$expr$} {ctx} />
   {/key}
 </div>

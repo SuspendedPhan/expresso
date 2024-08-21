@@ -1,9 +1,11 @@
-import * as rxjs from "rxjs";
-import { Observable } from "rxjs";
-import Logger from "../logger/Logger";
+import { Observable, ReplaySubject } from "rxjs";
+import { log5 } from "src/utils/utils/Log3";
+import type { SUB } from "src/utils/utils/Utils";
 import { loggedMethod } from "../logger/LoggerDecorator";
 import type { Point } from "./Layout";
 import { type Output, Layout } from "./Layout";
+
+const log55 = log5("ElementLayout.ts");
 
 export class ElementLayout {
   private layout;
@@ -11,12 +13,9 @@ export class ElementLayout {
   private getRootNode;
 
   // onCalculated is a useful event for redrawing the connecting lines and resizing the container.
-  public onCalculated = new rxjs.ReplaySubject<Output>(1);
+  public onCalculated = new ReplaySubject<Output>(1);
 
-  private onLocalPositionSubscriberByElementId = new Map<
-    string,
-    rxjs.Subscriber<Point>
-  >();
+  private localPosition$ByKey = new Map<string, SUB<Point>>();
   private elementByKey = new Map<string, HTMLElement>();
 
   private getKey;
@@ -45,20 +44,25 @@ export class ElementLayout {
 
   @loggedMethod
   public recalculate() {
-    const logger = Logger.logger();
-
     const rootNode = this.getRootNode();
     const output = this.layout.calculate(rootNode);
-    
+
     for (const [
       elementKey,
-      localPositionSubscriber,
-    ] of this.onLocalPositionSubscriberByElementId.entries()) {
-      localPositionSubscriber.next(output.localPositionsByKey.get(elementKey));
+      localPosition$,
+    ] of this.localPosition$ByKey.entries()) {
+      const newLocal = output.localPositionsByKey.get(elementKey);
+      log55.debug("newLocal", newLocal);
+      if (newLocal !== undefined) {
+        localPosition$.next(newLocal);
+      }
     }
 
-    logger.log("output", JSON.stringify(output));
-    logger.log("localPositionsByKey", JSON.stringify(Array.from(output.localPositionsByKey.entries())));
+    log55.debug2("output", JSON.stringify(output));
+    log55.debug2(
+      "localPositionsByKey",
+      JSON.stringify(Array.from(output.localPositionsByKey.entries()))
+    );
 
     this.onCalculated.next(output);
   }
@@ -73,15 +77,20 @@ export class ElementLayout {
   // all have the "position: absolute" CSS rule.
   // When the event is fired, a Layout.Point object is passed.
   public getLocalPositionObservable(elementKey: string): Observable<Point> {
-    return new Observable<Point>((subscriber) => {
-      this.onLocalPositionSubscriberByElementId.set(elementKey, subscriber);
-    });
+    const localPosition$ = this.getOrCreateLocalPosition(elementKey);
+    return localPosition$;
   }
 
   private getWidth(node: any) {
     const key = this.getKey(node);
     const element = this.elementByKey.get(key);
-    return element?.offsetWidth ?? 0;
+    // if (!element) {
+    //   throw new Error("Element not found for key", key);
+    // }
+    const width = element?.offsetWidth ?? 0;
+    log55.debug2("key", key);
+    log55.debug2("width", width);
+    return width;
   }
 
   private getHeight(node: any) {
@@ -89,5 +98,14 @@ export class ElementLayout {
     const element = this.elementByKey.get(key);
     const answer = element?.offsetHeight ?? 0;
     return answer;
+  }
+
+  private getOrCreateLocalPosition(elementKey: string) {
+    let localPosition$ = this.localPosition$ByKey.get(elementKey);
+    if (localPosition$ === undefined) {
+      localPosition$ = new ReplaySubject<Point>(1);
+      this.localPosition$ByKey.set(elementKey, localPosition$);
+    }
+    return localPosition$;
   }
 }

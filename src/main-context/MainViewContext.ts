@@ -11,6 +11,7 @@ export enum DexWindow {
   LibraryProjectList,
   LibraryComponentList,
   LibraryFunctionList,
+  TestView,
 }
 
 export enum ViewMode {
@@ -24,7 +25,8 @@ export default class MainViewContext {
     readonly ElementLayout[]
   >([]);
 
-  public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor);
+  public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.TestView);
+  // public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor);
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
   public readonly navSections: readonly NavSection[];
   public readonly viewMode$ = new BehaviorSubject<ViewMode>(ViewMode.Default);
@@ -44,6 +46,7 @@ export default class MainViewContext {
       { label: "Editor", window: DexWindow.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
       { label: "Components", window: DexWindow.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
       { label: "Functions", window: DexWindow.ProjectFunctionList, iconClasses: "fa-solid fa-code", section: section0 },
+      { label: "TestView", window: DexWindow.TestView, iconClasses: "fa-solid fa-file", section: section0 },
     ];
 
     (section0 as any).navItems = navItems0;

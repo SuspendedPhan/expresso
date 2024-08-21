@@ -2,6 +2,9 @@
   import { onMount, tick } from "svelte";
   import { ElementLayout } from "../layout/ElementLayout";
   import { ResizeSensor } from "css-element-queries";
+  import { log5 } from "src/utils/utils/Log3";
+
+  const log55 = log5("NodeView.svelte");
 
   export let elementLayout: ElementLayout;
   export let elementKey: string;
@@ -12,6 +15,9 @@
     const sub = elementLayout
       .getLocalPositionObservable(elementKey)
       .subscribe((position) => {
+        log55.debug2("elementKey", elementKey);
+        log55.debug("position", position);
+
         element.style.left = `${position.left}px`;
         element.style.top = `${position.top}px`;
       });
@@ -19,6 +25,9 @@
 
     const handleResize = () => {
       tick().then(() => {
+        log55.debug2("handleResize");
+        log55.debug2("key", elementKey);
+        log55.debug2("width", element.clientWidth);
         elementLayout.recalculate();
       });
     };

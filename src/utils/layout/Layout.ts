@@ -1,3 +1,7 @@
+import { log5 } from "src/utils/utils/Log3";
+
+const log55 = log5("Layout.ts");
+
 export interface Point {
   left: number;
   top: number;
@@ -79,6 +83,10 @@ export class Layout {
       lines
     );
 
+    log55.debug2("left", rootWorldLeft);
+    log55.debug2("top", rootWorldTop);
+    log55.debug2("key", treeRootKey);
+
     return {
       localPositionsByKey,
       lines,
@@ -115,6 +123,10 @@ export class Layout {
         key: childKey,
       });
       this.calculateForChildren(child, localPositionsByKey, subtreeWidthsByKey);
+
+      log55.debug2("left", childX);
+      log55.debug2("top", childY);
+      log55.debug2("key", childKey);
     }
   }
 

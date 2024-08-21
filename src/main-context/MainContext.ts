@@ -43,6 +43,8 @@ export default class MainContext {
   public readonly componentCtx = createComponentCtx(this);
   public readonly navFocusCtx = createNavFocusCtx(this);
 
+  public readonly debugCtx: any = {};
+
   public async getLibraryProm() {
     return firstValueFrom(this.library$);
   }

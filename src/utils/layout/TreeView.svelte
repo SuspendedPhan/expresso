@@ -1,12 +1,18 @@
 <script lang="ts">
   import ResizeSensor from "css-element-queries/src/ResizeSensor";
+  import { switchMap } from "rxjs";
   import MainContext from "src/main-context/MainContext";
   import type { Line } from "src/utils/layout/Layout";
+  import { RxFns } from "src/utils/utils/Utils";
   import { onMount, tick } from "svelte";
   import { ElementLayout } from "./ElementLayout";
+  import { log5 } from "src/utils/utils/Log3";
+
+  const log55 = log5("TreeView.svelte");
 
   export let elementLayout: ElementLayout;
   export let ctx: MainContext;
+  const debugCtx = structuredClone(ctx.debugCtx);
   let canvas: HTMLCanvasElement;
 
   let lines: Line[] = [];
@@ -15,24 +21,42 @@
   let canvasWidth: number;
   let canvasHeight: number;
 
-  elementLayout.onCalculated.subscribe((output) => {
-    treeLayoutStyle = `left: 0px; width: ${output.totalWidth}px; height: ${output.totalHeight}px`;
-    lines = output.lines;
-    drawLines(canvas, output.lines);
-  });
+  // RxFns.onMount$()
+  //   .pipe(switchMap(() => elementLayout.onCalculated))
+  //   .subscribe((output) => {
+  //     console.log(debugCtx);
+
+  //     treeLayoutStyle = `left: 0px; width: ${output.totalWidth}px; height: ${output.totalHeight}px`;
+  //     lines = output.lines;
+  //     drawLines(canvas, output.lines);
+  //   });
 
   onMount(() => {
+    console.log("canvas", canvas);
+
+    elementLayout.onCalculated.subscribe((output) => {
+      treeLayoutStyle = `left: 0px; width: ${output.totalWidth}px; height: ${output.totalHeight}px`;
+      lines = output.lines;
+      drawLines(canvas, output.lines);
+    });
+
     new ResizeSensor(rootElement, () => {
       canvasWidth = rootElement.clientWidth;
       canvasHeight = rootElement.clientHeight;
+
       drawLines(canvas, lines);
       tick().then(() => {
         drawLines(canvas, lines);
       });
+
+      log55.debug2(debugCtx);
+      log55.debug2("canvasWidth", canvasWidth);
+      log55.debug2("canvasHeight", canvasHeight);
     });
   });
 
   function drawLines(canvasElement: HTMLCanvasElement, lines: Line[]) {
+    console.log(debugCtx);
     const context = canvasElement.getContext("2d");
     if (!context) {
       throw new Error("Could not get 2d context");

@@ -4,7 +4,7 @@
   import ActionBar from "src/utils/views/ActionBar.svelte";
   import ActionBarButton from "src/utils/views/ActionBarButton.svelte";
   import ComponentView from "src/utils/views/ComponentView.svelte";
-  import FlexContainer from "src/utils/views/FlexContainer.svelte";
+  import MainPane from "src/utils/views/MainPane.svelte";
 
   export let ctx: MainContext;
   const project$ = ctx.projectManager.currentProject$;
@@ -13,7 +13,7 @@
   );
 </script>
 
-<FlexContainer class="p-window gap-y-8">
+<MainPane>
   <ActionBar>
     <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
       >Add Component</ActionBarButton
@@ -22,4 +22,4 @@
   {#each $componentL$ as component}
     <ComponentView {ctx} {component} />
   {/each}
-</FlexContainer>
+</MainPane>

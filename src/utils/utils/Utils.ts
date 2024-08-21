@@ -1,5 +1,6 @@
 import assert from "assert-ts";
-import { BehaviorSubject, combineLatest, map, of, partition, pipe, Subject, type Observable } from "rxjs";
+import { BehaviorSubject, combineLatest, map, Observable, of, partition, pipe, Subject } from "rxjs";
+import { onMount } from "svelte";
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -86,6 +87,18 @@ export namespace RxFns {
     }
 
     return combineLatest(observables);
+  }
+
+  export function onMount$<T>(): OBS<T> {
+    const obs = new Observable<T>((subscriber) => {
+      onMount(() => {
+        subscriber.next();
+        return () => {
+          subscriber.complete();
+        };
+      });
+    });
+    return obs;
   }
 }
 
