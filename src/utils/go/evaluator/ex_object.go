@@ -1,16 +1,16 @@
 package evaluator
 
 type ExObject struct {
-	Id                           string
-	ComponentParameterProperties []*Property
-	CloneCountProperty           *Property
+	Id                            string
+	ComponentParameterPropertyIds []string
+	CloneCountPropertyId          string
 }
 
 func (e *Evaluator) ExObjectCreate(id string) {
 	e.ExObjectById[id] = &ExObject{
-		Id:                           id,
-		ComponentParameterProperties: []*Property{},
-		CloneCountProperty:           nil,
+		Id:                            id,
+		ComponentParameterPropertyIds: []string{},
+		CloneCountPropertyId:          "",
 	}
 }
 
@@ -21,12 +21,7 @@ func (e *Evaluator) ExObjectAddComponentParameterProperty(exObjectId string, pro
 		panic("exObject not found")
 	}
 
-	property, found := e.PropertyById[propertyId]
-	if !found {
-		panic("property not found")
-	}
-
-	exObject.ComponentParameterProperties = append(exObject.ComponentParameterProperties, property)
+	exObject.ComponentParameterPropertyIds = append(exObject.ComponentParameterPropertyIds, propertyId)
 }
 
 func (e *Evaluator) ExObjectSetCloneCountProperty(id string, cloneCountPropertyId string) {
@@ -36,10 +31,5 @@ func (e *Evaluator) ExObjectSetCloneCountProperty(id string, cloneCountPropertyI
 		panic("exObject not found")
 	}
 
-	cloneCountProperty, found := e.PropertyById[cloneCountPropertyId]
-	if !found {
-		panic("cloneCountProperty not found")
-	}
-
-	exObject.CloneCountProperty = cloneCountProperty
+	exObject.CloneCountPropertyId = cloneCountPropertyId
 }
