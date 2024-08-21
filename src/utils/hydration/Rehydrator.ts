@@ -2,6 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import {
   ComponentParameterKind,
+  CreateComponent,
   createCustomComponentParameter,
   type Component,
   type ComponentParameter,
@@ -47,16 +48,20 @@ export default class Rehydrator {
   public async rehydrateProject(
     deProject: DehydratedProject
   ): Promise<LibraryProject> {
-    const rootExObjects$P = deProject.rootExObjects.map((deExObject) =>
-      this.rehydrateExObject(deExObject)
-    );
-    const rootExObjects = await Promise.all(rootExObjects$P);
+    log55.debug("rehydrateProject.start", deProject);
 
     const customComponentArr = await Promise.all(
       deProject.customComponents.map((deCustomComponent) =>
         this.rehydrateCustomComponent(deCustomComponent)
       )
     );
+
+    log55.debug("rehydrateProject.customComponentArr.end", customComponentArr);
+
+    const rootExObjects$P = deProject.rootExObjects.map((deExObject) =>
+      this.rehydrateExObject(deExObject)
+    );
+    const rootExObjects = await Promise.all(rootExObjects$P);
 
     const project = CreateProject.from(this.ctx, {
       rootExObjects,
@@ -85,10 +90,17 @@ export default class Rehydrator {
       )
     );
 
-    const component = await Create.Component.custom(this.ctx, {
+    const rootExObjectArr = await Promise.all(
+      deCustomComponent.rootExObjects.map((deExObject) =>
+        this.rehydrateExObject(deExObject)
+      )
+    );
+
+    const component = await CreateComponent.custom(this.ctx, {
       id: deCustomComponent.id,
       name: deCustomComponent.name,
       parameters: parameterArr,
+      rootExObjects: rootExObjectArr
     });
     this.customComponentById.set(component.id, component);
     return component;

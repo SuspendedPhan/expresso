@@ -22,7 +22,7 @@ export default class GoBridge {
 
     first$.subscribe((evt) => {
       evt.items.forEach((rootExObject) => {
-        log55.debug2("Adding initial rootExObject", rootExObject.id);
+        log55.debug("Adding initial rootExObject", rootExObject.id);
         goModule.Evaluator.addRootExObject(rootExObject.id);
       });
     });
@@ -30,7 +30,7 @@ export default class GoBridge {
     rest$.subscribe((evt) => {
       switch (evt.change.type) {
         case "ItemAdded":
-          log55.debug2("Adding rootExObject", evt.change.item.id);
+          log55.debug("Adding rootExObject", evt.change.item.id);
           goModule.Evaluator.addRootExObject(evt.change.item.id);
           break;
         case "ItemReplaced":
@@ -42,7 +42,7 @@ export default class GoBridge {
     });
 
     ctx.eventBus.objectAdded$.subscribe((object) => {
-      log55.debug2("Adding ExObject", object.id);
+      log55.debug("Adding ExObject", object.id);
       goModule.ExObject.create(object.id);
 
       goModule.ExObject.setCloneCountProperty(
@@ -56,7 +56,7 @@ export default class GoBridge {
     });
 
     ctx.eventBus.propertyAdded$.subscribe((property) => {
-      log55.debug2("Adding Property", property.id);
+      log55.debug("Adding Property", property.id);
       goModule.Property.create(property.id);
       property.expr$.subscribe((expr) => {
         goModule.Property.setExpr(property.id, expr.id);

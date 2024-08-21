@@ -88,7 +88,7 @@ export function createComponentCtx(_ctx: MainContext) {
     getCanvasComponentParameterById(id: string) {
       const parameter = parameterById.get(id);
       log55.debug("getCanvasComponentParameterById", id, parameter);
-      
+
       if (!parameter) {
         throw new Error(`Canvas component parameter not found: ${id}`);
       }
@@ -121,11 +121,15 @@ export namespace CreateComponent {
       rootExObjects?: ExObject[];
     }
   ): Promise<CustomComponent> {
-    const ordinal = await ctx.projectCtx.getOrdinalProm();
+    if (data.name === undefined) {
+      const ordinal = await ctx.projectCtx.getOrdinalProm();
+      data.name = `Component ${ordinal}`;
+    }
+
     return {
       id: data.id ?? `custom-component-${crypto.randomUUID()}`,
       componentKind: ComponentKind.CustomComponent,
-      name$: new BehaviorSubject(data.name ?? `Component ${ordinal}`),
+      name$: new BehaviorSubject(data.name),
       parameters$: new BehaviorSubject(data.parameters ?? []),
       rootExObjects$: new BehaviorSubject(data.rootExObjects ?? []),
     };
@@ -163,9 +167,7 @@ export namespace ComponentFns {
     _ctx: MainContext,
     component: CustomComponent
   ): Promise<void> {
-    const exObject = await CreateExObject.blank(_ctx, {
-      component,
-    });
+    const exObject = await CreateExObject.blank(_ctx, {});
     const rootExObjects = await firstValueFrom(component.rootExObjects$);
     component.rootExObjects$.next([...rootExObjects, exObject]);
   }
