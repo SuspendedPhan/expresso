@@ -90,6 +90,10 @@ export namespace CreateProject {
         const exObject = await CreateExObject.blank(ctx, {});
         this.rootExObjectObsArr.push(exObject);
       },
+
+      async addCustomExFunc(exFunc: ExFunc) {
+        this.exFuncObsArr.push(exFunc);
+      }
     };
 
     return project;

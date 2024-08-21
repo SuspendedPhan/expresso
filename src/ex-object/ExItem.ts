@@ -1,3 +1,4 @@
+import type { CallExprKind } from "src/ex-object/CallExpr";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
@@ -32,8 +33,10 @@ export interface NumberExpr extends ExItemBase {
   readonly value: number;
 }
 
-export interface CallExpr extends ExItemBase {
-  readonly itemType: ExItemType.Expr;
-  readonly exprType: ExprType.CallExpr;
-  readonly args$: SUB<Expr[]>;
-}
+// export interface CallExpr extends ExItemBase {
+//   readonly itemType: ExItemType.Expr;
+//   readonly exprType: ExprType.CallExpr;
+//   readonly args$: SUB<Expr[]>;
+// }
+
+export type CallExpr = typeof CallExprKind._Union;

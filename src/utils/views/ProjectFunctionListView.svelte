@@ -8,7 +8,9 @@
 
   export let ctx: MainContext;
   const project$ = ctx.projectManager.currentProject$;
-  const exFuncArr$ = project$.pipe(switchMap((project) => project.exFuncArr$));
+  const exFuncArr$ = project$.pipe(
+    switchMap((project) => project.exFuncObsArr.itemArr$)
+  );
 </script>
 
 <MainPane>

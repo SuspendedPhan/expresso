@@ -1,5 +1,10 @@
 import { firstValueFrom } from "rxjs";
+import {
+  createCallExprBase,
+  createCustomCallExpr,
+} from "src/ex-object/CallExpr";
 import { CreateComponent } from "src/ex-object/Component";
+import { createExFunc as createCustomExFunc } from "src/ex-object/ExFunc";
 import type { Expr } from "src/ex-object/ExItem";
 import {
   CreateExObject,
@@ -28,7 +33,20 @@ export function createRefactorContext(ctx: MainContext) {
     },
 
     async extractExFunc(expr: Expr) {
-      console.log("extractExFunc", expr);
+      const exFunc = await createCustomExFunc(ctx, {
+        expr,
+      });
+
+      const project = await ctx.projectCtx.getCurrentProjectProm();
+      project.addCustomExFunc(exFunc);
+
+      const callExprBase = await createCallExprBase(ctx, {});
+      const callExpr = await createCustomCallExpr(ctx, {
+        exFunc,
+        base: callExprBase,
+      });
+
+      ctx.mutator.replaceExpr(callExpr, expr);
     },
 
     async extractProperty(expr: Expr) {

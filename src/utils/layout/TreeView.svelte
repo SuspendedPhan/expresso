@@ -43,7 +43,6 @@
     });
 
   function drawLines(canvasElement: HTMLCanvasElement, lines: Line[]) {
-    console.log(debugCtx);
     const context = canvasElement.getContext("2d");
     if (!context) {
       throw new Error("Could not get 2d context");

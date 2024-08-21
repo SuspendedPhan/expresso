@@ -1,23 +1,42 @@
 import type { Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
-import { createBehaviorSubjectWithLifetime, Utils } from "src/utils/utils/Utils";
+import { createBehaviorSubjectWithLifetime, Utils, type SUB } from "src/utils/utils/Utils";
+import unionize, { ofType } from "unionize";
 
-export type ExFunc = ReturnType<typeof createExFunc>;
+export interface ExFunc {
+  readonly id: string;
+  readonly name$: SUB<string>;
+  readonly expr$: SUB<Expr>;
+  readonly exFuncParameterArr$: SUB<ExFuncParameter[]>;
+}
+
 export type ExFuncParameter = ReturnType<typeof createExFuncParameter>;
+
+export const SystemExFuncKind = unionize({
+  Add: {},
+}, {
+  tag: "systemExFuncKind",
+});
+
+export type SystemExFunc = typeof SystemExFuncKind._Union;
+
+export const ExFuncKind = unionize({
+  Custom: ofType<ExFunc>(),
+  System: ofType<SystemExFunc>(),
+});
 
 export async function createExFunc(
   ctx: MainContext,
-  data?: {
+  data: {
     id?: string;
     name?: string;
     expr?: Expr;
     exFuncParameterArr?: ExFuncParameter[];
   }
-) {
-  data ??= {};
+): Promise<ExFunc> {
   const id = data.id ?? Utils.createId("ex-func");
   let name = data.name;
-  const expr = data.expr ?? ctx.objectFactory.createNumberExpr();
+  const expr = data.expr ?? await ctx.objectFactory.createNumberExpr();
   const exFuncParameterArr = data.exFuncParameterArr ?? [];
   
   if (name === undefined) {

@@ -1,4 +1,5 @@
 import { type BehaviorSubject, first, firstValueFrom, type Subject } from "rxjs";
+import { createSystemCallExpr } from "src/ex-object/CallExpr";
 import {
   ExItemType,
   type Expr,
@@ -28,7 +29,7 @@ export default class MainMutator {
 
   @loggedMethod
   public async replaceWithCallExpr(oldExpr: Expr) {
-    const expr = await this.ctx.objectFactory.createCallExpr();
+    const expr = await createSystemCallExpr(this.ctx, {});
     this.replaceWithExpr(oldExpr, expr);
   }
 
@@ -37,11 +38,16 @@ export default class MainMutator {
     Logger.arg("oldExpr", oldExpr.id);
 
     oldExpr.parent$.pipe(first()).subscribe((parent) => {
-      this.replaceExpr(parent, newExpr, oldExpr);
+      this.replaceExpr2(parent, newExpr, oldExpr);
     });
   }
 
-  private replaceExpr(parent: Parent, newExpr: Expr, oldExpr: Expr) {
+  public async replaceExpr(newExpr: Expr, oldExpr: Expr) {
+    const parent = await firstValueFrom(oldExpr.parent$);
+    this.replaceExpr2(parent, newExpr, oldExpr);
+  }
+
+  public replaceExpr2(parent: Parent, newExpr: Expr, oldExpr: Expr) {
     if (parent === null) {
       throw new Error("oldExpr.parent$ is null");
     }

@@ -1,6 +1,10 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import {
+  createCallExprBase,
+  createSystemCallExpr,
+} from "src/ex-object/CallExpr";
+import {
   ComponentParameterKind,
   CreateComponent,
   createCustomComponentParameter,
@@ -100,7 +104,7 @@ export default class Rehydrator {
       id: deCustomComponent.id,
       name: deCustomComponent.name,
       parameters: parameterArr,
-      rootExObjects: rootExObjectArr
+      rootExObjects: rootExObjectArr,
     });
     this.customComponentById.set(component.id, component);
     return component;
@@ -134,12 +138,11 @@ export default class Rehydrator {
       this.rehydrateBasicProperty(deProperty)
     );
 
-    
     const componentPropertyL = await Promise.all(componentPropertyPL);
     log55.debug("rehydrateExObject.componentPropertyL.end");
     const basicPropertyL = await Promise.all(basicPropertyPL);
     log55.debug("rehydrateExObject.basicPropertyL.end");
-    
+
     const cloneCountProperty = await this.rehydrateCloneCountProperty(
       deExObject.cloneProperty
     );
@@ -179,7 +182,12 @@ export default class Rehydrator {
 
     const expr = await this.rehydrateExpr(deProperty.expr);
     log55.debug("rehydrateComponentProperty.rehydrateExpr.end");
-    const property = await Create.Property.component(this.ctx, deProperty.id, parameter, expr);
+    const property = await Create.Property.component(
+      this.ctx,
+      deProperty.id,
+      parameter,
+      expr
+    );
     log55.debug("rehydrateComponentProperty.end", property);
     return property;
   }
@@ -191,7 +199,7 @@ export default class Rehydrator {
     log55.debug("rehydrateBasicProperty.start", deProperty);
 
     const expr = await this.rehydrateExpr(deProperty.expr);
-    
+
     log55.debug("rehydrateBasicProperty", deProperty);
 
     return Create.Property.basic(
@@ -229,7 +237,10 @@ export default class Rehydrator {
   private async rehydrateNumberExpr(
     deExpr: DehydratedNumberExpr
   ): Promise<NumberExpr> {
-    const newLocal = this.ctx.objectFactory.createNumberExpr(deExpr.value, deExpr.id);
+    const newLocal = this.ctx.objectFactory.createNumberExpr(
+      deExpr.value,
+      deExpr.id
+    );
     log55.debug("rehydrateNumberExpr", newLocal);
     return newLocal;
   }
@@ -240,7 +251,12 @@ export default class Rehydrator {
   ): Promise<CallExpr> {
     const argPL = deExpr.args.map((arg) => this.rehydrateExpr(arg));
     const argL = await Promise.all(argPL);
-    return this.ctx.objectFactory.createCallExpr(deExpr.id, argL);
+    const callExprBase = await createCallExprBase(this.ctx, {
+      id: deExpr.id,
+      args: argL,
+    });
+    const callExpr = createSystemCallExpr(this.ctx, { base: callExprBase });
+    return callExpr;
   }
 
   private getComponent(componentId: string, componentType: string): Component {
