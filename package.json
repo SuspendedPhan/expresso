@@ -23,6 +23,7 @@
     "@aws-sdk/credential-providers": "^3.598.0",
     "@types/gapi": "^0.0.47",
     "@types/google-one-tap": "^1.2.6",
+    "@types/google.accounts": "^0.0.14",
     "assert-ts": "^0.3.4",
     "axios": "^1.7.2",
     "css-element-queries": "^1.2.3",
