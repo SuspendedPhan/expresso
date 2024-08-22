@@ -1,10 +1,23 @@
 <script lang="ts">
-  function signOut() {
-    const token = gapi.client.getToken();
-    if (token !== null) {
-      google.accounts.oauth2.revoke(token.access_token);
-      gapi.client.setToken("");
+  import type { CredentialResponse } from "google-one-tap";
+
+  google.accounts.id.initialize({
+    client_id:
+      "25459583594-pbqv5n3ppt0gurj3m4qgjfp5ujg9mo5p.apps.googleusercontent.com",
+    callback: handleCredentialResponse,
+  });
+  google.accounts.id.prompt();
+
+  function handleCredentialResponse(response: CredentialResponse) {
+    if (response.credential) {
+      console.log("Signed in as: " + response.credential);
+    } else {
+      console.log("Sign-in failed.");
     }
+  }
+
+  function signOut() {
+    // google.accounts.id.revoke();
   }
 </script>
 
