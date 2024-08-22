@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { CreateProject } from "src/ex-object/Project";
 import { createLibraryProject, type LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
@@ -39,9 +39,17 @@ export function createLibrary(
 
     async addProjectBlank() {
       log55.debug("addProjectBlank");
+      const ordinal = getAndIncrementOrdinal(this.projectOrdinal$);
+      const name = `Project ${ordinal}`;
       const project = CreateProject.from(ctx, {});
-      const libraryProject = await createLibraryProject(ctx, { project });
+      const libraryProject = await createLibraryProject(ctx, { project, name });
       this.addProject(libraryProject);
     }
   };
+
+  function getAndIncrementOrdinal(ordinal$: BehaviorSubject<number>) {
+    const ordinal = ordinal$.value + 1;
+    ordinal$.next(ordinal);
+    return ordinal;
+  }
 }

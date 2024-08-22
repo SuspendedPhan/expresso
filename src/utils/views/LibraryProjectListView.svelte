@@ -2,10 +2,13 @@
   import MainContext from "src/main-context/MainContext";
   import { Constants } from "../utils/ViewUtils";
   import LibraryProjectView from "./LibraryProjectView.svelte";
+  import { switchMap } from "rxjs";
 
   export let ctx: MainContext;
 
-  const projects$ = ctx.projectManager.libraryProjects$;
+  const projects$ = ctx.library$.pipe(
+    switchMap((library) => library.libraryProjectArr$)
+  );
   $: console.log($projects$);
 </script>
 
