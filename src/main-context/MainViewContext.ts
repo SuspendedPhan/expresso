@@ -26,8 +26,9 @@ export default class MainViewContext {
     readonly ElementLayout[]
   >([]);
 
-  public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.TestView);
+  // public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.TestView);
   // public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor);
+  public readonly activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.Settings);
   public readonly navCollapsed$ = new BehaviorSubject<boolean>(false);
   public readonly navSections: readonly NavSection[];
   public readonly viewMode$ = new BehaviorSubject<ViewMode>(ViewMode.Default);
