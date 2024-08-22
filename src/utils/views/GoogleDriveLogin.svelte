@@ -8,8 +8,12 @@
     <p>Drive API Quickstart</p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <button class="btn" id="authorize_button" onclick="handleAuthClick()"
+      >Authorize</button
+    >
+    <button class="btn" id="signout_button" onclick="handleSignoutClick()"
+      >Sign Out</button
+    >
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
@@ -99,10 +103,13 @@
         if (gapi.client.getToken() === null) {
           // Prompt the user to select a Google Account and ask for consent to share their data
           // when establishing a new session.
-          tokenClient.requestAccessToken({ prompt: "consent" });
+          // tokenClient.requestAccessToken({ prompt: "consent" });
+          // tokenClient.requestAccessToken({ prompt: "" });
+          tokenClient.requestAccessToken();
         } else {
           // Skip display of account chooser and consent dialog for an existing session.
-          tokenClient.requestAccessToken({ prompt: "" });
+          tokenClient.requestAccessToken();
+          // tokenClient.requestAccessToken({ prompt: "" });
         }
       }
 

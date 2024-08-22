@@ -1,7 +1,7 @@
 <script lang="ts">
   import { filter, map, switchMap } from "rxjs";
   import type MainContext from "src/main-context/MainContext";
-  import GoogleDriveSample from "src/utils/views/GoogleDriveLogin.svelte";
+  import GoogleDriveLogin2 from "src/utils/views/GoogleDriveLogin2.svelte";
   import PropertyView from "src/utils/views/PropertyView.svelte";
 
   export let ctx: MainContext;
@@ -17,4 +17,4 @@
   <PropertyView {ctx} property={$property$} />
 {/if}
 
-<GoogleDriveSample />
+<GoogleDriveLogin2 />
