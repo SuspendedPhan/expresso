@@ -4,6 +4,7 @@
   import FocusView from "./FocusView.svelte";
   import HugInput from "./HugInput.svelte";
   import assert from "assert-ts";
+  import FieldLabel from "src/utils/views/FieldLabel.svelte";
 
   export let label;
   export let value$: OBS<string> | SUB<string>;
@@ -24,7 +25,7 @@
 </script>
 
 <div class="flex flex-row">
-  <pre class="text-style-secondary">{label}: </pre>
+  <FieldLabel {label} />
   <FocusView on:mousedown focused={isFocused} class="text-emphatic">
     <HugInput {isEditing} on:input={handleInput} value={$value$}></HugInput>
   </FocusView>

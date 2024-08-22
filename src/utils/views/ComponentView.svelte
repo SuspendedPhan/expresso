@@ -38,6 +38,8 @@
       />
     </FlexContainer>
 
+    <!-- <FlexContainer class="p-window" centered={false}></FlexContainer> -->
+
     <FlexContainer>
       {#each $rootExObjects$ as rootExObject}
         <Divider />
