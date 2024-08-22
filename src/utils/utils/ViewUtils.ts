@@ -1,6 +1,7 @@
 import { DexWindow } from "src/main-context/MainViewContext";
 import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
 import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
+import SettingsView from "src/utils/views/SettingsView.svelte";
 import EditorView from "../views/EditorView.svelte";
 import ProjectComponentListView from "../views/ProjectComponentListView.svelte";
 import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
@@ -9,6 +10,8 @@ import TestView from "src/utils/views/TestView.svelte";
 
 export function activeWindowToSvelteComponent(activeWindow: DexWindow): any {
   switch (activeWindow) {
+    case DexWindow.Settings:
+      return SettingsView;
     case DexWindow.TestView:
       return TestView;
     case DexWindow.ProjectEditor:

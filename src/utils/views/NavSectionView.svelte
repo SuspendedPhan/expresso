@@ -12,9 +12,11 @@
 </script>
 
 <div class:ring={$focused$} class="p-1">
-  <div class="menu-title">
-    <KbdShortcutSpan label={section.title} showShortcut={$underline$} />
-  </div>
+  {#if section.title}
+    <div class="menu-title">
+      <KbdShortcutSpan label={section.title} showShortcut={$underline$} />
+    </div>
+  {/if}
 
   {#each section.navItems as item}
     <li>

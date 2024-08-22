@@ -12,6 +12,7 @@ export enum DexWindow {
   LibraryComponentList,
   LibraryFunctionList,
   TestView,
+  Settings,
 }
 
 export enum ViewMode {
@@ -49,8 +50,6 @@ export default class MainViewContext {
       // { label: "TestView", window: DexWindow.TestView, iconClasses: "fa-solid fa-file", section: section0 },
     ];
 
-    (section0 as any).navItems = navItems0;
-
     const section1: NavSection = {
       title: "Library",
       navItems: [],
@@ -63,9 +62,21 @@ export default class MainViewContext {
       { label: "Functions", window: DexWindow.LibraryFunctionList, iconClasses: "fa-solid fa-code", section: section1 },
     ];
 
-    (section1 as any).navItems = navItems1;
+    const section2: NavSection = {
+      title: "",
+      navItems: [],
+      // focused$: FocusFns.isFocus2Focused$(ctx, Focus2Kind.is.LibraryNav),
+    };
 
-    this.navSections = [section0, section1];
+    const navItems2: NavItem[] = [
+      { label: "Settings", window: DexWindow.Settings, iconClasses: "fa-solid fa-gears", section: section2 },
+    ];
+
+    (section0 as any).navItems = navItems0;
+    (section1 as any).navItems = navItems1;
+    (section2 as any).navItems = navItems2;
+
+    this.navSections = [section0, section1, section2];
   }
 
   public activeWindowEqualTo$(window: DexWindow) {

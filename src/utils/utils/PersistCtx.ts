@@ -5,6 +5,7 @@ import {
 import type MainContext from "src/main-context/MainContext";
 import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
+import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 import Persistence from "src/utils/persistence/Persistence";
 import { log5 } from "src/utils/utils/Log3";
 
@@ -14,6 +15,12 @@ const reset = false;
 const log55 = log5("PersistCtx.ts");
 
 export function createPersistCtx(ctx: MainContext) {
+  FirebaseAuthentication.userLoggedIn$.subscribe(() => {
+    complete: () => {
+      log55.debug("User logged in");
+    }
+  });
+
   Persistence.readProject$.subscribe(async (deProject) => {
     if (deProject === null || reset) {
       log55.debug("No project found, creating blank project");
