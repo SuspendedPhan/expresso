@@ -276,7 +276,7 @@ export namespace ExObjectFocusFuncs {
     keyboardCtx
       .onKeydown$(Hotkeys.Down, exObjectFocusCtx.exObjectFocus$, "hi")
       .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
+        focusCtx.setFocus(FocusKind.ExObjectName({ exObject, isEditing: false }));
       });
 
     keyboardCtx
@@ -303,7 +303,7 @@ export namespace ExObjectFocusFuncs {
     keyboardCtx
       .onKeydown$(Hotkeys.Up, exObjectFocusCtx.componentFocus$)
       .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
+        focusCtx.setFocus(FocusKind.ExObjectName({ exObject, isEditing: false }));
       });
 
     keyboardCtx

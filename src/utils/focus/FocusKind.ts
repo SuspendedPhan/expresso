@@ -8,7 +8,7 @@ import unionize, { ofType } from "unionize";
 
 export const ExObjectFocusKind = {
   ExObject: ofType<{ exObject: ExObject }>(),
-  ExObjectName: ofType<{ exObject: ExObject }>(),
+  ExObjectName: ofType<{ exObject: ExObject, isEditing: boolean }>(),
   ExObjectComponent: ofType<{ exObject: ExObject }>(),
   Property: ofType<{ property: Property }>(),
 
