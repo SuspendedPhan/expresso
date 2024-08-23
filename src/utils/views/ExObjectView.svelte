@@ -5,12 +5,18 @@
   import { rxEquals, type OBS } from "src/utils/utils/Utils";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import { createFieldData } from "src/utils/views/Field";
+  import {
+    createFieldData,
+    createReadonlyFieldData,
+    type FieldData,
+  } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { ComponentFns } from "src/ex-object/Component";
+  import { of } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -26,9 +32,7 @@
   }
 
   const exObjectFocused$ = equals$(ctx.exObjectFocusCtx.exObjectFocus$);
-  const exObjectNameField = createFieldData<
-    typeof FocusKind._TaggedRecord.ExObjectName
-  >({
+  const exObjectNameField = createFieldData({
     ctx,
     label: "Name",
     value$: exObject.name$,
@@ -36,6 +40,15 @@
     createEditingFocusFn: (isEditing) =>
       FocusKind.ExObjectName({ exObject, isEditing }),
     filterFn: (f) => f.exObject === exObject,
+  });
+
+  const componentField = createReadonlyFieldData({
+    ctx,
+    label: "Component",
+    value$: ComponentFns.getName$(exObject.component),
+    createFocusFn: () => FocusKind.ExObjectComponent({ exObject }),
+    filterFn: (f) => f.exObject === exObject,
+    focusIsFn: FocusKind.is.ExObjectComponent,
   });
 
   function handleClick() {
@@ -54,13 +67,7 @@
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
           <Field {ctx} fieldData={exObjectNameField} />
-          <!-- <Field
-            label="Component"
-            value$={componentName$}
-            isFocused={$componentNameFocused$}
-            isEditing={false}
-            on:mousedown={handleClickComponentName}
-          /> -->
+          <Field {ctx} fieldData={componentField} />
         </div>
       </div>
 

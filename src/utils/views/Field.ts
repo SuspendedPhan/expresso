@@ -1,4 +1,4 @@
-import { firstValueFrom, map } from "rxjs";
+import { firstValueFrom, map, of } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import type { Focus } from "src/utils/focus/Focus";
 import { log5 } from "src/utils/utils/Log3";
@@ -22,7 +22,7 @@ export interface FieldData {
     handleInput: (e: Event) => void;
     handleClick: () => void;
     label: string;
-    value$: SUB<string>;
+    value$: OBS<string>;
     isEditing$: OBS<boolean>;
     isFocused$: OBS<boolean>;
 }
@@ -82,6 +82,36 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
         label: init.label,
         value$: init.value$,
         isEditing$,
+        isFocused$,
+    };
+}
+
+export interface ReadonlyFieldInit<T extends Focus> {
+    ctx: MainContext;
+    label: string;
+
+    value$: OBS<string>;
+    focusIsFn: (focus: Focus) => focus is T;
+    filterFn(focus: T): boolean;
+    createFocusFn: () => Focus;
+}
+
+export function createReadonlyFieldData<T extends Focus>(init: ReadonlyFieldInit<T>): FieldData {
+    const { ctx } = init;
+    const {focusCtx} = ctx;
+
+    const isFocused$ = focusCtx.focusOrFalse$(init.focusIsFn).pipe(
+        map(f => f !== false && init.filterFn(f)),
+    );
+
+    return {
+        handleInput: () => {},
+        handleClick: () => {
+            ctx.focusCtx.setFocus(init.createFocusFn());
+        },
+        label: init.label,
+        value$: init.value$,
+        isEditing$: of(false),
         isFocused$,
     };
 }
