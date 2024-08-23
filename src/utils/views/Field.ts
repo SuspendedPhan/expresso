@@ -8,9 +8,8 @@ const log55 = log5("Field.ts");
 
 export type EditableFocus = Focus & { isEditing: boolean };
 
-export interface FieldInit<T extends EditableFocus> {
+export interface FieldValueInit<T extends EditableFocus> {
     ctx: MainContext;
-    label: string;
 
     value$: SUB<string>;
     focusIsFn: (focus: Focus) => focus is T;
@@ -18,16 +17,23 @@ export interface FieldInit<T extends EditableFocus> {
     filterFn(focus: T): boolean;
 }
 
-export interface FieldData {
-    handleInput: (e: Event) => void;
-    handleClick: () => void;
+export type FieldData = FieldValueData & {
     label: string;
+}
+
+export type FieldInit<T extends EditableFocus> = FieldValueInit<T> & {
+    label:string;
+};
+
+export interface FieldValueData {
     value$: OBS<string>;
     isEditing$: OBS<boolean>;
     isFocused$: OBS<boolean>;
+    handleInput: (e: Event) => void;
+    handleClick: () => void;
 }
 
-export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): FieldData {
+export function createFieldValueData<T extends EditableFocus>(init: FieldValueInit<T>): FieldValueData {
     const { ctx } = init;
     const {focusCtx, keyboardCtx} = ctx;
 
@@ -79,10 +85,18 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
             
             focusCtx.setFocus(init.createEditingFocusFn(false));
         },
-        label: init.label,
         value$: init.value$,
         isEditing$,
         isFocused$,
+    };
+}
+
+export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): FieldData {
+    const fieldData = createFieldValueData(init);
+
+    return {
+        ...fieldData,
+        label: init.label,
     };
 }
 
