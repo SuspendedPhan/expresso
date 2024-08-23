@@ -11,7 +11,7 @@
       log55.debug2("dirHandle", dirHandle);
 
       for await (const entry of dirHandle.values()) {
-        console.log(entry.kind, entry.name);
+        log55.debug(entry.kind, entry.name);
       }
     }
   }
@@ -21,7 +21,7 @@
   async function chooseDir() {
     const dirHandle = await self.showDirectoryPicker();
     for await (const entry of dirHandle.values()) {
-      console.log(entry.kind, entry.name);
+      log55.debug(entry.kind, entry.name);
     }
     set("dirHandle", dirHandle);
   }

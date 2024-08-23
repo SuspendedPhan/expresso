@@ -14,6 +14,9 @@ import {
 import { ProjectFns } from "src/ex-object/Project";
 import type { BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
+import { log5 } from "src/utils/utils/Log3";
+
+const log55 = log5("Refactor.ts");
 
 export function createRefactorContext(ctx: MainContext) {
   return {
@@ -50,11 +53,11 @@ export function createRefactorContext(ctx: MainContext) {
     },
 
     async extractProperty(expr: Expr) {
-      console.log("extractProperty", expr);
+      log55.debug("extractProperty", expr);
     },
 
     async movePropertyToParent(property: BasicProperty) {
-      console.log("movePropertyToParent", property);
+      log55.debug("movePropertyToParent", property);
     },
   };
 }

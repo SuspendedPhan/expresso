@@ -7,6 +7,9 @@ import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
+import { log5 } from "src/utils/utils/Log3";
+
+const log55 = log5("ExObjectFocus.ts");
 
 export function createExObjectFocusContext(ctx: MainContext) {
   const { focusCtx } = ctx;
@@ -309,7 +312,7 @@ export namespace ExObjectFocusFuncs {
         focusCtx.editingFocus$(FocusKind.is.ExObjectName, false)
       )
       .subscribe((f) => {
-        console.log("up");
+        log55.debug("up");
 
         focusCtx.setFocus(FocusKind.ExObject({ exObject: f.exObject }));
       });

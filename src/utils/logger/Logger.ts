@@ -99,7 +99,7 @@ export default class Logger {
         //   .map((arg: any) => arg?.toString() ?? "null/undefined")
         //   .join(", ");
         console.log(`${astCall.id}.${name}`, ...args);
-        // console.log(`${astCall.id}.${name}(${argString})`);
+        // log55.debug(`${astCall.id}.${name}(${argString})`);
       },
     };
   }

@@ -1,7 +1,10 @@
 import { firstValueFrom, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import type { Focus } from "src/utils/focus/Focus";
+import { log5 } from "src/utils/utils/Log3";
 import { RxFns, type OBS, type SUB } from "src/utils/utils/Utils";
+
+const log55 = log5("Field.ts");
 
 export type EditableFocus = Focus & { isEditing: boolean };
 
@@ -47,7 +50,7 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
         data$: notEditingFocus$,
         preventDefault: true,
     }).subscribe(() => {
-        console.log("edit");
+        log55.debug("edit");
         
         focusCtx.setFocus(init.createEditingFocusFn(true));
     });
@@ -64,15 +67,15 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
             }
         },
         handleClick: async () => {
-            console.log("click");
+            log55.debug("click");
             
             const isEditing = await firstValueFrom(isEditing$);
             if (isEditing) {
-                console.log("isEditing");
+                log55.debug("isEditing");
                 
                 return;
             }
-            console.log("notEditing");
+            log55.debug("notEditing");
             
             focusCtx.setFocus(init.createEditingFocusFn(false));
         },

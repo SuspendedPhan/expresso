@@ -19,6 +19,9 @@ import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
 import { createComponentCtx } from "src/ex-object/Component";
 import { createNavFocusCtx } from "src/utils/focus/NavFocus";
+import { log5 } from "src/utils/utils/Log3";
+
+const log55 = log5("MainContext.ts");
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -58,7 +61,7 @@ export default class MainContext {
     this.library$.next(library);
 
     this.focusCtx.focus$.subscribe((focus) => {
-      console.log("focus", focus);
+      log55.debug("focus", focus);
     });
   }
 }
