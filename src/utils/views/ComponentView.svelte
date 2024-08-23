@@ -4,9 +4,13 @@
   import type MainContext from "src/main-context/MainContext";
   import Divider from "src/utils/views/Divider.svelte";
   import Field from "src/utils/views/Field.svelte";
+  import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
+  import HugInput from "src/utils/views/HugInput.svelte";
+  import ComponentParameterView from "src/utils/views/ComponentParameterView.svelte";
+
   export let ctx: MainContext;
   export let component: CustomComponent;
 
@@ -24,11 +28,13 @@
   function handleMouseDown() {}
 
   function handleMouseDownName() {}
+
+  const parameters$ = component.parameters$;
 </script>
 
 <FlexContainer class="ex-card">
   <FocusView focused={$isComponentFocused$} on:mousedown={handleMouseDown}>
-    <FlexContainer class="p-window" centered={false}>
+    <FlexContainer class="p-window gap-2" centered={false}>
       <Field
         label="Name"
         value$={name$}
@@ -36,9 +42,13 @@
         isEditing={$isEditingName$}
         on:mousedown={handleMouseDownName}
       />
+      <div class="flex">
+        <FieldLabel label="Parameters" />
+        {#each $parameters$ as parameter (parameter.id)}
+          <ComponentParameterView {ctx} {parameter} />
+        {/each}
+      </div>
     </FlexContainer>
-
-    <!-- <FlexContainer class="p-window" centered={false}></FlexContainer> -->
 
     <FlexContainer>
       {#each $rootExObjects$ as rootExObject}

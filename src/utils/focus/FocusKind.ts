@@ -1,3 +1,4 @@
+import type { CustomComponentParameter } from "src/ex-object/Component";
 import type { ExItem, Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Property } from "src/ex-object/Property";
@@ -14,6 +15,8 @@ export const ExObjectFocusKind = {
   ExItemNewActions: ofType<{ exItem: ExItem }>(),
   ExObjectRefactor: ofType<{ exObject: ExObject }>(),
   ExprRefactor: ofType<{ expr: Expr }>(),
+
+  ComponentParameter: ofType<{ parameter: CustomComponentParameter, isEditing: boolean }>(),
 };
 
 export const ExprFocusKind = {
