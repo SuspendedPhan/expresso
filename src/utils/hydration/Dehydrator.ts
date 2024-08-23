@@ -37,6 +37,18 @@ export interface DehydratedProject {
   customComponents: DehydratedCustomComponent[];
 }
 
+export interface DehydratedExFunc {
+  id: string;
+  name: string;
+  parameters: DehydratedExFuncParameter[];
+  expr: DehydratedExpr;
+}
+
+export interface DehydratedExFuncParameter {
+  id: string;
+  name: string;
+}
+
 export interface DehydratedCustomComponent {
   id: string;
   name: string;

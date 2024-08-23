@@ -40,14 +40,10 @@
       <Field {ctx} fieldData={nameFieldData} />
     </FlexContainer>
 
-    <FlexContainer>
-      <RootExprView {ctx} expr={$expr$} />
-    </FlexContainer>
     <Divider />
+
     <FlexContainer class="p-window">
-      <button class="btn btn-sm w-max" on:click={addExObject}
-        >Add Root Object</button
-      >
+      <RootExprView {ctx} expr={$expr$} />
     </FlexContainer>
   </FocusView>
 </FlexContainer>
