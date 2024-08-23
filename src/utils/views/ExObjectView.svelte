@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
   import { FocusKind } from "src/utils/focus/FocusKind";
@@ -8,15 +9,12 @@
   import {
     createFieldData,
     createReadonlyFieldData,
-    type FieldData,
   } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { ComponentFns } from "src/ex-object/Component";
-  import { of } from "rxjs";
 
   export let ctx: MainContext;
   export let exObject: ExObject;

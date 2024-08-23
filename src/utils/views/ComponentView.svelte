@@ -5,6 +5,7 @@
   import { FocusKind } from "src/utils/focus/FocusKind";
   import ComponentParameterView from "src/utils/views/ComponentParameterView.svelte";
   import Divider from "src/utils/views/Divider.svelte";
+  import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import { createFieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
@@ -36,6 +37,10 @@
   function handleMouseDown() {}
 
   const parameters$ = component.parameters$;
+
+  function addParameter() {
+    component.addParameterBlank();
+  }
 </script>
 
 <FlexContainer class="ex-card">
@@ -48,6 +53,7 @@
           <ComponentParameterView {ctx} {parameter} />
         {/each}
       </div>
+      <ExObjectButton on:click={addParameter}>Add Parameter</ExObjectButton>
     </FlexContainer>
 
     <FlexContainer>

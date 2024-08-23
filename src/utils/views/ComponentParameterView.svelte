@@ -1,25 +1,20 @@
 <script lang="ts">
   import type { CustomComponentParameter } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
-  import HugInput from "./HugInput.svelte";
   import { FocusKind } from "src/utils/focus/FocusKind";
-  import { map } from "rxjs";
+  import { createFieldValueData } from "src/utils/views/Field";
+  import FieldValue from "src/utils/views/FieldValue.svelte";
 
   export let ctx: MainContext;
   export let parameter: CustomComponentParameter;
-  const name$ = parameter.name$;
-  const isEditing$ = ctx.focusCtx
-    .focusOrFalse$(FocusKind.is.ComponentParameter)
-    .pipe(map());
-
-  function handleInput(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.value === "") {
-      parameter.name$.next("a");
-    } else {
-      parameter.name$.next(target.value);
-    }
-  }
+  const fieldValueData = createFieldValueData({
+    ctx,
+    value$: parameter.name$,
+    focusIsFn: FocusKind.is.ComponentParameter,
+    createEditingFocusFn: (isEditing) =>
+      FocusKind.ComponentParameter({ parameter, isEditing }),
+    filterFn: (f) => f.parameter === parameter,
+  });
 </script>
 
-<HugInput on:input={handleInput} value={$name$}></HugInput>
+<FieldValue {ctx} fieldData={fieldValueData} />

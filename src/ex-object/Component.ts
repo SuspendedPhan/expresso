@@ -39,6 +39,8 @@ export interface CustomComponent {
   name$: SUB<string>;
   parameters$: SUB<CustomComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
+
+  addParameterBlank(): Promise<CustomComponentParameter>;
 }
 
 export interface CanvasComponentParameter {
@@ -126,13 +128,21 @@ export namespace CreateComponent {
       data.name = `Component ${ordinal}`;
     }
 
-    return {
+    const component: CustomComponent = {
       id: data.id ?? `custom-component-${crypto.randomUUID()}`,
       componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(data.name),
       parameters$: new BehaviorSubject(data.parameters ?? []),
       rootExObjects$: new BehaviorSubject(data.rootExObjects ?? []),
+
+      async addParameterBlank() {
+        const parameter = await createCustomComponentParameter(ctx, {});
+        const parameters = await firstValueFrom(component.parameters$);
+        this.parameters$.next([...parameters, parameter]);
+        return parameter;
+      },
     };
+    return component;
   }
 }
 
