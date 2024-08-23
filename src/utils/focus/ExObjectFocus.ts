@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { ExItemType, type ExItem } from "src/ex-object/ExItem";
 import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
-import { type Property } from "src/ex-object/Property";
+import { type ExObjectProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { type OBS } from "src/utils/utils/Utils";
@@ -25,7 +25,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
     });
   }
 
-  async function* getProperties(exObject: ExObject): AsyncGenerator<Property> {
+  async function* getProperties(exObject: ExObject): AsyncGenerator<ExObjectProperty> {
     const basicProperties = await firstValueFrom(exObject.basicProperties$);
     yield exObject.cloneCountProperty;
     for (const property of exObject.componentParameterProperties) {
@@ -36,7 +36,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
     }
   }
 
-  async function getNextProperty(property: Property): Promise<Property | null> {
+  async function getNextProperty(property: ExObjectProperty): Promise<ExObjectProperty | null> {
     const exObject = await firstValueFrom(property.parent$);
     assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
     let found = false;
@@ -72,7 +72,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
 
     getNextProperty,
 
-    async prevProperty(property: Property): Promise<Property | null> {
+    async prevProperty(property: ExObjectProperty): Promise<ExObjectProperty | null> {
       const exObject = await firstValueFrom(property.parent$);
       assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
       let prev = null;
@@ -85,7 +85,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
       return null;
     },
 
-    async focusNextExItem(property: Property) {
+    async focusNextExItem(property: ExObjectProperty) {
       const nextProperty = await getNextProperty(property);
       if (nextProperty !== null) {
         focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
@@ -117,7 +117,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
       }
     },
 
-    async focusPrevExItem(property: Property) {
+    async focusPrevExItem(property: ExObjectProperty) {
       const prevProperty = await this.prevProperty(property);
       if (prevProperty !== null) {
         focusCtx.setFocus(FocusKind.Property({ property: prevProperty }));
@@ -149,7 +149,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
       }
     },
 
-    async getNextExItem(property: Property): Promise<ExItem | null> {
+    async getNextExItem(property: ExObjectProperty): Promise<ExItem | null> {
       const nextProperty = await getNextProperty(property);
       return nextProperty;
     },

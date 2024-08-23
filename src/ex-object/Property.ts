@@ -1,3 +1,10 @@
+/**
+ * Component Property
+ * Object Property
+ * Component Parameter
+ * Component Argument
+ */
+
 import { of } from "rxjs";
 import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
@@ -11,7 +18,7 @@ import {
 
 const log55 = log5("Property.ts");
 
-export type Property =
+export type ExObjectProperty =
   | ComponentParameterProperty
   | BasicProperty
   | CloneCountProperty;
@@ -133,7 +140,7 @@ export namespace CreateProperty {
 export namespace PropertyFns {
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
 
-  export function getName$(property: Property): OBS<string> {
+  export function getName$(property: ExObjectProperty): OBS<string> {
     switch (property.propertyType) {
       case PropertyType.ComponentProperty:
         return ComponentParameterFns.getName$(property.componentParameter);

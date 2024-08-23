@@ -6,6 +6,7 @@
   import ComponentParameterView from "src/utils/views/ComponentParameterView.svelte";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import { createFieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
@@ -49,11 +50,19 @@
       <Field {ctx} fieldData={nameFieldData} />
       <div class="flex">
         <FieldLabel label="Parameters" />
-        {#each $parameters$ as parameter (parameter.id)}
-          <ComponentParameterView {ctx} {parameter} />
-        {/each}
+        <div class="flex gap-2">
+          {#each $parameters$ as parameter (parameter.id)}
+            <ComponentParameterView {ctx} {parameter} />
+          {/each}
+        </div>
       </div>
       <ExObjectButton on:click={addParameter}>Add Parameter</ExObjectButton>
+    </FlexContainer>
+
+    <Divider />
+
+    <FlexContainer centered={false} class="p-window flex flex-col">
+      <ExObjectHeaderView>Properties</ExObjectHeaderView>
     </FlexContainer>
 
     <FlexContainer>
