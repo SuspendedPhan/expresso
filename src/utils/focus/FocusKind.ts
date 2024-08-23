@@ -38,3 +38,7 @@ export const FocusKind = unionize({
   ...ExObjectFocusKind,
   ...ExprFocusKind,
 });
+
+// FocusKind.Component
+
+// console.log(FocusKind._TaggedRecord.Component); //

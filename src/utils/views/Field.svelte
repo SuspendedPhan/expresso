@@ -6,10 +6,13 @@
   import assert from "assert-ts";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
 
+  // export let obj: T;
+
   export let label;
   export let value$: OBS<string> | SUB<string>;
   export let isFocused;
   export let isEditing;
+  export let focusKind;
 
   async function handleInput(event: Event) {
     const target = event.target as HTMLInputElement;

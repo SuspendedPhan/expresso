@@ -3,6 +3,7 @@
   import type MainContext from "src/main-context/MainContext";
   import HugInput from "./HugInput.svelte";
   import { FocusKind } from "src/utils/focus/FocusKind";
+  import { map } from "rxjs";
 
   export let ctx: MainContext;
   export let parameter: CustomComponentParameter;
