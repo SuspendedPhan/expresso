@@ -27,25 +27,33 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
     const { ctx } = init;
     const {focusCtx, keyboardCtx} = ctx;
 
-    const focus$ = focusCtx.mapFocus2$(init.focusIsFn).pipe(
+    const focus$ = focusCtx.focusOrFalse$(init.focusIsFn).pipe(
         filter(f => f !== false),
         filter(init.filterFn),
     );
 
-    const isFocused$ = focusCtx.mapFocus2$(init.focusIsFn).pipe(
+    const isFocused$ = focusCtx.focusOrFalse$(init.focusIsFn).pipe(
         map(f => f !== false && init.filterFn(f)),
     );
 
-    const isEditing$ = focusCtx.mapFocus2$(init.focusIsFn).pipe(
-        map(f => f !== false && f.isEditing),
+    const isEditing$ = focus$.pipe(
+        map(f => f.isEditing),
     );
 
     const editingFocus$ = focus$.pipe(
-        filter(f => f.isEditing),
+        map(f => f.isEditing ? f : false),
     );
 
-    keyboardCtx.onKeydown$("e", editingFocus$).subscribe(() => {
-        console.log("editing");
+    const notEditingFocus$ = focus$.pipe(
+        map(f => f.isEditing ? false : f),
+    );
+
+    keyboardCtx.onKeydown2$({
+        keys: "e",
+        data$: notEditingFocus$,
+        preventDefault: true,
+    }).subscribe(() => {
+        console.log("edit");
         
         focusCtx.setFocus(init.createEditingFocusFn());
     });

@@ -56,5 +56,9 @@ export default class MainContext {
     FocusFns.register(this);
     const library = createLibrary(this, {});
     this.library$.next(library);
+
+    this.focusCtx.focus$.subscribe((focus) => {
+      console.log("focus", focus);
+    });
   }
 }

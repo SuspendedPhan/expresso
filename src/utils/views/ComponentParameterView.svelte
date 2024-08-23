@@ -9,7 +9,7 @@
   export let parameter: CustomComponentParameter;
   const name$ = parameter.name$;
   const isEditing$ = ctx.focusCtx
-    .mapFocus2$(FocusKind.is.ComponentParameter)
+    .focusOrFalse$(FocusKind.is.ComponentParameter)
     .pipe(map());
 
   function handleInput(event: Event) {

@@ -5,8 +5,8 @@ import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
+import { RxFns, type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
-import type { OBS } from "src/utils/utils/Utils";
 
 export function createExObjectFocusContext(ctx: MainContext) {
   const { focusCtx } = ctx;
@@ -238,7 +238,9 @@ export namespace ExObjectFocusFuncs {
         focusCtx.setFocus(FocusKind.ExprRefactor({ expr: focus.expr }));
       });
 
-    const refactorExprFocus$ = focusCtx.mapFocus2$(FocusKind.is.ExprRefactor);
+    const refactorExprFocus$ = focusCtx.focusOrFalse$(
+      FocusKind.is.ExprRefactor
+    );
 
     keyboardCtx.onKeydown$("f", refactorExprFocus$).subscribe(async (focus) => {
       const expr = focus.expr;
@@ -274,15 +276,25 @@ export namespace ExObjectFocusFuncs {
     // Down
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.exObjectFocus$, "hi")
+      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.exObjectFocus$)
       .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectName({ exObject, isEditing: false }));
+        focusCtx.setFocus(
+          FocusKind.ExObjectName({ exObject, isEditing: false })
+        );
       });
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Down, exObjectFocusCtx.nameFocus$)
-      .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
+      .onKeydown$(
+        Hotkeys.Down,
+        focusCtx.focus$.pipe(
+          RxFns.getOrFalsePred(FocusKind.is.ExObjectName),
+          RxFns.getOrFalse((f) => !f.isEditing)
+        )
+      )
+      .subscribe((f) => {
+        focusCtx.setFocus(
+          FocusKind.ExObjectComponent({ exObject: f.exObject })
+        );
       });
 
     keyboardCtx
@@ -295,15 +307,25 @@ export namespace ExObjectFocusFuncs {
     // Up
 
     keyboardCtx
-      .onKeydown$(Hotkeys.Up, exObjectFocusCtx.nameFocus$)
-      .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObject({ exObject }));
+      .onKeydown$(
+        Hotkeys.Up,
+        focusCtx.focus$.pipe(
+          RxFns.getOrFalsePred(FocusKind.is.ExObjectName),
+          RxFns.getOrFalse((f) => !f.isEditing)
+        )
+      )
+      .subscribe((f) => {
+        console.log("up");
+
+        focusCtx.setFocus(FocusKind.ExObject({ exObject: f.exObject }));
       });
 
     keyboardCtx
       .onKeydown$(Hotkeys.Up, exObjectFocusCtx.componentFocus$)
       .subscribe((exObject) => {
-        focusCtx.setFocus(FocusKind.ExObjectName({ exObject, isEditing: false }));
+        focusCtx.setFocus(
+          FocusKind.ExObjectName({ exObject, isEditing: false })
+        );
       });
 
     keyboardCtx

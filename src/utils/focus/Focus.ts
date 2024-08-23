@@ -40,7 +40,7 @@ export function createFocusContext(ctx: MainContext) {
       return data.focus$.pipe(map(mapperFn));
     },
 
-    mapFocus2$<T extends Focus>(predicate: (focus: Focus) => focus is T): OBS<T | false> {
+    focusOrFalse$<T extends Focus>(predicate: (focus: Focus) => focus is T): OBS<T | false> {
       return data.focus$.pipe(
         map((focus) => {
           const result = predicate(focus);

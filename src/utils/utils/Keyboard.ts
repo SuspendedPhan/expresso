@@ -7,7 +7,17 @@ export enum KeyboardResult {
 }
 
 export function createKeyboardContext(ctx: MainContext) {
-  function onKeydown$<T>(keys: string, data$: OBS<T | false>, _tag = "") {
+  function onKeydown$<T>(keys: string, data$: OBS<T | false>) {
+    return onKeydown2$({ keys, data$ });
+  }
+
+  function onKeydown2$<T>(data: {
+    keys: string;
+    data$: OBS<T | false>;
+    preventDefault?: boolean;
+  }) {
+    const { keys, data$, preventDefault = false } = data;
+    
     const keyArr = keys.split(",");
 
     return data$.pipe(
@@ -18,8 +28,13 @@ export function createKeyboardContext(ctx: MainContext) {
 
         return fromEvent<KeyboardEvent>(window, "keydown").pipe(
           filter((event) => {
-            const newLocal = keyArr.includes(event.key);
-            return newLocal;
+            const matches = keyArr.includes(event.key);
+            if (matches) {
+              if (preventDefault) {
+                event.preventDefault();
+              }
+            }
+            return matches;
           }),
           map(() => data)
         );
@@ -29,6 +44,7 @@ export function createKeyboardContext(ctx: MainContext) {
 
   return {
     onKeydown$,
+    onKeydown2$,
     registerCancel: <T>(data$: OBS<T | false>) => {
       onKeydown$("Escape", data$).subscribe(() => {
         ctx.focusCtx.popFocus();
