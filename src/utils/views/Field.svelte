@@ -13,7 +13,11 @@
 
 <div class="flex flex-row">
   <FieldLabel label={fieldData.label} />
-  <FocusView on:mousedown focused={$isFocused$} class="text-emphatic">
+  <FocusView
+    on:mousedown={fieldData.handleClick}
+    focused={$isFocused$}
+    class="text-emphatic"
+  >
     <HugInput
       isEditing={$isEditing$}
       on:input={fieldData.handleInput}

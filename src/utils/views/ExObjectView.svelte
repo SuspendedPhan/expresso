@@ -33,16 +33,10 @@
     label: "Name",
     value$: exObject.name$,
     focusIsFn: FocusKind.is.ExObjectName,
-    createEditingFocusFn: () =>
-      FocusKind.ExObjectName({ exObject, isEditing: true }),
+    createEditingFocusFn: (isEditing) =>
+      FocusKind.ExObjectName({ exObject, isEditing }),
     filterFn: (f) => f.exObject === exObject,
   });
-
-  // const exObjectNameFocused$ = equals$(ctx.exObjectFocusCtx.nameFocus$);
-
-  // const isEditingExObjectName$ = of(false);
-  // const componentName$ = ComponentFns.getName$(exObject.component);
-  // const componentNameFocused$ = equals$(ctx.exObjectFocusCtx.componentFocus$);
 
   function handleClick() {
     ctx.focusCtx.setFocus(FocusKind.ExObject({ exObject }));

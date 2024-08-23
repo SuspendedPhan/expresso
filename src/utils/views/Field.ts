@@ -1,7 +1,7 @@
-import { filter, map } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import type { Focus } from "src/utils/focus/Focus";
-import type { OBS, SUB } from "src/utils/utils/Utils";
+import { RxFns, type OBS, type SUB } from "src/utils/utils/Utils";
 
 export type EditableFocus = Focus & { isEditing: boolean };
 
@@ -11,12 +11,13 @@ export interface FieldInit<T extends EditableFocus> {
 
     value$: SUB<string>;
     focusIsFn: (focus: Focus) => focus is T;
-    createEditingFocusFn: () => Focus;
+    createEditingFocusFn: (isEditing: boolean) => Focus;
     filterFn(focus: T): boolean;
 }
 
 export interface FieldData {
     handleInput: (e: Event) => void;
+    handleClick: () => void;
     label: string;
     value$: SUB<string>;
     isEditing$: OBS<boolean>;
@@ -27,25 +28,18 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
     const { ctx } = init;
     const {focusCtx, keyboardCtx} = ctx;
 
-    const focus$ = focusCtx.focusOrFalse$(init.focusIsFn).pipe(
-        filter(f => f !== false),
-        filter(init.filterFn),
-    );
-
     const isFocused$ = focusCtx.focusOrFalse$(init.focusIsFn).pipe(
         map(f => f !== false && init.filterFn(f)),
     );
 
-    const isEditing$ = focus$.pipe(
-        map(f => f.isEditing),
+    const editingFocus$ = focusCtx.editingFocus$(init.focusIsFn, true).pipe(
+        RxFns.getOrFalse(f => init.filterFn(f)),
     );
-
-    const editingFocus$ = focus$.pipe(
-        map(f => f.isEditing ? f : false),
+    const notEditingFocus$ = focusCtx.editingFocus$(init.focusIsFn, false).pipe(
+        RxFns.getOrFalse(f => init.filterFn(f)),
     );
-
-    const notEditingFocus$ = focus$.pipe(
-        map(f => f.isEditing ? false : f),
+    const isEditing$ = editingFocus$.pipe(
+        map(f => f !== false),
     );
 
     keyboardCtx.onKeydown2$({
@@ -55,7 +49,7 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
     }).subscribe(() => {
         console.log("edit");
         
-        focusCtx.setFocus(init.createEditingFocusFn());
+        focusCtx.setFocus(init.createEditingFocusFn(true));
     });
 
     keyboardCtx.registerCancel(editingFocus$);
@@ -68,6 +62,19 @@ export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): Fi
             } else {
                 init.value$.next(target.value);
             }
+        },
+        handleClick: async () => {
+            console.log("click");
+            
+            const isEditing = await firstValueFrom(isEditing$);
+            if (isEditing) {
+                console.log("isEditing");
+                
+                return;
+            }
+            console.log("notEditing");
+            
+            focusCtx.setFocus(init.createEditingFocusFn(false));
         },
         label: init.label,
         value$: init.value$,
