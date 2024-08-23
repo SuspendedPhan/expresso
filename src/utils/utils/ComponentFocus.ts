@@ -3,7 +3,7 @@ import { ofType } from "unionize";
 
 export const ComponentFocusKind = {
     Component: ofType<{component: CustomComponent}>(),
-    ComponentName: ofType<{isEditing: boolean}>(),
+    ComponentName: ofType<{component: CustomComponent, isEditing: boolean}>(),
 };
 
 export namespace ComponentFocusFns {
