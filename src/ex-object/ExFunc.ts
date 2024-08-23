@@ -10,7 +10,7 @@ export interface ExFunc {
   readonly exFuncParameterArr$: SUB<ExFuncParameter[]>;
 }
 
-export type ExFuncParameter = ReturnType<typeof createExFuncParameter>;
+export type ExFuncParameter = Awaited<ReturnType<typeof createExFuncParameter>>;
 
 export const SystemExFuncKind = unionize({
   Add: {},

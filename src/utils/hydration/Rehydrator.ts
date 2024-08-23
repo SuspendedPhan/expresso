@@ -13,6 +13,7 @@ import {
   type CustomComponent,
   type CustomComponentParameter,
 } from "src/ex-object/Component";
+import { createExFunc, createExFuncParameter, type ExFunc, type ExFuncParameter } from "src/ex-object/ExFunc";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { CreateProject } from "src/ex-object/Project";
@@ -34,6 +35,8 @@ import type {
   DehydratedComponentProperty,
   DehydratedCustomComponent,
   DehydratedCustomComponentParameter,
+  DehydratedExFunc,
+  DehydratedExFuncParameter,
   DehydratedExObject,
   DehydratedExpr,
   DehydratedNumberExpr,
@@ -54,6 +57,10 @@ export default class Rehydrator {
   ): Promise<LibraryProject> {
     log55.debug("rehydrateProject.start", deProject);
 
+    const exFuncArr = await Promise.all(
+      deProject.exFuncArr.map((deExFunc) => this.rehydrateExFunc(deExFunc))
+    );
+
     const customComponentArr = await Promise.all(
       deProject.customComponents.map((deCustomComponent) =>
         this.rehydrateCustomComponent(deCustomComponent)
@@ -70,6 +77,7 @@ export default class Rehydrator {
     const project = CreateProject.from(this.ctx, {
       rootExObjects,
       componentArr: customComponentArr,
+      exFuncArr,
     });
 
     log55.debug("Project loaded", project);
@@ -83,6 +91,30 @@ export default class Rehydrator {
     const library = await firstValueFrom(this.ctx.library$);
     library.addProject(libraryProject);
     return libraryProject;
+  }
+
+  public async rehydrateExFunc(deExFunc: DehydratedExFunc): Promise<ExFunc> {
+    const expr = await this.rehydrateExpr(deExFunc.expr);
+    const exFuncParameterArr = await Promise.all(
+      deExFunc.parameters.map((deExFuncParameter) =>
+        this.rehydrateExFuncParameter(deExFuncParameter)
+      )
+    );
+    return createExFunc(this.ctx, {
+      id: deExFunc.id,
+      name: deExFunc.name,
+      expr,
+      exFuncParameterArr,
+    });
+  }
+
+  public async rehydrateExFuncParameter(
+    deExFuncParameter: DehydratedExFuncParameter
+  ): Promise<ExFuncParameter> {
+    return createExFuncParameter(this.ctx, {
+      id: deExFuncParameter.id,
+      name: deExFuncParameter.name,
+    });
   }
 
   public async rehydrateCustomComponent(

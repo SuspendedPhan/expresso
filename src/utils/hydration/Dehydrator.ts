@@ -5,9 +5,15 @@ import {
   type Observable,
   of,
   switchMap,
-  tap
+  tap,
 } from "rxjs";
-import { ComponentKind, ComponentParameterKind, type CustomComponent, type CustomComponentParameter } from "src/ex-object/Component";
+import {
+  ComponentKind,
+  ComponentParameterKind,
+  type CustomComponent,
+  type CustomComponentParameter,
+} from "src/ex-object/Component";
+import type { ExFunc, ExFuncParameter } from "src/ex-object/ExFunc";
 import {
   type CallExpr,
   type Expr,
@@ -35,6 +41,7 @@ export interface DehydratedProject {
   name: string;
   rootExObjects: DehydratedExObject[];
   customComponents: DehydratedCustomComponent[];
+  exFuncArr: DehydratedExFunc[];
 }
 
 export interface DehydratedExFunc {
@@ -131,18 +138,71 @@ export default class Dehydrator {
       })
     );
 
-    return combineLatest([deExObjects$, deComponents$]).pipe(
+    const deExFuncs$ = project.exFuncObsArr.itemArr$.pipe(
+      switchMap((exFuncs) => {
+        return RxFns.combineLatestOrEmpty(
+          exFuncs.map((exFunc) => {
+            return this.dehydrateExFunc$(exFunc);
+          })
+        );
+      })
+    );
+
+    return combineLatest([deExObjects$, deComponents$, deExFuncs$]).pipe(
       log55.tapDebug("dehydrateProject$.combineLatest.start"),
-      map(([deExObjects, deComponents]) => {
+      map(([deExObjects, deComponents, deExFuncs]) => {
         return {
           id: project.libraryProject!.id,
           name: project.libraryProject!.name,
           rootExObjects: deExObjects,
           customComponents: deComponents,
+          exFuncArr: deExFuncs,
         };
       }),
       tap((deProject) => {
         log55.debug("dehydrateProject$.end", deProject);
+      })
+    );
+  }
+
+  public dehydrateExFunc$(exFunc: ExFunc): Observable<DehydratedExFunc> {
+    const deParameters$ = exFunc.exFuncParameterArr$.pipe(
+      switchMap((parameters) => {
+        return RxFns.combineLatestOrEmpty(
+          parameters.map((parameter) => {
+            return this.dehydrateExFuncParameter$(parameter);
+          })
+        );
+      })
+    );
+
+    const deExpr$ = exFunc.expr$.pipe(
+      switchMap((expr) => {
+        return this.dehydrateExpr$(expr);
+      })
+    );
+
+    return combineLatest([deParameters$, deExpr$, exFunc.name$]).pipe(
+      map(([deParameters, deExpr, name]) => {
+        return {
+          id: exFunc.id,
+          name,
+          parameters: deParameters,
+          expr: deExpr,
+        };
+      })
+    );
+  }
+
+  public dehydrateExFuncParameter$(
+    parameter: ExFuncParameter
+  ): Observable<DehydratedExFuncParameter> {
+    return parameter.name$.pipe(
+      map((name) => {
+        return {
+          id: parameter.id,
+          name,
+        };
       })
     );
   }
@@ -168,7 +228,11 @@ export default class Dehydrator {
       })
     );
 
-    return combineLatest([deParameters$, deRootExObjects$, component.name$]).pipe(
+    return combineLatest([
+      deParameters$,
+      deRootExObjects$,
+      component.name$,
+    ]).pipe(
       map(([deParameters, deRootExObjects, name]) => {
         return {
           id: component.id,
@@ -192,7 +256,6 @@ export default class Dehydrator {
       })
     );
   }
-  
 
   @loggedMethod
   public dehydrateExObject$(
@@ -251,7 +314,7 @@ export default class Dehydrator {
           deBasicProperties,
           deCloneProperty,
           deChildren,
-          name
+          name,
         ]) => {
           const deExObject: DehydratedExObject = {
             id: exObject.id,
@@ -286,7 +349,8 @@ export default class Dehydrator {
         const deProperty: DehydratedComponentProperty = {
           id: property.id,
           componentParameterId: property.componentParameter.id,
-          componentParameterKind: property.componentParameter.componentParameterKind,
+          componentParameterKind:
+            property.componentParameter.componentParameterKind,
           expr: dehydratedExpr,
         };
         return deProperty;

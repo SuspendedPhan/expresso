@@ -26,6 +26,7 @@
   });
 
   const expr$ = exFunc.expr$;
+  const parameterArr$ = exFunc.exFuncParameterArr$;
 
   function addExObject() {
     ExFuncFns.addRootExObjectBlank(ctx, exFunc);
@@ -38,6 +39,11 @@
   <FocusView focused={$isExFuncFocused$} on:mousedown={handleMouseDown}>
     <FlexContainer class="p-window" centered={false}>
       <Field {ctx} fieldData={nameFieldData} />
+      <div class="flex gap-2">
+        {#each $parameterArr$ as parameter (parameter.id)}
+          <ExFuncParameterView {ctx} {parameter} />
+        {/each}
+      </div>
     </FlexContainer>
 
     <Divider />
