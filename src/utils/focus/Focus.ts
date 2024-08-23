@@ -6,6 +6,7 @@ import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
+import type { EditableFocus } from "src/utils/views/Field";
 
 export type Focus = UnionOf<typeof FocusKind>;
 
@@ -31,6 +32,21 @@ export function createFocusContext(ctx: MainContext) {
   return {
     ...data,
 
+    editingFocus$<T extends EditableFocus>(
+      predicate: (f: Focus) => f is T,
+      isEditing: boolean
+    ): OBS<T | false> {
+      return this.focusOrFalse$(predicate).pipe(
+        map((f) => {
+          if (f === false) {
+            return false;
+          }
+          const match = f.isEditing === isEditing;
+          return match ? f : false;
+        })
+      );
+    },
+
     popFocus() {
       focusStack.pop();
       data.focus$.next(focusStack[focusStack.length - 1] ?? FocusKind.None());
@@ -40,7 +56,9 @@ export function createFocusContext(ctx: MainContext) {
       return data.focus$.pipe(map(mapperFn));
     },
 
-    focusOrFalse$<T extends Focus>(predicate: (focus: Focus) => focus is T): OBS<T | false> {
+    focusOrFalse$<T extends Focus>(
+      predicate: (focus: Focus) => focus is T
+    ): OBS<T | false> {
       return data.focus$.pipe(
         map((focus) => {
           const result = predicate(focus);

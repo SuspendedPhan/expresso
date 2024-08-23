@@ -5,7 +5,7 @@ import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
-import { RxFns, type OBS } from "src/utils/utils/Utils";
+import { type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
 
 export function createExObjectFocusContext(ctx: MainContext) {
@@ -286,10 +286,7 @@ export namespace ExObjectFocusFuncs {
     keyboardCtx
       .onKeydown$(
         Hotkeys.Down,
-        focusCtx.focus$.pipe(
-          RxFns.getOrFalsePred(FocusKind.is.ExObjectName),
-          RxFns.getOrFalse((f) => !f.isEditing)
-        )
+        focusCtx.editingFocus$(FocusKind.is.ExObjectName, false)
       )
       .subscribe((f) => {
         focusCtx.setFocus(
@@ -309,10 +306,7 @@ export namespace ExObjectFocusFuncs {
     keyboardCtx
       .onKeydown$(
         Hotkeys.Up,
-        focusCtx.focus$.pipe(
-          RxFns.getOrFalsePred(FocusKind.is.ExObjectName),
-          RxFns.getOrFalse((f) => !f.isEditing)
-        )
+        focusCtx.editingFocus$(FocusKind.is.ExObjectName, false)
       )
       .subscribe((f) => {
         console.log("up");
