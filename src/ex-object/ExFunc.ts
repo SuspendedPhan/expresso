@@ -1,13 +1,15 @@
-import type { Expr } from "src/ex-object/ExItem";
+import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { createBehaviorSubjectWithLifetime, Utils, type SUB } from "src/utils/utils/Utils";
 import unionize, { ofType } from "unionize";
 
-export interface ExFunc {
+export interface ExFunc extends ExItemBase {
   readonly id: string;
+  readonly itemType: ExItemType.ExFunc;
   readonly name$: SUB<string>;
   readonly expr$: SUB<Expr>;
   readonly exFuncParameterArr$: SUB<ExFuncParameter[]>;
+  addParameterBlank(): Promise<ExFuncParameter>;
 }
 
 export type ExFuncParameter = Awaited<ReturnType<typeof createExFuncParameter>>;
@@ -45,12 +47,23 @@ export async function createExFunc(
   }
 
   const base = await ctx.objectFactory.createExItemBase(id);
-  return {
+  const exFunc = {
     ...base,
+    itemType: ExItemType.ExFunc,
     name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
     expr$: createBehaviorSubjectWithLifetime(base.destroy$, expr),
     exFuncParameterArr$: createBehaviorSubjectWithLifetime(base.destroy$, exFuncParameterArr),
-  };
+
+    async addParameterBlank() {
+      const param = await createExFuncParameter(ctx);
+      exFuncParameterArr.push(param);
+      this.exFuncParameterArr$.next(exFuncParameterArr);
+      return param;
+    },
+  } as ExFunc;
+
+  expr.parent$.next(exFunc);
+  return exFunc;
 }
 
 export async function createExFuncParameter(

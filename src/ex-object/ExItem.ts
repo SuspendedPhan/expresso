@@ -1,13 +1,15 @@
 import type { CallExprKind } from "src/ex-object/CallExpr";
+import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { ExObjectProperty } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
 
-export type ExItem = ExObject | ExObjectProperty | Expr;
+export type ExItem = ExObject | ExObjectProperty | Expr | ExFunc;
 export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr = NumberExpr | CallExpr;
 
 export enum ExItemType {
+  ExFunc,
   ExObject,
   Property,
   Expr,

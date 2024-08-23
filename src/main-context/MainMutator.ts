@@ -74,6 +74,13 @@ export default class MainMutator {
         }
         break;
       }
+      case ExItemType.ExFunc: {
+        const exFunc = parent;
+        exFunc.expr$.next(newExpr);
+        console.log("replaced expr in exFunc");
+        
+        break;
+      }
       default:
         assertUnreachable;
     }
