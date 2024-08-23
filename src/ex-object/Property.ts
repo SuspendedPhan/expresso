@@ -22,6 +22,7 @@ export type ExObjectProperty =
   | ComponentParameterProperty
   | BasicProperty
   | CloneCountProperty;
+
 export enum PropertyType {
   ComponentProperty,
   BasicProperty,

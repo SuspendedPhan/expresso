@@ -12,12 +12,12 @@ export interface ExprCommand {
 
 export function createExprCommandCtx(ctx: MainContext) {
   return {
-    async getReplacementCommands$Prom(expr: Expr, query$: OBS<string>) {
+    getReplacementCommands$(expr: Expr, query$: OBS<string>) {
       return query$.pipe(
         map((query) => {
           return [
             {
-              label: `Replace with ${query}`,
+              label: `${query}`,
               execute: () => {
                 const value = parseFloat(query);
                 if (!isNaN(value)) {
