@@ -1,8 +1,6 @@
 import { filter, map } from "rxjs";
-import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import type { Focus } from "src/utils/focus/Focus";
-import { FocusKind } from "src/utils/focus/FocusKind";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
 export type EditableFocus = Focus & { isEditing: boolean };
@@ -17,7 +15,7 @@ export interface FieldInit<T extends EditableFocus> {
     filterFn(focus: T): boolean;
 }
 
-export interface Field {
+export interface FieldData {
     handleInput: (e: Event) => void;
     label: string;
     value$: SUB<string>;
@@ -25,7 +23,7 @@ export interface Field {
     isFocused$: OBS<boolean>;
 }
 
-export function createField<T extends EditableFocus>(init: FieldInit<T>): Field {
+export function createFieldData<T extends EditableFocus>(init: FieldInit<T>): FieldData {
     const { ctx } = init;
     const {focusCtx, keyboardCtx} = ctx;
 
@@ -35,7 +33,7 @@ export function createField<T extends EditableFocus>(init: FieldInit<T>): Field 
     );
 
     const isFocused$ = focusCtx.mapFocus2$(init.focusIsFn).pipe(
-        map(f => f !== false),
+        map(f => f !== false && init.filterFn(f)),
     );
 
     const isEditing$ = focusCtx.mapFocus2$(init.focusIsFn).pipe(
@@ -47,6 +45,8 @@ export function createField<T extends EditableFocus>(init: FieldInit<T>): Field 
     );
 
     keyboardCtx.onKeydown$("e", editingFocus$).subscribe(() => {
+        console.log("editing");
+        
         focusCtx.setFocus(init.createEditingFocusFn());
     });
 
@@ -66,23 +66,4 @@ export function createField<T extends EditableFocus>(init: FieldInit<T>): Field 
         isEditing$,
         isFocused$,
     };
-}
-
-interface ExObjectNameFieldInit {
-    ctx: MainContext;
-    exObject: ExObject;
-}
-
-function createExObjectNameField(init: ExObjectNameFieldInit): Field {
-    const { ctx, exObject } = init;
-
-    typeof FocusKind._TaggedRecord.ExObjectName;
-    return createField<typeof FocusKind._TaggedRecord.ExObjectName>({
-        ctx,
-        label: "Name",
-        value$: exObject.name$,
-        focusIsFn: FocusKind.is.ExObjectName,
-        createEditingFocusFn: () => FocusKind.ExObjectName({ exObject, isEditing: true }),
-        filterFn: f => f.exObject === exObject,
-    });
 }

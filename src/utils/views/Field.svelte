@@ -3,20 +3,20 @@
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FocusView from "./FocusView.svelte";
   import HugInput from "./HugInput.svelte";
-  import type { Field } from "src/utils/views/Field";
+  import type { FieldData } from "src/utils/views/Field";
 
   export let ctx: MainContext;
-  export let field: Field;
+  export let fieldData: FieldData;
 
-  const { isFocused$, isEditing$, value$ } = field;
+  const { isFocused$, isEditing$, value$ } = fieldData;
 </script>
 
 <div class="flex flex-row">
-  <FieldLabel label={field.label} />
+  <FieldLabel label={fieldData.label} />
   <FocusView on:mousedown focused={$isFocused$} class="text-emphatic">
     <HugInput
       isEditing={$isEditing$}
-      on:input={field.handleInput}
+      on:input={fieldData.handleInput}
       value={$value$}
     ></HugInput>
   </FocusView>

@@ -1,17 +1,16 @@
 <script lang="ts">
-  import { of } from "rxjs";
-  import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
+  import { FocusKind } from "src/utils/focus/FocusKind";
   import { rxEquals, type OBS } from "src/utils/utils/Utils";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
+  import { createFieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { FocusKind } from "src/utils/focus/FocusKind";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -27,24 +26,26 @@
   }
 
   const exObjectFocused$ = equals$(ctx.exObjectFocusCtx.exObjectFocus$);
-  const exObjectName$ = exObject.name$;
+  const exObjectNameField = createFieldData<
+    typeof FocusKind._TaggedRecord.ExObjectName
+  >({
+    ctx,
+    label: "Name",
+    value$: exObject.name$,
+    focusIsFn: FocusKind.is.ExObjectName,
+    createEditingFocusFn: () =>
+      FocusKind.ExObjectName({ exObject, isEditing: true }),
+    filterFn: (f) => f.exObject === exObject,
+  });
 
-  const exObjectNameFocused$ = equals$(ctx.exObjectFocusCtx.nameFocus$);
+  // const exObjectNameFocused$ = equals$(ctx.exObjectFocusCtx.nameFocus$);
 
-  const isEditingExObjectName$ = of(false);
-  const componentName$ = ComponentFns.getName$(exObject.component);
-  const componentNameFocused$ = equals$(ctx.exObjectFocusCtx.componentFocus$);
+  // const isEditingExObjectName$ = of(false);
+  // const componentName$ = ComponentFns.getName$(exObject.component);
+  // const componentNameFocused$ = equals$(ctx.exObjectFocusCtx.componentFocus$);
 
   function handleClick() {
     ctx.focusCtx.setFocus(FocusKind.ExObject({ exObject }));
-  }
-
-  function handleClickExObjectName() {
-    ctx.focusCtx.setFocus(FocusKind.ExObjectName({ exObject }));
-  }
-
-  function handleClickComponentName() {
-    ctx.focusCtx.setFocus(FocusKind.ExObjectComponent({ exObject }));
   }
 </script>
 
@@ -58,20 +59,14 @@
       <div class="p-4 flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
-          <Field
-            label="Name"
-            value$={exObjectName$}
-            isFocused={$exObjectNameFocused$}
-            isEditing={$isEditingExObjectName$}
-            on:mousedown={handleClickExObjectName}
-          />
-          <Field
+          <Field {ctx} fieldData={exObjectNameField} />
+          <!-- <Field
             label="Component"
             value$={componentName$}
             isFocused={$componentNameFocused$}
             isEditing={false}
             on:mousedown={handleClickComponentName}
-          />
+          /> -->
         </div>
       </div>
 
