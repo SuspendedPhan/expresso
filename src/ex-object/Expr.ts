@@ -1,5 +1,6 @@
 import { firstValueFrom } from "rxjs";
-import { ExItemType, type Expr } from "src/ex-object/ExItem";
+import { ExItemType, ExprType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import type { Property } from "src/ex-object/Property";
 
 export namespace ExprFuncs {
   export async function getProperty(expr: Expr) {
@@ -12,4 +13,10 @@ export namespace ExprFuncs {
     }
     throw new Error("Property not found");
   }
+}
+
+export interface PropertyReferenceExpr extends ExItemBase {
+  readonly itemType: ExItemType.Expr;
+  readonly exprType: ExprType.PropertyReferenceExpr;
+  readonly property: Property;
 }

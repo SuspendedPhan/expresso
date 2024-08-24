@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { map, of, pipe } from "rxjs";
+  import { map, of } from "rxjs";
   import type { ExFunc } from "src/ex-object/ExFunc";
   import type MainContext from "src/main-context/MainContext";
   import { FocusKind } from "src/utils/focus/FocusKind";

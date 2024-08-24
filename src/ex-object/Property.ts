@@ -18,6 +18,8 @@ import {
 
 const log55 = log5("Property.ts");
 
+export type Property = ExObjectProperty;
+
 export type ExObjectProperty =
   | ComponentParameterProperty
   | BasicProperty
