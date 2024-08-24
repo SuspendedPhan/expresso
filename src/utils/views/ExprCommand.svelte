@@ -4,6 +4,7 @@
   import MainContext from "src/main-context/MainContext";
   import type { Expr } from "src/ex-object/ExItem";
   import Divider from "src/utils/views/Divider.svelte";
+  import type { ExprCommand } from "src/utils/utils/ExprCommand";
 
   export let expr: Expr;
   export let ctx: MainContext;
@@ -29,6 +30,7 @@
 
   const query$ = new BehaviorSubject<string>("");
   const cmds$ = ctx.exprCommandCtx.getReplacementCommands$(expr, query$);
+  const selectedCmd$ = new BehaviorSubject<ExprCommand | null>(null);
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -57,10 +59,12 @@
   </div>
   <Divider />
   <div>
-    {#each $cmds$ as cmd}
-      <div>
-        <button on:click={cmd.execute}>{cmd.label}</button>
-      </div>
-    {/each}
+    {#if $cmds$}
+      {#each $cmds$ as cmd}
+        <div class="bg-neutral-content">
+          <button on:click={cmd.execute}>{cmd.label}</button>
+        </div>
+      {/each}
+    {/if}
   </div>
 </div>

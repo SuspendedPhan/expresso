@@ -5,9 +5,10 @@
  * Component Argument
  */
 
-import { of } from "rxjs";
+import { firstValueFrom, of } from "rxjs";
 import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
 import { ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import { ExObjectFns } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import {
@@ -155,6 +156,8 @@ export namespace PropertyFns {
   }
 
   export async function getAncestorProperties(exItem: ExItem): Promise<Property[]> {
-    throw new Error("Not implemented");
+    const exObject = await ExObjectFns.getExObject(exItem);
+    const properties = await firstValueFrom(exObject.basicProperties$);
+    return properties;
   }
 }
