@@ -70,7 +70,7 @@ export default class MainMutator {
             break;
           }
           default:
-            assertUnreachable(parent.exprType);
+            console.error("Unexpected exprType", parent.exprType);
         }
         break;
       }

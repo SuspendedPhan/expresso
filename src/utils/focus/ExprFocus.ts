@@ -188,6 +188,7 @@ export namespace ExprFocusFuncs {
       assert(parent !== null);
 
       if (parent.itemType !== ExItemType.Expr) return;
+      if (parent.exprType !== ExprType.CallExpr) return;
 
       const callExpr = parent;
       const args = await firstValueFrom(callExpr.args$);

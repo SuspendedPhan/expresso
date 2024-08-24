@@ -30,7 +30,7 @@ import {
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log3";
-import { assertUnreachable, RxFns } from "src/utils/utils/Utils";
+import { RxFns } from "src/utils/utils/Utils";
 
 const log55 = log5("Dehydrator.ts");
 
@@ -411,7 +411,7 @@ export default class Dehydrator {
       case ExprType.CallExpr:
         return this.dehydrateCallExpr$(expr);
       default:
-        assertUnreachable(expr);
+        throw new Error("Unexpected exprType");
     }
   }
 

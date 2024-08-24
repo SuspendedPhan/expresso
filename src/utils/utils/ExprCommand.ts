@@ -1,5 +1,7 @@
-import { map } from "rxjs";
+import { firstValueFrom, switchMap } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
+import { createPropertyReferenceExpr } from "src/ex-object/Expr";
+import { PropertyFns } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import type { OBS } from "src/utils/utils/Utils";
 
@@ -14,22 +16,50 @@ export function createExprCommandCtx(ctx: MainContext) {
   return {
     getReplacementCommands$(expr: Expr, query$: OBS<string>) {
       return query$.pipe(
-        map((query) => {
-          return [
-            {
-              label: `${query}`,
-              execute: () => {
-                const value = parseFloat(query);
-                if (!isNaN(value)) {
-                  ctx.mutator.replaceWithNumberExpr(expr, value);
-                } else if (query === "+") {
-                  ctx.mutator.replaceWithCallExpr(expr);
-                }
-              },
-            },
-          ];
+        switchMap((query) => {
+          return getCommands(query, expr);
         })
       );
     },
   };
+
+  async function getCommands(
+    query: string,
+    expr: Expr
+  ): Promise<ExprCommand[]> {
+    const commands: ExprCommand[] = [];
+    const value = parseFloat(query);
+    if (!isNaN(value)) {
+      commands.push({
+        label: `${value}`,
+        execute: () => {
+          ctx.mutator.replaceWithNumberExpr(expr, value);
+        },
+      });
+    }
+
+    if (query === "+") {
+      commands.push({
+        label: "+",
+        execute: () => {
+          ctx.mutator.replaceWithCallExpr(expr);
+        },
+      });
+    }
+
+    const properties = await PropertyFns.getAncestorProperties(expr);
+    properties.forEach(async (property) => {
+      commands.push({
+        label: await firstValueFrom(PropertyFns.getName$(property)),
+        execute: async () => {
+          const propertyReferenceExpr = await createPropertyReferenceExpr({
+            ctx,
+            property,
+          });
+          ctx.mutator.replaceExpr(expr, propertyReferenceExpr);
+        },
+      });
+    });
+    return commands;
+  }
 }

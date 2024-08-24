@@ -7,7 +7,7 @@
 
 import { of } from "rxjs";
 import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
-import { ExItemType, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import { ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import {
@@ -152,5 +152,9 @@ export namespace PropertyFns {
       case PropertyType.CloneCountProperty:
         return of(CLONE_COUNT_PROPERTY_NAME);
     }
+  }
+
+  export async function getAncestorProperties(exItem: ExItem): Promise<Property[]> {
+    throw new Error("Not implemented");
   }
 }
