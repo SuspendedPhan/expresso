@@ -8,7 +8,7 @@
   async function setup() {
     const dirHandle = await get("dirHandle");
     if (dirHandle !== undefined) {
-      log55.debug2("dirHandle", dirHandle);
+      log55.debug("dirHandle", dirHandle);
 
       for await (const entry of dirHandle.values()) {
         log55.debug(entry.kind, entry.name);

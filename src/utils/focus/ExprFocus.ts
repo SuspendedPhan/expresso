@@ -4,14 +4,18 @@ import { ExItemType, ExprType, type Expr } from "src/ex-object/ExItem";
 import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
-import { ArrayFns, type OBS } from "src/utils/utils/Utils";
+import { log5 } from "src/utils/utils/Log3";
+import { ArrayFns, RxFns, type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
+
+const log55 = log5("ExprFocus.ts");
 
 export namespace ExprFocusFuncs {
   export function createContext(ctx: MainContext) {
     return {
       get exprFocus$(): OBS<typeof FocusKind._TaggedRecord.Expr | false> {
         return ctx.focusCtx.mapFocus$((focus) => {
+          log55.debug("focus", focus);
           return FocusKind.is.Expr(focus) ? focus : false;
         });
       },
@@ -54,8 +58,9 @@ export namespace ExprFocusFuncs {
     keyboardCtx
       .onKeydown$(
         "e",
-        exprFocusCtx.exprFocus$.pipe(
-          filter((focus) => focus !== false && !focus.isEditing)
+        focusCtx.focus$.pipe(
+          RxFns.getOrFalsePred(FocusKind.is.Expr),
+          RxFns.getOrFalse((focus) => !focus.isEditing)
         )
       )
       .subscribe(async (focus) => {

@@ -7,6 +7,9 @@ import type { OBS, SUB } from "src/utils/utils/Utils";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
 import type { EditableFocus } from "src/utils/views/Field";
+import { log5 } from "src/utils/utils/Log3";
+
+const log55 = log5("Focus.ts");
 
 export type Focus = UnionOf<typeof FocusKind>;
 
@@ -68,6 +71,7 @@ export function createFocusContext(ctx: MainContext) {
     },
 
     setFocus(focus: Focus) {
+      log55.debug("setFocus", focus);
       focusStack.push(focus);
       data.focus$.next(focus);
     },

@@ -58,7 +58,7 @@
     ctx.focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
   }
 
-  log55.debug2("expr", expr);
+  log55.debug("expr", expr);
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>
