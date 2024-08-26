@@ -15,6 +15,8 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
+  import FlexContainer from "src/utils/views/FlexContainer.svelte";
 
   export let ctx: MainContext;
   export let exObject: ExObject;
@@ -83,20 +85,13 @@
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-      <div class="flex flex-col gap-2 p-4">
-        <!-- if len 0 -->
-        {#if $basicProperties$.length > 0}
-          <ExObjectHeaderView>Properties</ExObjectHeaderView>
-        {/if}
-        {#each $basicProperties$ as property (property.id)}
-          <PropertyView {ctx} {property} />
-        {/each}
-        <ExObjectButton
-          on:click={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
-          class={$basicProperties$.length > 0 ? "mt-2" : ""}
-          >Add Property</ExObjectButton
-        >
-      </div>
+      <FlexContainer centered={false} class="flex flex-col p-4">
+        <BasicPropertyList
+          {ctx}
+          {basicProperties$}
+          addPropertyFn={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
+        />
+      </FlexContainer>
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>

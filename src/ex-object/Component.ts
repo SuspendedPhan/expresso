@@ -1,6 +1,7 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
+import { CreateProperty, type BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import type { OBS, SUB } from "src/utils/utils/Utils";
@@ -39,8 +40,10 @@ export interface CustomComponent {
   name$: SUB<string>;
   parameters$: SUB<CustomComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
+  properties$: SUB<BasicProperty[]>;
 
   addParameterBlank(): Promise<CustomComponentParameter>;
+  addPropertyBlank(): Promise<BasicProperty>;
 }
 
 export interface CanvasComponentParameter {
@@ -121,6 +124,7 @@ export namespace CreateComponent {
       name?: string;
       parameters?: CustomComponentParameter[];
       rootExObjects?: ExObject[];
+      properties?: BasicProperty[];
     }
   ): Promise<CustomComponent> {
     if (data.name === undefined) {
@@ -134,12 +138,20 @@ export namespace CreateComponent {
       name$: new BehaviorSubject(data.name),
       parameters$: new BehaviorSubject(data.parameters ?? []),
       rootExObjects$: new BehaviorSubject(data.rootExObjects ?? []),
+      properties$: new BehaviorSubject(data.properties ?? []),
 
       async addParameterBlank() {
         const parameter = await createCustomComponentParameter(ctx, {});
         const parameters = await firstValueFrom(component.parameters$);
         this.parameters$.next([...parameters, parameter]);
         return parameter;
+      },
+
+      async addPropertyBlank() {
+        const property = await CreateProperty.basicBlank(ctx);
+        const properties = await firstValueFrom(component.properties$);
+        this.properties$.next([...properties, property]);
+        return property;
       },
     };
     return component;

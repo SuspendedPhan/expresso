@@ -3,10 +3,10 @@
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
   import { FocusKind } from "src/utils/focus/FocusKind";
+  import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import ComponentParameterView from "src/utils/views/ComponentParameterView.svelte";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import { createFieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
@@ -46,7 +46,7 @@
 
 <FlexContainer class="ex-card">
   <FocusView focused={$isComponentFocused$} on:mousedown={handleMouseDown}>
-    <FlexContainer class="p-window gap-2" centered={false}>
+    <FlexContainer class="p-4 gap-2" centered={false}>
       <Field {ctx} fieldData={nameFieldData} />
       <div class="flex">
         <FieldLabel label="Parameters" />
@@ -56,13 +56,21 @@
           {/each}
         </div>
       </div>
-      <ExObjectButton on:click={addParameter}>Add Parameter</ExObjectButton>
+      <ExObjectButton class="justify-self-center" on:click={addParameter}
+        >Add Parameter</ExObjectButton
+      >
     </FlexContainer>
 
     <Divider />
 
-    <FlexContainer centered={false} class="p-window flex flex-col">
-      <ExObjectHeaderView>Properties</ExObjectHeaderView>
+    <FlexContainer centered={false} class="p-4 flex flex-col">
+      <BasicPropertyList
+        {ctx}
+        basicProperties$={component.properties$}
+        addPropertyFn={() => {
+          component.addPropertyBlank();
+        }}
+      />
     </FlexContainer>
 
     <FlexContainer>
@@ -72,7 +80,7 @@
       {/each}
     </FlexContainer>
     <Divider />
-    <FlexContainer class="p-window">
+    <FlexContainer class="p-4">
       <button class="btn btn-sm w-max" on:click={addExObject}
         >Add Root Object</button
       >
