@@ -38,16 +38,16 @@ export default class MainMutator {
     Logger.arg("oldExpr", oldExpr.id);
 
     oldExpr.parent$.pipe(first()).subscribe((parent) => {
-      this.replaceExpr2(parent, newExpr, oldExpr);
+      this.replaceExpr2(parent, oldExpr, newExpr);
     });
   }
 
-  public async replaceExpr(newExpr: Expr, oldExpr: Expr) {
+  public async replaceExpr(oldExpr: Expr, newExpr: Expr) {
     const parent = await firstValueFrom(oldExpr.parent$);
-    this.replaceExpr2(parent, newExpr, oldExpr);
+    this.replaceExpr2(parent, oldExpr, newExpr);
   }
 
-  public replaceExpr2(parent: Parent, newExpr: Expr, oldExpr: Expr) {
+  public replaceExpr2(parent: Parent, oldExpr: Expr, newExpr: Expr) {
     if (parent === null) {
       throw new Error("oldExpr.parent$ is null");
     }
@@ -78,7 +78,6 @@ export default class MainMutator {
         const exFunc = parent;
         exFunc.expr$.next(newExpr);
         console.log("replaced expr in exFunc");
-        
         break;
       }
       default:
@@ -86,7 +85,6 @@ export default class MainMutator {
     }
 
     newExpr.parent$.next(parent);
-    oldExpr.destroy$.complete();
     (this.ctx.eventBus.exprReplaced$ as Subject<ExprReplacement>).next({
       oldExpr,
       newExpr,

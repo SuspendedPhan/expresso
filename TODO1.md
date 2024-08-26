@@ -4,7 +4,11 @@ I will send you these notes.
 2. Demo / joy of collecting
 
 ## Roadmap
-- Refactor: Lift/drop property, extract component, extract function
+- Refactor
+    - Extract property
+    - Lift/drop property
+    - Extract component/function
+    - Extract parameter (component/function)
 - File system persistence
 - Library: Components, functions
 - System components: Rectangle, Triangle, Colors
@@ -27,7 +31,7 @@ I will send you these notes.
 
 
 
-## Roadmap (Dylan only)
+## TODO (Dylan only)
 - Evaluator
 - Component properties
 - Property references

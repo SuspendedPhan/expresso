@@ -8,12 +8,15 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import { log5 } from "src/utils/utils/Log3";
+  import { CallExprKind } from "src/ex-object/CallExpr";
 
   const log55 = log5("ExprView.svelte");
 
   export let ctx: MainContext;
   export let expr: Expr;
   export let elementLayout: ElementLayout;
+
+  console.log("expr", expr.exprType);
 
   const exprCommandFocused$ = ctx.focusCtx.focus$.pipe(
     map((focus) => {
@@ -33,14 +36,23 @@
     args$ = of([]);
   }
 
+  const text$ = getText();
   function getText() {
     switch (expr.exprType) {
       case ExprType.NumberExpr:
-        return expr.value.toString();
+        return of(expr.value.toString());
       case ExprType.CallExpr:
-        return "+";
+        return CallExprKind.match(expr, {
+          Custom: (custom) => {
+            log55.debug("custom", custom);
+            return custom.exFunc.name$;
+          },
+          default: () => {
+            return of("+");
+          },
+        });
       default:
-        return "";
+        return of("unknown");
     }
   }
 
@@ -76,7 +88,7 @@
           >Expr {expr.ordinal}</span
         >
       {/if}
-      <span>{getText()}</span>
+      <span>{$text$}</span>
 
       {#if $exprCommandFocused$}
         <ExprCommand {ctx} {expr} />

@@ -36,6 +36,8 @@ export function createRefactorContext(ctx: MainContext) {
     },
 
     async extractExFunc(expr: Expr) {
+      const parent = await firstValueFrom(expr.parent$);
+      
       const exFunc = await createCustomExFunc(ctx, {
         expr,
       });
@@ -49,7 +51,7 @@ export function createRefactorContext(ctx: MainContext) {
         base: callExprBase,
       });
 
-      ctx.mutator.replaceExpr(callExpr, expr);
+      ctx.mutator.replaceExpr2(parent, expr, callExpr);
     },
 
     async extractProperty(expr: Expr) {
