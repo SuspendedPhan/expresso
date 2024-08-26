@@ -4,7 +4,7 @@ import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelt
 import SettingsView from "src/utils/views/SettingsView.svelte";
 import EditorView from "../views/EditorView.svelte";
 import ProjectComponentListView from "../views/ProjectComponentListView.svelte";
-import ProjectFunctionListView from "../views/ProjectFunctionListView.svelte";
+import ProjectExFuncListView from "../views/ProjectExFuncListView.svelte";
 import { assertUnreachable } from "./Utils";
 import TestView from "src/utils/views/TestView.svelte";
 
@@ -19,7 +19,7 @@ export function activeWindowToSvelteComponent(activeWindow: DexWindow): any {
     case DexWindow.ProjectComponentList:
       return ProjectComponentListView;
     case DexWindow.ProjectFunctionList:
-      return ProjectFunctionListView;
+      return ProjectExFuncListView;
     case DexWindow.LibraryProjectList:
       return LibraryProjectListView;
     case DexWindow.LibraryComponentList:

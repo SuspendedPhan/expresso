@@ -16,7 +16,7 @@
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 
-  console.log("expr", expr.exprType);
+  log55.debug("expr", expr.exprType);
 
   const exprCommandFocused$ = ctx.focusCtx.focus$.pipe(
     map((focus) => {

@@ -16,7 +16,7 @@
 <MainPane>
   <ActionBar>
     <ActionBarButton on:click={() => ctx.mutator.addBlankProjectExFunc()}
-      >Add ExFunc</ActionBarButton
+      >Add Function</ActionBarButton
     >
   </ActionBar>
   {#each $exFuncArr$ as exFunc}

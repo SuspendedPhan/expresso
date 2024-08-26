@@ -35,7 +35,7 @@
   <FlexContainer>
     <div class="flex gap-4 {Constants.WindowPaddingClass}">
       <button
-        on:click={() => ctx.projectMutator.addRootObject()}
+        on:click={() => ctx.projectCtx.addRootExObjectBlank()}
         class="btn block"
         ><KbdShortcutSpan
           label="Add Object"

@@ -25,6 +25,10 @@ export function createProjectContext(ctx: MainContext) {
     async getCurrentProjectProm() {
       return firstValueFrom(ctx.projectManager.currentProject$);
     },
+    async addRootExObjectBlank() {
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      return project.addRootExObjectBlank();
+    },
   };
 }
 
