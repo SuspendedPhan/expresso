@@ -1,3 +1,5 @@
+I will send you these notes.
+
 1. Stuff I made
 2. Demo / joy of collecting
 
@@ -20,6 +22,10 @@
 - Web page embeddable
 - 3D
 - Shaders
+
+
+
+
 
 ## Roadmap (Dylan only)
 - Evaluator

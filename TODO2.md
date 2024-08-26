@@ -3,7 +3,7 @@
 - Full support (Zoom, in-person at your desire)
 - Skill progression
 - Dev setup is easy
-- We'd have 2 months to work, then I'm going to start winding down
+- We'd have 3 months to work
 - We can stop at any point, no obligations
 - Ownership - written agreement
 - Compensation - when you're ramped up
