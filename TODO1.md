@@ -1,4 +1,5 @@
-Joy of collecting
+1. Stuff I made
+2. Demo / joy of collecting
 
 ## Roadmap
 - Refactor: Lift/drop property, extract component, extract function
@@ -12,6 +13,8 @@ Joy of collecting
 ## Beyond / Pipe dreams
 - Audio input
 - Web socket input/output
+- Live collaboration
+- Shared library
 - Timeline
 - Web page embeddable
 - 3D
