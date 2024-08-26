@@ -15,7 +15,7 @@
 
 <MainPane>
   <ActionBar>
-    <ActionBarButton on:click={() => ctx.mutator.addBlankProjectExFunc()}
+    <ActionBarButton on:click={() => ctx.projectCtx.addExFuncBlank()}
       >Add Function</ActionBarButton
     >
   </ActionBar>

@@ -4,7 +4,7 @@ import {
   Subject
 } from "rxjs";
 import { CreateComponent, type CustomComponent } from "src/ex-object/Component";
-import type { ExFunc } from "src/ex-object/ExFunc";
+import { createExFunc, type ExFunc } from "src/ex-object/ExFunc";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
@@ -29,6 +29,11 @@ export function createProjectContext(ctx: MainContext) {
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
       return project.addRootExObjectBlank();
     },
+    async addExFuncBlank() {
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      const exFunc = await createExFunc(ctx, {});
+      return project.addCustomExFunc(exFunc);
+    }
   };
 }
 
