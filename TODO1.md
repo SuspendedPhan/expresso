@@ -6,6 +6,7 @@
 - File system persistence
 - Library: Components, functions
 - System components: Rectangle, Triangle, Colors
+- Keyboard shortcuts
 - Compact view: Editor, components, functions, library
 - Tags: Projects, components, functions
 - Performance optimization: Editor, canvas
@@ -19,3 +20,8 @@
 - Web page embeddable
 - 3D
 - Shaders
+
+## Roadmap (Dylan only)
+- Evaluator
+- Component properties
+- Property references
