@@ -1,18 +1,25 @@
 import assert from "assert-ts";
 import { firstValueFrom, switchMap } from "rxjs";
-import { ComponentKind, type CustomComponent, type CustomComponentParameter } from "src/ex-object/Component";
-import type { ExFuncParameter } from "src/ex-object/ExFunc";
 import {
-  ExItemFn,
-  ExItemType,
-  type Expr
-} from "src/ex-object/ExItem";
+  ComponentKind,
+  type CustomComponent,
+  type CustomComponentParameter,
+} from "src/ex-object/Component";
+import type { ExFuncParameter } from "src/ex-object/ExFunc";
+import { ExItemFn, ExItemType, type Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import { createComponentParameterReferenceExpr, createExFuncParameterReferenceExpr, createPropertyReferenceExpr } from "src/ex-object/Expr";
+import {
+  createComponentParameterReferenceExpr,
+  createExFuncParameterReferenceExpr,
+  createPropertyReferenceExpr,
+  createReferenceExpr,
+  ReferenceExpr2,
+} from "src/ex-object/Expr";
 import { PropertyFns, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import type { OBS } from "src/utils/utils/Utils";
+import { match } from "variant";
 
 const log55 = log5("ExprCommand.ts");
 
@@ -70,19 +77,20 @@ async function* getExprCommands2(
 ): AsyncGenerator<ExprCommand, void, undefined> {
   for await (const ancestor of ExItemFn.getAncestors(exItem)) {
     log55.debug("ancestor", ancestor.id);
+    const createReferenceExprCommand_ = (reference2: ReferenceExpr2) => createReferenceExprCommand(ctx, exItem, reference2, ancestor as any);
 
     switch (ancestor.itemType) {
       case ExItemType.ExObject:
-        yield createPropertyCommand(ctx, exItem, ancestor.cloneCountProperty, ancestor);
-        
+        createReferenceExprCommand_(ReferenceExpr2.Property({ property: ancestor.cloneCountProperty }));
+
         for (const property of ancestor.componentParameterProperties) {
-          yield createPropertyCommand(ctx, exItem, property, ancestor);
+          createReferenceExprCommand_(ReferenceExpr2.Property({ property }));
         }
 
         for (const property of await firstValueFrom(
           ancestor.basicProperties$
         )) {
-          yield createPropertyCommand(ctx, exItem, property, ancestor);
+          createReferenceExprCommand_(ReferenceExpr2.Property({ property }));
         }
 
         break;
@@ -90,62 +98,50 @@ async function* getExprCommands2(
         assert(ancestor.componentKind === ComponentKind.CustomComponent);
 
         for (const parameter of await firstValueFrom(ancestor.parameters$)) {
-          yield createComponentParameterCommand(ctx, exItem, parameter, ancestor);
+          createReferenceExprCommand_(ReferenceExpr2.ComponentParameter({ parameter }));
         }
 
         for (const property of await firstValueFrom(ancestor.properties$)) {
-          yield createPropertyCommand(ctx, exItem, property, ancestor);
+          createReferenceExprCommand_(ReferenceExpr2.Property({ property }));
+        }
+        break;
+      case ExItemType.ExFunc:
+        for (const parameter of await firstValueFrom(ancestor.exFuncParameterArr$)) {
+          createReferenceExprCommand_(ReferenceExpr2.ExFuncParameter({ parameter }));
         }
         break;
     }
   }
 }
 
-
-async function createPropertyCommand(ctx: MainContext, expr: Expr, property: Property, parent: ExObject | CustomComponent): Promise<ExprCommand> {
-  const name = await firstValueFrom(PropertyFns.getName$(property));
-  const parentName = await firstValueFrom(parent.name$);
-  const label = `${parentName}.${name}`;
-  return {
-    label,
-    execute: async () => {
-      const propertyReferenceExpr = await createPropertyReferenceExpr({
-        ctx,
-        property,
-      });
-      ctx.mutator.replaceExpr(expr, propertyReferenceExpr);
+async function createReferenceExprCommand(
+  ctx: MainContext,
+  expr: Expr,
+  reference2: ReferenceExpr2,
+  parent: ExObject | CustomComponent
+): Promise<ExprCommand> {
+  const name = match(reference2, {
+    Property: async ({ property }) => {
+      return await firstValueFrom(PropertyFns.getName$(property));
     },
-  };
-}
-
-async function createComponentParameterCommand(ctx: MainContext, expr: Expr, parameter: CustomComponentParameter, parent: ExObject | CustomComponent): Promise<ExprCommand> {
-  const name = await firstValueFrom(parameter.name$);
-  const parentName = await firstValueFrom(parent.name$);
-  const label = `${parentName}.${name}`;
-  return {
-    label,
-    execute: async () => {
-      const parameterReferenceExpr = await createComponentParameterReferenceExpr({
-        ctx,
-        parameter,
-      });
-      ctx.mutator.replaceExpr(expr, parameterReferenceExpr);
+    ComponentParameter: async ({ parameter }) => {
+      return await firstValueFrom(parameter.name$);
     },
-  };
-}
+    ExFuncParameter: async ({ parameter }) => {
+      return await firstValueFrom(parameter.name$);
+    },
+  });
 
-async function createExFuncParameterCommand(ctx: MainContext, expr: Expr, parameter: ExFuncParameter, parent: ExObject | CustomComponent): Promise<ExprCommand> {
-  const name = await firstValueFrom(parameter.name$);
   const parentName = await firstValueFrom(parent.name$);
   const label = `${parentName}.${name}`;
   return {
     label,
     execute: async () => {
-      const parameterReferenceExpr = await createExFuncParameterReferenceExpr({
-        ctx,
-        parameter,
+      const referenceExpr = await createReferenceExpr(ctx, {
+        parent,
+        reference: reference2,
       });
-      ctx.mutator.replaceExpr(expr, parameterReferenceExpr);
+      ctx.mutator.replaceExpr(expr, referenceExpr);
     },
   };
 }

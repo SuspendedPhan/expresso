@@ -4,9 +4,7 @@ import type { Component } from "src/ex-object/Component";
 import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
 import type {
-  ComponentParameterReferenceExpr,
-  ExFuncParameterReferenceExpr,
-  PropertyReferenceExpr,
+  ReferenceExpr
 } from "src/ex-object/Expr";
 import type { ExObjectProperty } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
@@ -16,9 +14,7 @@ export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr =
   | NumberExpr
   | CallExpr
-  | PropertyReferenceExpr
-  | ComponentParameterReferenceExpr
-  | ExFuncParameterReferenceExpr;
+  | ReferenceExpr;
 
 export enum ExItemType {
   Component,
