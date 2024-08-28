@@ -1,9 +1,14 @@
+import { map } from "rxjs";
 import {
-  map
-} from "rxjs";
-import { createBehaviorSubjectWithLifetime, type OBS } from "src/utils/utils/Utils";
+  createBehaviorSubjectWithLifetime,
+  type OBS,
+} from "src/utils/utils/Utils";
 
-export type ItemChange<T> = ItemAdded<T> | ItemRemoved<T> | InitialSubscription | ItemReplaced<T>;
+export type ItemChange<T> =
+  | ItemAdded<T>
+  | ItemRemoved<T>
+  | InitialSubscription
+  | ItemReplaced<T>;
 
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
@@ -30,12 +35,21 @@ export interface ArrayEvent<T> {
   readonly change: ItemChange<T>;
 }
 
-export function createObservableArrayWithLifetime<T>(destroy$: OBS<void>, initialItems: T[] = []) {
+export type ObservableArray<T> = ReturnType<
+  typeof createObservableArrayWithLifetime<T>
+>;
+
+export function createObservableArrayWithLifetime<T>(
+  destroy$: OBS<void>,
+  initialItems: T[] = []
+) {
   const event: ArrayEvent<T> = {
     change: { type: "InitialSubscription" },
     items: initialItems,
   };
   return {
+    kind: "ObservableArray" as const,
+
     event$: createBehaviorSubjectWithLifetime<ArrayEvent<T>>(destroy$, event),
 
     get itemArr() {
@@ -66,4 +80,20 @@ export function createObservableArrayWithLifetime<T>(destroy$: OBS<void>, initia
       });
     },
   };
+}
+
+export namespace ObservableArrayFns {
+  export function map2<T, R>(
+    obsArr: ObservableArray<T> | OBS<T[]>,
+    mapFn: (t: T) => R
+  ): OBS<R[]> {
+    let arr$;
+    if ("kind" in obsArr) {
+      arr$ = obsArr.itemArr$;
+    } else {
+      arr$ = obsArr;
+    }
+    const r = arr$.pipe(map((arr) => arr.map(mapFn)));
+    return r;
+  }
 }

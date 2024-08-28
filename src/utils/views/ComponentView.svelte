@@ -3,15 +3,15 @@
   import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
   import { FocusKind } from "src/utils/focus/FocusKind";
+  import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
-  import ComponentParameterView from "src/utils/views/ComponentParameterView.svelte";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import { createFieldData } from "src/utils/views/Field";
+  import { createFieldData, createFieldValueData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
-  import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
+  import ListInput from "src/utils/views/ListInput.svelte";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
 
   export let ctx: MainContext;
@@ -37,7 +37,19 @@
 
   function handleMouseDown() {}
 
-  const parameters$ = component.parameters$;
+  const parameterFieldValueArr$ = ObservableArrayFns.map2(
+    component.parameters$,
+    (parameter) => {
+      return createFieldValueData({
+        ctx,
+        value$: parameter.name$,
+        focusIsFn: FocusKind.is.ComponentParameter,
+        createEditingFocusFn: (isEditing) =>
+          FocusKind.ComponentParameter({ parameter, isEditing }),
+        filterFn: (f) => f.parameter === parameter,
+      });
+    }
+  );
 
   function addParameter() {
     component.addParameterBlank();
@@ -48,15 +60,12 @@
   <FocusView focused={$isComponentFocused$} on:mousedown={handleMouseDown}>
     <FlexContainer class="p-4 gap-2" centered={false}>
       <Field {ctx} fieldData={nameFieldData} />
-      <div class="flex">
-        <FieldLabel label="Parameters" />
-        <div class="flex gap-2">
-          {#each $parameters$ as parameter (parameter.id)}
-            <ComponentParameterView {ctx} {parameter} />
-          {/each}
-        </div>
-      </div>
-      <ExObjectButton class="justify-self-center" on:click={addParameter}
+      <ListInput
+        {ctx}
+        label="Parameters"
+        fieldValueDataArr$={parameterFieldValueArr$}
+      />
+      <ExObjectButton class="mt-2" on:click={addParameter}
         >Add Parameter</ExObjectButton
       >
     </FlexContainer>

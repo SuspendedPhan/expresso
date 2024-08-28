@@ -26,6 +26,7 @@ export type FieldInit<T extends EditableFocus> = FieldValueInit<T> & {
 };
 
 export interface FieldValueData {
+    id: string;
     value$: OBS<string>;
     isEditing$: OBS<boolean>;
     isFocused$: OBS<boolean>;
@@ -64,6 +65,7 @@ export function createFieldValueData<T extends EditableFocus>(init: FieldValueIn
     keyboardCtx.registerCancel(editingFocus$);
 
     return {
+        id: crypto.randomUUID(),
         handleInput: (e: Event) => {
             const target = e.target as HTMLInputElement;
             if (target.value === "") {
@@ -119,6 +121,7 @@ export function createReadonlyFieldData<T extends Focus>(init: ReadonlyFieldInit
     );
 
     return {
+        id: crypto.randomUUID(),
         handleInput: () => {},
         handleClick: () => {
             ctx.focusCtx.setFocus(init.createFocusFn());
