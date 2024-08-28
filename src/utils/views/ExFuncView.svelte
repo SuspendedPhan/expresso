@@ -57,19 +57,21 @@
 
 <FlexContainer class="ex-card">
   <FocusView focused={$isExFuncFocused$} on:mousedown={handleMouseDown}>
-    <FlexContainer class="p-window flex flex-col gap-2" centered={false}>
+    <FlexContainer class="p-card flex flex-col gap-2" centered={false}>
       <Field {ctx} fieldData={nameFieldData} />
       <ListInput
         {ctx}
         label="Parameters"
         fieldValueDataArr$={parameterFieldDataArr$}
       />
-      <ExObjectButton on:click={addParameter}>Add Parameter</ExObjectButton>
+      <ExObjectButton class="mt-2" on:click={addParameter}
+        >Add Parameter</ExObjectButton
+      >
     </FlexContainer>
 
     <Divider />
 
-    <FlexContainer class="p-window">
+    <FlexContainer class="p-card">
       {#key $exprId$}
         <RootExprView expr={$expr$} {ctx} />
       {/key}

@@ -9,6 +9,7 @@ export default {
       padding: ({theme}) => {
         return {
           "window": theme("spacing.8"),
+          "card": theme("spacing.4"),
         };
       },
       flexBasis: {

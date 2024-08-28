@@ -63,7 +63,7 @@
       on:mousedown={handleClick}
       class="ex-card w-max flex flex-col"
     >
-      <div class="p-4 flex flex-col">
+      <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
           <Field {ctx} fieldData={exObjectNameField} />
@@ -73,7 +73,7 @@
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-      <div class="p-4">
+      <div class="p-card">
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           <PropertyView {ctx} property={cloneCountProperty} />
@@ -85,7 +85,7 @@
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-      <FlexContainer centered={false} class="flex flex-col p-4">
+      <FlexContainer centered={false} class="flex flex-col p-card">
         <BasicPropertyList
           {ctx}
           {basicProperties$}
@@ -95,7 +95,7 @@
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
-      <div class="p-4 self-center">
+      <div class="p-card self-center">
         <ExObjectButton
           on:click={() => ExObjectFns.addChildBlank(ctx, exObject)}
           >Add Child Object</ExObjectButton
