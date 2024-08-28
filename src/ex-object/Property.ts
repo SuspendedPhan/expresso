@@ -5,8 +5,9 @@
  * Component Argument
  */
 
+import assert from "assert-ts";
 import { firstValueFrom, of } from "rxjs";
-import { ComponentParameterFns, type ComponentParameter, type CustomComponent } from "src/ex-object/Component";
+import { ComponentKind, ComponentParameterFns, type ComponentParameter, type CustomComponent } from "src/ex-object/Component";
 import { ExItemFn, ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
@@ -157,6 +158,8 @@ export namespace PropertyFns {
 
   export async function * getAncestorPropertyGen(exItem: ExItem): AsyncGenerator<[Property, ExObject | CustomComponent], void, undefined> {
     for await (const ancestor of ExItemFn.getAncestors(exItem)) {
+      log55.debug("ancestor", ancestor.id);
+      
       switch (ancestor.itemType) {
         case ExItemType.ExObject:
           yield [ancestor.cloneCountProperty, ancestor];
@@ -167,8 +170,12 @@ export namespace PropertyFns {
             yield [property, ancestor];
           }
           break;
-        // case ExItemType.Component:
-        //   break;
+        case ExItemType.Component:
+          assert(ancestor.componentKind === ComponentKind.CustomComponent);
+          for (const property of await firstValueFrom(ancestor.properties$)) {
+            yield [property, ancestor];
+          }
+          break;
       }
     }
   }

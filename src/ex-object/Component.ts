@@ -200,6 +200,7 @@ export namespace ComponentFns {
     component: CustomComponent
   ): Promise<void> {
     const exObject = await CreateExObject.blank(_ctx, {});
+    exObject.parent$.next(component);
     const rootExObjects = await firstValueFrom(component.rootExObjects$);
     component.rootExObjects$.next([...rootExObjects, exObject]);
   }
