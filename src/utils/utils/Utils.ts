@@ -72,6 +72,18 @@ export namespace ArrayFns {
     assert(val !== undefined);
     return val;
   }
+
+  export function getWrappedIndex<T>(arr: T[], index: number): number {
+    if (index < 0) {
+      return arr.length + index;
+    }
+
+    if (index >= arr.length) {
+      return index % arr.length;
+    }
+
+    return index;
+  }
 }
 
 export function rxEquals<T>(obj: T) {

@@ -1,10 +1,20 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { BehaviorSubject, firstValueFrom, of } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+  import {
+    BehaviorSubject,
+    combineLatest,
+    firstValueFrom,
+    map,
+    switchMap,
+  } from "rxjs";
   import type { Expr } from "src/ex-object/ExItem";
+  import MainContext from "src/main-context/MainContext";
+  import {
+    ArrayFns,
+    createBehaviorSubjectWithLifetime,
+    RxFns,
+  } from "src/utils/utils/Utils";
   import Divider from "src/utils/views/Divider.svelte";
-  import type { ExprCommand } from "src/utils/utils/ExprCommand";
+  import { onMount } from "svelte";
 
   export let expr: Expr;
   export let ctx: MainContext;
@@ -13,11 +23,7 @@
 
   onMount(() => {
     const sub = ctx.eventBus.submitExprReplaceCommand$.subscribe(async () => {
-      const text = input.value;
-      const cmds$ = ctx.exprCommandCtx.getReplacementCommands$(expr, of(text));
-
-      const cmds = await firstValueFrom(cmds$);
-      const cmd = cmds[0];
+      const cmd = await firstValueFrom(selectedCmd$);
       if (cmd) {
         cmd.execute();
       }
@@ -29,8 +35,29 @@
   });
 
   const query$ = new BehaviorSubject<string>("");
-  const cmds$ = ctx.exprCommandCtx.getReplacementCommands$(expr, query$);
-  const selectedCmd$ = new BehaviorSubject<ExprCommand | null>(null);
+  const cmds$ = RxFns.onMount$().pipe(
+    switchMap(() => ctx.exprCommandCtx.getReplacementCommands$(expr, query$))
+  );
+
+  const selectedIndex$ = createBehaviorSubjectWithLifetime<number | null>(
+    RxFns.onMount$(),
+    null
+  );
+
+  const selectedCmd$ = combineLatest([cmds$, selectedIndex$]).pipe(
+    map(([cmds, selectedIndex]) => {
+      if (selectedIndex === null) {
+        return null;
+      }
+      return cmds[selectedIndex];
+    })
+  );
+
+  cmds$.subscribe((cmds) => {
+    if (cmds.length > 0 && selectedIndex$.value === null) {
+      selectedIndex$.next(0);
+    }
+  });
 
   function handleInput(
     event: Event & { currentTarget: EventTarget & HTMLInputElement }
@@ -43,6 +70,25 @@
       input.focus();
     }, 0);
   });
+
+  async function handleKeydown(event: KeyboardEvent) {
+    const selectedIndex = selectedIndex$.value;
+    if (selectedIndex === null) {
+      return;
+    }
+
+    const cmds = await firstValueFrom(cmds$);
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      const index = ArrayFns.getWrappedIndex(cmds, selectedIndex + 1);
+      selectedIndex$.next(index);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      const index = ArrayFns.getWrappedIndex(cmds, selectedIndex - 1);
+      selectedIndex$.next(index);
+    }
+  }
 </script>
 
 <div
@@ -55,13 +101,14 @@
       value={$query$}
       on:input={handleInput}
       bind:this={input}
+      on:keydown={handleKeydown}
     />
   </div>
   <Divider />
   <div>
     {#if $cmds$}
       {#each $cmds$ as cmd}
-        <div class="bg-neutral-content">
+        <div class:bg-neutral-content={cmd === $selectedCmd$}>
           <button on:click={cmd.execute}>{cmd.label}</button>
         </div>
       {/each}
