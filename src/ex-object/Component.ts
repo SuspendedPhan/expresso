@@ -140,6 +140,8 @@ export namespace CreateComponent {
       data.name = `Component ${ordinal}`;
     }
 
+    const rootExObjects = data.rootExObjects ?? [];
+
     const component: CustomComponent = {
       id: data.id ?? `custom-component-${crypto.randomUUID()}`,
       itemType: ExItemType.Component,
@@ -147,7 +149,7 @@ export namespace CreateComponent {
       componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(data.name),
       parameters$: new BehaviorSubject(data.parameters ?? []),
-      rootExObjects$: new BehaviorSubject(data.rootExObjects ?? []),
+      rootExObjects$: new BehaviorSubject(rootExObjects),
       properties$: new BehaviorSubject(data.properties ?? []),
 
       async addParameterBlank() {
@@ -164,6 +166,11 @@ export namespace CreateComponent {
         return property;
       },
     };
+
+    rootExObjects.forEach((rootExObject) => {
+      rootExObject.parent$.next(component);
+    });
+
     return component;
   }
 }
