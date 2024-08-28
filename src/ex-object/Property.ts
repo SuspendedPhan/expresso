@@ -6,9 +6,9 @@
  */
 
 import { firstValueFrom, of } from "rxjs";
-import { ComponentParameterFns, type ComponentParameter } from "src/ex-object/Component";
-import { ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
-import { ExObjectFns } from "src/ex-object/ExObject";
+import { ComponentParameterFns, type ComponentParameter, type CustomComponent } from "src/ex-object/Component";
+import { ExItemFn, ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import {
@@ -141,7 +141,7 @@ export namespace CreateProperty {
   }
 }
 
-export namespace PropertyFns {
+export namespace PropertyFns {  
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
 
   export function getName$(property: ExObjectProperty): OBS<string> {
@@ -155,9 +155,21 @@ export namespace PropertyFns {
     }
   }
 
-  export async function getAncestorProperties(exItem: ExItem): Promise<Property[]> {
-    const exObject = await ExObjectFns.getExObject(exItem);
-    const properties = await firstValueFrom(exObject.basicProperties$);
-    return properties;
+  export async function * getAncestorPropertyGen(exItem: ExItem): AsyncGenerator<[Property, ExObject | CustomComponent], void, undefined> {
+    for await (const ancestor of ExItemFn.getAncestors(exItem)) {
+      switch (ancestor.itemType) {
+        case ExItemType.ExObject:
+          yield [ancestor.cloneCountProperty, ancestor];
+          for (const property of ancestor.componentParameterProperties) {
+            yield [property, ancestor];
+          }
+          for (const property of await firstValueFrom(ancestor.basicProperties$)) {
+            yield [property, ancestor];
+          }
+          break;
+        // case ExItemType.Component:
+        //   break;
+      }
+    }
   }
 }

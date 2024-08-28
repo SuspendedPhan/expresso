@@ -1,5 +1,6 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
+import { ExItemType } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { CreateProperty, type BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -28,14 +29,18 @@ export enum ComponentParameterKind {
   CustomComponentParameter,
 }
 
-export interface CanvasComponent {
+export interface ComponentBase {
   id: string;
+  itemType: ExItemType.Component;
+  parent$: OBS<null>;
+}
+
+export interface CanvasComponent extends ComponentBase {
   componentKind: ComponentKind.CanvasComponent;
   parameters: CanvasComponentParameter[];
 }
 
-export interface CustomComponent {
-  id: string;
+export interface CustomComponent extends ComponentBase {
   componentKind: ComponentKind.CustomComponent;
   name$: SUB<string>;
   parameters$: SUB<CustomComponentParameter[]>;
@@ -59,9 +64,12 @@ export interface CustomComponentParameter {
   readonly name$: SUB<string>;
 }
 
+
 export const CanvasComponentStore = {
   circle: {
     id: "circle",
+    parent$: of(null),
+    itemType: ExItemType.Component,
     componentKind: ComponentKind.CanvasComponent,
     parameters: [
       {
@@ -134,6 +142,8 @@ export namespace CreateComponent {
 
     const component: CustomComponent = {
       id: data.id ?? `custom-component-${crypto.randomUUID()}`,
+      itemType: ExItemType.Component,
+      parent$: of(null),
       componentKind: ComponentKind.CustomComponent,
       name$: new BehaviorSubject(data.name),
       parameters$: new BehaviorSubject(data.parameters ?? []),

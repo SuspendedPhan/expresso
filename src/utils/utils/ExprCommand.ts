@@ -47,10 +47,13 @@ export function createExprCommandCtx(ctx: MainContext) {
       });
     }
 
-    const properties = await PropertyFns.getAncestorProperties(expr);
-    properties.forEach(async (property) => {
+    const propertyGen = PropertyFns.getAncestorPropertyGen(expr);
+    for await (const [property, parent] of propertyGen) {
+      const name = await firstValueFrom(PropertyFns.getName$(property));
+      const parentName = await firstValueFrom(parent.name$);
+      const label = `${parentName}.${name}`;
       commands.push({
-        label: await firstValueFrom(PropertyFns.getName$(property)),
+        label,
         execute: async () => {
           const propertyReferenceExpr = await createPropertyReferenceExpr({
             ctx,
@@ -59,7 +62,7 @@ export function createExprCommandCtx(ctx: MainContext) {
           ctx.mutator.replaceExpr(expr, propertyReferenceExpr);
         },
       });
-    });
+    };
     return commands;
   }
 }

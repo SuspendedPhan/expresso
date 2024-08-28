@@ -5,9 +5,9 @@ import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type ExObjectProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
+import { log5 } from "src/utils/utils/Log3";
 import { type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
-import { log5 } from "src/utils/utils/Log3";
 
 const log55 = log5("ExObjectFocus.ts");
 
@@ -189,12 +189,14 @@ export namespace ExObjectFocusFuncs {
 
     keyboardCtx.onKeydown$("p", newActionsFocus$).subscribe(async (focus) => {
       const exObject = await ExObjectFns.getExObject(focus.exItem);
+      assert(exObject !== null);
       ExObjectFns.addBasicPropertyBlank(ctx, exObject);
       focusCtx.popFocus();
     });
 
     keyboardCtx.onKeydown$("c", newActionsFocus$).subscribe(async (focus) => {
       const exObject = await ExObjectFns.getExObject(focus.exItem);
+      assert(exObject !== null);
       ExObjectFns.addChildBlank(ctx, exObject);
       focusCtx.popFocus();
     });

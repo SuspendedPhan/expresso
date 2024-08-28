@@ -54,7 +54,7 @@ export namespace ExObjectFns {
     exObject.basicProperties$.next(newProperties);
   }
 
-  export async function getExObject(exItem: ExItem): Promise<ExObject> {
+  export async function getExObject(exItem: ExItem): Promise<ExObject | null> {
     let item: ExItem | null = exItem;
     while (item !== null) {
       if (item.itemType === ExItemType.ExObject) {
@@ -63,7 +63,7 @@ export namespace ExObjectFns {
       const parent: Parent = await firstValueFrom(item.parent$);
       item = parent;
     }
-    throw new Error("ExObject not found");
+    return null;
   }
 
   export async function getRootExObject(exObject: ExObject): Promise<ExObject> {

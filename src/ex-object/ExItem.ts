@@ -1,15 +1,18 @@
+import { firstValueFrom } from "rxjs";
 import type { CallExprKind } from "src/ex-object/CallExpr";
+import type { Component } from "src/ex-object/Component";
 import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { PropertyReferenceExpr } from "src/ex-object/Expr";
 import type { ExObjectProperty } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
 
-export type ExItem = ExObject | ExObjectProperty | Expr | ExFunc;
+export type ExItem = Component | ExObject | ExObjectProperty | Expr | ExFunc;
 export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr = NumberExpr | CallExpr | PropertyReferenceExpr;
 
 export enum ExItemType {
+  Component,
   ExFunc,
   ExObject,
   Property,
@@ -44,3 +47,13 @@ export interface NumberExpr extends ExItemBase {
 // }
 
 export type CallExpr = typeof CallExprKind._Union;
+
+export namespace ExItemFn {
+  export async function * getAncestors(item: ExItem): AsyncGenerator<ExItem> {
+    let parent: Parent = await firstValueFrom(item.parent$);
+    while (parent !== null) {
+      yield parent;
+      parent = await firstValueFrom(parent.parent$);
+    }
+  }
+}
