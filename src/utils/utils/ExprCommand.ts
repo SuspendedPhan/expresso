@@ -2,20 +2,15 @@ import assert from "assert-ts";
 import { firstValueFrom, switchMap } from "rxjs";
 import {
   ComponentKind,
-  type CustomComponent,
-  type CustomComponentParameter,
+  type CustomComponent
 } from "src/ex-object/Component";
-import type { ExFuncParameter } from "src/ex-object/ExFunc";
 import { ExItemFn, ExItemType, type Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import {
-  createComponentParameterReferenceExpr,
-  createExFuncParameterReferenceExpr,
-  createPropertyReferenceExpr,
   createReferenceExpr,
-  ReferenceExpr2,
+  ReferenceExpr2
 } from "src/ex-object/Expr";
-import { PropertyFns, type Property } from "src/ex-object/Property";
+import { PropertyFns } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log3";
 import type { OBS } from "src/utils/utils/Utils";
@@ -68,6 +63,8 @@ export function createExprCommandCtx(ctx: MainContext) {
     for await (const command of getExprCommands2(ctx, expr)) {
       commands.push(command);
     }
+    
+    return commands;
   }
 }
 

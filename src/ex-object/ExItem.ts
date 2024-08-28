@@ -27,9 +27,7 @@ export enum ExItemType {
 export enum ExprType {
   NumberExpr,
   CallExpr,
-  PropertyReferenceExpr,
-  ComponentParameterReferenceExpr,
-  ExFuncParameterReferenceExpr,
+  ReferenceExpr,
 }
 
 export interface ExItemBase {

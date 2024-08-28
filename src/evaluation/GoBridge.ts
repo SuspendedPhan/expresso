@@ -87,8 +87,8 @@ export default class GoBridge {
             goModule.CallExpr.setArg1(expr.id, arg1.id);
           });
           break;
-        case ExprType.PropertyReferenceExpr:
-          console.error("PropertyReferenceExpr not implemented");
+        case ExprType.ReferenceExpr:
+          console.error("ReferenceExpr not implemented");
           break;
         default:
           assertUnreachable(expr);

@@ -20,12 +20,6 @@ export namespace ExprFuncs {
   }
 }
 
-export interface PropertyReferenceExpr extends ExItemBase {
-  readonly itemType: ExItemType.Expr;
-  readonly exprType: ExprType.PropertyReferenceExpr;
-  readonly property: Property;
-}
-
 export async function createReferenceExpr(ctx: MainContext, data: {
   id?: string;
   parent: ExItem;
@@ -36,12 +30,14 @@ export async function createReferenceExpr(ctx: MainContext, data: {
   return {
     ...base,
     itemType: ExItemType.Expr,
+    exprType: ExprType.ReferenceExpr,
     reference: data.reference,
   };
 }
 
 export interface ReferenceExpr extends ExItemBase {
   itemType: ExItemType.Expr;
+  exprType: ExprType.ReferenceExpr;
   reference: ReferenceExpr2;
 }
 
