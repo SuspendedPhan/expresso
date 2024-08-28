@@ -12,7 +12,7 @@ import {
 } from "src/ex-object/Expr";
 import { PropertyFns } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 import { match } from "variant";
 
@@ -63,7 +63,7 @@ export function createExprCommandCtx(ctx: MainContext) {
     for await (const command of getExprCommands2(ctx, expr)) {
       commands.push(command);
     }
-    
+
     return commands;
   }
 }

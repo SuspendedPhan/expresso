@@ -7,7 +7,7 @@ import type { OBS, SUB } from "src/utils/utils/Utils";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
 import type { EditableFocus } from "src/utils/views/Field";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("Focus.ts");
 

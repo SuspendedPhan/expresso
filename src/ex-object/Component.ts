@@ -4,7 +4,7 @@ import { ExItemType } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { CreateProperty, type BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 
 const log55 = log5("Component.ts");

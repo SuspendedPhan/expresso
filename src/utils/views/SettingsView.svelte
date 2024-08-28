@@ -1,6 +1,6 @@
 <script lang="ts">
   import { get, set } from "idb-keyval";
-  import { log5 } from "src/utils/utils/Log3";
+  import { log5 } from "src/utils/utils/Log5";
   import MainPane from "src/utils/views/MainPane.svelte";
 
   const log55 = log5("SettingsView.svelte");

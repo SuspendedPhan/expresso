@@ -5,7 +5,7 @@ import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type ExObjectProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
 

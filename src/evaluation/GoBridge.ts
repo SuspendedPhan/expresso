@@ -3,7 +3,7 @@ import { type Expr, ExprType } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type GoModule from "src/utils/utils/GoModule";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 import { assertUnreachable, partitionFirst } from "src/utils/utils/Utils";
 
 const log55 = log5("GoBridge.ts");

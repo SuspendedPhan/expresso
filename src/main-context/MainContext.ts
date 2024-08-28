@@ -19,7 +19,7 @@ import MainMutator from "./MainMutator";
 import MainViewContext from "./MainViewContext";
 import { createComponentCtx } from "src/ex-object/Component";
 import { createNavFocusCtx } from "src/utils/focus/NavFocus";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("MainContext.ts");
 

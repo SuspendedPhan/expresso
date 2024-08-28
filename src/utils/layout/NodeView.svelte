@@ -2,7 +2,7 @@
   import { onMount, tick } from "svelte";
   import { ElementLayout } from "../layout/ElementLayout";
   import { ResizeSensor } from "css-element-queries";
-  import { log5 } from "src/utils/utils/Log3";
+  import { log5 } from "src/utils/utils/Log5";
 
   const log55 = log5("NodeView.svelte");
 

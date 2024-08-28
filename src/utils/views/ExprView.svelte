@@ -7,7 +7,7 @@
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import { log5 } from "src/utils/utils/Log3";
+  import { log5 } from "src/utils/utils/Log5";
   import { CallExprKind } from "src/ex-object/CallExpr";
 
   const log55 = log5("ExprView.svelte");

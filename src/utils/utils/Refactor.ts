@@ -14,7 +14,7 @@ import {
 import { ProjectFns } from "src/ex-object/Project";
 import type { BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("Refactor.ts");
 

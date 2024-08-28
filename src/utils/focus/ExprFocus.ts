@@ -4,7 +4,7 @@ import { ExItemType, ExprType, type Expr } from "src/ex-object/ExItem";
 import { ExprFuncs } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 import { ArrayFns, RxFns, type OBS } from "src/utils/utils/Utils";
 import { FocusKind } from "./FocusKind";
 

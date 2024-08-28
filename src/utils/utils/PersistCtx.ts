@@ -7,7 +7,7 @@ import Dehydrator from "src/utils/hydration/Dehydrator";
 import Rehydrator from "src/utils/hydration/Rehydrator";
 import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 import Persistence from "src/utils/persistence/Persistence";
-import { log5 } from "src/utils/utils/Log3";
+import { log5 } from "src/utils/utils/Log5";
 
 // const reset = true;
 const reset = false;
