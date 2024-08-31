@@ -10,7 +10,10 @@ import {
   pipe,
   Subject,
 } from "rxjs";
+import { log5 } from "src/utils/utils/Log5";
 import { onMount } from "svelte";
+
+const log55 = log5("Utils.ts");
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -75,6 +78,7 @@ export namespace ArrayFns {
 
   export function getWrappedIndex<T>(arr: T[], index: number): number {
     if (index < 0) {
+      log55.log3(9, "getWrappedIndex", index, arr.length);
       return arr.length + index;
     }
 
@@ -129,16 +133,15 @@ export namespace RxFns {
     return combineLatest(observables);
   }
 
-  export function onMount$<T>(): OBS<T> {
-    const obs = new Observable<T>((subscriber) => {
-      onMount(() => {
-        subscriber.next();
-        return () => {
-          subscriber.complete();
-        };
-      });
+  export function onMount$(): OBS<void> {
+    const subject = new Subject<void>();
+    onMount(() => {
+      subject.next();
+      return () => {
+        subject.complete();
+      };
     });
-    return obs;
+    return subject;
   }
 
   export function resizeSensor$(element: HTMLElement): OBS<void> {

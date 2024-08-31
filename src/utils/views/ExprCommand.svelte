@@ -4,10 +4,13 @@
     combineLatest,
     firstValueFrom,
     map,
+    share,
+    shareReplay,
     switchMap,
   } from "rxjs";
   import type { Expr } from "src/ex-object/ExItem";
   import MainContext from "src/main-context/MainContext";
+  import { log5 } from "src/utils/utils/Log5";
   import {
     ArrayFns,
     createBehaviorSubjectWithLifetime,
@@ -15,6 +18,8 @@
   } from "src/utils/utils/Utils";
   import Divider from "src/utils/views/Divider.svelte";
   import { onMount } from "svelte";
+
+  const log55 = log5("ExprCommand.svelte");
 
   export let expr: Expr;
   export let ctx: MainContext;
@@ -36,7 +41,8 @@
 
   const query$ = new BehaviorSubject<string>("");
   const cmds$ = RxFns.onMount$().pipe(
-    switchMap(() => ctx.exprCommandCtx.getReplacementCommands$(expr, query$))
+    switchMap(() => ctx.exprCommandCtx.getReplacementCommands$(expr, query$)),
+    shareReplay(1)
   );
 
   const selectedIndex$ = createBehaviorSubjectWithLifetime<number | null>(
@@ -54,6 +60,7 @@
   );
 
   cmds$.subscribe((cmds) => {
+    log55.debug("cmds", cmds);
     if (cmds.length > 0 && selectedIndex$.value === null) {
       selectedIndex$.next(0);
     }
@@ -73,19 +80,26 @@
 
   async function handleKeydown(event: KeyboardEvent) {
     const selectedIndex = selectedIndex$.value;
-    if (selectedIndex === null) {
-      return;
-    }
-
+    log55.debug("handleKeydown", event.key, selectedIndex);
     const cmds = await firstValueFrom(cmds$);
+    log55.debug("handleKeyDown.cmds", cmds);
 
     if (event.key === "ArrowDown") {
+      log55.debug("ArrowDown");
       event.preventDefault();
-      const index = ArrayFns.getWrappedIndex(cmds, selectedIndex + 1);
+      let index = 0;
+      if (selectedIndex !== null) {
+        ArrayFns.getWrappedIndex(cmds, selectedIndex + 1);
+      }
+      log55.debug("index", index);
       selectedIndex$.next(index);
     } else if (event.key === "ArrowUp") {
+      log55.debug("ArrowUp");
       event.preventDefault();
-      const index = ArrayFns.getWrappedIndex(cmds, selectedIndex - 1);
+      let index = cmds.length - 1;
+      if (selectedIndex !== null) {
+        index = ArrayFns.getWrappedIndex(cmds, selectedIndex - 1);
+      }
       selectedIndex$.next(index);
     }
   }
