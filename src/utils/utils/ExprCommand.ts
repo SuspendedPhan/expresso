@@ -61,7 +61,11 @@ export function createExprCommandCtx(ctx: MainContext) {
     }
 
     for await (const command of getExprCommands2(ctx, expr)) {
-      commands.push(command);
+      const blank = query === "";
+      const includes = command.label.includes(query);
+      if (blank || includes) {
+        commands.push(command);
+      }
     }
 
     return commands;
