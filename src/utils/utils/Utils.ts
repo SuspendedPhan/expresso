@@ -78,14 +78,16 @@ export namespace ArrayFns {
 
   export function getWrappedIndex<T>(arr: T[], index: number): number {
     if (index < 0) {
-      log55.log3(9, "getWrappedIndex", index, arr.length);
+      log55.log3(9, "getWrappedIndex1", index, arr.length);
       return arr.length + index;
     }
 
     if (index >= arr.length) {
+      log55.log3(9, "getWrappedIndex2", index, arr.length);
       return index % arr.length;
     }
 
+    log55.log3(9, "getWrappedIndex3", index, arr.length);
     return index;
   }
 }

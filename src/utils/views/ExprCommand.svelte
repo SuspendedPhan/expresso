@@ -89,7 +89,8 @@
       event.preventDefault();
       let index = 0;
       if (selectedIndex !== null) {
-        ArrayFns.getWrappedIndex(cmds, selectedIndex + 1);
+        log55.debug("selectedIndex", selectedIndex);
+        index = ArrayFns.getWrappedIndex(cmds, selectedIndex + 1);
       }
       log55.debug("index", index);
       selectedIndex$.next(index);
