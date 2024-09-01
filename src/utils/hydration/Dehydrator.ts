@@ -39,13 +39,14 @@ import {
   type Variant,
   variantCosmos,
   scoped,
-  type VariantOf
+  type VariantOf,
+  fields
 } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-const DEHYDRATED_EXPR_KIND = "dehydratedExprKind";
+const DEHYDRATED_EXPR_KIND = "type";
 type DEHYDRATED_EXPR_KIND = typeof DEHYDRATED_EXPR_KIND;
 
 export const DehydratedExprCosmos = variantCosmos({
@@ -57,35 +58,6 @@ type DehydratedExprVariant<Type extends string, Fields extends {}> = Variant<
   Fields,
   DEHYDRATED_EXPR_KIND
 >;
-
-type Asdf2_ = {
-  Number: { id: string; value: number };
-  Call: { id: string; args: Asdf2[] };
-  ReferenceExpr: { id: string; targetId: string; referenceExprKind: string };
-};
-
-// type Asdf2 = {
-//   [K in keyof Asdf2_]: Asdf2_[K] & { dehydratedExprKind: K };
-// };
-
-const Asdf2 = typed({
-  Number: pass,
-  Call: pass,
-  ReferenceExpr: pass,
-});
-
-const Asdf3 = scoped(DEHYDRATED_EXPR_KIND, Asdf2);
-type Asdf3 = VariantOf<typeof Asdf2>;
-
-// type Asdf3 = VariantOf<Asdf2, DEHYDRATED_EXPR_KIND>;
-const Asdf4 = variant(Asdf2);
-
-// const Asdf2 = DehydratedExprCosmos.variant(DehydratedExprCosmos.typed<Asdf2>({
-//   Number: pass,
-//   Call: pass,
-//   ReferenceExpr: pass,
-// }));
-
 
 type DehydratedExpr_ =
   | DehydratedExprVariant<"Number", { id: string; value: number }>
