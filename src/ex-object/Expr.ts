@@ -42,9 +42,9 @@ export interface ReferenceExpr extends ExItemBase {
 }
 
 export const ReferenceExpr2 = variantModule({
-  Property: fields<{property: Property}>(),
-  ComponentParameter: fields<{parameter: CustomComponentParameter}>(),
-  ExFuncParameter: fields<{parameter: ExFuncParameter}>(),
+  Property: fields<{target: Property}>(),
+  ComponentParameter: fields<{target: CustomComponentParameter}>(),
+  ExFuncParameter: fields<{target: ExFuncParameter}>(),
 });
 
 export type ReferenceExpr2<T extends TypeNames<typeof ReferenceExpr2> = undefined>

@@ -21,6 +21,7 @@ import {
   type NumberExpr,
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
+import { type ReferenceExpr } from "src/ex-object/Expr";
 import type { Project } from "src/ex-object/Project";
 import {
   type BasicProperty,
@@ -31,10 +32,80 @@ import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
+import type { DexTypeNames } from "src/utils/utils/VariantUtils";
+import {
+  typed,
+  variant,
+  type Variant,
+  variantCosmos,
+  scoped,
+  type VariantOf
+} from "variant";
+import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-export type DehydratedExpr = DehydratedNumberExpr | DehydratedCallExpr;
+const DEHYDRATED_EXPR_KIND = "dehydratedExprKind";
+type DEHYDRATED_EXPR_KIND = typeof DEHYDRATED_EXPR_KIND;
+
+export const DehydratedExprCosmos = variantCosmos({
+  key: DEHYDRATED_EXPR_KIND,
+});
+
+type DehydratedExprVariant<Type extends string, Fields extends {}> = Variant<
+  Type,
+  Fields,
+  DEHYDRATED_EXPR_KIND
+>;
+
+type Asdf2_ = {
+  Number: { id: string; value: number };
+  Call: { id: string; args: Asdf2[] };
+  ReferenceExpr: { id: string; targetId: string; referenceExprKind: string };
+};
+
+// type Asdf2 = {
+//   [K in keyof Asdf2_]: Asdf2_[K] & { dehydratedExprKind: K };
+// };
+
+const Asdf2 = typed({
+  Number: pass,
+  Call: pass,
+  ReferenceExpr: pass,
+});
+
+const Asdf3 = scoped(DEHYDRATED_EXPR_KIND, Asdf2);
+type Asdf3 = VariantOf<typeof Asdf2>;
+
+// type Asdf3 = VariantOf<Asdf2, DEHYDRATED_EXPR_KIND>;
+const Asdf4 = variant(Asdf2);
+
+// const Asdf2 = DehydratedExprCosmos.variant(DehydratedExprCosmos.typed<Asdf2>({
+//   Number: pass,
+//   Call: pass,
+//   ReferenceExpr: pass,
+// }));
+
+
+type DehydratedExpr_ =
+  | DehydratedExprVariant<"Number", { id: string; value: number }>
+  | DehydratedExprVariant<"Call", { id: string; args: DehydratedExpr[] }>
+  | DehydratedExprVariant<
+      "ReferenceExpr",
+      { id: string; targetId: string; referenceExprKind: string }
+    >;
+
+const DehydratedExpr = DehydratedExprCosmos.variant(
+  DehydratedExprCosmos.typed<DehydratedExpr_>({
+    Number: pass,
+    Call: pass,
+    ReferenceExpr: pass,
+  })
+);
+
+type DehydratedExpr<
+  T extends DexTypeNames<typeof DehydratedExpr, DEHYDRATED_EXPR_KIND> = undefined
+> = VariantOf<typeof DehydratedExpr, T>;
 
 export interface DehydratedProject {
   id: string;
@@ -95,18 +166,6 @@ export interface DehydratedBasicProperty {
 export interface DehydratedCloneCountProperty {
   id: string;
   expr: DehydratedExpr;
-}
-
-export interface DehydratedNumberExpr {
-  type: "NumberExpr";
-  id: string;
-  value: number;
-}
-
-export interface DehydratedCallExpr {
-  type: "CallExpr";
-  id: string;
-  args: DehydratedExpr[];
 }
 
 export default class Dehydrator {
@@ -410,29 +469,29 @@ export default class Dehydrator {
         return this.dehydrateNumberExpr$(expr);
       case ExprType.CallExpr:
         return this.dehydrateCallExpr$(expr);
+      case ExprType.ReferenceExpr:
+        return this.dehydrateReferenceExpr$(expr);
       default:
         throw new Error("Unexpected exprType");
     }
   }
 
-  private dehydrateNumberExpr$(
-    expr: NumberExpr
-  ): Observable<DehydratedNumberExpr> {
+  private dehydrateNumberExpr$(expr: NumberExpr): Observable<DehydratedExpr<"Number">> {
     return of({
-      type: "NumberExpr",
+      dehydratedExprKind: "NumberExpr",
       id: expr.id,
       value: expr.value,
     });
   }
 
-  private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedCallExpr> {
+  private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedExpr<"Call">> {
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
         return this.dehydrateArgs$(args);
       })
     );
 
-    const result: Observable<DehydratedCallExpr> = deArgs$.pipe(
+    const result: Observable<DehydratedExpr<"Call">> = deArgs$.pipe(
       map((deArgs) => {
         return {
           type: "CallExpr",
@@ -443,6 +502,19 @@ export default class Dehydrator {
     );
 
     return result;
+  }
+
+  private dehydrateReferenceExpr$(
+    expr: ReferenceExpr
+  ): Observable<DehydratedReferenceExpr> {
+    console.log(expr.reference);
+
+    return of({
+      type: "ReferenceExpr",
+      id: expr.id,
+      targetId: expr.reference.target.id,
+      referenceExprKind: expr.reference.type,
+    });
   }
 
   private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {
