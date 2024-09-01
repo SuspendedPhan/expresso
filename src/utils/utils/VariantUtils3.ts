@@ -9,7 +9,50 @@ import {
 } from "variant";
 
 // --------------------------------------------
-// Now let's try it with a helper for specific types
+// Now let's try to make the helper.
+// --------------------------------------------
+const BayKey5_ = "type2";
+const BayCosmos5_ = variantCosmos({
+  key: BayKey5_,
+});
+
+type Bay5_0 = {
+  Bay2: { id2: string };
+  Bay3: { id3: string; bay00: Bay5_3 };
+};
+
+type Bay5_2 = {
+  [K in keyof Bay5_0]: Variant<K, Bay5_0[K], typeof BayKey5_>;
+}[keyof Bay5_0];
+
+const Bay5_3 = BayCosmos5_.variant(
+  BayCosmos5_.typed<Bay5_2>({
+    Bay2: pass,
+    Bay3: pass,
+  })
+);
+// type Bay5_3 = VariantOf<typeof Bay5_3>;
+type Bay5_3<T extends TypeNames<typeof Bay5_3> = undefined> = VariantOf<
+  typeof Bay5_3,
+  T
+>;
+
+type Bay5_4 = {
+  [K in keyof Bay5_0]: ReturnType<(typeof Bay5_3)[K]>;
+} & {};
+
+// Example:
+Bay5_3.Bay3({ id3: "1", bay00: Bay5_3.Bay2({ id2: "2" }) });
+const f: ReturnType<typeof Bay5_3.Bay3> = Bay5_3.Bay3({
+  id3: "1",
+  bay00: Bay5_3.Bay2({ id2: "2" }),
+});
+const f2: Bay5_3<"Bay3"> = Bay5_3.Bay2({ id2: "2" });
+const f3: Bay5_4["Bay2"] = Bay5_3.Bay2({ id2: "2" });
+// const f4: Bay5_4.
+
+// --------------------------------------------
+// Now let's try it with a helper for specific types. First, help ChatGPT understand the types.
 // --------------------------------------------
 const BayKey4_ = "type2";
 const BayCosmos4_ = variantCosmos({
@@ -32,12 +75,22 @@ const Bay4_3 = BayCosmos4_.variant(
   })
 );
 // type Bay4_3 = VariantOf<typeof Bay4_3>;
-type Bay4_3<T extends TypeNames<typeof Bay4_3> = undefined> = VariantOf<typeof Bay4_3, T>;
+type Bay4_3<T extends TypeNames<typeof Bay4_3> = undefined> = VariantOf<
+  typeof Bay4_3,
+  T
+>;
+
+type Bay4_Bay2 = ReturnType<typeof Bay4_3.Bay2>;
+type Bay4_Bay3 = ReturnType<typeof Bay4_3.Bay3>;
 
 // Example:
 Bay4_3.Bay3({ id3: "1", bay00: Bay4_3.Bay2({ id2: "2" }) });
-const f: ReturnType<typeof Bay4_3.Bay3> = Bay4_3.Bay3({ id3: "1", bay00: Bay4_3.Bay2({ id2: "2" }) });
+const f: ReturnType<typeof Bay4_3.Bay3> = Bay4_3.Bay3({
+  id3: "1",
+  bay00: Bay4_3.Bay2({ id2: "2" }),
+});
 const f2: Bay4_3<"Bay3"> = Bay4_3.Bay2({ id2: "2" });
+const f3: Bay4_Bay2 = Bay4_3.Bay2({ id2: "2" });
 
 // --------------------------------------------
 // Now let's try it with generic
@@ -63,11 +116,17 @@ const Bay3_3 = BayCosmos3_.variant(
   })
 );
 // type Bay3_3 = VariantOf<typeof Bay3_3>;
-type Bay3_3<T extends TypeNames<typeof Bay3_3> = undefined> = VariantOf<typeof Bay3_3, T>;
+type Bay3_3<T extends TypeNames<typeof Bay3_3> = undefined> = VariantOf<
+  typeof Bay3_3,
+  T
+>;
 
 // Example:
 Bay3_3.Bay3({ id3: "1", bay00: Bay3_3.Bay2({ id2: "2" }) });
-const f: ReturnType<typeof Bay3_3.Bay3> = Bay3_3.Bay3({ id3: "1", bay00: Bay3_3.Bay2({ id2: "2" }) });
+const f: ReturnType<typeof Bay3_3.Bay3> = Bay3_3.Bay3({
+  id3: "1",
+  bay00: Bay3_3.Bay2({ id2: "2" }),
+});
 const f2: Bay3_3<"Bay3"> = Bay3_3.Bay2({ id2: "2" });
 
 // --------------------------------------------
