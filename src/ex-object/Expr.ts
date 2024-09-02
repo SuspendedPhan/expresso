@@ -14,6 +14,7 @@ import { Utils } from "src/utils/utils/Utils";
 import {
   fields,
   variant,
+  variantCosmos,
   type VariantOf
 } from "variant";
 
@@ -54,7 +55,10 @@ export interface ReferenceExpr extends ExItemBase {
   reference: ReferenceExpr2;
 }
 
-export const ReferenceExpr2 = variant({
+const REFERENCE_EXPR2_TAG = "referenceExpr2Kind";
+export const ReferenceExpr2Cosmos = variantCosmos({ key: REFERENCE_EXPR2_TAG });
+
+export const ReferenceExpr2 = ReferenceExpr2Cosmos.variant({
   Property: fields<{ target: Property }>(),
   ComponentParameter: fields<{ target: CustomComponentParameter }>(),
   ExFuncParameter: fields<{ target: ExFuncParameter }>(),

@@ -21,7 +21,7 @@ import {
   type NumberExpr,
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import { type ReferenceExpr } from "src/ex-object/Expr";
+import { ReferenceExpr2, type ReferenceExpr } from "src/ex-object/Expr";
 import type { Project } from "src/ex-object/Project";
 import {
   type BasicProperty,
@@ -36,7 +36,7 @@ import {
   dexVariantTyped,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { variantCosmos, type VariantOf } from "variant";
+import { variantCosmos, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
@@ -55,7 +55,7 @@ type DehydratedExpr_ = {
   ReferenceExpr: {
     id: string;
     targetId: string;
-    referenceExprKind: string;
+    referenceExprKind: TypesOf<typeof ReferenceExpr2>;
   };
 };
 
@@ -486,7 +486,7 @@ export default class Dehydrator {
       dehydratedExprKind: "ReferenceExpr",
       id: expr.id,
       targetId: expr.reference.target.id,
-      referenceExprKind: expr.reference.type,
+      referenceExprKind: expr.reference.referenceExpr2Kind,
     });
   }
 

@@ -16,6 +16,7 @@ import {
 import { createExFunc, createExFuncParameter, type ExFunc, type ExFuncParameter } from "src/ex-object/ExFunc";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
+import { ReferenceExpr2 } from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
   BasicProperty,
@@ -291,7 +292,8 @@ export default class Rehydrator {
   private async rehydrateReferenceExpr(
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ): Promise<ReferenceExpr> {
-    // const referenceExpr2 = 
+    const expr2 = ReferenceExpr2[deExpr.referenceExprKind]
+    // const referenceExpr2 = ReferenceExpr2.
   }
 
   private getComponent(componentId: string, componentType: string): Component {
