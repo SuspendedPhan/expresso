@@ -11,6 +11,7 @@ import {
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
+import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
 import {
   fields,
   variant,
@@ -65,3 +66,4 @@ export const ReferenceExpr2 = ReferenceExpr2Cosmos.variant({
 });
 
 export type ReferenceExpr2 = VariantOf<typeof ReferenceExpr2>;
+export type ReferenceExpr2Kind = DexVariantKind<typeof ReferenceExpr2, typeof REFERENCE_EXPR2_TAG>;

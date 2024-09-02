@@ -16,12 +16,13 @@ import {
 import { createExFunc, createExFuncParameter, type ExFunc, type ExFuncParameter } from "src/ex-object/ExFunc";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { ReferenceExpr2 } from "src/ex-object/Expr";
+import { ReferenceExpr2, ReferenceExpr2Cosmos, type ReferenceExpr, type ReferenceExpr2Kind } from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
   BasicProperty,
   CloneCountProperty,
   ComponentParameterProperty,
+  Property,
 } from "src/ex-object/Property";
 import {
   createLibraryProject,
@@ -45,6 +46,7 @@ import {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
+import { TypesOf } from "variant";
 
 const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {
@@ -292,8 +294,15 @@ export default class Rehydrator {
   private async rehydrateReferenceExpr(
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ): Promise<ReferenceExpr> {
-    const expr2 = ReferenceExpr2[deExpr.referenceExprKind]
-    // const referenceExpr2 = ReferenceExpr2.
+    const propertyById = new Map<string, Property>();
+    const componentParameterById = new Map<string, CustomComponentParameter>();
+    const exFuncParameterById = new Map<string, ExFuncParameter>();
+
+    switch (deExpr.referenceExprKind) {
+      case "ComponentParameter": {
+        
+      }
+    }
   }
 
   private getComponent(componentId: string, componentType: string): Component {
