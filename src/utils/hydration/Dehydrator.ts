@@ -32,16 +32,20 @@ import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
-import { dexVariantTyped, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import type { VariantOf } from "variant";
+import {
+  dexVariantTyped,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
+import { variantCosmos, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
 const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
+const DehydratedExprCosmos = variantCosmos({ key: DEHYDRATED_EXPR_TAG });
 
 type DehydratedExpr_ = {
-  NumberExpr: {
+  Number: {
     id: string;
     value: number;
   };
@@ -56,17 +60,20 @@ type DehydratedExpr_ = {
   };
 };
 
-const DehydratedExpr = dexVariantTyped<
+export const DehydratedExpr = dexVariantTyped<
   DehydratedExpr_,
   typeof DEHYDRATED_EXPR_TAG
 >(DEHYDRATED_EXPR_TAG, {
-  NumberExpr: pass,
+  Number: pass,
   CallExpr: pass,
   ReferenceExpr: pass,
 });
 
-type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
-type DehydratedExprKind = DexVariantKind<typeof DehydratedExpr, typeof DEHYDRATED_EXPR_TAG>;
+export type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
+export type DehydratedExprKind = DexVariantKind<
+  typeof DehydratedExpr,
+  typeof DEHYDRATED_EXPR_TAG
+>;
 
 export interface DehydratedProject {
   id: string;
@@ -439,12 +446,13 @@ export default class Dehydrator {
 
   private dehydrateNumberExpr$(
     expr: NumberExpr
-  ): Observable<DehydratedExprKind["NumberExpr"]> {
-    return of({
-      dehydratedExprKind: "NumberExpr",
-      id: expr.id,
-      value: expr.value,
-    });
+  ): Observable<DehydratedExprKind["Number"]> {
+    return of(
+      DehydratedExpr.Number({
+        id: expr.id,
+        value: expr.value,
+      })
+    );
   }
 
   private dehydrateCallExpr$(
