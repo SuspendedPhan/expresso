@@ -42,17 +42,14 @@ const Bay7_3 = variantTyped7_<Bay7_0, typeof Bay7_Key>(Bay7_Key, {
   Bay3: pass,
 });
 
-type Bay7_3<T extends TypeNames<typeof Bay7_3> = undefined> = VariantOf<
-  typeof Bay7_3,
-  T
->;
+type Bay7_3 = VariantOf<typeof Bay7_3>;
 
-type Bay7_4 = {
+type Bay7_3Kind = {
   [K in keyof Bay7_0]: ReturnType<(typeof Bay7_3)[K]>;
 };
 
 // Client code:
-const f7_: Bay7_4["Bay3"] = Bay7_3.Bay3({
+const f7_: Bay7_3Kind["Bay3"] = Bay7_3.Bay3({
   id3: "1",
   bay00: Bay7_3.Bay2({ id2: "2" }),
 });
