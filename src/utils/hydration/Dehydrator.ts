@@ -34,13 +34,9 @@ import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
 import type { DexTypeNames } from "src/utils/utils/VariantUtils";
 import {
-  typed,
-  variant,
   type Variant,
   variantCosmos,
-  scoped,
-  type VariantOf,
-  fields
+  type VariantOf
 } from "variant";
 import { pass } from "variant/lib/typed";
 

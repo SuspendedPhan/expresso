@@ -5,6 +5,7 @@ import {
   variantCosmos,
   type TypeNames,
   type Variant,
+  type VariantModule,
   type VariantOf,
 } from "variant";
 import type { ExactDefinition } from "variant/lib/typed";
@@ -21,7 +22,13 @@ type DexVariantUnion7_<T extends Record<string, any>, Key extends string> = {
   [K in keyof T]: K extends string ? Variant<K, T[K], Key> : never;
 }[keyof T];
 
-function variantTyped7_<T extends Record<string, any>, Key extends string>(
+/**
+ * Creates a type-first variant module.
+ * @param key 
+ * @param obj 
+ * @returns 
+ */
+function dexVariantTyped7_<T extends Record<string, any>, Key extends string>(
   key: Key,
   obj: ExactDefinition<DexVariantUnion7_<T, Key>, Key>
 ) {
@@ -30,6 +37,20 @@ function variantTyped7_<T extends Record<string, any>, Key extends string>(
   return cosmos.variant(cosmos.typed<VUnion>(obj));
 }
 
+/**
+ * Given:
+ *   The desired Expr definition is: { Number: {}, Call: {} }`;
+ *   const Expr = variant(...);
+ *   type ExprKind = DexVariant<...>;
+ * Then:
+ *   const expr: ExprKind["Number"] = Expr.Number();
+ */
+type DexVariantKind<T extends VariantModule<K>, K extends string> = {
+  [K in keyof T]: ReturnType<(T)[K]>;
+};
+
+// Now the declaration code:
+
 const Bay7_Key = "type2";
 
 type Bay7_0 = {
@@ -37,23 +58,19 @@ type Bay7_0 = {
   Bay3: { id3: string; bay00: Bay7_3 };
 };
 
-const Bay7_3 = variantTyped7_<Bay7_0, typeof Bay7_Key>(Bay7_Key, {
+const Bay7_3 = dexVariantTyped7_<Bay7_0, typeof Bay7_Key>(Bay7_Key, {
   Bay2: pass,
   Bay3: pass,
 });
 
 type Bay7_3 = VariantOf<typeof Bay7_3>;
-
-type Bay7_3Kind = {
-  [K in keyof Bay7_0]: ReturnType<(typeof Bay7_3)[K]>;
-};
+type Bay7_3Kind = DexVariantKind<typeof Bay7_3, typeof Bay7_Key>;
 
 // Client code:
 const f7_: Bay7_3Kind["Bay3"] = Bay7_3.Bay3({
   id3: "1",
   bay00: Bay7_3.Bay2({ id2: "2" }),
 });
-// const f7_: Bay7_3["Bay3"] = Bay7_3.Bay3({ id3: "1", bay00: Bay7_3.Bay2({ id2: "2" }) });
 console.log(f7_);
 
 // --------------------------------------------
