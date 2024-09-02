@@ -2,7 +2,7 @@ import {
   dexVariantTyped,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { match, matcher, pass, variantCosmos, type VariantOf } from "variant";
+import { pass, variantCosmos, type VariantOf } from "variant";
 
 // ----------------
 // Variant declaration

@@ -226,7 +226,7 @@ export default class Rehydrator {
     );
 
     const expr = await this.rehydrateExpr(deProperty.expr);
-    log55.debug("rehydrateComponentProperty.rehydrateExpr.end");
+    log55.debug("rehydrateComponentProperty.rehydrateExpr.end", expr);
     const property = await Create.Property.component(
       this.ctx,
       deProperty.id,
@@ -267,7 +267,10 @@ export default class Rehydrator {
   private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
     log55.debug("rehydrateExpr", deExpr);
     const result = DehydratedExprCosmos.matcher(deExpr)
-      .when(DehydratedExpr.Number, (deExpr) => this.rehydrateNumberExpr(deExpr))
+      .when(DehydratedExpr.Number, (deExpr) => {
+        log55.debug("rehydrateExpr.Number", deExpr);
+        return this.rehydrateNumberExpr(deExpr);
+      })
       .when(DehydratedExpr.CallExpr, (deExpr) => this.rehydrateCallExpr(deExpr))
       .when(DehydratedExpr.ReferenceExpr, (deExpr) =>
         this.rehydrateReferenceExpr(deExpr)
