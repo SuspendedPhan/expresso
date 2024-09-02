@@ -28,17 +28,18 @@ import {
 } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
-import type {
-  DehydratedBasicProperty,
-  DehydratedCloneCountProperty,
-  DehydratedComponentProperty,
-  DehydratedCustomComponent,
-  DehydratedCustomComponentParameter,
-  DehydratedExFunc,
-  DehydratedExFuncParameter,
-  DehydratedExObject,
-  DehydratedExpr,
-  DehydratedProject,
+import {
+  DehydratedExprCosmos,
+  type DehydratedBasicProperty,
+  type DehydratedCloneCountProperty,
+  type DehydratedComponentProperty,
+  type DehydratedCustomComponent,
+  type DehydratedCustomComponentParameter,
+  type DehydratedExFunc,
+  type DehydratedExFuncParameter,
+  type DehydratedExObject,
+  type DehydratedExpr,
+  type DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
@@ -251,7 +252,8 @@ export default class Rehydrator {
   @loggedMethod
   private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
     log55.debug("rehydrateExpr", deExpr);
-    // return 
+    // const result = DehydratedExprCosmos.matcher(deExpr)
+    //   .when("Number", (deExpr) => this.rehydrateNumberExpr(deExpr));
     switch (deExpr.type) {
       case "NumberExpr":
         const newLocal = await this.rehydrateNumberExpr(deExpr);

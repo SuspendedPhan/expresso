@@ -2,7 +2,7 @@ import {
   dexVariantTyped,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { pass, type VariantOf } from "variant";
+import { match, matcher, pass, variantCosmos, type VariantOf } from "variant";
 
 // ----------------
 // Variant declaration
@@ -39,3 +39,21 @@ type ExprKind = DexVariantKind<typeof Expr, typeof EXPR_TAG>;
 const a: ExprKind["Number"] = Expr.Number({ id: "1", value: 1 });
 const b: ExprKind["Number"] = Expr.Number({ id: "2", value: 2 });
 const c: ExprKind["CallExpr"] = Expr.CallExpr({ id: "3", args: [a, b] });
+
+const m = c as Expr;
+const ExprCosmos = variantCosmos({ key: EXPR_TAG });
+ExprCosmos.matcher(m).with({
+  Number: ({ id, value }) => console.log(`Number: ${id}, ${value}`),
+  CallExpr: ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`),
+});
+
+ExprCosmos.matcher(m)
+  .when(Expr.Number, ({ id, value }) => console.log(`Number: ${id}, ${value}`))
+  .when(Expr.CallExpr, ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`))
+  .complete();
+
+// .with({
+//   Number: ({ id, value }) => console.log(`Number: ${id}, ${value}`),
+//   CallExpr: ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`),
+// })
+// .complete();

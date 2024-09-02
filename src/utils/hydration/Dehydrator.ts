@@ -42,7 +42,6 @@ import { pass } from "variant/lib/typed";
 const log55 = log5("Dehydrator.ts");
 
 const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
-const DehydratedExprCosmos = variantCosmos({ key: DEHYDRATED_EXPR_TAG });
 
 type DehydratedExpr_ = {
   Number: {
@@ -74,6 +73,7 @@ export type DehydratedExprKind = DexVariantKind<
   typeof DehydratedExpr,
   typeof DEHYDRATED_EXPR_TAG
 >;
+export const DehydratedExprCosmos = variantCosmos({ key: DEHYDRATED_EXPR_TAG });
 
 export interface DehydratedProject {
   id: string;
