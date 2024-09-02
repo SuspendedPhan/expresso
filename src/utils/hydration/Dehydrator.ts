@@ -475,7 +475,7 @@ export default class Dehydrator {
 
   private dehydrateNumberExpr$(
     expr: NumberExpr
-  ): Observable<DehydratedExpr<"Number">> {
+  ): Observable<DehydratedExprKind["NumberExpr"]> {
     return of({
       dehydratedExprKind: "NumberExpr",
       id: expr.id,
@@ -485,17 +485,17 @@ export default class Dehydrator {
 
   private dehydrateCallExpr$(
     expr: CallExpr
-  ): Observable<DehydratedExpr<"Call">> {
+  ): Observable<DehydratedExprKind["CallExpr"]> {
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
         return this.dehydrateArgs$(args);
       })
     );
 
-    const result: Observable<DehydratedExpr<"Call">> = deArgs$.pipe(
+    const result: Observable<DehydratedExprKind["CallExpr"]> = deArgs$.pipe(
       map((deArgs) => {
         return {
-          type: "CallExpr",
+          dehydratedExprKind: "CallExpr",
           id: expr.id,
           args: deArgs,
         };
@@ -507,11 +507,11 @@ export default class Dehydrator {
 
   private dehydrateReferenceExpr$(
     expr: ReferenceExpr
-  ): Observable<DehydratedReferenceExpr> {
+  ): Observable<DehydratedExprKind["ReferenceExpr"]> {
     console.log(expr.reference);
 
     return of({
-      type: "ReferenceExpr",
+      dehydratedExprKind: "ReferenceExpr",
       id: expr.id,
       targetId: expr.reference.target.id,
       referenceExprKind: expr.reference.type,
