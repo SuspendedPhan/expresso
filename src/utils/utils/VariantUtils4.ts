@@ -6,7 +6,7 @@ import type { ExactDefinition } from "variant/lib/typed";
  * @param T Variant type defintion.
  * @param Key Discriminator.
  */
-type DexVariantUnion<T extends Record<string, any>, Key extends string> = {
+export type DexVariantUnion<T extends Record<string, any>, Key extends string> = {
   [K in keyof T]: K extends string ? Variant<K, T[K], Key> : never;
 }[keyof T];
 
@@ -16,7 +16,7 @@ type DexVariantUnion<T extends Record<string, any>, Key extends string> = {
  * @param obj
  * @returns
  */
-function dexVariantTyped<T extends Record<string, any>, Key extends string>(
+export function dexVariantTyped<T extends Record<string, any>, Key extends string>(
   key: Key,
   obj: ExactDefinition<DexVariantUnion<T, Key>, Key>
 ) {
@@ -33,6 +33,6 @@ function dexVariantTyped<T extends Record<string, any>, Key extends string>(
  * Then:
  *   const expr: ExprKind["Number"] = Expr.Number();
  */
-type DexVariantKind<T extends VariantModule<K>, K extends string> = {
+export type DexVariantKind<T extends VariantModule<K>, K extends string> = {
   [K in keyof T]: ReturnType<T[K]>;
 };

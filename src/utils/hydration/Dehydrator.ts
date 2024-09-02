@@ -32,48 +32,77 @@ import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
-import type { DexTypeNames } from "src/utils/utils/VariantUtils";
-import {
-  type Variant,
-  variantCosmos,
-  type VariantOf
-} from "variant";
+import { dexVariantTyped, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import type { VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-const DEHYDRATED_EXPR_KIND = "type";
-type DEHYDRATED_EXPR_KIND = typeof DEHYDRATED_EXPR_KIND;
+const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
 
-export const DehydratedExprCosmos = variantCosmos({
-  key: DEHYDRATED_EXPR_KIND,
+type DehydratedExpr_ = {
+  NumberExpr: {
+    id: string;
+    value: number;
+  };
+  CallExpr: {
+    id: string;
+    args: DehydratedExpr[];
+  };
+  ReferenceExpr: {
+    id: string;
+    targetId: string;
+    referenceExprKind: string;
+  };
+};
+
+const DehydratedExpr = dexVariantTyped<
+  DehydratedExpr_,
+  typeof DEHYDRATED_EXPR_TAG
+>(DEHYDRATED_EXPR_TAG, {
+  NumberExpr: pass,
+  CallExpr: pass,
+  ReferenceExpr: pass,
 });
 
-type DehydratedExprVariant<Type extends string, Fields extends {}> = Variant<
-  Type,
-  Fields,
-  DEHYDRATED_EXPR_KIND
->;
+type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
+type DehydratedExprKind = DexVariantKind<typeof DehydratedExpr, typeof DEHYDRATED_EXPR_TAG>;
 
-type DehydratedExpr_ =
-  | DehydratedExprVariant<"Number", { id: string; value: number }>
-  | DehydratedExprVariant<"Call", { id: string; args: DehydratedExpr[] }>
-  | DehydratedExprVariant<
-      "ReferenceExpr",
-      { id: string; targetId: string; referenceExprKind: string }
-    >;
+// --------------------------------------------
+// Take 1
+// --------------------------------------------
 
-const DehydratedExpr = DehydratedExprCosmos.variant(
-  DehydratedExprCosmos.typed<DehydratedExpr_>({
-    Number: pass,
-    Call: pass,
-    ReferenceExpr: pass,
-  })
-);
+// type DEHYDRATED_EXPR_KIND = typeof DEHYDRATED_EXPR_KIND;
 
-type DehydratedExpr<
-  T extends DexTypeNames<typeof DehydratedExpr, DEHYDRATED_EXPR_KIND> = undefined
-> = VariantOf<typeof DehydratedExpr, T>;
+// export const DehydratedExprCosmos = variantCosmos({
+//   key: DEHYDRATED_EXPR_KIND,
+// });
+
+// type DehydratedExprVariant<Type extends string, Fields extends {}> = Variant<
+//   Type,
+//   Fields,
+//   DEHYDRATED_EXPR_KIND
+// >;
+
+// type DehydratedExpr_ =
+//   | DehydratedExprVariant<"Number", { id: string; value: number }>
+//   | DehydratedExprVariant<"Call", { id: string; args: DehydratedExpr[] }>
+//   | DehydratedExprVariant<
+//       "ReferenceExpr",
+//       { id: string; targetId: string; referenceExprKind: string }
+//     >;
+
+// const DehydratedExpr = DehydratedExprCosmos.variant(
+//   DehydratedExprCosmos.typed<DehydratedExpr_>({
+//     Number: pass,
+//     Call: pass,
+//     ReferenceExpr: pass,
+//   })
+// );
+
+// type DehydratedExpr<
+//   T extends DexTypeNames<typeof DehydratedExpr, DEHYDRATED_EXPR_KIND> = undefined
+// > = VariantOf<typeof DehydratedExpr, T>;
 
 export interface DehydratedProject {
   id: string;
@@ -444,7 +473,9 @@ export default class Dehydrator {
     }
   }
 
-  private dehydrateNumberExpr$(expr: NumberExpr): Observable<DehydratedExpr<"Number">> {
+  private dehydrateNumberExpr$(
+    expr: NumberExpr
+  ): Observable<DehydratedExpr<"Number">> {
     return of({
       dehydratedExprKind: "NumberExpr",
       id: expr.id,
@@ -452,7 +483,9 @@ export default class Dehydrator {
     });
   }
 
-  private dehydrateCallExpr$(expr: CallExpr): Observable<DehydratedExpr<"Call">> {
+  private dehydrateCallExpr$(
+    expr: CallExpr
+  ): Observable<DehydratedExpr<"Call">> {
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
         return this.dehydrateArgs$(args);
