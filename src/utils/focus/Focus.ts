@@ -2,12 +2,13 @@ import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
+import { Focus2, FOCUS2_TAG } from "src/utils/focus/FocusKind2";
 import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
+import { log5 } from "src/utils/utils/Log5";
 import type { OBS, SUB } from "src/utils/utils/Utils";
+import type { EditableFocus } from "src/utils/views/Field";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
-import type { EditableFocus } from "src/utils/views/Field";
-import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("Focus.ts");
 
@@ -70,10 +71,16 @@ export function createFocusContext(ctx: MainContext) {
       );
     },
 
-    setFocus(focus: Focus) {
-      log55.debug("setFocus", focus);
-      focusStack.push(focus);
-      data.focus$.next(focus);
+    setFocus(focus: Focus | Focus2) {
+      let focus3: Focus;
+      if (FOCUS2_TAG in focus) {
+        focus3 = FocusKind.Focus2({ focus2: focus });
+      } else {
+        focus3 = focus;
+      }
+      log55.debug("setFocus", focus3);
+      focusStack.push(focus3);
+      data.focus$.next(focus3);
     },
   };
 }

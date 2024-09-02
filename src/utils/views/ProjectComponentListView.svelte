@@ -11,6 +11,10 @@
   const componentL$ = project$.pipe(
     switchMap((project) => project.componentArr$)
   );
+
+  const addComponentFocused$ = ctx.focusCtx.isFocused$(
+    ProjectComponentListView
+  );
 </script>
 
 <MainPane>

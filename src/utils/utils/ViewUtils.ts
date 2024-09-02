@@ -16,7 +16,7 @@ export function activeWindowToSvelteComponent(activeWindow: DexWindow): any {
       return TestView;
     case DexWindow.ProjectEditor:
       return EditorView;
-    case DexWindow.ProjectComponentList:
+    case DexWindow.ProjectComponents:
       return ProjectComponentListView;
     case DexWindow.ProjectFunctionList:
       return ProjectExFuncListView;

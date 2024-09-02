@@ -52,7 +52,7 @@
           },
         });
       case ExprType.ReferenceExpr:
-        return of(expr.name$);
+        return expr.name$;
       default:
         return of("unknown");
     }

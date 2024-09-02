@@ -41,7 +41,7 @@ function register(ctx: MainContext) {
   keyboardCtx
     .onKeydown$("c", focusCtx.mapFocus$(FocusKind.is.ProjectNav))
     .subscribe(() => {
-      ctx.viewCtx.activeWindow$.next(DexWindow.ProjectComponentList);
+      ctx.viewCtx.activeWindow$.next(DexWindow.ProjectComponents);
       focusCtx.popFocus();
     });
 

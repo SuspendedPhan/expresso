@@ -6,7 +6,7 @@ import { createCommandCardContext, type CommandCardContext } from "src/utils/uti
 
 export enum DexWindow {
   ProjectEditor,
-  ProjectComponentList,
+  ProjectComponents,
   ProjectFunctionList,
   LibraryProjectList,
   LibraryComponentList,
@@ -46,7 +46,7 @@ export default class MainViewContext {
     
     const navItems0: NavItem[] = [
       { label: "Editor", window: DexWindow.ProjectEditor, iconClasses: "fa-solid fa-file", section: section0 },
-      { label: "Components", window: DexWindow.ProjectComponentList, iconClasses: "fa-solid fa-cube", section: section0 },
+      { label: "Components", window: DexWindow.ProjectComponents, iconClasses: "fa-solid fa-cube", section: section0 },
       { label: "Functions", window: DexWindow.ProjectFunctionList, iconClasses: "fa-solid fa-code", section: section0 },
       // { label: "TestView", window: DexWindow.TestView, iconClasses: "fa-solid fa-file", section: section0 },
     ];
