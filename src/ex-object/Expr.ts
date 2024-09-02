@@ -4,9 +4,8 @@ import type { ExFuncParameter } from "src/ex-object/ExFunc";
 import {
   ExItemType,
   ExprType,
-  type ExItem,
   type ExItemBase,
-  type Expr,
+  type Expr
 } from "src/ex-object/ExItem";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -14,7 +13,6 @@ import { Utils } from "src/utils/utils/Utils";
 import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
 import {
   fields,
-  variant,
   variantCosmos,
   type VariantOf
 } from "variant";
@@ -36,8 +34,7 @@ export async function createReferenceExpr(
   ctx: MainContext,
   data: {
     id?: string;
-    parent: ExItem;
-    reference: ReferenceExpr2;
+    reference2: ReferenceExpr2;
   }
 ): Promise<ReferenceExpr> {
   const id = data.id ?? Utils.createId("reference-expr");
@@ -46,7 +43,7 @@ export async function createReferenceExpr(
     ...base,
     itemType: ExItemType.Expr,
     exprType: ExprType.ReferenceExpr,
-    reference: data.reference,
+    reference: data.reference2,
   };
 }
 

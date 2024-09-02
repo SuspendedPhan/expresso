@@ -8,13 +8,13 @@ import { ExItemFn, ExItemType, type Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import {
   createReferenceExpr,
-  ReferenceExpr2
+  ReferenceExpr2,
+  ReferenceExpr2Cosmos
 } from "src/ex-object/Expr";
 import { PropertyFns } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
-import { match } from "variant";
 
 const log55 = log5("ExprCommand.ts");
 
@@ -122,7 +122,7 @@ async function createReferenceExprCommand(
   reference2: ReferenceExpr2,
   parent: ExObject | CustomComponent
 ): Promise<ExprCommand> {
-  const name = await match(reference2, {
+  const name = await ReferenceExpr2Cosmos.match(reference2, {
     Property: async ({ target: property }) => {
       return await firstValueFrom(PropertyFns.getName$(property));
     },
@@ -140,8 +140,7 @@ async function createReferenceExprCommand(
     label,
     execute: async () => {
       const referenceExpr = await createReferenceExpr(ctx, {
-        parent,
-        reference: reference2,
+        reference2: reference2,
       });
       ctx.mutator.replaceExpr(expr, referenceExpr);
     },

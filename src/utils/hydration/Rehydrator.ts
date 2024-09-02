@@ -13,10 +13,19 @@ import {
   type CustomComponent,
   type CustomComponentParameter,
 } from "src/ex-object/Component";
-import { createExFunc, createExFuncParameter, type ExFunc, type ExFuncParameter } from "src/ex-object/ExFunc";
+import {
+  createExFunc,
+  createExFuncParameter,
+  type ExFunc,
+  type ExFuncParameter,
+} from "src/ex-object/ExFunc";
 import type { CallExpr, Expr, NumberExpr } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { ReferenceExpr2, ReferenceExpr2Cosmos, type ReferenceExpr, type ReferenceExpr2Kind } from "src/ex-object/Expr";
+import {
+  createReferenceExpr,
+  ReferenceExpr2,
+  type ReferenceExpr,
+} from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
   BasicProperty,
@@ -46,12 +55,13 @@ import {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
-import { TypesOf } from "variant";
 
 const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {
   private customComponentById = new Map<string, CustomComponent>();
   private componentParameterById = new Map<string, ComponentParameter>();
+  private propertyById = new Map<string, Property>();
+  private exFuncParameterById = new Map<string, ExFuncParameter>();
 
   public constructor(private readonly ctx: MainContext) {}
 
@@ -259,7 +269,9 @@ export default class Rehydrator {
     const result = DehydratedExprCosmos.matcher(deExpr)
       .when(DehydratedExpr.Number, (deExpr) => this.rehydrateNumberExpr(deExpr))
       .when(DehydratedExpr.CallExpr, (deExpr) => this.rehydrateCallExpr(deExpr))
-      .when(DehydratedExpr.ReferenceExpr, (deExpr) => this.rehydrateReferenceExpr(deExpr))
+      .when(DehydratedExpr.ReferenceExpr, (deExpr) =>
+        this.rehydrateReferenceExpr(deExpr)
+      )
       .complete();
     return result;
   }
@@ -294,14 +306,45 @@ export default class Rehydrator {
   private async rehydrateReferenceExpr(
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ): Promise<ReferenceExpr> {
-    const propertyById = new Map<string, Property>();
-    const componentParameterById = new Map<string, CustomComponentParameter>();
-    const exFuncParameterById = new Map<string, ExFuncParameter>();
+    const reference2 = this.rehydrateReferenceExpr2(this, deExpr);
+    const expr = createReferenceExpr(this.ctx, { reference2 });
+    return expr;
+  }
 
+  private rehydrateReferenceExpr2(
+    ctx: Rehydrator,
+    deExpr: DehydratedExprKind["ReferenceExpr"]
+  ) {
     switch (deExpr.referenceExprKind) {
       case "ComponentParameter": {
-        
+        const target = ctx.componentParameterById.get(deExpr.targetId);
+        assert(
+          target !== undefined,
+          `Component parameter not found: ${deExpr.targetId}`
+        );
+        assert(
+          target.componentParameterKind ===
+            ComponentParameterKind.CustomComponentParameter
+        );
+        return ReferenceExpr2.ComponentParameter({ target });
       }
+      case "ExFuncParameter": {
+        const target = ctx.exFuncParameterById.get(deExpr.targetId);
+        assert(
+          target !== undefined,
+          `ExFunc parameter not found: ${deExpr.targetId}`
+        );
+        return ReferenceExpr2.ExFuncParameter({ target });
+      }
+      case "Property": {
+        const target = ctx.propertyById.get(deExpr.targetId);
+        assert(target !== undefined, `Property not found: ${deExpr.targetId}`);
+        return ReferenceExpr2.Property({ target });
+      }
+      default:
+        throw new Error(
+          `Unknown reference expr kind: ${deExpr.referenceExprKind}`
+        );
     }
   }
 
