@@ -68,42 +68,6 @@ const DehydratedExpr = dexVariantTyped<
 type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
 type DehydratedExprKind = DexVariantKind<typeof DehydratedExpr, typeof DEHYDRATED_EXPR_TAG>;
 
-// --------------------------------------------
-// Take 1
-// --------------------------------------------
-
-// type DEHYDRATED_EXPR_KIND = typeof DEHYDRATED_EXPR_KIND;
-
-// export const DehydratedExprCosmos = variantCosmos({
-//   key: DEHYDRATED_EXPR_KIND,
-// });
-
-// type DehydratedExprVariant<Type extends string, Fields extends {}> = Variant<
-//   Type,
-//   Fields,
-//   DEHYDRATED_EXPR_KIND
-// >;
-
-// type DehydratedExpr_ =
-//   | DehydratedExprVariant<"Number", { id: string; value: number }>
-//   | DehydratedExprVariant<"Call", { id: string; args: DehydratedExpr[] }>
-//   | DehydratedExprVariant<
-//       "ReferenceExpr",
-//       { id: string; targetId: string; referenceExprKind: string }
-//     >;
-
-// const DehydratedExpr = DehydratedExprCosmos.variant(
-//   DehydratedExprCosmos.typed<DehydratedExpr_>({
-//     Number: pass,
-//     Call: pass,
-//     ReferenceExpr: pass,
-//   })
-// );
-
-// type DehydratedExpr<
-//   T extends DexTypeNames<typeof DehydratedExpr, DEHYDRATED_EXPR_KIND> = undefined
-// > = VariantOf<typeof DehydratedExpr, T>;
-
 export interface DehydratedProject {
   id: string;
   name: string;
