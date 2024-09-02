@@ -52,6 +52,17 @@ ExprCosmos.matcher(m)
   .when(Expr.CallExpr, ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`))
   .complete();
 
+ExprCosmos.matcher(m)
+  .with({
+    Number: ({ id, value }) => console.log(`Number: ${id}, ${value}`),
+    CallExpr: ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`),
+  });
+
+ExprCosmos.match(m, {
+  Number: ({ id, value }) => console.log(`Number: ${id}, ${value}`),
+  CallExpr: ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`),
+});
+
 // .with({
 //   Number: ({ id, value }) => console.log(`Number: ${id}, ${value}`),
 //   CallExpr: ({ id, args }) => console.log(`CallExpr: ${id}, ${args}`),

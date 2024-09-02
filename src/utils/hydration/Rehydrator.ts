@@ -29,6 +29,7 @@ import {
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import {
+  DehydratedExpr,
   DehydratedExprCosmos,
   type DehydratedBasicProperty,
   type DehydratedCloneCountProperty,
@@ -38,7 +39,7 @@ import {
   type DehydratedExFunc,
   type DehydratedExFuncParameter,
   type DehydratedExObject,
-  type DehydratedExpr,
+  type DehydratedExprKind,
   type DehydratedProject,
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
@@ -252,23 +253,17 @@ export default class Rehydrator {
   @loggedMethod
   private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
     log55.debug("rehydrateExpr", deExpr);
-    // const result = DehydratedExprCosmos.matcher(deExpr)
-    //   .when("Number", (deExpr) => this.rehydrateNumberExpr(deExpr));
-    switch (deExpr.type) {
-      case "NumberExpr":
-        const newLocal = await this.rehydrateNumberExpr(deExpr);
-        log55.debug("rehydrateExpr.rehydrateNumberExpr", newLocal);
-        return newLocal;
-      case "CallExpr":
-        return this.rehydrateCallExpr(deExpr);
-      default:
-        throw new Error(`Unknown expr type: ${deExpr}`);
-    }
+    const result = DehydratedExprCosmos.matcher(deExpr)
+      .when(DehydratedExpr.Number, (deExpr) => this.rehydrateNumberExpr(deExpr))
+      .when(DehydratedExpr.CallExpr, (deExpr) => this.rehydrateCallExpr(deExpr))
+      .when(DehydratedExpr.ReferenceExpr, (deExpr) => this.rehydrateReferenceExpr(deExpr))
+      .complete();
+    return result;
   }
 
   @loggedMethod
   private async rehydrateNumberExpr(
-    deExpr: DehydratedNumberExpr
+    deExpr: DehydratedExprKind["Number"]
   ): Promise<NumberExpr> {
     const newLocal = this.ctx.objectFactory.createNumberExpr(
       deExpr.value,
@@ -280,7 +275,7 @@ export default class Rehydrator {
 
   @loggedMethod
   private async rehydrateCallExpr(
-    deExpr: DehydratedCallExpr
+    deExpr: DehydratedExprKind["CallExpr"]
   ): Promise<CallExpr> {
     const argPL = deExpr.args.map((arg) => this.rehydrateExpr(arg));
     const argL = await Promise.all(argPL);
@@ -290,6 +285,13 @@ export default class Rehydrator {
     });
     const callExpr = createSystemCallExpr(this.ctx, { base: callExprBase });
     return callExpr;
+  }
+
+  @loggedMethod
+  private async rehydrateReferenceExpr(
+    deExpr: DehydratedExprKind["ReferenceExpr"]
+  ): Promise<ReferenceExpr> {
+    // const referenceExpr2 = 
   }
 
   private getComponent(componentId: string, componentType: string): Component {

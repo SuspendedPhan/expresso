@@ -1,11 +1,21 @@
 import { firstValueFrom } from "rxjs";
 import type { CustomComponentParameter } from "src/ex-object/Component";
 import type { ExFuncParameter } from "src/ex-object/ExFunc";
-import { ExItemType, ExprType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import {
+  ExItemType,
+  ExprType,
+  type ExItem,
+  type ExItemBase,
+  type Expr,
+} from "src/ex-object/ExItem";
 import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
-import { fields, variantModule, type TypeNames, type VariantOf } from "variant";
+import {
+  fields,
+  variant,
+  type VariantOf
+} from "variant";
 
 export namespace ExprFuncs {
   export async function getProperty(expr: Expr) {
@@ -20,11 +30,14 @@ export namespace ExprFuncs {
   }
 }
 
-export async function createReferenceExpr(ctx: MainContext, data: {
-  id?: string;
-  parent: ExItem;
-  reference: ReferenceExpr2;
-}): Promise<ReferenceExpr> {
+export async function createReferenceExpr(
+  ctx: MainContext,
+  data: {
+    id?: string;
+    parent: ExItem;
+    reference: ReferenceExpr2;
+  }
+): Promise<ReferenceExpr> {
   const id = data.id ?? Utils.createId("reference-expr");
   const base = await ctx.objectFactory.createExItemBase(id);
   return {
@@ -41,11 +54,10 @@ export interface ReferenceExpr extends ExItemBase {
   reference: ReferenceExpr2;
 }
 
-export const ReferenceExpr2 = variantModule({
-  Property: fields<{target: Property}>(),
-  ComponentParameter: fields<{target: CustomComponentParameter}>(),
-  ExFuncParameter: fields<{target: ExFuncParameter}>(),
+export const ReferenceExpr2 = variant({
+  Property: fields<{ target: Property }>(),
+  ComponentParameter: fields<{ target: CustomComponentParameter }>(),
+  ExFuncParameter: fields<{ target: ExFuncParameter }>(),
 });
 
-export type ReferenceExpr2<T extends TypeNames<typeof ReferenceExpr2> = undefined>
-    = VariantOf<typeof ReferenceExpr2, T>;
+export type ReferenceExpr2 = VariantOf<typeof ReferenceExpr2>;
