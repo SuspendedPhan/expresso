@@ -51,6 +51,8 @@
             return of("+");
           },
         });
+      case ExprType.ReferenceExpr:
+        return of(expr.name$);
       default:
         return of("unknown");
     }
