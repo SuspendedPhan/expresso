@@ -42,7 +42,8 @@ import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
+const DEHYDRATED_EXPR_TAG = "type";
+// const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
 
 type DehydratedExpr_ = {
   Number: {
@@ -84,8 +85,8 @@ export const DehydratedExpr2 = DehydratedExprCosmos.scoped(
     ReferenceExpr: pass,
   })
 );
-const a = DehydratedExpr2.Number({ id: "1", value: 1 });
-
+export type DehydratedExpr2 = VariantOf<typeof DehydratedExpr2>;
+export type DehydratedExpr2Kind = DexVariantKind<typeof DehydratedExpr2, typeof DEHYDRATED_EXPR_TAG>;
 
 
 export interface DehydratedProject {
