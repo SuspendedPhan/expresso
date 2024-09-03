@@ -2,13 +2,13 @@ import { BehaviorSubject, map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { ExObjectFocusFuncs } from "src/utils/focus/ExObjectFocus";
 import { ExprFocusFuncs } from "src/utils/focus/ExprFocus";
+import { Focus2 } from "src/utils/focus/Focus2";
 import { EditorFocusFuncs } from "src/utils/utils/EditorFocus";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS, SUB } from "src/utils/utils/Utils";
 import type { EditableFocus } from "src/utils/views/Field";
 import { type UnionOf } from "unionize";
 import { FocusKind } from "./FocusKind";
-import { Focus2, FOCUS2_TAG } from "src/utils/focus/Focus2";
 
 const log55 = log5("Focus.ts");
 
@@ -32,12 +32,14 @@ export function createFocusContext(ctx: MainContext) {
   const focus$ = new BehaviorSubject<Focus>(FocusKind.None());
   const data = {
     focus$: focus$,
-    focus2$: focus$.pipe(map(f => {
-      if (FocusKind.is.Focus2(f)) {
-        return f.focus2;
-      }
-      return Focus2.NotFocus2();
-    })) as OBS<Focus2>,
+    focus2$: focus$.pipe(
+      map((f) => {
+        if (FocusKind.is.Focus2(f)) {
+          return f.focus2;
+        }
+        return Focus2.NotFocus2();
+      })
+    ) as OBS<Focus2>,
     exprFocusCtx: ExprFocusFuncs.createContext(ctx),
   };
   return {
@@ -67,6 +69,10 @@ export function createFocusContext(ctx: MainContext) {
       return data.focus$.pipe(map(mapperFn));
     },
 
+    mapFocus2$<T>(mapperFn: (focus2: Focus2) => T) {
+      return data.focus2$.pipe(map(mapperFn));
+    },
+
     focusOrFalse$<T extends Focus>(
       predicate: (focus: Focus) => focus is T
     ): OBS<T | false> {
@@ -80,7 +86,7 @@ export function createFocusContext(ctx: MainContext) {
 
     setFocus(focus: Focus | Focus2) {
       let focus3: Focus;
-      if (FOCUS2_TAG in focus) {
+      if ("type" in focus) {
         focus3 = FocusKind.Focus2({ focus2: focus });
       } else {
         focus3 = focus;

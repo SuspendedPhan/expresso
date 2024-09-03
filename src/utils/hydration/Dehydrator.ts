@@ -2,10 +2,10 @@ import {
   combineLatest,
   combineLatestWith,
   map,
-  type Observable,
   of,
   switchMap,
   tap,
+  type Observable,
 } from "rxjs";
 import {
   ComponentKind,
@@ -15,9 +15,9 @@ import {
 } from "src/ex-object/Component";
 import type { ExFunc, ExFuncParameter } from "src/ex-object/ExFunc";
 import {
+  ExprType,
   type CallExpr,
   type Expr,
-  ExprType,
   type NumberExpr,
 } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
@@ -33,17 +33,15 @@ import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
 import {
-  dexVariantTyped,
   type DexVariantKind,
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import { typed, variantCosmos, type TypesOf, type VariantOf } from "variant";
+import { scoped, typed, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-const DEHYDRATED_EXPR_TAG = "type";
-// const DEHYDRATED_EXPR_TAG = "dehydratedExprKind";
+const DEHYDRATED_EXPR_TAG = "DehydratedExpr";
 
 type DehydratedExpr_ = {
   Number: {
@@ -61,33 +59,16 @@ type DehydratedExpr_ = {
   };
 };
 
-export const DehydratedExpr = dexVariantTyped<
-  DehydratedExpr_,
-  typeof DEHYDRATED_EXPR_TAG
->(DEHYDRATED_EXPR_TAG, {
-  Number: pass,
-  CallExpr: pass,
-  ReferenceExpr: pass,
-});
-
-export type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
-export type DehydratedExprKind = DexVariantKind<
-  typeof DehydratedExpr,
-  typeof DEHYDRATED_EXPR_TAG
->;
-export const DehydratedExprCosmos = variantCosmos({ key: DEHYDRATED_EXPR_TAG });
-
-export const DehydratedExpr2 = DehydratedExprCosmos.scoped(
+export const DehydratedExpr = scoped(
   DEHYDRATED_EXPR_TAG,
-  DehydratedExprCosmos.typed<DexVariantUnion<DehydratedExpr_, typeof DEHYDRATED_EXPR_TAG>>({
+  typed<DexVariantUnion<DehydratedExpr_>>({
     Number: pass,
     CallExpr: pass,
     ReferenceExpr: pass,
   })
 );
-export type DehydratedExpr2 = VariantOf<typeof DehydratedExpr2>;
-export type DehydratedExpr2Kind = DexVariantKind<typeof DehydratedExpr2, typeof DEHYDRATED_EXPR_TAG>;
-
+export type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
+export type DehydratedExprKind = DexVariantKind<typeof DehydratedExpr>;
 
 export interface DehydratedProject {
   id: string;
@@ -480,11 +461,10 @@ export default class Dehydrator {
 
     const result: Observable<DehydratedExprKind["CallExpr"]> = deArgs$.pipe(
       map((deArgs) => {
-        return {
-          dehydratedExprKind: "CallExpr",
+        return DehydratedExpr.CallExpr({
           id: expr.id,
           args: deArgs,
-        };
+        });
       })
     );
 
@@ -496,12 +476,13 @@ export default class Dehydrator {
   ): Observable<DehydratedExprKind["ReferenceExpr"]> {
     console.log(expr.reference);
 
-    return of({
-      dehydratedExprKind: "ReferenceExpr",
-      id: expr.id,
-      targetId: expr.reference.target.id,
-      referenceExprKind: expr.reference.referenceExpr2Kind,
-    });
+    return of(
+      DehydratedExpr.ReferenceExpr({
+        id: expr.id,
+        targetId: expr.reference.target.id,
+        referenceExprKind: expr.reference.referenceExpr2Kind,
+      })
+    );
   }
 
   private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {

@@ -41,7 +41,6 @@ import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import {
   DehydratedExpr,
-  DehydratedExprCosmos,
   type DehydratedBasicProperty,
   type DehydratedCloneCountProperty,
   type DehydratedComponentProperty,
@@ -55,6 +54,7 @@ import {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
+import { matcher } from "variant";
 
 const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {
@@ -266,7 +266,7 @@ export default class Rehydrator {
   @loggedMethod
   private async rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
     log55.debug("rehydrateExpr", deExpr);
-    const result = DehydratedExprCosmos.matcher(deExpr)
+    const result = matcher(deExpr)
       .when(DehydratedExpr.Number, (deExpr) => {
         log55.debug("rehydrateExpr.Number", deExpr);
         return this.rehydrateNumberExpr(deExpr);

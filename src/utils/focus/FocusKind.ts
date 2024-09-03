@@ -3,7 +3,7 @@ import type { ExFunc, ExFuncParameter } from "src/ex-object/ExFunc";
 import type { ExItem, Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { ExObjectProperty } from "src/ex-object/Property";
-import type { Focus2 } from "src/utils/focus/FocusKind2";
+import type { Focus2 } from "src/utils/focus/Focus2";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
 import { EditorFocusKind } from "src/utils/utils/EditorFocus";
 import unionize, { ofType } from "unionize";
