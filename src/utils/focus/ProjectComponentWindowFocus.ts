@@ -1,6 +1,7 @@
+import { map } from "rxjs";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
-import { FocusKind } from "src/utils/focus/FocusKind";
+import { Focus2Cosmos } from "src/utils/focus/Focus2";
 import { Focus2 } from "src/utils/focus/FocusKind2";
 import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { variantCosmos, type VariantOf } from "variant";
@@ -43,4 +44,14 @@ export function registerProjectComponentWindowFocus(ctx: MainContext) {
         )
       );
     });
+
+  keyboardCtx
+    .onKeydown2$({
+      keys: "n",
+      data$: focusCtx.focus2$.pipe(
+        map((f) => {
+          return Focus2Cosmos.isType(f, ProjectComponentWindowFocus.NewActions);
+        })
+      ),
+    })
 }

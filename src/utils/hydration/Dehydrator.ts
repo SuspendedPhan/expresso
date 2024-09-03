@@ -35,8 +35,9 @@ import { RxFns } from "src/utils/utils/Utils";
 import {
   dexVariantTyped,
   type DexVariantKind,
+  type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import { variantCosmos, type TypesOf, type VariantOf } from "variant";
+import { typed, variantCosmos, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
@@ -74,6 +75,18 @@ export type DehydratedExprKind = DexVariantKind<
   typeof DEHYDRATED_EXPR_TAG
 >;
 export const DehydratedExprCosmos = variantCosmos({ key: DEHYDRATED_EXPR_TAG });
+
+export const DehydratedExpr2 = DehydratedExprCosmos.scoped(
+  DEHYDRATED_EXPR_TAG,
+  DehydratedExprCosmos.typed<DexVariantUnion<DehydratedExpr_, typeof DEHYDRATED_EXPR_TAG>>({
+    Number: pass,
+    CallExpr: pass,
+    ReferenceExpr: pass,
+  })
+);
+const a = DehydratedExpr2.Number({ id: "1", value: 1 });
+
+
 
 export interface DehydratedProject {
   id: string;

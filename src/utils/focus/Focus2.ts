@@ -8,6 +8,7 @@ export const Focus2Cosmos = variantCosmos({
 });
 
 export const Focus2 = Focus2Cosmos.variant({
+    NotFocus2: {},
     ProjectComponentWindowFocus: payload<ProjectComponentWindowFocus>(),
 });
 
