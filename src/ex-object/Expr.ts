@@ -64,9 +64,9 @@ const REFERENCE_EXPR2_TAG = "referenceExpr2Kind";
 export const ReferenceExpr2Cosmos = variantCosmos({ key: REFERENCE_EXPR2_TAG });
 
 export const ReferenceExpr2 = ReferenceExpr2Cosmos.variant({
-  Property: fields<{ target: Property }>(),
-  ComponentParameter: fields<{ target: CustomComponentParameter }>(),
-  ExFuncParameter: fields<{ target: ExFuncParameter }>(),
+  Property: fields<{ target: Property | null }>(),
+  ComponentParameter: fields<{ target: CustomComponentParameter | null }>(),
+  ExFuncParameter: fields<{ target: ExFuncParameter|null }>(),
 });
 
 export type ReferenceExpr2 = VariantOf<typeof ReferenceExpr2>;

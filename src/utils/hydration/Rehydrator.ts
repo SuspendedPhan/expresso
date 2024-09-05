@@ -329,40 +329,13 @@ export default class Rehydrator {
   }
 
   private rehydrateReferenceExpr2(
-    ctx: Rehydrator,
+    _ctx: Rehydrator,
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ) {
-    switch (deExpr.referenceExprKind) {
-      case "ComponentParameter": {
-        const target = ctx.componentParameterById.get(deExpr.targetId);
-        assert(
-          target !== undefined,
-          `Component parameter not found: ${deExpr.targetId}`
-        );
-        assert(
-          target.componentParameterKind ===
-            ComponentParameterKind.CustomComponentParameter
-        );
-        return ReferenceExpr2.ComponentParameter({ target });
-      }
-      case "ExFuncParameter": {
-        const target = ctx.exFuncParameterById.get(deExpr.targetId);
-        assert(
-          target !== undefined,
-          `ExFunc parameter not found: ${deExpr.targetId}`
-        );
-        return ReferenceExpr2.ExFuncParameter({ target });
-      }
-      case "Property": {
-        const target = ctx.propertyById.get(deExpr.targetId);
-        assert(target !== undefined, `Property not found: ${deExpr.targetId}`);
-        return ReferenceExpr2.Property({ target });
-      }
-      default:
-        throw new Error(
-          `Unknown reference expr kind: ${deExpr.referenceExprKind}`
-        );
-    }
+    const creator = ReferenceExpr2[deExpr.referenceExprKind];
+    const reference = creator({ target: null });
+    this.referenceByTargetId.set(deExpr.targetId, reference);
+    return reference;
   }
 
   private getComponent(componentId: string, componentType: string): Component {
