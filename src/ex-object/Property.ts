@@ -9,7 +9,7 @@ import assert from "assert-ts";
 import { firstValueFrom, of } from "rxjs";
 import {
   ComponentParameterFns,
-  type ComponentParameter,
+  type ComponentParameterFactory,
   type CustomComponent
 } from "src/ex-object/Component";
 import {

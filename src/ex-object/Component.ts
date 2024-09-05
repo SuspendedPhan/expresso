@@ -5,7 +5,10 @@ import { Property, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
-import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+import {
+  dexScopedVariant,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
 import { fields, variant, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
@@ -52,29 +55,37 @@ export interface ComponentParameterCreationArgs {
   };
 }
 
-export const ComponentParameter = {
-  creators: variant({
+export const ComponentParameterFactory = dexScopedVariant(
+  "ComponentParameter",
+  {
     Canvas: fields<CanvasComponentParameter>(),
     Custom: fields<CustomComponentParameter>(),
-  }),
+  }
+);
 
-  creators2: {
-    async Custom(creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]) {
-      const creationArgs2: Required<ComponentParameterCreationArgs["CustomComponentParameter"]> = {
-        id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
-        name: creationArgs.name ?? "Parameter",
-      };
-      const parameter: CustomComponentParameter = {
-        id: creationArgs2.id,
-        name$: new BehaviorSubject(creationArgs2.name),
-      };
-      return parameter;
-    }
+export type ComponentParameter = VariantOf<typeof ComponentParameterFactory>;
+export type ComponentParameterKind = DexVariantKind<
+  typeof ComponentParameterFactory
+>;
+
+export const ComponentParameterFactory2 = {
+  async Custom(
+    _ctx: MainContext,
+    creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]
+  ) {
+    const creationArgs2: Required<
+      ComponentParameterCreationArgs["CustomComponentParameter"]
+    > = {
+      id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
+      name: creationArgs.name ?? "Parameter",
+    };
+    const parameter: CustomComponentParameter = {
+      id: creationArgs2.id,
+      name$: new BehaviorSubject(creationArgs2.name),
+    };
+    return parameter;
   },
 };
-
-export type ComponentParameter = VariantOf<typeof ComponentParameter.creators>;
-export type ComponentParameterKind = DexVariantKind<typeof ComponentParameter.creators>;
 
 export interface ComponentCreationArgs {
   Custom: {
@@ -87,13 +98,16 @@ export interface ComponentCreationArgs {
 }
 
 export const Component = {
-  creators: variant({
+  creators: dexScopedVariant("Component", {
     CanvasComponent: fields<CanvasComponent>(),
     CustomComponent: fields<CustomComponent>(),
   }),
 
   creators2: {
-    async CustomComponent(ctx: MainContext, creationArgs: ComponentCreationArgs["Custom"]) {
+    async CustomComponent(
+      ctx: MainContext,
+      creationArgs: ComponentCreationArgs["Custom"]
+    ) {
       const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
         id: creationArgs.id ?? Utils.createId("custom-component"),
         name: creationArgs.name ?? "Component",
@@ -111,7 +125,7 @@ export const Component = {
         properties$: new BehaviorSubject(creationArgs2.properties),
 
         async addParameterBlank() {
-          const parameter = await createCustomComponentParameter(ctx, {});
+          const parameter = await ComponentParameterFactory2.Custom(ctx, {});
           const parameters = await firstValueFrom(component.parameters$);
           this.parameters$.next([...parameters, parameter]);
           return parameter;
@@ -142,7 +156,7 @@ export const CanvasComponentStore = {
     id: "circle",
     parent$: of(null),
     parameters: [
-      ComponentParameter.creators.Canvas({
+      ComponentParameterFactory.creators.Canvas({
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {

@@ -9,7 +9,7 @@ import {
   CreateComponent,
   createCustomComponentParameter,
   type Component,
-  type ComponentParameter,
+  type ComponentParameterFactory,
   type CustomComponent,
   type CustomComponentParameter,
 } from "src/ex-object/Component";
