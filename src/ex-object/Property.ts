@@ -17,14 +17,29 @@ import {
   type OBS,
   type SUB,
 } from "src/utils/utils/Utils";
+import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { fields, variant, type VariantOf } from "variant";
 
 const log55 = log5("Property.ts");
-// 
 
-export type Property =
-  | ComponentParameterProperty
-  | BasicProperty
-  | CloneCountProperty;
+export const Property = variant({
+  ComponentParameterProperty: fields<{
+    componentParameter: ComponentParameter,
+    expr$: SUB<Expr>,
+  }>(),
+
+  BasicProperty: fields<{
+    name$: SUB<string>,
+    expr$: SUB<Expr>,
+  }>(),
+
+  CloneCountProperty: fields<{
+    expr$: SUB<Expr>,
+  }>(),
+});
+
+export type Property = VariantOf<typeof Property>;
+export type PropertyKind = DexVariantKind<typeof Property>;
 
 export enum PropertyType {
   ComponentProperty,
