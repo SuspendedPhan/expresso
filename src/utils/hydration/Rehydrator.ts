@@ -24,8 +24,7 @@ import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import {
   createReferenceExpr,
   ReferenceExpr2,
-  type ReferenceExpr,
-  type ReferenceExpr2Kind,
+  type ReferenceExpr
 } from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
@@ -55,16 +54,23 @@ import {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
-import { matcher, type TypesOf } from "variant";
+import { matcher } from "variant";
 
 const log55 = log5("Rehydrator.ts");
+
+interface RehydratedReferenceExpr {
+  referenceExpr2: ReferenceExpr2;
+  dehydratedReferenceExpr: DehydratedExprKind["ReferenceExpr"];
+}
+
 export default class Rehydrator {
   private customComponentById = new Map<string, CustomComponent>();
   private componentParameterById = new Map<string, ComponentParameter>();
   private propertyById = new Map<string, Property>();
   private exFuncParameterById = new Map<string, ExFuncParameter>();
 
-  private referenceByTargetId = new Map<string, ReferenceExpr2>(); // id could be id of `CustomComponentParameter | ExFuncParameter | Property`
+  private rehydratedReferenceExprs = new Array<RehydratedReferenceExpr>();
+  private targetById = new Map<string, ComponentParameter | ExFuncParameter | Property>();
 
   public constructor(private readonly ctx: MainContext) {}
 
@@ -90,6 +96,8 @@ export default class Rehydrator {
     );
     const rootExObjects = await Promise.all(rootExObjects$P);
 
+    this.rehydrateTargets();
+
     const project = CreateProject.from(this.ctx, {
       rootExObjects,
       componentArr: customComponentArr,
@@ -107,6 +115,13 @@ export default class Rehydrator {
     const library = await firstValueFrom(this.ctx.library$);
     library.addProject(libraryProject);
     return libraryProject;
+  }
+
+  private async rehydrateTargets() {
+    for (const reRefExpr of this.rehydratedReferenceExprs) {
+      const target = this.targetById.get(reRefExpr.dehydratedReferenceExpr.targetId);
+      reRefExpr.referenceExpr2.target = target as any;
+    }
   }
 
   public async rehydrateExFunc(deExFunc: DehydratedExFunc): Promise<ExFunc> {
@@ -334,7 +349,10 @@ export default class Rehydrator {
   ) {
     const creator = ReferenceExpr2[deExpr.referenceExprKind];
     const reference = creator({ target: null });
-    this.referenceByTargetId.set(deExpr.targetId, reference);
+    this.rehydratedReferenceExprs.push({
+        referenceExpr2: reference,
+        dehydratedReferenceExpr: deExpr,
+      });
     return reference;
   }
 
