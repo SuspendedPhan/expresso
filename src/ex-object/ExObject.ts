@@ -7,7 +7,12 @@ import {
   type Component,
   type CustomComponent,
 } from "src/ex-object/Component";
-import { ExItemType, type ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
+import {
+  ExItemType,
+  type ExItem,
+  type ExItemBase,
+  type Parent,
+} from "src/ex-object/ExItem";
 import type { PropertyKind } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
@@ -53,7 +58,7 @@ export namespace ExObjectFns {
   export async function getExObject(exItem: ExItem): Promise<ExObject | null> {
     let item: ExItem | null = exItem;
     while (item !== null) {
-      if (item.itemType === ExItemType.ExObject) {
+      if ("itemType" in item && item.itemType === ExItemType.ExObject) {
         return item;
       }
       const parent: Parent = await firstValueFrom(item.parent$);
@@ -67,7 +72,7 @@ export namespace ExObjectFns {
     while (true) {
       const nextParent: Parent = await firstValueFrom(parent.parent$);
       if (nextParent === null) {
-        assert(parent.itemType === ExItemType.ExObject);
+        assert("itemType" in parent && parent.itemType === ExItemType.ExObject);
         return parent;
       }
       parent = nextParent;
@@ -92,14 +97,14 @@ export namespace ExObjectFns {
     newExObject.parent$.next(parent);
     children[index] = newExObject;
     parent.children$.next(children);
-    
+
     exObject.destroy$.next();
   }
 
   async function replaceRootExObject(
     ctx: MainContext,
     exObject: ExObject,
-    newExObject: ExObject,
+    newExObject: ExObject
   ) {
     const project = await firstValueFrom(ctx.projectCtx.currentProject$);
     project.rootExObjectObsArr.replaceItem(exObject, newExObject);
@@ -109,7 +114,6 @@ export namespace ExObjectFns {
 }
 
 export namespace CreateExObject {
-
   export async function blank(
     ctx: MainContext,
     data: {
@@ -120,7 +124,7 @@ export namespace CreateExObject {
       basicProperties?: PropertyKind["BasicProperty"][];
       cloneCountProperty?: PropertyKind["CloneCountProperty"];
       children?: ExObject[];
-    },
+    }
   ): Promise<ExObject> {
     let name = data.name;
     if (name === undefined) {
@@ -131,9 +135,12 @@ export namespace CreateExObject {
     const id = data.id ?? `ex-object-${crypto.randomUUID()}`;
     const base = await ctx.objectFactory.createExItemBase(id);
     const component = data.component ?? CanvasComponentStore.circle;
-    const componentProperties = data.componentProperties ?? await createComponentProperties(ctx, component);
+    const componentProperties =
+      data.componentProperties ??
+      (await createComponentProperties(ctx, component));
     const basicProperties = data.basicProperties ?? [];
-    const cloneCountProperty = data.cloneCountProperty ?? await Create.Property.cloneCountBlank(ctx);
+    const cloneCountProperty =
+      data.cloneCountProperty ?? (await Create.Property.cloneCountBlank(ctx));
     const children = data.children ?? [];
 
     const object: ExObject = {
