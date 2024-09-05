@@ -1,5 +1,11 @@
-import { type Variant, variantCosmos, type VariantModule } from "variant";
-import type { VariantCreator } from "variant/lib/precepts";
+import {
+  scoped,
+  variant,
+  type Variant,
+  variantCosmos,
+  type VariantModule,
+} from "variant";
+import { RawVariant, type VariantCreator } from "variant/lib/precepts";
 import type { ExactDefinition } from "variant/lib/typed";
 
 /**
@@ -7,7 +13,10 @@ import type { ExactDefinition } from "variant/lib/typed";
  * @param T Variant type defintion.
  * @param Key Discriminator.
  */
-export type DexVariantUnion<T extends Record<string, any>, Key extends string = "type"> = {
+export type DexVariantUnion<
+  T extends Record<string, any>,
+  Key extends string = "type"
+> = {
   [K in keyof T]: K extends string ? Variant<K, T[K], Key> : never;
 }[keyof T];
 
@@ -17,10 +26,10 @@ export type DexVariantUnion<T extends Record<string, any>, Key extends string = 
  * @param obj
  * @returns
  */
-export function dexVariantTyped<T extends Record<string, any>, Key extends string>(
-  key: Key,
-  obj: ExactDefinition<DexVariantUnion<T, Key>, Key>
-) {
+export function dexVariantTyped<
+  T extends Record<string, any>,
+  Key extends string
+>(key: Key, obj: ExactDefinition<DexVariantUnion<T, Key>, Key>) {
   type VUnion = DexVariantUnion<T, Key>;
   const cosmos = variantCosmos({ key });
   return cosmos.variant(cosmos.typed<VUnion>(obj));
@@ -34,9 +43,16 @@ export function dexVariantTyped<T extends Record<string, any>, Key extends strin
  * Then:
  *   const expr: ExprKind["Number"] = Expr.Number();
  */
-export type DexVariantKind<T extends VariantModule<K>, K extends string = "type"> = {
+export type DexVariantKind<
+  T extends VariantModule<K>,
+  K extends string = "type"
+> = {
   [K in keyof T]: Awaited<ReturnType<T[K]>>;
 };
 
+export type DexVariantFactoryArgs<T extends (...args: any[]) => any> =
+  Parameters<T>[0];
 
-export type DexVariantFactoryArgs<T extends (...args: any[]) => any> = Parameters<T>[0];
+export function dexScopedVariant<T extends RawVariant, Scope extends string>(scope: Scope, v: T) {
+  return variant(scoped<T, Scope>(scope, v));
+}

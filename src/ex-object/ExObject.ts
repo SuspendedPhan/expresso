@@ -2,13 +2,9 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import {
   CanvasComponentStore,
-  ComponentKind,
-  type CanvasComponent,
   type Component,
-  type CustomComponent,
 } from "src/ex-object/Component";
 import {
-  ExItemType,
   type ExItem,
   type ExItemBase,
   type Parent,
@@ -20,9 +16,13 @@ import {
   createBehaviorSubjectWithLifetime,
   type SUB,
 } from "src/utils/utils/Utils";
+import { fields } from "variant";
 
-export interface ExObject extends ExItemBase {
-  itemType: ExItemType.ExObject;
+export const ExObjectFactory = {
+  Basic: fields<ExObject>(),
+};
+
+interface ExObject extends ExItemBase {
   name$: SUB<string>;
   component: Component;
   children$: SUB<ExObject[]>;
@@ -30,7 +30,6 @@ export interface ExObject extends ExItemBase {
   basicProperties$: SUB<PropertyKind["BasicProperty"][]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
-
 export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
     const child = await CreateExObject.blank(ctx, {});

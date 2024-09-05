@@ -5,9 +5,15 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";
 import type { Property } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
+import { fields } from "variant";
 
 export type ExItem = Component | ExObject | Expr | ExFunc | Property;
 export type Parent = ExItem | null | Property | ComponentKind["CustomComponent"];
+
+export const ExItemFactory = {
+  // ExObject: fields<ExObject>(),
+
+}
 
 export interface ExItemBase {
   readonly id: string;

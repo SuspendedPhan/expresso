@@ -2,22 +2,23 @@ import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
 import type { ComponentParameterKind } from "src/ex-object/Component";
 import type { ExFuncParameter } from "src/ex-object/ExFunc";
-import { ExItemType, type ExItemBase } from "src/ex-object/ExItem";
-import { type Property } from "src/ex-object/Property";
+import { type ExItemBase } from "src/ex-object/ExItem";
+import { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
-import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, variant, type VariantOf } from "variant";
+import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { fields, scoped, variant, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
   | ComponentParameterKind["Custom"]
   | ExFuncParameter;
 
-export const ExprFactory = variant({
+export const ExprFactory = dexScopedVariant("Expr", {
   Number: fields<{ value: number } & ExItemBase>(),
   Reference: fields<{ target: ReferenceTarget | null } & ExItemBase>(),
 });
+
 
 export type Expr = VariantOf<typeof ExprFactory> | CallExpr;
 export type ExprKind = DexVariantKind<typeof ExprFactory>;
