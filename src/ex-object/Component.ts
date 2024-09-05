@@ -1,5 +1,6 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
+import { type ComponentParameterKind, ComponentParameterFactory2, ComponentParameterFactory, type ComponentParameter } from "src/ex-object/ComponentParameter";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
 import { Property, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -9,7 +10,7 @@ import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, variant, type VariantOf } from "variant";
+import { fields, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
 
@@ -29,69 +30,21 @@ interface CanvasComponent extends ComponentBase {
 
 interface CustomComponent extends ComponentBase {
   name$: SUB<string>;
-  parameters$: SUB<CustomComponentParameter[]>;
+  parameters$: SUB<ComponentParameterKind["Custom"][]>;
   rootExObjects$: SUB<ExObject[]>;
   properties$: SUB<PropertyKind["BasicProperty"][]>;
 
-  addParameterBlank(): Promise<CustomComponentParameter>;
+  addParameterBlank(): Promise<ComponentParameterKind["Custom"]>;
   addPropertyBlank(): Promise<PropertyKind["BasicProperty"]>;
 }
 
-interface CanvasComponentParameter {
-  readonly id: string;
-  readonly name: string;
-  readonly canvasSetter: CanvasSetter;
-}
 
-interface CustomComponentParameter {
-  readonly id: string;
-  readonly name$: SUB<string>;
-}
-
-export interface ComponentParameterCreationArgs {
-  CustomComponentParameter: {
-    id?: string;
-    name?: string;
-  };
-}
-
-export const ComponentParameterFactory = dexScopedVariant(
-  "ComponentParameter",
-  {
-    Canvas: fields<CanvasComponentParameter>(),
-    Custom: fields<CustomComponentParameter>(),
-  }
-);
-
-export type ComponentParameter = VariantOf<typeof ComponentParameterFactory>;
-export type ComponentParameterKind = DexVariantKind<
-  typeof ComponentParameterFactory
->;
-
-export const ComponentParameterFactory2 = {
-  async Custom(
-    _ctx: MainContext,
-    creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]
-  ) {
-    const creationArgs2: Required<
-      ComponentParameterCreationArgs["CustomComponentParameter"]
-    > = {
-      id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
-      name: creationArgs.name ?? "Parameter",
-    };
-    const parameter: CustomComponentParameter = {
-      id: creationArgs2.id,
-      name$: new BehaviorSubject(creationArgs2.name),
-    };
-    return parameter;
-  },
-};
 
 export interface ComponentCreationArgs {
   Custom: {
     id?: string;
     name?: string;
-    parameters?: CustomComponentParameter[];
+    parameters?: ComponentParameterKind["Custom"][];
     rootExObjects?: ExObject[];
     properties?: PropertyKind["BasicProperty"][];
   };
@@ -198,7 +151,7 @@ export namespace ComponentParameterFns {
     switch (componentParameter.componentParameterKind) {
       case ComponentParameterKind.CanvasComponentParameter:
         return of(componentParameter.name);
-      case ComponentParameterKind.CustomComponentParameter:
+      case ComponentParameterKind.ComponentParameterKind["Custom"]:
         return componentParameter.name$;
       default:
         throw new Error("unknown component parameter type");

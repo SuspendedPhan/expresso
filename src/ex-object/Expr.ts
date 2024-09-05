@@ -7,7 +7,7 @@ import { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
 import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, scoped, variant, type VariantOf } from "variant";
+import { fields, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
