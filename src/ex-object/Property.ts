@@ -20,9 +20,7 @@ import {
 
 const log55 = log5("Property.ts");
 
-export type Property = ExObjectProperty;
-
-export type ExObjectProperty =
+export type Property =
   | ComponentParameterProperty
   | BasicProperty
   | CloneCountProperty;
@@ -145,7 +143,7 @@ export namespace CreateProperty {
 export namespace PropertyFns {  
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
 
-  export function getName$(property: ExObjectProperty): OBS<string> {
+  export function getName$(property: Property): OBS<string> {
     switch (property.propertyType) {
       case PropertyType.ComponentProperty:
         return ComponentParameterFns.getName$(property.componentParameter);

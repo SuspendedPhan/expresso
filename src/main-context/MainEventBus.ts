@@ -1,7 +1,7 @@
 import { ReplaySubject, Subject, switchMap } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { ExObjectProperty } from "src/ex-object/Property";
+import type { Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import type { ExprReplacement } from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
@@ -12,7 +12,7 @@ const log55 = log5("MainEventBus.ts");
 export class MainEventBus {
   public readonly rootObjects$: OBS<readonly ExObject[]>;
 
-  public readonly propertyAdded$ = new ReplaySubject<ExObjectProperty>(10);
+  public readonly propertyAdded$ = new ReplaySubject<Property>(10);
   public readonly objectAdded$ = new ReplaySubject<ExObject>(10);
   public readonly exprAdded$ = new ReplaySubject<Expr>(10);
   public readonly exprReplaced$ = new Subject<ExprReplacement>();

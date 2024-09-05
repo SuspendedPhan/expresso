@@ -2,7 +2,7 @@ import type { CustomComponentParameter } from "src/ex-object/Component";
 import type { ExFunc, ExFuncParameter } from "src/ex-object/ExFunc";
 import type { ExItem, Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { ExObjectProperty } from "src/ex-object/Property";
+import type { Property } from "src/ex-object/Property";
 import type { Focus2 } from "src/utils/focus/Focus2";
 import { ComponentFocusKind } from "src/utils/utils/ComponentFocus";
 import { EditorFocusKind } from "src/utils/utils/EditorFocus";
@@ -12,7 +12,7 @@ export const ExObjectFocusKind = {
   ExObject: ofType<{ exObject: ExObject }>(),
   ExObjectName: ofType<{ exObject: ExObject, isEditing: boolean }>(),
   ExObjectComponent: ofType<{ exObject: ExObject }>(),
-  Property: ofType<{ property: ExObjectProperty }>(),
+  Property: ofType<{ property: Property }>(),
 
   ExItemNewActions: ofType<{ exItem: ExItem }>(),
   ExObjectRefactor: ofType<{ exObject: ExObject }>(),

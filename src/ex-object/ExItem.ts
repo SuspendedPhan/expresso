@@ -6,10 +6,10 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type {
   ReferenceExpr
 } from "src/ex-object/Expr";
-import type { ExObjectProperty } from "src/ex-object/Property";
+import type { Property } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
 
-export type ExItem = Component | ExObject | ExObjectProperty | Expr | ExFunc;
+export type ExItem = Component | ExObject | Property | Expr | ExFunc;
 export type Parent = Exclude<ExItem, NumberExpr> | null;
 export type Expr =
   | NumberExpr

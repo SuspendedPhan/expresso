@@ -4,7 +4,7 @@
   import {
     PropertyFns,
     PropertyType,
-    type ExObjectProperty,
+    type Property,
   } from "src/ex-object/Property";
   import type MainContext from "src/main-context/MainContext";
   import { rxEquals } from "src/utils/utils/Utils";
@@ -14,7 +14,7 @@
   import ExprLayout from "../layout/ExprLayout";
 
   export let ctx: MainContext;
-  export let property: ExObjectProperty;
+  export let property: Property;
 
   const name$ = PropertyFns.getName$(property);
 
