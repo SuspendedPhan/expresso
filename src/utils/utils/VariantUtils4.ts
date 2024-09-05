@@ -1,4 +1,5 @@
 import { type Variant, variantCosmos, type VariantModule } from "variant";
+import type { VariantCreator } from "variant/lib/precepts";
 import type { ExactDefinition } from "variant/lib/typed";
 
 /**
@@ -36,3 +37,6 @@ export function dexVariantTyped<T extends Record<string, any>, Key extends strin
 export type DexVariantKind<T extends VariantModule<K>, K extends string = "type"> = {
   [K in keyof T]: ReturnType<T[K]>;
 };
+
+
+export type DexVariantFactoryArgs<T extends (...args: any[]) => any> = Parameters<T>[0];

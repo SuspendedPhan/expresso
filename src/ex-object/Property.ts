@@ -47,15 +47,12 @@ export const Property = variant({
   BasicProperty: fields<
     {
       name$: SUB<string>;
-      expr$: SUB<Expr>;
-      base: ExItemBase;
     } & PropertyBase
   >(),
 
   CloneCountProperty: fields<
     {
       expr$: SUB<Expr>;
-      base: ExItemBase;
     } & PropertyBase
   >(),
 });
@@ -63,95 +60,78 @@ export const Property = variant({
 export type Property = VariantOf<typeof Property>;
 export type PropertyKind = DexVariantKind<typeof Property>;
 
-export namespace CreateProperty {
-  export async function componentBlank(
-    ctx: MainContext,
-    componentInput: ComponentParameter
-  ): Promise<PropertyKind["ComponentParameterProperty"]> {
-    const id = `component-property-${crypto.randomUUID()}`;
-    const expr = await ctx.objectFactory.createNumberExpr();
-    return component(ctx, id, componentInput, expr);
-  }
+export interface CreatePropertyArgs {
+  Base: {
+    id?: string;
+    expr?: Expr;
+  };
+  
+  ComponentParameter: {
+    componentParameter: ComponentParameter;
+  } & CreatePropertyArgs["Base"];
 
-  export async function component(
-    ctx: MainContext,
-    id: string,
-    componentInput: ComponentParameter,
-    expr: Expr
-  ): Promise<PropertyKind["ComponentParameterProperty"]> {
-    const itemBase = await ctx.objectFactory.createExItemBase(id);
-    log55.debug(`CreateProperty.component.itemBase.end ${id}`);
+  Basic: {
+    name?: string;
+  } & CreatePropertyArgs["Base"];
 
-    const componentProperty: PropertyKind["ComponentParameterProperty"] = {
-      ...itemBase,
-      itemType: ExItemType.Property,
-      expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
-      propertyType: PropertyType.ComponentProperty,
-      componentParameter: componentInput,
+  CloneCount: {
+  } & CreatePropertyArgs["Base"];
+}
+
+
+export const CreateProperty = {
+  async componentParameter(ctx: MainContext, createArgs: CreatePropertyArgs["ComponentParameter"]) {
+    const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
+      id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
+      componentParameter: createArgs.componentParameter,
+      expr: createArgs.expr ?? await ctx.objectFactory.createNumberExpr(),
     };
-    expr.parent$.next(componentProperty);
-    ctx.eventBus.propertyAdded$.next(componentProperty);
 
-    log55.debug(`CreateProperty.component.end`);
-    return componentProperty;
-  }
-
-  export async function basicBlank(
-    ctx: MainContext
-  ): Promise<PropertyKind["BasicProperty"]> {
-    const id = `basic-property-${crypto.randomUUID()}`;
-    const expr = await ctx.objectFactory.createNumberExpr();
-    const name = `Basic Property`;
-    return await basic(ctx, id, name, expr);
-  }
-
-  export async function basic(
-    ctx: MainContext,
-    id: string,
-    name: string,
-    expr: Expr
-  ): Promise<PropertyKind["BasicProperty"]> {
-    const itemBase = await ctx.objectFactory.createExItemBase(id);
-    const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
-    const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
-    const property: PropertyKind["BasicProperty"] = {
-      ...itemBase,
-      itemType: ExItemType.Property,
-      expr$: exprSub$,
-      name$: nameSub$,
-      propertyType: PropertyType.PropertyKind["BasicProperty"],
-    };
-    expr.parent$.next(property);
+    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const property = Property.ComponentParameterProperty({
+      ...base,
+      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
+      componentParameter: createArgs2.componentParameter,
+    });
+    createArgs2.expr.parent$.next(property);
     ctx.eventBus.propertyAdded$.next(property);
     return property;
-  }
-
-  export async function cloneCountBlank(
-    ctx: MainContext
-  ): Promise<PropertyKind["CloneCountProperty"]> {
-    const id = `clone-count-property-${crypto.randomUUID()}`;
-    const expr = await ctx.objectFactory.createNumberExpr(1);
-    return cloneCount(ctx, id, expr);
-  }
-
-  export async function cloneCount(
-    ctx: MainContext,
-    id: string,
-    expr: Expr
-  ): Promise<PropertyKind["CloneCountProperty"]> {
-    const itemBase = await ctx.objectFactory.createExItemBase(id);
-    const cloneCountProperty: PropertyKind["CloneCountProperty"] = {
-      ...itemBase,
-      itemType: ExItemType.Property,
-      expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
-      propertyType: PropertyType.CloneCountProperty,
+  },
+  
+  async basic(ctx: MainContext, createArgs: CreatePropertyArgs["Basic"]) {
+    const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
+      id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
+      expr: createArgs.expr ?? await ctx.objectFactory.createNumberExpr(),
+      name: createArgs.name ?? "Basic Property",
     };
-    expr.parent$.next(cloneCountProperty);
-    ctx.eventBus.propertyAdded$.next(cloneCountProperty);
-    log55.debug(`CreateProperty.cloneCount.end`);
-    return cloneCountProperty;
-  }
-}
+
+    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const property = Property.BasicProperty({
+      ...base,
+      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
+      name$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.name),
+    });
+    createArgs2.expr.parent$.next(property);
+    ctx.eventBus.propertyAdded$.next(property);
+    return property;
+  },
+
+  async cloneCount(ctx: MainContext, createArgs: CreatePropertyArgs["CloneCount"]) {
+    const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
+      id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
+      expr: createArgs.expr ?? await ctx.objectFactory.createNumberExpr(1),
+    };
+
+    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const property = Property.CloneCountProperty({
+      ...base,
+      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
+    });
+    createArgs2.expr.parent$.next(property);
+    ctx.eventBus.propertyAdded$.next(property);
+    return property;
+  },
+};
 
 export namespace PropertyFns {
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
