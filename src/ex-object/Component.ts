@@ -119,7 +119,7 @@ export const CanvasComponentStore = {
 } satisfies Record<string, ComponentKind["CanvasComponent"]>;
 
 export function createComponentCtx(_ctx: MainContext) {
-  const parameterById = new Map<string, CanvasComponentParameter>();
+  const parameterById = new Map<string, ComponentParameterKind["Canvas"]>();
   CanvasComponentStore.circle.parameters.forEach((parameter) => {
     parameterById.set(parameter.id, parameter);
   });
@@ -149,7 +149,7 @@ export namespace ComponentParameterFns {
     componentParameter: ComponentParameter
   ): OBS<string> {
     switch (componentParameter.componentParameterKind) {
-      case ComponentParameterKind.CanvasComponentParameter:
+      case ComponentParameterKind.ComponentParameterKind["Canvas"]:
         return of(componentParameter.name);
       case ComponentParameterKind.ComponentParameterKind["Custom"]:
         return componentParameter.name$;
