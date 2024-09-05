@@ -1,15 +1,12 @@
-import { firstValueFrom, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import {
   SystemExFuncKind,
   type ExFunc,
   type SystemExFunc,
 } from "src/ex-object/ExFunc";
 import {
-  ExItemType,
-  ExprType,
-  type CallExpr,
   type ExItemBase,
-  type Expr,
+  type Expr
 } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import {
@@ -17,85 +14,77 @@ import {
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import unionize, { ofType } from "unionize";
+import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { fields, variant, type VariantOf } from "variant";
 
 interface CallExprBase extends ExItemBase {
-  readonly itemType: ExItemType.Expr;
-  readonly exprType: ExprType.CallExpr;
   readonly args$: SUB<Expr[]>;
 }
 
-export const CallExprKind = unionize({
-  Custom: ofType<{ exFunc: ExFunc } & CallExprBase>(),
-  System: ofType<{ systemExFunc: SystemExFunc } & CallExprBase>(),
-});
-
-export async function createCallExprBase(
-  ctx: MainContext,
-  data: {
+interface CallExprCreationArgs {
+  Custom: {
     id?: string;
+    exFunc: ExFunc;
     args?: Expr[];
-  }
-): Promise<CallExprBase> {
-  const id = data.id ?? Utils.createId("call-expr");
-  const base = await ctx.objectFactory.createExItemBase(id);
-  const args = data.args ?? [];
+  };
 
-  return {
-    ...base,
-    itemType: ExItemType.Expr,
-    exprType: ExprType.CallExpr,
-    args$: createBehaviorSubjectWithLifetime<Expr[]>(base.destroy$, args),
-    ...data,
+  System: {
+    id?: string;
+    systemExFunc?: SystemExFunc;
+    args?: Expr[];
   };
 }
 
-export async function createCustomCallExpr(
-  ctx: MainContext,
-  data: {
-    exFunc: ExFunc;
-    base: CallExprBase;
-  }
-) {
-  return createCallExpr(ctx, () => {
-    return CallExprKind.Custom({
-      ...data.base,
-      ...data,
-    });
-  });
-}
+export const CallExpr = {
+  creators: variant({
+    Custom: fields<{ exFunc: ExFunc } & CallExprBase>(),
+    System: fields<{ systemExFunc: SystemExFunc } & CallExprBase>(),
+  }),
 
-export async function createSystemCallExpr(
-  ctx: MainContext,
-  data: {
-    systemExFunc?: SystemExFunc;
-    base?: CallExprBase;
-  }
-): Promise<CallExpr> {
-  let base = data.base;
-  if (base === undefined) {
-    const args = [];
-    args[0] = await ctx.objectFactory.createNumberExpr();
-    args[1] = await ctx.objectFactory.createNumberExpr();
-    base = await createCallExprBase(ctx, { args });
-  }
-  const systemExFunc = data.systemExFunc ?? SystemExFuncKind.Add();
+  creators2: {
+    async Custom(ctx: MainContext, creationArgs: CallExprCreationArgs["Custom"]) {
+      const creationArgs2: Required<CallExprCreationArgs["Custom"]> = {
+        id: creationArgs.id ?? Utils.createId("call-expr"),
+        args: creationArgs.args ?? [],
+        exFunc: creationArgs.exFunc,
+      };
 
-  return createCallExpr(ctx, () => {
-    return CallExprKind.System({
-      ...base,
-      systemExFunc,
-    });
-  });
-}
+      const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+      const expr = CallExpr.creators.Custom({
+        ...base,
+        args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),
+        exFunc: creationArgs2.exFunc,
+      });
 
-async function createCallExpr(ctx: MainContext, factory: () => CallExpr) {
-  const expr = factory();
-  const args = await firstValueFrom(expr.args$);
-  for (const arg of args) {
-    arg.parent$.next(expr);
-  }
+      for (const arg of creationArgs2.args) {
+        arg.parent$.next(expr);
+      }
+      (ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
+      return expr;
+    },
 
-  (ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
-  return expr;
-}
+    async System(ctx: MainContext, creationArgs: CallExprCreationArgs["System"]) {
+      const creationArgs2: Required<CallExprCreationArgs["System"]> = {
+        id: creationArgs.id ?? Utils.createId("call-expr"),
+        args: creationArgs.args ?? [],
+        systemExFunc: creationArgs.systemExFunc ?? SystemExFuncKind.Add(),
+      };
+
+      const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+      const expr = CallExpr.creators.System({
+        ...base,
+        args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),
+        systemExFunc: creationArgs2.systemExFunc,
+      });
+
+      for (const arg of creationArgs2.args) {
+        arg.parent$.next(expr);
+      }
+      (ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
+      return expr;
+    }
+  },
+};
+
+export type CallExpr = VariantOf<typeof CallExpr.creators>;
+export type CallExprKind = DexVariantKind<typeof CallExpr.creators>;
