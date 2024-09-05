@@ -17,13 +17,10 @@ export type ProjectComponentWindowFocusKind = DexVariantKind<
   typeof ProjectComponentWindowFocus
 >;
 
-export function createProjectComponentWindowFocusCtx(ctx: MainContext) {
-  return {};
-}
-
-export function registerProjectComponentWindowFocus(ctx: MainContext) {
+export async function createProjectComponentWindowFocusCtx(ctx: MainContext) {
   const { focusCtx, keyboardCtx } = ctx;
 
+  console.log("Registering ProjectComponentWindowFocus");
   keyboardCtx
     .onKeydown$(
       "n",
@@ -34,10 +31,25 @@ export function registerProjectComponentWindowFocus(ctx: MainContext) {
       focusCtx.setFocus(ProjectComponentWindowFocus.NewActions());
     });
 
-  keyboardCtx.onKeydown2$({
-    keys: "c",
-    data$: focusCtx.mapFocus2$(f => isType(f, ProjectComponentWindowFocus.NewActions)),
-  }).subscribe(async () => {
-    console.log("Create new component");
+  ctx.viewCtx.commandCardCtx.addCommandCard({
+    title: "Project Component Commands",
+    commands: ["New Component"],
+    visible$: focusCtx.mapFocus2$((f) =>
+      isType(f, ProjectComponentWindowFocus.NewActions)
+    ),
   });
+
+  keyboardCtx
+    .onKeydown2$({
+      keys: "c",
+      data$: focusCtx.mapFocus2$((f) =>
+        isType(f, ProjectComponentWindowFocus.NewActions)
+      ),
+    })
+    .subscribe(async () => {
+      console.log("Create new component");
+      ctx.projectCtx.addComponentBlank();
+      focusCtx.popFocus();
+      focusCtx.popFocus();
+    });
 }

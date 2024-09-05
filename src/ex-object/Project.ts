@@ -33,7 +33,11 @@ export function createProjectContext(ctx: MainContext) {
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
       const exFunc = await createExFunc(ctx, {});
       return project.addCustomExFunc(exFunc);
-    }
+    },
+    async addComponentBlank() {
+      const project = await firstValueFrom(ctx.projectManager.currentProject$);
+      return ProjectFns.addComponentBlank(ctx, project);
+    },
   };
 }
 

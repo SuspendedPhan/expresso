@@ -1,4 +1,5 @@
-import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+// @ts-nocheck
+
 import { fields } from "variant";
 
 class Bar {

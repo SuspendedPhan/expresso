@@ -20,6 +20,7 @@ import MainViewContext from "./MainViewContext";
 import { createComponentCtx } from "src/ex-object/Component";
 import { createNavFocusCtx } from "src/utils/focus/NavFocus";
 import { log5 } from "src/utils/utils/Log5";
+import { createProjectComponentWindowFocusCtx } from "src/utils/focus/ProjectComponentWindowFocus";
 
 const log55 = log5("MainContext.ts");
 
@@ -45,6 +46,7 @@ export default class MainContext {
   public readonly library$ = new ReplaySubject<Library>(1);
   public readonly componentCtx = createComponentCtx(this);
   public readonly navFocusCtx = createNavFocusCtx(this);
+  public readonly projectComponentFocusCtx = createProjectComponentWindowFocusCtx(this);
 
   public readonly debugCtx: any = {};
   public disableCanvas = true;
