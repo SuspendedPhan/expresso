@@ -332,18 +332,6 @@ export default class Rehydrator {
     ctx: Rehydrator,
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ) {
-    type TargetById = {
-      [K in TypesOf<typeof ReferenceExpr2>]: Map<string, ReferenceExpr2Kind[K]>;
-    }
-    const targetById = Object.keys(ReferenceExpr2).reduce((acc: any, key) => {
-      acc[key as keyof typeof ReferenceExpr2] = new Map();
-      return acc;
-    }, {}) as TargetById;
-
-    const target = targetById[deExpr.referenceExprKind].get(deExpr.targetId);
-    const referenceExpr2Creator = ReferenceExpr2[deExpr.referenceExprKind];
-    referenceExpr2Creator({ target });
-
     switch (deExpr.referenceExprKind) {
       case "ComponentParameter": {
         const target = ctx.componentParameterById.get(deExpr.targetId);
