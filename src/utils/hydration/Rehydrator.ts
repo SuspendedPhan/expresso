@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, from } from "rxjs";
 import {
   createCallExprBase,
   createSystemCallExpr,
@@ -28,10 +28,7 @@ import {
 } from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
-  BasicProperty,
-  CloneCountProperty,
-  ComponentParameterProperty,
-  Property,
+  PropertyKind,
 } from "src/ex-object/Property";
 import {
   createLibraryProject,
@@ -55,6 +52,7 @@ import {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
+import type { Property } from "src/ex-object/Property";
 
 const log55 = log5("Rehydrator.ts");
 
@@ -234,7 +232,7 @@ export default class Rehydrator {
   @loggedMethod
   public async rehydrateComponentProperty(
     deProperty: DehydratedComponentProperty
-  ): Promise<ComponentParameterProperty> {
+  ): Promise<PropertyKind["ComponentParameterProperty"]> {
     log55.debug("rehydrateComponentProperty.start", deProperty);
     const parameter = this.getComponentParameter(
       deProperty.componentParameterId,
@@ -256,7 +254,7 @@ export default class Rehydrator {
   @loggedMethod
   public async rehydrateBasicProperty(
     deProperty: DehydratedBasicProperty
-  ): Promise<BasicProperty> {
+  ): Promise<PropertyKind["BasicProperty"]> {
     log55.debug("rehydrateBasicProperty.start", deProperty);
 
     const expr = await this.rehydrateExpr(deProperty.expr);
@@ -276,7 +274,7 @@ export default class Rehydrator {
   @loggedMethod
   public async rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
-  ): Promise<CloneCountProperty> {
+  ): Promise<PropertyKind["CloneCountProperty"]> {
     log55.debug("rehydrateCloneCountProperty", deProperty);
     const expr = await this.rehydrateExpr(deProperty.expr);
     const property = await Create.Property.cloneCount(

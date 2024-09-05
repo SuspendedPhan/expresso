@@ -24,11 +24,7 @@ import {
 import type { ExObject } from "src/ex-object/ExObject";
 import { ReferenceExpr2, type ReferenceExpr } from "src/ex-object/Expr";
 import type { Project } from "src/ex-object/Project";
-import {
-  type BasicProperty,
-  type CloneCountProperty,
-  type ComponentParameterProperty,
-} from "src/ex-object/Property";
+import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
@@ -364,7 +360,7 @@ export default class Dehydrator {
 
   @loggedMethod
   public dehydrateComponentProperty$(
-    property: ComponentParameterProperty
+    property: PropertyKind["ComponentParameterProperty"]
   ): Observable<DehydratedComponentProperty> {
     const logger = Logger.logger();
     return property.expr$.pipe(
@@ -387,7 +383,7 @@ export default class Dehydrator {
 
   @loggedMethod
   public dehydrateBasicProperty$(
-    property: BasicProperty
+    property: PropertyKind["BasicProperty"]
   ): Observable<DehydratedBasicProperty> {
     log55.debug("dehydrateBasicProperty$", property);
     const logger = Logger.logger();
@@ -412,7 +408,7 @@ export default class Dehydrator {
 
   @loggedMethod
   public dehydrateCloneProperty$(
-    property: CloneCountProperty
+    property: PropertyKind["CloneCountProperty"]
   ): Observable<DehydratedCloneCountProperty> {
     const logger = Logger.logger();
     return property.expr$.pipe(

@@ -4,10 +4,10 @@
   import PropertyView from "src/utils/views/PropertyView.svelte";
   import type MainContext from "src/main-context/MainContext";
   import type { OBS } from "src/utils/utils/Utils";
-  import type { BasicProperty } from "src/ex-object/Property";
+  import type { PropertyKind } from "src/ex-object/Property";
 
   export let ctx: MainContext;
-  export let basicProperties$: OBS<BasicProperty[]>;
+  export let basicProperties$: OBS<PropertyKind["BasicProperty"][]>;
   export let addPropertyFn: () => void;
 </script>
 

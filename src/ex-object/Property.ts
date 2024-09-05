@@ -7,8 +7,19 @@
 
 import assert from "assert-ts";
 import { firstValueFrom, of } from "rxjs";
-import { ComponentKind, ComponentParameterFns, type ComponentParameter, type CustomComponent } from "src/ex-object/Component";
-import { ExItemFn, ExItemType, type ExItem, type ExItemBase, type Expr } from "src/ex-object/ExItem";
+import {
+  ComponentKind,
+  ComponentParameterFns,
+  type ComponentParameter,
+  type CustomComponent,
+} from "src/ex-object/Component";
+import {
+  ExItemFn,
+  ExItemType,
+  type ExItem,
+  type ExItemBase,
+  type Expr,
+} from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
@@ -18,7 +29,7 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, variant, type VariantOf } from "variant";
+import { fields, matcher, variant, type VariantOf } from "variant";
 
 const log55 = log5("Property.ts");
 
@@ -27,37 +38,36 @@ interface PropertyBase extends ExItemBase {
 }
 
 export const Property = variant({
-  ComponentParameterProperty: fields<{
-    componentParameter: ComponentParameter,
-  } & PropertyBase>(),
+  ComponentParameterProperty: fields<
+    {
+      componentParameter: ComponentParameter;
+    } & PropertyBase
+  >(),
 
-  BasicProperty: fields<{
-    name$: SUB<string>,
-    expr$: SUB<Expr>,
-    base: ExItemBase,
-  } & PropertyBase>(),
+  BasicProperty: fields<
+    {
+      name$: SUB<string>;
+      expr$: SUB<Expr>;
+      base: ExItemBase;
+    } & PropertyBase
+  >(),
 
-  CloneCountProperty: fields<{
-    expr$: SUB<Expr>,
-    base: ExItemBase,
-  } & PropertyBase>(),
+  CloneCountProperty: fields<
+    {
+      expr$: SUB<Expr>;
+      base: ExItemBase;
+    } & PropertyBase
+  >(),
 });
 
 export type Property = VariantOf<typeof Property>;
 export type PropertyKind = DexVariantKind<typeof Property>;
 
-export enum PropertyType {
-  ComponentProperty,
-  BasicProperty,
-  CloneCountProperty,
-}
-
-
 export namespace CreateProperty {
   export async function componentBlank(
     ctx: MainContext,
     componentInput: ComponentParameter
-  ): Promise<ComponentParameterProperty> {
+  ): Promise<PropertyKind["ComponentParameterProperty"]> {
     const id = `component-property-${crypto.randomUUID()}`;
     const expr = await ctx.objectFactory.createNumberExpr();
     return component(ctx, id, componentInput, expr);
@@ -68,11 +78,11 @@ export namespace CreateProperty {
     id: string,
     componentInput: ComponentParameter,
     expr: Expr
-  ): Promise<ComponentParameterProperty> {
+  ): Promise<PropertyKind["ComponentParameterProperty"]> {
     const itemBase = await ctx.objectFactory.createExItemBase(id);
     log55.debug(`CreateProperty.component.itemBase.end ${id}`);
 
-    const componentProperty: ComponentParameterProperty = {
+    const componentProperty: PropertyKind["ComponentParameterProperty"] = {
       ...itemBase,
       itemType: ExItemType.Property,
       expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
@@ -87,8 +97,8 @@ export namespace CreateProperty {
   }
 
   export async function basicBlank(
-    ctx: MainContext,
-  ): Promise<BasicProperty> {
+    ctx: MainContext
+  ): Promise<PropertyKind["BasicProperty"]> {
     const id = `basic-property-${crypto.randomUUID()}`;
     const expr = await ctx.objectFactory.createNumberExpr();
     const name = `Basic Property`;
@@ -100,16 +110,16 @@ export namespace CreateProperty {
     id: string,
     name: string,
     expr: Expr
-  ): Promise<BasicProperty> {
+  ): Promise<PropertyKind["BasicProperty"]> {
     const itemBase = await ctx.objectFactory.createExItemBase(id);
     const exprSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, expr);
     const nameSub$ = createBehaviorSubjectWithLifetime(itemBase.destroy$, name);
-    const property: BasicProperty = {
+    const property: PropertyKind["BasicProperty"] = {
       ...itemBase,
       itemType: ExItemType.Property,
       expr$: exprSub$,
       name$: nameSub$,
-      propertyType: PropertyType.BasicProperty,
+      propertyType: PropertyType.PropertyKind["BasicProperty"],
     };
     expr.parent$.next(property);
     ctx.eventBus.propertyAdded$.next(property);
@@ -118,7 +128,7 @@ export namespace CreateProperty {
 
   export async function cloneCountBlank(
     ctx: MainContext
-  ): Promise<CloneCountProperty> {
+  ): Promise<PropertyKind["CloneCountProperty"]> {
     const id = `clone-count-property-${crypto.randomUUID()}`;
     const expr = await ctx.objectFactory.createNumberExpr(1);
     return cloneCount(ctx, id, expr);
@@ -128,9 +138,9 @@ export namespace CreateProperty {
     ctx: MainContext,
     id: string,
     expr: Expr
-  ): Promise<CloneCountProperty> {
+  ): Promise<PropertyKind["CloneCountProperty"]> {
     const itemBase = await ctx.objectFactory.createExItemBase(id);
-    const cloneCountProperty: CloneCountProperty = {
+    const cloneCountProperty: PropertyKind["CloneCountProperty"] = {
       ...itemBase,
       itemType: ExItemType.Property,
       expr$: createBehaviorSubjectWithLifetime(itemBase.destroy$, expr),
@@ -143,31 +153,34 @@ export namespace CreateProperty {
   }
 }
 
-export namespace PropertyFns {  
+export namespace PropertyFns {
   export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
 
   export function getName$(property: Property): OBS<string> {
-    switch (property.propertyType) {
-      case PropertyType.ComponentProperty:
-        return ComponentParameterFns.getName$(property.componentParameter);
-      case PropertyType.BasicProperty:
-        return property.name$;
-      case PropertyType.CloneCountProperty:
-        return of(CLONE_COUNT_PROPERTY_NAME);
-    }
+    return matcher(property)
+      .when(Property.ComponentParameterProperty, (p) =>
+        ComponentParameterFns.getName$(p.componentParameter)
+      )
+      .when(Property.BasicProperty, (p) => p.name$)
+      .when(Property.CloneCountProperty, () => of(CLONE_COUNT_PROPERTY_NAME))
+      .complete();
   }
 
-  export async function * getAncestorPropertyGen(exItem: ExItem): AsyncGenerator<[Property, ExObject | CustomComponent], void, undefined> {
+  export async function* getAncestorPropertyGen(
+    exItem: ExItem
+  ): AsyncGenerator<[Property, ExObject | CustomComponent], void, undefined> {
     for await (const ancestor of ExItemFn.getAncestors(exItem)) {
       log55.debug("ancestor", ancestor.id);
-      
+
       switch (ancestor.itemType) {
         case ExItemType.ExObject:
           yield [ancestor.cloneCountProperty, ancestor];
           for (const property of ancestor.componentParameterProperties) {
             yield [property, ancestor];
           }
-          for (const property of await firstValueFrom(ancestor.basicProperties$)) {
+          for (const property of await firstValueFrom(
+            ancestor.basicProperties$
+          )) {
             yield [property, ancestor];
           }
           break;

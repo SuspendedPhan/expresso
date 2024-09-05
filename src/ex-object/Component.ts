@@ -2,7 +2,6 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { ExItemType } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { CreateProperty, type BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS, SUB } from "src/utils/utils/Utils";
@@ -45,10 +44,10 @@ export interface CustomComponent extends ComponentBase {
   name$: SUB<string>;
   parameters$: SUB<CustomComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
-  properties$: SUB<BasicProperty[]>;
+  properties$: SUB<PropertyKind["BasicProperty"][]>;
 
   addParameterBlank(): Promise<CustomComponentParameter>;
-  addPropertyBlank(): Promise<BasicProperty>;
+  addPropertyBlank(): Promise<PropertyKind["BasicProperty"]>;
 }
 
 export interface CanvasComponentParameter {
@@ -132,7 +131,7 @@ export namespace CreateComponent {
       name?: string;
       parameters?: CustomComponentParameter[];
       rootExObjects?: ExObject[];
-      properties?: BasicProperty[];
+      properties?: PropertyKind["BasicProperty"][];
     }
   ): Promise<CustomComponent> {
     if (data.name === undefined) {

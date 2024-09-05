@@ -8,11 +8,7 @@ import {
   type CustomComponent,
 } from "src/ex-object/Component";
 import { ExItemType, type ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
-import type {
-  BasicProperty,
-  CloneCountProperty,
-  ComponentParameterProperty,
-} from "src/ex-object/Property";
+import type { PropertyKind } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import {
@@ -25,9 +21,9 @@ export interface ExObject extends ExItemBase {
   name$: SUB<string>;
   component: Component;
   children$: SUB<ExObject[]>;
-  componentParameterProperties: ComponentParameterProperty[];
-  basicProperties$: SUB<BasicProperty[]>;
-  cloneCountProperty: CloneCountProperty;
+  componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
+  basicProperties$: SUB<PropertyKind["BasicProperty"][]>;
+  cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
 
 export namespace ExObjectFns {
@@ -120,9 +116,9 @@ export namespace CreateExObject {
       id?: string;
       component?: Component;
       name?: string;
-      componentProperties?: ComponentParameterProperty[];
-      basicProperties?: BasicProperty[];
-      cloneCountProperty?: CloneCountProperty;
+      componentProperties?: PropertyKind["ComponentParameterProperty"][];
+      basicProperties?: PropertyKind["BasicProperty"][];
+      cloneCountProperty?: PropertyKind["CloneCountProperty"];
       children?: ExObject[];
     },
   ): Promise<ExObject> {
@@ -172,7 +168,7 @@ export namespace CreateExObject {
 async function createComponentProperties(
   ctx: MainContext,
   component: Component
-): Promise<ComponentParameterProperty[]> {
+): Promise<PropertyKind["ComponentParameterProperty"][]> {
   switch (component.componentKind) {
     case ComponentKind.CanvasComponent:
       return createCanvasComponentProperties(ctx, component);
@@ -183,7 +179,7 @@ async function createComponentProperties(
 async function createCanvasComponentProperties(
   ctx: MainContext,
   component: CanvasComponent
-): Promise<ComponentParameterProperty[]> {
+): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameter$Ps = component.parameters.map((input) => {
     return Create.Property.componentBlank(ctx, input);
   });
@@ -194,7 +190,7 @@ async function createCanvasComponentProperties(
 async function createCustomComponentProperties(
   ctx: MainContext,
   component: CustomComponent
-): Promise<ComponentParameterProperty[]> {
+): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameterL = await firstValueFrom(component.parameters$);
   const propertyPL = parameterL.map((input) => {
     return Create.Property.componentBlank(ctx, input);

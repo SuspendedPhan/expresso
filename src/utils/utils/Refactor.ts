@@ -12,7 +12,6 @@ import {
   type ExObject,
 } from "src/ex-object/ExObject";
 import { ProjectFns } from "src/ex-object/Project";
-import type { BasicProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -58,7 +57,7 @@ export function createRefactorContext(ctx: MainContext) {
       log55.debug("extractProperty", expr);
     },
 
-    async movePropertyToParent(property: BasicProperty) {
+    async movePropertyToParent(property: PropertyKind["BasicProperty"]) {
       log55.debug("movePropertyToParent", property);
     },
   };
