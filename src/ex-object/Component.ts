@@ -97,66 +97,64 @@ export interface ComponentCreationArgs {
   };
 }
 
-export const Component = {
-  creators: dexScopedVariant("Component", {
-    CanvasComponent: fields<CanvasComponent>(),
-    CustomComponent: fields<CustomComponent>(),
-  }),
+export const ComponentFactory = dexScopedVariant("Component", {
+  CanvasComponent: fields<CanvasComponent>(),
+  CustomComponent: fields<CustomComponent>(),
+});
 
-  creators2: {
-    async CustomComponent(
-      ctx: MainContext,
-      creationArgs: ComponentCreationArgs["Custom"]
-    ) {
-      const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
-        id: creationArgs.id ?? Utils.createId("custom-component"),
-        name: creationArgs.name ?? "Component",
-        parameters: creationArgs.parameters ?? [],
-        rootExObjects: creationArgs.rootExObjects ?? [],
-        properties: creationArgs.properties ?? [],
-      };
+export const ComponentFactory2 = {
+  async CustomComponent(
+    ctx: MainContext,
+    creationArgs: ComponentCreationArgs["Custom"]
+  ) {
+    const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
+      id: creationArgs.id ?? Utils.createId("custom-component"),
+      name: creationArgs.name ?? "Component",
+      parameters: creationArgs.parameters ?? [],
+      rootExObjects: creationArgs.rootExObjects ?? [],
+      properties: creationArgs.properties ?? [],
+    };
 
-      const component = Component.creators.CustomComponent({
-        id: "circle",
-        parent$: of(null),
-        name$: new BehaviorSubject(creationArgs2.name),
-        parameters$: new BehaviorSubject(creationArgs2.parameters),
-        rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
-        properties$: new BehaviorSubject(creationArgs2.properties),
+    const component = ComponentFactory.CustomComponent({
+      id: "circle",
+      parent$: of(null),
+      name$: new BehaviorSubject(creationArgs2.name),
+      parameters$: new BehaviorSubject(creationArgs2.parameters),
+      rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
+      properties$: new BehaviorSubject(creationArgs2.properties),
 
-        async addParameterBlank() {
-          const parameter = await ComponentParameterFactory2.Custom(ctx, {});
-          const parameters = await firstValueFrom(component.parameters$);
-          this.parameters$.next([...parameters, parameter]);
-          return parameter;
-        },
+      async addParameterBlank() {
+        const parameter = await ComponentParameterFactory2.Custom(ctx, {});
+        const parameters = await firstValueFrom(component.parameters$);
+        this.parameters$.next([...parameters, parameter]);
+        return parameter;
+      },
 
-        async addPropertyBlank() {
-          const property = await Property.creators2.BasicProperty(ctx, {});
-          const properties = await firstValueFrom(component.properties$);
-          this.properties$.next([...properties, property]);
-          return property;
-        },
-      });
+      async addPropertyBlank() {
+        const property = await Property.creators2.BasicProperty(ctx, {});
+        const properties = await firstValueFrom(component.properties$);
+        this.properties$.next([...properties, property]);
+        return property;
+      },
+    });
 
-      creationArgs2.rootExObjects.forEach((rootExObject) => {
-        rootExObject.parent$.next(component);
-      });
+    creationArgs2.rootExObjects.forEach((rootExObject) => {
+      rootExObject.parent$.next(component);
+    });
 
-      return component;
-    },
+    return component;
   },
 };
 
-export type Component = VariantOf<typeof Component.creators>;
-export type ComponentKind = DexVariantKind<typeof Component.creators>;
+export type Component = VariantOf<typeof ComponentFactory>;
+export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
 
 export const CanvasComponentStore = {
-  circle: Component.creators.CanvasComponent({
+  circle: ComponentFactory.CanvasComponent({
     id: "circle",
     parent$: of(null),
     parameters: [
-      ComponentParameterFactory.creators.Canvas({
+      ComponentParameterFactory.Canvas({
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {

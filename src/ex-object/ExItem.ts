@@ -1,5 +1,5 @@
 import { firstValueFrom } from "rxjs";
-import type { Component, ComponentKind } from "src/ex-object/Component";
+import type { ComponentFactory, ComponentKind } from "src/ex-object/Component";
 import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";

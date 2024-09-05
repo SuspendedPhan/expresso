@@ -8,7 +8,7 @@ import {
   ComponentParameterKind,
   CreateComponent,
   createCustomComponentParameter,
-  type Component,
+  type ComponentFactory,
   type ComponentParameterFactory,
   type CustomComponent,
   type CustomComponentParameter,

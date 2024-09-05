@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import {
   CanvasComponentStore,
-  type Component,
+  type ComponentFactory,
 } from "src/ex-object/Component";
 import {
   type ExItem,
