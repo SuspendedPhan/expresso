@@ -25,6 +25,7 @@ import {
   createReferenceExpr,
   ReferenceExpr2,
   type ReferenceExpr,
+  type ReferenceExpr2Kind,
 } from "src/ex-object/Expr";
 import { CreateProject } from "src/ex-object/Project";
 import type {
@@ -54,7 +55,7 @@ import {
 } from "src/utils/hydration/Dehydrator";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
-import { matcher } from "variant";
+import { matcher, type TypesOf } from "variant";
 
 const log55 = log5("Rehydrator.ts");
 export default class Rehydrator {
@@ -62,6 +63,8 @@ export default class Rehydrator {
   private componentParameterById = new Map<string, ComponentParameter>();
   private propertyById = new Map<string, Property>();
   private exFuncParameterById = new Map<string, ExFuncParameter>();
+
+  private referenceByTargetId = new Map<string, ReferenceExpr2>(); // id could be id of `CustomComponentParameter | ExFuncParameter | Property`
 
   public constructor(private readonly ctx: MainContext) {}
 
@@ -263,8 +266,13 @@ export default class Rehydrator {
   public async rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
   ): Promise<CloneCountProperty> {
+    log55.debug("rehydrateCloneCountProperty", deProperty);
     const expr = await this.rehydrateExpr(deProperty.expr);
-    const property = await Create.Property.cloneCount(this.ctx, deProperty.id, expr);
+    const property = await Create.Property.cloneCount(
+      this.ctx,
+      deProperty.id,
+      expr
+    );
     this.propertyById.set(property.id, property);
     return property;
   }
@@ -324,6 +332,14 @@ export default class Rehydrator {
     ctx: Rehydrator,
     deExpr: DehydratedExprKind["ReferenceExpr"]
   ) {
+    type TargetMap = {
+      [K in TypesOf<typeof ReferenceExpr2>]: Map<string, ReferenceExpr2Kind[K]>;
+    }
+    const output = Object.keys(ReferenceExpr2).reduce((acc: any, key) => {
+      acc[key as keyof typeof ReferenceExpr2] = `${key}_mapped`;
+      return acc;
+    }, {}) as ReferenceExpr2;
+
     switch (deExpr.referenceExprKind) {
       case "ComponentParameter": {
         const target = ctx.componentParameterById.get(deExpr.targetId);
