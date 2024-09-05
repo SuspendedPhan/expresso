@@ -1,7 +1,7 @@
 import { ReplaySubject, Subject, switchMap } from "rxjs";
 import type { Expr } from "src/ex-object/ExItem";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { Property } from "src/ex-object/Property";
+import type { PropertyFactory } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import type { ExprReplacement } from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";

@@ -2,7 +2,7 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { type ComponentParameterKind, ComponentParameterFactory2, ComponentParameterFactory, type ComponentParameter } from "src/ex-object/ComponentParameter";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { Property, type PropertyKind } from "src/ex-object/Property";
+import { PropertyFactory, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
@@ -38,8 +38,6 @@ interface CustomComponent extends ComponentBase {
   addPropertyBlank(): Promise<PropertyKind["BasicProperty"]>;
 }
 
-
-
 export interface ComponentCreationArgs {
   Custom: {
     id?: string;
@@ -54,6 +52,9 @@ export const ComponentFactory = dexScopedVariant("Component", {
   CanvasComponent: fields<CanvasComponent>(),
   CustomComponent: fields<CustomComponent>(),
 });
+
+export type Component = VariantOf<typeof ComponentFactory>;
+export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
 
 export const ComponentFactory2 = {
   async CustomComponent(
@@ -84,7 +85,7 @@ export const ComponentFactory2 = {
       },
 
       async addPropertyBlank() {
-        const property = await Property.creators2.BasicProperty(ctx, {});
+        const property = await PropertyFactory.creators2.BasicProperty(ctx, {});
         const properties = await firstValueFrom(component.properties$);
         this.properties$.next([...properties, property]);
         return property;
@@ -98,9 +99,6 @@ export const ComponentFactory2 = {
     return component;
   },
 };
-
-export type Component = VariantOf<typeof ComponentFactory>;
-export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
 
 export const CanvasComponentStore = {
   circle: ComponentFactory.CanvasComponent({

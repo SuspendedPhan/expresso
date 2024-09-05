@@ -4,7 +4,7 @@
   import {
     PropertyFns,
     PropertyType,
-    type Property,
+    type PropertyFactory,
   } from "src/ex-object/Property";
   import type MainContext from "src/main-context/MainContext";
   import { rxEquals } from "src/utils/utils/Utils";

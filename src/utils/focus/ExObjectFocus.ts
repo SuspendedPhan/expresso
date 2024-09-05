@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { ExItemType, type ExItem } from "src/ex-object/ExItem";
 import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
-import { type Property } from "src/ex-object/Property";
+import { type PropertyFactory } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";

@@ -3,11 +3,11 @@ import { CallExpr } from "src/ex-object/CallExpr";
 import type { ComponentParameterKind } from "src/ex-object/Component";
 import type { ExFuncParameter } from "src/ex-object/ExFunc";
 import { type ExItemBase } from "src/ex-object/ExItem";
-import { Property } from "src/ex-object/Property";
+import { PropertyFactory, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
 import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, type VariantOf } from "variant";
+import { fields, isOfVariant, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
@@ -48,7 +48,7 @@ export const Expr = {
   async getProperty(expr: Expr) {
     let parent = await firstValueFrom(expr.parent$);
     while (parent) {
-      if (parent.itemType === ExItemType.Property) {
+      if (isOfVariant(parent, PropertyFactory)) {
         return parent;
       }
       parent = await firstValueFrom(parent.parent$);

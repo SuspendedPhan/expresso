@@ -52,7 +52,7 @@ import {
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
-import type { Property } from "src/ex-object/Property";
+import type { PropertyFactory } from "src/ex-object/Property";
 
 const log55 = log5("Rehydrator.ts");
 
