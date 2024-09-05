@@ -124,10 +124,12 @@ export default class Rehydrator {
   public async rehydrateExFuncParameter(
     deExFuncParameter: DehydratedExFuncParameter
   ): Promise<ExFuncParameter> {
-    return createExFuncParameter(this.ctx, {
+    const parameter = await createExFuncParameter(this.ctx, {
       id: deExFuncParameter.id,
       name: deExFuncParameter.name,
     });
+    this.exFuncParameterById.set(parameter.id, parameter);
+    return parameter;
   }
 
   public async rehydrateCustomComponent(
@@ -247,12 +249,14 @@ export default class Rehydrator {
 
     log55.debug("rehydrateBasicProperty", deProperty);
 
-    return Create.Property.basic(
+    const property = await Create.Property.basic(
       this.ctx,
       deProperty.id,
       deProperty.name,
       expr
     );
+    this.propertyById.set(property.id, property);
+    return property;
   }
 
   @loggedMethod
@@ -260,7 +264,9 @@ export default class Rehydrator {
     deProperty: DehydratedCloneCountProperty
   ): Promise<CloneCountProperty> {
     const expr = await this.rehydrateExpr(deProperty.expr);
-    return Create.Property.cloneCount(this.ctx, deProperty.id, expr);
+    const property = await Create.Property.cloneCount(this.ctx, deProperty.id, expr);
+    this.propertyById.set(property.id, property);
+    return property;
   }
 
   @loggedMethod

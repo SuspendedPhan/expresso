@@ -9,12 +9,12 @@ import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentica
 import Persistence from "src/utils/persistence/Persistence";
 import { log5 } from "src/utils/utils/Log5";
 
-const reset = true;
-// const reset = false;
+// const reset = true;
+const reset = false;
 
 const log55 = log5("PersistCtx.ts");
 
-export function createPersistCtx(ctx: MainContext) {
+export async function createPersistCtx(ctx: MainContext) {
   FirebaseAuthentication.userLoggedIn$.subscribe(() => {
     complete: () => {
       log55.debug("User logged in");
