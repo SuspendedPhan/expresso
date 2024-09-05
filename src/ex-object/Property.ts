@@ -22,20 +22,25 @@ import { fields, variant, type VariantOf } from "variant";
 
 const log55 = log5("Property.ts");
 
+interface PropertyBase extends ExItemBase {
+  expr$: SUB<Expr>;
+}
+
 export const Property = variant({
   ComponentParameterProperty: fields<{
     componentParameter: ComponentParameter,
-    expr$: SUB<Expr>,
-  }>(),
+  } & PropertyBase>(),
 
   BasicProperty: fields<{
     name$: SUB<string>,
     expr$: SUB<Expr>,
-  }>(),
+    base: ExItemBase,
+  } & PropertyBase>(),
 
   CloneCountProperty: fields<{
     expr$: SUB<Expr>,
-  }>(),
+    base: ExItemBase,
+  } & PropertyBase>(),
 });
 
 export type Property = VariantOf<typeof Property>;
@@ -47,24 +52,6 @@ export enum PropertyType {
   CloneCountProperty,
 }
 
-export interface PropertyBase extends ExItemBase {
-  itemType: ExItemType.Property;
-  expr$: SUB<Expr>;
-}
-
-export interface ComponentParameterProperty extends PropertyBase {
-  propertyType: PropertyType.ComponentProperty;
-  componentParameter: ComponentParameter;
-}
-
-export interface BasicProperty extends PropertyBase {
-  propertyType: PropertyType.BasicProperty;
-  name$: SUB<string>;
-}
-
-export interface CloneCountProperty extends PropertyBase {
-  propertyType: PropertyType.CloneCountProperty;
-}
 
 export namespace CreateProperty {
   export async function componentBlank(
