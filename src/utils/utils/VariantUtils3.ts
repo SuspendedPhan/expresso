@@ -73,7 +73,7 @@ const f7_: Bay7_3Kind["Bay3"] = Bay7_3.Bay3({
   id3: "1",
   bay00: Bay7_3.Bay2({ id2: "2" }),
 });
-console.log(f7_);
+log55.debug(f7_);
 
 // --------------------------------------------
 // Now let's make this generic. Woot!
@@ -117,7 +117,7 @@ const f6_: Bay6_4["Bay3"] = Bay6_3.Bay3({
   bay00: Bay6_3.Bay2({ id2: "2" }),
 });
 // const f6_: Bay6_3["Bay3"] = Bay6_3.Bay3({ id3: "1", bay00: Bay6_3.Bay2({ id2: "2" }) });
-console.log(f6_);
+log55.debug(f6_);
 
 // --------------------------------------------
 // Now let's try to make the helper.

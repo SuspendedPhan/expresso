@@ -9,7 +9,7 @@
   const projects$ = ctx.library$.pipe(
     switchMap((library) => library.libraryProjectArr$)
   );
-  $: console.log($projects$);
+  $: log55.debug($projects$);
 </script>
 
 <div class={Constants.WindowPaddingClass}>

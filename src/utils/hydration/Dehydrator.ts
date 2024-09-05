@@ -474,7 +474,7 @@ export default class Dehydrator {
   private dehydrateReferenceExpr$(
     expr: ReferenceExpr
   ): Observable<DehydratedExprKind["ReferenceExpr"]> {
-    console.log(expr.reference);
+    log55.debug(expr.reference);
 
     return of(
       DehydratedExpr.ReferenceExpr({

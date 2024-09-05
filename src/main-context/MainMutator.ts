@@ -12,6 +12,9 @@ import { assertUnreachable } from "src/utils/utils/Utils";
 import Logger from "../utils/logger/Logger";
 import type MainContext from "./MainContext";
 import type { ExprReplacement } from "./MainContext";
+import { log5 } from "src/utils/utils/Log5";
+
+const log55 = log5("MainMutator.ts");
 
 export type ExItemMutBase = {
   readonly parentSub$: BehaviorSubject<Parent>;
@@ -77,7 +80,7 @@ export default class MainMutator {
       case ExItemType.ExFunc: {
         const exFunc = parent;
         exFunc.expr$.next(newExpr);
-        console.log("replaced expr in exFunc");
+        log55.debug("replaced expr in exFunc");
         break;
       }
       default:
