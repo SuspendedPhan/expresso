@@ -35,7 +35,7 @@ export function dexVariantTyped<T extends Record<string, any>, Key extends strin
  *   const expr: ExprKind["Number"] = Expr.Number();
  */
 export type DexVariantKind<T extends VariantModule<K>, K extends string = "type"> = {
-  [K in keyof T]: ReturnType<T[K]>;
+  [K in keyof T]: Awaited<ReturnType<T[K]>>;
 };
 
 

@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import type { CallExprKind } from "src/ex-object/CallExpr";
-import type { Component } from "src/ex-object/Component";
+import type { Component, ComponentKind } from "src/ex-object/Component";
 import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
 import type {
@@ -10,7 +10,7 @@ import type { Property } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
 
 export type ExItem = Component | ExObject | Expr | ExFunc | Property;
-export type Parent = Exclude<ExItem, NumberExpr> | null | Property;
+export type Parent = Exclude<ExItem, NumberExpr> | null | Property | ComponentKind["CustomComponent"];
 export type Expr =
   | NumberExpr
   | CallExpr

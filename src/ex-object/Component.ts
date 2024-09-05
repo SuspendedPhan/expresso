@@ -1,11 +1,12 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import { ExItemType } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { type PropertyKind, CreateProperty } from "src/ex-object/Property";
+import { Property, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
-import type { OBS, SUB } from "src/utils/utils/Utils";
+import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
+import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { fields, variant, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
 
@@ -14,34 +15,16 @@ export type CanvasSetter = (
   value: number
 ) => void;
 
-export type Component = CanvasComponent | CustomComponent;
-export type ComponentParameter =
-  | CanvasComponentParameter
-  | CustomComponentParameter;
-
-export enum ComponentKind {
-  CanvasComponent,
-  CustomComponent,
-}
-
-export enum ComponentParameterKind {
-  CanvasComponentParameter,
-  CustomComponentParameter,
-}
-
-export interface ComponentBase {
+interface ComponentBase {
   id: string;
-  itemType: ExItemType.Component;
   parent$: OBS<null>;
 }
 
-export interface CanvasComponent extends ComponentBase {
-  componentKind: ComponentKind.CanvasComponent;
-  parameters: CanvasComponentParameter[];
+interface CanvasComponent extends ComponentBase {
+  parameters: ComponentParameterKind["Canvas"][];
 }
 
-export interface CustomComponent extends ComponentBase {
-  componentKind: ComponentKind.CustomComponent;
+interface CustomComponent extends ComponentBase {
   name$: SUB<string>;
   parameters$: SUB<CustomComponentParameter[]>;
   rootExObjects$: SUB<ExObject[]>;
@@ -51,38 +34,124 @@ export interface CustomComponent extends ComponentBase {
   addPropertyBlank(): Promise<PropertyKind["BasicProperty"]>;
 }
 
-export interface CanvasComponentParameter {
+interface CanvasComponentParameter {
   readonly id: string;
   readonly name: string;
-  readonly componentParameterKind: ComponentParameterKind.CanvasComponentParameter;
   readonly canvasSetter: CanvasSetter;
 }
 
-export interface CustomComponentParameter {
+interface CustomComponentParameter {
   readonly id: string;
-  readonly componentParameterKind: ComponentParameterKind.CustomComponentParameter;
   readonly name$: SUB<string>;
 }
 
+export interface ComponentParameterCreationArgs {
+  CustomComponentParameter: {
+    id?: string;
+    name?: string;
+  };
+}
+
+export const ComponentParameter = {
+  creators: variant({
+    Canvas: fields<CanvasComponentParameter>(),
+    Custom: fields<CustomComponentParameter>(),
+  }),
+
+  creators2: {
+    async Custom(creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]) {
+      const creationArgs2: Required<ComponentParameterCreationArgs["CustomComponentParameter"]> = {
+        id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
+        name: creationArgs.name ?? "Parameter",
+      };
+      const parameter: CustomComponentParameter = {
+        id: creationArgs2.id,
+        name$: new BehaviorSubject(creationArgs2.name),
+      };
+      return parameter;
+    }
+  },
+};
+
+export type ComponentParameter = VariantOf<typeof ComponentParameter.creators>;
+export type ComponentParameterKind = DexVariantKind<typeof ComponentParameter.creators>;
+
+export interface ComponentCreationArgs {
+  Custom: {
+    id?: string;
+    name?: string;
+    parameters?: CustomComponentParameter[];
+    rootExObjects?: ExObject[];
+    properties?: PropertyKind["BasicProperty"][];
+  };
+}
+
+export const Component = {
+  creators: variant({
+    CanvasComponent: fields<CanvasComponent>(),
+    CustomComponent: fields<CustomComponent>(),
+  }),
+
+  creators2: {
+    async CustomComponent(ctx: MainContext, creationArgs: ComponentCreationArgs["Custom"]) {
+      const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
+        id: creationArgs.id ?? Utils.createId("custom-component"),
+        name: creationArgs.name ?? "Component",
+        parameters: creationArgs.parameters ?? [],
+        rootExObjects: creationArgs.rootExObjects ?? [],
+        properties: creationArgs.properties ?? [],
+      };
+
+      const component = Component.creators.CustomComponent({
+        id: "circle",
+        parent$: of(null),
+        name$: new BehaviorSubject(creationArgs2.name),
+        parameters$: new BehaviorSubject(creationArgs2.parameters),
+        rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
+        properties$: new BehaviorSubject(creationArgs2.properties),
+
+        async addParameterBlank() {
+          const parameter = await createCustomComponentParameter(ctx, {});
+          const parameters = await firstValueFrom(component.parameters$);
+          this.parameters$.next([...parameters, parameter]);
+          return parameter;
+        },
+
+        async addPropertyBlank() {
+          const property = await Property.creators2.BasicProperty(ctx, {});
+          const properties = await firstValueFrom(component.properties$);
+          this.properties$.next([...properties, property]);
+          return property;
+        },
+      });
+
+      creationArgs2.rootExObjects.forEach((rootExObject) => {
+        rootExObject.parent$.next(component);
+      });
+
+      return component;
+    },
+  },
+};
+
+export type Component = VariantOf<typeof Component.creators>;
+export type ComponentKind = DexVariantKind<typeof Component.creators>;
 
 export const CanvasComponentStore = {
-  circle: {
+  circle: Component.creators.CanvasComponent({
     id: "circle",
     parent$: of(null),
-    itemType: ExItemType.Component,
-    componentKind: ComponentKind.CanvasComponent,
     parameters: [
-      {
-        componentParameterKind: ComponentParameterKind.CanvasComponentParameter,
+      ComponentParameter.creators.Canvas({
         name: "x",
         id: "x",
         canvasSetter: (pixiObject, value) => {
           pixiObject.x = value;
         },
-      },
+      }),
     ],
-  },
-} satisfies Record<string, CanvasComponent>;
+  }),
+} satisfies Record<string, ComponentKind["CanvasComponent"]>;
 
 export function createComponentCtx(_ctx: MainContext) {
   const parameterById = new Map<string, CanvasComponentParameter>();
@@ -108,71 +177,6 @@ export function createComponentCtx(_ctx: MainContext) {
       return parameter;
     },
   };
-}
-
-export async function createCustomComponentParameter(
-  _ctx: MainContext,
-  data: {
-    id?: string;
-    name?: string;
-  }
-): Promise<CustomComponentParameter> {
-  return {
-    componentParameterKind: ComponentParameterKind.CustomComponentParameter,
-    id: data.id ?? `custom-component-parameter-${crypto.randomUUID()}`,
-    name$: new BehaviorSubject(data.name ?? "Parameter"),
-  };
-}
-
-export namespace CreateComponent {
-  export async function custom(
-    ctx: MainContext,
-    data: {
-      id?: string;
-      name?: string;
-      parameters?: CustomComponentParameter[];
-      rootExObjects?: ExObject[];
-      properties?: PropertyKind["BasicProperty"][];
-    }
-  ): Promise<CustomComponent> {
-    if (data.name === undefined) {
-      const ordinal = await ctx.projectCtx.getOrdinalProm();
-      data.name = `Component ${ordinal}`;
-    }
-
-    const rootExObjects = data.rootExObjects ?? [];
-
-    const component: CustomComponent = {
-      id: data.id ?? `custom-component-${crypto.randomUUID()}`,
-      itemType: ExItemType.Component,
-      parent$: of(null),
-      componentKind: ComponentKind.CustomComponent,
-      name$: new BehaviorSubject(data.name),
-      parameters$: new BehaviorSubject(data.parameters ?? []),
-      rootExObjects$: new BehaviorSubject(rootExObjects),
-      properties$: new BehaviorSubject(data.properties ?? []),
-
-      async addParameterBlank() {
-        const parameter = await createCustomComponentParameter(ctx, {});
-        const parameters = await firstValueFrom(component.parameters$);
-        this.parameters$.next([...parameters, parameter]);
-        return parameter;
-      },
-
-      async addPropertyBlank() {
-        const property = await CreateProperty.basic(ctx, {});
-        const properties = await firstValueFrom(component.properties$);
-        this.properties$.next([...properties, property]);
-        return property;
-      },
-    };
-
-    rootExObjects.forEach((rootExObject) => {
-      rootExObject.parent$.next(component);
-    });
-
-    return component;
-  }
 }
 
 export namespace ComponentParameterFns {
