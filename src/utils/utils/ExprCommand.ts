@@ -123,14 +123,17 @@ async function createReferenceExprCommand(
   parent: ExObject | CustomComponent
 ): Promise<ExprCommand> {
   const name = await ReferenceExpr2Cosmos.match(reference2, {
-    Property: async ({ target: property }) => {
-      return await firstValueFrom(PropertyFns.getName$(property));
+    Property: async ({ target }) => {
+      assert(target != null);
+      return firstValueFrom(PropertyFns.getName$(target));
     },
-    ComponentParameter: async ({ target: parameter }) => {
-      return await firstValueFrom(parameter.name$);
+    ComponentParameter: async ({ target }) => {
+      assert(target != null);
+      return firstValueFrom(target.name$);
     },
-    ExFuncParameter: async ({ target: parameter }) => {
-      return await firstValueFrom(parameter.name$);
+    ExFuncParameter: async ({ target }) => {
+      assert(target != null);
+      return firstValueFrom(target.name$);
     },
   });
 

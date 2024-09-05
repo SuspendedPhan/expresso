@@ -1,3 +1,4 @@
+import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import type { CustomComponentParameter } from "src/ex-object/Component";
 import type { ExFuncParameter } from "src/ex-object/ExFunc";
@@ -5,17 +6,18 @@ import {
   ExItemType,
   ExprType,
   type ExItemBase,
-  type Expr
+  type Expr,
 } from "src/ex-object/ExItem";
 import { PropertyFns, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils, type OBS } from "src/utils/utils/Utils";
 import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
-import {
-  fields,
-  variantCosmos,
-  type VariantOf
-} from "variant";
+import { fields, variantCosmos, type VariantOf } from "variant";
+
+export type ReferenceTarget =
+  | Property
+  | CustomComponentParameter
+  | ExFuncParameter;
 
 export namespace ExprFuncs {
   export async function getProperty(expr: Expr) {
@@ -28,6 +30,10 @@ export namespace ExprFuncs {
     }
     throw new Error("Property not found");
   }
+
+  // export function getTargetName$(target: ReferenceTarget): OBS<string> {
+    
+  // }
 }
 
 export async function createReferenceExpr(
@@ -46,9 +52,15 @@ export async function createReferenceExpr(
     reference: data.reference2,
     get name$(): OBS<string> {
       return ReferenceExpr2Cosmos.matcher(this.reference)
-        .when(ReferenceExpr2.Property, ({ target }) => PropertyFns.getName$(target))
-        .else(x => x.target.name$);
-    }
+        .when(ReferenceExpr2.Property, ({ target }) => {
+          assert(target != null);
+          return PropertyFns.getName$(target);
+        })
+        .else((x) => {
+          assert(x.target != null);
+          return x.target.name$;
+        });
+    },
   } as ReferenceExpr;
   return expr;
 }
@@ -66,8 +78,11 @@ export const ReferenceExpr2Cosmos = variantCosmos({ key: REFERENCE_EXPR2_TAG });
 export const ReferenceExpr2 = ReferenceExpr2Cosmos.variant({
   Property: fields<{ target: Property | null }>(),
   ComponentParameter: fields<{ target: CustomComponentParameter | null }>(),
-  ExFuncParameter: fields<{ target: ExFuncParameter|null }>(),
+  ExFuncParameter: fields<{ target: ExFuncParameter | null }>(),
 });
 
 export type ReferenceExpr2 = VariantOf<typeof ReferenceExpr2>;
-export type ReferenceExpr2Kind = DexVariantKind<typeof ReferenceExpr2, typeof REFERENCE_EXPR2_TAG>;
+export type ReferenceExpr2Kind = DexVariantKind<
+  typeof ReferenceExpr2,
+  typeof REFERENCE_EXPR2_TAG
+>;

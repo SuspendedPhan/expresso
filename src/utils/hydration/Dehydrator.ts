@@ -1,3 +1,4 @@
+import assert from "assert-ts";
 import {
   combineLatest,
   combineLatestWith,
@@ -476,10 +477,12 @@ export default class Dehydrator {
   ): Observable<DehydratedExprKind["ReferenceExpr"]> {
     log55.debug(expr.reference);
 
+    const target = expr.reference.target;
+    assert(target != null);
     return of(
       DehydratedExpr.ReferenceExpr({
         id: expr.id,
-        targetId: expr.reference.target.id,
+        targetId: target.id,
         referenceExprKind: expr.reference.referenceExpr2Kind,
       })
     );

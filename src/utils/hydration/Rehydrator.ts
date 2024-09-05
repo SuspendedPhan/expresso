@@ -65,10 +65,6 @@ interface RehydratedReferenceExpr {
 
 export default class Rehydrator {
   private customComponentById = new Map<string, CustomComponent>();
-  private componentParameterById = new Map<string, ComponentParameter>();
-  private propertyById = new Map<string, Property>();
-  private exFuncParameterById = new Map<string, ExFuncParameter>();
-
   private rehydratedReferenceExprs = new Array<RehydratedReferenceExpr>();
   private targetById = new Map<string, ComponentParameter | ExFuncParameter | Property>();
 
@@ -146,7 +142,7 @@ export default class Rehydrator {
       id: deExFuncParameter.id,
       name: deExFuncParameter.name,
     });
-    this.exFuncParameterById.set(parameter.id, parameter);
+    this.targetById.set(parameter.id, parameter);
     return parameter;
   }
 
@@ -182,7 +178,7 @@ export default class Rehydrator {
       id: deParameter.id,
       name: deParameter.name,
     });
-    this.componentParameterById.set(parameter.id, parameter);
+    this.targetById.set(parameter.id, parameter);
     return parameter;
   }
 
@@ -273,7 +269,7 @@ export default class Rehydrator {
       deProperty.name,
       expr
     );
-    this.propertyById.set(property.id, property);
+    this.targetById.set(property.id, property);
     return property;
   }
 
@@ -288,7 +284,7 @@ export default class Rehydrator {
       deProperty.id,
       expr
     );
-    this.propertyById.set(property.id, property);
+    this.targetById.set(property.id, property);
     return property;
   }
 
@@ -380,11 +376,12 @@ export default class Rehydrator {
   ): ComponentParameter {
     switch (parameterKind) {
       case ComponentParameterKind.CustomComponentParameter:
-        const parameter = this.componentParameterById.get(parameterId);
+        const parameter = this.targetById.get(parameterId);
         assert(
           parameter !== undefined,
           `Component parameter not found: ${parameterId} ${parameterKind}`
         );
+        assert("componentParameterKind" in parameter);
         return parameter;
       case ComponentParameterKind.CanvasComponentParameter:
         log55.debug("getCanvasComponentParameterById", parameterId);
