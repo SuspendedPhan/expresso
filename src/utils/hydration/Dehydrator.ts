@@ -231,8 +231,10 @@ export default class Dehydrator {
   }
 
   public dehydrateCustomComponent$(component: CustomComponent) {
+    log55.debug("dehydrateCustomComponent$", component);
     const deParameters$ = component.parameters$.pipe(
       switchMap((parameters) => {
+        log55.debug("dehydrateCustomComponent$.parameters", parameters);
         return RxFns.combineLatestOrEmpty(
           parameters.map((parameter) => {
             return this.dehydrateCustomComponentParameter$(parameter);
@@ -243,7 +245,8 @@ export default class Dehydrator {
 
     const deRootExObjects$ = component.rootExObjects$.pipe(
       switchMap((rootExObjects) => {
-        return combineLatest(
+        log55.debug("dehydrateCustomComponent$.rootExObjects", rootExObjects);
+        return RxFns.combineLatestOrEmpty(
           rootExObjects.map((exObject) => {
             return this.dehydrateExObject$(exObject);
           })
@@ -257,6 +260,7 @@ export default class Dehydrator {
       component.name$,
     ]).pipe(
       map(([deParameters, deRootExObjects, name]) => {
+        log55.debug("dehydrateCustomComponent$.combineLatest");
         return {
           id: component.id,
           name,
