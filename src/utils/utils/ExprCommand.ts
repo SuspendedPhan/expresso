@@ -1,11 +1,13 @@
 import assert from "assert-ts";
 import { firstValueFrom, switchMap } from "rxjs";
 import {
+  ComponentFactory,
   ComponentKind,
   type CustomComponent
 } from "src/ex-object/Component";
+import { ExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItemFn, ExItemType, type Expr } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
+import { ExObjectFactory, type ExObject } from "src/ex-object/ExObject";
 import {
   createReferenceExpr,
   ReferenceExpr2,
@@ -15,6 +17,7 @@ import { PropertyFns } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
+import { isType, matcher } from "variant";
 
 const log55 = log5("ExprCommand.ts");
 
@@ -80,38 +83,31 @@ async function* getExprCommands2(
     log55.debug("ancestor", ancestor.id);
     const createReferenceExprCommand_ = (reference2: ReferenceExpr2) => createReferenceExprCommand(ctx, exItem, reference2, ancestor as any);
 
-    switch (ancestor.itemType) {
-      case ExItemType.ExObject:
-        yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: ancestor.cloneCountProperty }));
+    if (isType(ancestor, ExObjectFactory.Basic)) {
+      yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: ancestor }));
 
-        for (const property of ancestor.componentParameterProperties) {
-          yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
-        }
+      for (const property of ancestor.componentParameterProperties) {
+        yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
+      }
 
-        for (const property of await firstValueFrom(
-          ancestor.basicProperties$
-        )) {
-          yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
-        }
+      for (const property of await firstValueFrom(
+        ancestor.basicProperties$
+      )) {
+        yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
+      }
+    } else if (isType(ancestor, ComponentFactory.CustomComponent)) {
+      for (const parameter of await firstValueFrom(ancestor.parameters$)) {
+        yield createReferenceExprCommand_(ReferenceExpr2.ComponentParameter({ target: parameter }));
+      }
 
-        break;
-      case ExItemType.Component:
-        assert(ancestor.componentKind === ComponentKind.CustomComponent);
-
-        for (const parameter of await firstValueFrom(ancestor.parameters$)) {
-          yield createReferenceExprCommand_(ReferenceExpr2.ComponentParameter({ target: parameter }));
-        }
-
-        for (const property of await firstValueFrom(ancestor.properties$)) {
-          yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
-        }
-        break;
-      case ExItemType.ExFunc:
-        for (const parameter of await firstValueFrom(ancestor.exFuncParameterArr$)) {
-          log55.debug("parameter", parameter.id);
-          yield createReferenceExprCommand_(ReferenceExpr2.ExFuncParameter({ target: parameter }));
-        }
-        break;
+      for (const property of await firstValueFrom(ancestor.properties$)) {
+        yield createReferenceExprCommand_(ReferenceExpr2.Property({ target: property }));
+      }
+    } else if (isType(ancestor, ExFuncFactory.Custom)) {
+      for (const parameter of await firstValueFrom(ancestor.exFuncParameterArr$)) {
+        log55.debug("parameter", parameter.id);
+        yield createReferenceExprCommand_(ReferenceExpr2.ExFuncParameter({ target: parameter
+        }));
     }
   }
 }

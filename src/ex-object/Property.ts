@@ -142,32 +142,4 @@ export namespace PropertyFns {
       )
       .complete();
   }
-
-  export async function* getAncestorPropertyGen(
-    exItem: ExItem
-  ): AsyncGenerator<[Property, ExObject | CustomComponent], void, undefined> {
-    for await (const ancestor of ExItemFn.getAncestors(exItem)) {
-      log55.debug("ancestor", ancestor.id);
-
-      switch (ancestor.itemType) {
-        case ExItemType.ExObject:
-          yield [ancestor.cloneCountProperty, ancestor];
-          for (const property of ancestor.componentParameterProperties) {
-            yield [property, ancestor];
-          }
-          for (const property of await firstValueFrom(
-            ancestor.basicProperties$
-          )) {
-            yield [property, ancestor];
-          }
-          break;
-        case ExItemType.Component:
-          assert(ancestor.componentKind === ComponentKind.CustomComponent);
-          for (const property of await firstValueFrom(ancestor.properties$)) {
-            yield [property, ancestor];
-          }
-          break;
-      }
-    }
-  }
 }

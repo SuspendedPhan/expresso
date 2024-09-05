@@ -6,7 +6,7 @@ import {
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { fields, variant, type VariantOf } from "variant";
 
 interface CustomExFunc extends ExItemBase {
@@ -27,7 +27,7 @@ export const SystemExFuncFactory = variant({
 export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
 export type SystemExFuncKind = DexVariantKind<typeof SystemExFuncFactory>;
 
-export const ExFuncFactory = variant({
+export const ExFuncFactory = dexScopedVariant("ExFunc", {
   Custom: fields<CustomExFunc>(),
   System: fields<SystemExFunc>(),
 });

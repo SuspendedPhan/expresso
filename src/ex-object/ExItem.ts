@@ -1,13 +1,13 @@
 import { firstValueFrom } from "rxjs";
-import type { Component, ComponentKind } from "src/ex-object/Component";
+import { type Component } from "src/ex-object/Component";
 import type { ExFunc } from "src/ex-object/ExFunc";
 import type { ExObject } from "src/ex-object/ExObject";
-import type { Expr } from "src/ex-object/Expr";
-import type { PropertyFactory } from "src/ex-object/Property";
+import { type Expr } from "src/ex-object/Expr";
+import type { Property } from "src/ex-object/Property";
 import type { SUB } from "src/utils/utils/Utils";
 
 export type ExItem = Component | ExObject | Expr | ExFunc | Property;
-export type Parent = ExItem | null | Property | ComponentKind["CustomComponent"];
+export type Parent = ExItem | null;
 
 export interface ExItemBase {
   readonly id: string;

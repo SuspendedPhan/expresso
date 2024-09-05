@@ -1,6 +1,6 @@
 import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
-import type { ComponentParameterKind } from "src/ex-object/Component";
+import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import type { ExFuncParameter } from "src/ex-object/ExFunc";
 import { type ExItemBase } from "src/ex-object/ExItem";
 import { PropertyFactory, type Property } from "src/ex-object/Property";
