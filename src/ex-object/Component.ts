@@ -2,6 +2,7 @@ import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import { ExItemType } from "src/ex-object/ExItem";
 import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
+import { type PropertyKind, CreateProperty } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS, SUB } from "src/utils/utils/Utils";
@@ -159,7 +160,7 @@ export namespace CreateComponent {
       },
 
       async addPropertyBlank() {
-        const property = await CreateProperty.basicBlank(ctx);
+        const property = await CreateProperty.basic(ctx, {});
         const properties = await firstValueFrom(component.properties$);
         this.properties$.next([...properties, property]);
         return property;
