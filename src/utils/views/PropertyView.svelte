@@ -1,17 +1,13 @@
 <script lang="ts">
   import { map, of } from "rxjs";
-  import { ExprType } from "src/ex-object/ExItem";
-  import {
-    PropertyFns,
-    PropertyType,
-    type PropertyFactory,
-  } from "src/ex-object/Property";
+  import { ExprFactory } from "src/ex-object/Expr";
+  import { PropertyFns, type Property } from "src/ex-object/Property";
   import type MainContext from "src/main-context/MainContext";
   import { rxEquals } from "src/utils/utils/Utils";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
-  import ExprLayout from "../layout/ExprLayout";
+  import { isType } from "variant";
 
   export let ctx: MainContext;
   export let property: Property;
@@ -21,14 +17,7 @@
   const expr$ = property.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
 
-  const isNumberExpr$ = expr$.pipe(
-    map((expr) => expr.exprType === ExprType.NumberExpr)
-  );
-
-  // Hmmm... this seems inefficient
-  const elementLayout$ = expr$.pipe(
-    map((expr) => ExprLayout.create(ctx, expr))
-  );
+  const isNumberExpr$ = expr$.pipe(map(isType(ExprFactory.Number)));
 
   const isFocused$ = ctx.exObjectFocusCtx.propertyFocus$.pipe(
     rxEquals(property)
