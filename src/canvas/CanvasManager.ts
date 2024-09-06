@@ -5,8 +5,6 @@ import {
 } from "src/canvas/CanvasObject";
 import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
 import {
-  ComponentParameterKind,
-  ComponentKind,
   type CanvasSetter,
 } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";

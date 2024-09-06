@@ -1,6 +1,6 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import { ComponentParameterFactory, ComponentParameterFactory2, type ComponentParameter, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
+import { ComponentParameterFactory, ComponentParameterFactory2, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
@@ -142,23 +142,8 @@ export function createComponentCtx(_ctx: MainContext) {
   };
 }
 
-export namespace ComponentParameterFns {
-  export function getName$(
-    componentParameter: ComponentParameter
-  ): OBS<string> {
-    return matcher(componentParameter)
-      .when(ComponentParameterFactory.Canvas, (componentParameter) => {
-        return of(componentParameter.name);
-      })
-      .when(ComponentParameterFactory.Custom, (componentParameter) => {
-        return componentParameter.name$;
-      })
-      .complete();
-  }
-}
-
-export namespace ComponentFns {
-  export function getName$(component: Component): OBS<string> {
+export const Component = {
+  getName$(component: Component): OBS<string> {
     return matcher(component)
       .when(ComponentFactory.CanvasComponent, (component) => {
         return of(component.id);
@@ -167,9 +152,9 @@ export namespace ComponentFns {
         return component.name$;
       })
       .complete();
-  }
+  },
 
-  export async function addRootExObjectBlank(
+  async addRootExObjectBlank(
     _ctx: MainContext,
     component: ComponentKind["CustomComponent"]
   ): Promise<void> {

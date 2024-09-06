@@ -18,12 +18,12 @@ export interface ExItemBase {
   readonly destroy$: SUB<void>;
 }
 
-export namespace ExItemFn {
-  export async function* getAncestors(item: ExItem): AsyncGenerator<ExItem> {
+export const ExItem = {
+  async *getAncestors(item: ExItem): AsyncGenerator<ExItem> {
     let parent: Parent = await firstValueFrom(item.parent$);
     while (parent !== null) {
       yield parent;
       parent = await firstValueFrom(parent.parent$);
     }
-  }
-}
+  },
+};

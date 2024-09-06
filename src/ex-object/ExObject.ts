@@ -75,20 +75,20 @@ export async function ExObjectFactory2(ctx: MainContext, creationArgs: ExObjectC
   return exObject;
 }
 
-export namespace ExObjectFns {
-  export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
+export const ExObject = {
+  async addChildBlank(ctx: MainContext, exObject: ExObject) {
     const child = await ExObjectFactory2(ctx, {});
-    addChild(exObject, child);
-  }
+    ExObject.addChild(exObject, child);
+  },
 
-  export async function addChild(exObject: ExObject, child: ExObject) {
+  async addChild(exObject: ExObject, child: ExObject) {
     const children = await firstValueFrom(exObject.children$);
     child.parent$.next(exObject);
     const newChildren = [...children, child];
     exObject.children$.next(newChildren);
-  }
+  },
 
-  export async function addBasicPropertyBlank(
+  async addBasicPropertyBlank(
     ctx: MainContext,
     exObject: ExObject
   ) {
@@ -97,9 +97,9 @@ export namespace ExObjectFns {
     const properties = await firstValueFrom(exObject.basicProperties$);
     const newProperties = [...properties, property];
     exObject.basicProperties$.next(newProperties);
-  }
+  },
 
-  export async function getExObject(exItem: ExItem): Promise<ExObject | null> {
+  async getExObject(exItem: ExItem): Promise<ExObject | null> {
     let item: ExItem | null = exItem;
     while (item !== null) {
       if (isType(item, ExObjectFactory)) {
@@ -109,9 +109,9 @@ export namespace ExObjectFns {
       item = parent;
     }
     return null;
-  }
+  },
 
-  export async function getRootExObject(exObject: ExObject): Promise<ExObject> {
+  async getRootExObject(exObject: ExObject): Promise<ExObject> {
     let parent: Parent = exObject;
     while (true) {
       const nextParent: Parent = await firstValueFrom(parent.parent$);
@@ -121,16 +121,16 @@ export namespace ExObjectFns {
       }
       parent = nextParent;
     }
-  }
+  },
 
-  export async function replaceExObject(
+  async replaceExObject(
     ctx: MainContext,
     exObject: ExObject,
     newExObject: ExObject
   ) {
     const parent = await firstValueFrom(exObject.parent$);
     if (parent === null) {
-      replaceRootExObject(ctx, exObject, newExObject);
+      ExObject.replaceRootExObject(ctx, exObject, newExObject);
       return;
     }
 
@@ -143,9 +143,9 @@ export namespace ExObjectFns {
     parent.children$.next(children);
 
     exObject.destroy$.next();
-  }
+  },
 
-  async function replaceRootExObject(
+  async replaceRootExObject(
     ctx: MainContext,
     exObject: ExObject,
     newExObject: ExObject
