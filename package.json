@@ -28,6 +28,7 @@
     "axios": "^1.7.2",
     "css-element-queries": "^1.2.3",
     "deepool": "^3.0.1",
+    "effect": "^3.7.2",
     "firebase": "^10.12.2",
     "firebaseui": "^6.1.0",
     "gapi-script": "^1.2.0",
