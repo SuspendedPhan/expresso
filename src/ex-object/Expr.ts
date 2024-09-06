@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
 import { ComponentParameterFactory, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
@@ -23,7 +24,35 @@ export const ExprFactory = dexScopedVariant("Expr", {
 export type Expr = VariantOf<typeof ExprFactory> | CallExpr;
 export type ExprKind = DexVariantKind<typeof ExprFactory>;
 
+interface ExprCreationArgs {
+  Number: {
+    id?: string;
+    value?: number;
+  };
+
+  Reference: {
+    id?: string;
+    target: ReferenceTarget | null;
+  };
+}
+
 export const ExprFactory2 = {
+  Number(creationArgs: ExprCreationArgs["Number"]) {
+    return Effect.gen(function* () {
+      const creationArgs2: Required<ExprCreationArgs["Number"]> = {
+        id: creationArgs.id ?? Utils.createId("expr"),
+        value: creationArgs.value ?? 0,
+      };
+
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const expr = ExprFactory.Number({
+        ...base,
+        value: creationArgs2.value,
+      });
+      return expr;
+    });
+  },
+
   async Reference(
     ctx: MainContext,
     creationArgs: ExprCreationArgs["Reference"]
@@ -67,9 +96,3 @@ export const Expr = {
   },
 };
 
-interface ExprCreationArgs {
-  Reference: {
-    id?: string;
-    target: ReferenceTarget | null;
-  };
-}

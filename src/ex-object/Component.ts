@@ -9,6 +9,7 @@ import {
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
 import { type DexVariantKind } from "src/utils/utils/VariantUtils4";
@@ -79,6 +80,8 @@ export const ComponentFactory2 = {
         rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
         properties$: new BehaviorSubject(creationArgs2.properties),
 
+        ...createMethods(this),
+
         addParameterBlank() {
           const component = this;
           return Effect.gen(function* () {
@@ -92,8 +95,8 @@ export const ComponentFactory2 = {
         addPropertyBlank() {
           const component = this;
           return Effect.gen(function* () {
-            const property = yield* Effect.promise(() => PropertyFactory2.BasicProperty(ctx, {}));
-            const properties = yield* Effect.promise(() => firstValueFrom(component.properties$));
+            const property = yield* PropertyFactory2.BasicProperty({});
+            const properties = yield* EffectUtils.firstValueFrom(component.properties$);
             component.properties$.next([...properties, property]);
             return property;
           });
@@ -107,6 +110,28 @@ export const ComponentFactory2 = {
       return component;
     }),
 };
+
+function createMethods(component: ComponentKind["Custom"]) {
+  return {
+    addParameterBlank() {
+      return Effect.gen(function* () {
+        const parameter = ComponentParameterFactory2.Custom({});
+        const parameters = yield* Effect.promise(() => firstValueFrom(component.parameters$));
+        component.parameters$.next([...parameters, parameter]);
+        return parameter;
+      });
+    },
+
+    addPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        const properties = yield* EffectUtils.firstValueFrom(component.properties$);
+        component.properties$.next([...properties, property]);
+        return property;
+      });
+    },
+  };
+}
 
 // const ComponentMethods = {
 //   addParameterBlank: Effect.gen(function* () {

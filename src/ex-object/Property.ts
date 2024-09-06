@@ -5,15 +5,12 @@
  * Component Argument
  */
 
+import { Effect } from "effect";
 import { of } from "rxjs";
-import {
-} from "src/ex-object/Component";
+import {} from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
-import {
-  ExItem,
-  type ExItemBase
-} from "src/ex-object/ExItem";
-import type { Expr } from "src/ex-object/Expr";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExprFactory, ExprFactory2, type Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import {
@@ -89,21 +86,26 @@ export const PropertyFactory2 = {
     return property;
   },
 
-  async BasicProperty(
-    ctx: MainContext,
-    createArgs: CreatePropertyArgs["Basic"]
-  ) {
-    const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
-      id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
-      expr: createArgs.expr ?? (await ctx.objectFactory.createNumberExpr()),
-      name: createArgs.name ?? "Basic Property",
-    };
+  BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
+    return Effect.gen(function* () {
+      const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
+        id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
+        expr: createArgs.expr === undefined ? yield* ExprFactory2.Number({}) : createArgs.expr,
+        name: createArgs.name ?? "Basic Property",
+      };
 
-    const base = await ExItem.createExItemBase(createArgs2.id);
-    return PropertyFactory.BasicProperty({
-      ...base,
-      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
-      name$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.name),
+      const base = await ExItem.createExItemBase(createArgs2.id);
+      return PropertyFactory.BasicProperty({
+        ...base,
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          createArgs2.expr
+        ),
+        name$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          createArgs2.name
+        ),
+      });
     });
   },
 
