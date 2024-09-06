@@ -1,103 +1,55 @@
-import { Subject } from "rxjs";
+import { Effect } from "effect";
 import {
-  SystemExFuncFactory,
-  type ExFunc,
-  type SystemExFunc
+  type ExFunc
 } from "src/ex-object/ExFunc";
-import {
-  ExItem,
-  type ExItemBase,
-} from "src/ex-object/ExItem";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import type { Expr } from "src/ex-object/Expr";
-import type MainContext from "src/main-context/MainContext";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, pass, variant, type VariantOf } from "variant";
+import { fields, variation } from "variant";
 
-interface CallExprBase extends ExItemBase {
-  readonly args$: SUB<Expr[]>;
+interface CallExpr_ extends ExItemBase {
+  args$: SUB<Expr[]>;
+  exFunc$: SUB<ExFunc>;
 }
+
+export const CallExprFactory = variation("CallExpr", fields<CallExpr_>());
+export type CallExpr = ReturnType<typeof CallExprFactory>;
 
 interface CallExprCreationArgs {
-  Custom: {
-    id?: string;
-    exFunc: ExFunc;
-    args?: Expr[];
-  };
-
-  System: {
-    id?: string;
-    systemExFunc?: SystemExFunc;
-    args?: Expr[];
-  };
+  id?: string;
+  exFunc: ExFunc;
+  args?: Expr[];
 }
 
-interface CallExpr_ {
-    Custom: CallExprBase & { exFunc: ExFunc };
-    System: CallExprBase & { systemExFunc: SystemExFunc };
-}
+export function CallExprFactory2(creationArgs: CallExprCreationArgs) {
+  return Effect.gen(function* () {
+    const creationArgs2: Required<CallExprCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("call-expr"),
+      args: creationArgs.args ?? [],
+      exFunc: creationArgs.exFunc,
+    };
 
-export const CallExprFactory = dexVariant.scoped("CallExpr")(dexVariant.typed<CallExpr_>({
-    NewCommand: pass,
-}));
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+    const expr = CallExprFactory({
+      ...base,
+      args$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.args
+      ),
+      exFunc$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.exFunc
+      ),
+    });
 
-export type CallExpr = VariantOf<typeof CallExprFactory>;
-export type CallExprKind = DexVariantKind<typeof CallExprFactory>;
-
-export const CallExpr = {
-  creators: variant({
-    Custom: fields<{ exFunc: ExFunc } & CallExprBase>(),
-    System: fields<{ systemExFunc: SystemExFunc } & CallExprBase>(),
-  }),
-
-  creators2: {
-    async Custom(ctx: MainContext, creationArgs: CallExprCreationArgs["Custom"]) {
-      const creationArgs2: Required<CallExprCreationArgs["Custom"]> = {
-        id: creationArgs.id ?? Utils.createId("call-expr"),
-        args: creationArgs.args ?? [],
-        exFunc: creationArgs.exFunc,
-      };
-
-      const base = await ExItem.createExItemBase(creationArgs2.id);
-      const expr = CallExpr.creators.Custom({
-        ...base,
-        args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),
-        exFunc: creationArgs2.exFunc,
-      });
-
-      for (const arg of creationArgs2.args) {
-        arg.parent$.next(expr);
-      }
-      (ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
-      return expr;
-    },
-
-    async System(ctx: MainContext, creationArgs: CallExprCreationArgs["System"]) {
-      const creationArgs2: Required<CallExprCreationArgs["System"]> = {
-        id: creationArgs.id ?? Utils.createId("call-expr"),
-        args: creationArgs.args ?? [],
-        systemExFunc: creationArgs.systemExFunc ?? SystemExFuncFactory.Add(),
-      };
-
-      const base = await ExItem.createExItemBase(creationArgs2.id);
-      const expr = CallExpr.creators.System({
-        ...base,
-        args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),
-        systemExFunc: creationArgs2.systemExFunc,
-      });
-
-      for (const arg of creationArgs2.args) {
-        arg.parent$.next(expr);
-      }
-      (ctx.eventBus.exprAdded$ as Subject<Expr>).next(expr);
-      return expr;
+    for (const arg of creationArgs2.args) {
+      arg.parent$.next(expr);
     }
-  },
-};
 
-export type CallExpr = VariantOf<typeof CallExpr.creators>;
-export type CallExprKind = DexVariantKind<typeof CallExpr.creators>;
+    return expr;
+  });
+}

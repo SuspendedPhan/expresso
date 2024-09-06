@@ -6,14 +6,15 @@ import {
   ComponentParameterFactory2,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
-import { type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, matcher, scoped, variant, type VariantOf } from "variant";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { matcher, pass, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
 
@@ -22,24 +23,19 @@ export type CanvasSetter = (
   value: number
 ) => void;
 
-interface ComponentBase {
+interface CanvasComponent_ {
   id: string;
-  parent$: OBS<null>;
-}
-
-interface CanvasComponent extends ComponentBase {
   parameters: ComponentParameterKind["Canvas"][];
 }
 
-interface CustomComponent extends ComponentBase {
+interface CustomComponent_ extends ExItemBase {
   name$: SUB<string>;
   parameters$: SUB<ComponentParameterKind["Custom"][]>;
   rootExObjects$: SUB<ExObject[]>;
   properties$: SUB<PropertyKind["BasicProperty"][]>;
-
-  addParameterBlank(): Effect.Effect<ComponentParameterKind["Custom"]>;
-  addPropertyBlank(): Effect.Effect<PropertyKind["BasicProperty"]>;
 }
+
+type CustomComponent2_ = CustomComponent_ & ReturnType<typeof customComponentMethodsFactory>;
 
 export interface ComponentCreationArgs {
   Custom: {
@@ -51,12 +47,15 @@ export interface ComponentCreationArgs {
   };
 }
 
-export const ComponentFactory = variant(
-  scoped("Component", {
-    Canvas: fields<CanvasComponent>(),
-    Custom: fields<CustomComponent>(),
-  })
-);
+interface Component_ {
+  Canvas: CanvasComponent_;
+  Custom: CustomComponent2_;
+}
+
+export const ComponentFactory = dexVariant.scoped("Component")(dexVariant.typed<Component_>({
+  Canvas: pass,
+  Custom: pass,
+}));
 
 export type Component = VariantOf<typeof ComponentFactory>;
 export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
@@ -72,38 +71,22 @@ export const ComponentFactory2 = {
         properties: creationArgs.properties ?? [],
       };
 
-      const component = ComponentFactory.Custom({
-        id: "circle",
-        parent$: of(null),
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+      const component_: CustomComponent_ = {
+        ...base,
         name$: new BehaviorSubject(creationArgs2.name),
         parameters$: new BehaviorSubject(creationArgs2.parameters),
         rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
         properties$: new BehaviorSubject(creationArgs2.properties),
+      };
 
-        addParameterBlank() {
-          const component = this;
-          return Effect.gen(function* () {
-            const parameter = ComponentParameterFactory2.Custom({});
-            const parameters = yield* Effect.promise(() =>
-              firstValueFrom(component.parameters$)
-            );
-            component.parameters$.next([...parameters, parameter]);
-            return parameter;
-          });
-        },
+      const component2_: CustomComponent2_ = {
+        ...component_,
+        ...customComponentMethodsFactory(component_),
+      };
 
-        addPropertyBlank() {
-          const component = this;
-          return Effect.gen(function* () {
-            const property = yield* PropertyFactory2.BasicProperty({});
-            const properties = yield* EffectUtils.firstValueFrom(
-              component.properties$
-            );
-            component.properties$.next([...properties, property]);
-            return property;
-          });
-        },
-      });
+      const component = ComponentFactory.Custom(component2_);
 
       creationArgs2.rootExObjects.forEach((rootExObject) => {
         rootExObject.parent$.next(component);
@@ -113,11 +96,35 @@ export const ComponentFactory2 = {
     }),
 };
 
+function customComponentMethodsFactory(component: CustomComponent_) {
+  return {
+    addParameterBlank() {
+      return Effect.gen(function* () {
+        const parameter = ComponentParameterFactory2.Custom({});
+        const parameters = yield* Effect.promise(() =>
+          firstValueFrom(component.parameters$)
+        );
+        component.parameters$.next([...parameters, parameter]);
+        return parameter;
+      });
+    },
+
+    addPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        const properties = yield* EffectUtils.firstValueFrom(
+          component.properties$
+        );
+        component.properties$.next([...properties, property]);
+        return property;
+      });
+    },
+  };
+}
 
 export const CanvasComponentStore = {
   circle: ComponentFactory.Canvas({
     id: "circle",
-    parent$: of(null),
     parameters: [
       ComponentParameterFactory.Canvas({
         name: "x",
