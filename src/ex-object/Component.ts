@@ -36,8 +36,8 @@ interface CustomComponent extends ComponentBase {
   rootExObjects$: SUB<ExObject[]>;
   properties$: SUB<PropertyKind["BasicProperty"][]>;
 
-  addParameterBlank(): Promise<ComponentParameterKind["Custom"]>;
-  addPropertyBlank(): Promise<PropertyKind["BasicProperty"]>;
+  addParameterBlank(): Effect.Effect<ComponentParameterKind["Custom"]>;
+  addPropertyBlank(): Effect.Effect<PropertyKind["BasicProperty"]>;
 }
 
 export interface ComponentCreationArgs {
@@ -80,17 +80,23 @@ export const ComponentFactory2 = {
         properties$: new BehaviorSubject(creationArgs2.properties),
 
         addParameterBlank() {
-          const parameter = await ComponentParameterFactory2.Custom(ctx, {});
-          const parameters = await firstValueFrom(component.parameters$);
-          this.parameters$.next([...parameters, parameter]);
-          return parameter;
+          const component = this;
+          return Effect.gen(function* () {
+            const parameter = ComponentParameterFactory2.Custom({});
+            const parameters = yield* Effect.promise(() => firstValueFrom(component.parameters$));
+            component.parameters$.next([...parameters, parameter]);
+            return parameter;
+          });
         },
 
-        async addPropertyBlank() {
-          const property = await PropertyFactory2.BasicProperty(ctx, {});
-          const properties = await firstValueFrom(component.properties$);
-          this.properties$.next([...properties, property]);
-          return property;
+        addPropertyBlank() {
+          const component = this;
+          return Effect.gen(function* () {
+            const property = yield* Effect.promise(() => PropertyFactory2.BasicProperty(ctx, {}));
+            const properties = yield* Effect.promise(() => firstValueFrom(component.properties$));
+            component.properties$.next([...properties, property]);
+            return property;
+          });
         },
       });
 
@@ -102,21 +108,21 @@ export const ComponentFactory2 = {
     }),
 };
 
-const ComponentMethods = {
-  addParameterBlank: Effect.gen(function* () {
-    const parameter = ComponentParameterFactory2.Custom(ctx, {});
-    const parameters = yield* Effect.promise(firstValueFrom(component.parameters$));
-    this.parameters$.next([...parameters, parameter]);
-    return parameter;
-  }),
+// const ComponentMethods = {
+//   addParameterBlank: Effect.gen(function* () {
+//     const parameter = ComponentParameterFactory2.Custom(ctx, {});
+//     const parameters = yield* Effect.promise(firstValueFrom(component.parameters$));
+//     this.parameters$.next([...parameters, parameter]);
+//     return parameter;
+//   }),
 
-  async addPropertyBlank() {
-    const property = await PropertyFactory2.BasicProperty(ctx, {});
-    const properties = await firstValueFrom(component.properties$);
-    this.properties$.next([...properties, property]);
-    return property;
-  },
-}
+//   async addPropertyBlank() {
+//     const property = await PropertyFactory2.BasicProperty(ctx, {});
+//     const properties = await firstValueFrom(component.properties$);
+//     this.properties$.next([...properties, property]);
+//     return property;
+//   },
+// }
 
 export const CanvasComponentStore = {
   circle: ComponentFactory.Canvas({

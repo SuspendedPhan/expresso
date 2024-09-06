@@ -40,8 +40,7 @@ export type ComponentParameterKind = DexVariantKind<
 >;
 
 export const ComponentParameterFactory2 = {
-  async Custom(
-    _ctx: MainContext,
+  Custom(
     creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]
   ) {
     const creationArgs2: Required<
