@@ -80,13 +80,13 @@ export const ComponentFactory2 = {
         rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
         properties$: new BehaviorSubject(creationArgs2.properties),
 
-        ...createMethods(this),
-
         addParameterBlank() {
           const component = this;
           return Effect.gen(function* () {
             const parameter = ComponentParameterFactory2.Custom({});
-            const parameters = yield* Effect.promise(() => firstValueFrom(component.parameters$));
+            const parameters = yield* Effect.promise(() =>
+              firstValueFrom(component.parameters$)
+            );
             component.parameters$.next([...parameters, parameter]);
             return parameter;
           });
@@ -96,7 +96,9 @@ export const ComponentFactory2 = {
           const component = this;
           return Effect.gen(function* () {
             const property = yield* PropertyFactory2.BasicProperty({});
-            const properties = yield* EffectUtils.firstValueFrom(component.properties$);
+            const properties = yield* EffectUtils.firstValueFrom(
+              component.properties$
+            );
             component.properties$.next([...properties, property]);
             return property;
           });
@@ -111,43 +113,6 @@ export const ComponentFactory2 = {
     }),
 };
 
-function createMethods(component: ComponentKind["Custom"]) {
-  return {
-    addParameterBlank() {
-      return Effect.gen(function* () {
-        const parameter = ComponentParameterFactory2.Custom({});
-        const parameters = yield* Effect.promise(() => firstValueFrom(component.parameters$));
-        component.parameters$.next([...parameters, parameter]);
-        return parameter;
-      });
-    },
-
-    addPropertyBlank() {
-      return Effect.gen(function* () {
-        const property = yield* PropertyFactory2.BasicProperty({});
-        const properties = yield* EffectUtils.firstValueFrom(component.properties$);
-        component.properties$.next([...properties, property]);
-        return property;
-      });
-    },
-  };
-}
-
-// const ComponentMethods = {
-//   addParameterBlank: Effect.gen(function* () {
-//     const parameter = ComponentParameterFactory2.Custom(ctx, {});
-//     const parameters = yield* Effect.promise(firstValueFrom(component.parameters$));
-//     this.parameters$.next([...parameters, parameter]);
-//     return parameter;
-//   }),
-
-//   async addPropertyBlank() {
-//     const property = await PropertyFactory2.BasicProperty(ctx, {});
-//     const properties = await firstValueFrom(component.properties$);
-//     this.properties$.next([...properties, property]);
-//     return property;
-//   },
-// }
 
 export const CanvasComponentStore = {
   circle: ComponentFactory.Canvas({
@@ -164,32 +129,6 @@ export const CanvasComponentStore = {
     ],
   }),
 } satisfies Record<string, ComponentKind["Canvas"]>;
-
-export function createComponentCtx(_ctx: MainContext) {
-  const parameterById = new Map<string, ComponentParameterKind["Canvas"]>();
-  CanvasComponentStore.circle.parameters.forEach((parameter) => {
-    parameterById.set(parameter.id, parameter);
-  });
-
-  return {
-    getCanvasComponentById(id: string) {
-      const component = (CanvasComponentStore as any)[id];
-      if (!component) {
-        throw new Error(`Canvas component not found: ${id}`);
-      }
-      return component;
-    },
-    getCanvasComponentParameterById(id: string) {
-      const parameter = parameterById.get(id);
-      log55.debug("getCanvasComponentParameterById", id, parameter);
-
-      if (!parameter) {
-        throw new Error(`Canvas component parameter not found: ${id}`);
-      }
-      return parameter;
-    },
-  };
-}
 
 export const Component = {
   getName$(component: Component): OBS<string> {

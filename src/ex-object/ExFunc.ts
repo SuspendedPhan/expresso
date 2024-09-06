@@ -1,74 +1,101 @@
-import { ExFuncParameterFactory2, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
+import { Effect } from "effect";
+import { LibraryCtx } from "src/ctx/LibraryCtx";
+import {
+  ExFuncParameterFactory2,
+  type ExFuncParameter,
+} from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import type { Expr } from "src/ex-object/Expr";
-import type MainContext from "src/main-context/MainContext";
+import { ExprFactory2, type Expr } from "src/ex-object/Expr";
+import { createObservableArrayWithLifetime, type ObservableArray } from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, variant, type VariantOf } from "variant";
+import {
+  dexScopedVariant,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
+import { fields, variation, type VariantOf } from "variant";
 
-interface CustomExFunc extends ExItemBase {
-  readonly id: string;
-  readonly name$: SUB<string>;
-  readonly expr$: SUB<Expr>;
-  readonly exFuncParameterArr$: SUB<ExFuncParameter[]>;
-  addParameterBlank(): Promise<ExFuncParameter>;
+export type ExFunc = CustomExFunc | SystemExFunc;
+
+interface CustomExFunc_ extends ExItemBase {
+  id: string;
+  name$: SUB<string>;
+  expr$: SUB<Expr>;
+  parameters: ObservableArray<ExFuncParameter>;
+  addParameterBlank(): Effect.Effect<ExFuncParameter>;
 }
 
-export const SystemExFuncFactory = variant({
+export const SystemExFuncFactory = dexScopedVariant("ExFunc/System", {
   Add: {},
 });
 
 export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
 export type SystemExFuncKind = DexVariantKind<typeof SystemExFuncFactory>;
 
-export const ExFuncFactory = dexScopedVariant("ExFunc", {
-  Custom: fields<CustomExFunc>(),
-  System: fields<SystemExFunc>(),
-});
+export const CustomExFuncFactory = variation(
+  "ExFunc/Custom",
+  fields<CustomExFunc_>()
+);
+export type CustomExFunc = ReturnType<typeof CustomExFuncFactory>;
 
-export type ExFunc = VariantOf<typeof ExFuncFactory>;
-export type ExFuncKind = DexVariantKind<typeof ExFuncFactory>;
+interface CustomExFuncCreationArgs {
+  id?: string;
+  name?: string;
+  expr?: Expr;
+  exFuncParameterArr?: ExFuncParameter[];
+}
 
-export const ExFuncFactory2 = {
-  async Custom(
-    ctx: MainContext,
-    data: {
-      id?: string;
-      name?: string;
-      expr?: Expr;
-      exFuncParameterArr?: ExFuncParameter[];
-    }
-  ) {
-    const id = data.id ?? Utils.createId("ex-func");
-    let name = data.name;
-    const expr = data.expr ?? (await ctx.objectFactory.createNumberExpr());
-    const exFuncParameterArr = data.exFuncParameterArr ?? [];
+export const CustomExFuncFactory2 = {
+  Custom(creationArgs: CustomExFuncCreationArgs) {
+    return Effect.gen(function* () {
+      const libraryCtx = yield* LibraryCtx;
+      let name = creationArgs.name;
+      if (name === undefined) {
+        const project = yield* libraryCtx.activeProject;
+        const ordinal = project.getAndIncrementOrdinal();
+        name = `Function ${ordinal}`;
+      }
 
-    if (name === undefined) {
-      const ordinal: number = await ctx.projectCtx.getOrdinalProm();
-      name = `Function ${ordinal}`;
-    }
+      const creationArgs2: Required<CustomExFuncCreationArgs> = {
+        id: creationArgs.id ?? Utils.createId("ex-func"),
+        name: creationArgs.name ?? `Function ${Utils.createId("ex-func")}`,
+        expr:
+          creationArgs.expr === undefined
+            ? yield* ExprFactory2.Number({})
+            : creationArgs.expr,
+        exFuncParameterArr: creationArgs.exFuncParameterArr ?? [],
+      };
 
-    const base = await ExItem.createExItemBase(id);
-    return ExFuncFactory.Custom({
-      ...base,
-      name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
-      expr$: createBehaviorSubjectWithLifetime(base.destroy$, expr),
-      exFuncParameterArr$: createBehaviorSubjectWithLifetime(
-        base.destroy$,
-        exFuncParameterArr
-      ),
+      if (name === undefined) {
+        const ordinal: number = await ctx.projectCtx.getOrdinalProm();
+        name = `Function ${ordinal}`;
+      }
 
-      async addParameterBlank() {
-        const param = await ExFuncParameterFactory2(ctx, {});
-        exFuncParameterArr.push(param);
-        this.exFuncParameterArr$.next(exFuncParameterArr);
-        return param;
-      },
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      return CustomExFuncFactory({
+        ...base,
+        name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          creationArgs2.expr
+        ),
+        parameters: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.exFuncParameterArr
+        ),
+
+        addParameterBlank() {
+          const exFunc = this;
+          return Effect.gen(function* () {
+            const param = yield* ExFuncParameterFactory2({});
+            exFunc.parameters.push(param);
+            return param;
+          });
+        },
+      });
     });
   },
 };

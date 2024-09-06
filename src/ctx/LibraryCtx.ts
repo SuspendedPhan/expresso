@@ -1,26 +1,19 @@
 import { Context, Effect, Layer } from "effect";
 import {
   BehaviorSubject,
+  firstValueFrom,
   ReplaySubject,
-  switchMap,
-  type Observable,
+  switchMap
 } from "rxjs";
-import type { Project } from "src/ex-object/Project";
 import type { LibraryProject } from "src/library/LibraryProject";
-import type { SUB } from "src/utils/utils/Utils";
+
 
 export class LibraryCtx extends Context.Tag("LibraryCtx")<
   LibraryCtx,
-  {
-    libraryProjects$: SUB<readonly LibraryProject[]>;
-    activeLibraryProject$: Observable<LibraryProject>;
-    activeProject$: Observable<Project>;
-  }
+  Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
-export const LibraryCtxLive = Layer.effect(
-  LibraryCtx,
-  Effect.gen(function* () {
+const ctxEffect = Effect.gen(function* () {
     const activeLibraryProject$ = new ReplaySubject<LibraryProject>(1);
     return {
       libraryProjects$: new BehaviorSubject<readonly LibraryProject[]>([]),
@@ -28,6 +21,20 @@ export const LibraryCtxLive = Layer.effect(
       activeProject$: activeLibraryProject$.pipe(
         switchMap((libraryProject) => libraryProject.project$)
       ),
+
+      get activeProject() {
+        return Effect.gen(function* () {
+          const project = yield* Effect.promise(() =>
+            firstValueFrom(activeLibraryProject$.pipe(switchMap((lp) => lp.project$)))
+          );
+          return project;
+        });
+      }
     };
-  })
+});
+
+export const LibraryCtxLive = Layer.effect(
+  LibraryCtx,
+  ctxEffect
 );
+

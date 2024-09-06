@@ -6,6 +6,7 @@ import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
@@ -27,8 +28,8 @@ export const ProjectFactory = variation(
 
       addRootExObjectBlank(): Promise<void>;
       addCustomExFunc(exFunc: ExFunc): Promise<void>;
-      getAndIncrementOrdinal(project: Project): Promise<number>;
-      
+      getAndIncrementOrdinal(): Effect.Effect<number>;
+
       // addComponentBlank(ctx: MainContext, project: Project): Promise<ComponentKind["Custom"]>;
       // addComponent(ctx: MainContext, project: Project, component: ComponentKind["Custom"]): Promise<void>;
     } & ExItemBase
@@ -91,18 +92,20 @@ export async function ProjectFactory2(
       this.exFuncObsArr.push(exFunc);
     },
 
-    async getAndIncrementOrdinal(): Promise<number> {
-      const ordinal = await firstValueFrom(currentOrdinal$);
-      project.currentOrdinal$.next(ordinal + 1);
-      return ordinal;
+    getAndIncrementOrdinal() {
+      return Effect.gen(function* () {
+        const ordinal = yield* EffectUtils.firstValueFrom(currentOrdinal$);
+        project.currentOrdinal$.next(ordinal + 1);
+        return ordinal;
+      });
     },
-  
-    addComponentBlank: Effect.gen(function*(){
+
+    addComponentBlank: Effect.gen(function* () {
       const component = await ComponentFactory2.Custom(ctx, {});
       this.addComponent(ctx, project, component);
       return component;
     }),
-  
+
     // async addComponent(
     //   _ctx: MainContext,
     //   project: Project,

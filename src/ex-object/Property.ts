@@ -94,7 +94,7 @@ export const PropertyFactory2 = {
         name: createArgs.name ?? "Basic Property",
       };
 
-      const base = await ExItem.createExItemBase(createArgs2.id);
+      const base = yield* ExItem.createExItemBase(createArgs2.id);
       return PropertyFactory.BasicProperty({
         ...base,
         expr$: createBehaviorSubjectWithLifetime(

@@ -15,8 +15,8 @@ import {
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, variant, type VariantOf } from "variant";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { fields, pass, variant, type VariantOf } from "variant";
 
 interface CallExprBase extends ExItemBase {
   readonly args$: SUB<Expr[]>;
@@ -35,6 +35,18 @@ interface CallExprCreationArgs {
     args?: Expr[];
   };
 }
+
+interface CallExpr_ {
+    Custom: CallExprBase & { exFunc: ExFunc };
+    System: CallExprBase & { systemExFunc: SystemExFunc };
+}
+
+export const CallExprFactory = dexVariant.scoped("CallExpr")(dexVariant.typed<CallExpr_>({
+    NewCommand: pass,
+}));
+
+export type CallExpr = VariantOf<typeof CallExprFactory>;
+export type CallExprKind = DexVariantKind<typeof CallExprFactory>;
 
 export const CallExpr = {
   creators: variant({
