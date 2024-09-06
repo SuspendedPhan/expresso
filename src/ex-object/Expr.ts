@@ -1,13 +1,13 @@
 import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
 import { ComponentParameterFactory, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
-import { type ExFuncParameter, ExFuncParameterFactory } from "src/ex-object/ExFuncParameter";
+import { ExFuncParameterFactory, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import { type ExItemBase } from "src/ex-object/ExItem";
 import { PropertyFactory, PropertyFns, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
 import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, isOfVariant, isType, matcher, type VariantOf } from "variant";
+import { fields, isOfVariant, isType, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
