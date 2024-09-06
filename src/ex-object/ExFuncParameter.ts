@@ -1,13 +1,12 @@
 import { Effect } from "effect";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import type MainContext from "src/main-context/MainContext";
 import {
   type SUB,
   Utils,
   createBehaviorSubjectWithLifetime,
 } from "src/utils/utils/Utils";
-import { variation, fields } from "variant";
+import { fields, variation } from "variant";
 
 export const ExFuncParameterFactory = variation(
   "ExFuncParameter",
