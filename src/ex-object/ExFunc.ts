@@ -1,3 +1,4 @@
+import { ExFuncParameterFactory2, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExItemBase } from "src/ex-object/ExItem";
 import type { Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
@@ -16,9 +17,6 @@ interface CustomExFunc extends ExItemBase {
   readonly exFuncParameterArr$: SUB<ExFuncParameter[]>;
   addParameterBlank(): Promise<ExFuncParameter>;
 }
-
-export interface ExFuncParameter
-  extends Awaited<ReturnType<typeof createExFuncParameter>> {}
 
 export const SystemExFuncFactory = variant({
   Add: {},
@@ -66,7 +64,7 @@ export const ExFuncFactory2 = {
       ),
 
       async addParameterBlank() {
-        const param = await createExFuncParameter(ctx);
+        const param = await ExFuncParameterFactory2(ctx, {});
         exFuncParameterArr.push(param);
         this.exFuncParameterArr$.next(exFuncParameterArr);
         return param;
@@ -105,7 +103,7 @@ export async function createExFunc(
     ),
 
     async addParameterBlank() {
-      const param = await createExFuncParameter(ctx);
+      const param = await ExFuncParameterFactory2(ctx, {});
       exFuncParameterArr.push(param);
       this.exFuncParameterArr$.next(exFuncParameterArr);
       return param;
@@ -116,25 +114,3 @@ export async function createExFunc(
   return exFunc;
 }
 
-export async function createExFuncParameter(
-  ctx: MainContext,
-  data?: {
-    id?: string;
-    name?: string;
-  }
-) {
-  data ??= {};
-  const id = data.id ?? Utils.createId("ex-func-param");
-  let name = data.name;
-
-  if (name === undefined) {
-    const ordinal: number = await ctx.projectCtx.getOrdinalProm();
-    name = `Parameter ${ordinal}`;
-  }
-
-  const base = await ctx.objectFactory.createExItemBase(id);
-  return {
-    ...base,
-    name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
-  };
-}

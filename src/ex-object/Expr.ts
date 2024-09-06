@@ -1,13 +1,13 @@
 import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
-import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
-import type { ExFuncParameter } from "src/ex-object/ExFunc";
+import { ComponentParameterFactory, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
+import { type ExFuncParameter, ExFuncParameterFactory } from "src/ex-object/ExFuncParameter";
 import { type ExItemBase } from "src/ex-object/ExItem";
-import { PropertyFactory, type Property } from "src/ex-object/Property";
+import { PropertyFactory, PropertyFns, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
 import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, isOfVariant, type VariantOf } from "variant";
+import { fields, isOfVariant, isType, matcher, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
@@ -43,7 +43,17 @@ export const ExprFactory2 = {
 };
 
 export const Expr = {
-  getReferenceTargetName$(target: ReferenceTarget) {},
+  getReferenceTargetName$(target: ReferenceTarget) {
+    if (isOfVariant(target, PropertyFactory)) {
+      return PropertyFns.getName$(target);
+    } else if (isType(target, ComponentParameterFactory.Custom)) {
+      return target.name$;
+    } else if (isType(target, ExFuncParameterFactory)) {
+      return target.name$;
+    } else {
+      throw new Error("Unknown target type");
+    }
+  },
 
   async getProperty(expr: Expr) {
     let parent = await firstValueFrom(expr.parent$);
