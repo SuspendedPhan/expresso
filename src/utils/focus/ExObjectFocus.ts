@@ -2,14 +2,42 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { ExItemType, type ExItem } from "src/ex-object/ExItem";
 import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
-import { type PropertyFactory } from "src/ex-object/Property";
+import { type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { pass, type VariantOf } from "variant";
 import { FocusKind } from "./FocusKind";
+import type { Expr } from "src/ex-object/Expr";
 
 const log55 = log5("ExObjectFocus.ts");
+
+interface ExObjectFocus_ {
+  ExObject: { exObject: ExObject };
+  Name: { exObject: ExObject; isEditing: boolean };
+  Component: { exObject: ExObject };
+  PropertyName: { property: Property; isEditing: boolean };
+
+  ExObjectRefactorCommand: { exObject: ExObject },
+  ExprRefactorCommand: { expr: Expr },
+}
+
+export const ExObjectFocusFactory = dexVariant.scoped("ExObjectFocus")(
+  dexVariant.typed<ExObjectFocus_>({
+    ExObject: pass,
+    Name: pass,
+    Component: pass,
+    PropertyName: pass,
+
+    ExObjectRefactorCommand: pass,
+    ExprRefactorCommand: pass,
+  })
+);
+
+export type ExObjectFocus = VariantOf<typeof ExObjectFocusFactory>;
+export type ExObjectFocusKind = DexVariantKind<typeof ExObjectFocusFactory>;
 
 export function createExObjectFocusContext(ctx: MainContext) {
   const { focusCtx } = ctx;

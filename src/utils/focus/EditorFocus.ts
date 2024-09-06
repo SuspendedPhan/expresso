@@ -2,12 +2,20 @@ import { combineLatestWith, firstValueFrom, map } from "rxjs";
 import type { ExItem } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { pass, type VariantOf } from "variant";
 import { FocusKind } from "../focus/FocusKind";
-import { ofType } from "unionize";
 
-export const EditorFocusKind = {
-  EditorNewActions: ofType<{ exItem: ExItem | null }>(),
-};
+interface EditorFocus_ {
+    EditorNewActions: { exItem: ExItem | null };
+}
+
+export const EditorFocusFactory = dexVariant.scoped("EditorFocus")(dexVariant.typed<EditorFocus_>({
+    EditorNewActions: pass,
+}));
+
+export type EditorFocus = VariantOf<typeof EditorFocusFactory>;
+export type EditorFocusKind = DexVariantKind<typeof EditorFocusFactory>;
 
 export namespace EditorFocusFuncs {
   export async function register(ctx: MainContext) {

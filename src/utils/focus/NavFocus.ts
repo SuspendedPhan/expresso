@@ -2,6 +2,21 @@ import type MainContext from "src/main-context/MainContext";
 import { DexWindow } from "src/main-context/MainViewContext";
 import { FocusKind } from "src/utils/focus/FocusKind";
 import type { NavSection } from "src/utils/utils/Nav";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { pass, type VariantOf } from "variant";
+
+interface NavFocus_ {
+    Project: {}
+    Library: {}
+}
+
+export const NavFocusFactory = dexVariant.scoped("NavFocus")(dexVariant.typed<NavFocus_>({
+    Project: pass,
+    Library: pass,
+}));
+
+export type NavFocus = VariantOf<typeof NavFocusFactory>;
+export type NavFocusKind = DexVariantKind<typeof NavFocusFactory>;
 
 export function createNavFocusCtx(ctx: MainContext) {
   register(ctx);

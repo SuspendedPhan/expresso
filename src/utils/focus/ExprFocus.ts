@@ -6,9 +6,22 @@ import type MainContext from "src/main-context/MainContext";
 import { Hotkeys } from "src/utils/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";
 import { ArrayFns, RxFns, type OBS } from "src/utils/utils/Utils";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { pass, type VariantOf } from "variant";
 import { FocusKind } from "./FocusKind";
 
 const log55 = log5("ExprFocus.ts");
+
+interface ExprFocus_ {
+    Expr: { expr: Expr };
+}
+
+export const ExprFocusFactory = dexVariant.scoped("ExprFocus")(dexVariant.typed<ExprFocus_>({
+    Expr: pass,
+}));
+
+export type ExprFocus = VariantOf<typeof ExprFocusFactory>;
+export type ExprFocusKind = DexVariantKind<typeof ExprFocusFactory>;
 
 export namespace ExprFocusFuncs {
   export function createContext(ctx: MainContext) {
