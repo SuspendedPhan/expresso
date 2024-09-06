@@ -18,8 +18,8 @@ export interface LibraryProject_ {
   project$: ReplaySubject<Project>;
 }
 
-const LibraryProjectFactory = variation("LibraryProject", fields<LibraryProject_>());
-type LibraryProject = ReturnType<typeof LibraryProjectFactory>;
+export const LibraryProjectFactory = variation("LibraryProject", fields<LibraryProject_>());
+export type LibraryProject = ReturnType<typeof LibraryProjectFactory>;
 
 interface LibraryProjectCreationArgs {
   id?: string;

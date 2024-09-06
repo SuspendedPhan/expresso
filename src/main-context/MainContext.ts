@@ -1,8 +1,4 @@
 import { firstValueFrom, ReplaySubject } from "rxjs";
-import type { Expr } from "src/ex-object/ExItem";
-import ExObjectFactory from "src/ex-object/ExObjectFactory";
-import { createProjectContext } from "src/ex-object/Project";
-import { createLibrary, type Library } from "src/library/Library";
 import {
   ProjectManager
 } from "src/library/LibraryProject";
