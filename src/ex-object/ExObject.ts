@@ -1,6 +1,6 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
-import { CanvasComponentStore, type Component } from "src/ex-object/Component";
+import { CanvasComponentStore, ComponentFactory, type Component, type ComponentKind } from "src/ex-object/Component";
 import {
   type ExItem,
   type ExItemBase,
@@ -14,7 +14,7 @@ import {
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import { fields, variation } from "variant";
+import { fields, matcher, variation } from "variant";
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
 export type ExObject = ReturnType<typeof ExObjectFactory>;
@@ -161,16 +161,19 @@ async function createComponentProperties(
   ctx: MainContext,
   component: Component
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
-  switch (component.componentKind) {
-    case ComponentKind.CanvasComponent:
+  return matcher(component)
+    .when(ComponentFactory.CanvasComponent, async (component) => {
       return createCanvasComponentProperties(ctx, component);
-    case ComponentKind.CustomComponent:
+    })
+    .when(ComponentFactory.CustomComponent, async (component) => {
       return createCustomComponentProperties(ctx, component);
-  }
+    })
+    .complete();
 }
+
 async function createCanvasComponentProperties(
   ctx: MainContext,
-  component: CanvasComponent
+  component: ComponentKind["CanvasComponent"]
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameter$Ps = component.parameters.map((input) => {
     return Create.Property.componentBlank(ctx, input);
@@ -181,7 +184,7 @@ async function createCanvasComponentProperties(
 
 async function createCustomComponentProperties(
   ctx: MainContext,
-  component: CustomComponent
+  component: ComponentKind["CustomComponent"]
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameterL = await firstValueFrom(component.parameters$);
   const propertyPL = parameterL.map((input) => {
