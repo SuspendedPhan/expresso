@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { ResizeSensor } from "css-element-queries";
+import type { Effect } from "effect";
 import {
   BehaviorSubject,
   combineLatest,
@@ -14,6 +15,8 @@ import { log5 } from "src/utils/utils/Log5";
 import { onMount } from "svelte";
 
 const log55 = log5("Utils.ts");
+
+export type DexEffectSuccess<T> = T extends Effect.Effect<infer A, any, any> ? A : never;
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;

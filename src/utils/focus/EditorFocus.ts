@@ -17,6 +17,7 @@ export const EditorFocusFactory = dexVariant.scoped("EditorFocus")(dexVariant.ty
 export type EditorFocus = VariantOf<typeof EditorFocusFactory>;
 export type EditorFocusKind = DexVariantKind<typeof EditorFocusFactory>;
 
+
 export namespace EditorFocusFuncs {
   export async function register(ctx: MainContext) {
     const { focusCtx, keyboardCtx } = ctx;
@@ -63,34 +64,5 @@ export namespace EditorFocusFuncs {
     });
 
     keyboardCtx.registerCancel(focusIsEditorNewActions$);
-
-    // keyboardCtx.onKeydown$(
-    //   "r",
-    //   focusIsEditorNewActions$
-    // ).subscribe(async (focus) => {
-    //   const exItem = focus.exItem;
-    //   if (exItem === null) {
-    //     return;
-    //   }
-
-    //   const exObject = await ExObjectFns.getExObject(exItem);
-    //   ExObjectFns.addBasicPropertyBlank(ctx, exObject);
-    //   focusCtx.popFocus();
-    // });
-
-    // keyboardCtx.onKeydown$(
-    //   "c",
-    //   focusIsEditorNewActions$
-    // ).subscribe(async (focus) => {
-    //   const exItem = focus.exItem;
-    //   if (exItem === null) {
-    //     return;
-    //   }
-
-    //   const exObject = await ExObjectFns.getExObject(exItem);
-    //   ExObjectFns.addChildBlank(ctx, exObject);
-    //   focusCtx.popFocus();
-    // });
-
   }
 }
