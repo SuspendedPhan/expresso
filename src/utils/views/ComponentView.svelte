@@ -1,6 +1,6 @@
 <script lang="ts">
   import { of } from "rxjs";
-  import { ComponentFns, type CustomComponent } from "src/ex-object/Component";
+  import { ComponentFns, type ComponentKind } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
   import { FocusKind } from "src/utils/focus/FocusKind";
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
@@ -15,7 +15,7 @@
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
 
   export let ctx: MainContext;
-  export let component: CustomComponent;
+  export let component: ComponentKind["CustomComponent"];
 
   const isComponentFocused$ = of(false);
 

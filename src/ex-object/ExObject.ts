@@ -14,7 +14,7 @@ import {
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import { fields, matcher, variation } from "variant";
+import { fields, isType, matcher, variation } from "variant";
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
 export type ExObject = ReturnType<typeof ExObjectFactory>;
@@ -77,7 +77,7 @@ export async function ExObjectFactory2(ctx: MainContext, creationArgs: ExObjectC
 
 export namespace ExObjectFns {
   export async function addChildBlank(ctx: MainContext, exObject: ExObject) {
-    const child = await CreateExObject.blank(ctx, {});
+    const child = await ExObjectFactory2(ctx, {});
     addChild(exObject, child);
   }
 
@@ -102,7 +102,7 @@ export namespace ExObjectFns {
   export async function getExObject(exItem: ExItem): Promise<ExObject | null> {
     let item: ExItem | null = exItem;
     while (item !== null) {
-      if ("itemType" in item && item.itemType === ExItemType.ExObject) {
+      if (isType(item, ExObjectFactory)) {
         return item;
       }
       const parent: Parent = await firstValueFrom(item.parent$);
@@ -116,7 +116,7 @@ export namespace ExObjectFns {
     while (true) {
       const nextParent: Parent = await firstValueFrom(parent.parent$);
       if (nextParent === null) {
-        assert("itemType" in parent && parent.itemType === ExItemType.ExObject);
+        assert(isType(parent, ExObjectFactory));
         return parent;
       }
       parent = nextParent;
@@ -134,7 +134,7 @@ export namespace ExObjectFns {
       return;
     }
 
-    assert(parent.itemType === ExItemType.ExObject);
+    assert(isType(parent, ExObjectFactory));
     const children = await firstValueFrom(parent.children$);
     const index = children.indexOf(exObject);
     assert(index !== -1);
