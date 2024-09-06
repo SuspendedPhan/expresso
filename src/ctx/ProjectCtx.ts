@@ -1,20 +1,54 @@
-import { Effect, Context, Layer } from "effect";
-import { firstValueFrom, ReplaySubject } from "rxjs";
+import { Context, Effect, Layer } from "effect";
+import { firstValueFrom, map, ReplaySubject } from "rxjs";
 import { ExFuncFactory2 } from "src/ex-object/ExFunc";
 import { Project } from "src/ex-object/Project";
-import type MainContext from "src/main-context/MainContext";
+import type { DexEffectSuccess } from "src/utils/utils/Utils";
 
-// Create a tag for the ProjectCtx service
-class ProjectCtx extends Context.Tag("ProjectCtx")<
+export class ProjectCtx extends Context.Tag("ProjectCtx")<
   ProjectCtx,
-  {
-    getOrdinalProm(): Promise<number>;
-    getCurrentProjectProm(): Promise<Project>;
-    addRootExObjectBlank(): Promise<void>;
-    addExFuncBlank(): Promise<void>;
-    addComponentBlank(): Promise<void>;
-  }
+  DexEffectSuccess<typeof ctxEffect>
 >() {}
+
+const ctxEffect = Effect.gen(function* () {
+  const currentProject$ = new ReplaySubject<Project>(1);
+  return {
+    getOrdinalProm() {
+      return firstValueFrom(
+        currentProject$.pipe(map(Project.getAndIncrementOrdinal))
+      );
+    },
+    getCurrentProjectProm() {
+      return firstValueFrom(currentProject$);
+    },
+    addRootExObjectBlank() {
+      return firstValueFrom(
+        currentProject$.pipe(map(Project.addRootExObjectBlank))
+      );
+    },
+    addExFuncBlank() {
+      return firstValueFrom(currentProject$.pipe(map(ExFuncFactory2.Custom)));
+    },
+    addComponentBlank() {
+      return firstValueFrom(
+        currentProject$.pipe(map(Project.addComponentBlank))
+      );
+    },
+  };
+});
+
+export const ProjectCtxLive = Layer.effect(ProjectCtx, ctxEffect);
+
+// // Create a tag for the ProjectCtx service
+// class ProjectCtx extends Context.Tag("ProjectCtx")<
+//   ProjectCtx,
+//   {
+//     getOrdinalProm(): Promise<number>;
+//     getCurrentProjectProm(): Promise<Project>;
+//     addRootExObjectBlank(): Promise<void>;
+//     addExFuncBlank(): Promise<void>;
+//     addComponentBlank(): Promise<void>;
+//   }
+// >() {}
 
 // const ProjectCtxLive = Layer.succeed(
 //   ProjectCtx,

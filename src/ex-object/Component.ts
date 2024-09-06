@@ -1,14 +1,17 @@
+import { Effect } from "effect";
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import { ComponentParameterFactory, ComponentParameterFactory2, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
+import {
+  ComponentParameterFactory,
+  ComponentParameterFactory2,
+  type ComponentParameterKind,
+} from "src/ex-object/ComponentParameter";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
-import {
-  type DexVariantKind
-} from "src/utils/utils/VariantUtils4";
+import { type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { fields, matcher, scoped, variant, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
@@ -47,57 +50,73 @@ export interface ComponentCreationArgs {
   };
 }
 
-export const ComponentFactory = variant(scoped("Component", {
-  Canvas: fields<CanvasComponent>(),
-  Custom: fields<CustomComponent>(),
-}));
+export const ComponentFactory = variant(
+  scoped("Component", {
+    Canvas: fields<CanvasComponent>(),
+    Custom: fields<CustomComponent>(),
+  })
+);
 
 export type Component = VariantOf<typeof ComponentFactory>;
 export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
 
 export const ComponentFactory2 = {
-  async Custom(
-    ctx: MainContext,
-    creationArgs: ComponentCreationArgs["Custom"]
-  ) {
-    const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
-      id: creationArgs.id ?? Utils.createId("custom-component"),
-      name: creationArgs.name ?? "Component",
-      parameters: creationArgs.parameters ?? [],
-      rootExObjects: creationArgs.rootExObjects ?? [],
-      properties: creationArgs.properties ?? [],
-    };
+  Custom: (creationArgs: ComponentCreationArgs["Custom"]) =>
+    Effect.gen(function* () {
+      const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
+        id: creationArgs.id ?? Utils.createId("custom-component"),
+        name: creationArgs.name ?? "Component",
+        parameters: creationArgs.parameters ?? [],
+        rootExObjects: creationArgs.rootExObjects ?? [],
+        properties: creationArgs.properties ?? [],
+      };
 
-    const component = ComponentFactory.Custom({
-      id: "circle",
-      parent$: of(null),
-      name$: new BehaviorSubject(creationArgs2.name),
-      parameters$: new BehaviorSubject(creationArgs2.parameters),
-      rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
-      properties$: new BehaviorSubject(creationArgs2.properties),
+      const component = ComponentFactory.Custom({
+        id: "circle",
+        parent$: of(null),
+        name$: new BehaviorSubject(creationArgs2.name),
+        parameters$: new BehaviorSubject(creationArgs2.parameters),
+        rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
+        properties$: new BehaviorSubject(creationArgs2.properties),
 
-      async addParameterBlank() {
-        const parameter = await ComponentParameterFactory2.Custom(ctx, {});
-        const parameters = await firstValueFrom(component.parameters$);
-        this.parameters$.next([...parameters, parameter]);
-        return parameter;
-      },
+        addParameterBlank() {
+          const parameter = await ComponentParameterFactory2.Custom(ctx, {});
+          const parameters = await firstValueFrom(component.parameters$);
+          this.parameters$.next([...parameters, parameter]);
+          return parameter;
+        },
 
-      async addPropertyBlank() {
-        const property = await PropertyFactory2.BasicProperty(ctx, {});
-        const properties = await firstValueFrom(component.properties$);
-        this.properties$.next([...properties, property]);
-        return property;
-      },
-    });
+        async addPropertyBlank() {
+          const property = await PropertyFactory2.BasicProperty(ctx, {});
+          const properties = await firstValueFrom(component.properties$);
+          this.properties$.next([...properties, property]);
+          return property;
+        },
+      });
 
-    creationArgs2.rootExObjects.forEach((rootExObject) => {
-      rootExObject.parent$.next(component);
-    });
+      creationArgs2.rootExObjects.forEach((rootExObject) => {
+        rootExObject.parent$.next(component);
+      });
 
-    return component;
-  },
+      return component;
+    }),
 };
+
+const ComponentMethods = {
+  addParameterBlank: Effect.gen(function* () {
+    const parameter = ComponentParameterFactory2.Custom(ctx, {});
+    const parameters = yield* Effect.promise(firstValueFrom(component.parameters$));
+    this.parameters$.next([...parameters, parameter]);
+    return parameter;
+  }),
+
+  async addPropertyBlank() {
+    const property = await PropertyFactory2.BasicProperty(ctx, {});
+    const properties = await firstValueFrom(component.properties$);
+    this.properties$.next([...properties, property]);
+    return property;
+  },
+}
 
 export const CanvasComponentStore = {
   circle: ComponentFactory.Canvas({
@@ -161,5 +180,5 @@ export const Component = {
     exObject.parent$.next(component);
     const rootExObjects = await firstValueFrom(component.rootExObjects$);
     component.rootExObjects$.next([...rootExObjects, exObject]);
-  }
-}
+  },
+};
