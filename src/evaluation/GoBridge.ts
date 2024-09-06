@@ -19,7 +19,7 @@ export default class GoBridge {
   @loggedMethod
   private async setup(goModule: GoModule, ctx: MainContext) {
     const project = await ctx.projectCtx.getCurrentProjectProm();
-    const [first$, rest$] = partitionFirst(project.rootExObjectObsArr.event$);
+    const [first$, rest$] = partitionFirst(project.rootExObjects.event$);
 
     first$.subscribe((evt) => {
       evt.items.forEach((rootExObject) => {

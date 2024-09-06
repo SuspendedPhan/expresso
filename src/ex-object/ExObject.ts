@@ -151,7 +151,7 @@ export const ExObject = {
     newExObject: ExObject
   ) {
     const project = await firstValueFrom(ctx.projectCtx.currentProject$);
-    project.rootExObjectObsArr.replaceItem(exObject, newExObject);
+    project.rootExObjects.replaceItem(exObject, newExObject);
 
     exObject.destroy$.next();
   }
