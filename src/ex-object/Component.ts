@@ -1,8 +1,8 @@
 import { BehaviorSubject, firstValueFrom, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
-import { type ComponentParameterKind, ComponentParameterFactory2, ComponentParameterFactory, type ComponentParameter } from "src/ex-object/ComponentParameter";
-import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
-import { PropertyFactory, type PropertyKind } from "src/ex-object/Property";
+import { ComponentParameterFactory, ComponentParameterFactory2, type ComponentParameter, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
+import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
@@ -10,7 +10,7 @@ import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, type VariantOf } from "variant";
+import { fields, matcher, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
 
@@ -85,7 +85,7 @@ export const ComponentFactory2 = {
       },
 
       async addPropertyBlank() {
-        const property = await PropertyFactory.creators2.BasicProperty(ctx, {});
+        const property = await PropertyFactory2.BasicProperty(ctx, {});
         const properties = await firstValueFrom(component.properties$);
         this.properties$.next([...properties, property]);
         return property;
@@ -146,34 +146,34 @@ export namespace ComponentParameterFns {
   export function getName$(
     componentParameter: ComponentParameter
   ): OBS<string> {
-    switch (componentParameter.componentParameterKind) {
-      case ComponentParameterKind.ComponentParameterKind["Canvas"]:
+    return matcher(componentParameter)
+      .when(ComponentParameterFactory.Canvas, (componentParameter) => {
         return of(componentParameter.name);
-      case ComponentParameterKind.ComponentParameterKind["Custom"]:
+      })
+      .when(ComponentParameterFactory.Custom, (componentParameter) => {
         return componentParameter.name$;
-      default:
-        throw new Error("unknown component parameter type");
-    }
+      })
+      .complete();
   }
 }
 
 export namespace ComponentFns {
   export function getName$(component: Component): OBS<string> {
-    switch (component.componentKind) {
-      case ComponentKind.CanvasComponent:
+    return matcher(component)
+      .when(ComponentFactory.CanvasComponent, (component) => {
         return of(component.id);
-      case ComponentKind.CustomComponent:
+      })
+      .when(ComponentFactory.CustomComponent, (component) => {
         return component.name$;
-      default:
-        throw new Error("unknown component type");
-    }
+      })
+      .complete();
   }
 
   export async function addRootExObjectBlank(
     _ctx: MainContext,
-    component: CustomComponent
+    component: ComponentKind["CustomComponent"]
   ): Promise<void> {
-    const exObject = await CreateExObject.blank(_ctx, {});
+    const exObject = await ExObjectFactory2(_ctx, {});
     exObject.parent$.next(component);
     const rootExObjects = await firstValueFrom(component.rootExObjects$);
     component.rootExObjects$.next([...rootExObjects, exObject]);

@@ -1,13 +1,13 @@
 import { Subject } from "rxjs";
 import {
-  SystemExFuncKind,
+  SystemExFuncFactory,
   type ExFunc,
-  type SystemExFunc,
+  type SystemExFunc
 } from "src/ex-object/ExFunc";
 import {
   type ExItemBase,
-  type Expr
 } from "src/ex-object/ExItem";
+import type { Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import {
   createBehaviorSubjectWithLifetime,
@@ -67,7 +67,7 @@ export const CallExpr = {
       const creationArgs2: Required<CallExprCreationArgs["System"]> = {
         id: creationArgs.id ?? Utils.createId("call-expr"),
         args: creationArgs.args ?? [],
-        systemExFunc: creationArgs.systemExFunc ?? SystemExFuncKind.Add(),
+        systemExFunc: creationArgs.systemExFunc ?? SystemExFuncFactory.Add(),
       };
 
       const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
