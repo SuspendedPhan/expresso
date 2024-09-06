@@ -29,12 +29,9 @@ type CustomExFunc_ = ExItemBase & {
   name$: SUB<string>;
   expr$: SUB<Expr>;
   parameters: ObservableArray<ExFuncParameter>;
-  // addParameterBlank(): Effect.Effect<ExFuncParameter>;
 };
 
-type CustomExFunc2_ = CustomExFunc_ & {
-  addParameterBlank: typeof addParameterBlank;
-};
+type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
 
 export const SystemExFuncFactory = dexScopedVariant("ExFunc/System", {
   Add: {},
@@ -58,51 +55,55 @@ interface CustomExFuncCreationArgs {
 
 export const CustomExFuncFactory2 = {
   Custom(creationArgs: CustomExFuncCreationArgs) {
-    return Effect.gen(eff.bind(null, creationArgs));
+    return Effect.gen(function* () {
+      const libraryCtx = yield* LibraryCtx;
+      let name = creationArgs.name;
+      if (name === undefined) {
+        const project: Project = yield* libraryCtx.activeProject;
+        const ordinal = project.getAndIncrementOrdinal();
+        name = `Function ${ordinal}`;
+      }
+
+      const creationArgs2: Required<CustomExFuncCreationArgs> = {
+        id: creationArgs.id ?? Utils.createId("ex-func"),
+        name: creationArgs.name ?? `Function ${Utils.createId("ex-func")}`,
+        expr:
+          creationArgs.expr === undefined
+            ? yield* ExprFactory2.Number({})
+            : creationArgs.expr,
+        exFuncParameterArr: creationArgs.exFuncParameterArr ?? [],
+      };
+
+      const base: ExItemBase = yield* ExItem.createExItemBase(creationArgs2.id);
+      const customExFunc_ = {
+        ...base,
+        name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          creationArgs2.expr
+        ),
+        parameters: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.exFuncParameterArr
+        ),
+      };
+      const customExFunc2_: CustomExFunc2_ = {
+        ...customExFunc_,
+        ...methodsFactory(customExFunc_),
+      };
+      return CustomExFuncFactory(customExFunc2_);
+    });
   },
 };
 
-function* eff(creationArgs: CustomExFuncCreationArgs) {
-  const libraryCtx = yield* LibraryCtx;
-  let name = creationArgs.name;
-  if (name === undefined) {
-    const project: Project = yield* libraryCtx.activeProject;
-    const ordinal = project.getAndIncrementOrdinal();
-    name = `Function ${ordinal}`;
-  }
-
-  const creationArgs2: Required<CustomExFuncCreationArgs> = {
-    id: creationArgs.id ?? Utils.createId("ex-func"),
-    name: creationArgs.name ?? `Function ${Utils.createId("ex-func")}`,
-    expr:
-      creationArgs.expr === undefined
-        ? yield* ExprFactory2.Number({})
-        : creationArgs.expr,
-    exFuncParameterArr: creationArgs.exFuncParameterArr ?? [],
-  };
-
-  const base: ExItemBase = yield* ExItem.createExItemBase(creationArgs2.id);
+function methodsFactory(exFunc: CustomExFunc_) {
   return {
-    ...base,
-    name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
-    expr$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.expr),
-    parameters: createObservableArrayWithLifetime(
-      base.destroy$,
-      creationArgs2.exFuncParameterArr
-    ),
-
-    addParameterBlank,
+    addParameterBlank() {
+      return Effect.gen(function* () {
+        const param = yield* ExFuncParameterFactory2({});
+        exFunc.parameters.push(param);
+        return param;
+      });
+    },
   };
-}
-
-const methods = {
-  addParameterBlank,
-};
-
-function addParameterBlank(exFunc: CustomExFunc_) {
-  return Effect.gen(function* () {
-    const param = yield* ExFuncParameterFactory2({});
-    exFunc.parameters.push(param);
-    return param;
-  });
 }
