@@ -15,7 +15,7 @@
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
 
   export let ctx: MainContext;
-  export let component: ComponentKind["CustomComponent"];
+  export let component: ComponentKind["Custom"];
 
   const isComponentFocused$ = of(false);
 

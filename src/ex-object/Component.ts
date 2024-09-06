@@ -7,10 +7,9 @@ import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
 import {
-  dexScopedVariant,
-  type DexVariantKind,
+  type DexVariantKind
 } from "src/utils/utils/VariantUtils4";
-import { fields, matcher, type VariantOf } from "variant";
+import { fields, matcher, scoped, variant, type VariantOf } from "variant";
 
 const log55 = log5("Component.ts");
 
@@ -48,16 +47,16 @@ export interface ComponentCreationArgs {
   };
 }
 
-export const ComponentFactory = dexScopedVariant("Component", {
-  CanvasComponent: fields<CanvasComponent>(),
-  CustomComponent: fields<CustomComponent>(),
-});
+export const ComponentFactory = variant(scoped("Component", {
+  Canvas: fields<CanvasComponent>(),
+  Custom: fields<CustomComponent>(),
+}));
 
 export type Component = VariantOf<typeof ComponentFactory>;
 export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
 
 export const ComponentFactory2 = {
-  async CustomComponent(
+  async Custom(
     ctx: MainContext,
     creationArgs: ComponentCreationArgs["Custom"]
   ) {
@@ -69,7 +68,7 @@ export const ComponentFactory2 = {
       properties: creationArgs.properties ?? [],
     };
 
-    const component = ComponentFactory.CustomComponent({
+    const component = ComponentFactory.Custom({
       id: "circle",
       parent$: of(null),
       name$: new BehaviorSubject(creationArgs2.name),
@@ -101,7 +100,7 @@ export const ComponentFactory2 = {
 };
 
 export const CanvasComponentStore = {
-  circle: ComponentFactory.CanvasComponent({
+  circle: ComponentFactory.Canvas({
     id: "circle",
     parent$: of(null),
     parameters: [
@@ -114,7 +113,7 @@ export const CanvasComponentStore = {
       }),
     ],
   }),
-} satisfies Record<string, ComponentKind["CanvasComponent"]>;
+} satisfies Record<string, ComponentKind["Canvas"]>;
 
 export function createComponentCtx(_ctx: MainContext) {
   const parameterById = new Map<string, ComponentParameterKind["Canvas"]>();
@@ -145,10 +144,10 @@ export function createComponentCtx(_ctx: MainContext) {
 export const Component = {
   getName$(component: Component): OBS<string> {
     return matcher(component)
-      .when(ComponentFactory.CanvasComponent, (component) => {
+      .when(ComponentFactory.Canvas, (component) => {
         return of(component.id);
       })
-      .when(ComponentFactory.CustomComponent, (component) => {
+      .when(ComponentFactory.Custom, (component) => {
         return component.name$;
       })
       .complete();
@@ -156,7 +155,7 @@ export const Component = {
 
   async addRootExObjectBlank(
     _ctx: MainContext,
-    component: ComponentKind["CustomComponent"]
+    component: ComponentKind["Custom"]
   ): Promise<void> {
     const exObject = await ExObjectFactory2(_ctx, {});
     exObject.parent$.next(component);

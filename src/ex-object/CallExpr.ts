@@ -5,6 +5,7 @@ import {
   type SystemExFunc
 } from "src/ex-object/ExFunc";
 import {
+  ExItem,
   type ExItemBase,
 } from "src/ex-object/ExItem";
 import type { Expr } from "src/ex-object/Expr";
@@ -49,7 +50,7 @@ export const CallExpr = {
         exFunc: creationArgs.exFunc,
       };
 
-      const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+      const base = await ExItem.createExItemBase(creationArgs2.id);
       const expr = CallExpr.creators.Custom({
         ...base,
         args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),
@@ -70,7 +71,7 @@ export const CallExpr = {
         systemExFunc: creationArgs.systemExFunc ?? SystemExFuncFactory.Add(),
       };
 
-      const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+      const base = await ExItem.createExItemBase(creationArgs2.id);
       const expr = CallExpr.creators.System({
         ...base,
         args$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.args),

@@ -1,5 +1,5 @@
 import { ExFuncParameterFactory2, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
-import type { ExItemBase } from "src/ex-object/ExItem";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import type { Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import {
@@ -53,7 +53,7 @@ export const ExFuncFactory2 = {
       name = `Function ${ordinal}`;
     }
 
-    const base = await ctx.objectFactory.createExItemBase(id);
+    const base = await ExItem.createExItemBase(id);
     return ExFuncFactory.Custom({
       ...base,
       name$: createBehaviorSubjectWithLifetime(base.destroy$, name),

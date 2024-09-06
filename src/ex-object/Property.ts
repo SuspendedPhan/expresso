@@ -5,18 +5,14 @@
  * Component Argument
  */
 
-import assert from "assert-ts";
-import { firstValueFrom, of } from "rxjs";
+import { of } from "rxjs";
 import {
-  ComponentParameterFns,
 } from "src/ex-object/Component";
-import type { ComponentParameter } from "src/ex-object/ComponentParameter";
+import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import {
-  ExItemFn,
-  type ExItem,
-  type ExItemBase,
+  ExItem,
+  type ExItemBase
 } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
@@ -84,7 +80,7 @@ export const PropertyFactory2 = {
       expr: createArgs.expr ?? (await ctx.objectFactory.createNumberExpr()),
     };
 
-    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const base = await ExItem.createExItemBase(createArgs2.id);
     const property = PropertyFactory.ComponentParameterProperty({
       ...base,
       expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
@@ -103,7 +99,7 @@ export const PropertyFactory2 = {
       name: createArgs.name ?? "Basic Property",
     };
 
-    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const base = await ExItem.createExItemBase(createArgs2.id);
     return PropertyFactory.BasicProperty({
       ...base,
       expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
@@ -120,7 +116,7 @@ export const PropertyFactory2 = {
       expr: createArgs.expr ?? (await ctx.objectFactory.createNumberExpr(1)),
     };
 
-    const base = await ctx.objectFactory.createExItemBase(createArgs2.id);
+    const base = await ExItem.createExItemBase(createArgs2.id);
     return PropertyFactory.CloneCountProperty({
       ...base,
       expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
@@ -134,7 +130,7 @@ export namespace PropertyFns {
   export function getName$(property: Property): OBS<string> {
     return matcher(property)
       .when(PropertyFactory.ComponentParameterProperty, (p) =>
-        ComponentParameterFns.getName$(p.componentParameter)
+        ComponentParameter.getName$(p.componentParameter)
       )
       .when(PropertyFactory.BasicProperty, (p) => p.name$)
       .when(PropertyFactory.CloneCountProperty, () =>

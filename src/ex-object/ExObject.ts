@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
 import { CanvasComponentStore, ComponentFactory, type Component, type ComponentKind } from "src/ex-object/Component";
 import {
-  type ExItem,
+  ExItem,
   type ExItemBase,
   type Parent,
 } from "src/ex-object/ExItem";
@@ -50,7 +50,7 @@ export async function ExObjectFactory2(ctx: MainContext, creationArgs: ExObjectC
     children: creationArgs.children ?? [],
   };
 
-  const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+  const base = await ExItem.createExItemBase(creationArgs2.id);
   const exObject = ExObjectFactory({
     ...base,
     name$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.name),
@@ -162,10 +162,10 @@ async function createComponentProperties(
   component: Component
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
   return matcher(component)
-    .when(ComponentFactory.CanvasComponent, async (component) => {
+    .when(ComponentFactory.Canvas, async (component) => {
       return createCanvasComponentProperties(ctx, component);
     })
-    .when(ComponentFactory.CustomComponent, async (component) => {
+    .when(ComponentFactory.Custom, async (component) => {
       return createCustomComponentProperties(ctx, component);
     })
     .complete();
@@ -173,7 +173,7 @@ async function createComponentProperties(
 
 async function createCanvasComponentProperties(
   ctx: MainContext,
-  component: ComponentKind["CanvasComponent"]
+  component: ComponentKind["Canvas"]
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameter$Ps = component.parameters.map((input) => {
     return Create.Property.componentBlank(ctx, input);
@@ -184,7 +184,7 @@ async function createCanvasComponentProperties(
 
 async function createCustomComponentProperties(
   ctx: MainContext,
-  component: ComponentKind["CustomComponent"]
+  component: ComponentKind["Custom"]
 ): Promise<PropertyKind["ComponentParameterProperty"][]> {
   const parameterL = await firstValueFrom(component.parameters$);
   const propertyPL = parameterL.map((input) => {

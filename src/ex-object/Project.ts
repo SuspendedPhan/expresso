@@ -3,9 +3,9 @@ import {
   firstValueFrom,
   Subject
 } from "rxjs";
-import { CreateComponent, type CustomComponent } from "src/ex-object/Component";
-import { createExFunc, type ExFunc } from "src/ex-object/ExFunc";
-import { CreateExObject, type ExObject } from "src/ex-object/ExObject";
+import { ComponentFactory2 } from "src/ex-object/Component";
+import { ExFuncFactory2, type ExFunc } from "src/ex-object/ExFunc";
+import type { ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
 import type MainContext from "src/main-context/MainContext";
 import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
@@ -31,7 +31,7 @@ export function createProjectContext(ctx: MainContext) {
     },
     async addExFuncBlank() {
       const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const exFunc = await createExFunc(ctx, {});
+      const exFunc = await ExFuncFactory2.Custom(ctx, {});
       return project.addCustomExFunc(exFunc);
     },
     async addComponentBlank() {
@@ -51,7 +51,7 @@ export namespace ProjectFns {
   }
 
   export async function addComponentBlank(ctx: MainContext, project: Project) {
-    const component = await CreateComponent.custom(ctx, {});
+    const component = await ComponentFactory2.Custom(ctx, {});
     addComponent(ctx, project, component);
     return component;
   }

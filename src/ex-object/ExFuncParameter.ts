@@ -1,4 +1,4 @@
-import type { ExItemBase } from "src/ex-object/ExItem";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import type MainContext from "src/main-context/MainContext";
 import {
   type SUB,
@@ -21,7 +21,7 @@ export async function ExFuncParameterFactory2(ctx: MainContext, creationArgs: Ex
         name: creationArgs.name ?? `Parameter ${await ctx.projectCtx.getOrdinalProm()}`,
     };
 
-    const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+    const base = await ExItem.createExItemBase(creationArgs2.id);
     return ExFuncParameterFactory({
         ...base,
         name$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.name),

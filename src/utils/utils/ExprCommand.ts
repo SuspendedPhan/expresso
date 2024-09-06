@@ -91,7 +91,7 @@ async function* getExprCommands2(
           await ExprFactory2.Reference(ctx, { target: property })
         );
       }
-    } else if (isType(ancestor, ComponentFactory.CustomComponent)) {
+    } else if (isType(ancestor, ComponentFactory.Custom)) {
       for (const parameter of await firstValueFrom(ancestor.parameters$)) {
         yield createReferenceExprCommand_(
           await ExprFactory2.Reference(ctx, { target: parameter })
@@ -120,7 +120,7 @@ async function createReferenceExprCommand(
   ctx: MainContext,
   currentExpr: Expr,
   newExpr: ExprKind["Reference"],
-  parent: ExObject | ComponentKind["CustomComponent"]
+  parent: ExObject | ComponentKind["Custom"]
 ): Promise<ExprCommand> {
   const target = newExpr.target;
   assert(target !== null);

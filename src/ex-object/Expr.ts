@@ -2,7 +2,7 @@ import { firstValueFrom } from "rxjs";
 import { CallExpr } from "src/ex-object/CallExpr";
 import { ComponentParameterFactory, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { ExFuncParameterFactory, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
-import { type ExItemBase } from "src/ex-object/ExItem";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { PropertyFactory, PropertyFns, type Property } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { Utils } from "src/utils/utils/Utils";
@@ -33,7 +33,7 @@ export const ExprFactory2 = {
       target: creationArgs.target,
     };
 
-    const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+    const base = await ExItem.createExItemBase(creationArgs2.id);
     const expr = ExprFactory.Reference({
       ...base,
       target: creationArgs2.target,
