@@ -1,38 +1,78 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
-import {
-  CanvasComponentStore,
-  type Component
-} from "src/ex-object/Component";
+import { CanvasComponentStore, type Component } from "src/ex-object/Component";
 import {
   type ExItem,
   type ExItemBase,
   type Parent,
 } from "src/ex-object/ExItem";
-import type { PropertyKind } from "src/ex-object/Property";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import {
   createBehaviorSubjectWithLifetime,
+  Utils,
   type SUB,
 } from "src/utils/utils/Utils";
-import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { fields, type VariantOf } from "variant";
+import { fields, variation } from "variant";
 
-export const ExObjectFactory = dexScopedVariant("ExObject", {
-  Basic: fields<BasicExObject>(),
-});
+export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
+export type ExObject = ReturnType<typeof ExObjectFactory>;
 
-export type ExObject = VariantOf<typeof ExObjectFactory>;
-export type ExObjectKind = DexVariantKind<typeof ExObjectFactory>;
-
-interface BasicExObject extends ExItemBase {
+interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
   children$: SUB<ExObject[]>;
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
   basicProperties$: SUB<PropertyKind["BasicProperty"][]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
+}
+
+interface ExObjectCreationArgs {
+  id?: string;
+  component?: Component;
+  name?: string;
+  componentProperties?: PropertyKind["ComponentParameterProperty"][];
+  basicProperties?: PropertyKind["BasicProperty"][];
+  cloneCountProperty?: PropertyKind["CloneCountProperty"];
+  children?: ExObject[];
+}
+export async function ExObjectFactory2(ctx: MainContext, creationArgs: ExObjectCreationArgs) {
+  const component = creationArgs.component ?? CanvasComponentStore.circle;
+
+  const creationArgs2: Required<ExObjectCreationArgs> = {
+    id: creationArgs.id ?? Utils.createId("ex-object"),
+    component,
+    name: creationArgs.name ?? `Object ${await ctx.projectCtx.getOrdinalProm()}`,
+    componentProperties: creationArgs.componentProperties ?? await createComponentProperties(ctx, component),
+    basicProperties: creationArgs.basicProperties ?? [],
+    cloneCountProperty: creationArgs.cloneCountProperty ?? await PropertyFactory2.CloneCountProperty(ctx, {}),
+    children: creationArgs.children ?? [],
+  };
+
+  const base = await ctx.objectFactory.createExItemBase(creationArgs2.id);
+  const exObject = ExObjectFactory({
+    ...base,
+    name$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.name),
+    component: creationArgs2.component,
+    componentParameterProperties: creationArgs2.componentProperties,
+    basicProperties$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.basicProperties),
+    children$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.children),
+    cloneCountProperty: creationArgs2.cloneCountProperty,
+  });
+  
+  creationArgs2.componentProperties.forEach((property) => {
+    property.parent$.next(exObject);
+  });
+
+  creationArgs2.basicProperties.forEach((property) => {
+    property.parent$.next(exObject);
+  });
+
+  creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+  ctx.eventBus.objectAdded$.next(exObject);
+  return exObject;
 }
 
 export namespace ExObjectFns {
@@ -114,65 +154,6 @@ export namespace ExObjectFns {
     project.rootExObjectObsArr.replaceItem(exObject, newExObject);
 
     exObject.destroy$.next();
-  }
-}
-
-export namespace CreateExObject {
-  export async function blank(
-    ctx: MainContext,
-    data: {
-      id?: string;
-      component?: Component;
-      name?: string;
-      componentProperties?: PropertyKind["ComponentParameterProperty"][];
-      basicProperties?: PropertyKind["BasicProperty"][];
-      cloneCountProperty?: PropertyKind["CloneCountProperty"];
-      children?: ExObject[];
-    }
-  ): Promise<ExObject> {
-    let name = data.name;
-    if (name === undefined) {
-      const ordinal = await ctx.projectCtx.getOrdinalProm();
-      name = `Object ${ordinal}`;
-    }
-
-    const id = data.id ?? `ex-object-${crypto.randomUUID()}`;
-    const base = await ctx.objectFactory.createExItemBase(id);
-    const component = data.component ?? CanvasComponentStore.circle;
-    const componentProperties =
-      data.componentProperties ??
-      (await createComponentProperties(ctx, component));
-    const basicProperties = data.basicProperties ?? [];
-    const cloneCountProperty =
-      data.cloneCountProperty ?? (await Create.Property.cloneCountBlank(ctx));
-    const children = data.children ?? [];
-
-    const object: ExObject = {
-      ...base,
-      name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
-      itemType: ExItemType.ExObject,
-      component,
-      componentParameterProperties: componentProperties,
-      basicProperties$: createBehaviorSubjectWithLifetime(
-        base.destroy$,
-        basicProperties
-      ),
-      children$: createBehaviorSubjectWithLifetime<ExObject[]>(
-        base.destroy$,
-        children
-      ),
-      cloneCountProperty,
-    };
-
-    componentProperties.forEach((property) => {
-      property.parent$.next(object);
-    });
-    basicProperties.forEach((property) => {
-      property.parent$.next(object);
-    });
-    cloneCountProperty.parent$.next(object);
-    ctx.eventBus.objectAdded$.next(object);
-    return object;
   }
 }
 
