@@ -5,8 +5,23 @@ import type { ExObjectFocus } from "src/utils/focus/ExObjectFocus";
 import type { ExprFocus } from "src/utils/focus/ExprFocus";
 import type { NavFocus } from "src/utils/focus/NavFocus";
 import type { ProjectComponentWindowFocus } from "src/utils/focus/ProjectComponentWindowFocus";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { pass, type VariantOf } from "variant";
+
+interface Focus_ {
+  None: {};
+}
+
+export const FocusFactory = dexVariant.scoped("Focus")(
+  dexVariant.typed<Focus_>({
+    None: pass,
+  })
+);
+
+export type FocusKind = DexVariantKind<typeof FocusFactory>;
 
 export type Focus =
+  | VariantOf<typeof FocusFactory>
   | ExItemFocus
   | ExObjectFocus
   | ExprFocus

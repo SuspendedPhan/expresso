@@ -1,12 +1,9 @@
 import { Context, Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
+import { FocusFactory, type Focus } from "src/utils/focus/Focus";
 import type { OBS, SUB } from "src/utils/utils/Utils";
-import { type UnionOf } from "unionize";
-import { FocusKind } from "./FocusKind";
 
 // const log55 = log5("Focus.ts");
-
-export type Focus = UnionOf<typeof FocusKind>;
 
 export enum Hotkeys {
   Down = "ArrowDown,s",
@@ -32,14 +29,14 @@ export class FocusCtx extends Context.Tag("FocusCtx")<
 export const FocusCtxLive = Layer.effect(
   FocusCtx,
   Effect.gen(function* () {
-    const focus$ = new BehaviorSubject<Focus>(FocusKind.None());
+    const focus$ = new BehaviorSubject<Focus>(FocusFactory.None());
     const focusStack = new Array<Focus>();
 
     return {
       focus$: focus$,
       popFocus() {
         focusStack.pop();
-        focus$.next(focusStack[focusStack.length - 1] ?? FocusKind.None());
+        focus$.next(focusStack[focusStack.length - 1] ?? FocusFactory.None());
       },
 
       focusOrFalse$<T extends Focus>(
