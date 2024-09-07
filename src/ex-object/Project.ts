@@ -4,7 +4,7 @@ import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { type ExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
-import type { LibraryProject } from "src/library/LibraryProject";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,

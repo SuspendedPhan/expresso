@@ -6,7 +6,7 @@ import {
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
-import type { Project } from "src/ex-object/Project";
+import { Project } from "src/ex-object/Project";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
@@ -60,7 +60,7 @@ export const CustomExFuncFactory2 = {
       let name = creationArgs.name;
       if (name === undefined) {
         const project: Project = yield* projectCtx.activeProject;
-        const ordinal = project.getAndIncrementOrdinal();
+        const ordinal = Project.Methods(project).getAndIncrementOrdinal();
         name = `Function ${ordinal}`;
       }
 

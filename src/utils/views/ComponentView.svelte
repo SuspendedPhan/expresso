@@ -29,7 +29,7 @@
     filterFn: (f) => f.component === component,
   });
 
-  const rootExObjects$ = component.rootExObjects$;
+  const rootExObjects$ = component.rootExObjects;
 
   function addExObject() {
     ComponentFns.addRootExObjectBlank(ctx, component);

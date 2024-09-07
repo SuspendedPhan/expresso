@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { BehaviorSubject, firstValueFrom, of } from "rxjs";
+import { BehaviorSubject, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/CanvasContext";
 import {
   ComponentParameterFactory,
@@ -9,8 +9,10 @@ import {
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
-import type MainContext from "src/main-context/MainContext";
-import { EffectUtils } from "src/utils/utils/EffectUtils";
+import {
+  createObservableArrayWithLifetime,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { matcher, pass, type VariantOf } from "variant";
@@ -29,12 +31,13 @@ interface CanvasComponent_ {
 
 interface CustomComponent_ extends ExItemBase {
   name$: SUB<string>;
-  parameters$: SUB<ComponentParameterKind["Custom"][]>;
-  rootExObjects$: SUB<ExObject[]>;
-  properties$: SUB<PropertyKind["BasicProperty"][]>;
+  parameters: ObservableArray<ComponentParameterKind["Custom"]>;
+  rootExObjects: ObservableArray<ExObject>;
+  properties: ObservableArray<PropertyKind["BasicProperty"]>;
 }
 
-type CustomComponent2_ = CustomComponent_ & ReturnType<typeof customComponentMethodsFactory>;
+type CustomComponent2_ = CustomComponent_ &
+  ReturnType<typeof customComponentMethodsFactory>;
 
 export interface ComponentCreationArgs {
   Custom: {
@@ -51,10 +54,12 @@ interface Component_ {
   Custom: CustomComponent2_;
 }
 
-export const ComponentFactory = dexVariant.scoped("Component")(dexVariant.typed<Component_>({
-  Canvas: pass,
-  Custom: pass,
-}));
+export const ComponentFactory = dexVariant.scoped("Component")(
+  dexVariant.typed<Component_>({
+    Canvas: pass,
+    Custom: pass,
+  })
+);
 
 export type Component = VariantOf<typeof ComponentFactory>;
 export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
@@ -75,9 +80,18 @@ export const ComponentFactory2 = {
       const component_: CustomComponent_ = {
         ...base,
         name$: new BehaviorSubject(creationArgs2.name),
-        parameters$: new BehaviorSubject(creationArgs2.parameters),
-        rootExObjects$: new BehaviorSubject(creationArgs2.rootExObjects),
-        properties$: new BehaviorSubject(creationArgs2.properties),
+        parameters: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.parameters
+        ),
+        rootExObjects: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.rootExObjects
+        ),
+        properties: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.properties
+        ),
       };
 
       const component2_: CustomComponent2_ = {
@@ -100,10 +114,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
     addParameterBlank() {
       return Effect.gen(function* () {
         const parameter = ComponentParameterFactory2.Custom({});
-        const parameters = yield* Effect.promise(() =>
-          firstValueFrom(component.parameters$)
-        );
-        component.parameters$.next([...parameters, parameter]);
+        component.parameters.push(parameter);
         return parameter;
       });
     },
@@ -111,10 +122,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
     addPropertyBlank() {
       return Effect.gen(function* () {
         const property = yield* PropertyFactory2.BasicProperty({});
-        const properties = yield* EffectUtils.firstValueFrom(
-          component.properties$
-        );
-        component.properties$.next([...properties, property]);
+        component.properties.push(property);
         return property;
       });
     },
@@ -148,13 +156,11 @@ export const Component = {
       .complete();
   },
 
-  async addRootExObjectBlank(
-    _ctx: MainContext,
-    component: ComponentKind["Custom"]
-  ): Promise<void> {
-    const exObject = await ExObjectFactory2(_ctx, {});
-    exObject.parent$.next(component);
-    const rootExObjects = await firstValueFrom(component.rootExObjects$);
-    component.rootExObjects$.next([...rootExObjects, exObject]);
+  addRootExObjectBlank(component: ComponentKind["Custom"]) {
+    return Effect.gen(function* () {
+      const exObject = yield* ExObjectFactory2({});
+      exObject.parent$.next(component);
+      component.rootExObjects.push(exObject);
+    });
   },
 };

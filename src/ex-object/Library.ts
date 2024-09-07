@@ -1,17 +1,14 @@
 import { Effect } from "effect";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, from, Subject } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ProjectFactory2 } from "src/ex-object/Project";
-import {
-  LibraryProjectFactory2,
-  type LibraryProject,
-} from "src/library/LibraryProject";
-import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
 import { fields, variation } from "variant";
+import { log5 } from "src/utils/utils/Log5";
+import { LibraryProject, LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 
 const log55 = log5("Library.ts");
 
