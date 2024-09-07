@@ -1,13 +1,25 @@
 import { Effect } from "effect";
-import { firstValueFrom } from "rxjs";
-import { CallExpr } from "src/ex-object/CallExpr";
-import { ComponentParameterFactory, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
-import { ExFuncParameterFactory, type ExFuncParameter } from "src/ex-object/ExFuncParameter";
+import type { CallExpr } from "src/ex-object/CallExpr";
+import {
+  ComponentParameterFactory,
+  type ComponentParameterKind,
+} from "src/ex-object/ComponentParameter";
+import {
+  ExFuncParameterFactory,
+  type ExFuncParameter,
+} from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import { PropertyFactory, PropertyFns, type Property } from "src/ex-object/Property";
-import type MainContext from "src/main-context/MainContext";
+import {
+  PropertyFactory,
+  PropertyFns,
+  type Property,
+} from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { Utils } from "src/utils/utils/Utils";
-import { dexScopedVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import {
+  dexScopedVariant,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
 import { fields, isOfVariant, isType, type VariantOf } from "variant";
 
 export type ReferenceTarget =
@@ -19,7 +31,6 @@ export const ExprFactory = dexScopedVariant("Expr", {
   Number: fields<{ value: number } & ExItemBase>(),
   Reference: fields<{ target: ReferenceTarget | null } & ExItemBase>(),
 });
-
 
 export type Expr = VariantOf<typeof ExprFactory> | CallExpr;
 export type ExprKind = DexVariantKind<typeof ExprFactory>;
@@ -53,21 +64,20 @@ export const ExprFactory2 = {
     });
   },
 
-  async Reference(
-    ctx: MainContext,
-    creationArgs: ExprCreationArgs["Reference"]
-  ) {
-    const creationArgs2: Required<ExprCreationArgs["Reference"]> = {
-      id: creationArgs.id ?? Utils.createId("expr"),
-      target: creationArgs.target,
-    };
+  Reference(creationArgs: ExprCreationArgs["Reference"]) {
+    return Effect.gen(function* () {
+      const creationArgs2: Required<ExprCreationArgs["Reference"]> = {
+        id: creationArgs.id ?? Utils.createId("expr"),
+        target: creationArgs.target,
+      };
 
-    const base = await ExItem.createExItemBase(creationArgs2.id);
-    const expr = ExprFactory.Reference({
-      ...base,
-      target: creationArgs2.target,
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const expr = ExprFactory.Reference({
+        ...base,
+        target: creationArgs2.target,
+      });
+      return expr;
     });
-    return expr;
   },
 };
 
@@ -84,15 +94,16 @@ export const Expr = {
     }
   },
 
-  async getProperty(expr: Expr) {
-    let parent = await firstValueFrom(expr.parent$);
-    while (parent) {
-      if (isOfVariant(parent, PropertyFactory)) {
-        return parent;
+  getProperty(expr: Expr) {
+    return Effect.gen(function* () {
+      let parent = yield* EffectUtils.firstValueFrom(expr.parent$);
+      while (parent) {
+        if (isOfVariant(parent, PropertyFactory)) {
+          return parent;
+        }
+        parent = yield* EffectUtils.firstValueFrom(parent.parent$);
       }
-      parent = await firstValueFrom(parent.parent$);
-    }
-    throw new Error("Property not found");
+      throw new Error("Property not found");
+    });
   },
 };
-

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
-import { ExFuncFactory2, type ExFunc } from "src/ex-object/ExFunc";
+import { type ExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
@@ -11,7 +11,7 @@ import {
   createObservableArrayWithLifetime,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
-import { Utils, type OBS } from "src/utils/utils/Utils";
+import { Utils } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
 
 export const ProjectFactory = variation(
@@ -20,10 +20,10 @@ export const ProjectFactory = variation(
     {
       libraryProject: LibraryProject | null;
       rootExObjects: ObservableArray<ExObject>;
-      componentArr$: BehaviorSubject<ComponentKind["Custom"][]>;
-      exFuncObsArr: ObservableArray<ExFunc>;
+      components: ObservableArray<ComponentKind["Custom"][]>;
+      exFuncs: ObservableArray<ExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
-      rootExObjects$: OBS<ExObject[]>;
+      exObjects: ObservableArray<ExObject>;
       destroy$: Subject<void>;
 
       addRootExObjectBlank(): Promise<void>;

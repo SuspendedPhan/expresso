@@ -10,7 +10,7 @@ import { of } from "rxjs";
 import {} from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import { ExprFactory, ExprFactory2, type Expr } from "src/ex-object/Expr";
+import { ExprFactory2, type Expr } from "src/ex-object/Expr";
 import type MainContext from "src/main-context/MainContext";
 import { log5 } from "src/utils/utils/Log5";
 import {
@@ -24,7 +24,7 @@ import {
 } from "src/utils/utils/VariantUtils4";
 import { fields, matcher, type VariantOf } from "variant";
 
-const log55 = log5("Property.ts");
+// const log55 = log5("Property.ts");
 
 interface PropertyBase extends ExItemBase {
   expr$: SUB<Expr>;
@@ -67,30 +67,37 @@ export type Property = VariantOf<typeof PropertyFactory>;
 export type PropertyKind = DexVariantKind<typeof PropertyFactory>;
 
 export const PropertyFactory2 = {
-  async ComponentParameterProperty(
-    ctx: MainContext,
+  ComponentParameterProperty(
     createArgs: CreatePropertyArgs["ComponentParameter"]
   ) {
-    const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
-      id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
-      componentParameter: createArgs.componentParameter,
-      expr: createArgs.expr ?? (await ctx.objectFactory.createNumberExpr()),
-    };
+    return Effect.gen(function* () {
+      const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
+        id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
+        componentParameter: createArgs.componentParameter,
+        expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
+      };
 
-    const base = await ExItem.createExItemBase(createArgs2.id);
-    const property = PropertyFactory.ComponentParameterProperty({
-      ...base,
-      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
-      componentParameter: createArgs2.componentParameter,
+      const base = yield* ExItem.createExItemBase(createArgs2.id);
+      const property = PropertyFactory.ComponentParameterProperty({
+        ...base,
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          createArgs2.expr
+        ),
+        componentParameter: createArgs2.componentParameter,
+      });
+      return property;
     });
-    return property;
   },
 
   BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
     return Effect.gen(function* () {
       const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
         id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
-        expr: createArgs.expr === undefined ? yield* ExprFactory2.Number({}) : createArgs.expr,
+        expr:
+          createArgs.expr === undefined
+            ? yield* ExprFactory2.Number({})
+            : createArgs.expr,
         name: createArgs.name ?? "Basic Property",
       };
 
@@ -109,19 +116,21 @@ export const PropertyFactory2 = {
     });
   },
 
-  async CloneCountProperty(
-    ctx: MainContext,
-    createArgs: CreatePropertyArgs["CloneCount"]
-  ) {
-    const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
-      id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
-      expr: createArgs.expr ?? (await ctx.objectFactory.createNumberExpr(1)),
-    };
+  CloneCountProperty(createArgs: CreatePropertyArgs["CloneCount"]) {
+    return Effect.gen(function* () {
+      const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
+        id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
+        expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
+      };
 
-    const base = await ExItem.createExItemBase(createArgs2.id);
-    return PropertyFactory.CloneCountProperty({
-      ...base,
-      expr$: createBehaviorSubjectWithLifetime(base.destroy$, createArgs2.expr),
+      const base = yield* ExItem.createExItemBase(createArgs2.id);
+      return PropertyFactory.CloneCountProperty({
+        ...base,
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          createArgs2.expr
+        ),
+      });
     });
   },
 };

@@ -1,6 +1,8 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
 import { firstValueFrom } from "rxjs";
+import { LibraryCtx } from "src/ctx/LibraryCtx";
+import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -12,17 +14,16 @@ import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import type { ObservableArray } from "src/utils/utils/ObservableArray";
+import {
+  createObservableArrayWithLifetime,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type SUB,
 } from "src/utils/utils/Utils";
 import { fields, isType, matcher, variation } from "variant";
-
-export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
-export type ExObject = ReturnType<typeof ExObjectFactory>;
-
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
@@ -32,7 +33,8 @@ interface ExObject_ extends ExItemBase {
   cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
 
-type ExObject2 = ExObject & ReturnType<typeof methodsFactory>;
+export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
+export type ExObject = ReturnType<typeof ExObjectFactory>;
 
 interface ExObjectCreationArgs {
   id?: string;
@@ -43,26 +45,30 @@ interface ExObjectCreationArgs {
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
 }
+
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
+    const projectCtx = yield* ProjectCtx;
+    const project = yield* projectCtx.activeProject;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     const creationArgs2: Required<ExObjectCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("ex-object"),
       component,
       name:
-        creationArgs.name ?? `Object ${await ctx.projectCtx.getOrdinalProm()}`,
+        creationArgs.name ??
+        `Object ${yield* project.getAndIncrementOrdinal()}`,
       componentProperties:
         creationArgs.componentProperties ??
-        (await createComponentProperties(ctx, component)),
+        (yield* createComponentProperties(component)),
       basicProperties: creationArgs.basicProperties ?? [],
       cloneCountProperty:
         creationArgs.cloneCountProperty ??
-        (await PropertyFactory2.CloneCountProperty(ctx, {})),
+        (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
     };
 
-    const base = await ExItem.createExItemBase(creationArgs2.id);
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
     const exObject = ExObjectFactory({
       ...base,
       name$: createBehaviorSubjectWithLifetime(
@@ -71,7 +77,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       ),
       component: creationArgs2.component,
       componentParameterProperties: creationArgs2.componentProperties,
-      basicProperties: createBehaviorSubjectWithLifetime(
+      basicProperties: createObservableArrayWithLifetime(
         base.destroy$,
         creationArgs2.basicProperties
       ),
@@ -92,134 +98,135 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
 
-    ctx.eventBus.objectAdded$.next(exObject);
+    project.exObjects.push(exObject);
     return exObject;
   });
 }
 
-function methodsFactory(exObject: ExObject_) {
+export function ExObjectMethods(exObject: ExObject) {
   return {
-    
-  };
-}
+    addChildBlank() {
+      return Effect.gen(this, function* () {
+        const child = yield* ExObjectFactory2({});
+        this.addChild(child);
+      });
+    },
 
-export const ExObject = {
-  addChildBlank(exObject: ExObject) {
-    return Effect.gen(this, function* () {
-      const child = yield* ExObjectFactory2({});
-      this.addChild(exObject, child);
-    });
-  },
+    addChild(child: ExObject) {
+      return Effect.gen(function* () {
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        child.parent$.next(exObject);
+        const newChildren = [...children, child];
+        exObject.children$.next(newChildren);
+      });
+    },
 
-  addChild(exObject: ExObject, child: ExObject) {
-    return Effect.gen(function* () {
-      const children = yield* EffectUtils.firstValueFrom(exObject.children$);
-      child.parent$.next(exObject);
-      const newChildren = [...children, child];
-      exObject.children$.next(newChildren);
-    });
-  },
+    addBasicPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        property.parent$.next(exObject);
+        exObject.basicProperties.push(property);
+      });
+    },
 
-  addBasicPropertyBlank(exObject: ExObject) {
-    return Effect.gen(function* () {
-      const property = yield* PropertyFactory2.BasicProperty({});
-      property.parent$.next(exObject);
-      exObject.basicProperties.push(property);
-    });
-  },
-
-  getExObject(exItem: ExItem) {
-    return Effect.gen(function* () {
-      let item: ExItem | null = exItem;
-      while (item !== null) {
-        if (isType(item, ExObjectFactory)) {
-          return item;
+    getExObject(exItem: ExItem) {
+      return Effect.gen(function* () {
+        let item: ExItem | null = exItem;
+        while (item !== null) {
+          if (isType(item, ExObjectFactory)) {
+            return item;
+          }
+          const parent: Parent = yield* EffectUtils.firstValueFrom(
+            item.parent$
+          );
+          item = parent;
         }
-        const parent: Parent = yield* EffectUtils.firstValueFrom(item.parent$);
-        item = parent;
-      }
-      return null;
-    });
-  },
+        return null;
+      });
+    },
 
-    getRootExObject(exObject: ExObject): Promise<ExObject> {
+    getRootExObject() {
+      return Effect.gen(function* () {
         let parent: Parent = exObject;
         while (true) {
-          const nextParent: Parent = await firstValueFrom(parent.parent$);
+          const nextParent: Parent = yield* EffectUtils.firstValueFrom(
+            parent.parent$
+          );
           if (nextParent === null) {
             assert(isType(parent, ExObjectFactory));
             return parent;
           }
           parent = nextParent;
         }
-      },
-      replaceExObject(
-        ctx: MainContext,
-        exObject: ExObject,
-        newExObject: ExObject
-      ) {
-        const parent = await firstValueFrom(exObject.parent$);
+      });
+    },
+
+    replaceExObject(newExObject: ExObject) {
+      return Effect.gen(this, function* () {
+        const parent = yield* EffectUtils.firstValueFrom(exObject.parent$);
         if (parent === null) {
-          ExObject.replaceRootExObject(ctx, exObject, newExObject);
+          this.replaceRootExObject(newExObject);
           return;
         }
         assert(isType(parent, ExObjectFactory));
-        const children = await firstValueFrom(parent.children$);
+        const children = yield* EffectUtils.firstValueFrom(parent.children$);
         const index = children.indexOf(exObject);
         assert(index !== -1);
         newExObject.parent$.next(parent);
         children[index] = newExObject;
         parent.children$.next(children);
         exObject.destroy$.next();
-      },
-      replaceRootExObject(
-        ctx: MainContext,
-        exObject: ExObject,
-        newExObject: ExObject
-      ) {
-        const project = await firstValueFrom(ctx.projectCtx.currentProject$);
+      });
+    },
+
+    replaceRootExObject(newExObject: ExObject) {
+      return Effect.gen(function* () {
+        const projectCtx = yield* ProjectCtx;
+        const project = yield* projectCtx.activeProject;
         project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
-      },
-};
+      });
+    },
+  };
+}
 
 // ----------------
 // Private functions
 // ----------------
 
-async function createComponentProperties(
-  ctx: MainContext,
-  component: Component
-): Promise<PropertyKind["ComponentParameterProperty"][]> {
-  return matcher(component)
-    .when(ComponentFactory.Canvas, async (component) => {
-      return createCanvasComponentProperties(ctx, component);
-    })
-    .when(ComponentFactory.Custom, async (component) => {
-      return createCustomComponentProperties(ctx, component);
-    })
-    .complete();
-}
-
-async function createCanvasComponentProperties(
-  ctx: MainContext,
-  component: ComponentKind["Canvas"]
-): Promise<PropertyKind["ComponentParameterProperty"][]> {
-  const parameter$Ps = component.parameters.map((input) => {
-    return Create.Property.componentBlank(ctx, input);
+function createComponentProperties(component: Component) {
+  return Effect.gen(function* () {
+    return matcher(component)
+      .when(ComponentFactory.Canvas, (component) => {
+        return createCanvasComponentProperties(component);
+      })
+      .when(ComponentFactory.Custom, (component) => {
+        return createCustomComponentProperties(component);
+      })
+      .complete();
   });
-  const parameters$P = await Promise.all(parameter$Ps);
-  return parameters$P;
 }
 
-async function createCustomComponentProperties(
+function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
+  return Effect.gen(function* () {
+    const parameter$Ps = component.parameters.map((input) => {
+      return PropertyFactory2.ComponentParameterProperty(input);
+    });
+    const parameters$P = await Promise.all(parameter$Ps);
+    return parameters$P;
+  });
+}
+
+function createCustomComponentProperties(
   ctx: MainContext,
   component: ComponentKind["Custom"]
-): Promise<PropertyKind["ComponentParameterProperty"][]> {
-  const parameterL = await firstValueFrom(component.parameters$);
-  const propertyPL = parameterL.map((input) => {
-    return Create.Property.componentBlank(ctx, input);
+) {
+  return Effect.gen(function* () {
+    const parameters = yield* EffectUtils.firstValueFrom(component.parameters$);
+    const properties = parameters.map((input) => {
+      return PropertyFactory2.ComponentParameterProperty(input);
+    });
+    const propertyLP = yield* EffectUtils.Promise.all(properties);
+    return propertyLP;
   });
-  const propertyLP = await Promise.all(propertyPL);
-  return propertyLP;
 }

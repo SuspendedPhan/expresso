@@ -18,18 +18,6 @@ const ctxEffect = Effect.gen(function* () {
     return {
       libraryProjects$: new BehaviorSubject<readonly LibraryProject[]>([]),
       activeLibraryProject$,
-      activeProject$: activeLibraryProject$.pipe(
-        switchMap((libraryProject) => libraryProject.project$)
-      ),
-
-      get activeProject() {
-        return Effect.gen(function* () {
-          const project = yield* Effect.promise(() =>
-            firstValueFrom(activeLibraryProject$.pipe(switchMap((lp) => lp.project$)))
-          );
-          return project;
-        });
-      }
     };
 });
 

@@ -1,5 +1,6 @@
 import { Context, Effect, Layer } from "effect";
-import { firstValueFrom, map, ReplaySubject } from "rxjs";
+import { firstValueFrom, map, ReplaySubject, switchMap } from "rxjs";
+import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ExFuncFactory2 } from "src/ex-object/ExFunc";
 import { Project } from "src/ex-object/Project";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
@@ -11,7 +12,22 @@ export class ProjectCtx extends Context.Tag("ProjectCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const currentProject$ = new ReplaySubject<Project>(1);
+  const libraryCtx = yield* LibraryCtx;
+  const activeLibraryProject$ = libraryCtx.activeLibraryProject$;
   return {
+    activeProject$: activeLibraryProject$.pipe(
+      switchMap((libraryProject) => libraryProject.project$)
+    ),
+
+    get activeProject() {
+      return Effect.gen(function* () {
+        const project = yield* Effect.promise(() =>
+          firstValueFrom(activeLibraryProject$.pipe(switchMap((lp) => lp.project$)))
+        );
+        return project;
+      });
+    },
+
     getOrdinalProm() {
       return firstValueFrom(
         currentProject$.pipe(map(Project.getAndIncrementOrdinal))
