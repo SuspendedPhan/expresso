@@ -32,7 +32,7 @@ interface ExObject_ extends ExItemBase {
   cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
 
-type ExObject2_ = ExObject_ & ReturnType<typeof methodsFactory>;
+type ExObject2 = ExObject & ReturnType<typeof methodsFactory>;
 
 interface ExObjectCreationArgs {
   id?: string;
@@ -97,99 +97,91 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   });
 }
 
-function testFunc() {
-  return "hi";
-};
-
 function methodsFactory(exObject: ExObject_) {
   return {
-    // todp: move these back into static methods
-    addChildBlank() {
-      return Effect.gen(this, function* () {
-        const child = yield* ExObjectFactory2({});
-        this.addChild(exObject, child);
-      });
-    },
+    
+  };
+}
 
-    addChild(child: ExObject) {
-      return Effect.gen(function* () {
-        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
-        child.parent$.next(exObject);
-        const newChildren = [...children, child];
-        exObject.children$.next(newChildren);
-      });
-    },
+export const ExObject = {
+  addChildBlank(exObject: ExObject) {
+    return Effect.gen(this, function* () {
+      const child = yield* ExObjectFactory2({});
+      this.addChild(exObject, child);
+    });
+  },
 
-    addBasicPropertyBlank() {
-      return Effect.gen(function* () {
-        const property = yield* PropertyFactory2.BasicProperty({});
-        property.parent$.next(exObject);
-        exObject.basicProperties.push(property);
-      });
-    },
+  addChild(exObject: ExObject, child: ExObject) {
+    return Effect.gen(function* () {
+      const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+      child.parent$.next(exObject);
+      const newChildren = [...children, child];
+      exObject.children$.next(newChildren);
+    });
+  },
 
-    getExObject(exItem: ExItem): Promise<ExObject | null> {
+  addBasicPropertyBlank(exObject: ExObject) {
+    return Effect.gen(function* () {
+      const property = yield* PropertyFactory2.BasicProperty({});
+      property.parent$.next(exObject);
+      exObject.basicProperties.push(property);
+    });
+  },
+
+  getExObject(exItem: ExItem) {
+    return Effect.gen(function* () {
       let item: ExItem | null = exItem;
       while (item !== null) {
         if (isType(item, ExObjectFactory)) {
           return item;
         }
-        const parent: Parent = await firstValueFrom(item.parent$);
+        const parent: Parent = yield* EffectUtils.firstValueFrom(item.parent$);
         item = parent;
       }
       return null;
-    },
+    });
+  },
 
     getRootExObject(exObject: ExObject): Promise<ExObject> {
-      let parent: Parent = exObject;
-      while (true) {
-        const nextParent: Parent = await firstValueFrom(parent.parent$);
-        if (nextParent === null) {
-          assert(isType(parent, ExObjectFactory));
-          return parent;
+        let parent: Parent = exObject;
+        while (true) {
+          const nextParent: Parent = await firstValueFrom(parent.parent$);
+          if (nextParent === null) {
+            assert(isType(parent, ExObjectFactory));
+            return parent;
+          }
+          parent = nextParent;
         }
-        parent = nextParent;
-      }
-    },
-
-    replaceExObject(
-      ctx: MainContext,
-      exObject: ExObject,
-      newExObject: ExObject
-    ) {
-      const parent = await firstValueFrom(exObject.parent$);
-      if (parent === null) {
-        ExObject.replaceRootExObject(ctx, exObject, newExObject);
-        return;
-      }
-
-      assert(isType(parent, ExObjectFactory));
-      const children = await firstValueFrom(parent.children$);
-      const index = children.indexOf(exObject);
-      assert(index !== -1);
-      newExObject.parent$.next(parent);
-      children[index] = newExObject;
-      parent.children$.next(children);
-
-      exObject.destroy$.next();
-    },
-
-    replaceRootExObject(
-      ctx: MainContext,
-      exObject: ExObject,
-      newExObject: ExObject
-    ) {
-      const project = await firstValueFrom(ctx.projectCtx.currentProject$);
-      project.rootExObjects.replaceItem(exObject, newExObject);
-
-      exObject.destroy$.next();
-    },
-  };
-}
-
-export const ExObject = {
-
-}
+      },
+      replaceExObject(
+        ctx: MainContext,
+        exObject: ExObject,
+        newExObject: ExObject
+      ) {
+        const parent = await firstValueFrom(exObject.parent$);
+        if (parent === null) {
+          ExObject.replaceRootExObject(ctx, exObject, newExObject);
+          return;
+        }
+        assert(isType(parent, ExObjectFactory));
+        const children = await firstValueFrom(parent.children$);
+        const index = children.indexOf(exObject);
+        assert(index !== -1);
+        newExObject.parent$.next(parent);
+        children[index] = newExObject;
+        parent.children$.next(children);
+        exObject.destroy$.next();
+      },
+      replaceRootExObject(
+        ctx: MainContext,
+        exObject: ExObject,
+        newExObject: ExObject
+      ) {
+        const project = await firstValueFrom(ctx.projectCtx.currentProject$);
+        project.rootExObjects.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      },
+};
 
 // ----------------
 // Private functions
