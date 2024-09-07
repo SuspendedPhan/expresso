@@ -52,7 +52,7 @@ export function createObservableArrayWithLifetime<T>(
 
     event$: createBehaviorSubjectWithLifetime<ArrayEvent<T>>(destroy$, event),
 
-    get itemArr() {
+    get items() {
       return this.event$.getValue().items;
     },
 
@@ -61,22 +61,22 @@ export function createObservableArrayWithLifetime<T>(
     },
 
     push(item: T) {
-      this.itemArr.push(item);
+      this.items.push(item);
       this.event$.next({
         change: { type: "ItemAdded", item },
-        items: this.itemArr,
+        items: this.items,
       });
     },
 
     replaceItem(oldItem: T, newItem: T) {
-      const index = this.itemArr.indexOf(oldItem);
+      const index = this.items.indexOf(oldItem);
       if (index === -1) {
         throw new Error("Item not found");
       }
-      this.itemArr[index] = newItem;
+      this.items[index] = newItem;
       this.event$.next({
         change: { type: "ItemReplaced", newItem, oldItem },
-        items: this.itemArr,
+        items: this.items,
       });
     },
   };

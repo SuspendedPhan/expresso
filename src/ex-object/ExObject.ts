@@ -217,8 +217,7 @@ function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
 
 function createCustomComponentProperties(component: ComponentKind["Custom"]) {
   return Effect.gen(function* () {
-    const parameters = yield* EffectUtils.firstValueFrom(component.parameters$);
-    const properties = parameters.map((parameter) => {
+    const properties = component.parameters.items.map((parameter) => {
       return PropertyFactory2.ComponentParameterProperty({
         parameter,
       });
