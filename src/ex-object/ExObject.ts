@@ -1,7 +1,5 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
-import { firstValueFrom } from "rxjs";
-import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   CanvasComponentStore,
@@ -11,8 +9,6 @@ import {
 } from "src/ex-object/Component";
 import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
-import { Create } from "src/main-context/Create";
-import type MainContext from "src/main-context/MainContext";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,
@@ -196,7 +192,7 @@ export function ExObjectMethods(exObject: ExObject) {
 
 function createComponentProperties(component: Component) {
   return Effect.gen(function* () {
-    return matcher(component)
+    return yield* matcher(component)
       .when(ComponentFactory.Canvas, (component) => {
         return createCanvasComponentProperties(component);
       })
@@ -212,7 +208,7 @@ function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
     const parameters = component.parameters.map((parameter) => {
       return PropertyFactory2.ComponentParameterProperty({ parameter });
     });
-    return Effect.all(parameters);
+    return yield* Effect.all(parameters);
   });
 }
 
@@ -224,6 +220,6 @@ function createCustomComponentProperties(component: ComponentKind["Custom"]) {
         parameter,
       });
     });
-    return Effect.all(properties);
+    return yield* Effect.all(properties);
   });
 }
