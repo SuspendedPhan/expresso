@@ -209,24 +209,21 @@ function createComponentProperties(component: Component) {
 
 function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
   return Effect.gen(function* () {
-    const parameter$Ps = component.parameters.map((input) => {
-      return PropertyFactory2.ComponentParameterProperty(input);
+    const parameters = component.parameters.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({ parameter });
     });
-    const parameters$P = await Promise.all(parameter$Ps);
-    return parameters$P;
+    return Effect.all(parameters);
   });
 }
 
-function createCustomComponentProperties(
-  ctx: MainContext,
-  component: ComponentKind["Custom"]
-) {
+function createCustomComponentProperties(component: ComponentKind["Custom"]) {
   return Effect.gen(function* () {
     const parameters = yield* EffectUtils.firstValueFrom(component.parameters$);
-    const properties = parameters.map((input) => {
-      return PropertyFactory2.ComponentParameterProperty(input);
+    const properties = parameters.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({
+        parameter,
+      });
     });
-    const propertyLP = yield* EffectUtils.Promise.all(properties);
-    return propertyLP;
+    return Effect.all(properties);
   });
 }

@@ -47,7 +47,7 @@ export interface CreatePropertyArgs {
   };
 
   ComponentParameter: {
-    componentParameter: ComponentParameter;
+    parameter: ComponentParameter;
   } & CreatePropertyArgs["Base"];
 
   Basic: {
@@ -73,7 +73,7 @@ export const PropertyFactory2 = {
     return Effect.gen(function* () {
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
-        componentParameter: createArgs.componentParameter,
+        parameter: createArgs.parameter,
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
       };
 
@@ -84,7 +84,7 @@ export const PropertyFactory2 = {
           base.destroy$,
           createArgs2.expr
         ),
-        componentParameter: createArgs2.componentParameter,
+        componentParameter: createArgs2.parameter,
       });
       return property;
     });
