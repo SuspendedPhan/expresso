@@ -13,50 +13,42 @@ import type { Evaluation } from "src/utils/utils/GoModule";
 import Logger from "../utils/logger/Logger";
 import type { CanvasContext, LibCanvasObject } from "./CanvasContext";
 
-export class CanvasManager {
-  private readonly canvasObjectByCanvasObjectPath = new Map<
+export function CanvasManagerFactory() {
+  const canvasObjectByCanvasObjectPath = new Map<
     string,
     LibCanvasObject
   >();
 
-  public constructor(private readonly ctx: CanvasContext) {
-    if (ctx.mainCtx.disableCanvas) return;
-    this.setup();
-  }
+  ctx.evaluator.eval$
+    .pipe(withLatestFrom(ctx.mainCtx.eventBus.rootObjects$))
+    .subscribe(([evaluation, rootExObjects]) => {
+      updateRootExObjects(evaluation, rootExObjects);
+    });
 
-  @loggedMethod
-  private setup() {
-    this.ctx.evaluator.eval$
-      .pipe(withLatestFrom(this.ctx.mainCtx.eventBus.rootObjects$))
-      .subscribe(([evaluation, rootExObjects]) => {
-        this.updateRootExObjects(evaluation, rootExObjects);
-      });
-  }
-
-  private updateRootExObjects(
+  function updateRootExObjects(
     evaluation: Evaluation,
     rootExObjects: readonly ExObject[]
   ): void {
     for (const exObject of rootExObjects) {
-      this.updateExObject(exObject, evaluation, []);
+      updateExObject(exObject, evaluation, []);
     }
   }
 
-  private updateExObject(
+  function updateExObject(
     exObject: ExObject,
     evaluation: Evaluation,
     parentPath: CanvasObjectPath
   ) {
     const cloneCount = EvaluationUtils.getCloneCount(
-      this.ctx.mainCtx,
+      ctx.mainCtx,
       evaluation,
       exObject,
       parentPath
     );
-    this.updateExObject1(exObject, evaluation, parentPath, cloneCount);
+    updateExObject1(exObject, evaluation, parentPath, cloneCount);
   }
 
-  private updateExObject1(
+  function updateExObject1(
     exObject: ExObject,
     evaluation: Evaluation,
     parentPath: CanvasObjectPath,
@@ -67,22 +59,22 @@ export class CanvasManager {
         ...parentPath,
         { exObjectId: exObject.id, cloneId: i.toString() },
       ];
-      this.updateCanvasObject(exObject, evaluation, path);
+      updateCanvasObject(exObject, evaluation, path);
     }
   }
 
   @loggedMethod
-  private updateCanvasObject(
+  function updateCanvasObject(
     exObject: ExObject,
     evaluation: Evaluation,
     path: CanvasObjectPath
   ): void {
     Logger.arg("path", path);
     const pathString = CanvasObjectUtils.canvasObjectPathToString(path);
-    let canvasObject = this.canvasObjectByCanvasObjectPath.get(pathString);
+    let canvasObject = canvasObjectByCanvasObjectPath.get(pathString);
     if (!canvasObject) {
-      canvasObject = this.ctx.pool.takeObject();
-      this.canvasObjectByCanvasObjectPath.set(pathString, canvasObject);
+      canvasObject = ctx.pool.takeObject();
+      canvasObjectByCanvasObjectPath.set(pathString, canvasObject);
     }
 
     const component = exObject.component;
@@ -100,7 +92,7 @@ export class CanvasManager {
           return;
         }
 
-        this.updateCanvasProperty(
+        updateCanvasProperty(
           canvasObject,
           componentParameterProperty.id,
           componentParameterProperty.componentParameter.canvasSetter,
@@ -112,7 +104,7 @@ export class CanvasManager {
   }
 
   @loggedMethod
-  private updateCanvasProperty(
+  function updateCanvasProperty(
     canvasObject: LibCanvasObject,
     propertyId: string,
     canvasSetter: CanvasSetter,
@@ -120,7 +112,7 @@ export class CanvasManager {
     evaluation: Evaluation
   ): void {
     const pathString = CanvasObjectUtils.canvasPropertyPathToString(
-      this.ctx.mainCtx.goModule,
+      ctx.mainCtx.goModule,
       propertyId,
       path
     );

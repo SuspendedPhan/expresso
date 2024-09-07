@@ -1,23 +1,25 @@
-import * as PIXI from "pixi.js";
+import { type ICanvas, Application, Graphics } from "pixi.js";
 
-export default class PixiFactory {
-  private app;
-  constructor(viewportElement: HTMLElement, canvasElement: PIXI.ICanvas) {
-    this.app = new PIXI.Application();
-    this.app.init({
-      resizeTo: viewportElement,
-      canvas: canvasElement,
-      antialias: true,
-    });
-  }
+export interface PixiFactoryArgs {
+  viewportElement: HTMLElement;
+  canvasElement: ICanvas;
+}
 
-  public makeCircle() {
-    // prettier-ignore
-    const ret = new PIXI.Graphics()
-      .circle(0, 0, 1)
-      .fill(0xffffff);
+export function PixiFactory(args: PixiFactoryArgs) {
+  const app = new Application();
+  app.init({
+    resizeTo: args.viewportElement,
+    canvas: args.canvasElement,
+    antialias: true,
+  });
 
-    this.app.stage.addChild(ret);
-    return ret;
-  }
+  return {
+    makeCircle() {
+      // prettier-ignore
+      const ret = new Graphics()
+                .circle(0, 0, 1)
+                .fill(0xffffff);
+      return ret;
+    },
+  };
 }
