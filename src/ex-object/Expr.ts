@@ -10,9 +10,8 @@ import {
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import {
+  Property,
   PropertyFactory,
-  PropertyFns,
-  type Property,
 } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { Utils } from "src/utils/utils/Utils";
@@ -84,7 +83,7 @@ export const ExprFactory2 = {
 export const Expr = {
   getReferenceTargetName$(target: ReferenceTarget) {
     if (isOfVariant(target, PropertyFactory)) {
-      return PropertyFns.getName$(target);
+      return Property.getName$(target);
     } else if (isType(target, ComponentParameterFactory.Custom)) {
       return target.name$;
     } else if (isType(target, ExFuncParameterFactory)) {

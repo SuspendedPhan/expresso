@@ -99,8 +99,8 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   });
 }
 
-export function ExObjectMethods(exObject: ExObject) {
-  return {
+export const ExObject = {
+  Methods: (exObject: ExObject) => ({
     addChildBlank() {
       return Effect.gen(this, function* () {
         const child = yield* ExObjectFactory2({});
@@ -183,8 +183,8 @@ export function ExObjectMethods(exObject: ExObject) {
         exObject.destroy$.next();
       });
     },
-  };
-}
+  }),
+};
 
 // ----------------
 // Private functions

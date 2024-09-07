@@ -135,18 +135,18 @@ export const PropertyFactory2 = {
   },
 };
 
-export namespace PropertyFns {
-  export const CLONE_COUNT_PROPERTY_NAME = "Clone Count";
+export const Property = {
+  CloneCountPropertyName: "Clone Count",
 
-  export function getName$(property: Property): OBS<string> {
+  getName$(property: Property): OBS<string> {
     return matcher(property)
       .when(PropertyFactory.ComponentParameterProperty, (p) =>
         ComponentParameter.getName$(p.componentParameter)
       )
       .when(PropertyFactory.BasicProperty, (p) => p.name$)
       .when(PropertyFactory.CloneCountProperty, () =>
-        of(CLONE_COUNT_PROPERTY_NAME)
+        of(this.CloneCountPropertyName)
       )
       .complete();
-  }
-}
+  },
+};
