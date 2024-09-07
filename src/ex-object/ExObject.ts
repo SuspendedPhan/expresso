@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
+import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   CanvasComponentStore,
@@ -8,6 +9,7 @@ import {
   type ComponentKind,
 } from "src/ex-object/Component";
 import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
@@ -45,6 +47,7 @@ interface ExObjectCreationArgs {
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
     const projectCtx = yield* ProjectCtx;
+    const exObjectCtx = yield* ExObjectCtx;
     const project = yield* projectCtx.activeProject;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
@@ -53,7 +56,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       component,
       name:
         creationArgs.name ??
-        `Object ${yield* project.getAndIncrementOrdinal()}`,
+        `Object ${yield* Project.Methods(project).getAndIncrementOrdinal()}`,
       componentProperties:
         creationArgs.componentProperties ??
         (yield* createComponentProperties(component)),
@@ -94,7 +97,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
 
-    project.exObjects.push(exObject);
+    exObjectCtx.exObjects.push(exObject);
     return exObject;
   });
 }

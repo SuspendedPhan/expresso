@@ -7,16 +7,17 @@ import { pass, type VariantOf } from "variant";
 import { FocusKind } from "../focus/FocusKind";
 
 interface EditorFocus_ {
-    EditorNewActions: { exItem: ExItem | null };
+  EditorNewActions: { exItem: ExItem | null };
 }
 
-export const EditorFocusFactory = dexVariant.scoped("EditorFocus")(dexVariant.typed<EditorFocus_>({
+export const EditorFocusFactory = dexVariant.scoped("EditorFocus")(
+  dexVariant.typed<EditorFocus_>({
     EditorNewActions: pass,
-}));
+  })
+);
 
 export type EditorFocus = VariantOf<typeof EditorFocusFactory>;
 export type EditorFocusKind = DexVariantKind<typeof EditorFocusFactory>;
-
 
 export namespace EditorFocusFuncs {
   export async function register(ctx: MainContext) {
@@ -51,17 +52,21 @@ export namespace EditorFocusFuncs {
       visible$: focusIsEditorNewActions$.pipe(map((focus) => focus !== false)),
     });
 
-    keyboardCtx.onKeydown$("p", focusIsEditorNewActions$).subscribe(async () => {
-      const library = await firstValueFrom(ctx.library$);
-      library.addProjectBlank();
-      focusCtx.popFocus();
-    });
+    keyboardCtx
+      .onKeydown$("p", focusIsEditorNewActions$)
+      .subscribe(async () => {
+        const library = await firstValueFrom(ctx.library$);
+        library.addProjectBlank();
+        focusCtx.popFocus();
+      });
 
-    keyboardCtx.onKeydown$("o", focusIsEditorNewActions$).subscribe(async() => {
-      const project = await ctx.projectCtx.getCurrentProjectProm();
-      project.addRootExObjectBlank();
-      focusCtx.popFocus();
-    });
+    keyboardCtx
+      .onKeydown$("o", focusIsEditorNewActions$)
+      .subscribe(async () => {
+        const project = await ctx.projectCtx.getCurrentProjectProm();
+        project.addRootExObjectBlank();
+        focusCtx.popFocus();
+      });
 
     keyboardCtx.registerCancel(focusIsEditorNewActions$);
   }

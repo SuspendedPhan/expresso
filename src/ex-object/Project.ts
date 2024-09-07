@@ -1,11 +1,10 @@
 import { Effect } from "effect";
-import { BehaviorSubject, firstValueFrom, Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { type ExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/library/LibraryProject";
-import type MainContext from "src/main-context/MainContext";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,
@@ -20,18 +19,10 @@ export const ProjectFactory = variation(
     {
       libraryProject: LibraryProject | null;
       rootExObjects: ObservableArray<ExObject>;
-      components: ObservableArray<ComponentKind["Custom"][]>;
+      components: ObservableArray<ComponentKind["Custom"]>;
       exFuncs: ObservableArray<ExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
-      exObjects: ObservableArray<ExObject>;
       destroy$: Subject<void>;
-
-      addRootExObjectBlank(): Promise<void>;
-      addCustomExFunc(exFunc: ExFunc): Promise<void>;
-      getAndIncrementOrdinal(): Effect.Effect<number>;
-
-      // addComponentBlank(ctx: MainContext, project: Project): Promise<ComponentKind["Custom"]>;
-      // addComponent(ctx: MainContext, project: Project, component: ComponentKind["Custom"]): Promise<void>;
     } & ExItemBase
   >()
 );
@@ -41,104 +32,75 @@ export type Project = ReturnType<typeof ProjectFactory>;
 interface ProjectCreationArgs {
   id?: string;
   rootExObjects?: ExObject[];
-  componentArr?: ComponentKind["Custom"][];
-  exFuncArr?: ExFunc[];
+  components?: ComponentKind["Custom"][];
+  exFunc?: ExFunc[];
   currentOrdinal?: number;
 }
 
-export async function ProjectFactory2(
-  ctx: MainContext,
-  creationArgs: ProjectCreationArgs
-) {
-  const currentOrdinal = creationArgs.currentOrdinal ?? 0;
-  const creationArgs2: Required<ProjectCreationArgs> = {
-    id: creationArgs.id ?? Utils.createId("project"),
-    rootExObjects: creationArgs.rootExObjects ?? [],
-    componentArr: creationArgs.componentArr ?? [],
-    exFuncArr: creationArgs.exFuncArr ?? [],
-    currentOrdinal: creationArgs.currentOrdinal ?? 0,
-  };
+export async function ProjectFactory2(creationArgs: ProjectCreationArgs) {
+  return Effect.gen(function* () {
+    const currentOrdinal = creationArgs.currentOrdinal ?? 0;
+    const creationArgs2: Required<ProjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("project"),
+      rootExObjects: creationArgs.rootExObjects ?? [],
+      components: creationArgs.components ?? [],
+      exFunc: creationArgs.exFunc ?? [],
+      currentOrdinal: creationArgs.currentOrdinal ?? 0,
+    };
 
-  const base = await ExItem.createExItemBase(creationArgs2.id);
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
 
-  const rootExObjects = createObservableArrayWithLifetime<ExObject>(
-    base.destroy$,
-    creationArgs2.rootExObjects
-  );
-
-  const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
-
-  const project = ProjectFactory({
-    ...base,
-    libraryProject: null,
-    rootExObjects: rootExObjects,
-    componentArr$: new BehaviorSubject<ComponentKind["Custom"][]>(
-      creationArgs2.componentArr
-    ),
-    exFuncObsArr: createObservableArrayWithLifetime<ExFunc>(
+    const rootExObjects = createObservableArrayWithLifetime<ExObject>(
       base.destroy$,
-      creationArgs2.exFuncArr
-    ),
-    currentOrdinal$,
-    rootExObjects$: rootExObjects.itemArr$,
-    destroy$: new Subject<void>(),
+      creationArgs2.rootExObjects
+    );
 
-    async addRootExObjectBlank() {
-      const exObject = await ExObjectFactory2(ctx, {});
-      rootExObjects.push(exObject);
-    },
+    const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
-    async addCustomExFunc(exFunc: ExFunc) {
-      this.exFuncObsArr.push(exFunc);
+    const project = ProjectFactory({
+      ...base,
+      libraryProject: null,
+      rootExObjects: rootExObjects,
+      components: createObservableArrayWithLifetime<ComponentKind["Custom"]>(
+        base.destroy$,
+        creationArgs2.components
+      ),
+      exFuncs: createObservableArrayWithLifetime<ExFunc>(
+        base.destroy$,
+        creationArgs2.exFunc
+      ),
+      currentOrdinal$,
+      destroy$: new Subject<void>(),
+    });
+    return project;
+  });
+}
+
+export const Project = {
+  Methods: (project: Project) => ({
+    addRootExObjectBlank() {
+      return Effect.gen(function* () {
+        const exObject = yield* ExObjectFactory2({});
+        project.rootExObjects.push(exObject);
+      });
     },
 
     getAndIncrementOrdinal() {
       return Effect.gen(function* () {
-        const ordinal = yield* EffectUtils.firstValueFrom(currentOrdinal$);
+        const ordinal = yield* EffectUtils.firstValueFrom(
+          project.currentOrdinal$
+        );
         project.currentOrdinal$.next(ordinal + 1);
         return ordinal;
       });
     },
 
     addComponentBlank: Effect.gen(function* () {
-      const component = await ComponentFactory2.Custom(ctx, {});
-      this.addComponent(ctx, project, component);
-      return component;
+      return Effect.gen(function* () {
+        const component = yield* ComponentFactory2.Custom({});
+        project.components.push(component);
+        return component;
+      });
     }),
-
-    // async addComponent(
-    //   _ctx: MainContext,
-    //   project: Project,
-    //   component: ComponentKind["Custom"]
-    // ) {
-    //   const componentL = await firstValueFrom(project.componentArr$);
-    //   componentL.push(component);
-    //   project.componentArr$.next(componentL);
-    // },
-  });
-  return project;
-}
-
-export const Project = {
-  async getAndIncrementOrdinal(project: Project): Promise<number> {
-    const ordinal = await firstValueFrom(project.currentOrdinal$);
-    project.currentOrdinal$.next(ordinal + 1);
-    return ordinal;
-  },
-
-  async addComponentBlank(ctx: MainContext, project: Project) {
-    const component = await ComponentFactory2.Custom(ctx, {});
-    this.addComponent(ctx, project, component);
-    return component;
-  },
-
-  async addComponent(
-    _ctx: MainContext,
-    project: Project,
-    component: ComponentKind["Custom"]
-  ) {
-    const componentL = await firstValueFrom(project.componentArr$);
-    componentL.push(component);
-    project.componentArr$.next(componentL);
-  },
+  }),
 };
