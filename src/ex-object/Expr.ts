@@ -106,3 +106,53 @@ export const Expr = {
     });
   },
 };
+
+
+// public async replaceExpr(oldExpr: Expr, newExpr: Expr) {
+//   const parent = await firstValueFrom(oldExpr.parent$);
+//   this.replaceExpr2(parent, oldExpr, newExpr);
+// }
+
+// public replaceExpr2(parent: Parent, oldExpr: Expr, newExpr: Expr) {
+//   if (parent === null) {
+//     throw new Error("oldExpr.parent$ is null");
+//   }
+
+//   switch (parent.itemType) {
+//     case ExItemType.Property: {
+//       parent.expr$.next(newExpr);
+//       break;
+//     }
+//     case ExItemType.Expr: {
+//       switch (parent.exprType) {
+//         case ExprType.CallExpr: {
+//           const expr = parent;
+//           expr.args$.pipe(first()).subscribe((args) => {
+//             const newArgs = args.map((arg) =>
+//               arg === oldExpr ? newExpr : arg
+//             );
+//             expr.args$.next(newArgs);
+//           });
+//           break;
+//         }
+//         default:
+//           console.error("Unexpected exprType", parent.exprType);
+//       }
+//       break;
+//     }
+//     case ExItemType.ExFunc: {
+//       const exFunc = parent;
+//       exFunc.expr$.next(newExpr);
+//       log55.debug("replaced expr in exFunc");
+//       break;
+//     }
+//     default:
+//       assertUnreachable;
+//   }
+
+//   newExpr.parent$.next(parent);
+//   (this.ctx.eventBus.exprReplaced$ as Subject<ExprReplacement>).next({
+//     oldExpr,
+//     newExpr,
+//   });
+// }

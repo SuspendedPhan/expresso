@@ -7,12 +7,10 @@
 
 import { Effect } from "effect";
 import { of } from "rxjs";
-import {} from "src/ex-object/Component";
+import { } from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
-import type MainContext from "src/main-context/MainContext";
-import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
