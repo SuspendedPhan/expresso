@@ -56,7 +56,7 @@ export function createObservableArrayWithLifetime<T>(
       return this.event$.getValue().items;
     },
 
-    get itemArr$() {
+    get items$() {
       return this.event$.pipe(map((evt) => evt.items));
     },
 
@@ -89,7 +89,7 @@ export namespace ObservableArrayFns {
   ): OBS<R[]> {
     let arr$;
     if ("kind" in obsArr) {
-      arr$ = obsArr.itemArr$;
+      arr$ = obsArr.items$;
     } else {
       arr$ = obsArr;
     }
