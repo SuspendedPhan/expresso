@@ -1,14 +1,18 @@
 import assert from "assert-ts";
+import { Effect } from "effect";
 import { firstValueFrom } from "rxjs";
-import { CanvasComponentStore, ComponentFactory, type Component, type ComponentKind } from "src/ex-object/Component";
 import {
-  ExItem,
-  type ExItemBase,
-  type Parent,
-} from "src/ex-object/ExItem";
+  CanvasComponentStore,
+  ComponentFactory,
+  type Component,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import { Create } from "src/main-context/Create";
 import type MainContext from "src/main-context/MainContext";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import type { ObservableArray } from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
@@ -24,9 +28,11 @@ interface ExObject_ extends ExItemBase {
   component: Component;
   children$: SUB<ExObject[]>;
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
-  basicProperties$: SUB<PropertyKind["BasicProperty"][]>;
+  basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
+
+type ExObject2_ = ExObject_ & ReturnType<typeof methodsFactory>;
 
 interface ExObjectCreationArgs {
   id?: string;
@@ -37,125 +43,157 @@ interface ExObjectCreationArgs {
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
 }
-export async function ExObjectFactory2(ctx: MainContext, creationArgs: ExObjectCreationArgs) {
-  const component = creationArgs.component ?? CanvasComponentStore.circle;
+export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
+  return Effect.gen(function* () {
+    const component = creationArgs.component ?? CanvasComponentStore.circle;
 
-  const creationArgs2: Required<ExObjectCreationArgs> = {
-    id: creationArgs.id ?? Utils.createId("ex-object"),
-    component,
-    name: creationArgs.name ?? `Object ${await ctx.projectCtx.getOrdinalProm()}`,
-    componentProperties: creationArgs.componentProperties ?? await createComponentProperties(ctx, component),
-    basicProperties: creationArgs.basicProperties ?? [],
-    cloneCountProperty: creationArgs.cloneCountProperty ?? await PropertyFactory2.CloneCountProperty(ctx, {}),
-    children: creationArgs.children ?? [],
+    const creationArgs2: Required<ExObjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("ex-object"),
+      component,
+      name:
+        creationArgs.name ?? `Object ${await ctx.projectCtx.getOrdinalProm()}`,
+      componentProperties:
+        creationArgs.componentProperties ??
+        (await createComponentProperties(ctx, component)),
+      basicProperties: creationArgs.basicProperties ?? [],
+      cloneCountProperty:
+        creationArgs.cloneCountProperty ??
+        (await PropertyFactory2.CloneCountProperty(ctx, {})),
+      children: creationArgs.children ?? [],
+    };
+
+    const base = await ExItem.createExItemBase(creationArgs2.id);
+    const exObject = ExObjectFactory({
+      ...base,
+      name$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.name
+      ),
+      component: creationArgs2.component,
+      componentParameterProperties: creationArgs2.componentProperties,
+      basicProperties: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.basicProperties
+      ),
+      children$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.children
+      ),
+      cloneCountProperty: creationArgs2.cloneCountProperty,
+    });
+
+    creationArgs2.componentProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.basicProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+    ctx.eventBus.objectAdded$.next(exObject);
+    return exObject;
+  });
+}
+
+function testFunc() {
+  return "hi";
+};
+
+function methodsFactory(exObject: ExObject_) {
+  return {
+    // todp: move these back into static methods
+    addChildBlank() {
+      return Effect.gen(this, function* () {
+        const child = yield* ExObjectFactory2({});
+        this.addChild(exObject, child);
+      });
+    },
+
+    addChild(child: ExObject) {
+      return Effect.gen(function* () {
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        child.parent$.next(exObject);
+        const newChildren = [...children, child];
+        exObject.children$.next(newChildren);
+      });
+    },
+
+    addBasicPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        property.parent$.next(exObject);
+        exObject.basicProperties.push(property);
+      });
+    },
+
+    getExObject(exItem: ExItem): Promise<ExObject | null> {
+      let item: ExItem | null = exItem;
+      while (item !== null) {
+        if (isType(item, ExObjectFactory)) {
+          return item;
+        }
+        const parent: Parent = await firstValueFrom(item.parent$);
+        item = parent;
+      }
+      return null;
+    },
+
+    getRootExObject(exObject: ExObject): Promise<ExObject> {
+      let parent: Parent = exObject;
+      while (true) {
+        const nextParent: Parent = await firstValueFrom(parent.parent$);
+        if (nextParent === null) {
+          assert(isType(parent, ExObjectFactory));
+          return parent;
+        }
+        parent = nextParent;
+      }
+    },
+
+    replaceExObject(
+      ctx: MainContext,
+      exObject: ExObject,
+      newExObject: ExObject
+    ) {
+      const parent = await firstValueFrom(exObject.parent$);
+      if (parent === null) {
+        ExObject.replaceRootExObject(ctx, exObject, newExObject);
+        return;
+      }
+
+      assert(isType(parent, ExObjectFactory));
+      const children = await firstValueFrom(parent.children$);
+      const index = children.indexOf(exObject);
+      assert(index !== -1);
+      newExObject.parent$.next(parent);
+      children[index] = newExObject;
+      parent.children$.next(children);
+
+      exObject.destroy$.next();
+    },
+
+    replaceRootExObject(
+      ctx: MainContext,
+      exObject: ExObject,
+      newExObject: ExObject
+    ) {
+      const project = await firstValueFrom(ctx.projectCtx.currentProject$);
+      project.rootExObjects.replaceItem(exObject, newExObject);
+
+      exObject.destroy$.next();
+    },
   };
-
-  const base = await ExItem.createExItemBase(creationArgs2.id);
-  const exObject = ExObjectFactory({
-    ...base,
-    name$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.name),
-    component: creationArgs2.component,
-    componentParameterProperties: creationArgs2.componentProperties,
-    basicProperties$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.basicProperties),
-    children$: createBehaviorSubjectWithLifetime(base.destroy$, creationArgs2.children),
-    cloneCountProperty: creationArgs2.cloneCountProperty,
-  });
-  
-  creationArgs2.componentProperties.forEach((property) => {
-    property.parent$.next(exObject);
-  });
-
-  creationArgs2.basicProperties.forEach((property) => {
-    property.parent$.next(exObject);
-  });
-
-  creationArgs2.cloneCountProperty.parent$.next(exObject);
-
-  ctx.eventBus.objectAdded$.next(exObject);
-  return exObject;
 }
 
 export const ExObject = {
-  async addChildBlank(ctx: MainContext, exObject: ExObject) {
-    const child = await ExObjectFactory2(ctx, {});
-    ExObject.addChild(exObject, child);
-  },
 
-  async addChild(exObject: ExObject, child: ExObject) {
-    const children = await firstValueFrom(exObject.children$);
-    child.parent$.next(exObject);
-    const newChildren = [...children, child];
-    exObject.children$.next(newChildren);
-  },
-
-  async addBasicPropertyBlank(
-    ctx: MainContext,
-    exObject: ExObject
-  ) {
-    const property = await Create.Property.basicBlank(ctx);
-    property.parent$.next(exObject);
-    const properties = await firstValueFrom(exObject.basicProperties$);
-    const newProperties = [...properties, property];
-    exObject.basicProperties$.next(newProperties);
-  },
-
-  async getExObject(exItem: ExItem): Promise<ExObject | null> {
-    let item: ExItem | null = exItem;
-    while (item !== null) {
-      if (isType(item, ExObjectFactory)) {
-        return item;
-      }
-      const parent: Parent = await firstValueFrom(item.parent$);
-      item = parent;
-    }
-    return null;
-  },
-
-  async getRootExObject(exObject: ExObject): Promise<ExObject> {
-    let parent: Parent = exObject;
-    while (true) {
-      const nextParent: Parent = await firstValueFrom(parent.parent$);
-      if (nextParent === null) {
-        assert(isType(parent, ExObjectFactory));
-        return parent;
-      }
-      parent = nextParent;
-    }
-  },
-
-  async replaceExObject(
-    ctx: MainContext,
-    exObject: ExObject,
-    newExObject: ExObject
-  ) {
-    const parent = await firstValueFrom(exObject.parent$);
-    if (parent === null) {
-      ExObject.replaceRootExObject(ctx, exObject, newExObject);
-      return;
-    }
-
-    assert(isType(parent, ExObjectFactory));
-    const children = await firstValueFrom(parent.children$);
-    const index = children.indexOf(exObject);
-    assert(index !== -1);
-    newExObject.parent$.next(parent);
-    children[index] = newExObject;
-    parent.children$.next(children);
-
-    exObject.destroy$.next();
-  },
-
-  async replaceRootExObject(
-    ctx: MainContext,
-    exObject: ExObject,
-    newExObject: ExObject
-  ) {
-    const project = await firstValueFrom(ctx.projectCtx.currentProject$);
-    project.rootExObjects.replaceItem(exObject, newExObject);
-
-    exObject.destroy$.next();
-  }
 }
+
+// ----------------
+// Private functions
+// ----------------
 
 async function createComponentProperties(
   ctx: MainContext,

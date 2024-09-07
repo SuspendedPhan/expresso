@@ -292,7 +292,7 @@ export default class Dehydrator {
       )
     );
 
-    const deBasicProperties$ = exObject.basicProperties$.pipe(
+    const deBasicProperties$ = exObject.basicProperties.pipe(
       switchMap((properties) => {
         const deProperties = properties.map((property) =>
           this.dehydrateBasicProperty$(property)

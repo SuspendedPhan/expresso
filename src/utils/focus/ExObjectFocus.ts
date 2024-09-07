@@ -54,7 +54,7 @@ export function createExObjectFocusContext(ctx: MainContext) {
   }
 
   async function* getProperties(exObject: ExObject): AsyncGenerator<Property> {
-    const basicProperties = await firstValueFrom(exObject.basicProperties$);
+    const basicProperties = await firstValueFrom(exObject.basicProperties);
     yield exObject.cloneCountProperty;
     for (const property of exObject.componentParameterProperties) {
       yield property;

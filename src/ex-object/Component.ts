@@ -11,12 +11,11 @@ import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import type MainContext from "src/main-context/MainContext";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { log5 } from "src/utils/utils/Log5";
 import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { matcher, pass, type VariantOf } from "variant";
 
-const log55 = log5("Component.ts");
+// const log55 = log5("Component.ts");
 
 export type CanvasSetter = (
   canvasObject: LibCanvasObject,

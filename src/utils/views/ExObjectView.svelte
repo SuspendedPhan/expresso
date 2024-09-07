@@ -24,7 +24,7 @@
 
   const componentParameterProperties = exObject.componentParameterProperties;
   const cloneCountProperty = exObject.cloneCountProperty;
-  const basicProperties$ = exObject.basicProperties$;
+  const basicProperties$ = exObject.basicProperties;
   const children$ = exObject.children$;
 
   function equals$(exObject$: OBS<ExObject | false>) {
