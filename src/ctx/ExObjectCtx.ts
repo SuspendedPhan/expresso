@@ -1,6 +1,6 @@
 import { Context, Effect, Layer } from "effect";
 import { Subject } from "rxjs";
-import type { ExObject } from "src/ex-object/ExObject";
+import { ExObject } from "src/ex-object/ExObject";
 import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
 
 export class ExObjectCtx extends Context.Tag("ExObjectCtx")<

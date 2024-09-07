@@ -37,7 +37,7 @@ interface ProjectCreationArgs {
   currentOrdinal?: number;
 }
 
-export async function ProjectFactory2(creationArgs: ProjectCreationArgs) {
+export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
   return Effect.gen(function* () {
     const currentOrdinal = creationArgs.currentOrdinal ?? 0;
     const creationArgs2: Required<ProjectCreationArgs> = {

@@ -1,12 +1,7 @@
 import { Context, Effect, Layer } from "effect";
-import {
-  BehaviorSubject,
-  firstValueFrom,
-  ReplaySubject,
-  switchMap
-} from "rxjs";
-import type { LibraryProject } from "src/library/LibraryProject";
-
+import { ReplaySubject } from "rxjs";
+import { type Library } from "src/library/Library";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 
 export class LibraryCtx extends Context.Tag("LibraryCtx")<
   LibraryCtx,
@@ -14,15 +9,14 @@ export class LibraryCtx extends Context.Tag("LibraryCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
-    const activeLibraryProject$ = new ReplaySubject<LibraryProject>(1);
-    return {
-      libraryProjects$: new BehaviorSubject<readonly LibraryProject[]>([]),
-      activeLibraryProject$,
-    };
+  return {
+    library$: new ReplaySubject<Library>(1),
+    get library() {
+      return Effect.gen(this, function* () {
+        return yield* EffectUtils.firstValueFrom(this.library$);
+      });
+    },
+  };
 });
 
-export const LibraryCtxLive = Layer.effect(
-  LibraryCtx,
-  ctxEffect
-);
-
+export const LibraryCtxLive = Layer.effect(LibraryCtx, ctxEffect);
