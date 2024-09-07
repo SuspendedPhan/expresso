@@ -5,11 +5,12 @@ import {
 } from "src/canvas/CanvasObject";
 import type { ExObject } from "src/ex-object/ExObject";
 import type MainContext from "src/main-context/MainContext";
+import type GoModule from "src/utils/utils/GoModule";
 import type { Evaluation } from "src/utils/utils/GoModule";
 
 export namespace EvaluationUtils {
   export function getCloneCount(
-    ctx: MainContext,
+    goModule: GoModule,
     evaluation: Evaluation,
     exObject: ExObject,
     parentPath: CanvasObjectPath
@@ -20,7 +21,7 @@ export namespace EvaluationUtils {
       exObjectId: exObject.id,
       cloneCountPropertyId: property.id,
     };
-    const pathString = CanvasObjectUtils.cloneCountCanvasPropertyPathToString(ctx.goModule, cloneCountCanvasPropertyPath);
+    const pathString = CanvasObjectUtils.cloneCountCanvasPropertyPathToString(goModule, cloneCountCanvasPropertyPath);
     const result = evaluation.getResult(pathString);
     return result;
   }

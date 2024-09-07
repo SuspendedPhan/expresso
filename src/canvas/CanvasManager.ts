@@ -12,15 +12,33 @@ import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import Logger from "../utils/logger/Logger";
 import type { CanvasContext, LibCanvasObject } from "./CanvasContext";
+import { Effect } from "effect";
+import { EvaluatorCtx } from "src/evaluation/EvaluatorCtx";
+import { ProjectCtx } from "src/ctx/ProjectCtx";
+import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import ScenePool from "src/canvas/CanvasPool";
+import { PixiFactory, type PixiFactoryArgs } from "src/canvas/PixiFactory";
 
-export function CanvasManagerFactory() {
+export function CanvasManagerFactory(args: PixiFactoryArgs) {
+  const pixiFactory = PixiFactory(args);
+  const pool = new ScenePool(() => pixiFactory.makeCircle());
+
+  return Effect.gen(function* () {
+
+    const evaluatorCtx = yield* EvaluatorCtx;
+    const projectCtx = yield* ProjectCtx;
+    const project = yield* projectCtx.activeProject;
+    const rootExObjects = project.rootExObjects;
+    const goModuleCtx = yield* GoModuleCtx;
+    const goModule = yield* goModuleCtx.goModule;
+
   const canvasObjectByCanvasObjectPath = new Map<
     string,
     LibCanvasObject
   >();
 
-  ctx.evaluator.eval$
-    .pipe(withLatestFrom(ctx.mainCtx.eventBus.rootObjects$))
+  evaluatorCtx.eval$
+    .pipe(withLatestFrom(rootExObjects.items$))
     .subscribe(([evaluation, rootExObjects]) => {
       updateRootExObjects(evaluation, rootExObjects);
     });
@@ -40,7 +58,7 @@ export function CanvasManagerFactory() {
     parentPath: CanvasObjectPath
   ) {
     const cloneCount = EvaluationUtils.getCloneCount(
-      ctx.mainCtx,
+      goModule,
       evaluation,
       exObject,
       parentPath
@@ -63,7 +81,6 @@ export function CanvasManagerFactory() {
     }
   }
 
-  @loggedMethod
   function updateCanvasObject(
     exObject: ExObject,
     evaluation: Evaluation,
@@ -73,7 +90,7 @@ export function CanvasManagerFactory() {
     const pathString = CanvasObjectUtils.canvasObjectPathToString(path);
     let canvasObject = canvasObjectByCanvasObjectPath.get(pathString);
     if (!canvasObject) {
-      canvasObject = ctx.pool.takeObject();
+      canvasObject = pool.takeObject();
       canvasObjectByCanvasObjectPath.set(pathString, canvasObject);
     }
 
@@ -112,7 +129,7 @@ export function CanvasManagerFactory() {
     evaluation: Evaluation
   ): void {
     const pathString = CanvasObjectUtils.canvasPropertyPathToString(
-      ctx.mainCtx.goModule,
+      goModule,
       propertyId,
       path
     );
@@ -123,4 +140,5 @@ export function CanvasManagerFactory() {
     canvasObject.scale.y = 100;
     canvasSetter(canvasObject, result);
   }
+  });
 }

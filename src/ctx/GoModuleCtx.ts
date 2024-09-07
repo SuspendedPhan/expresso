@@ -1,4 +1,5 @@
 import { Context, Effect, Layer } from "effect";
+import type GoModule from "src/utils/utils/GoModule";
 
 export class GoModuleCtx extends Context.Tag("GoModuleCtx")<
   GoModuleCtx,
@@ -12,7 +13,7 @@ declare var Go: any;
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    goModule: Effect.cached(
+    goModule: yield* Effect.cached(
       Effect.gen(function* () {
         const go = new Go();
         const result = yield* Effect.promise(() =>
@@ -22,8 +23,8 @@ const ctxEffect = Effect.gen(function* () {
           )
         );
         go.run(result.instance);
-        const goModule = window.GoModule;
-        goModule.hello();
+        const goModule: GoModule = window.GoModule;
+        (goModule as any).hello();
         return goModule;
       })
     ),
