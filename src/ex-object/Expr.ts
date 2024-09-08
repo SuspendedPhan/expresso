@@ -1,21 +1,22 @@
 import { Effect } from "effect";
 import { ExprCtx } from "src/ctx/ExprCtx";
-import type { CallExpr } from "src/ex-object/CallExpr";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
+import type { ExFunc } from "src/ex-object/ExFunc";
 import {
   ExFuncParameterFactory,
   type ExFuncParameter,
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import {
-  Property,
-  PropertyFactory,
-} from "src/ex-object/Property";
+import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { Utils } from "src/utils/utils/Utils";
+import {
+  createBehaviorSubjectWithLifetime,
+  Utils,
+  type SUB,
+} from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
   type DexVariantKind,
@@ -27,12 +28,18 @@ export type ReferenceTarget =
   | ComponentParameterKind["Custom"]
   | ExFuncParameter;
 
+interface CallExpr_ extends ExItemBase {
+  args$: SUB<Expr[]>;
+  exFunc$: SUB<ExFunc>;
+}
+
 export const ExprFactory = dexScopedVariant("Expr", {
   Number: fields<{ value: number } & ExItemBase>(),
   Reference: fields<{ target: ReferenceTarget | null } & ExItemBase>(),
+  Call: fields<CallExpr_>(),
 });
 
-export type Expr = VariantOf<typeof ExprFactory> | CallExpr;
+export type Expr = VariantOf<typeof ExprFactory>;
 export type ExprKind = DexVariantKind<typeof ExprFactory>;
 
 interface ExprCreationArgs {
@@ -44,6 +51,12 @@ interface ExprCreationArgs {
   Reference: {
     id?: string;
     target: ReferenceTarget | null;
+  };
+
+  CallExpr: {
+    id?: string;
+    exFunc: ExFunc;
+    args?: Expr[];
   };
 }
 
@@ -81,6 +94,36 @@ export const ExprFactory2 = {
       return expr;
     });
   },
+
+  Call: (creationArgs: ExprCreationArgs["CallExpr"]) => {
+    return Effect.gen(function* () {
+      const creationArgs2: Required<ExprCreationArgs["CallExpr"]> = {
+        id: creationArgs.id ?? Utils.createId("call-expr"),
+        args: creationArgs.args ?? [],
+        exFunc: creationArgs.exFunc,
+      };
+
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const expr = ExprFactory.Call({
+        ...base,
+        args$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          creationArgs2.args
+        ),
+        exFunc$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          creationArgs2.exFunc
+        ),
+      });
+
+      for (const arg of creationArgs2.args) {
+        arg.parent$.next(expr);
+      }
+
+      (yield* ExprCtx).exprs.push(expr);
+      return expr;
+    });
+  },
 };
 
 export const Expr = {
@@ -109,7 +152,6 @@ export const Expr = {
     });
   },
 };
-
 
 // public async replaceExpr(oldExpr: Expr, newExpr: Expr) {
 //   const parent = await firstValueFrom(oldExpr.parent$);

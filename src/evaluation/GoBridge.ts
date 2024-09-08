@@ -1,13 +1,13 @@
-import { Effect } from "effect";
-import { first, Subject } from "rxjs";
-import { ExObjectCtx } from "src/ctx/ExObjectCtx";
-import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
-import { PropertyCtx } from "src/ctx/PropertyCtx";
-import type { Expr } from "src/ex-object/Expr";
-import type GoModule from "src/utils/utils/GoModule";
+import { Effect, Layer } from "effect";
+import { first } from "rxjs";
+import { ExObjectCtx, ExObjectCtxLive } from "src/ctx/ExObjectCtx";
+import { ExprCtx, ExprCtxLive } from "src/ctx/ExprCtx";
+import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
+import { ProjectCtx, ProjectCtxLive } from "src/ctx/ProjectCtx";
+import { PropertyCtx, PropertyCtxLive } from "src/ctx/PropertyCtx";
+import { ExprFactory } from "src/ex-object/Expr";
 import { log5 } from "src/utils/utils/Log5";
-import { assertUnreachable } from "src/utils/utils/Utils";
+import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
@@ -62,21 +62,26 @@ const startGoBridge_ = Effect.gen(function* () {
     }
   });
 
-  ctx.eventBus.exprAdded$.subscribe((expr) => {
-    switch (expr.exprType) {
-      case ExprType.NumberExpr:
+  (yield* ExprCtx).exprs.events$.subscribe((evt) => {
+    if (evt.type !== "ItemAdded") return;
+
+    const expr = evt.item;
+
+    matcher(expr)
+      .when(ExprFactory.Number, (expr) => {
         goModule.NumberExpr.create(expr.id);
         goModule.NumberExpr.setValue(expr.id, expr.value);
-        break;
-      case ExprType.CallExpr:
+      })
+      .when(ExprFactory.Reference, (expr) => {
+        console.error("ReferenceExpr not implemented");
+      })
+      .when(ExprFactory.Call, (expr) => {
         goModule.CallExpr.create(expr.id);
-
         expr.args$.pipe(first()).subscribe((args) => {
           const arg0 = args[0];
           const arg1 = args[1];
 
           if (arg0 === undefined || arg1 === undefined) {
-            // throw new Error("CallExpr must have 2 args");
             console.error("CallExpr must have 2 args");
             return;
           }
@@ -84,34 +89,16 @@ const startGoBridge_ = Effect.gen(function* () {
           goModule.CallExpr.setArg0(expr.id, arg0.id);
           goModule.CallExpr.setArg1(expr.id, arg1.id);
         });
-        break;
-      case ExprType.ReferenceExpr:
-        console.error("ReferenceExpr not implemented");
-        break;
-      default:
-        assertUnreachable(expr);
-    }
-
-    const ready$ = this.getOrCreateReady$(expr);
-    ready$.complete();
+      })
+      .complete();
   });
 });
 
-export default class GoBridge {
-  private readonly ready$ByExpr = new Map<Expr, Subject<void>>();
+const layers = GoModuleCtxLive.pipe(
+  Layer.merge(ProjectCtxLive),
+  Layer.merge(ExprCtxLive),
+  Layer.merge(ExObjectCtxLive),
+  Layer.merge(PropertyCtxLive)
+);
 
-  public constructor(goModule: GoModule, ctx: MainContext) {
-    if (ctx.disableCanvas) return;
-    this.setup(goModule, ctx);
-  }
-
-  private getOrCreateReady$(expr: Expr): Subject<void> {
-    let ready$ = this.ready$ByExpr.get(expr);
-    if (!ready$) {
-      ready$ = new Subject();
-      this.ready$ByExpr.set(expr, ready$);
-    }
-
-    return ready$;
-  }
-}
+export const startGoBridge = Effect.provide(startGoBridge_, layers);
