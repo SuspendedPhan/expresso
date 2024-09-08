@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ExprCtx } from "src/ctx/ExprCtx";
 import {
   type ExFunc
 } from "src/ex-object/ExFunc";
@@ -49,7 +50,8 @@ export function CallExprFactory2(creationArgs: CallExprCreationArgs) {
     for (const arg of creationArgs2.args) {
       arg.parent$.next(expr);
     }
-
+    
+    (yield* ExprCtx).exprs.push(expr);
     return expr;
   });
 }
