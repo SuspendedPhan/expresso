@@ -1,18 +1,18 @@
-import { map } from "rxjs";
+import { map, Subject } from "rxjs";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
 } from "src/utils/utils/Utils";
 
-export type ItemChange<T> =
+export type ArrayEvent<T> =
   | ItemAdded<T>
   | ItemRemoved<T>
-  | InitialSubscription
+  | CurrentItem<T>
   | ItemReplaced<T>;
 
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
-  readonly item: T;
+  readonly newItem: T;
 }
 
 export interface ItemRemoved<T> {
@@ -26,13 +26,9 @@ export interface ItemReplaced<T> {
   readonly oldItem: T;
 }
 
-export interface InitialSubscription {
-  readonly type: "InitialSubscription";
-}
-
-export interface ArrayEvent<T> {
-  readonly items: T[];
-  readonly change: ItemChange<T>;
+export interface CurrentItem<T> {
+  readonly type: "CurrentItem";
+  readonly item: T;
 }
 
 export type ObservableArray<T> = ReturnType<
@@ -43,29 +39,21 @@ export function createObservableArrayWithLifetime<T>(
   destroy$: OBS<void>,
   initialItems: T[] = []
 ) {
-  const event: ArrayEvent<T> = {
-    change: { type: "InitialSubscription" },
-    items: initialItems,
-  };
+  const items$ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
   return {
     kind: "ObservableArray" as const,
 
-    event$: createBehaviorSubjectWithLifetime<ArrayEvent<T>>(destroy$, event),
+    event$: new Subject<ArrayEvent<T>>(),
 
     get items() {
-      return this.event$.getValue().items;
+      return items$.value;
     },
 
-    get items$() {
-      return this.event$.pipe(map((evt) => evt.items));
-    },
+    items$,
 
     push(item: T) {
       this.items.push(item);
-      this.event$.next({
-        change: { type: "ItemAdded", item },
-        items: this.items,
-      });
+      this.event$.next({ type: "ItemAdded", newItem: item });
     },
 
     replaceItem(oldItem: T, newItem: T) {
@@ -74,10 +62,7 @@ export function createObservableArrayWithLifetime<T>(
         throw new Error("Item not found");
       }
       this.items[index] = newItem;
-      this.event$.next({
-        change: { type: "ItemReplaced", newItem, oldItem },
-        items: this.items,
-      });
+      this.event$.next({ type: "ItemReplaced", newItem, oldItem });
     },
   };
 }

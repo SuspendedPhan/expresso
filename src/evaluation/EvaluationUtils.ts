@@ -4,7 +4,6 @@ import {
   type CloneCountCanvasPropertyPath,
 } from "src/canvas/CanvasObject";
 import type { ExObject } from "src/ex-object/ExObject";
-import type MainContext from "src/main-context/MainContext";
 import type GoModule from "src/utils/utils/GoModule";
 import type { Evaluation } from "src/utils/utils/GoModule";
 
