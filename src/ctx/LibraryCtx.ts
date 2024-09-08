@@ -1,6 +1,6 @@
 import { Context, Effect, Layer } from "effect";
 import { ReplaySubject } from "rxjs";
-import { type Library } from "src/library/Library";
+import type { Library } from "src/ex-object/Library";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 
 export class LibraryCtx extends Context.Tag("LibraryCtx")<

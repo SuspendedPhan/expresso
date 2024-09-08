@@ -2,8 +2,10 @@ import { Context, Layer, Effect } from "effect";
 import { combineLatestWith, map, firstValueFrom } from "rxjs";
 import { FocusCtx } from "src/ctx/FocusCtx";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
-import { DexWindow } from "src/main-context/MainViewContext";
+import { ViewCtx, DexWindow } from "src/ctx/ViewCtx";
+import { FocusFactory } from "src/focus/Focus";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
+import { isType } from "variant";
 
 export class EditorFocusCtx extends Context.Tag("EditorFocusCtx")<
   EditorFocusCtx,
@@ -21,8 +23,8 @@ const ctxEffect = Effect.gen(function* () {
       keyboardCtx
         .onKeydown$(
           "n",
-          ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor).pipe(
-            combineLatestWith(focusCtx.mapFocus$(FocusKind.is.None)),
+          viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor).pipe(
+            combineLatestWith(focusCtx.mapFocus$(isType(FocusFactory.None))),
             map(([activeWindow, noneFocus]) => {
               return activeWindow && noneFocus;
             })
@@ -30,7 +32,7 @@ const ctxEffect = Effect.gen(function* () {
         )
         .subscribe(async () => {
           const exItem = await firstValueFrom(
-            ctx.exObjectFocusCtx.exItemFocus$
+            exObjectFocusCtx.exItemFocus$
           );
           focusCtx.setFocus(
             FocusKind.EditorNewActions({

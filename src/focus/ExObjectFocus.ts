@@ -1,16 +1,14 @@
 import assert from "assert-ts";
 import { firstValueFrom } from "rxjs";
-import { ExItemType, type ExItem } from "src/ex-object/ExItem";
-import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
 import { type Property } from "src/ex-object/Property";
-import type MainContext from "src/main-context/MainContext";
-import { Hotkeys } from "src/utils/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { pass, type VariantOf } from "variant";
-import { FocusKind } from "./FocusKind";
 import type { Expr } from "src/ex-object/Expr";
+import { Hotkeys } from "src/ctx/FocusCtx";
+import type { ExItem } from "src/ex-object/ExItem";
+import type { ExObject } from "src/ex-object/ExObject";
 
 const log55 = log5("ExObjectFocus.ts");
 

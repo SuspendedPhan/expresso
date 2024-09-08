@@ -1,6 +1,5 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
-import { firstValueFrom } from "rxjs";
 import { FocusCtx } from "src/ctx/FocusCtx";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import type { ExItem } from "src/ex-object/ExItem";
