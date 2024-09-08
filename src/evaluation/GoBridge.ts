@@ -3,10 +3,11 @@ import { first, Subject } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
+import { PropertyCtx } from "src/ctx/PropertyCtx";
 import type { Expr } from "src/ex-object/Expr";
 import type GoModule from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
-import { assertUnreachable, partitionFirst } from "src/utils/utils/Utils";
+import { assertUnreachable } from "src/utils/utils/Utils";
 
 const log55 = log5("GoBridge.ts");
 
@@ -16,72 +17,49 @@ const startGoBridge_ = Effect.gen(function* () {
   const exObjectCtx = yield* ExObjectCtx;
   const goModule = yield* goModuleCtx.goModule;
   const project = yield* projectCtx.activeProject;
-
-  const [first$, rest$] = partitionFirst(project.rootExObjects.events$);
+  const propertyCtx = yield* PropertyCtx;
 
   project.rootExObjects.events$.subscribe((evt) => {
     switch (evt.type) {
       case "ItemAdded":
-      case "ItemReplaced":
-      case "CurrentItem": {
         goModule.Evaluator.addRootExObject(evt.item.id);
-      }
-    }
-  });
-
-  first$.subscribe((evt) => {
-    evt.items.forEach((rootExObject) => {
-      log55.debug("Adding initial rootExObject", rootExObject.id);
-      goModule.Evaluator.addRootExObject(rootExObject.id);
-    });
-  });
-
-  rest$.subscribe((evt) => {
-    switch (evt.change.type) {
-      case "ItemAdded":
-        log55.debug("Adding rootExObject", evt.change.newItem.id);
-        goModule.Evaluator.addRootExObject(evt.change.newItem.id);
         break;
-      case "ItemReplaced":
-        goModule.Evaluator.addRootExObject(evt.change.newItem.id);
-        break;
-      default:
-        console.error("Unexpected change type", evt.change);
     }
   });
 
   exObjectCtx.exObjects.events$.subscribe((evt) => {
-    switch (evt.change.type) {
+    switch (evt.type) {
       case "ItemAdded":
-      case "ItemReplaced":
-        log55.debug("Adding ExObject", evt.change.newItem.id);
-        goModule.ExObject.create(evt.change.newItem.id);
+        const exObject = evt.item;
+        log55.debug("Adding ExObject", exObject.id);
+
+        goModule.ExObject.create(exObject.id);
+        goModule.ExObject.setCloneCountProperty(
+          exObject.id,
+          exObject.cloneCountProperty.id
+        );
+
+        for (const property of exObject.componentParameterProperties) {
+          goModule.ExObject.addComponentParameterProperty(
+            exObject.id,
+            property.id
+          );
+        }
         break;
-      default:
-        console.error("Unexpected change type", evt.change);
     }
   });
 
-  ctx.eventBus.objectAdded$.subscribe((object) => {
-    log55.debug("Adding ExObject", object.id);
-    goModule.ExObject.create(object.id);
-
-    goModule.ExObject.setCloneCountProperty(
-      object.id,
-      object.cloneCountProperty.id
-    );
-
-    for (const property of object.componentParameterProperties) {
-      goModule.ExObject.addComponentParameterProperty(object.id, property.id);
+  propertyCtx.properties.events$.subscribe((evt) => {
+    switch (evt.type) {
+      case "ItemAdded":
+        const property = evt.item;
+        log55.debug("Adding Property", property.id);
+        goModule.Property.create(property.id);
+        property.expr$.subscribe((expr) => {
+          goModule.Property.setExpr(property.id, expr.id);
+        });
+        break;
     }
-  });
-
-  ctx.eventBus.propertyAdded$.subscribe((property) => {
-    log55.debug("Adding Property", property.id);
-    goModule.Property.create(property.id);
-    property.expr$.subscribe((expr) => {
-      goModule.Property.setExpr(property.id, expr.id);
-    });
   });
 
   ctx.eventBus.exprAdded$.subscribe((expr) => {
