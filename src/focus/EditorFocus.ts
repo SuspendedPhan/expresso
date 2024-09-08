@@ -1,10 +1,13 @@
+import { Effect } from "effect";
 import { combineLatestWith, firstValueFrom, map } from "rxjs";
+import { ExObjectFocusCtx } from "src/ctx/ExObjectFocusCtx";
+import { FocusCtx } from "src/ctx/FocusCtx";
+import { KeyboardCtx } from "src/ctx/KeyboardCtx";
+import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import type { ExItem } from "src/ex-object/ExItem";
-import type MainContext from "src/main-context/MainContext";
-import { DexWindow } from "src/main-context/MainViewContext";
+import { FocusFactory } from "src/focus/Focus";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { pass, type VariantOf } from "variant";
-import { FocusKind } from "../focus/FocusKind";
+import { isType, pass, type VariantOf } from "variant";
 
 interface EditorFocus_ {
   EditorNewActions: { exItem: ExItem | null };
@@ -19,55 +22,54 @@ export const EditorFocusFactory = dexVariant.scoped("EditorFocus")(
 export type EditorFocus = VariantOf<typeof EditorFocusFactory>;
 export type EditorFocusKind = DexVariantKind<typeof EditorFocusFactory>;
 
-export namespace EditorFocusFuncs {
-  export async function register(ctx: MainContext) {
-    const { focusCtx, keyboardCtx } = ctx;
+const registerEditorFocus = Effect.gen(function* () {
+  const focusCtx = yield* FocusCtx;
+  const keyboardCtx = yield* KeyboardCtx;
+  const viewCtx = yield* ViewCtx;
+  const exObjectFocusCtx = yield* ExObjectFocusCtx;
+  const commandCardCtx = yield* CommandCardCtx;
 
-    keyboardCtx
-      .onKeydown$(
-        "n",
-        ctx.viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor).pipe(
-          combineLatestWith(focusCtx.mapFocus$(FocusKind.is.None)),
-          map(([activeWindow, noneFocus]) => {
-            return activeWindow && noneFocus;
-          })
-        )
+  keyboardCtx
+    .onKeydown$(
+      "n",
+      viewCtx.activeWindowEqualTo$(DexWindow.ProjectEditor).pipe(
+        combineLatestWith(focusCtx.mapFocus$(isType(FocusFactory.None))),
+        map(([activeWindow, noneFocus]) => {
+          return activeWindow && noneFocus;
+        })
       )
-      .subscribe(async () => {
-        const exItem = await firstValueFrom(ctx.exObjectFocusCtx.exItemFocus$);
-        focusCtx.setFocus(
-          FocusKind.EditorNewActions({
-            exItem: exItem === false ? null : exItem,
-          })
-        );
-      });
-
-    const focusIsEditorNewActions$ = focusCtx.mapFocus$((focus) => {
-      return FocusKind.is.EditorNewActions(focus) ? focus : false;
+    )
+    .subscribe(async () => {
+      const exItem = await firstValueFrom(exObjectFocusCtx.exItemFocus$);
+      focusCtx.setFocus(
+        FocusKind.EditorNewActions({
+          exItem: exItem === false ? null : exItem,
+        })
+      );
     });
 
-    ctx.viewCtx.commandCardCtx.addCommandCard({
-      title: "Editor Commands",
-      commands: ["New Object", "New Project"],
-      visible$: focusIsEditorNewActions$.pipe(map((focus) => focus !== false)),
-    });
+  const focusIsEditorNewActions$ = focusCtx.mapFocus$((focus) => {
+    return FocusKind.is.EditorNewActions(focus) ? focus : false;
+  });
 
-    keyboardCtx
-      .onKeydown$("p", focusIsEditorNewActions$)
-      .subscribe(async () => {
-        const library = await firstValueFrom(ctx.library$);
-        library.addProjectBlank();
-        focusCtx.popFocus();
-      });
+  viewCtx.commandCardCtx.addCommandCard({
+    title: "Editor Commands",
+    commands: ["New Object", "New Project"],
+    visible$: focusIsEditorNewActions$.pipe(map((focus) => focus !== false)),
+  });
 
-    keyboardCtx
-      .onKeydown$("o", focusIsEditorNewActions$)
-      .subscribe(async () => {
-        const project = await ctx.projectCtx.getCurrentProjectProm();
-        project.addRootExObjectBlank();
-        focusCtx.popFocus();
-      });
+  keyboardCtx.onKeydown$("p", focusIsEditorNewActions$).subscribe(async () => {
+    const library = await firstValueFrom(ctx.library$);
+    library.addProjectBlank();
+    focusCtx.popFocus();
+  });
 
-    keyboardCtx.registerCancel(focusIsEditorNewActions$);
-  }
-}
+  keyboardCtx.onKeydown$("o", focusIsEditorNewActions$).subscribe(async () => {
+    const project = await ctx.projectCtx.getCurrentProjectProm();
+    project.addRootExObjectBlank();
+    focusCtx.popFocus();
+  });
+
+  keyboardCtx.registerCancel(focusIsEditorNewActions$);
+});
+
