@@ -1,4 +1,4 @@
-import { map, Subject } from "rxjs";
+import { concat, map, Subject } from "rxjs";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
@@ -7,27 +7,14 @@ import {
 export type ArrayEvent<T> =
   | ItemAdded<T>
   | ItemRemoved<T>
-  | CurrentItem<T>
-  | ItemReplaced<T>;
 
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
-  readonly newItem: T;
+  readonly item: T;
 }
 
 export interface ItemRemoved<T> {
   readonly type: "ItemRemoved";
-  readonly item: T;
-}
-
-export interface ItemReplaced<T> {
-  readonly type: "ItemReplaced";
-  readonly newItem: T;
-  readonly oldItem: T;
-}
-
-export interface CurrentItem<T> {
-  readonly type: "CurrentItem";
   readonly item: T;
 }
 
@@ -40,10 +27,17 @@ export function createObservableArrayWithLifetime<T>(
   initialItems: T[] = []
 ) {
   const items$ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
+  const events$ = new Subject<ArrayEvent<T>>();
   return {
     kind: "ObservableArray" as const,
 
-    event$: new Subject<ArrayEvent<T>>(),
+    get events$() {
+      const currentItemEvents: ItemAdded<T>[] = items$.value.map((item) => ({
+        type: "ItemAdded",
+        item,
+      }));
+      return concat(currentItemEvents, events$);
+    },
 
     get items() {
       return items$.value;
@@ -52,17 +46,18 @@ export function createObservableArrayWithLifetime<T>(
     items$,
 
     push(item: T) {
-      this.items.push(item);
-      this.event$.next({ type: "ItemAdded", newItem: item });
+      items$.value.push(item);
+      items$.next(items$.value);
+      events$.next({ type: "ItemAdded", item });
     },
 
     replaceItem(oldItem: T, newItem: T) {
-      const index = this.items.indexOf(oldItem);
-      if (index === -1) {
-        throw new Error("Item not found");
-      }
-      this.items[index] = newItem;
-      this.event$.next({ type: "ItemReplaced", newItem, oldItem });
+      // const index = this.items.indexOf(oldItem);
+      // if (index === -1) {
+      //   throw new Error("Item not found");
+      // }
+      // this.items[index] = newItem;
+      // this.events$.next({ type: "ItemReplaced", newItem, oldItem });
     },
   };
 }

@@ -17,7 +17,17 @@ const startGoBridge_ = Effect.gen(function* () {
   const goModule = yield* goModuleCtx.goModule;
   const project = yield* projectCtx.activeProject;
 
-  const [first$, rest$] = partitionFirst(project.rootExObjects.event$);
+  const [first$, rest$] = partitionFirst(project.rootExObjects.events$);
+
+  project.rootExObjects.events$.subscribe((evt) => {
+    switch (evt.type) {
+      case "ItemAdded":
+      case "ItemReplaced":
+      case "CurrentItem": {
+        goModule.Evaluator.addRootExObject(evt.item.id);
+      }
+    }
+  });
 
   first$.subscribe((evt) => {
     evt.items.forEach((rootExObject) => {
@@ -40,7 +50,7 @@ const startGoBridge_ = Effect.gen(function* () {
     }
   });
 
-  exObjectCtx.exObjects.event$.subscribe((evt) => {
+  exObjectCtx.exObjects.events$.subscribe((evt) => {
     switch (evt.change.type) {
       case "ItemAdded":
       case "ItemReplaced":
