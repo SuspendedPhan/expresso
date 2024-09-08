@@ -7,6 +7,7 @@
 
 import { Effect } from "effect";
 import { of } from "rxjs";
+import { PropertyCtx } from "src/ctx/PropertyCtx";
 import { } from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
@@ -69,6 +70,7 @@ export const PropertyFactory2 = {
     createArgs: CreatePropertyArgs["ComponentParameter"]
   ) {
     return Effect.gen(function* () {
+      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
         parameter: createArgs.parameter,
@@ -84,12 +86,14 @@ export const PropertyFactory2 = {
         ),
         componentParameter: createArgs2.parameter,
       });
+      propertyCtx.properties.push(property);
       return property;
     });
   },
 
   BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
     return Effect.gen(function* () {
+      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
         id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
         expr:
@@ -100,7 +104,7 @@ export const PropertyFactory2 = {
       };
 
       const base = yield* ExItem.createExItemBase(createArgs2.id);
-      return PropertyFactory.BasicProperty({
+      const property = PropertyFactory.BasicProperty({
         ...base,
         expr$: createBehaviorSubjectWithLifetime(
           base.destroy$,
@@ -111,24 +115,29 @@ export const PropertyFactory2 = {
           createArgs2.name
         ),
       });
+      propertyCtx.properties.push(property);
+      return property;
     });
   },
 
   CloneCountProperty(createArgs: CreatePropertyArgs["CloneCount"]) {
     return Effect.gen(function* () {
+      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
         id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
       };
 
       const base = yield* ExItem.createExItemBase(createArgs2.id);
-      return PropertyFactory.CloneCountProperty({
+      const property = PropertyFactory.CloneCountProperty({
         ...base,
         expr$: createBehaviorSubjectWithLifetime(
           base.destroy$,
           createArgs2.expr
         ),
       });
+      propertyCtx.properties.push(property);
+      return property;
     });
   },
 };
