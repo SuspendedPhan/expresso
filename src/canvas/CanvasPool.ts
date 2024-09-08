@@ -1,7 +1,7 @@
 import deePool from "deepool";
-import type { LibCanvasObject } from "./CanvasContext";
+import type { LibCanvasObject } from "src/canvas/Canvas";
 
-export default class ScenePool {
+export default class CanvasPool {
   private circlePool;
   private usedCircles = [] as any[]; 
 

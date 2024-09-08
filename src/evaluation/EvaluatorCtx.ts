@@ -1,11 +1,7 @@
 import { Context, Effect, Layer } from "effect";
-import {
-  interval,
-  Subject
-} from "rxjs";
-import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import { interval, Subject } from "rxjs";
+import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import type { Evaluation } from "src/utils/utils/GoModule";
-
 
 export class EvaluatorCtx extends Context.Tag("EvaluatorCtx")<
   EvaluatorCtx,
@@ -15,7 +11,7 @@ export class EvaluatorCtx extends Context.Tag("EvaluatorCtx")<
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
   const goModule = yield* goModuleCtx.goModule;
-  
+
   const eval$ = new Subject<Evaluation>();
   interval(1000).subscribe(() => {
     const evaluation = goModule.Evaluator.eval();
@@ -28,7 +24,6 @@ const ctxEffect = Effect.gen(function* () {
   };
 });
 
-export const EvaluatorCtxLive = Layer.effect(
-  EvaluatorCtx,
-  ctxEffect
+export const EvaluatorCtxLive = Layer.effect(EvaluatorCtx, ctxEffect).pipe(
+  Layer.provideMerge(GoModuleCtxLive)
 );

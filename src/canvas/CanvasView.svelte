@@ -1,15 +1,12 @@
 <script lang="ts">
+  import { Effect } from "effect";
+  import { CanvasFactory } from "src/canvas/Canvas";
   import { onMount } from "svelte";
-  import { CanvasMain } from "./CanvasMain";
-  import PixiFactory from "./PixiFactory";
-  import MainContext from "src/main-context/MainContext";
-  export let ctx: MainContext;
   let viewportElement: HTMLDivElement;
   let canvasElement: HTMLCanvasElement;
 
   onMount(() => {
-    const pixiFactory = new PixiFactory(viewportElement, canvasElement);
-    new CanvasMain(ctx, pixiFactory);
+    Effect.runPromise(CanvasFactory({ viewportElement, canvasElement }));
   });
 </script>
 
