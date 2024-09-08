@@ -5,12 +5,14 @@
  * Component Argument
  */
 
+import assert from "assert-ts";
 import { Effect } from "effect";
-import { of } from "rxjs";
+import { firstValueFrom, of } from "rxjs";
 import { PropertyCtx } from "src/ctx/PropertyCtx";
-import { } from "src/ex-object/Component";
+import {} from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
 import {
   createBehaviorSubjectWithLifetime,
@@ -21,7 +23,7 @@ import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, matcher, type VariantOf } from "variant";
+import { fields, isType, matcher, type VariantOf } from "variant";
 
 // const log55 = log5("Property.ts");
 
@@ -145,15 +147,45 @@ export const PropertyFactory2 = {
 export const Property = {
   CloneCountPropertyName: "Clone Count",
 
-  getName$(property: Property): OBS<string> {
-    return matcher(property)
-      .when(PropertyFactory.ComponentParameterProperty, (p) =>
-        ComponentParameter.getName$(p.componentParameter)
-      )
-      .when(PropertyFactory.BasicProperty, (p) => p.name$)
-      .when(PropertyFactory.CloneCountProperty, () =>
-        of(this.CloneCountPropertyName)
-      )
-      .complete();
-  },
+  Methods: (property: Property) => ({
+    getName$(): OBS<string> {
+      return matcher(property)
+        .when(PropertyFactory.ComponentParameterProperty, (p) =>
+          ComponentParameter.getName$(p.componentParameter)
+        )
+        .when(PropertyFactory.BasicProperty, (p) => p.name$)
+        .when(PropertyFactory.CloneCountProperty, () =>
+          of(Property.CloneCountPropertyName)
+        )
+        .complete();
+    },
+
+    async getNextProperty() {
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && isType(exObject, ExObjectFactory));
+      let found = false;
+      for (const p of ExObject.Methods(exObject).properties) {
+        if (found) {
+          return p;
+        }
+        if (p === property) {
+          found = true;
+        }
+      }
+      return null;
+    },
+
+    async prevProperty() {
+      const exObject = await firstValueFrom(property.parent$);
+      assert(exObject !== null && isType(exObject, ExObjectFactory));
+      let prev = null;
+      for (const p of ExObject.Methods(exObject).properties) {
+        if (p === property) {
+          return prev;
+        }
+        prev = p;
+      }
+      return null;
+    },
+  }),
 };

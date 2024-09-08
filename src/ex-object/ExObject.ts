@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
+import { firstValueFrom } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
@@ -185,6 +186,19 @@ export const ExObject = {
         project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
       });
+    },
+
+    get properties() {
+      return (function* () {
+        const basicProperties = exObject.basicProperties.items;
+        yield exObject.cloneCountProperty;
+        for (const property of exObject.componentParameterProperties) {
+          yield property;
+        }
+        for (const property of basicProperties) {
+          yield property;
+        }
+      })();
     },
   }),
 };

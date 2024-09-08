@@ -21,17 +21,6 @@ const ctxEffect = Effect.gen(function* () {
         return (focus as any).exObject;
       });
     },
-
-    getProperties(exObject: ExObject) {
-      const basicProperties = await firstValueFrom(exObject.basicProperties);
-      yield exObject.cloneCountProperty;
-      for (const property of exObject.componentParameterProperties) {
-        yield property;
-      }
-      for (const property of basicProperties) {
-        yield property;
-      }
-    },
   };
 });
 
