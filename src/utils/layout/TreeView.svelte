@@ -10,7 +10,7 @@
   const log55 = log5("TreeView.svelte");
 
   export let elementLayout: ElementLayout;
-  export let ctx: MainContext;
+
   const debugCtx = structuredClone(ctx.debugCtx);
   let canvas: HTMLCanvasElement;
 

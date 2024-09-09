@@ -1,7 +1,6 @@
 <script lang="ts">
   import { map, of } from "rxjs";
   import type { ExFunc } from "src/ex-object/ExFunc";
-  import type MainContext from "src/main-context/MainContext";
 
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
@@ -14,7 +13,7 @@
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
-  export let ctx: MainContext;
+
   export let exFunc: ExFunc;
 
   const isExFuncFocused$ = of(false);

@@ -9,7 +9,6 @@
 
   const log55 = log5("ExprView.svelte");
 
-  export let ctx: MainContext;
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 

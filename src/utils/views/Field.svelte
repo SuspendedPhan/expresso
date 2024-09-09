@@ -1,10 +1,8 @@
 <script lang="ts">
-  import type MainContext from "src/main-context/MainContext";
   import type { FieldData } from "src/utils/views/Field";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FieldValue from "src/utils/views/FieldValue.svelte";
 
-  export let ctx: MainContext;
   export let fieldData: FieldData;
 </script>
 

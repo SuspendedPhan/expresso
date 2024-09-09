@@ -1,7 +1,6 @@
 <script lang="ts">
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
-  import type MainContext from "src/main-context/MainContext";
 
   import { rxEquals, type OBS } from "src/utils/utils/Utils";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
@@ -18,7 +17,6 @@
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
 
-  export let ctx: MainContext;
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
 

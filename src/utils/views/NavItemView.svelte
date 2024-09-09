@@ -3,7 +3,7 @@
 
   import { type NavItem } from "../utils/Nav";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  export let ctx: MainContext;
+
   export let item: NavItem;
 
   const isActive$ = ctx.viewCtx.activeWindow$.pipe(

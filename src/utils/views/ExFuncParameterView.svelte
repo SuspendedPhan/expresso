@@ -1,11 +1,9 @@
 <script lang="ts">
   import type { ExFuncParameter } from "src/ex-object/ExFunc";
-  import type MainContext from "src/main-context/MainContext";
 
   import { createFieldValueData } from "src/utils/views/Field";
   import FieldValue from "src/utils/views/FieldValue.svelte";
 
-  export let ctx: MainContext;
   export let parameter: ExFuncParameter;
   const fieldValueData = createFieldValueData({
     ctx,

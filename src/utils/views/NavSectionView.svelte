@@ -5,7 +5,6 @@
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
   import NavItemView from "./NavItemView.svelte";
 
-  export let ctx: MainContext;
   export let section: NavSection;
   const focused$ = of(false);
   const underline$ = of(false);

@@ -37,7 +37,7 @@ import {
   type LibraryProject,
 } from "src/library/LibraryProject";
 import { Create } from "src/main-context/Create";
-import type MainContext from "src/main-context/MainContext";
+
 import {
   DehydratedExpr,
   type DehydratedBasicProperty,

@@ -2,11 +2,10 @@
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import PropertyView from "src/utils/views/PropertyView.svelte";
-  import type MainContext from "src/main-context/MainContext";
+
   import type { OBS } from "src/utils/utils/Utils";
   import type { PropertyKind } from "src/ex-object/Property";
 
-  export let ctx: MainContext;
   export let basicProperties$: OBS<PropertyKind["BasicProperty"][]>;
   export let addPropertyFn: () => void;
 </script>

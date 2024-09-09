@@ -1,10 +1,8 @@
 <script lang="ts">
-  import type MainContext from "src/main-context/MainContext";
   import type { FieldValueData } from "src/utils/views/Field";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
 
-  export let ctx: MainContext;
   export let fieldData: FieldValueData;
 
   const { isFocused$, isEditing$, value$ } = fieldData;

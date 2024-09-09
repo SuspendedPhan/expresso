@@ -3,8 +3,6 @@
   import NavSectionView from "./NavSectionView.svelte";
   import { of } from "rxjs";
 
-  export let ctx: MainContext;
-
   const navCollapsed$ = ctx.viewCtx.navCollapsed$;
   const projectNavFocused$ = of(false);
 

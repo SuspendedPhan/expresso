@@ -1,6 +1,5 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import type MainContext from "src/main-context/MainContext";
   import CanvasView from "src/canvas/CanvasView.svelte";
   import { onMount } from "svelte";
   import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
@@ -9,8 +8,6 @@
 
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
-
-  export let ctx: MainContext;
 
   const activeWindow$ = ctx.viewCtx.activeWindow$.pipe(
     map((w) => {

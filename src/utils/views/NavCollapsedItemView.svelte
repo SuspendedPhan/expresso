@@ -2,7 +2,6 @@
   import { type NavItem } from "../utils/Nav";
   import { map, of } from "rxjs";
 
-  export let ctx: MainContext;
   export let item: NavItem;
 
   const active$ = ctx.viewCtx.activeWindow$.pipe(map((w) => w === item.window));

@@ -9,7 +9,6 @@
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
 
-  export let ctx: MainContext;
   export let exObject: ExObject;
   let clazz = "";
   export { clazz as class };

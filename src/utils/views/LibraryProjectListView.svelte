@@ -3,8 +3,6 @@
   import LibraryProjectView from "./LibraryProjectView.svelte";
   import { switchMap } from "rxjs";
 
-  export let ctx: MainContext;
-
   const projects$ = ctx.library$.pipe(
     switchMap((library) => library.libraryProjectArr$)
   );

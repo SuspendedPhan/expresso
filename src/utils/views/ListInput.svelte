@@ -1,11 +1,9 @@
 <script lang="ts">
-  import type MainContext from "src/main-context/MainContext";
   import type { OBS } from "src/utils/utils/Utils";
   import type { FieldValueData } from "src/utils/views/Field";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FieldValue from "src/utils/views/FieldValue.svelte";
 
-  export let ctx: MainContext;
   export let label: string;
   export let fieldValueDataArr$: OBS<FieldValueData[]>;
 </script>

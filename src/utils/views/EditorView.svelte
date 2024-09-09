@@ -8,7 +8,6 @@
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
 
-  export let ctx: MainContext;
   const rootExObjects$ = ctx.eventBus.rootObjects$;
 
   let rootElement: HTMLElement;

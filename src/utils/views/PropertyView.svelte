@@ -2,14 +2,13 @@
   import { map, of } from "rxjs";
   import { ExprFactory } from "src/ex-object/Expr";
   import { PropertyFns, type Property } from "src/ex-object/Property";
-  import type MainContext from "src/main-context/MainContext";
+
   import { rxEquals } from "src/utils/utils/Utils";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
   import { isType } from "variant";
 
-  export let ctx: MainContext;
   export let property: Property;
 
   const name$ = PropertyFns.getName$(property);

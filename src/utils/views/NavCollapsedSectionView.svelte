@@ -4,7 +4,6 @@
   import { type NavSection } from "../utils/Nav";
   import NavCollapsedItemView from "./NavCollapsedItemView.svelte";
 
-  export let ctx: MainContext;
   export let section: NavSection;
 
   const focused$ = of(false);
