@@ -8,7 +8,21 @@ import { Property } from "src/ex-object/Property";
 import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { isType, matcher, pass, type VariantOf } from "variant";
+import {
+  isOfVariant,
+  isType,
+  matcher,
+  pass,
+  variant,
+  type VariantOf,
+} from "variant";
+
+export const ExItemBasicFocusFactory = variant([
+  ExObjectFocusFactory.ExObject,
+  ExObjectFocusFactory.Name,
+  ExObjectFocusFactory.Component,
+  ExObjectFocusFactory.PropertyName,
+]);
 
 interface ExItemFocus_ {
   NewCommand: { exItem: ExItem };
@@ -111,20 +125,24 @@ export const ExItemFocus = {
     });
   },
 
-  exItemFocus$: Effect.gen(function* () {
+  exItemBasicFocus$: Effect.gen(function* () {
     return (yield* FocusCtx).mapFocus$((focus) => {
-      matcher(focus)
-        .when(ExObjectFocusFactory.ExObject, ({ exObject }) => exObject)
-        .when(ExObjectFocusFactory.Name, ({ exObject }) => exObject)
+      if (!isOfVariant(focus, ExItemBasicFocusFactory)) {
+        return false;
+      }
 
-      const exItem: ExItem | false = FocusKind.match(focus, {
-        ExObject: ({ exObject }) => exObject as ExItem | false,
-        ExObjectName: ({ exObject }) => exObject,
-        ExObjectComponent: ({ exObject }) => exObject,
-        Property: ({ property }) => property,
-        Expr: ({ expr }) => expr,
-        default: () => false,
-      });
+      const exItem = matcher(focus)
+        .when(
+          [
+            ExObjectFocusFactory.ExObject,
+            ExObjectFocusFactory.Name,
+            ExObjectFocusFactory.Component,
+          ],
+          ({ exObject }) => exObject
+        )
+        .when(ExObjectFocusFactory.PropertyName, ({ property }) => property)
+        .complete();
+
       return exItem;
     });
   }),
