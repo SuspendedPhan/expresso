@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import type GoModule from "src/utils/utils/GoModule";
 
 export class GoModuleCtx extends Effect.Tag("GoModuleCtx")<

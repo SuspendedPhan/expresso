@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
 import type { ElementLayout } from "src/utils/layout/ElementLayout";
 import type { NavItem, NavSection } from "src/utils/utils/Nav";

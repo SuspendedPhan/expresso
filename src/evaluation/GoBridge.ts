@@ -72,7 +72,7 @@ const startGoBridge_ = Effect.gen(function* () {
         goModule.NumberExpr.create(expr.id);
         goModule.NumberExpr.setValue(expr.id, expr.value);
       })
-      .when(ExprFactory.Reference, (expr) => {
+      .when(ExprFactory.Reference, (_expr) => {
         console.error("ReferenceExpr not implemented");
       })
       .when(ExprFactory.Call, (expr) => {

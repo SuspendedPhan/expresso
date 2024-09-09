@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { BehaviorSubject, of } from "rxjs";
-import type { LibCanvasObject } from "src/canvas/CanvasContext";
+import type { LibCanvasObject } from "src/canvas/Canvas";
 import {
   ComponentParameterFactory,
   ComponentParameterFactory2,

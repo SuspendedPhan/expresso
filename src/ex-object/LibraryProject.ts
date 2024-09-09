@@ -55,5 +55,5 @@ export function LibraryProjectFactory2(
 }
 
 export const LibraryProject = {
-  Methods: (libraryProject: LibraryProject) => ({}),
+  Methods: (_libraryProject: LibraryProject) => ({}),
 };

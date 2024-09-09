@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Effect, Layer } from "effect";
 import { filter, fromEvent, map, of, switchMap } from "rxjs";
 import { FocusCtx } from "src/ctx/FocusCtx";

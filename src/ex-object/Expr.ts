@@ -129,7 +129,7 @@ export const ExprFactory2 = {
 export const Expr = {
   getReferenceTargetName$(target: ReferenceTarget) {
     if (isOfVariant(target, PropertyFactory)) {
-      return Property.getName$(target);
+      return Property.Methods(target).getName$();
     } else if (isType(target, ComponentParameterFactory.Custom)) {
       return target.name$;
     } else if (isType(target, ExFuncParameterFactory)) {

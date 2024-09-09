@@ -1,30 +1,33 @@
-import type { ExObject } from "src/ex-object/ExObject";
+import { ExObject } from "src/ex-object/ExObject";
 import { ElementLayout } from "./ElementLayout";
+import { Effect } from "effect";
+import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 
-
-export default class ExObjectLayout {
-  public static create(
-    ctx: MainContext,
-    rootExObject: ExObject
-  ): ElementLayout {
+export function createExObjectLayout(rootExObject: ExObject) {
+  return Effect.gen(function* () {
     const childrenByExObject = new Map<ExObject, readonly ExObject[]>();
-    
-    ctx.eventBus.objectAdded$.subscribe((exObject) => {
+
+    function getChildren(exObject: ExObject, childrenByExObject: Map<ExObject, readonly ExObject[]>) {
+      return childrenByExObject.get(exObject) ?? [];
+    }
+
+    (yield* ExObjectCtx.exObjects).events$.subscribe((event) => {
+      if (event.type !== "ItemAdded") {
+        return;
+      }
+
+      const exObject = event.item;
       exObject.children$.subscribe((children) => {
         childrenByExObject.set(exObject, children);
       });
     });
-
+    
     return new ElementLayout(
       () => rootExObject,
-      (exObject) => this.getChildren(exObject, childrenByExObject),
+      (exObject) => getChildren(exObject, childrenByExObject),
       (exObject) => exObject.id,
       16,
       16
     );
-  }
-
-  static getChildren(exObject: ExObject, childrenByExObject: Map<ExObject, readonly ExObject[]>): readonly ExObject[] {
-    return childrenByExObject.get(exObject) ?? [];
-  }
+  });
 }

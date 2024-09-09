@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { interval, Subject } from "rxjs";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import type { Evaluation } from "src/utils/utils/GoModule";

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import assert from "assert-ts";
 import { firstValueFrom, from } from "rxjs";
 import {

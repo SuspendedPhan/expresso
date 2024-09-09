@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { firstValueFrom, switchMap } from "rxjs";
 import { LibraryProjectCtx, LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import type { LibraryProject } from "src/ex-object/LibraryProject";

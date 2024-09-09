@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
 import {
   type SUB,
   Utils,
@@ -28,7 +29,7 @@ export function ExFuncParameterFactory2(
       id: creationArgs.id ?? Utils.createId("ex-func-param"),
       name:
         creationArgs.name ??
-        `Parameter ${project.getAndIncrementOrdinal()}`,
+        `Parameter ${Project.Methods(project).getAndIncrementOrdinal()}`,
     };
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);
