@@ -1,5 +1,5 @@
+import { Context, Effect, Layer } from "effect";
 import { BehaviorSubject } from "rxjs";
-import type MainContext from "src/main-context/MainContext";
 import type { OBS } from "src/utils/utils/Utils";
 
 export interface CommandCardData {
@@ -8,9 +8,12 @@ export interface CommandCardData {
   visible$: OBS<boolean>;
 }
 
-export type CommandCardContext = ReturnType<typeof createCommandCardContext>;
+export class CommandCardCtx extends Context.Tag("CommandCardCtx")<
+  CommandCardCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
 
-export function createCommandCardContext(_ctx: MainContext) {
+const ctxEffect = Effect.gen(function* () {
   const props = {
     commandCards$: new BehaviorSubject<CommandCardData[]>([]),
   };
@@ -25,4 +28,10 @@ export function createCommandCardContext(_ctx: MainContext) {
       commandCards$.next(commandCards);
     },
   };
-}
+});
+
+export const CommandCardCtxLive = Layer.effect(
+  CommandCardCtx,
+  ctxEffect
+);
+
