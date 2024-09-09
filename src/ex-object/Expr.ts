@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
 import { ExprCtx } from "src/ctx/ExprCtx";
+import { ComponentFactory } from "src/ex-object/Component";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -11,6 +12,7 @@ import {
   type ExFuncParameter,
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExObjectFactory } from "src/ex-object/ExObject";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
@@ -180,27 +182,8 @@ export const Expr = {
   },
 };
 
-export const ExprParentFactory = variant([
-  ExprFactory.Call,
-  ComponentParameterFactory.Custom,
+export const ReferenceTargetParent = variant([
+  ExObjectFactory,
+  ComponentFactory.Custom,
   CustomExFuncFactory,
-  ...Object.values(PropertyFactory),
 ]);
-
-export type ExprParent = VariantOf<typeof ExprParentFactory>;
-
-export const ExprParent = {
-  Methods: (parent: ExprParent) => ({
-    label$: Effect.gen(function* () {
-      if (isOfVariant(parent, PropertyFactory)) {
-        return Property.Methods(parent).getName$();
-      } else if (isType(parent, ComponentParameterFactory.Custom)) {
-        return parent.name$;
-      } else if (isType(parent, CustomExFuncFactory)) {
-        return parent.name$;
-      } else if (isOfVariant(parent, ExprFactory)) {
-        
-      }
-    })
-  }),
-};

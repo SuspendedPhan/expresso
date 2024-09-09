@@ -1,5 +1,7 @@
+import { Effect } from "effect";
 import { BehaviorSubject, of } from "rxjs";
 import type { CanvasSetter } from "src/ex-object/Component";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { type OBS, type SUB, Utils } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
@@ -13,7 +15,7 @@ interface CanvasComponentParameter {
   readonly canvasSetter: CanvasSetter;
 }
 
-interface CustomComponentParameter {
+interface CustomComponentParameter extends ExItemBase {
   readonly id: string;
   readonly name$: SUB<string>;
 }
@@ -42,24 +44,27 @@ export const ComponentParameterFactory2 = {
   Custom(
     creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]
   ) {
-    const creationArgs2: Required<
-      ComponentParameterCreationArgs["CustomComponentParameter"]
-    > = {
-      id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
-      name: creationArgs.name ?? "Parameter",
-    };
-    const parameter = ComponentParameterFactory.Custom({
-      id: creationArgs2.id,
-      name$: new BehaviorSubject(creationArgs2.name),
+    return Effect.gen(function* () {
+      const creationArgs2: Required<
+        ComponentParameterCreationArgs["CustomComponentParameter"]
+      > = {
+        id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
+        name: creationArgs.name ?? "Parameter",
+      };
+
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const parameter = ComponentParameterFactory.Custom({
+        ...base,
+        id: creationArgs2.id,
+        name$: new BehaviorSubject(creationArgs2.name),
+      });
+      return parameter;
     });
-    return parameter;
   },
 };
 
 export const ComponentParameter = {
-  getName$(
-    componentParameter: ComponentParameter
-  ): OBS<string> {
+  getName$(componentParameter: ComponentParameter): OBS<string> {
     return matcher(componentParameter)
       .when(ComponentParameterFactory.Canvas, (componentParameter) => {
         return of(componentParameter.name);
@@ -68,5 +73,5 @@ export const ComponentParameter = {
         return componentParameter.name$;
       })
       .complete();
-  }
-}
+  },
+};

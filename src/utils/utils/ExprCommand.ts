@@ -1,19 +1,16 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
-import { firstValueFrom, switchMap } from "rxjs";
-import {
-  Component,
-  ComponentFactory,
-  type ComponentKind,
-} from "src/ex-object/Component";
+import { switchMap } from "rxjs";
+import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
-import { Expr, ExprFactory2, ExprParentFactory, type ExprKind } from "src/ex-object/Expr";
+import { Expr, ExprFactory2, type ExprKind } from "src/ex-object/Expr";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
-import { isOfVariant, isType } from "variant";
+import { isType } from "variant";
 
 const log55 = log5("ExprCommand.ts");
 
@@ -68,13 +65,17 @@ const ctxEffect = Effect.gen(function* () {
           });
         }
 
-        for await (const command of getExprCommands2(ctx, expr)) {
-          const blank = query === "";
-          const includes = command.label.includes(query);
-          if (blank || includes) {
-            commands.push(command);
+        const exprCommands = getExprCommands(expr);
+        Effect.promise(async () => {
+          for await (const command of exprCommands) {
+            const command2 = await DexRuntime.runPromise(command);
+            const blank = query === "";
+            const includes = command2.label.includes(query);
+            if (blank || includes) {
+              commands.push(command2);
+            }
           }
-        }
+        });
 
         return commands;
       });
@@ -82,111 +83,68 @@ const ctxEffect = Effect.gen(function* () {
   };
 });
 
-async function* getExprCommands2(exItem: Expr) {
-  for await (const ancestor of ExItem.getAncestors(exItem)) {
-    log55.debug("ancestor", ancestor.id);
-    const createReferenceExprCommand_ = (reference2: ExprKind["Reference"]) =>
-      createReferenceExprCommand(exItem, reference2, ancestor as any);
-
-    if (isType(ancestor, ExObjectFactory)) {
-      yield createReferenceExprCommand_(
-        yield* ExprFactory2.Reference({
-          target: ancestor.cloneCountProperty,
-        })
-      );
-
-      for (const property of ancestor.componentParameterProperties) {
-        const reference = await DexRuntime.runPromise(
-          ExprFactory2.Reference({ target: property })
-        );
-        yield createReferenceExprCommand_(reference);
-      }
-
-      for (const property of await firstValueFrom(ancestor.basicProperties$)) {
-        const reference = await DexRuntime.runPromise(
-          ExprFactory2.Reference({ target: property })
-        );
-        yield createReferenceExprCommand_(reference);
-      }
-    } else if (isType(ancestor, ComponentFactory.Custom)) {
-      for (const parameter of await firstValueFrom(ancestor.parameters$)) {
-        yield createReferenceExprCommand_(
-          await ExprFactory2.Reference(ctx, { target: parameter })
-        );
-      }
-
-      for (const property of await firstValueFrom(ancestor.properties$)) {
-        yield createReferenceExprCommand_(
-          await ExprFactory2.Reference(ctx, { target: property })
-        );
-      }
-    } else if (isType(ancestor, ExFuncFactory.Custom)) {
-      for (const parameter of await firstValueFrom(
-        ancestor.exFuncParameterArr$
-      )) {
-        log55.debug("parameter", parameter.id);
-        yield createReferenceExprCommand_(
-          await ExprFactory2.Reference(ctx, { target: parameter })
-        );
-      }
-    }
-  }
-}
-
 /**
  * @returns Generator of Effect. Not an Effect.
  */
-function* getReferences(ancestor: ExItem) {
-  if (isType(ancestor, ExObjectFactory)) {
-    const properties = ExObject.Methods(ancestor).properties;
-    for (const property of properties) {
-      yield* ExprFactory2.Reference({ target: property });
-    }
-  } else if (isType(ancestor, ComponentFactory.Custom)) {
-    for (const parameter of ancestor.parameters.items) {
-      yield* ExprFactory2.Reference({ target: parameter });
-    }
-
-    for (const property of ancestor.properties.items) {
-      yield* ExprFactory2.Reference({ target: property });
-    }
-  } else if (isType(ancestor, CustomExFuncFactory)) {
-    for (const parameter of ancestor.parameters.items) {
-      yield* ExprFactory2.Reference({ target: parameter });
-    }
+async function* getExprCommands(currentExpr: Expr) {
+  for await (const ancestor of ExItem.getAncestors(currentExpr)) {
+    yield* getExprCommands2(currentExpr, ancestor);
   }
 }
-
-function* createReferenceExprCommands(
-  currentExpr: Expr,
-  referenceExprs: Iterable<ExprKind["Reference"]>
-) {
+function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {
+  const referenceExprs = getReferences();
   for (const referenceExpr of referenceExprs) {
-    yield createReferenceExprCommand(currentExpr, referenceExpr);
+    yield Effect.gen(function* () {
+      const referenceExpr2 = yield* referenceExpr;
+      const target = (yield* referenceExpr).target;
+      assert(target !== null);
+      const name = yield* EffectUtils.firstValueFrom(
+        Expr.getReferenceTargetName$(target)
+      );
+
+      const targetParent = yield* EffectUtils.firstValueFrom(target.parent$);
+      let label;
+      if (isType(targetParent, ExObjectFactory)) {
+        const parentName = yield* EffectUtils.firstValueFrom(
+          targetParent.name$
+        );
+        label = `${parentName}.${name}`;
+      } else {
+        label = name;
+      }
+
+      return {
+        label,
+        execute() {
+          return Effect.gen(function* () {
+            yield* Expr.replaceExpr(currentExpr, referenceExpr2);
+          });
+        },
+      };
+    });
   }
-}
 
-async function createReferenceExprCommand(
-  currentExpr: Expr,
-  newExpr: ExprKind["Reference"]
-): Promise<ExprCommand> {
-  const parent = await firstValueFrom(currentExpr.parent$);
-  assert(isOfVariant(parent, ExprParentFactory));
+  /**
+   * @returns Generator of Effect. Not an Effect.
+   */
+  function* getReferences() {
+    if (isType(ancestor, ExObjectFactory)) {
+      const properties = ExObject.Methods(ancestor).properties;
+      for (const property of properties) {
+        yield ExprFactory2.Reference({ target: property });
+      }
+    } else if (isType(ancestor, ComponentFactory.Custom)) {
+      for (const parameter of ancestor.parameters.items) {
+        yield ExprFactory2.Reference({ target: parameter });
+      }
 
-  parent
-
-  const target = newExpr.target;
-  assert(target !== null);
-  const name = await firstValueFrom(Expr.getReferenceTargetName$(target));
-
-  const parentName = await firstValueFrom(parent.name$);
-  const label = `${parentName}.${name}`;
-  return {
-    label,
-    execute() {
-      return Effect.gen(function* () {
-        yield* Expr.replaceExpr(currentExpr, newExpr);
-      });
-    },
-  };
+      for (const property of ancestor.properties.items) {
+        yield ExprFactory2.Reference({ target: property });
+      }
+    } else if (isType(ancestor, CustomExFuncFactory)) {
+      for (const parameter of ancestor.parameters.items) {
+        yield ExprFactory2.Reference({ target: parameter });
+      }
+    }
+  }
 }
