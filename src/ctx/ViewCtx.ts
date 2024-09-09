@@ -21,7 +21,7 @@ export enum ViewMode {
   CanvasWindowMaximized,
 }
 
-export class ViewCtx extends Context.Tag("ViewCtx")<
+export class ViewCtx extends Effect.Tag("ViewCtx")<
   ViewCtx,
   DexEffectSuccess<typeof ctxEffect>
 >() {}

@@ -6,7 +6,7 @@ import type { DexEffectSuccess } from "src/utils/utils/Utils";
 
 const log55 = log5("ComponentCtx.ts");
 
-export class ComponentCtx extends Context.Tag("ComponentCtx")<
+export class ComponentCtx extends Effect.Tag("ComponentCtx")<
   ComponentCtx,
   DexEffectSuccess<typeof ctxEffect>
 >() {}

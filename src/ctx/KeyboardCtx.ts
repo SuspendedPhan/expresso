@@ -7,7 +7,7 @@ export enum KeyboardResult {
   OutOfScope,
 }
 
-export class KeyboardCtx extends Context.Tag("KeyboardCtx")<
+export class KeyboardCtx extends Effect.Tag("KeyboardCtx")<
   KeyboardCtx,
   DexEffectSuccess<typeof ctxEffect>
 >() {}

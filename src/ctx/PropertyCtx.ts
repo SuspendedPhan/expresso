@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import type { Property } from "src/ex-object/Property";
 import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
 
-export class PropertyCtx extends Context.Tag("PropertyCtx")<
+export class PropertyCtx extends Effect.Tag("PropertyCtx")<
   PropertyCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

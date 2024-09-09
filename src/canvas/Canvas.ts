@@ -139,5 +139,5 @@ export function CanvasFactory(args: PixiFactoryArgs) {
     }
   });
 
-  return Effect.provide(effect, Layer.merge(ProjectCtxLive, EvaluatorCtxLive));
+  return effect;
 }

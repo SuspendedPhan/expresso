@@ -3,7 +3,7 @@ import { ReplaySubject } from "rxjs";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 
-export class LibraryProjectCtx extends Context.Tag("LibraryProjectCtx")<
+export class LibraryProjectCtx extends Effect.Tag("LibraryProjectCtx")<
   LibraryProjectCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

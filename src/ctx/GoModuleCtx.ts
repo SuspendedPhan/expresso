@@ -1,7 +1,7 @@
 import { Context, Effect, Layer } from "effect";
 import type GoModule from "src/utils/utils/GoModule";
 
-export class GoModuleCtx extends Context.Tag("GoModuleCtx")<
+export class GoModuleCtx extends Effect.Tag("GoModuleCtx")<
   GoModuleCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

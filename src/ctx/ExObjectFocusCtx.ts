@@ -3,7 +3,7 @@ import { FocusCtx } from "src/ctx/FocusCtx";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { OBS } from "src/utils/utils/Utils";
 
-export class ExObjectFocusCtx extends Context.Tag("ExObjectFocusCtx")<
+export class ExObjectFocusCtx extends Effect.Tag("ExObjectFocusCtx")<
   ExObjectFocusCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

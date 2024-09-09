@@ -3,7 +3,7 @@ import { interval, Subject } from "rxjs";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import type { Evaluation } from "src/utils/utils/GoModule";
 
-export class EvaluatorCtx extends Context.Tag("EvaluatorCtx")<
+export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
   EvaluatorCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

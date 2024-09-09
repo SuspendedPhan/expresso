@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import type { Expr } from "src/ex-object/Expr";
 import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
 
-export class ExprCtx extends Context.Tag("ExprCtx")<
+export class ExprCtx extends Effect.Tag("ExprCtx")<
   ExprCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

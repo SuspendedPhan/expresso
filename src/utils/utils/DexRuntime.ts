@@ -1,9 +1,7 @@
-import { Console, Effect, Layer, ManagedRuntime } from "effect";
+import { Layer, ManagedRuntime } from "effect";
+import { ProjectCtxLive } from "src/ctx/ProjectCtx";
+import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 
-class MainCtx extends Effect.Tag("MainCtx")<
-  MainCtx,
-  { readonly notify: (message: string) => Effect.Effect<void> }
->() {
-}
+const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive);
 
-export const DexRuntime = ManagedRuntime.make(Layer.succeed());
+export const DexRuntime = ManagedRuntime.make(mainLayer);

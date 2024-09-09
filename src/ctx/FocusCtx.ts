@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
 import { type Focus, FocusFactory } from "src/focus/Focus";
 import type { OBS } from "src/utils/utils/Utils";
@@ -12,7 +12,7 @@ export enum Hotkeys {
   Right = "ArrowRight,d",
 }
 
-export class FocusCtx extends Context.Tag("FocusCtx")<
+export class FocusCtx extends Effect.Tag("FocusCtx")<
   FocusCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

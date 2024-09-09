@@ -8,7 +8,7 @@ export interface CommandCardData {
   visible$: OBS<boolean>;
 }
 
-export class CommandCardCtx extends Context.Tag("CommandCardCtx")<
+export class CommandCardCtx extends Effect.Tag("CommandCardCtx")<
   CommandCardCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}

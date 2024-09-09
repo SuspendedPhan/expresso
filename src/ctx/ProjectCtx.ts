@@ -4,7 +4,7 @@ import { LibraryProjectCtx, LibraryProjectCtxLive } from "src/ctx/LibraryProject
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
 
-export class ProjectCtx extends Context.Tag("ProjectCtx")<
+export class ProjectCtx extends Effect.Tag("ProjectCtx")<
   ProjectCtx,
   DexEffectSuccess<typeof ctxEffect>
 >() {}
