@@ -1,12 +1,14 @@
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { combineLatestWith, firstValueFrom, map } from "rxjs";
 import { ExObjectFocusCtx } from "src/ctx/ExObjectFocusCtx";
-import { FocusCtx } from "src/ctx/FocusCtx";
+import { FocusCtx, FocusCtxLive } from "src/ctx/FocusCtx";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
-import type { ExItem } from "src/ex-object/ExItem";
+import { ExItem } from "src/ex-object/ExItem";
+import { ExItemFocus } from "src/focus/ExItemFocus";
 import { FocusFactory } from "src/focus/Focus";
 import { CommandCardCtx } from "src/utils/utils/CommandCard";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { isType, pass, type VariantOf } from "variant";
 
@@ -42,7 +44,20 @@ export const EditorFocus = {
         )
       )
       .subscribe(async () => {
-        const exItem = await firstValueFrom(exObjectFocusCtx.exItemFocus$);
+        const effect = Effect.gen(function* () {
+          const exItem$ = yield* ExItemFocus.exItemBasicFocus$;
+          const exItem = yield* EffectUtils.firstValueFrom(exItem$);
+          focusCtx.setFocus(
+            EditorFocusFactory.EditorNewActions({
+              exItem: exItem === false ? null : exItem,
+            })
+          );
+        }).pipe(Effect.provide(Layer.provide(FocusCtxLive)));
+        
+        Effect.runPromise();
+        const exItem = await firstValueFrom(
+          yield * ExItemFocus.exItemBasicFocus$
+        );
         focusCtx.setFocus(
           EditorFocusFactory.EditorNewActions({
             exItem: exItem === false ? null : exItem,
