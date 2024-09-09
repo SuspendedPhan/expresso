@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MainContext from "src/main-context/MainContext";
   import { Constants } from "../utils/ViewUtils";
   import LibraryProjectView from "./LibraryProjectView.svelte";
   import { switchMap } from "rxjs";

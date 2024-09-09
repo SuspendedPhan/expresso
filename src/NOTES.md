@@ -3,23 +3,23 @@ Keyboard shortcuts
 ---
 
 # Project components
-Add component
-Add root object
+Add component - c
+Add root object - r
 
 # Project functions
-Add function
-Add parameter
+Add function - f
+Add parameter - m
 
 # Editor
-New project
-Add root object
+New project - n
+Add root object - r
 
 # Object
-Add property
-Add child object
-Add component*
+Add property - p
+Add child object - o
+Add component* - c
 
 # Component
-Add root object
-Add parameter
-Add property
+Add root object - r
+Add parameter - m
+Add property - p

@@ -1,5 +1,3 @@
-import type MainContext from "src/main-context/MainContext";
-import { DexWindow } from "src/main-context/MainViewContext";
 import { log5 } from "src/utils/utils/Log5";
 import type { DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { isType, scoped, variant, type VariantOf } from "variant";

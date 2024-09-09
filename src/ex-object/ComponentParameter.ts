@@ -1,6 +1,5 @@
 import { BehaviorSubject, of } from "rxjs";
 import type { CanvasSetter } from "src/ex-object/Component";
-import type MainContext from "src/main-context/MainContext";
 import { type OBS, type SUB, Utils } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,

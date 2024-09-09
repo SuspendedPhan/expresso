@@ -1,6 +1,6 @@
 <script lang="ts">
   import { of } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+
   import { type NavSection } from "../utils/Nav";
   import NavCollapsedItemView from "./NavCollapsedItemView.svelte";
 

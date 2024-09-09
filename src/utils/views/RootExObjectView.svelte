@@ -2,7 +2,7 @@
   import { ResizeSensor } from "css-element-queries";
   import { first } from "rxjs";
   import type { ExObject } from "src/ex-object/ExObject";
-  import MainContext from "src/main-context/MainContext";
+
   import ExObjectLayout from "src/utils/layout/ExObjectLayout";
   import ExObjectView from "src/utils/views/ExObjectView.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";

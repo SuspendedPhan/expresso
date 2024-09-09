@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
   import { of, ReplaySubject } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import MainContext from "src/main-context/MainContext";
   import { type NavItem } from "../utils/Nav";
   import { map, of } from "rxjs";
 

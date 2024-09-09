@@ -1,6 +1,6 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import MainContext from "src/main-context/MainContext";
+
   import { type NavItem } from "../utils/Nav";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
   export let ctx: MainContext;

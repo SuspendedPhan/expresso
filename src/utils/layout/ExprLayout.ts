@@ -1,5 +1,5 @@
 import { type Expr, ExprType } from "src/ex-object/ExItem";
-import MainContext from "src/main-context/MainContext";
+
 import { ElementLayout } from "./ElementLayout";
 
 export default class ComponentLayout {
