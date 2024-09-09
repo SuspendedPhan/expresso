@@ -15,44 +15,42 @@ export class KeyboardCtx extends Effect.Tag("KeyboardCtx")<
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
 
-  function onKeydown$<T>(keys: string, data$: OBS<T | false>) {
-    return onKeydown2$({ keys, data$ });
-  }
-
-  function onKeydown2$<T>(data: {
-    keys: string;
-    data$: OBS<T | false>;
-    preventDefault?: boolean;
-  }) {
-    const { keys, data$, preventDefault = false } = data;
-    
-    const keyArr = keys.split(",");
-
-    return data$.pipe(
-      switchMap((data) => {
-        if (data === false) {
-          return of();
-        }
-
-        return fromEvent<KeyboardEvent>(window, "keydown").pipe(
-          filter((event) => {
-            const matches = keyArr.includes(event.key);
-            if (matches) {
-              if (preventDefault) {
-                event.preventDefault();
-              }
-            }
-            return matches;
-          }),
-          map(() => data)
-        );
-      })
-    );
-  }
-
   return {
-    onKeydown$,
-    onKeydown2$,
+    onKeydown$<T>(keys: string, data$: OBS<T | false>): OBS<T> {
+      return this.onKeydown2$({ keys, data$ });
+    },
+
+    onKeydown2$<T>(data: {
+      keys: string;
+      data$: OBS<T | false>;
+      preventDefault?: boolean;
+    }): OBS<T> {
+      const { keys, data$, preventDefault = false } = data;
+
+      const keyArr = keys.split(",");
+
+      return data$.pipe(
+        switchMap((data) => {
+          if (data === false) {
+            return of();
+          }
+
+          return fromEvent<KeyboardEvent>(window, "keydown").pipe(
+            filter((event) => {
+              const matches = keyArr.includes(event.key);
+              if (matches) {
+                if (preventDefault) {
+                  event.preventDefault();
+                }
+              }
+              return matches;
+            }),
+            map(() => data)
+          );
+        })
+      );
+    },
+
     registerCancel: <T>(data$: OBS<T | false>) => {
       onKeydown$("Escape", data$).subscribe(() => {
         focusCtx.popFocus();
@@ -61,8 +59,4 @@ const ctxEffect = Effect.gen(function* () {
   };
 });
 
-export const KeyboardCtxLive = Layer.effect(
-  KeyboardCtx,
-  ctxEffect
-);
-
+export const KeyboardCtxLive = Layer.effect(KeyboardCtx, ctxEffect);

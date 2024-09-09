@@ -1,14 +1,16 @@
 import assert from "assert-ts";
+import { Effect } from "effect";
 import { firstValueFrom } from "rxjs";
+import { ExObjectFocusCtx } from "src/ctx/ExObjectFocusCtx";
+import { FocusCtx, Hotkeys } from "src/ctx/FocusCtx";
+import { KeyboardCtx } from "src/ctx/KeyboardCtx";
+import type { ExObject } from "src/ex-object/ExObject";
+import type { Expr } from "src/ex-object/Expr";
 import { type Property } from "src/ex-object/Property";
+import { ExItemFocus } from "src/focus/ExItemFocus";
 import { log5 } from "src/utils/utils/Log5";
-import { type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { pass, type VariantOf } from "variant";
-import type { Expr } from "src/ex-object/Expr";
-import { Hotkeys } from "src/ctx/FocusCtx";
-import type { ExItem } from "src/ex-object/ExItem";
-import type { ExObject } from "src/ex-object/ExObject";
 
 const log55 = log5("ExObjectFocus.ts");
 
@@ -18,8 +20,8 @@ interface ExObjectFocus_ {
   Component: { exObject: ExObject };
   PropertyName: { property: Property; isEditing: boolean };
 
-  ExObjectRefactorCommand: { exObject: ExObject },
-  ExprRefactorCommand: { expr: Expr },
+  ExObjectRefactorCommand: { exObject: ExObject };
+  ExprRefactorCommand: { expr: Expr };
 }
 
 export const ExObjectFocusFactory = dexVariant.scoped("ExObjectFocus")(
@@ -37,174 +39,16 @@ export const ExObjectFocusFactory = dexVariant.scoped("ExObjectFocus")(
 export type ExObjectFocus = VariantOf<typeof ExObjectFocusFactory>;
 export type ExObjectFocusKind = DexVariantKind<typeof ExObjectFocusFactory>;
 
-export function createExObjectFocusContext(ctx: MainContext) {
-  const { focusCtx } = ctx;
-
-  function mapExObjectFocus$(
-    focusKindCheck: (obj: any) => boolean
-  ): OBS<ExObject | false> {
-    return ctx.focusCtx.mapFocus$((focus) => {
-      if (!focusKindCheck(focus)) {
-        return false;
-      }
-      return (focus as any).exObject;
-    });
-  }
-
-  async function* getProperties(exObject: ExObject): AsyncGenerator<Property> {
-    const basicProperties = await firstValueFrom(exObject.basicProperties);
-    yield exObject.cloneCountProperty;
-    for (const property of exObject.componentParameterProperties) {
-      yield property;
-    }
-    for (const property of basicProperties) {
-      yield property;
-    }
-  }
-
-  async function getNextProperty(property: Property): Promise<Property | null> {
-    const exObject = await firstValueFrom(property.parent$);
-    assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-    let found = false;
-    for await (const p of getProperties(exObject)) {
-      if (found) {
-        return p;
-      }
-      if (p === property) {
-        found = true;
-      }
-    }
-    return null;
-  }
-
-  return {
-    get exObjectFocus$() {
-      return mapExObjectFocus$(FocusKind.is.ExObject);
-    },
-
-    get nameFocus$() {
-      return mapExObjectFocus$(FocusKind.is.ExObjectName);
-    },
-
-    get componentFocus$() {
-      return mapExObjectFocus$(FocusKind.is.ExObjectComponent);
-    },
-
-    get propertyFocus$() {
-      return ctx.focusCtx.mapFocus$((focus) => {
-        return FocusKind.is.Property(focus) ? focus.property : false;
-      });
-    },
-
-    getNextProperty,
-
-    async prevProperty(property: Property): Promise<Property | null> {
-      const exObject = await firstValueFrom(property.parent$);
-      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-      let prev = null;
-      for await (const p of getProperties(exObject)) {
-        if (p === property) {
-          return prev;
-        }
-        prev = p;
-      }
-      return null;
-    },
-
-    async focusNextExItem(property: Property) {
-      const nextProperty = await getNextProperty(property);
-      if (nextProperty !== null) {
-        focusCtx.setFocus(FocusKind.Property({ property: nextProperty }));
-        return;
-      }
-
-      const exObject = await firstValueFrom(property.parent$);
-      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-
-      // Find the first child exObject
-      const children = await firstValueFrom(exObject.children$);
-      const child = children[0];
-      if (child !== undefined) {
-        focusCtx.setFocus(FocusKind.ExObject({ exObject: child }));
-        return;
-      }
-
-      // Find the next root object
-      const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const rootExObject = await ExObjectFns.getRootExObject(exObject);
-      const rootExObjects = await firstValueFrom(project.rootExObjects$);
-      const index = rootExObjects.indexOf(rootExObject);
-      assert(index !== -1);
-      const nextIndex = index + 1;
-      const nextRootExObject = rootExObjects[nextIndex];
-      if (nextRootExObject !== undefined) {
-        focusCtx.setFocus(FocusKind.ExObject({ exObject: nextRootExObject }));
-        return;
-      }
-    },
-
-    async focusPrevExItem(property: Property) {
-      const prevProperty = await this.prevProperty(property);
-      if (prevProperty !== null) {
-        focusCtx.setFocus(FocusKind.Property({ property: prevProperty }));
-        return;
-      }
-
-      const exObject = await firstValueFrom(property.parent$);
-      assert(exObject !== null && exObject.itemType === ExItemType.ExObject);
-
-      // Find the parent exObject
-      const parent = await firstValueFrom(exObject.parent$);
-      if (parent !== null) {
-        assert(parent.itemType === ExItemType.ExObject);
-        focusCtx.setFocus(FocusKind.ExObject({ exObject: parent }));
-        return;
-      }
-
-      // Find the previous root object
-      const project = await firstValueFrom(ctx.projectManager.currentProject$);
-      const rootExObject = await ExObjectFns.getRootExObject(exObject);
-      const rootExObjects = await firstValueFrom(project.rootExObjects$);
-      const index = rootExObjects.indexOf(rootExObject);
-      assert(index !== -1);
-      const prevIndex = index - 1;
-      const prevRootExObject = rootExObjects[prevIndex];
-      if (prevRootExObject !== undefined) {
-        focusCtx.setFocus(FocusKind.ExObject({ exObject: prevRootExObject }));
-        return;
-      }
-    },
-
-    async getNextExItem(property: Property): Promise<ExItem | null> {
-      const nextProperty = await getNextProperty(property);
-      return nextProperty;
-    },
-
-    get exItemFocus$() {
-      return ctx.focusCtx.mapFocus$((focus) => {
-        const exItem: ExItem | false = FocusKind.match(focus, {
-          ExObject: ({ exObject }) => exObject as ExItem | false,
-          ExObjectName: ({ exObject }) => exObject,
-          ExObjectComponent: ({ exObject }) => exObject,
-          Property: ({ property }) => property,
-          Expr: ({ expr }) => expr,
-          default: () => false,
-        });
-        return exItem;
-      });
-    },
-  };
-}
-
-export namespace ExObjectFocusFuncs {
-  export async function register(ctx: MainContext) {
-    const { focusCtx, keyboardCtx } = ctx;
-    const { exObjectFocusCtx } = ctx;
+export const ExObjectFocus = {
+  register: Effect.gen(function* () {
+    const keyboardCtx = yield* KeyboardCtx;
+    const focusCtx = yield* FocusCtx;
+    const exObjectFocusCtx = yield* ExObjectFocusCtx;
 
     // New Actions
 
     keyboardCtx
-      .onKeydown$("n", exObjectFocusCtx.exItemFocus$)
+      .onKeydown$("n", yield* ExItemFocus.exItemBasicFocus$)
       .subscribe(async (exItem) => {
         focusCtx.setFocus(FocusKind.ExItemNewActions({ exItem }));
       });
@@ -366,5 +210,5 @@ export namespace ExObjectFocusFuncs {
           focusCtx.setFocus(FocusKind.Property({ property: prevProperty }));
         }
       });
-  }
-}
+  }),
+};
