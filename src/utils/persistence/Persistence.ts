@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Observable } from "rxjs";
 import type { DehydratedProject } from "../hydration/Dehydrator";
 import type { OBS } from "../utils/Utils";

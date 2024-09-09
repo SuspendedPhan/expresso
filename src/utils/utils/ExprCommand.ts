@@ -1,25 +1,33 @@
 import assert from "assert-ts";
+import { Effect } from "effect";
 import { firstValueFrom, switchMap } from "rxjs";
-import { ComponentFactory, type ComponentKind } from "src/ex-object/Component";
-import { ExFuncFactory } from "src/ex-object/ExFunc";
-import { ExItemFn } from "src/ex-object/ExItem";
-import { ExObjectFactory, type ExObject } from "src/ex-object/ExObject";
-import { Expr, ExprFactory2, type ExprKind } from "src/ex-object/Expr";
-import type MainContext from "src/main-context/MainContext";
+import {
+  Component,
+  ComponentFactory,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
+import { ExItem } from "src/ex-object/ExItem";
+import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
+import { Expr, ExprFactory2, ExprParentFactory, type ExprKind } from "src/ex-object/Expr";
+import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
-import { isType } from "variant";
+import { isOfVariant, isType } from "variant";
 
 const log55 = log5("ExprCommand.ts");
-
-export type ExprCommandCtx = ReturnType<typeof createExprCommandCtx>;
 
 export interface ExprCommand {
   label: string;
   execute: () => void;
 }
 
-export function createExprCommandCtx(ctx: MainContext) {
+export class ExprCommandCtx extends Effect.Tag("ExprCommandCtx")<
+  ExprCommandCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
+
+const ctxEffect = Effect.gen(function* () {
   return {
     getReplacementCommands$(expr: Expr, query$: OBS<string>) {
       return query$.pipe(
@@ -28,68 +36,77 @@ export function createExprCommandCtx(ctx: MainContext) {
         })
       );
     },
+
+    getCommands(query: string, expr: Expr) {
+      return Effect.gen(function* () {
+        const commands: ExprCommand[] = [];
+        const value = parseFloat(query);
+        if (!isNaN(value)) {
+          commands.push({
+            label: `${value}`,
+            execute: () => {
+              return Effect.gen(function* () {
+                const numberExpr = yield* ExprFactory2.Number({ value });
+                yield* Expr.replaceExpr(expr, numberExpr);
+              });
+            },
+          });
+        }
+
+        if (query === "+") {
+          commands.push({
+            label: "+",
+            execute: () => {
+              return Effect.gen(function* () {
+                const systemExFunc = SystemExFuncFactory.Add();
+                const callExpr = yield* ExprFactory2.Call({
+                  exFunc: systemExFunc,
+                });
+                yield* Expr.replaceExpr(expr, callExpr);
+              });
+            },
+          });
+        }
+
+        for await (const command of getExprCommands2(ctx, expr)) {
+          const blank = query === "";
+          const includes = command.label.includes(query);
+          if (blank || includes) {
+            commands.push(command);
+          }
+        }
+
+        return commands;
+      });
+    },
   };
+});
 
-  async function getCommands(
-    query: string,
-    expr: Expr
-  ): Promise<ExprCommand[]> {
-    const commands: ExprCommand[] = [];
-    const value = parseFloat(query);
-    if (!isNaN(value)) {
-      commands.push({
-        label: `${value}`,
-        execute: () => {
-          ctx.mutator.replaceWithNumberExpr(expr, value);
-        },
-      });
-    }
-
-    if (query === "+") {
-      commands.push({
-        label: "+",
-        execute: () => {
-          ctx.mutator.replaceWithCallExpr(expr);
-        },
-      });
-    }
-
-    for await (const command of getExprCommands2(ctx, expr)) {
-      const blank = query === "";
-      const includes = command.label.includes(query);
-      if (blank || includes) {
-        commands.push(command);
-      }
-    }
-
-    return commands;
-  }
-}
-
-async function* getExprCommands2(
-  ctx: MainContext,
-  exItem: Expr
-): AsyncGenerator<ExprCommand, void, undefined> {
-  for await (const ancestor of ExItemFn.getAncestors(exItem)) {
+async function* getExprCommands2(exItem: Expr) {
+  for await (const ancestor of ExItem.getAncestors(exItem)) {
     log55.debug("ancestor", ancestor.id);
     const createReferenceExprCommand_ = (reference2: ExprKind["Reference"]) =>
-      createReferenceExprCommand(ctx, exItem, reference2, ancestor as any);
+      createReferenceExprCommand(exItem, reference2, ancestor as any);
 
-    if (isType(ancestor, ExObjectFactory.Basic)) {
+    if (isType(ancestor, ExObjectFactory)) {
       yield createReferenceExprCommand_(
-        await ExprFactory2.Reference(ctx, { target: ancestor.cloneCountProperty })
+        yield* ExprFactory2.Reference({
+          target: ancestor.cloneCountProperty,
+        })
       );
 
       for (const property of ancestor.componentParameterProperties) {
-        yield createReferenceExprCommand_(
-          await ExprFactory2.Reference(ctx, { target: property })
+        const reference = await DexRuntime.runPromise(
+          ExprFactory2.Reference({ target: property })
         );
+        yield createReferenceExprCommand_(reference);
       }
 
       for (const property of await firstValueFrom(ancestor.basicProperties$)) {
-        yield createReferenceExprCommand_(
-          await ExprFactory2.Reference(ctx, { target: property })
+        const reference = await DexRuntime.runPromise(
+          ExprFactory2.Reference({ target: property })
         );
+        yield createReferenceExprCommand_(reference);
       }
     } else if (isType(ancestor, ComponentFactory.Custom)) {
       for (const parameter of await firstValueFrom(ancestor.parameters$)) {
@@ -116,12 +133,48 @@ async function* getExprCommands2(
   }
 }
 
-async function createReferenceExprCommand(
-  ctx: MainContext,
+/**
+ * @returns Generator of Effect. Not an Effect.
+ */
+function* getReferences(ancestor: ExItem) {
+  if (isType(ancestor, ExObjectFactory)) {
+    const properties = ExObject.Methods(ancestor).properties;
+    for (const property of properties) {
+      yield* ExprFactory2.Reference({ target: property });
+    }
+  } else if (isType(ancestor, ComponentFactory.Custom)) {
+    for (const parameter of ancestor.parameters.items) {
+      yield* ExprFactory2.Reference({ target: parameter });
+    }
+
+    for (const property of ancestor.properties.items) {
+      yield* ExprFactory2.Reference({ target: property });
+    }
+  } else if (isType(ancestor, CustomExFuncFactory)) {
+    for (const parameter of ancestor.parameters.items) {
+      yield* ExprFactory2.Reference({ target: parameter });
+    }
+  }
+}
+
+function* createReferenceExprCommands(
   currentExpr: Expr,
-  newExpr: ExprKind["Reference"],
-  parent: ExObject | ComponentKind["Custom"]
+  referenceExprs: Iterable<ExprKind["Reference"]>
+) {
+  for (const referenceExpr of referenceExprs) {
+    yield createReferenceExprCommand(currentExpr, referenceExpr);
+  }
+}
+
+async function createReferenceExprCommand(
+  currentExpr: Expr,
+  newExpr: ExprKind["Reference"]
 ): Promise<ExprCommand> {
+  const parent = await firstValueFrom(currentExpr.parent$);
+  assert(isOfVariant(parent, ExprParentFactory));
+
+  parent
+
   const target = newExpr.target;
   assert(target !== null);
   const name = await firstValueFrom(Expr.getReferenceTargetName$(target));
@@ -130,8 +183,10 @@ async function createReferenceExprCommand(
   const label = `${parentName}.${name}`;
   return {
     label,
-    execute: async () => {
-      ctx.mutator.replaceExpr(currentExpr, newExpr);
+    execute() {
+      return Effect.gen(function* () {
+        yield* Expr.replaceExpr(currentExpr, newExpr);
+      });
     },
   };
 }

@@ -1,10 +1,11 @@
+import assert from "assert-ts";
 import { Effect } from "effect";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import type { ExFunc } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory, type ExFunc } from "src/ex-object/ExFunc";
 import {
   ExFuncParameterFactory,
   type ExFuncParameter,
@@ -13,6 +14,7 @@ import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
+  assertUnreachable,
   createBehaviorSubjectWithLifetime,
   Utils,
   type SUB,
@@ -21,7 +23,7 @@ import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, isOfVariant, isType, type VariantOf } from "variant";
+import { fields, isOfVariant, isType, variant, type VariantOf } from "variant";
 
 export type ReferenceTarget =
   | Property
@@ -151,53 +153,54 @@ export const Expr = {
       throw new Error("Property not found");
     });
   },
+
+  replaceExpr(oldExpr: Expr, newExpr: Expr) {
+    return Effect.gen(function* () {
+      const parent = yield* EffectUtils.firstValueFrom(oldExpr.parent$);
+      if (!parent) {
+        throw new Error("oldExpr.parent$ is null");
+      }
+
+      if (isOfVariant(parent, PropertyFactory)) {
+        parent.expr$.next(newExpr);
+      } else if (isOfVariant(parent, ExprFactory)) {
+        assert(isType(parent, ExprFactory.Call));
+
+        const args = yield* EffectUtils.firstValueFrom(parent.args$);
+        const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
+        parent.args$.next(newArgs);
+      } else if (isType(parent, CustomExFuncFactory)) {
+        parent.expr$.next(newExpr);
+      } else {
+        throw new Error("Unexpected itemType");
+      }
+
+      newExpr.parent$.next(parent);
+    });
+  },
 };
 
-// public async replaceExpr(oldExpr: Expr, newExpr: Expr) {
-//   const parent = await firstValueFrom(oldExpr.parent$);
-//   this.replaceExpr2(parent, oldExpr, newExpr);
-// }
+export const ExprParentFactory = variant([
+  ExprFactory.Call,
+  ComponentParameterFactory.Custom,
+  CustomExFuncFactory,
+  ...Object.values(PropertyFactory),
+]);
 
-// public replaceExpr2(parent: Parent, oldExpr: Expr, newExpr: Expr) {
-//   if (parent === null) {
-//     throw new Error("oldExpr.parent$ is null");
-//   }
+export type ExprParent = VariantOf<typeof ExprParentFactory>;
 
-//   switch (parent.itemType) {
-//     case ExItemType.Property: {
-//       parent.expr$.next(newExpr);
-//       break;
-//     }
-//     case ExItemType.Expr: {
-//       switch (parent.exprType) {
-//         case ExprType.CallExpr: {
-//           const expr = parent;
-//           expr.args$.pipe(first()).subscribe((args) => {
-//             const newArgs = args.map((arg) =>
-//               arg === oldExpr ? newExpr : arg
-//             );
-//             expr.args$.next(newArgs);
-//           });
-//           break;
-//         }
-//         default:
-//           console.error("Unexpected exprType", parent.exprType);
-//       }
-//       break;
-//     }
-//     case ExItemType.ExFunc: {
-//       const exFunc = parent;
-//       exFunc.expr$.next(newExpr);
-//       log55.debug("replaced expr in exFunc");
-//       break;
-//     }
-//     default:
-//       assertUnreachable;
-//   }
-
-//   newExpr.parent$.next(parent);
-//   (this.ctx.eventBus.exprReplaced$ as Subject<ExprReplacement>).next({
-//     oldExpr,
-//     newExpr,
-//   });
-// }
+export const ExprParent = {
+  Methods: (parent: ExprParent) => ({
+    label$: Effect.gen(function* () {
+      if (isOfVariant(parent, PropertyFactory)) {
+        return Property.Methods(parent).getName$();
+      } else if (isType(parent, ComponentParameterFactory.Custom)) {
+        return parent.name$;
+      } else if (isType(parent, CustomExFuncFactory)) {
+        return parent.name$;
+      } else if (isOfVariant(parent, ExprFactory)) {
+        
+      }
+    })
+  }),
+};
