@@ -1,14 +1,18 @@
 <script lang="ts">
+  import assert from "assert-ts";
+  import { Effect } from "effect";
   import {
     BehaviorSubject,
     combineLatest,
     firstValueFrom,
     map,
-    share,
+    mergeAll,
     shareReplay,
     switchMap,
   } from "rxjs";
-  import type { Expr } from "src/ex-object/ExItem";
+  import type { Expr } from "src/ex-object/Expr";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { ExprCommandCtx } from "src/utils/utils/ExprCommand";
 
   import { log5 } from "src/utils/utils/Log5";
   import {
@@ -22,26 +26,36 @@
   const log55 = log5("ExprCommand.svelte");
 
   export let expr: Expr;
-  export let ctx: MainContext;
 
   let input: HTMLInputElement;
 
-  onMount(() => {
-    const sub = ctx.eventBus.submitExprReplaceCommand$.subscribe(async () => {
+  RxFns.onMount$().pipe(
+    switchMap(() => {
+      return DexRuntime.runPromise(ExprCommandCtx.onSubmitExprCommand$);
+    }),
+    map(async () => {
       const cmd = await firstValueFrom(selectedCmd$);
       if (cmd) {
         cmd.execute();
       }
-    });
-
-    return () => {
-      sub.unsubscribe();
-    };
-  });
+    })
+  );
 
   const query$ = new BehaviorSubject<string>("");
   const cmds$ = RxFns.onMount$().pipe(
-    switchMap(() => ctx.exprCommandCtx.getReplacementCommands$(expr, query$)),
+    switchMap(async () => {
+      const result = DexRuntime.runPromise(
+        Effect.gen(function* () {
+          const commands = yield* ExprCommandCtx.getReplacementCommands$(
+            expr,
+            query$
+          );
+          return commands;
+        })
+      );
+      return await result;
+    }),
+    mergeAll(),
     shareReplay(1)
   );
 
@@ -52,10 +66,12 @@
 
   const selectedCmd$ = combineLatest([cmds$, selectedIndex$]).pipe(
     map(([cmds, selectedIndex]) => {
-      if (selectedIndex === null) {
-        return null;
+      if (selectedIndex !== null) {
+        const cmd = cmds[selectedIndex];
+        assert(cmd !== undefined);
+        return cmd;
       }
-      return cmds[selectedIndex];
+      return null;
     })
   );
 

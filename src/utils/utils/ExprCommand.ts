@@ -1,11 +1,11 @@
 import assert from "assert-ts";
-import { Effect } from "effect";
-import { switchMap } from "rxjs";
+import { Effect, Layer } from "effect";
+import { Observable, Subject, switchMap } from "rxjs";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
-import { Expr, ExprFactory2, type ExprKind } from "src/ex-object/Expr";
+import { Expr, ExprFactory2 } from "src/ex-object/Expr";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
@@ -26,10 +26,16 @@ export class ExprCommandCtx extends Effect.Tag("ExprCommandCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    getReplacementCommands$(expr: Expr, query$: OBS<string>) {
+    onSubmitExprCommand$: new Subject<void>(),
+
+    getReplacementCommands$(
+      expr: Expr,
+      query$: OBS<string>
+    ): Observable<ExprCommand[]> {
       return query$.pipe(
-        switchMap((query) => {
-          return getCommands(query, expr);
+        switchMap(async (query) => {
+          const commands = this.getCommands(query, expr);
+          return DexRuntime.runPromise(commands);
         })
       );
     },
@@ -148,3 +154,5 @@ function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {
     }
   }
 }
+
+export const ExprCommandCtxLive = Layer.effect(ExprCommandCtx, ctxEffect);
