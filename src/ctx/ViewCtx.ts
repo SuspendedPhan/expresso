@@ -103,7 +103,7 @@ const ctxEffect = Effect.gen(function* () {
     activeWindow$: new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor),
     navCollapsed$: new BehaviorSubject<boolean>(false),
     navSections: [section0, section1, section2],
-    viewMode$: ViewMode.Default,
+    viewMode$: new BehaviorSubject<ViewMode>(ViewMode.Default),
 
     activeWindowEqualTo$(window: DexWindow) {
         return this.activeWindow$.pipe(map((w) => w === window));
