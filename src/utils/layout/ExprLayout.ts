@@ -1,38 +1,38 @@
-import { type Expr, ExprType } from "src/ex-object/ExItem";
 
+import { Effect } from "effect";
+import { ExprCtx } from "src/ctx/ExprCtx";
+import { ExprFactory, type Expr } from "src/ex-object/Expr";
+import { isType } from "variant";
 import { ElementLayout } from "./ElementLayout";
 
-export default class ComponentLayout {
-  public static create(ctx: MainContext, rootExpr: Expr): ElementLayout {
+export function createComponentLayout(rootExpr: Expr) {
+  return Effect.gen(function* () {
     const childrenByExpr = new Map<Expr, readonly Expr[]>();
 
-    ctx.eventBus.exprAdded$.subscribe((expr) => {
-      switch (expr.exprType) {
-        case ExprType.NumberExpr:
-          break;
-        case ExprType.CallExpr:
-          expr.args$.subscribe((args) => {
-            childrenByExpr.set(expr, args);
-          });
-          break;
-        default:
-          console.error(`Unexpected exprType: ${expr.exprType}`);
+    function getChildren(expr: Expr) {
+      return childrenByExpr.get(expr) ?? [];
+    }
+
+    (yield* ExprCtx.exprs).events$.subscribe((event) => {
+      if (event.type !== "ItemAdded") {
+        return;
+      }
+
+      const expr = event.item;
+      if (isType(expr, ExprFactory.Call)) {
+        expr.args$.subscribe((args) => {
+          childrenByExpr.set(expr, args);
+        });
       }
     });
-
+    
     return new ElementLayout(
       () => rootExpr,
-      (component) => this.getChildren(component, childrenByExpr),
-      (component) => component.id,
-      8,
-      8
+      (expr) => getChildren(expr),
+      (expr) => expr.id,
+      16,
+      16
     );
-  }
-
-  static getChildren(
-    component: Expr,
-    childrenByComponent: Map<Expr, readonly Expr[]>
-  ): readonly Expr[] {
-    return childrenByComponent.get(component) ?? [];
-  }
+  });
 }
+

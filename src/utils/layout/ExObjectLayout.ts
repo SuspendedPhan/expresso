@@ -7,7 +7,7 @@ export function createExObjectLayout(rootExObject: ExObject) {
   return Effect.gen(function* () {
     const childrenByExObject = new Map<ExObject, readonly ExObject[]>();
 
-    function getChildren(exObject: ExObject, childrenByExObject: Map<ExObject, readonly ExObject[]>) {
+    function getChildren(exObject: ExObject) {
       return childrenByExObject.get(exObject) ?? [];
     }
 
@@ -24,7 +24,7 @@ export function createExObjectLayout(rootExObject: ExObject) {
     
     return new ElementLayout(
       () => rootExObject,
-      (exObject) => getChildren(exObject, childrenByExObject),
+      (exObject) => getChildren(exObject),
       (exObject) => exObject.id,
       16,
       16
