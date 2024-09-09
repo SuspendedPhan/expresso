@@ -1,6 +1,6 @@
 <script lang="ts">
   import { map } from "rxjs";
-  import Main from "src/utils/utils/Main";
+  import Main from "src/utils/utils/DexRuntime";
   import AppLayoutView from "./AppLayoutView.svelte";
 
   const main$ = Main.setup$();

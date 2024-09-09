@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { Effect } from "effect";
   import { CanvasFactory } from "src/canvas/Canvas";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { onMount } from "svelte";
   let viewportElement: HTMLDivElement;
   let canvasElement: HTMLCanvasElement;
 
   onMount(() => {
-    Effect.runPromise(CanvasFactory({ viewportElement, canvasElement }));
+    DexRuntime.runPromise(CanvasFactory({ viewportElement, canvasElement }));
   });
 </script>
 

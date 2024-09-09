@@ -7,7 +7,7 @@ import Rehydrator from "src/utils/hydration/Rehydrator";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import type MainContext from "src/main-context/MainContext";
-import type Main from "./Main";
+import type Main from "./DexRuntime";
 
 export default class HydrationTest {
   @loggedMethod
