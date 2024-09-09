@@ -1,5 +1,5 @@
 
-import { FocusKind } from "src/utils/focus/FocusKind";
+
 import type { NavSection } from "src/utils/utils/Nav";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { pass, type VariantOf } from "variant";

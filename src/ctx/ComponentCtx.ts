@@ -1,4 +1,4 @@
-import { Context, Effect, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { CanvasComponentStore } from "src/ex-object/Component";
 import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { log5 } from "src/utils/utils/Log5";

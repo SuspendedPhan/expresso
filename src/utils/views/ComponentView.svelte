@@ -2,7 +2,7 @@
   import { of } from "rxjs";
   import { ComponentFns, type ComponentKind } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/focus/FocusKind";
+
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import Divider from "src/utils/views/Divider.svelte";

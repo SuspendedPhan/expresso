@@ -2,7 +2,7 @@
   import { ComponentFns } from "src/ex-object/Component";
   import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/focus/FocusKind";
+
   import { rxEquals, type OBS } from "src/utils/utils/Utils";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";

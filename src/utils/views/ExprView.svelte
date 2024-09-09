@@ -1,14 +1,11 @@
 <script lang="ts">
   import { map, of, type Observable } from "rxjs";
-  import { ExprType, type Expr } from "src/ex-object/ExItem";
-  import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/focus/FocusKind";
+
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import { log5 } from "src/utils/utils/Log5";
-  import { CallExprKind } from "src/ex-object/CallExpr";
 
   const log55 = log5("ExprView.svelte");
 

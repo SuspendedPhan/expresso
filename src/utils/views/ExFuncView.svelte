@@ -2,7 +2,7 @@
   import { map, of } from "rxjs";
   import type { ExFunc } from "src/ex-object/ExFunc";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/focus/FocusKind";
+
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
   import ExFuncParameterView from "src/utils/views/ExFuncParameterView.svelte";

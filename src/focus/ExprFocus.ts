@@ -7,7 +7,7 @@ import { log5 } from "src/utils/utils/Log5";
 import { ArrayFns, RxFns, type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { pass, type VariantOf } from "variant";
-import { FocusKind } from "./FocusKind";
+
 
 const log55 = log5("ExprFocus.ts");
 

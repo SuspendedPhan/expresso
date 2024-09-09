@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { CustomComponentParameter } from "src/ex-object/Component";
   import type MainContext from "src/main-context/MainContext";
-  import { FocusKind } from "src/utils/focus/FocusKind";
+
   import { createFieldValueData } from "src/utils/views/Field";
   import FieldValue from "src/utils/views/FieldValue.svelte";
 
