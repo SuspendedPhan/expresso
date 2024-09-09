@@ -6,7 +6,7 @@
   import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
   import { activeWindowToSvelteComponent } from "../utils/ViewUtils";
   import NavMenuView from "./NavMenuView.svelte";
-  import { ViewMode } from "src/main-context/MainViewContext";
+
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
 

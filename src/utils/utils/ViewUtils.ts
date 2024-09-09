@@ -1,4 +1,4 @@
-import { DexWindow } from "src/main-context/MainViewContext";
+
 import LibraryFunctionListView from "src/utils/views/LibraryFunctionListView.svelte";
 import LibraryProjectListView from "src/utils/views/LibraryProjectListView.svelte";
 import SettingsView from "src/utils/views/SettingsView.svelte";
