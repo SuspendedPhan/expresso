@@ -1,4 +1,5 @@
-import { Effect, Layer } from "effect";
+import { Effect } from "effect";
+import type { Graphics } from "pixi.js";
 import { withLatestFrom } from "rxjs";
 import {
   CanvasObjectUtils,
@@ -7,16 +8,15 @@ import {
 import CanvasPool from "src/canvas/CanvasPool";
 import { PixiFactory, type PixiFactoryArgs } from "src/canvas/PixiFactory";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import { ProjectCtx, ProjectCtxLive } from "src/ctx/ProjectCtx";
+import { ProjectCtx } from "src/ctx/ProjectCtx";
 import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
-import { EvaluatorCtx, EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
+import { EvaluatorCtx } from "src/evaluation/EvaluatorCtx";
 import { ComponentFactory, type CanvasSetter } from "src/ex-object/Component";
+import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import { isType } from "variant";
 import Logger from "../utils/logger/Logger";
-import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
-import type { Graphics } from "pixi.js";
 
 export type LibCanvasObject = Graphics;
 
