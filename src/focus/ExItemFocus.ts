@@ -13,16 +13,8 @@ import {
   isType,
   matcher,
   pass,
-  variant,
-  type VariantOf,
+  type VariantOf
 } from "variant";
-
-export const ExItemBasicFocusFactory = variant([
-  ExObjectFocusFactory.ExObject,
-  ExObjectFocusFactory.Name,
-  ExObjectFocusFactory.Component,
-  ExObjectFocusFactory.PropertyName,
-]);
 
 interface ExItemFocus_ {
   NewCommand: { exItem: ExItem };
@@ -124,26 +116,4 @@ export const ExItemFocus = {
       }
     });
   },
-
-  exItemBasicFocus$: Effect.gen(function* () {
-    return (yield* FocusCtx).mapFocus$((focus) => {
-      if (!isOfVariant(focus, ExItemBasicFocusFactory)) {
-        return false;
-      }
-
-      const exItem = matcher(focus)
-        .when(
-          [
-            ExObjectFocusFactory.ExObject,
-            ExObjectFocusFactory.Name,
-            ExObjectFocusFactory.Component,
-          ],
-          ({ exObject }) => exObject
-        )
-        .when(ExObjectFocusFactory.PropertyName, ({ property }) => property)
-        .complete();
-
-      return exItem;
-    });
-  }),
 };
