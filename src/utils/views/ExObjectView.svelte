@@ -1,10 +1,6 @@
 <script lang="ts">
-  import { ComponentFns } from "src/ex-object/Component";
-  import { ExObjectFns, type ExObject } from "src/ex-object/ExObject";
-
   import { rxEquals, type OBS } from "src/utils/utils/Utils";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import {
     createFieldData,
     createReadonlyFieldData,
@@ -16,6 +12,8 @@
   import PropertyView from "./PropertyView.svelte";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
+  import { ExObject } from "src/ex-object/ExObject";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -64,8 +62,8 @@
       <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
-          <Field {ctx} fieldData={exObjectNameField} />
-          <Field {ctx} fieldData={componentField} />
+          <Field fieldData={exObjectNameField} />
+          <Field fieldData={componentField} />
         </div>
       </div>
 
@@ -74,9 +72,9 @@
       <div class="p-card">
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
-          <PropertyView {ctx} property={cloneCountProperty} />
+          <PropertyView property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
-            <PropertyView {ctx} {property} />
+            <PropertyView {property} />
           {/each}
         </div>
       </div>
@@ -85,7 +83,6 @@
       <div class="divider m-0 h-0"></div>
       <FlexContainer centered={false} class="flex flex-col p-card">
         <BasicPropertyList
-          {ctx}
           {basicProperties$}
           addPropertyFn={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
         />
@@ -102,7 +99,7 @@
     </FocusView>
     {#if $children$}
       {#each $children$ as child (child.id)}
-        <svelte:self {ctx} exObject={child} {elementLayout} />
+        <svelte:self exObject={child} {elementLayout} />
       {/each}
     {/if}
   </div>
