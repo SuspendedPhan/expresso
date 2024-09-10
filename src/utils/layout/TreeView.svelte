@@ -11,7 +11,6 @@
 
   export let elementLayout: ElementLayout;
 
-  const debugCtx = structuredClone(ctx.debugCtx);
   let canvas: HTMLCanvasElement;
 
   let lines: Line[] = [];
@@ -37,7 +36,6 @@
       tick().then(() => {
         drawLines(canvas, lines);
       });
-      log55.debug(debugCtx);
       log55.debug("canvasWidth", canvasWidth);
       log55.debug("canvasHeight", canvasHeight);
     });

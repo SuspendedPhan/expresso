@@ -1,18 +1,32 @@
 <script lang="ts">
-  import { map, of, type Observable } from "rxjs";
+  import { map, of, switchAll, switchMap, type Observable } from "rxjs";
 
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import { log5 } from "src/utils/utils/Log5";
+  import type { Expr } from "src/ex-object/Expr";
+  import { rxEquals, RxFns } from "src/utils/utils/Utils";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { ExprFocusCtx } from "src/focus/ExprFocus";
 
   const log55 = log5("ExprView.svelte");
 
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 
-  log55.debug("expr", expr.exprType);
+  let exprCommandFocused = false;
+  let isFocused = false;
+  RxFns.onMount$()
+    .pipe(
+      switchMap(() => DexRuntime.runPromise(ExprFocusCtx.propertyFocus$)),
+      switchAll(),
+      rxEquals(expr)
+    )
+    .subscribe((isFocused2) => {
+      isFocused = isFocused2;
+    });
 
   const exprCommandFocused$ = ctx.focusCtx.focus$.pipe(
     map((focus) => {
