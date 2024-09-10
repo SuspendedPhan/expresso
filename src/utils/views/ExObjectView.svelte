@@ -13,7 +13,12 @@
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import { ExObject } from "src/ex-object/ExObject";
+  import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { Effect } from "effect";
+  import { FocusCtx } from "src/focus/FocusCtx";
+  import { isType } from "variant";
+  import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -22,6 +27,14 @@
   const cloneCountProperty = exObject.cloneCountProperty;
   const basicProperties$ = exObject.basicProperties;
   const children$ = exObject.children$;
+
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      (yield* FocusCtx).mapFocus$((focus) =>
+        isType(focus, ExObjectFocusFactory.ExObject) ? focus.exObject : false
+      );
+    })
+  );
 
   function equals$(exObject$: OBS<ExObject | false>) {
     return exObject$.pipe(rxEquals(exObject));
