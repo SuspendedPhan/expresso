@@ -1,6 +1,5 @@
 <script lang="ts">
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import PropertyView from "src/utils/views/PropertyView.svelte";
 
   import type { OBS } from "src/utils/utils/Utils";
@@ -12,7 +11,7 @@
 
 <div class="flex flex-col gap-2">
   {#if $basicProperties$.length > 0}
-    <ExObjectHeaderView>Properties</ExObjectHeaderView>
+    <!-- <ExObjectHeaderView>Properties</ExObjectHeaderView> -->
   {/if}
   {#each $basicProperties$ as property (property.id)}
     <PropertyView {property} />

@@ -5,7 +5,7 @@ import { ExprFactory, type Expr } from "src/ex-object/Expr";
 import { isType } from "variant";
 import { ElementLayout } from "./ElementLayout";
 
-export function createComponentLayout(rootExpr: Expr) {
+export function createExprLayout(rootExpr: Expr) {
   return Effect.gen(function* () {
     const childrenByExpr = new Map<Expr, readonly Expr[]>();
 

@@ -78,6 +78,12 @@ export const ExObjectFocus = {
       isType(focus, ExObjectFocusFactory.ExObject) ? focus.exObject : false
     );
   }),
+
+  propertyFocus$: Effect.gen(function* () {
+    return (yield* FocusCtx).mapFocus$((focus) =>
+      isType(focus, ExObjectFocusFactory.PropertyName) ? focus.property : false
+    );
+  }),
 };
 
 // register() {

@@ -8,5 +8,5 @@
 
 <div class="flex flex-row">
   <FieldLabel label={fieldData.label} />
-  <FieldValue {ctx} {fieldData} />
+  <FieldValue {fieldData} />
 </div>
