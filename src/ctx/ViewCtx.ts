@@ -99,7 +99,6 @@ const ctxEffect = Effect.gen(function* () {
   (section2 as any).navItems = navItems2;
 
   return {
-    exObjectLayouts$: new BehaviorSubject<ElementLayout[]>([]),
     activeWindow$: new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor),
     navCollapsed$: new BehaviorSubject<boolean>(false),
     navSections: [section0, section1, section2],

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { first } from "rxjs";
   import type { ExObject } from "src/ex-object/ExObject";
 
-  import ExObjectLayout from "src/utils/layout/ExObjectLayout";
+  import type { ElementLayout } from "src/utils/layout/ElementLayout";
+  import { createExObjectLayout } from "src/utils/layout/ExObjectLayout";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
   import ExObjectView from "src/utils/views/ExObjectView.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import { onMount, tick } from "svelte";
@@ -13,37 +14,31 @@
   let clazz = "";
   export { clazz as class };
 
-  // export let elementLayout: ElementLayout;
-  ctx.debugCtx.treeRoot = "object " + exObject.id;
-  const elementLayout = ExObjectLayout.create(ctx, exObject);
+  let elementLayout: ElementLayout;
 
   let element: HTMLElement;
 
   onMount(() => {
-    new ResizeSensor(element, () => {
+    DexRuntime.runPromise(createExObjectLayout(exObject)).then((layout) => {
+      elementLayout = layout;
+    });
+
+    const sensor = new ResizeSensor(element, () => {
       tick().then(() => {
         elementLayout.recalculate();
       });
     });
 
-    ctx.viewCtx.exObjectLayouts$.pipe(first()).subscribe((layouts) => {
-      ctx.viewCtx.exObjectLayouts$.next([...layouts, elementLayout]);
-    });
-
     return () => {
-      ctx.viewCtx.exObjectLayouts$.pipe(first()).subscribe((layouts) => {
-        ctx.viewCtx.exObjectLayouts$.next(
-          layouts.filter((layout) => layout !== elementLayout)
-        );
-      });
+      sensor.detach();
     };
   });
 </script>
 
-<FlexContainer class="p-window">
-  <TreeView {elementLayout} {ctx}>
+<FlexContainer class="p-window {clazz}">
+  <TreeView {elementLayout}>
     <div bind:this={element}>
-      <ExObjectView {ctx} {exObject} {elementLayout} />
+      <ExObjectView {exObject} {elementLayout} />
     </div>
   </TreeView>
 </FlexContainer>
