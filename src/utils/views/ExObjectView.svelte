@@ -10,7 +10,6 @@
   import { RxFns } from "src/utils/utils/Utils";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import {
     createFieldData,
     createReadonlyFieldData,
@@ -108,7 +107,7 @@
       class="ex-card w-max flex flex-col"
     >
       <div class="p-card flex flex-col">
-        <ExObjectHeaderView>Basics</ExObjectHeaderView>
+        <!-- <ExObjectHeaderView>Basics</ExObjectHeaderView> -->
         <div class="flex flex-col gap-2 font-mono">
           <Field fieldData={exObjectNameField} />
           <Field fieldData={componentField} />
@@ -118,7 +117,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-card">
-        <ExObjectHeaderView>Component</ExObjectHeaderView>
+        <!-- <ExObjectHeaderView>Component</ExObjectHeaderView> -->
         <div class="flex flex-col gap-2">
           <PropertyView property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}

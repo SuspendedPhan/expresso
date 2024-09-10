@@ -15,7 +15,7 @@
     <ExObjectHeaderView>Properties</ExObjectHeaderView>
   {/if}
   {#each $basicProperties$ as property (property.id)}
-    <PropertyView {ctx} {property} />
+    <PropertyView {property} />
   {/each}
   <ExObjectButton
     on:click={addPropertyFn}
