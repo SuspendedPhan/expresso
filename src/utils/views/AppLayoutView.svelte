@@ -15,18 +15,19 @@
   let activeWindow: any;
   let viewMode: ViewMode;
 
-  RxFns.onMount$().pipe(
-    switchMap(() => {
-      return DexRuntime.runPromise(ViewCtx);
-    }),
-    switchMap((viewCtx) => {
-      return combineLatest([viewCtx.activeWindow$, viewCtx.viewMode$]);
-    }),
-    map(([activeWindow, viewMode2]) => {
+  RxFns.onMount$()
+    .pipe(
+      switchMap(() => {
+        return DexRuntime.runPromise(ViewCtx);
+      }),
+      switchMap((viewCtx) => {
+        return combineLatest([viewCtx.activeWindow$, viewCtx.viewMode$]);
+      })
+    )
+    .subscribe(([activeWindow, viewMode2]) => {
       activeWindow = activeWindowToSvelteComponent(activeWindow);
       viewMode = viewMode2;
-    })
-  );
+    });
 
   onMount(() => {
     FirebaseAuthentication.init();

@@ -1,46 +1,42 @@
 <script lang="ts">
-  import { rxEquals, type OBS } from "src/utils/utils/Utils";
+  import { switchAll, switchMap } from "rxjs";
+  import { ExObject } from "src/ex-object/ExObject";
+  import { ExObjectFocus } from "src/focus/ExObjectFocus";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { RxFns } from "src/utils/utils/Utils";
+  import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import {
     createFieldData,
     createReadonlyFieldData,
   } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
+  import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
-  import FlexContainer from "src/utils/views/FlexContainer.svelte";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
-  import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { Effect } from "effect";
-  import { FocusCtx } from "src/focus/FocusCtx";
-  import { isType } from "variant";
-  import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
 
   const componentParameterProperties = exObject.componentParameterProperties;
   const cloneCountProperty = exObject.cloneCountProperty;
-  const basicProperties$ = exObject.basicProperties;
+  const basicProperties$ = exObject.basicProperties.items$;
   const children$ = exObject.children$;
 
-  DexRuntime.runPromise(
-    Effect.gen(function* () {
-      (yield* FocusCtx).mapFocus$((focus) =>
-        isType(focus, ExObjectFocusFactory.ExObject) ? focus.exObject : false
-      );
-    })
-  );
+  let exObjectFocused = false;
 
-  function equals$(exObject$: OBS<ExObject | false>) {
-    return exObject$.pipe(rxEquals(exObject));
-  }
+  RxFns.onMount$()
+    .pipe(
+      switchMap(() => DexRuntime.runPromise(ExObjectFocus.exObjectFocus$)),
+      switchAll()
+    )
+    .subscribe((exObject) => {
+      exObjectFocused = exObject !== false && exObject === exObject;
+    });
 
-  const exObjectFocused$ = equals$(ctx.exObjectFocusCtx.exObjectFocus$);
   const exObjectNameField = createFieldData({
     ctx,
     label: "Name",
@@ -68,7 +64,7 @@
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
     <FocusView
-      focused={$exObjectFocused$}
+      focused={exObjectFocused}
       on:mousedown={handleClick}
       class="ex-card w-max flex flex-col"
     >

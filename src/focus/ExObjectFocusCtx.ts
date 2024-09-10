@@ -1,6 +1,6 @@
 import { Effect, Layer } from "effect";
 import type { ExObject } from "src/ex-object/ExObject";
-import { FocusCtx } from "src/focus/FocusCtx";
+import { FocusCtx, FocusCtxLive } from "src/focus/FocusCtx";
 import type { OBS } from "src/utils/utils/Utils";
 
 export class ExObjectFocusCtx extends Effect.Tag("ExObjectFocusCtx")<
