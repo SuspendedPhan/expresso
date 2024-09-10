@@ -50,7 +50,7 @@ export function LibraryFactory2(creationArgs: LibraryCreationArgs) {
   });
 }
 
-const Library = {
+export const Library = {
   Methods: (library: Library) => ({
     addProjectBlank() {
       return Effect.gen(function* () {

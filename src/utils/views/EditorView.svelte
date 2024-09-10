@@ -1,14 +1,33 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { of, ReplaySubject } from "rxjs";
+  import { map, mergeAll, of, ReplaySubject, switchMap } from "rxjs";
 
+  import { ProjectCtx } from "src/ctx/ProjectCtx";
+  import type { ExObject } from "src/ex-object/ExObject";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { RxFns } from "src/utils/utils/Utils";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import { LibraryCtx } from "src/ctx/LibraryCtx";
+  import { Library } from "src/ex-object/Library";
+  import { Effect } from "effect";
+  import { Project } from "src/ex-object/Project";
 
-  const rootExObjects$ = ctx.eventBus.rootObjects$;
+  let rootExObjects: ExObject[];
+
+  RxFns.onMount$().pipe(
+    switchMap(async () => {
+      const project = await DexRuntime.runPromise(ProjectCtx.activeProject);
+      return project.rootExObjects.items$;
+    }),
+    mergeAll(),
+    map((rootExObjects2) => {
+      rootExObjects = rootExObjects2;
+    })
+  );
 
   let rootElement: HTMLElement;
   const editorViewWidth$ = new ReplaySubject<number>(1);
@@ -25,17 +44,25 @@
   const newActionsFocused$ = of(false);
 
   async function handleClickNewProject() {
-    const library = await ctx.getLibraryProm();
-    library.addProjectBlank();
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const library = yield* LibraryCtx.library;
+        Library.Methods(library).addProjectBlank();
+      })
+    );
+  }
+
+  function addRootExObjectBlank() {
+    DexRuntime.runPromise(ProjectCtx.activeProject).then((project) => {
+      Project.Methods(project).addRootExObjectBlank();
+    });
   }
 </script>
 
 <div bind:this={rootElement} class="w-max min-w-full">
   <FlexContainer>
     <div class="flex gap-4 {Constants.WindowPaddingClass}">
-      <button
-        on:click={() => ctx.projectCtx.addRootExObjectBlank()}
-        class="btn block"
+      <button on:click={addRootExObjectBlank} class="btn block"
         ><KbdShortcutSpan
           label="Add Object"
           showShortcut={$newActionsFocused$}
@@ -50,15 +77,15 @@
         />
       </button>
 
-      <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
+      <!-- <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
         Debug Evaluator
-      </button>
+      </button> -->
     </div>
     <FlexContainer>
-      {#if $rootExObjects$}
-        {#each $rootExObjects$ as exObject (exObject.id)}
+      {#if rootExObjects}
+        {#each rootExObjects as exObject (exObject.id)}
           <div class="divider w-full m-0 h-0"></div>
-          <RootExObjectView {ctx} {exObject} />
+          <RootExObjectView {exObject} />
         {/each}
       {/if}
     </FlexContainer>
