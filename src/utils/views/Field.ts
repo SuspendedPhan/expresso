@@ -103,9 +103,9 @@ export function createFieldValueData<T extends EditableFocus>(
 
 export function createFieldData<T extends EditableFocus>(init: FieldInit<T>) {
   return Effect.gen(function* () {
-    const fieldValueData = createFieldValueData(init);
+    const fieldValueData = yield* createFieldValueData(init);
 
-    const fieldData = {
+    const fieldData: FieldData = {
       ...fieldValueData,
       label: init.label,
     };

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { Effect, Layer } from "effect";
 import { filter, fromEvent, map, of, switchMap } from "rxjs";
-import { FocusCtx } from "src/ctx/FocusCtx";
+import { FocusCtx } from "src/focus/FocusCtx";
 import type { DexEffectSuccess, OBS } from "src/utils/utils/Utils";
 
 export enum KeyboardResult {
@@ -52,8 +51,8 @@ const ctxEffect = Effect.gen(function* () {
       );
     },
 
-    registerCancel: <T>(data$: OBS<T | false>) => {
-      onKeydown$("Escape", data$).subscribe(() => {
+    registerCancel<T>(data$: OBS<T | false>) {
+      this.onKeydown$("Escape", data$).subscribe(() => {
         focusCtx.popFocus();
       });
     },

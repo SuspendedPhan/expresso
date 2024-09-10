@@ -1,7 +1,11 @@
 <script lang="ts">
   import { switchAll, switchMap } from "rxjs";
   import { ExObject } from "src/ex-object/ExObject";
-  import { ExObjectFocus } from "src/focus/ExObjectFocus";
+  import {
+    ExObjectFocus,
+    ExObjectFocusFactory,
+    type ExObjectFocusKind,
+  } from "src/focus/ExObjectFocus";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { RxFns } from "src/utils/utils/Utils";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
@@ -10,6 +14,7 @@
   import {
     createFieldData,
     createReadonlyFieldData,
+    type FieldData,
   } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
@@ -17,6 +22,10 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
+  import { Effect } from "effect";
+  import { isType } from "variant";
+  import { Component } from "src/ex-object/Component";
+  import { FocusCtx } from "src/focus/FocusCtx";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -37,27 +46,57 @@
       exObjectFocused = exObject !== false && exObject === exObject;
     });
 
-  const exObjectNameField = createFieldData({
-    ctx,
-    label: "Name",
-    value$: exObject.name$,
-    focusIsFn: FocusKind.is.ExObjectName,
-    createEditingFocusFn: (isEditing) =>
-      FocusKind.ExObjectName({ exObject, isEditing }),
-    filterFn: (f) => f.exObject === exObject,
-  });
+  let exObjectNameField: FieldData;
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      exObjectNameField = yield* createFieldData<ExObjectFocusKind["Name"]>({
+        label: "Name",
+        value$: exObject.name$,
+        focusIsFn: isType(ExObjectFocusFactory.Name),
+        createEditingFocusFn: (isEditing) =>
+          ExObjectFocusFactory.Name({ exObject, isEditing }),
+        filterFn: (f) => f.exObject === exObject,
+      });
+    })
+  );
 
-  const componentField = createReadonlyFieldData({
-    ctx,
-    label: "Component",
-    value$: ComponentFns.getName$(exObject.component),
-    createFocusFn: () => FocusKind.ExObjectComponent({ exObject }),
-    filterFn: (f) => f.exObject === exObject,
-    focusIsFn: FocusKind.is.ExObjectComponent,
-  });
+  let componentField: FieldData;
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      componentField = yield* createReadonlyFieldData<
+        ExObjectFocusKind["Component"]
+      >({
+        label: "Component",
+        value$: Component.getName$(exObject.component),
+        createFocusFn: () => ExObjectFocusFactory.Component({ exObject }),
+        filterFn: (f) => f.exObject === exObject,
+        focusIsFn: isType(ExObjectFocusFactory.Component),
+      });
+    })
+  );
 
   function handleClick() {
-    ctx.focusCtx.setFocus(FocusKind.ExObject({ exObject }));
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        FocusCtx.setFocus(ExObjectFocusFactory.ExObject({ exObject }));
+      })
+    );
+  }
+
+  function addChild() {
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        ExObject.Methods(exObject).addChildBlank();
+      })
+    );
+  }
+
+  function addProperty() {
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        ExObject.Methods(exObject).addBasicPropertyBlank();
+      })
+    );
   }
 </script>
 
@@ -91,19 +130,13 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <FlexContainer centered={false} class="flex flex-col p-card">
-        <BasicPropertyList
-          {basicProperties$}
-          addPropertyFn={() => ExObjectFns.addBasicPropertyBlank(ctx, exObject)}
-        />
+        <BasicPropertyList {basicProperties$} addPropertyFn={addProperty} />
       </FlexContainer>
 
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-card self-center">
-        <ExObjectButton
-          on:click={() => ExObjectFns.addChildBlank(ctx, exObject)}
-          >Add Child Object</ExObjectButton
-        >
+        <ExObjectButton on:click={addChild}>Add Child Object</ExObjectButton>
       </div>
     </FocusView>
     {#if $children$}

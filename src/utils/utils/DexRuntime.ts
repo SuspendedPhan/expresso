@@ -1,6 +1,7 @@
 import { Layer, ManagedRuntime } from "effect";
 import { ExObjectCtxLive } from "src/ctx/ExObjectCtx";
 import { ExprCtxLive } from "src/ctx/ExprCtx";
+import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { ProjectCtxLive } from "src/ctx/ProjectCtx";
 import { PropertyCtxLive } from "src/ctx/PropertyCtx";
@@ -19,6 +20,7 @@ const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive).pipe(
   Layer.provideMerge(ViewCtxLive),
   Layer.provideMerge(ExObjectCtxLive),
   Layer.provideMerge(ExObjectFocusCtxLive),
+  Layer.provideMerge(KeyboardCtxLive),
   Layer.provideMerge(FocusCtxLive),
 );
 
