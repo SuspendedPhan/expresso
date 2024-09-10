@@ -2,6 +2,7 @@ import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
 import { type Focus, FocusFactory } from "src/focus/Focus";
 import type { OBS } from "src/utils/utils/Utils";
+import type { EditableFocus } from "src/utils/views/Field";
 
 // const log55 = log5("Focus.ts");
 
@@ -47,6 +48,17 @@ const ctxEffect = Effect.gen(function* () {
 
     mapFocus$<T>(mapperFn: (focus: Focus) => T) {
       return focus$.pipe(map(mapperFn));
+    },
+
+    editingFocus$(filter: (focus: Focus) => focus is EditableFocus, isEditing: boolean) {
+      return Effect.gen(this, function* () {
+        return this.mapFocus$((focus) => {
+          if (!filter(focus)) return false;
+          if (!("isEditing" in focus)) return false;
+
+          return focus.isEditing === isEditing ? focus : false;
+        });
+      });
     },
 
     register() {

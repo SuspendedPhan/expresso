@@ -29,3 +29,5 @@ export type Focus =
   | ProjectComponentWindowFocus
   | EditorFocus
   | ComponentFocus;
+
+export type EditingFocus = Focus & { isEditing: boolean };
