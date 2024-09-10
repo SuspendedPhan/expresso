@@ -46,13 +46,14 @@ export function createFieldValueData<T extends EditableFocus>(
       .focusOrFalse$(init.focusIsFn)
       .pipe(map((f) => f !== false && init.filterFn(f)));
 
-    const editingFocus$ = (yield* focusCtx.editingFocus$(
-      init.focusIsFn,
-      true
-    )).pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
+    const editingFocus$ = focusCtx
+      .editingFocus$(init.focusIsFn, true)
+      .pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
+
     const notEditingFocus$ = focusCtx
       .editingFocus$(init.focusIsFn, false)
       .pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
+
     const isEditing$ = editingFocus$.pipe(map((f) => f !== false));
 
     keyboardCtx
@@ -100,15 +101,16 @@ export function createFieldValueData<T extends EditableFocus>(
   });
 }
 
-export function createFieldData<T extends EditableFocus>(
-  init: FieldInit<T>
-): FieldData {
-  const fieldData = createFieldValueData(init);
+export function createFieldData<T extends EditableFocus>(init: FieldInit<T>) {
+  return Effect.gen(function* () {
+    const fieldValueData = createFieldValueData(init);
 
-  return {
-    ...fieldData,
-    label: init.label,
-  };
+    const fieldData = {
+      ...fieldValueData,
+      label: init.label,
+    };
+    return fieldData;
+  });
 }
 
 export interface ReadonlyFieldInit<T extends Focus> {

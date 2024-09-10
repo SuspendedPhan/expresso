@@ -50,15 +50,19 @@ const ctxEffect = Effect.gen(function* () {
       return focus$.pipe(map(mapperFn));
     },
 
-    editingFocus$(filter: (focus: Focus) => focus is EditableFocus, isEditing: boolean) {
-      return Effect.gen(this, function* () {
-        return this.mapFocus$((focus) => {
-          if (!filter(focus)) return false;
-          if (!("isEditing" in focus)) return false;
-
-          return focus.isEditing === isEditing ? focus : false;
-        });
-      });
+    editingFocus$<T extends EditableFocus>(
+      predicate: (f: Focus) => f is T,
+      isEditing: boolean
+    ): OBS<T | false> {
+      return this.focusOrFalse$(predicate).pipe(
+        map((f) => {
+          if (f === false) {
+            return false;
+          }
+          const match = f.isEditing === isEditing;
+          return match ? f : false;
+        })
+      );
     },
 
     register() {
