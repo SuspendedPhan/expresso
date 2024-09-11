@@ -26,8 +26,10 @@ Add property - p
 
 
 ---
-Learn Typescript
+Conventions
 ---
 
-help me learn the basics of typescript. give me a coding challenge. i will respond with my attempt and you'll give me feedback. when i'm done, i'll say "next challenge", and you'll give me another challenge. we will keep repeating this loop. the challenges should start basic, and progressively increase in nuance
-
+- ExItemFocus
+- ExItemFocus.Methods: instance methods
+- ExItemFocus.*: static methods
+- ExItemFocusCtx: static properties

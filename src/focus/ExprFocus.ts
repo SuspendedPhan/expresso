@@ -30,6 +30,14 @@ export class ExprFocusCtx extends Effect.Tag("ExprFocusCtx")<
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
+export const ExprFocus = {
+  exprFocus$: Effect.gen(function* () {
+    return (yield* FocusCtx).mapFocus$((focus) =>
+      isType(focus, ExprFocusFactory.Expr) ? focus.expr : false
+    );
+  }),
+};
+
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
   const keyboardCtx = yield* KeyboardCtx;
@@ -99,131 +107,131 @@ const ctxEffect = Effect.gen(function* () {
           exprCommandCtx.onSubmitExprCommand$.next();
         });
 
-      ctx.eventBus.exprReplaced$.subscribe(async (replacement) => {
-        const newExpr = replacement.newExpr;
-        focusCtx.setFocus(ExprFocusFactory.Expr({ expr: newExpr, isEditing: false }));
-      });
+      // ctx.eventBus.exprReplaced$.subscribe(async (replacement) => {
+      //   const newExpr = replacement.newExpr;
+      //   focusCtx.setFocus(ExprFocusFactory.Expr({ expr: newExpr, isEditing: false }));
+      // });
 
-      keyboardCtx.registerCancel(exprFocusCtx.getExprFocus$(true));
+      // keyboardCtx.registerCancel(exprFocusCtx.getExprFocus$(true));
 
-      // Down
+      // // Down
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
-        .subscribe(async (property) => {
-          const expr = await firstValueFrom(property.expr$);
-          if (expr.exprType === ExprType.NumberExpr) {
-            exObjectFocusCtx.focusNextExItem(property);
-          } else {
-            focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
-          }
-        });
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Down, exObjectFocusCtx.propertyFocus$)
+      //   .subscribe(async (property) => {
+      //     const expr = await firstValueFrom(property.expr$);
+      //     if (expr.exprType === ExprType.NumberExpr) {
+      //       exObjectFocusCtx.focusNextExItem(property);
+      //     } else {
+      //       focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
+      //     }
+      //   });
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Down, exprFocusCtx.getExprFocus$(false))
-        .subscribe(async (focus) => {
-          const expr = focus.expr;
-          switch (expr.exprType) {
-            case ExprType.CallExpr:
-              const callExpr = expr;
-              const args = await firstValueFrom(callExpr.args$);
-              const arg = args[0];
-              assert(arg !== undefined);
-              focusCtx.setFocus(
-                ExprFocusFactory.Expr({ expr: arg, isEditing: false })
-              );
-              break;
-            case ExprType.NumberExpr:
-              const property = await ExprFuncs.getProperty(expr);
-              exObjectFocusCtx.focusNextExItem(property);
-              break;
-          }
-        });
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Down, exprFocusCtx.getExprFocus$(false))
+      //   .subscribe(async (focus) => {
+      //     const expr = focus.expr;
+      //     switch (expr.exprType) {
+      //       case ExprType.CallExpr:
+      //         const callExpr = expr;
+      //         const args = await firstValueFrom(callExpr.args$);
+      //         const arg = args[0];
+      //         assert(arg !== undefined);
+      //         focusCtx.setFocus(
+      //           ExprFocusFactory.Expr({ expr: arg, isEditing: false })
+      //         );
+      //         break;
+      //       case ExprType.NumberExpr:
+      //         const property = await ExprFuncs.getProperty(expr);
+      //         exObjectFocusCtx.focusNextExItem(property);
+      //         break;
+      //     }
+      //   });
 
-      // Up
+      // // Up
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Up, exprFocusCtx.getExprFocus$(false))
-        .subscribe(async (focus) => {
-          const expr = focus.expr;
-          const parent = await firstValueFrom(expr.parent$);
-          assert(parent !== null);
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Up, exprFocusCtx.getExprFocus$(false))
+      //   .subscribe(async (focus) => {
+      //     const expr = focus.expr;
+      //     const parent = await firstValueFrom(expr.parent$);
+      //     assert(parent !== null);
 
-          switch (parent.itemType) {
-            case ExItemType.Expr:
-              const expr = parent;
-              focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
-              break;
-            case ExItemType.Property:
-              const property = parent;
-              focusCtx.setFocus(FocusKind.Property({ property }));
-              break;
-          }
-        });
+      //     switch (parent.itemType) {
+      //       case ExItemType.Expr:
+      //         const expr = parent;
+      //         focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
+      //         break;
+      //       case ExItemType.Property:
+      //         const property = parent;
+      //         focusCtx.setFocus(FocusKind.Property({ property }));
+      //         break;
+      //     }
+      //   });
 
-      // Left
+      // // Left
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
-        .subscribe(async (focus) => {
-          const expr = focus.expr;
-          const parent = await firstValueFrom(expr.parent$);
-          assert(parent !== null);
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
+      //   .subscribe(async (focus) => {
+      //     const expr = focus.expr;
+      //     const parent = await firstValueFrom(expr.parent$);
+      //     assert(parent !== null);
 
-          if (
-            parent.itemType === ExItemType.Property &&
-            expr.exprType === ExprType.NumberExpr
-          ) {
-            const property = parent;
-            focusCtx.setFocus(FocusKind.Property({ property }));
-            return;
-          }
-        });
+      //     if (
+      //       parent.itemType === ExItemType.Property &&
+      //       expr.exprType === ExprType.NumberExpr
+      //     ) {
+      //       const property = parent;
+      //       focusCtx.setFocus(FocusKind.Property({ property }));
+      //       return;
+      //     }
+      //   });
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
-        .subscribe(async (focus) => {
-          const direction = -1;
-          focusHorizontal(focus, direction);
-        });
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Left, exprFocusCtx.getExprFocus$(false))
+      //   .subscribe(async (focus) => {
+      //     const direction = -1;
+      //     focusHorizontal(focus, direction);
+      //   });
 
-      // Right
+      // // Right
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Right, exObjectFocusCtx.propertyFocus$)
-        .subscribe(async (property) => {
-          const expr = await firstValueFrom(property.expr$);
-          if (expr.exprType === ExprType.NumberExpr) {
-            focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
-          }
-        });
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Right, exObjectFocusCtx.propertyFocus$)
+      //   .subscribe(async (property) => {
+      //     const expr = await firstValueFrom(property.expr$);
+      //     if (expr.exprType === ExprType.NumberExpr) {
+      //       focusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }));
+      //     }
+      //   });
 
-      keyboardCtx
-        .onKeydown$(Hotkeys.Right, exprFocusCtx.exprFocus$)
-        .subscribe(async (focus) => {
-          const direction = 1;
-          focusHorizontal(focus, direction);
-        });
+      // keyboardCtx
+      //   .onKeydown$(Hotkeys.Right, exprFocusCtx.exprFocus$)
+      //   .subscribe(async (focus) => {
+      //     const direction = 1;
+      //     focusHorizontal(focus, direction);
+      //   });
 
-      async function focusHorizontal(
-        focus: { tag: "Expr" } & { expr: Expr; isEditing: boolean },
-        direction: number
-      ) {
-        const expr = focus.expr;
-        const parent = await firstValueFrom(expr.parent$);
-        assert(parent !== null);
+      // async function focusHorizontal(
+      //   focus: { tag: "Expr" } & { expr: Expr; isEditing: boolean },
+      //   direction: number
+      // ) {
+      //   const expr = focus.expr;
+      //   const parent = await firstValueFrom(expr.parent$);
+      //   assert(parent !== null);
 
-        if (parent.itemType !== ExItemType.Expr) return;
-        if (parent.exprType !== ExprType.CallExpr) return;
+      //   if (parent.itemType !== ExItemType.Expr) return;
+      //   if (parent.exprType !== ExprType.CallExpr) return;
 
-        const callExpr = parent;
-        const args = await firstValueFrom(callExpr.args$);
-        const index = args.indexOf(expr);
-        assert(index !== -1);
+      //   const callExpr = parent;
+      //   const args = await firstValueFrom(callExpr.args$);
+      //   const index = args.indexOf(expr);
+      //   assert(index !== -1);
 
-        const arg = ArrayFns.getWrapped(args, index + direction);
-        focusCtx.setFocus(ExprFocusFactory.Expr({ expr: arg, isEditing: false }));
-      }
+      //   const arg = ArrayFns.getWrapped(args, index + direction);
+      //   focusCtx.setFocus(ExprFocusFactory.Expr({ expr: arg, isEditing: false }));
+      // }
     },
   };
 });

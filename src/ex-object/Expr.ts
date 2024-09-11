@@ -18,6 +18,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
+  type BSUB,
   type SUB
 } from "src/utils/utils/Utils";
 import {
@@ -38,7 +39,7 @@ export type ReferenceTarget =
 
 interface CallExpr_ extends ExItemBase {
   args$: SUB<Expr[]>;
-  exFunc$: SUB<ExFunc>;
+  exFunc$: BSUB<ExFunc>;
 }
 
 export const ExprFactory = dexScopedVariant("Expr", {

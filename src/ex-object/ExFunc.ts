@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { of } from "rxjs";
 import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   ExFuncParameterFactory2,
@@ -14,27 +15,27 @@ import {
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
-  type SUB,
+  type BSUB,
 } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, variation, type VariantOf } from "variant";
+import { fields, isType, matcher, variation, type VariantOf } from "variant";
 
 export type ExFunc = CustomExFunc | SystemExFunc;
 
 type CustomExFunc_ = ExItemBase & {
   id: string;
-  name$: SUB<string>;
-  expr$: SUB<Expr>;
+  name$: BSUB<string>;
+  expr$: BSUB<Expr>;
   parameters: ObservableArray<ExFuncParameter>;
 };
 
 type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
 
 export const SystemExFuncFactory = dexScopedVariant("ExFunc/System", {
-  Add: {},
+  Add: () => ({ name: "Add" }),
 });
 
 export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
@@ -93,6 +94,15 @@ export const CustomExFuncFactory2 = {
       };
       return CustomExFuncFactory(customExFunc2_);
     });
+  },
+};
+
+export const ExFunc = {
+  name$(exFunc: ExFunc) {
+    if (isType(exFunc, CustomExFuncFactory)) {
+      return exFunc.name$;
+    }
+    return of(exFunc.name);
   },
 };
 

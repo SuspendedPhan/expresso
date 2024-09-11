@@ -1,72 +1,61 @@
 <script lang="ts">
-  import { map, of, switchAll, switchMap, type Observable } from "rxjs";
+  import { of, switchAll, switchMap, type Observable } from "rxjs";
 
+  import assert from "assert-ts";
+  import { ExFunc } from "src/ex-object/ExFunc";
+  import { Expr, ExprFactory } from "src/ex-object/Expr";
+  import { ExprFocusFactory } from "src/focus/ExprFocus";
+  import { FocusCtx } from "src/focus/FocusCtx";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { log5 } from "src/utils/utils/Log5";
+  import { RxFns } from "src/utils/utils/Utils";
   import ExprCommand from "src/utils/views/ExprCommand.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
+  import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import { log5 } from "src/utils/utils/Log5";
-  import type { Expr } from "src/ex-object/Expr";
-  import { rxEquals, RxFns } from "src/utils/utils/Utils";
-  import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { ExprFocusCtx } from "src/focus/ExprFocus";
 
   const log55 = log5("ExprView.svelte");
 
   export let expr: Expr;
   export let elementLayout: ElementLayout;
 
+  let exprFocused = false;
   let exprCommandFocused = false;
-  let isFocused = false;
   RxFns.onMount$()
     .pipe(
-      switchMap(() => DexRuntime.runPromise(ExprFocusCtx.propertyFocus$)),
-      switchAll(),
-      rxEquals(expr)
+      switchMap(() => DexRuntime.runPromise(FocusCtx.focus$)),
+      switchAll()
     )
-    .subscribe((isFocused2) => {
-      isFocused = isFocused2;
+    .subscribe((focus) => {
+      if (isType(focus, ExprFocusFactory.Expr) && focus.expr === expr) {
+        exprFocused = focus.expr === expr;
+        exprCommandFocused = focus.isEditing;
+      } else {
+        exprFocused = false;
+        exprCommandFocused = false;
+      }
     });
 
-  const exprCommandFocused$ = ctx.focusCtx.focus$.pipe(
-    map((focus) => {
-      if (!FocusKind.is.Expr(focus) || focus.expr !== expr) {
-        return false;
-      }
-      return focus.isEditing;
-    })
-  );
-
-  const exprFocused$ = ctx.focusCtx.exprFocusCtx.exprFocused$(expr);
-
   let args$: Observable<readonly Expr[]>;
-  if (expr.exprType === ExprType.CallExpr) {
+  if (isType(expr, ExprFactory.Call)) {
     args$ = expr.args$;
   } else {
     args$ = of([]);
   }
 
-  const text$ = getText();
-  function getText() {
-    switch (expr.exprType) {
-      case ExprType.NumberExpr:
-        return of(expr.value.toString());
-      case ExprType.CallExpr:
-        return CallExprKind.match(expr, {
-          Custom: (custom) => {
-            log55.debug("custom", custom);
-            return custom.exFunc.name$;
-          },
-          default: () => {
-            return of("+");
-          },
-        });
-      case ExprType.ReferenceExpr:
-        return expr.name$;
-      default:
-        return of("unknown");
-    }
-  }
+  const text$ = matcher(expr)
+    .when(ExprFactory.Number, (number) => {
+      return of(number.value.toString());
+    })
+    .when(ExprFactory.Call, (call) => {
+      return ExFunc.name$(call.exFunc$.value);
+    })
+    .when(ExprFactory.Reference, (reference) => {
+      assert(reference.target !== null);
+      return Expr.getReferenceTargetName$(reference.target);
+    })
+    .complete();
 
   let tooltipVisible = false;
   function handleMouseOver(event: MouseEvent) {
@@ -79,14 +68,16 @@
   }
 
   function handleMousedown() {
-    ctx.focusCtx.setFocus(FocusKind.Expr({ expr, isEditing: false }));
+    DexRuntime.runPromise(
+      FocusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }))
+    );
   }
 
   log55.debug("expr", expr);
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>
-  <FocusView focused={$exprFocused$} on:mousedown={handleMousedown}>
+  <FocusView focused={exprFocused} on:mousedown={handleMousedown}>
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-mouse-events-have-key-events -->
     <div
@@ -102,13 +93,13 @@
       {/if}
       <span>{$text$}</span>
 
-      {#if $exprCommandFocused$}
-        <ExprCommand {ctx} {expr} />
+      {#if exprCommandFocused}
+        <ExprCommand {expr} />
       {/if}
 
       <div class="pl-2">
         {#each $args$ as arg (arg.id)}
-          <svelte:self expr={arg} {ctx} {elementLayout} />
+          <svelte:self expr={arg} {elementLayout} />
         {/each}
       </div>
     </div>
