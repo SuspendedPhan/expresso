@@ -1,13 +1,32 @@
 <script lang="ts">
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
   import { of } from "rxjs";
+  import { Effect } from "effect";
+  import { ViewCtx } from "src/ctx/ViewCtx";
+  import type { OBS } from "src/utils/utils/Utils";
+  import type { NavSection } from "src/utils/utils/Nav";
 
-  const navCollapsed$ = ctx.viewCtx.navCollapsed$;
+  let navCollapsed$: OBS<boolean>;
+  let navSections: NavSection[];
+
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      navCollapsed$ = yield* ViewCtx.navCollapsed$;
+      navSections = yield* ViewCtx.navSections;
+    })
+  );
+
   const projectNavFocused$ = of(false);
 
   function toggleNav() {
-    ctx.viewCtx.navCollapsed$.next(!ctx.viewCtx.navCollapsed$.value);
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const navCollapsed$ = yield* ViewCtx.navCollapsed$;
+        navCollapsed$.next(!navCollapsed$.value);
+      })
+    );
   }
 </script>
 
@@ -24,9 +43,9 @@
       ></button>
     </div>
 
-    {#each ctx.viewCtx.navSections as section}
+    {#each navSections as section}
       <div class="divider m-0"></div>
-      <NavCollapsedSectionView {ctx} {section}></NavCollapsedSectionView>
+      <NavCollapsedSectionView {section}></NavCollapsedSectionView>
     {/each}
   </div>
 {:else}
@@ -45,9 +64,9 @@
       </div>
     </div>
 
-    {#each ctx.viewCtx.navSections as section}
+    {#each navSections as section}
       <div class="divider m-0"></div>
-      <NavSectionView {ctx} {section}></NavSectionView>
+      <NavSectionView {section}></NavSectionView>
     {/each}
   </ul>
 {/if}

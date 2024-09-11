@@ -30,6 +30,4 @@ Conventions
 ---
 
 - ExItemFocus
-- ExItemFocus.Methods: instance methods
-- ExItemFocus.*: static methods
-- ExItemFocusCtx: static properties
+- ExItemFocusCtx: static properties, methods, instance methods

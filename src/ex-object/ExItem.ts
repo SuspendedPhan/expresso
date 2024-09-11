@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
-import type { CustomExFunc } from "src/ex-object/ExFunc";
-import type { ExObject } from "src/ex-object/ExObject";
+import { type CustomExFunc } from "src/ex-object/ExFunc";
+import { type ExObject } from "src/ex-object/ExObject";
 import { type Expr } from "src/ex-object/Expr";
 import type { Property } from "src/ex-object/Property";
 import {

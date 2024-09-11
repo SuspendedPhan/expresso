@@ -1,8 +1,6 @@
 <script lang="ts">
-  import MainView from "src/utils/views/MainView.svelte";
   import "overlayscrollbars/overlayscrollbars.css";
+  import AppLayoutView from "src/utils/views/AppLayoutView.svelte";
 </script>
 
-<MainView />
-
-<style></style>
+<AppLayoutView />

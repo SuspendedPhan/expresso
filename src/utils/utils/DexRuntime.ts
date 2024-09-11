@@ -9,6 +9,7 @@ import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { FocusCtxLive } from "src/focus/FocusCtx";
+import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
 
 const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive).pipe(
@@ -22,6 +23,7 @@ const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive).pipe(
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(KeyboardCtxLive),
   Layer.provideMerge(FocusCtxLive),
+  Layer.provideMerge(CommandCardCtxLive)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);

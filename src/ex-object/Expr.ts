@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
 import { ExprCtx } from "src/ctx/ExprCtx";
-import { ComponentFactory } from "src/ex-object/Component";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -12,20 +11,19 @@ import {
   type ExFuncParameter,
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import { ExObjectFactory } from "src/ex-object/ExObject";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type BSUB,
-  type SUB
+  type SUB,
 } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, isOfVariant, isType, variant, type VariantOf } from "variant";
+import { fields, isOfVariant, isType, type VariantOf } from "variant";
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -139,13 +137,17 @@ export const Expr = {
   getReferenceTargetName$(target: ReferenceTarget) {
     if (isOfVariant(target, PropertyFactory)) {
       return Property.Methods(target).getName$();
-    } else if (isType(target, ComponentParameterFactory.Custom)) {
-      return target.name$;
-    } else if (isType(target, ExFuncParameterFactory)) {
-      return target.name$;
-    } else {
-      throw new Error("Unknown target type");
     }
+
+    if (isType(target, ComponentParameterFactory.Custom)) {
+      return target.name$;
+    }
+
+    if (isType(target, ExFuncParameterFactory)) {
+      return target.name$;
+    }
+
+    throw new Error("Unknown target type");
   },
 
   getProperty(expr: Expr) {
@@ -187,8 +189,3 @@ export const Expr = {
   },
 };
 
-export const ReferenceTargetParent = variant([
-  ExObjectFactory,
-  ComponentFactory.Custom,
-  CustomExFuncFactory,
-]);
