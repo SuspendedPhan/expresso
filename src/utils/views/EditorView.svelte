@@ -15,6 +15,10 @@
   import { Library } from "src/ex-object/Library";
   import { Effect } from "effect";
   import { Project } from "src/ex-object/Project";
+  import { log5 } from "src/utils/utils/Log5";
+
+  // @ts-ignore
+  const log55 = log5("EditorView.svelte");
 
   let rootExObjects: ExObject[];
 

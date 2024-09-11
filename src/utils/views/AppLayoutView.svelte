@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { combineLatest, map, switchMap } from "rxjs";
+  import { combineLatest, switchMap } from "rxjs";
   import CanvasView from "src/canvas/CanvasView.svelte";
   import { onMount } from "svelte";
-  import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
+  // import { FirebaseAuthentication } from "../persistence/FirebaseAuthentication";
   import { activeWindowToSvelteComponent } from "../utils/ViewUtils";
   import NavMenuView from "./NavMenuView.svelte";
 
@@ -11,8 +11,11 @@
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { RxFns } from "src/utils/utils/Utils";
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
+  import { log5 } from "src/utils/utils/Log5";
 
-  let activeWindow: any;
+  const log55 = log5("AppLayoutView.svelte");
+
+  let activeWindowSvelteComponent: any;
   let viewMode: ViewMode;
 
   RxFns.onMount$()
@@ -25,12 +28,13 @@
       })
     )
     .subscribe(([activeWindow, viewMode2]) => {
-      activeWindow = activeWindowToSvelteComponent(activeWindow);
+      log55.debug("activeWindow", activeWindow);
+      activeWindowSvelteComponent = activeWindowToSvelteComponent(activeWindow);
       viewMode = viewMode2;
     });
 
   onMount(() => {
-    FirebaseAuthentication.init();
+    // FirebaseAuthentication.init();
   });
 </script>
 
@@ -41,7 +45,7 @@
     <NavMenuView />
 
     <OverlayScrollbarsComponent defer class="shrink-1 basis-1/2">
-      <svelte:component this={activeWindow} />
+      <svelte:component this={activeWindowSvelteComponent} />
     </OverlayScrollbarsComponent>
 
     <div class="shrink-1 basis-1/2">
@@ -53,7 +57,7 @@
     <NavMenuView />
 
     <div class="grow-1 w-full" style="overflow: auto;">
-      <svelte:component this={activeWindow} />
+      <svelte:component this={activeWindowSvelteComponent} />
     </div>
   </div>
 {:else if viewMode === ViewMode.CanvasWindowMaximized}

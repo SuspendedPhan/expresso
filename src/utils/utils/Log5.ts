@@ -1,6 +1,7 @@
 import { tap } from "rxjs";
 
-const level_minimum = 12;
+const level_minimum = 1;
+// const level_minimum = 12;
 
 /**
  * @param level Lower levels get filtered out.
@@ -22,6 +23,8 @@ export const log4 = {
 };
 
 export function log5(topic: string) {
+  log3(1, topic);
+
   return {
     info(...args: any[]) {
       log4.info(`[${topic}]`, ...args);

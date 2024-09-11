@@ -19,7 +19,7 @@
 
   {#each section.navItems as item}
     <li>
-      <NavItemView {ctx} {item}></NavItemView>
+      <NavItemView {item}></NavItemView>
     </li>
   {/each}
 </div>
