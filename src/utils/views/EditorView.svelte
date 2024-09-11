@@ -25,10 +25,12 @@
   RxFns.onMount$().pipe(
     switchMap(async () => {
       const project = await DexRuntime.runPromise(ProjectCtx.activeProject);
+      log55.debug("project", project);
       return project.rootExObjects.items$;
     }),
     mergeAll(),
     map((rootExObjects2) => {
+      log55.debug("rootExObjects2", rootExObjects2);
       rootExObjects = rootExObjects2;
     })
   );
@@ -57,6 +59,7 @@
   }
 
   function addRootExObjectBlank() {
+    log55.debug("addRootExObjectBlank");
     DexRuntime.runPromise(ProjectCtx.activeProject).then((project) => {
       Project.Methods(project).addRootExObjectBlank();
     });

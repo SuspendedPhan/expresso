@@ -2,12 +2,15 @@ import { Effect, Layer } from "effect";
 import { firstValueFrom, switchMap } from "rxjs";
 import { LibraryProjectCtx, LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
+import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
 
 export class ProjectCtx extends Effect.Tag("ProjectCtx")<
   ProjectCtx,
   DexEffectSuccess<typeof ctxEffect>
 >() {}
+
+const log55 = log5("ProjectCtx.ts");
 
 const ctxEffect = Effect.gen(function* () {
   const libraryProjectCtx = yield* LibraryProjectCtx;
@@ -18,7 +21,9 @@ const ctxEffect = Effect.gen(function* () {
     ),
 
     get activeProject() {
+      log55.debug("activeProject");
       return Effect.gen(function* () {
+        log55.debug("activeProject2");
         const project = yield* Effect.promise(() =>
           firstValueFrom(
             activeLibraryProject$.pipe(
