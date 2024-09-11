@@ -21,7 +21,7 @@ import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
-import { fields, isType, matcher, variation, type VariantOf } from "variant";
+import { fields, isType, variation, type VariantOf } from "variant";
 
 export type ExFunc = CustomExFunc | SystemExFunc;
 

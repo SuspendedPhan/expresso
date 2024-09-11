@@ -52,12 +52,13 @@ export function createObservableArrayWithLifetime<T>(
     },
 
     replaceItem(oldItem: T, newItem: T) {
-      // const index = this.items.indexOf(oldItem);
-      // if (index === -1) {
-      //   throw new Error("Item not found");
-      // }
-      // this.items[index] = newItem;
-      // this.events$.next({ type: "ItemReplaced", newItem, oldItem });
+      const index = this.items.indexOf(oldItem);
+      if (index === -1) {
+        throw new Error("Item not found");
+      }
+      this.items$.value[index] = newItem;
+      events$.next({ type: "ItemRemoved", item: oldItem });
+      events$.next({ type: "ItemAdded", item: newItem });
     },
   };
 }

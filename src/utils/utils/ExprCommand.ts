@@ -1,21 +1,19 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
-import { ExprCtx } from "src/ctx/ExprCtx";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
-import { Expr, ExprFactory2, type ExprReplacement } from "src/ex-object/Expr";
+import { Expr, ExprFactory2 } from "src/ex-object/Expr";
 import { ExprFocusFactory } from "src/focus/ExprFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
 
-const log55 = log5("ExprCommand.ts");
+// const log55 = log5("ExprCommand.ts");
 
 export interface ExprCommand {
   label: string;

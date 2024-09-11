@@ -1,3 +1,4 @@
+import type { DexWindow } from "src/ctx/ViewCtx";
 
 
 export interface NavSection {

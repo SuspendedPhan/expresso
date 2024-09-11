@@ -1,15 +1,11 @@
 import {
-  descope,
-  match,
-  matcher,
   scoped,
   variant,
   type Variant,
-  variantCosmos,
-  type VariantModule,
+  type VariantModule
 } from "variant";
-import type { RawVariant, VariantOf } from "variant/lib/precepts";
-import { pass, typedImpl, type ExactDefinition } from "variant/lib/typed";
+import type { RawVariant } from "variant/lib/precepts";
+import { typedImpl, type ExactDefinition } from "variant/lib/typed";
 import { variantImpl } from "variant/lib/variant";
 
 /**

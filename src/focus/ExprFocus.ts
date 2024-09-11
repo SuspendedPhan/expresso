@@ -1,12 +1,11 @@
-import assert from "assert-ts";
 import { Effect, Layer } from "effect";
-import { filter, firstValueFrom } from "rxjs";
+import { filter } from "rxjs";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { Expr } from "src/ex-object/Expr";
-import { FocusCtx, Hotkeys } from "src/focus/FocusCtx";
+import { FocusCtx } from "src/focus/FocusCtx";
 import { ExprCommandCtx } from "src/utils/utils/ExprCommand";
 import { log5 } from "src/utils/utils/Log5";
-import { ArrayFns, RxFns, type OBS } from "src/utils/utils/Utils";
+import { RxFns, type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { isType, pass, type VariantOf } from "variant";
 

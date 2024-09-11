@@ -3,7 +3,6 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";
 import { type Property } from "src/ex-object/Property";
 import { FocusCtx } from "src/focus/FocusCtx";
-import { log5 } from "src/utils/utils/Log5";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import {
   isOfVariant,
@@ -14,7 +13,7 @@ import {
   type VariantOf,
 } from "variant";
 
-const log55 = log5("ExObjectFocus.ts");
+// const log55 = log5("ExObjectFocus.ts");
 
 interface ExObjectFocus_ {
   ExObject: { exObject: ExObject };

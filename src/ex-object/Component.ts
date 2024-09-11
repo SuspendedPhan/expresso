@@ -113,7 +113,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
   return {
     addParameterBlank() {
       return Effect.gen(function* () {
-        const parameter = ComponentParameterFactory2.Custom({});
+        const parameter = yield* ComponentParameterFactory2.Custom({});
         component.parameters.push(parameter);
         return parameter;
       });

@@ -7,6 +7,7 @@ import ProjectComponentListView from "../views/ProjectComponentListView.svelte";
 import ProjectExFuncListView from "../views/ProjectExFuncListView.svelte";
 import { assertUnreachable } from "./Utils";
 import TestView from "src/utils/views/TestView.svelte";
+import { DexWindow } from "src/ctx/ViewCtx";
 
 export function activeWindowToSvelteComponent(activeWindow: DexWindow): any {
   switch (activeWindow) {
