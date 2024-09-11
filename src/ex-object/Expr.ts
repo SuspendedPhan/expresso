@@ -16,16 +16,20 @@ import { ExObjectFactory } from "src/ex-object/ExObject";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
-  assertUnreachable,
   createBehaviorSubjectWithLifetime,
   Utils,
-  type SUB,
+  type SUB
 } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
 import { fields, isOfVariant, isType, variant, type VariantOf } from "variant";
+
+export interface ExprReplacement {
+  oldExpr: Expr;
+  newExpr: Expr;
+}
 
 export type ReferenceTarget =
   | Property

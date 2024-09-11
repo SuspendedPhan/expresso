@@ -1,11 +1,14 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
+import { ExprCtx } from "src/ctx/ExprCtx";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
-import { Expr, ExprFactory2 } from "src/ex-object/Expr";
+import { Expr, ExprFactory2, type ExprReplacement } from "src/ex-object/Expr";
+import { ExprFocusFactory } from "src/focus/ExprFocus";
+import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
@@ -45,15 +48,9 @@ const ctxEffect = Effect.gen(function* () {
         const commands: ExprCommand[] = [];
         const value = parseFloat(query);
         if (!isNaN(value)) {
-          commands.push({
-            label: `${value}`,
-            execute: () => {
-              return Effect.gen(function* () {
-                const numberExpr = yield* ExprFactory2.Number({ value });
-                yield* Expr.replaceExpr(expr, numberExpr);
-              });
-            },
-          });
+          const numberExpr = yield* ExprFactory2.Number({ value });
+          const command = createCommand(value.toString(), expr, numberExpr);
+          commands.push(command);
         }
 
         if (query === "+") {
@@ -153,6 +150,18 @@ function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {
       }
     }
   }
+}
+
+function createCommand(label: string, oldExpr: Expr, newExpr: Expr): ExprCommand {
+  return {
+    label,
+    execute() {
+      return Effect.gen(function* () {
+        yield* Expr.replaceExpr(oldExpr, newExpr);
+        yield* FocusCtx.setFocus(ExprFocusFactory.Expr({expr: newExpr, isEditing: false}));
+      });
+    },
+  };
 }
 
 export const ExprCommandCtxLive = Layer.effect(ExprCommandCtx, ctxEffect);
