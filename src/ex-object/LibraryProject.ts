@@ -22,6 +22,7 @@ interface LibraryProjectCreationArgs {
   id?: string;
   name?: string;
   project?: Project | null;
+  ordinal?: number;
 }
 
 export function LibraryProjectFactory2(
@@ -30,27 +31,29 @@ export function LibraryProjectFactory2(
   return Effect.gen(function* () {
     const libraryCtx = yield* LibraryCtx;
     const library = yield* libraryCtx.library;
-    const ordinal = yield* EffectUtils.firstValueFrom(library.projectOrdinal$);
 
-    const creationArgs2: Required<LibraryProjectCreationArgs> = {
-      id: creationArgs.id ?? Utils.createId("library-project"),
-      name: creationArgs.name ?? `Project ${ordinal}`,
-      project: creationArgs.project ?? null,
-    };
+    // const ordinal = creationArgs.ordinal ?? (yield* EffectUtils.firstValueFrom(library.projectOrdinal$));
 
-    const project$ = new ReplaySubject<Project>(1);
-    const libraryProject = LibraryProjectFactory({
-      id: creationArgs2.id,
-      name: creationArgs2.name,
-      project$,
-    });
+    // const creationArgs2: Required<LibraryProjectCreationArgs> = {
+    //   id: creationArgs.id ?? Utils.createId("library-project"),
+    //   name: creationArgs.name ?? `Project ${ordinal}`,
+    //   project: creationArgs.project ?? null,
+    //   ordinal,
+    // };
 
-    if (creationArgs2.project !== null) {
-      project$.next(creationArgs2.project);
-      creationArgs2.project.libraryProject = libraryProject;
-    }
+    // const project$ = new ReplaySubject<Project>(1);
+    // const libraryProject = LibraryProjectFactory({
+    //   id: creationArgs2.id,
+    //   name: creationArgs2.name,
+    //   project$,
+    // });
 
-    return libraryProject;
+    // if (creationArgs2.project !== null) {
+    //   project$.next(creationArgs2.project);
+    //   creationArgs2.project.libraryProject = libraryProject;
+    // }
+
+    // return libraryProject;
   });
 }
 
