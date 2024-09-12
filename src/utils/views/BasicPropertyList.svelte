@@ -4,6 +4,7 @@
 
   import type { OBS } from "src/utils/utils/Utils";
   import type { PropertyKind } from "src/ex-object/Property";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
 
   export let basicProperties$: OBS<PropertyKind["BasicProperty"][]>;
   export let addPropertyFn: () => void;
@@ -11,7 +12,7 @@
 
 <div class="flex flex-col gap-2">
   {#if $basicProperties$.length > 0}
-    <!-- <ExObjectHeaderView>Properties</ExObjectHeaderView> -->
+    <ExObjectHeaderView>Properties</ExObjectHeaderView>
   {/if}
   {#each $basicProperties$ as property (property.id)}
     <PropertyView {property} />

@@ -31,3 +31,7 @@ Conventions
 
 - ExItemFocus
 - ExItemFocusCtx: static properties, methods, instance methods
+
+
+Effect refactor:
+https://chatgpt.com/c/66e222c8-84a8-8008-9716-9fbf2fee4d79

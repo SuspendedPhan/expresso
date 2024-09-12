@@ -99,12 +99,12 @@ export const Project = {
       });
     },
 
-    addComponentBlank: Effect.gen(function* () {
+    addComponentBlank() {
       return Effect.gen(function* () {
         const component = yield* ComponentFactory2.Custom({});
         project.components.push(component);
         return component;
       });
-    }),
+    },
   }),
 };

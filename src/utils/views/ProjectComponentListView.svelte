@@ -1,24 +1,41 @@
 <script lang="ts">
-  import { switchMap } from "rxjs";
+  import { Effect } from "effect";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
 
-  import ActionBar from "src/utils/views/ActionBar.svelte";
+  import { ProjectCtx } from "src/ctx/ProjectCtx";
+  import { Project } from "src/ex-object/Project";
+  import type { OBS } from "src/utils/utils/Utils";
   import ActionBarButton from "src/utils/views/ActionBarButton.svelte";
   import ComponentView from "src/utils/views/ComponentView.svelte";
   import MainPane from "src/utils/views/MainPane.svelte";
+  import ActionBar from "src/utils/views/ActionBar.svelte";
 
-  const project$ = ctx.projectManager.currentProject$;
-  const componentL$ = project$.pipe(
-    switchMap((project) => project.componentArr$)
+  let components$: OBS<any[]>;
+
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const project = yield* ProjectCtx.activeProject;
+      components$ = project.components.items$;
+    })
   );
+
+  function addBlankProjectComponent() {
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const project = yield* ProjectCtx.activeProject;
+        yield* Project.Methods(project).addComponentBlank();
+      })
+    );
+  }
 </script>
 
 <MainPane>
-  <ActionBar>
-    <ActionBarButton on:click={() => ctx.mutator.addBlankProjectComponent()}
-      >Add Component</ActionBarButton
-    >
+  <ActionBar asdf="hi">
+    <ActionBarButton on:click={addBlankProjectComponent}>
+      Add Component
+    </ActionBarButton>
   </ActionBar>
-  {#each $componentL$ as component}
-    <ComponentView {ctx} {component} />
+  {#each $components$ as component}
+    <ComponentView {component} />
   {/each}
 </MainPane>
