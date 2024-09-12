@@ -32,28 +32,28 @@ export function LibraryProjectFactory2(
     const libraryCtx = yield* LibraryCtx;
     const library = yield* libraryCtx.library;
 
-    // const ordinal = creationArgs.ordinal ?? (yield* EffectUtils.firstValueFrom(library.projectOrdinal$));
+    const ordinal = creationArgs.ordinal ?? (yield* EffectUtils.firstValueFrom(library.projectOrdinal$));
 
-    // const creationArgs2: Required<LibraryProjectCreationArgs> = {
-    //   id: creationArgs.id ?? Utils.createId("library-project"),
-    //   name: creationArgs.name ?? `Project ${ordinal}`,
-    //   project: creationArgs.project ?? null,
-    //   ordinal,
-    // };
+    const creationArgs2: Required<LibraryProjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("library-project"),
+      name: creationArgs.name ?? `Project ${ordinal}`,
+      project: creationArgs.project ?? null,
+      ordinal,
+    };
 
-    // const project$ = new ReplaySubject<Project>(1);
-    // const libraryProject = LibraryProjectFactory({
-    //   id: creationArgs2.id,
-    //   name: creationArgs2.name,
-    //   project$,
-    // });
+    const project$ = new ReplaySubject<Project>(1);
+    const libraryProject: LibraryProject = LibraryProjectFactory({
+      id: creationArgs2.id,
+      name: creationArgs2.name,
+      project$,
+    });
 
-    // if (creationArgs2.project !== null) {
-    //   project$.next(creationArgs2.project);
-    //   creationArgs2.project.libraryProject = libraryProject;
-    // }
+    if (creationArgs2.project !== null) {
+      project$.next(creationArgs2.project);
+      creationArgs2.project.libraryProject = libraryProject;
+    }
 
-    // return libraryProject;
+    return libraryProject;
   });
 }
 

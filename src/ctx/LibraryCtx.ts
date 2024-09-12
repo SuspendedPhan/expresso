@@ -1,16 +1,47 @@
 import { Effect, Layer } from "effect";
-import { ReplaySubject } from "rxjs";
-import { LibraryFactory2, type Library } from "src/ex-object/Library";
+import { BehaviorSubject, ReplaySubject, Subject } from "rxjs";
+import { LibraryFactory, type Library } from "src/ex-object/Library";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
 
 export class LibraryCtx extends Effect.Tag("LibraryCtx")<
   LibraryCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
+interface LibraryCreationArgs {
+  projectOrdinal?: number;
+  libraryProjects?: LibraryProject[];
+}
+
 const ctxEffect = Effect.gen(function* () {
   const library$ = new ReplaySubject<Library>(1);
-  library$.next(yield* LibraryFactory2({}));
+  library$.next(yield* factory({}));
+
+  function factory(creationArgs: LibraryCreationArgs) {
+    return Effect.gen(function* () {
+      const creationArgs2: Required<LibraryCreationArgs> = {
+        projectOrdinal: creationArgs.projectOrdinal ?? 0,
+        libraryProjects: creationArgs.libraryProjects ?? [],
+      };
+
+      const library = LibraryFactory({
+        projectOrdinal$: new BehaviorSubject<number>(
+          creationArgs2.projectOrdinal
+        ),
+        libraryProjects: createObservableArrayWithLifetime<LibraryProject>(
+          new Subject(),
+          creationArgs2.libraryProjects
+        ),
+        destroy$: new Subject<void>(),
+      });
+
+      library$.next(library);
+      return library;
+    });
+  }
+
   return {
     library$,
     get library() {
@@ -18,6 +49,8 @@ const ctxEffect = Effect.gen(function* () {
         return yield* EffectUtils.firstValueFrom(this.library$);
       });
     },
+
+    factory,
   };
 });
 

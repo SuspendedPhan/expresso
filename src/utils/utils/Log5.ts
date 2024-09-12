@@ -23,7 +23,7 @@ export const log4 = {
 };
 
 export function log5(topic: string) {
-  log3(1, topic);
+  log3(1, `[${topic}]`);
 
   return {
     info(...args: any[]) {

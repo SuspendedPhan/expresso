@@ -1,11 +1,9 @@
 import { Effect } from "effect";
 import { BehaviorSubject, Subject } from "rxjs";
-import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProject, LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { ProjectFactory2 } from "src/ex-object/Project";
 import {
-  createObservableArrayWithLifetime,
-  type ObservableArray,
+  type ObservableArray
 } from "src/utils/utils/ObservableArray";
 import { fields, variation } from "variant";
 
@@ -19,36 +17,6 @@ interface Library_ {
 
 export const LibraryFactory = variation("Library", fields<Library_>());
 export type Library = ReturnType<typeof LibraryFactory>;
-
-interface LibraryCreationArgs {
-  projectOrdinal?: number;
-  libraryProjects?: LibraryProject[];
-}
-
-export function LibraryFactory2(creationArgs: LibraryCreationArgs) {
-  return Effect.gen(function* () {
-    const libraryCtx = yield* LibraryCtx;
-
-    const creationArgs2: Required<LibraryCreationArgs> = {
-      projectOrdinal: creationArgs.projectOrdinal ?? 0,
-      libraryProjects: creationArgs.libraryProjects ?? [],
-    };
-
-    const library = LibraryFactory({
-      projectOrdinal$: new BehaviorSubject<number>(
-        creationArgs2.projectOrdinal
-      ),
-      libraryProjects: createObservableArrayWithLifetime<LibraryProject>(
-        new Subject(),
-        creationArgs2.libraryProjects
-      ),
-      destroy$: new Subject<void>(),
-    });
-
-    libraryCtx.library$.next(library);
-    return library;
-  });
-}
 
 export const Library = {
   Methods: (library: Library) => ({
