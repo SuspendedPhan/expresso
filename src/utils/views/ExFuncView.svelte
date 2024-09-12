@@ -4,11 +4,9 @@
 
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
-  import ExFuncParameterView from "src/utils/views/ExFuncParameterView.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import { createFieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
-  import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
