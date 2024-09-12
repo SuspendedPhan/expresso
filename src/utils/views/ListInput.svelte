@@ -11,12 +11,12 @@
   export let label: string;
   export let fieldValueDataArr$: OBS<FieldValueData[]>;
 
-  let fieldValueDataArr = new Array<FieldValueData>();
+  let fieldValueDatas = new Array<FieldValueData>();
   RxFns.onMount$()
     .pipe(switchMap(() => fieldValueDataArr$))
-    .subscribe((fieldValueDataArr) => {
-      log55.debug("fieldValueDataArr", fieldValueDataArr);
-      fieldValueDataArr = fieldValueDataArr;
+    .subscribe((datas) => {
+      log55.debug("fieldValueDataArr", datas);
+      fieldValueDatas = datas;
     });
 </script>
 
@@ -24,7 +24,7 @@
   <div class="flex">
     <FieldLabel {label} />
     <div class="flex gap-2">
-      {#each fieldValueDataArr as fieldValueData, i (fieldValueData.id)}
+      {#each fieldValueDatas as fieldValueData, i (fieldValueData.id)}
         {#if i > 0}
           <div class="divider divider-horizontal m-0 w-0" />
         {/if}

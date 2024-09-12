@@ -1,7 +1,10 @@
 <script lang="ts">
+  import { log5 } from "src/utils/utils/Log5";
   import type { FieldValueData } from "src/utils/views/Field";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
+
+  const log55 = log5("FieldValue.svelte");
 
   export let fieldData: FieldValueData;
 
