@@ -1,5 +1,5 @@
 import { Effect, Layer } from "effect";
-import { filter } from "rxjs";
+import { filter, tap } from "rxjs";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { Expr } from "src/ex-object/Expr";
 import { FocusCtx } from "src/focus/FocusCtx";
@@ -85,11 +85,14 @@ const ctxEffect = Effect.gen(function* () {
         .onKeydown$(
           "e",
           focusCtx.focus$.pipe(
+            tap((focus) => log55.debug("e.focus$", focus)),
             RxFns.getOrFalsePred(isType(ExprFocusFactory.Expr)),
+            tap((focus) => log55.debug("e.getOrFalsePred", focus)),
             RxFns.getOrFalse((focus) => !focus.isEditing)
           )
         )
         .subscribe(async (focus) => {
+          log55.debug("e", focus);
           focusCtx.setFocus(
             ExprFocusFactory.Expr({ expr: focus.expr, isEditing: true })
           );

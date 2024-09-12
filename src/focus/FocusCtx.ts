@@ -1,10 +1,12 @@
 import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
+import { ExprFocus, ExprFocusCtx } from "src/focus/ExprFocus";
 import { type Focus, FocusFactory } from "src/focus/Focus";
+import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 import type { EditableFocus } from "src/utils/views/Field";
 
-// const log55 = log5("Focus.ts");
+const log55 = log5("Focus.ts");
 
 export enum Hotkeys {
   Down = "ArrowDown,s",
@@ -21,6 +23,10 @@ export class FocusCtx extends Effect.Tag("FocusCtx")<
 const ctxEffect = Effect.gen(function* () {
   const focus$ = new BehaviorSubject<Focus>(FocusFactory.None());
   const focusStack = new Array<Focus>();
+
+  focus$.subscribe((focus) => {
+    log55.debug("focus", focus);
+  });
 
   return {
     focus$: focus$,
@@ -66,9 +72,6 @@ const ctxEffect = Effect.gen(function* () {
     },
 
     register() {
-      // EditorFocusFuncs.register(ctx);
-      // ExObjectFocusFuncs.register(ctx);
-      // ExprFocusFuncs.register(ctx);
       document.addEventListener("keydown", async (event: KeyboardEvent) => {
         if (event.target !== null && "tagName" in event.target) {
           if (event.target.tagName === "INPUT") {

@@ -1,7 +1,10 @@
 import { Effect, Layer } from "effect";
-import { filter, fromEvent, map, of, switchMap } from "rxjs";
+import { filter, fromEvent, map, of, switchMap, tap } from "rxjs";
 import { FocusCtx } from "src/focus/FocusCtx";
+import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess, OBS } from "src/utils/utils/Utils";
+
+const log55 = log5("KeyboardCtx.ts");
 
 export enum KeyboardResult {
   OutOfScope,
@@ -30,6 +33,7 @@ const ctxEffect = Effect.gen(function* () {
       const keyArr = keys.split(",");
 
       return data$.pipe(
+        tap((data) => { log55.debug("onKeydown2$.data", data); }),
         switchMap((data) => {
           if (data === false) {
             return of();

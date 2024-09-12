@@ -21,6 +21,8 @@ const ctxEffect = Effect.gen(function* () {
         return (focus as any).exObject;
       });
     },
+
+    register() {},
   };
 });
 
