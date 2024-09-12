@@ -22,18 +22,20 @@
 
   let rootExObjects: ExObject[];
 
-  RxFns.onMount$().pipe(
-    switchMap(async () => {
-      const project = await DexRuntime.runPromise(ProjectCtx.activeProject);
-      log55.debug("project", project);
-      return project.rootExObjects.items$;
-    }),
-    mergeAll(),
-    map((rootExObjects2) => {
+  RxFns.onMount$()
+    .pipe(
+      switchMap(async () => {
+        log55.debug("onMount");
+        const project = await DexRuntime.runPromise(ProjectCtx.activeProject);
+        log55.debug("project", project);
+        return project.rootExObjects.items$;
+      }),
+      mergeAll()
+    )
+    .subscribe((rootExObjects2) => {
       log55.debug("rootExObjects2", rootExObjects2);
       rootExObjects = rootExObjects2;
-    })
-  );
+    });
 
   let rootElement: HTMLElement;
   const editorViewWidth$ = new ReplaySubject<number>(1);
