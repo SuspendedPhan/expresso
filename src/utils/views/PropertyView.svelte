@@ -4,12 +4,15 @@
   import { Property, PropertyFactory } from "src/ex-object/Property";
   import { ExObjectFocus } from "src/focus/ExObjectFocus";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { log5 } from "src/utils/utils/Log5";
 
   import { rxEquals, RxFns } from "src/utils/utils/Utils";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
   import { isType } from "variant";
+
+  const log55 = log5("PropertyView.svelte");
 
   export let property: Property;
 

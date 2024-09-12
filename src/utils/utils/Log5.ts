@@ -1,7 +1,7 @@
 import { tap } from "rxjs";
 
-const level_minimum = 1;
-// const level_minimum = 12;
+// const level_minimum = 1;
+const level_minimum = 10;
 
 /**
  * @param level Lower levels get filtered out.

@@ -85,7 +85,7 @@
   function addChild() {
     DexRuntime.runPromise(
       Effect.gen(function* () {
-        ExObject.Methods(exObject).addChildBlank();
+        yield* ExObject.Methods(exObject).addChildBlank();
       })
     );
   }
@@ -93,7 +93,7 @@
   function addProperty() {
     DexRuntime.runPromise(
       Effect.gen(function* () {
-        ExObject.Methods(exObject).addBasicPropertyBlank();
+        yield* ExObject.Methods(exObject).addBasicPropertyBlank();
       })
     );
   }

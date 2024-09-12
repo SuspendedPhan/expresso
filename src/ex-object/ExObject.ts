@@ -12,6 +12,7 @@ import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
 import { Project } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
@@ -22,6 +23,8 @@ import {
   type SUB,
 } from "src/utils/utils/Utils";
 import { fields, isType, matcher, variation } from "variant";
+
+const log55 = log5("ExObject.ts");
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
@@ -106,8 +109,9 @@ export const ExObject = {
   Methods: (exObject: ExObject) => ({
     addChildBlank() {
       return Effect.gen(this, function* () {
+        log55.debug("addChildBlank");
         const child = yield* ExObjectFactory2({});
-        this.addChild(child);
+        yield* this.addChild(child);
       });
     },
 
