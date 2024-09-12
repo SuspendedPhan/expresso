@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { ReplaySubject } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
-import { type Project } from "src/ex-object/Project";
+import { ProjectFactory2, type Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { Utils } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
@@ -32,7 +32,9 @@ export function LibraryProjectFactory2(
     const libraryCtx = yield* LibraryCtx;
     const library = yield* libraryCtx.library;
 
-    const ordinal = creationArgs.ordinal ?? (yield* EffectUtils.firstValueFrom(library.projectOrdinal$));
+    const ordinal =
+      creationArgs.ordinal ??
+      (yield* EffectUtils.firstValueFrom(library.projectOrdinal$));
 
     const creationArgs2: Required<LibraryProjectCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("library-project"),
@@ -48,10 +50,13 @@ export function LibraryProjectFactory2(
       project$,
     });
 
-    if (creationArgs2.project !== null) {
-      project$.next(creationArgs2.project);
-      creationArgs2.project.libraryProject = libraryProject;
+    let project = creationArgs2.project;
+    if (project === null) {
+      project = yield* ProjectFactory2({});
     }
+    
+    project$.next(project);
+    project.libraryProject = libraryProject;
 
     return libraryProject;
   });

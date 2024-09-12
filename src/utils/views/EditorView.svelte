@@ -60,9 +60,13 @@
 
   function addRootExObjectBlank() {
     log55.debug("addRootExObjectBlank");
-    DexRuntime.runPromise(ProjectCtx.activeProject).then((project) => {
-      Project.Methods(project).addRootExObjectBlank();
-    });
+
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const activeProject = yield* ProjectCtx.activeProject;
+        yield* Project.Methods(activeProject).addRootExObjectBlank();
+      })
+    );
   }
 </script>
 

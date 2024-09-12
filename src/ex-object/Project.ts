@@ -6,12 +6,15 @@ import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
 import { Utils } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
+
+const log55 = log5("Project.ts");
 
 export const ProjectFactory = variation(
   "Project",
@@ -80,6 +83,7 @@ export const Project = {
   Methods: (project: Project) => ({
     addRootExObjectBlank() {
       return Effect.gen(function* () {
+        log55.debug("addRootExObjectBlank");
         const exObject = yield* ExObjectFactory2({});
         project.rootExObjects.push(exObject);
       });
