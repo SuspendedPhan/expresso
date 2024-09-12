@@ -1,21 +1,21 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { map, mergeAll, of, ReplaySubject, switchMap } from "rxjs";
+  import { mergeAll, of, ReplaySubject, switchMap } from "rxjs";
 
+  import { Effect } from "effect";
+  import { LibraryCtx } from "src/ctx/LibraryCtx";
   import { ProjectCtx } from "src/ctx/ProjectCtx";
   import type { ExObject } from "src/ex-object/ExObject";
+  import { Library } from "src/ex-object/Library";
+  import { Project } from "src/ex-object/Project";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
   import { onMount } from "svelte";
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  import { LibraryCtx } from "src/ctx/LibraryCtx";
-  import { Library } from "src/ex-object/Library";
-  import { Effect } from "effect";
-  import { Project } from "src/ex-object/Project";
-  import { log5 } from "src/utils/utils/Log5";
 
   // @ts-ignore
   const log55 = log5("EditorView.svelte");

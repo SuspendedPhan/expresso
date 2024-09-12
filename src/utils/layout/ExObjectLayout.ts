@@ -2,9 +2,15 @@ import { ExObject } from "src/ex-object/ExObject";
 import { ElementLayout } from "./ElementLayout";
 import { Effect } from "effect";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
+import { log5 } from "src/utils/utils/Log5";
+
+const log55 = log5("ExObjectLayout.ts");
 
 export function createExObjectLayout(rootExObject: ExObject) {
+  log55.debug("createExObjectLayout_");
   return Effect.gen(function* () {
+    log55.debug("createExObjectLayout");
+
     const childrenByExObject = new Map<ExObject, readonly ExObject[]>();
 
     function getChildren(exObject: ExObject) {

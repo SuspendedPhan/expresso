@@ -9,6 +9,10 @@
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
+  import { log5 } from "src/utils/utils/Log5";
+  import { Deferred } from "effect";
+
+  const log55 = log5("RootExObjectView.svelte");
 
   export let exObject: ExObject;
   let clazz = "";
@@ -18,14 +22,18 @@
 
   let element: HTMLElement;
 
-  onMount(() => {
-    DexRuntime.runPromise(createExObjectLayout(exObject)).then((layout) => {
-      elementLayout = layout;
-    });
+  let sensor: ResizeSensor;
 
-    const sensor = new ResizeSensor(element, () => {
-      tick().then(() => {
-        elementLayout.recalculate();
+  onMount(() => {
+    log55.debug("onMount");
+    DexRuntime.runPromise(createExObjectLayout(exObject)).then((layout) => {
+      log55.debug("layout", layout);
+
+      elementLayout = layout;
+      sensor = new ResizeSensor(element, () => {
+        tick().then(() => {
+          elementLayout.recalculate();
+        });
       });
     });
 
@@ -36,11 +44,13 @@
 </script>
 
 <FlexContainer class="p-window {clazz}">
-  <TreeView {elementLayout}>
-    <div bind:this={element}>
-      <ExObjectView {exObject} {elementLayout} />
-    </div>
-  </TreeView>
+  {#if elementLayout}
+    <TreeView {elementLayout}>
+      <div bind:this={element}>
+        <ExObjectView {exObject} {elementLayout} />
+      </div>
+    </TreeView>
+  {/if}
 </FlexContainer>
 
 <style></style>
