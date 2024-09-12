@@ -5,7 +5,11 @@ import {
   ComponentParameterFactory,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import { CustomExFuncFactory, type ExFunc } from "src/ex-object/ExFunc";
+import {
+  CustomExFuncFactory,
+  SystemExFuncFactory,
+  type ExFunc,
+} from "src/ex-object/ExFunc";
 import {
   ExFuncParameterFactory,
   type ExFuncParameter,
@@ -112,6 +116,17 @@ export const ExprFactory2 = {
         args: creationArgs.args ?? [],
         exFunc: creationArgs.exFunc,
       };
+      
+      const { exFunc } = creationArgs2;
+      const isExFunc = isOfVariant(exFunc, SystemExFuncFactory);
+      const argsEmpty = creationArgs2.args.length === 0;
+      const makeArgs = argsEmpty && isExFunc;
+      if (makeArgs) {
+        for (let index = 0; index < exFunc.parameterCount; index++) {
+          const arg = yield* ExprFactory2.Number({ value: 0 });
+          creationArgs2.args.push(arg);
+        }
+      }
 
       const base = yield* ExItem.createExItemBase(creationArgs2.id);
       const expr = ExprFactory.Call({
@@ -120,10 +135,7 @@ export const ExprFactory2 = {
           base.destroy$,
           creationArgs2.args
         ),
-        exFunc$: createBehaviorSubjectWithLifetime(
-          base.destroy$,
-          creationArgs2.exFunc
-        ),
+        exFunc$: createBehaviorSubjectWithLifetime(base.destroy$, exFunc),
       });
 
       for (const arg of creationArgs2.args) {
@@ -192,4 +204,3 @@ export const Expr = {
     });
   },
 };
-

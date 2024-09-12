@@ -1,11 +1,5 @@
 <script lang="ts">
-  import {
-    combineLatestWith,
-    of,
-    switchAll,
-    switchMap,
-    type Observable,
-  } from "rxjs";
+  import { of, switchAll, switchMap, type Observable } from "rxjs";
 
   import assert from "assert-ts";
   import { ExFunc } from "src/ex-object/ExFunc";
@@ -20,7 +14,6 @@
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import { onMount } from "svelte";
 
   const log55 = log5("ExprView.svelte");
 
