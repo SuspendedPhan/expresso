@@ -1,24 +1,41 @@
 <script lang="ts">
-  import { switchMap } from "rxjs";
+  import { Effect } from "effect";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { ProjectCtx } from "src/ctx/ProjectCtx";
+  import type { OBS } from "src/utils/utils/Utils";
 
   import ActionBar from "src/utils/views/ActionBar.svelte";
   import ActionBarButton from "src/utils/views/ActionBarButton.svelte";
   import ExFuncView from "src/utils/views/ExFuncView.svelte";
   import MainPane from "src/utils/views/MainPane.svelte";
+  import { Project } from "src/ex-object/Project";
 
-  const project$ = ctx.projectManager.currentProject$;
-  const exFuncArr$ = project$.pipe(
-    switchMap((project) => project.exFuncObsArr.itemArr$)
+  let exFuncArr$: OBS<any[]>;
+
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const project = yield* ProjectCtx.activeProject;
+      exFuncArr$ = project.exFuncs.items$;
+    })
   );
+
+  function addBlankExFunc() {
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const project = yield* ProjectCtx.activeProject;
+        yield* Project.Methods(project).addExFuncBlank();
+      })
+    );
+  }
 </script>
 
 <MainPane>
   <ActionBar>
-    <ActionBarButton on:click={() => ctx.projectCtx.addExFuncBlank()}
-      >Add Function</ActionBarButton
-    >
+    <ActionBarButton on:click={addBlankExFunc}>Add Function</ActionBarButton>
   </ActionBar>
-  {#each $exFuncArr$ as exFunc}
-    <ExFuncView {ctx} {exFunc} />
-  {/each}
+  {#if exFuncArr$ !== undefined}
+    {#each $exFuncArr$ as exFunc}
+      <ExFuncView {exFunc} />
+    {/each}
+  {/if}
 </MainPane>

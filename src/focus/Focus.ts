@@ -1,5 +1,6 @@
 import type { ComponentFocus } from "src/focus/ComponentFocus";
 import type { EditorFocus } from "src/focus/EditorFocus";
+import type { ExFuncFocus } from "src/focus/ExFuncFocus";
 import type { ExItemFocus } from "src/focus/ExItemFocus";
 import type { ExObjectFocus } from "src/focus/ExObjectFocus";
 import type { ExprFocus } from "src/focus/ExprFocus";
@@ -28,6 +29,7 @@ export type Focus =
   | NavFocus
   | ProjectComponentWindowFocus
   | EditorFocus
-  | ComponentFocus;
+  | ComponentFocus
+  | ExFuncFocus;
 
 export type EditingFocus = Focus & { isEditing: boolean };

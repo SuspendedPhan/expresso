@@ -1,48 +1,62 @@
 <script lang="ts">
-  import { map, of } from "rxjs";
-  import type { ExFunc } from "src/ex-object/ExFunc";
+  import { Effect } from "effect";
+  import { map, of, switchAll } from "rxjs";
+  import { type CustomExFunc } from "src/ex-object/ExFunc";
+  import {
+    ExFuncFocusFactory,
+    type ExFuncFocusKind,
+  } from "src/focus/ExFuncFocus";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
 
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import { createFieldData } from "src/utils/views/Field";
+  import { createFieldData, type FieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
+  import { isType } from "variant";
 
-  export let exFunc: ExFunc;
+  export let exFunc: CustomExFunc;
 
   const isExFuncFocused$ = of(false);
 
-  const nameFieldData = createFieldData({
-    label: "Name",
-    value$: exFunc.name$,
-    createEditingFocusFn: (isEditing) => {
-      return FocusKind.ExFuncName({ exFunc, isEditing });
-    },
-    ctx,
-    focusIsFn: FocusKind.is.ExFuncName,
-    filterFn: (f) => f.exFunc === exFunc,
-  });
+  let nameFieldData: FieldData;
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      nameFieldData = yield* createFieldData<ExFuncFocusKind["Name"]>({
+        label: "Name",
+        value$: exFunc.name$,
+        focusIsFn: isType(ExFuncFocusFactory.Name),
+        createEditingFocusFn: (isEditing) =>
+          ExFuncFocusFactory.Name({ exFunc, isEditing }),
+        filterFn: (f) => f.exFunc === exFunc,
+      });
+    })
+  );
 
   const expr$ = exFunc.expr$;
   const exprId$ = expr$.pipe(map((expr) => expr.id));
-  const parameterFieldDataArr$ = ObservableArrayFns.map2(
-    exFunc.exFuncParameterArr$,
+  const parameterFieldDatas$ = ObservableArrayFns.map2(
+    exFunc.parameters.items$,
     (parameter) => {
-      return createFieldData({
+      const effect = createFieldData<ExFuncFocusKind["Parameter"]>({
         label: "Parameter",
         value$: parameter.name$,
-        createEditingFocusFn: (isEditing) => {
-          return FocusKind.ExFuncParameter({ parameter, isEditing });
-        },
-        ctx,
-        focusIsFn: FocusKind.is.ExFuncParameter,
+        focusIsFn: isType(ExFuncFocusFactory.Parameter),
+        createEditingFocusFn: (isEditing) =>
+          ExFuncFocusFactory.Parameter({ parameter, isEditing }),
         filterFn: (f) => f.parameter === parameter,
       });
+      return DexRuntime.runPromise(effect);
     }
+  ).pipe(
+    map(async (fieldDataArr) => {
+      return await Promise.all(fieldDataArr);
+    }),
+    switchAll()
   );
 
   function handleMouseDown() {}
@@ -55,12 +69,8 @@
 <FlexContainer class="ex-card">
   <FocusView focused={$isExFuncFocused$} on:mousedown={handleMouseDown}>
     <FlexContainer class="p-card flex flex-col gap-2" centered={false}>
-      <Field {ctx} fieldData={nameFieldData} />
-      <ListInput
-        {ctx}
-        label="Parameters"
-        fieldValueDataArr$={parameterFieldDataArr$}
-      />
+      <Field fieldData={nameFieldData} />
+      <ListInput label="Parameters" fieldValueDataArr$={parameterFieldDatas$} />
       <ExObjectButton class="mt-2" on:click={addParameter}
         >Add Parameter</ExObjectButton
       >
@@ -70,7 +80,7 @@
 
     <FlexContainer class="p-card">
       {#key $exprId$}
-        <RootExprView expr={$expr$} {ctx} />
+        <RootExprView expr={$expr$} />
       {/key}
     </FlexContainer>
   </FocusView>

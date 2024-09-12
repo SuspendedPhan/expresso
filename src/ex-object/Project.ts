@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { BehaviorSubject, Subject } from "rxjs";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
-import { type ExFunc } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory2, type ExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
@@ -104,6 +104,14 @@ export const Project = {
         const component = yield* ComponentFactory2.Custom({});
         project.components.push(component);
         return component;
+      });
+    },
+
+    addExFuncBlank() {
+      return Effect.gen(function* () {
+        const exFunc = yield* CustomExFuncFactory2.Custom({});
+        project.exFuncs.push(exFunc);
+        return exFunc;
       });
     },
   }),
