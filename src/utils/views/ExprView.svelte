@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { of, switchAll, switchMap, type Observable } from "rxjs";
+  import {
+    combineLatestWith,
+    of,
+    switchAll,
+    switchMap,
+    type Observable,
+  } from "rxjs";
 
   import assert from "assert-ts";
   import { ExFunc } from "src/ex-object/ExFunc";
@@ -14,6 +20,7 @@
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import { onMount } from "svelte";
 
   const log55 = log5("ExprView.svelte");
 
@@ -44,6 +51,12 @@
     args$ = of([]);
   }
 
+  RxFns.onMount$()
+    .pipe(switchMap(() => args$))
+    .subscribe((args) => {
+      log55.debug("onMount.args", args);
+    });
+
   const text$ = matcher(expr)
     .when(ExprFactory.Number, (number) => {
       return of(number.value.toString());
@@ -56,6 +69,12 @@
       return Expr.getReferenceTargetName$(reference.target);
     })
     .complete();
+
+  RxFns.onMount$()
+    .pipe(switchMap(() => text$))
+    .subscribe((text) => {
+      log55.debug("onMount.text", text);
+    });
 
   let tooltipVisible = false;
   function handleMouseOver(event: MouseEvent) {
@@ -72,8 +91,6 @@
       FocusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }))
     );
   }
-
-  log55.debug("expr", expr);
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>

@@ -106,9 +106,7 @@
 
   async function handleKeydown(event: KeyboardEvent) {
     const selectedIndex = selectedIndex$.value;
-    log55.debug("handleKeydown", event.key, selectedIndex);
     const cmds = await firstValueFrom(cmds$);
-    log55.debug("handleKeyDown.cmds", cmds);
 
     if (event.key === "ArrowDown") {
       log55.debug("ArrowDown");

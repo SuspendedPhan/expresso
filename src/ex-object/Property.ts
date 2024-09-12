@@ -88,6 +88,7 @@ export const PropertyFactory2 = {
         ),
         componentParameter: createArgs2.parameter,
       });
+      createArgs2.expr.parent$.next(property);
       propertyCtx.properties.push(property);
       return property;
     });
@@ -117,6 +118,7 @@ export const PropertyFactory2 = {
           createArgs2.name
         ),
       });
+      createArgs2.expr.parent$.next(property);
       propertyCtx.properties.push(property);
       return property;
     });
@@ -138,6 +140,7 @@ export const PropertyFactory2 = {
           createArgs2.expr
         ),
       });
+      createArgs2.expr.parent$.next(property);
       propertyCtx.properties.push(property);
       return property;
     });
