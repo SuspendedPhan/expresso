@@ -30,12 +30,14 @@
 </script>
 
 <MainPane>
-  <ActionBar asdf="hi">
+  <ActionBar>
     <ActionBarButton on:click={addBlankProjectComponent}>
       Add Component
     </ActionBarButton>
   </ActionBar>
-  {#each $components$ as component}
-    <ComponentView {component} />
-  {/each}
+  {#if components$ !== undefined}
+    {#each $components$ as component}
+      <ComponentView {component} />
+    {/each}
+  {/if}
 </MainPane>
