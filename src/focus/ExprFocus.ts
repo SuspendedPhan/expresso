@@ -1,9 +1,8 @@
 import { Effect, Layer } from "effect";
-import { filter, tap } from "rxjs";
+import { tap } from "rxjs";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { Expr } from "src/ex-object/Expr";
 import { FocusCtx } from "src/focus/FocusCtx";
-import { ExprCommandCtx } from "src/utils/utils/ExprCommand";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns, type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
@@ -40,7 +39,7 @@ export const ExprFocus = {
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
   const keyboardCtx = yield* KeyboardCtx;
-  const exprCommandCtx = yield* ExprCommandCtx;
+  // const exprCommandCtx = yield* ExprCommandCtx;
 
   return {
     get exprFocus$(): OBS<ExprFocus | false> {
@@ -98,16 +97,16 @@ const ctxEffect = Effect.gen(function* () {
           );
         });
 
-      keyboardCtx
-        .onKeydown$(
-          "Enter",
-          this.exprFocus$.pipe(
-            filter((focus) => focus !== false && focus.isEditing)
-          )
-        )
-        .subscribe(async () => {
-          exprCommandCtx.onSubmitExprCommand$.next();
-        });
+      // keyboardCtx
+      //   .onKeydown$(
+      //     "Enter",
+      //     this.exprFocus$.pipe(
+      //       filter((focus) => focus !== false && focus.isEditing)
+      //     )
+      //   )
+      //   .subscribe(async () => {
+      //     exprCommandCtx.onSubmitExprCommand$.next();
+      //   });
 
       // ctx.eventBus.exprReplaced$.subscribe(async (replacement) => {
       //   const newExpr = replacement.newExpr;

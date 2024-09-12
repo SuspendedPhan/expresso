@@ -1,6 +1,5 @@
 import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
-import { ExprFocus, ExprFocusCtx } from "src/focus/ExprFocus";
 import { type Focus, FocusFactory } from "src/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";

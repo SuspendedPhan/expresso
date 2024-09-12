@@ -13,6 +13,7 @@ import {
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
@@ -24,6 +25,8 @@ import {
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
 import { fields, isOfVariant, isType, type VariantOf } from "variant";
+
+const log55 = log5("Expr.ts");
 
 export interface ExprReplacement {
   oldExpr: Expr;
@@ -165,6 +168,7 @@ export const Expr = {
 
   replaceExpr(oldExpr: Expr, newExpr: Expr) {
     return Effect.gen(function* () {
+      log55.debug("replaceExpr", oldExpr, newExpr);
       const parent = yield* EffectUtils.firstValueFrom(oldExpr.parent$);
       if (!parent) {
         throw new Error("oldExpr.parent$ is null");

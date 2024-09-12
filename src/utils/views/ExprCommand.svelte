@@ -8,6 +8,7 @@
     map,
     mergeAll,
     shareReplay,
+    switchAll,
     switchMap,
   } from "rxjs";
   import type { Expr } from "src/ex-object/Expr";
@@ -29,17 +30,26 @@
 
   let input: HTMLInputElement;
 
-  RxFns.onMount$().pipe(
-    switchMap(() => {
-      return DexRuntime.runPromise(ExprCommandCtx.onSubmitExprCommand$);
-    }),
-    map(async () => {
+  RxFns.onMount$()
+    .pipe(
+      switchMap(() => {
+        log55.debug("onMount");
+        return DexRuntime.runPromise(ExprCommandCtx.onSubmitExprCommand$);
+      }),
+      switchAll()
+    )
+    .subscribe(async () => {
+      log55.debug("onSubmitExprCommand");
       const cmd = await firstValueFrom(selectedCmd$);
       if (cmd) {
-        cmd.execute();
+        log55.debug("onSubmitExprCommand.cmd", cmd);
+        DexRuntime.runPromise(
+          Effect.gen(function* () {
+            yield* cmd.execute();
+          })
+        );
       }
-    })
-  );
+    });
 
   const query$ = new BehaviorSubject<string>("");
   const cmds$ = RxFns.onMount$().pipe(
@@ -118,6 +128,15 @@
         index = ArrayFns.getWrappedIndex(cmds, selectedIndex - 1);
       }
       selectedIndex$.next(index);
+    } else if (event.key === "Enter") {
+      log55.debug("Enter");
+      event.preventDefault();
+      DexRuntime.runPromise(
+        Effect.gen(function* () {
+          log55.debug("handleKeydown.onSubmitExprCommand");
+          (yield* ExprCommandCtx.onSubmitExprCommand$).next();
+        })
+      );
     }
   }
 </script>

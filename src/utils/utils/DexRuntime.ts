@@ -19,7 +19,6 @@ const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive).pipe(
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(ExprFocusCtxLive),
   Layer.provideMerge(KeyboardCtxLive),
-  Layer.provideMerge(FocusCtxLive),
   
   Layer.provideMerge(ExprCommandCtxLive),
   Layer.provideMerge(LibraryCtxLive),
@@ -29,6 +28,8 @@ const mainLayer = Layer.merge(EvaluatorCtxLive, ProjectCtxLive).pipe(
   Layer.provideMerge(ViewCtxLive),
   Layer.provideMerge(ExObjectCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
+  Layer.provideMerge(FocusCtxLive),
+
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);
