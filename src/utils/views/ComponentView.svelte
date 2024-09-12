@@ -77,7 +77,11 @@
   );
 
   function addParameter() {
-    component.addParameterBlank();
+    DexRuntime.runPromise(component.addParameterBlank());
+  }
+
+  function addProperty() {
+    DexRuntime.runPromise(component.addPropertyBlank());
   }
 </script>
 
@@ -99,9 +103,7 @@
     <FlexContainer centered={false} class="p-4 flex flex-col">
       <BasicPropertyList
         basicProperties$={component.properties.items$}
-        addPropertyFn={() => {
-          component.addPropertyBlank();
-        }}
+        addPropertyFn={addProperty}
       />
     </FlexContainer>
 
