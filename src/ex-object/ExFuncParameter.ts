@@ -29,7 +29,7 @@ export function ExFuncParameterFactory2(
       id: creationArgs.id ?? Utils.createId("ex-func-param"),
       name:
         creationArgs.name ??
-        `Parameter ${Project.Methods(project).getAndIncrementOrdinal()}`,
+        `Parameter ${yield* Project.Methods(project).getAndIncrementOrdinal()}`,
     };
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);

@@ -7,6 +7,7 @@
     type ExFuncFocusKind,
   } from "src/focus/ExFuncFocus";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { log5 } from "src/utils/utils/Log5";
 
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
@@ -18,6 +19,8 @@
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
   import { isType } from "variant";
+
+  const log55 = log5("ExFuncView.svelte");
 
   export let exFunc: CustomExFunc;
 
@@ -58,6 +61,7 @@
     }
   ).pipe(
     map(async (fieldDataArr) => {
+      log55.debug("fieldDataArr", fieldDataArr);
       return await Promise.all(fieldDataArr);
     }),
     switchAll()
@@ -66,7 +70,7 @@
   function handleMouseDown() {}
 
   function addParameter() {
-    exFunc.addParameterBlank();
+    DexRuntime.runPromise(exFunc.addParameterBlank());
   }
 </script>
 

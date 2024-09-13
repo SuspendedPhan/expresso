@@ -96,7 +96,9 @@ export const CustomExFuncFactory2 = {
         ...methodsFactory(customExFunc_),
       };
       log55.debug("CustomExFuncFactory2.Custom", customExFunc2_);
-      return CustomExFuncFactory(customExFunc2_);
+      const exFunc = CustomExFuncFactory(customExFunc2_);
+      creationArgs2.expr.parent$.next(exFunc);
+      return exFunc;
     });
   },
 };
