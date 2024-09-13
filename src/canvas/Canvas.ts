@@ -8,12 +8,12 @@ import {
 import CanvasPool from "src/canvas/CanvasPool";
 import { PixiFactory, type PixiFactoryArgs } from "src/canvas/PixiFactory";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
 import { EvaluationUtils } from "src/evaluation/EvaluationUtils";
 import { EvaluatorCtx } from "src/evaluation/EvaluatorCtx";
 import { ComponentFactory, type CanvasSetter } from "src/ex-object/Component";
 import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
 import type { ExObject } from "src/ex-object/ExObject";
+import { Project } from "src/ex-object/Project";
 import type { Evaluation } from "src/utils/utils/GoModule";
 import { isType } from "variant";
 import Logger from "../utils/logger/Logger";
@@ -25,13 +25,12 @@ export function CanvasFactory(args: PixiFactoryArgs) {
   const pool = new CanvasPool(() => pixiFactory.makeCircle());
 
   return Effect.gen(function* () {
-  
+    
   });
 
   const effect = Effect.gen(function* () {
     const evaluatorCtx = yield* EvaluatorCtx;
-    const projectCtx = yield* ProjectCtx;
-    const project = yield* projectCtx.activeProject;
+    const project = yield* Project.activeProject;
     const rootExObjects = project.rootExObjects;
     const goModuleCtx = yield* GoModuleCtx;
     const goModule = yield* goModuleCtx.goModule;

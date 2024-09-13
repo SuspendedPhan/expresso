@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Effect } from "effect";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { ProjectCtx } from "src/ctx/ProjectCtx";
+
   import type { OBS } from "src/utils/utils/Utils";
 
   import ActionBar from "src/utils/views/ActionBar.svelte";
@@ -14,7 +14,7 @@
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      const project = yield* ProjectCtx.activeProject;
+      const project = yield* Project.activeProject;
       exFuncArr$ = project.exFuncs.items$;
     })
   );
@@ -22,7 +22,7 @@
   function addBlankExFunc() {
     DexRuntime.runPromise(
       Effect.gen(function* () {
-        const project = yield* ProjectCtx.activeProject;
+        const project = yield* Project.activeProject;
         yield* Project.Methods(project).addExFuncBlank();
       })
     );

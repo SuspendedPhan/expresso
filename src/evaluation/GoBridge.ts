@@ -3,20 +3,19 @@ import { first } from "rxjs";
 import { ExObjectCtx, ExObjectCtxLive } from "src/ctx/ExObjectCtx";
 import { ExprCtx, ExprCtxLive } from "src/ctx/ExprCtx";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
-import { ProjectCtx, ProjectCtxLive } from "src/ctx/ProjectCtx";
 import { PropertyCtx, PropertyCtxLive } from "src/ctx/PropertyCtx";
 import { ExprFactory } from "src/ex-object/Expr";
+import { Project } from "src/ex-object/Project";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
 const startGoBridge_ = Effect.gen(function* () {
-  const projectCtx = yield* ProjectCtx;
   const goModuleCtx = yield* GoModuleCtx;
   const exObjectCtx = yield* ExObjectCtx;
   const goModule = yield* goModuleCtx.goModule;
-  const project = yield* projectCtx.activeProject;
+  const project = yield* Project.activeProject;
   const propertyCtx = yield* PropertyCtx;
 
   project.rootExObjects.events$.subscribe((evt) => {
@@ -94,11 +93,5 @@ const startGoBridge_ = Effect.gen(function* () {
   });
 });
 
-const layers = GoModuleCtxLive.pipe(
-  Layer.merge(ProjectCtxLive),
-  Layer.merge(ExprCtxLive),
-  Layer.merge(ExObjectCtxLive),
-  Layer.merge(PropertyCtxLive)
-);
 
-export const startGoBridge = Effect.provide(startGoBridge_, layers);
+export const GoBridgeCtxLive = Layer.effect(GoBridge, ctxEffect);

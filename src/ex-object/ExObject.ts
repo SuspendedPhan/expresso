@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -49,9 +48,8 @@ interface ExObjectCreationArgs {
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
-    const projectCtx = yield* ProjectCtx;
     const exObjectCtx = yield* ExObjectCtx;
-    const project = yield* projectCtx.activeProject;
+    const project = yield* Project.activeProject;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     const creationArgs2: Required<ExObjectCreationArgs> = {
@@ -185,7 +183,7 @@ export const ExObject = {
     replaceRootExObject(newExObject: ExObject) {
       return Effect.gen(function* () {
         const projectCtx = yield* ProjectCtx;
-        const project = yield* projectCtx.activeProject;
+        const project = yield* Project.activeProject;
         project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
       });

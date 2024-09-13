@@ -2,7 +2,6 @@
   import { Effect } from "effect";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
 
-  import { ProjectCtx } from "src/ctx/ProjectCtx";
   import { Project } from "src/ex-object/Project";
   import type { OBS } from "src/utils/utils/Utils";
   import ActionBarButton from "src/utils/views/ActionBarButton.svelte";
@@ -14,7 +13,7 @@
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      const project = yield* ProjectCtx.activeProject;
+      const project = yield* Project.activeProject;
       components$ = project.components.items$;
     })
   );
@@ -22,7 +21,7 @@
   function addBlankProjectComponent() {
     DexRuntime.runPromise(
       Effect.gen(function* () {
-        const project = yield* ProjectCtx.activeProject;
+        const project = yield* Project.activeProject;
         yield* Project.Methods(project).addComponentBlank();
       })
     );

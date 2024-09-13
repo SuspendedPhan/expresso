@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
+
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Project } from "src/ex-object/Project";
 import {
@@ -24,7 +24,7 @@ export function ExFuncParameterFactory2(
 ) {
   return Effect.gen(function* () {
     const projectCtx = yield* ProjectCtx;
-    const project = yield* projectCtx.activeProject;
+    const project = yield* Project.activeProject;
     const creationArgs2: Required<ExFuncParameterCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("ex-func-param"),
       name:

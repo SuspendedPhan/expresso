@@ -4,10 +4,9 @@
 
   import { Effect } from "effect";
   import { LibraryCtx } from "src/ctx/LibraryCtx";
-  import { ProjectCtx } from "src/ctx/ProjectCtx";
+
   import type { ExObject } from "src/ex-object/ExObject";
   import { Library } from "src/ex-object/Library";
-  import { Project } from "src/ex-object/Project";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
@@ -16,6 +15,7 @@
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import { Project } from "src/ex-object/Project";
 
   // @ts-ignore
   const log55 = log5("EditorView.svelte");
@@ -26,7 +26,7 @@
     .pipe(
       switchMap(async () => {
         log55.debug("onMount");
-        const project = await DexRuntime.runPromise(ProjectCtx.activeProject);
+        const project = await DexRuntime.runPromise(Project.activeProject);
         log55.debug("project", project);
         return project.rootExObjects.items$;
       }),
@@ -65,7 +65,7 @@
 
     DexRuntime.runPromise(
       Effect.gen(function* () {
-        const activeProject = yield* ProjectCtx.activeProject;
+        const activeProject = yield* Project.activeProject;
         yield* Project.Methods(activeProject).addRootExObjectBlank();
       })
     );

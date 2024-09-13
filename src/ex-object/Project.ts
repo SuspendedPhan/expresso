@@ -4,8 +4,7 @@ import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import {
   CustomExFuncFactory2,
-  type CustomExFunc,
-  type ExFunc,
+  type CustomExFunc
 } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
@@ -84,6 +83,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
   });
 }
 
+
 export const Project = {
   get activeProject$() {
     return Effect.gen(function* () {
@@ -99,15 +99,16 @@ export const Project = {
     });
   },
 
-  get activeProject() {
-    return Effect.gen(function* () {
+  get activeProject(): Effect.Effect<Project, never, LibraryProjectCtx> {
+    const effect = Effect.gen(function* () {
       log55.debug("activeProject");
       const activeProjects$ = yield* Project.activeProject$;
-      const project = yield* Effect.promise(() =>
+      const project: Project = yield* Effect.promise(() =>
         firstValueFrom(activeProjects$)
       );
       return project;
     });
+    return effect;
   },
 
   Methods: (project: Project) => ({

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { combineLatestWith, map } from "rxjs";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
+
 import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObjectFactory2 } from "src/ex-object/ExObject";
@@ -82,7 +82,7 @@ export const EditorFocus = {
     keyboardCtx.onKeydown$("o", focusIsEditorNewActions$).subscribe(() => {
       DexRuntime.runPromise(
         Effect.gen(function* () {
-          const project = yield* ProjectCtx.activeProject;
+          const project = yield* Project.activeProject;
           const exObject = yield* ExObjectFactory2({});
           project.rootExObjects.push(exObject);
           focusCtx.popFocus();
