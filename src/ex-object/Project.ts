@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { BehaviorSubject, Subject } from "rxjs";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
-import { CustomExFuncFactory2, type ExFunc } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory2, type CustomExFunc, type ExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
@@ -23,7 +23,7 @@ export const ProjectFactory = variation(
       libraryProject: LibraryProject | null;
       rootExObjects: ObservableArray<ExObject>;
       components: ObservableArray<ComponentKind["Custom"]>;
-      exFuncs: ObservableArray<ExFunc>;
+      exFuncs: ObservableArray<CustomExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
     } & ExItemBase
@@ -36,7 +36,7 @@ interface ProjectCreationArgs {
   id?: string;
   rootExObjects?: ExObject[];
   components?: ComponentKind["Custom"][];
-  exFunc?: ExFunc[];
+  exFunc?: CustomExFunc[];
   currentOrdinal?: number;
 }
 
@@ -68,7 +68,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         base.destroy$,
         creationArgs2.components
       ),
-      exFuncs: createObservableArrayWithLifetime<ExFunc>(
+      exFuncs: createObservableArrayWithLifetime<CustomExFunc>(
         base.destroy$,
         creationArgs2.exFunc
       ),

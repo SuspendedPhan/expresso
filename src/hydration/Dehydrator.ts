@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import assert from "assert-ts";
 import {
   combineLatest,
@@ -10,21 +8,15 @@ import {
   tap,
   type Observable,
 } from "rxjs";
-import {
-  ComponentKind,
+import type { ComponentFactory, ComponentKind } from "src/ex-object/Component";
+import type {
+  ComponentParameterFactory,
   ComponentParameterKind,
-  type CustomComponent,
-  type CustomComponentParameter,
-} from "src/ex-object/Component";
-import type { ExFunc, ExFuncParameter } from "src/ex-object/ExFunc";
-import {
-  ExprType,
-  type CallExpr,
-  type Expr,
-  type NumberExpr,
-} from "src/ex-object/ExItem";
+} from "src/ex-object/ComponentParameter";
+import type { CustomExFunc } from "src/ex-object/ExFunc";
+import type { ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExObject } from "src/ex-object/ExObject";
-import { ReferenceExpr2, type ReferenceExpr } from "src/ex-object/Expr";
+import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
 import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
@@ -35,7 +27,7 @@ import {
   type DexVariantKind,
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import { scoped, typed, type TypesOf, type VariantOf } from "variant";
+import { matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
@@ -54,7 +46,6 @@ type DehydratedExpr_ = {
   ReferenceExpr: {
     id: string;
     targetId: string;
-    referenceExprKind: TypesOf<typeof ReferenceExpr2>;
   };
 };
 
@@ -105,7 +96,7 @@ export interface DehydratedExObject {
   id: string;
   name: string;
   componentId: string;
-  componentType: string;
+  componentType: TypesOf<typeof ComponentFactory>;
   componentProperties: DehydratedComponentProperty[];
   basicProperties: DehydratedBasicProperty[];
   cloneProperty: DehydratedCloneCountProperty;
@@ -114,7 +105,7 @@ export interface DehydratedExObject {
 
 export interface DehydratedComponentProperty {
   id: string;
-  componentParameterKind: ComponentParameterKind;
+  componentParameterKind: TypesOf<typeof ComponentParameterFactory>;
   componentParameterId: string;
   expr: DehydratedExpr;
 }
@@ -132,7 +123,7 @@ export interface DehydratedCloneCountProperty {
 
 export default class Dehydrator {
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
-    const deExObjects$ = project.rootExObjects$.pipe(
+    const deExObjects$ = project.rootExObjects.items$.pipe(
       log55.tapDebug("dehydrateProject$.exObjects.start"),
       switchMap((exObjects) => {
         log55.debug("dehydrateProject$.exObjects", exObjects);
@@ -149,7 +140,7 @@ export default class Dehydrator {
       log55.tapDebug("dehydrateProject$.exObjects.end")
     );
 
-    const deComponents$ = project.componentArr$.pipe(
+    const deComponents$ = project.components.items$.pipe(
       switchMap((components) => {
         return RxFns.combineLatestOrEmpty(
           components.map((component) => {
@@ -159,7 +150,7 @@ export default class Dehydrator {
       })
     );
 
-    const deExFuncs$ = project.exFuncObsArr.itemArr$.pipe(
+    const deExFuncs$ = project.exFuncs.items$.pipe(
       switchMap((exFuncs) => {
         return RxFns.combineLatestOrEmpty(
           exFuncs.map((exFunc) => {
@@ -169,25 +160,31 @@ export default class Dehydrator {
       })
     );
 
-    return combineLatest([deExObjects$, deComponents$, deExFuncs$]).pipe(
+    const deProject$ = combineLatest([
+      deExObjects$,
+      deComponents$,
+      deExFuncs$,
+    ]).pipe(
       log55.tapDebug("dehydrateProject$.combineLatest.start"),
       map(([deExObjects, deComponents, deExFuncs]) => {
-        return {
+        const deProject: DehydratedProject = {
           id: project.libraryProject!.id,
           name: project.libraryProject!.name,
           rootExObjects: deExObjects,
           customComponents: deComponents,
           exFuncArr: deExFuncs,
         };
+        return deProject;
       }),
       tap((deProject) => {
         log55.debug("dehydrateProject$.end", deProject);
       })
     );
+    return deProject$;
   }
 
-  public dehydrateExFunc$(exFunc: ExFunc): Observable<DehydratedExFunc> {
-    const deParameters$ = exFunc.exFuncParameterArr$.pipe(
+  public dehydrateExFunc$(exFunc: CustomExFunc): Observable<DehydratedExFunc> {
+    const deParameters$ = exFunc.parameters.items$.pipe(
       switchMap((parameters) => {
         return RxFns.combineLatestOrEmpty(
           parameters.map((parameter) => {
@@ -228,9 +225,9 @@ export default class Dehydrator {
     );
   }
 
-  public dehydrateCustomComponent$(component: CustomComponent) {
+  public dehydrateCustomComponent$(component: ComponentKind["Custom"]) {
     log55.debug("dehydrateCustomComponent$", component);
-    const deParameters$ = component.parameters$.pipe(
+    const deParameters$ = component.parameters.items$.pipe(
       switchMap((parameters) => {
         log55.debug("dehydrateCustomComponent$.parameters", parameters);
         return RxFns.combineLatestOrEmpty(
@@ -241,7 +238,7 @@ export default class Dehydrator {
       })
     );
 
-    const deRootExObjects$ = component.rootExObjects$.pipe(
+    const deRootExObjects$ = component.rootExObjects.items$.pipe(
       switchMap((rootExObjects) => {
         log55.debug("dehydrateCustomComponent$.rootExObjects", rootExObjects);
         return RxFns.combineLatestOrEmpty(
@@ -270,7 +267,7 @@ export default class Dehydrator {
   }
 
   public dehydrateCustomComponentParameter$(
-    parameter: CustomComponentParameter
+    parameter: ComponentParameterKind["Custom"]
   ): Observable<DehydratedCustomComponentParameter> {
     return parameter.name$.pipe(
       map((name) => {
@@ -294,7 +291,7 @@ export default class Dehydrator {
       )
     );
 
-    const deBasicProperties$ = exObject.basicProperties.pipe(
+    const deBasicProperties$ = exObject.basicProperties.items$.pipe(
       switchMap((properties) => {
         const deProperties = properties.map((property) =>
           this.dehydrateBasicProperty$(property)
@@ -345,7 +342,7 @@ export default class Dehydrator {
             id: exObject.id,
             name,
             componentId: exObject.component.id,
-            componentType: ComponentKind[exObject.component.componentKind],
+            componentType: exObject.component.type,
             componentProperties: deComponentProperties,
             basicProperties: deBasicProperties,
             cloneProperty: deCloneProperty,
@@ -374,8 +371,7 @@ export default class Dehydrator {
         const deProperty: DehydratedComponentProperty = {
           id: property.id,
           componentParameterId: property.componentParameter.id,
-          componentParameterKind:
-            property.componentParameter.componentParameterKind,
+          componentParameterKind: property.componentParameter.type,
           expr: dehydratedExpr,
         };
         return deProperty;
@@ -430,20 +426,15 @@ export default class Dehydrator {
 
   @loggedMethod
   private dehydrateExpr$(expr: Expr): Observable<DehydratedExpr> {
-    switch (expr.exprType) {
-      case ExprType.NumberExpr:
-        return this.dehydrateNumberExpr$(expr);
-      case ExprType.CallExpr:
-        return this.dehydrateCallExpr$(expr);
-      case ExprType.ReferenceExpr:
-        return this.dehydrateReferenceExpr$(expr);
-      default:
-        throw new Error("Unexpected exprType");
-    }
+    return matcher(expr)
+      .when(ExprFactory.Number, (expr) => this.dehydrateNumberExpr$(expr))
+      .when(ExprFactory.Call, (expr) => this.dehydrateCallExpr$(expr))
+      .when(ExprFactory.Reference, (expr) => this.dehydrateReferenceExpr$(expr))
+      .complete();
   }
 
   private dehydrateNumberExpr$(
-    expr: NumberExpr
+    expr: ExprKind["Number"]
   ): Observable<DehydratedExprKind["Number"]> {
     return of(
       DehydratedExpr.Number({
@@ -454,7 +445,7 @@ export default class Dehydrator {
   }
 
   private dehydrateCallExpr$(
-    expr: CallExpr
+    expr: ExprKind["Call"]
   ): Observable<DehydratedExprKind["CallExpr"]> {
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
@@ -475,17 +466,16 @@ export default class Dehydrator {
   }
 
   private dehydrateReferenceExpr$(
-    expr: ReferenceExpr
+    expr: ExprKind["Reference"]
   ): Observable<DehydratedExprKind["ReferenceExpr"]> {
-    log55.debug(expr.reference);
+    log55.debug(expr.target);
 
-    const target = expr.reference.target;
+    const target = expr.target;
     assert(target != null);
     return of(
       DehydratedExpr.ReferenceExpr({
         id: expr.id,
         targetId: target.id,
-        referenceExprKind: expr.reference.referenceExpr2Kind,
       })
     );
   }
