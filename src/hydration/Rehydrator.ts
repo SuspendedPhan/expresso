@@ -4,6 +4,7 @@ import { firstValueFrom } from "rxjs";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
+import { LibraryCtx } from "src/ctx/LibraryCtx";
 import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import type { PropertyCtx } from "src/ctx/PropertyCtx";
 import {
@@ -25,7 +26,8 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
-import { ProjectFactory2 } from "src/ex-object/Project";
+import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
+import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import {
   DehydratedExpr,
@@ -92,23 +94,22 @@ export default function createRehydrator() {
       yield* assignTargets();
       yield* assignComponentParameters();
 
-      const project = ProjectFactory2({
+      const project: Project = yield* ProjectFactory2({
         id: deProject.id,
-        name: deProject.name,
         rootExObjects,
-        componentArr: customComponentArr,
-        exFuncArr,
+        components: customComponentArr,
+        exFuncs: exFuncArr,
       });
 
       log55.debug("Project loaded", project);
 
-      const libraryProject = yield* createLibraryProject(ctx, {
+      const libraryProject = yield* LibraryProjectFactory2({
         id: deProject.id,
         name: deProject.name,
         project,
       });
 
-      const library = yield* Effect.fromPromise(firstValueFrom(ctx.library$));
+      const library = yield* LibraryCtx.library;
       library.addProject(libraryProject);
 
       return libraryProject;

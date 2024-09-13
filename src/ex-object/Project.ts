@@ -40,7 +40,7 @@ interface ProjectCreationArgs {
   id?: string;
   rootExObjects?: ExObject[];
   components?: ComponentKind["Custom"][];
-  exFunc?: CustomExFunc[];
+  exFuncs?: CustomExFunc[];
   currentOrdinal?: number;
 }
 
@@ -51,7 +51,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       id: creationArgs.id ?? Utils.createId("project"),
       rootExObjects: creationArgs.rootExObjects ?? [],
       components: creationArgs.components ?? [],
-      exFunc: creationArgs.exFunc ?? [],
+      exFuncs: creationArgs.exFuncs ?? [],
       currentOrdinal: creationArgs.currentOrdinal ?? 0,
     };
 
@@ -74,7 +74,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       ),
       exFuncs: createObservableArrayWithLifetime<CustomExFunc>(
         base.destroy$,
-        creationArgs2.exFunc
+        creationArgs2.exFuncs
       ),
       currentOrdinal$,
       destroy$: new Subject<void>(),
