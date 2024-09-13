@@ -1,7 +1,12 @@
 import { Effect } from "effect";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Subject, switchMap } from "rxjs";
+import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
-import { CustomExFuncFactory2, type CustomExFunc, type ExFunc } from "src/ex-object/ExFunc";
+import {
+  CustomExFuncFactory2,
+  type CustomExFunc,
+  type ExFunc,
+} from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
@@ -11,7 +16,7 @@ import {
   createObservableArrayWithLifetime,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
-import { Utils } from "src/utils/utils/Utils";
+import { Utils, type OBS } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
 
 const log55 = log5("Project.ts");
@@ -80,6 +85,31 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 }
 
 export const Project = {
+  get activeProject$() {
+    return Effect.gen(function* () {
+      const libraryProjectCtx = yield* LibraryProjectCtx;
+      const activeLibraryProject$ = libraryProjectCtx.activeLibraryProject$;
+      const result = activeLibraryProject$.pipe(
+        switchMap(libraryProject => {
+          const project$: OBS<Project> = libraryProject.project$;
+          return project$;
+        })
+      );
+      return result;
+    });
+  },
+
+  get activeProject() {
+    return Effect.gen(function* () {
+      log55.debug("activeProject");
+      const activeProjects$ = yield* Project.activeProject$;
+      const project = yield* Effect.promise(() =>
+        firstValueFrom(activeProjects$)
+      );
+      return project;
+    });
+  },
+
   Methods: (project: Project) => ({
     addRootExObjectBlank() {
       return Effect.gen(function* () {
