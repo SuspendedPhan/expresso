@@ -34,6 +34,10 @@
           ExFuncFocusFactory.Name({ exFunc, isEditing }),
         filterFn: (f) => f.exFunc === exFunc,
       });
+      nameFieldData.value$.subscribe((value) => {
+        console.log("nameFieldData.value$", value);
+      });
+      console.log("nameFieldData", nameFieldData.value$);
     })
   );
 

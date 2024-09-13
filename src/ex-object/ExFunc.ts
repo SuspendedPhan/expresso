@@ -8,6 +8,7 @@ import {
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
@@ -22,6 +23,8 @@ import {
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
 import { fields, isType, variation, type VariantOf } from "variant";
+
+const log55 = log5("ExFunc.ts");
 
 export type ExFunc = CustomExFunc | SystemExFunc;
 
@@ -61,7 +64,7 @@ export const CustomExFuncFactory2 = {
       let name = creationArgs.name;
       if (name === undefined) {
         const project: Project = yield* projectCtx.activeProject;
-        const ordinal = Project.Methods(project).getAndIncrementOrdinal();
+        const ordinal = yield* Project.Methods(project).getAndIncrementOrdinal();
         name = `Function ${ordinal}`;
       }
 
@@ -92,6 +95,7 @@ export const CustomExFuncFactory2 = {
         ...customExFunc_,
         ...methodsFactory(customExFunc_),
       };
+      log55.debug("CustomExFuncFactory2.Custom", customExFunc2_);
       return CustomExFuncFactory(customExFunc2_);
     });
   },
