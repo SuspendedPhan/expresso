@@ -2,17 +2,9 @@ import assert from "assert-ts";
 import { Effect } from "effect";
 import { firstValueFrom } from "rxjs";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
-import {
-  ComponentFactory,
-  type Component,
-  type ComponentKind,
-} from "src/ex-object/Component";
-import {
-  ComponentParameter,
-  ComponentParameterFactory,
-  type ComponentParameterKind,
-} from "src/ex-object/ComponentParameter";
-import type { ExFunc } from "src/ex-object/ExFunc";
+import type { ExprCtx } from "src/ctx/ExprCtx";
+import { ComponentFactory, type ComponentKind } from "src/ex-object/Component";
+import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
 import type { ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import {
@@ -21,8 +13,6 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
-import type { LibraryProject } from "src/ex-object/LibraryProject";
-import type { PropertyKind } from "src/ex-object/Property";
 import {
   DehydratedExpr,
   type DehydratedBasicProperty,
@@ -55,21 +45,21 @@ export default function createRehydrator() {
   function rehydrateProject(deProject: DehydratedProject) {
     log55.debug("rehydrateProject.start", deProject);
 
-    const exFuncArr: ExFunc[] = await Promise.all(
+    const exFuncArr = await Promise.all(
       deProject.exFuncArr.map(rehydrateExFunc)
     );
 
-    const customComponentArr: ComponentKind["Custom"][] = await Promise.all(
+    const customComponentArr = await Promise.all(
       deProject.customComponents.map(rehydrateCustomComponent)
     );
 
     log55.debug("rehydrateProject.customComponentArr.end", customComponentArr);
 
-    const rootExObjects: ExObject[] = await Promise.all(
+    const rootExObjects = await Promise.all(
       deProject.rootExObjects.map(rehydrateExObject)
     );
 
-    rehydrateTargets();
+    await rehydrateTargets();
 
     const project = CreateProject.from(ctx, {
       rootExObjects,
@@ -79,7 +69,7 @@ export default function createRehydrator() {
 
     log55.debug("Project loaded", project);
 
-    const libraryProject: LibraryProject = await createLibraryProject(ctx, {
+    const libraryProject = await createLibraryProject(ctx, {
       id: deProject.id,
       name: deProject.name,
       project,
@@ -90,7 +80,7 @@ export default function createRehydrator() {
     return libraryProject;
   }
 
-  async function rehydrateTargets(): Promise<void> {
+  function rehydrateTargets() {
     for (const reRefExpr of rehydratedReferenceExprs) {
       const target = targetById.get(reRefExpr.dehydratedReferenceExpr.targetId);
       assert(target !== undefined);
@@ -98,9 +88,9 @@ export default function createRehydrator() {
     }
   }
 
-  async function rehydrateExFunc(deExFunc: DehydratedExFunc): Promise<ExFunc> {
+  function rehydrateExFunc(deExFunc: DehydratedExFunc) {
     const expr = await rehydrateExpr(deExFunc.expr);
-    const exFuncParameterArr: ExFuncParameter[] = await Promise.all(
+    const exFuncParameterArr = await Promise.all(
       deExFunc.parameters.map(rehydrateExFuncParameter)
     );
     return createExFunc(ctx, {
@@ -111,7 +101,7 @@ export default function createRehydrator() {
     });
   }
 
-  async function rehydrateExFuncParameter(
+  function rehydrateExFuncParameter(
     deExFuncParameter: DehydratedExFuncParameter
   ): Promise<ExFuncParameter> {
     const parameter = await createExFuncParameter(ctx, {
@@ -122,7 +112,7 @@ export default function createRehydrator() {
     return parameter;
   }
 
-  async function rehydrateCustomComponent(
+  function rehydrateCustomComponent(
     deCustomComponent: DehydratedCustomComponent
   ): Promise<CustomComponent> {
     const parameterArr: CustomComponentParameter[] = await Promise.all(
@@ -144,9 +134,9 @@ export default function createRehydrator() {
     return component;
   }
 
-  async function rehydrateComponentParameter(
+  function rehydrateComponentParameter(
     deParameter: DehydratedCustomComponentParameter
-  ): Promise<CustomComponentParameter> {
+  ) {
     const parameter = await createCustomComponentParameter(ctx, {
       id: deParameter.id,
       name: deParameter.name,
@@ -155,19 +145,16 @@ export default function createRehydrator() {
     return parameter;
   }
 
-  async function rehydrateExObject(
-    deExObject: DehydratedExObject
-  ): Promise<ExObject> {
-    const component = getComponent(
+  function rehydrateExObject(deExObject: DehydratedExObject) {
+    const component = await getComponent(
       deExObject.componentId,
       deExObject.componentType
     );
-    const componentPropertyL: PropertyKind["ComponentParameterProperty"][] =
-      await Promise.all(
-        deExObject.componentProperties.map(rehydrateComponentProperty)
-      );
+    const componentPropertyL = await Promise.all(
+      deExObject.componentProperties.map(rehydrateComponentProperty)
+    );
 
-    const basicPropertyL: PropertyKind["BasicProperty"][] = await Promise.all(
+    const basicPropertyL = await Promise.all(
       deExObject.basicProperties.map(rehydrateBasicProperty)
     );
 
@@ -175,11 +162,11 @@ export default function createRehydrator() {
       deExObject.cloneProperty
     );
 
-    const children: ExObject[] = await Promise.all(
+    const children = await Promise.all(
       deExObject.children.map(rehydrateExObject)
     );
 
-    const exObject: ExObject = await CreateExObject.blank(ctx, {
+    const exObject = await CreateExObject.blank(ctx, {
       component,
       id: deExObject.id,
       name: deExObject.name,
@@ -192,10 +179,10 @@ export default function createRehydrator() {
     return exObject;
   }
 
-  async function rehydrateComponentProperty(
+  function rehydrateComponentProperty(
     deProperty: DehydratedComponentProperty
-  ): Promise<PropertyKind["ComponentParameterProperty"]> {
-    const parameter = getComponentParameter(
+  ) {
+    const parameter = await getComponentParameter(
       deProperty.componentParameterId,
       deProperty.componentParameterKind
     );
@@ -211,9 +198,7 @@ export default function createRehydrator() {
     return property;
   }
 
-  async function rehydrateBasicProperty(
-    deProperty: DehydratedBasicProperty
-  ): Promise<PropertyKind["BasicProperty"]> {
+  function rehydrateBasicProperty(deProperty: DehydratedBasicProperty) {
     const expr = await rehydrateExpr(deProperty.expr);
     const property = await Create.Property.basic(
       ctx,
@@ -226,9 +211,9 @@ export default function createRehydrator() {
     return property;
   }
 
-  async function rehydrateCloneCountProperty(
+  function rehydrateCloneCountProperty(
     deProperty: DehydratedCloneCountProperty
-  ): Promise<PropertyKind["CloneCountProperty"]> {
+  ) {
     const expr = await rehydrateExpr(deProperty.expr);
     const property = await Create.Property.cloneCount(ctx, deProperty.id, expr);
 
@@ -236,39 +221,54 @@ export default function createRehydrator() {
     return property;
   }
 
-  async function rehydrateExpr(deExpr: DehydratedExpr): Promise<Expr> {
-    const result = matcher(deExpr)
-      .when(DehydratedExpr.Number, rehydrateNumberExpr)
-      .when(DehydratedExpr.CallExpr, rehydrateCallExpr)
-      .when(DehydratedExpr.ReferenceExpr, rehydrateReferenceExpr)
-      .complete();
-    return result;
-  }
-
-  async function rehydrateNumberExpr(
-    deExpr: DehydratedExprKind["Number"]
-  ): Promise<NumberExpr> {
-    const newLocal = ctx.objectFactory.createNumberExpr(
-      deExpr.value,
-      deExpr.id
-    );
-    return newLocal;
-  }
-
-  async function rehydrateCallExpr(
-    deExpr: DehydratedExprKind["CallExpr"]
-  ): Promise<CallExpr> {
-    const argL = await Promise.all(deExpr.args.map(rehydrateExpr));
-    const callExprBase = await createCallExprBase(ctx, {
-      id: deExpr.id,
-      args: argL,
+  function rehydrateExpr(deExpr: DehydratedExpr) {
+    return Effect.gen(function* () {
+      const result = matcher(deExpr)
+        .when(DehydratedExpr.Number, (deExpr) => {
+          return rehydrateNumberExpr(deExpr);
+        })
+        .when(DehydratedExpr.CallExpr, (deExpr) => {
+          return rehydrateCallExpr(deExpr);
+        })
+        .when(DehydratedExpr.ReferenceExpr, (deExpr) => {
+          return rehydrateReferenceExpr(deExpr);
+        })
+        .complete();
+      return yield* result;
     });
-    return createSystemCallExpr(ctx, { base: callExprBase });
+  }
+
+  function rehydrateNumberExpr(deExpr: DehydratedExprKind["Number"]) {
+    return Effect.gen(function* () {
+      const expr = yield* ExprFactory2.Number({
+        id: deExpr.id,
+        value: deExpr.value,
+      });
+      return expr;
+    });
+  }
+
+  function rehydrateCallExpr(
+    deExpr: DehydratedExprKind["CallExpr"]
+  ): Effect.Effect<ExprKind["Call"], never, ExprCtx> {
+    return Effect.gen(function* () {
+      let args = new Array<Expr>();
+      for (const deArg of deExpr.args) {
+        const arg = yield* rehydrateExpr(deArg);
+        args.push(arg);
+      }
+
+      const expr = yield* ExprFactory2.Call({
+        id: deExpr.id,
+        args,
+      });
+      return expr;
+    });
   }
 
   function rehydrateReferenceExpr(deExpr: DehydratedExprKind["ReferenceExpr"]) {
     return Effect.gen(function* () {
-      const reference: ExprKind["Reference"] = yield* ExprFactory2.Reference({
+      const reference = yield* ExprFactory2.Reference({
         id: deExpr.id,
         target: null,
       });
@@ -294,7 +294,7 @@ export default function createRehydrator() {
           );
           return component;
         case ComponentFactory.Canvas.output.type:
-          return ctx.componentCtx.getCanvasComponentById(componentId);
+          return yield* ComponentCtx.getCanvasComponentById(componentId);
         default:
           throw new Error(`Unknown component type: ${componentType}`);
       }

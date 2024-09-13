@@ -44,7 +44,7 @@ export type ReferenceTarget =
 
 interface CallExpr_ extends ExItemBase {
   args$: SUB<Expr[]>;
-  exFunc$: BSUB<ExFunc>;
+  exFunc$: BSUB<ExFunc | null>;
 }
 
 export const ExprFactory = dexScopedVariant("Expr", {
@@ -69,7 +69,7 @@ interface ExprCreationArgs {
 
   CallExpr: {
     id?: string;
-    exFunc: ExFunc;
+    exFunc?: ExFunc | null;
     args?: Expr[];
   };
 }
@@ -114,9 +114,9 @@ export const ExprFactory2 = {
       const creationArgs2: Required<ExprCreationArgs["CallExpr"]> = {
         id: creationArgs.id ?? Utils.createId("call-expr"),
         args: creationArgs.args ?? [],
-        exFunc: creationArgs.exFunc,
+        exFunc: creationArgs.exFunc ?? null,
       };
-      
+
       const { exFunc } = creationArgs2;
       const isExFunc = isOfVariant(exFunc, SystemExFuncFactory);
       const argsEmpty = creationArgs2.args.length === 0;
