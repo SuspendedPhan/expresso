@@ -1,6 +1,5 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
-import { firstValueFrom } from "rxjs";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
@@ -42,7 +41,6 @@ import {
   type DehydratedExprKind,
   type DehydratedProject,
 } from "src/hydration/Dehydrator";
-import { DexRuntime } from "src/utils/utils/DexRuntime";
 
 import { log5 } from "src/utils/utils/Log5";
 import { matcher, type TypesOf } from "variant";
@@ -110,7 +108,7 @@ export default function createRehydrator() {
       });
 
       const library = yield* LibraryCtx.library;
-      library.addProject(libraryProject);
+      library.libraryProjects.push(libraryProject);
 
       return libraryProject;
     });
