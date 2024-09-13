@@ -3,6 +3,7 @@ import { Effect } from "effect";
 
 import type { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
+import { Project } from "src/ex-object/Project";
 import { Property } from "src/ex-object/Property";
 import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
@@ -56,7 +57,7 @@ export const ExItemFocus = {
       }
 
       // Find the next root object
-      const project = yield* (yield* ProjectCtx).activeProject;
+      const project = yield* Project.activeProject;
       const rootExObject = yield* ExObject.Methods(exObject).getRootExObject();
       const rootExObjects = project.rootExObjects.items;
       const index = rootExObjects.indexOf(rootExObject);
@@ -99,7 +100,7 @@ export const ExItemFocus = {
       }
 
       // Find the previous root object
-      const project = yield* (yield* ProjectCtx).activeProject;
+      const project = yield* Project.activeProject;
       const rootExObject = yield* ExObject.Methods(exObject).getRootExObject();
       const rootExObjects = project.rootExObjects.items;
       const index = rootExObjects.indexOf(rootExObject);

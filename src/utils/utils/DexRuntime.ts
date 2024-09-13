@@ -3,6 +3,7 @@ import { ExObjectCtxLive } from "src/ctx/ExObjectCtx";
 import { ExprCtxLive } from "src/ctx/ExprCtx";
 import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
+import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
 import { PropertyCtxLive } from "src/ctx/PropertyCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
@@ -20,6 +21,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(KeyboardCtxLive),
   
   Layer.provideMerge(ExprCommandCtxLive),
+  Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(PropertyCtxLive),
   Layer.provideMerge(ExObjectCtxLive),
@@ -28,7 +30,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ExObjectCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
   Layer.provideMerge(FocusCtxLive),
-
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);

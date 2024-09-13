@@ -1,9 +1,9 @@
 import { Effect, Layer } from "effect";
 import { first } from "rxjs";
-import { ExObjectCtx, ExObjectCtxLive } from "src/ctx/ExObjectCtx";
-import { ExprCtx, ExprCtxLive } from "src/ctx/ExprCtx";
-import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
-import { PropertyCtx, PropertyCtxLive } from "src/ctx/PropertyCtx";
+import { ExObjectCtx } from "src/ctx/ExObjectCtx";
+import { ExprCtx } from "src/ctx/ExprCtx";
+import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import { PropertyCtx } from "src/ctx/PropertyCtx";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { log5 } from "src/utils/utils/Log5";
@@ -11,7 +11,12 @@ import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
-const startGoBridge_ = Effect.gen(function* () {
+export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
+  GoBridgeCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
+
+const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
   const exObjectCtx = yield* ExObjectCtx;
   const goModule = yield* goModuleCtx.goModule;
@@ -91,7 +96,8 @@ const startGoBridge_ = Effect.gen(function* () {
       })
       .complete();
   });
+
+  return {};
 });
 
-
-export const GoBridgeCtxLive = Layer.effect(GoBridge, ctxEffect);
+export const GoBridgeCtxLive = Layer.effect(GoBridgeCtx, ctxEffect);

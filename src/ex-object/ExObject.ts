@@ -182,7 +182,7 @@ export const ExObject = {
 
     replaceRootExObject(newExObject: ExObject) {
       return Effect.gen(function* () {
-        const projectCtx = yield* ProjectCtx;
+        
         const project = yield* Project.activeProject;
         project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();

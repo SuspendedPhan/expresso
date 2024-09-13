@@ -7,6 +7,7 @@ import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObjectFactory2 } from "src/ex-object/ExObject";
 import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
+import { Project } from "src/ex-object/Project";
 import { FocusFactory } from "src/focus/Focus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { CommandCardCtx } from "src/utils/utils/CommandCard";
