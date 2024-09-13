@@ -1,5 +1,5 @@
 import { Effect, Layer } from "effect";
-import { CanvasComponentStore } from "src/ex-object/Component";
+import { CanvasComponentStore, type ComponentKind } from "src/ex-object/Component";
 import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
@@ -19,7 +19,7 @@ const ctxEffect = Effect.gen(function* () {
 
   return {
     getCanvasComponentById(id: string) {
-      const component = (CanvasComponentStore as any)[id];
+      const component: ComponentKind["Canvas"] = (CanvasComponentStore as any)[id];
       if (!component) {
         throw new Error(`Canvas component not found: ${id}`);
       }

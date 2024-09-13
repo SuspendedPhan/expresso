@@ -32,7 +32,7 @@ interface PropertyBase extends ExItemBase {
 }
 
 interface ComponentParameterProperty extends PropertyBase {
-  componentParameter: ComponentParameter;
+  componentParameter: ComponentParameter|null;
 }
 
 interface BasicProperty extends PropertyBase {
@@ -48,7 +48,7 @@ export interface CreatePropertyArgs {
   };
 
   ComponentParameter: {
-    parameter: ComponentParameter;
+    parameter?: ComponentParameter | null;
   } & CreatePropertyArgs["Base"];
 
   Basic: {
@@ -75,7 +75,7 @@ export const PropertyFactory2 = {
       const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
-        parameter: createArgs.parameter,
+        parameter: createArgs.parameter ?? null,
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
       };
 
