@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import { of } from "rxjs";
-import { ProjectCtx } from "src/ctx/ProjectCtx";
 import {
   ExFuncParameterFactory2,
   type ExFuncParameter,
@@ -60,10 +59,9 @@ interface CustomExFuncCreationArgs {
 export const CustomExFuncFactory2 = {
   Custom(creationArgs: CustomExFuncCreationArgs) {
     return Effect.gen(function* () {
-      const projectCtx = yield* ProjectCtx;
       let name = creationArgs.name;
       if (name === undefined) {
-        const project: Project = yield* projectCtx.activeProject;
+        const project: Project = yield* Project.activeProject;
         const ordinal = yield* Project.Methods(project).getAndIncrementOrdinal();
         name = `Function ${ordinal}`;
       }
