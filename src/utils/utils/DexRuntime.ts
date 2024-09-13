@@ -13,6 +13,7 @@ import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
+import { PersistCtxLive } from "src/utils/utils/PersistCtx";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -21,6 +22,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(KeyboardCtxLive),
   
   Layer.provideMerge(ExprCommandCtxLive),
+  Layer.provideMerge(PersistCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(PropertyCtxLive),
