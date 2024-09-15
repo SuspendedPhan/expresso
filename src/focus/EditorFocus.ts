@@ -46,8 +46,7 @@ export const EditorFocus = {
         )
       )
       .subscribe(async () => {
-        // DexRuntime.runPromise(
-        //   Effect.gen(function* () {
+        // const effect = Effect.gen(function* () {
         //     const exItem$ = yield* ExItemFocus.exItemBasicFocus$;
         //     const exItem = yield* EffectUtils.firstValueFrom(exItem$);
         //     focusCtx.setFocus(
@@ -55,7 +54,9 @@ export const EditorFocus = {
         //         exItem: exItem === false ? null : exItem,
         //       })
         //     );
-        //   })
+        //   });
+        // DexRuntime.runPromise(
+        //   effect
         // );
       });
 

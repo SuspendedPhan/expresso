@@ -84,6 +84,7 @@ export interface DehydratedCustomComponent {
   id: string;
   name: string;
   parameters: DehydratedCustomComponentParameter[];
+  properties: DehydratedBasicProperty[];
   rootExObjects: DehydratedExObject[];
 }
 
@@ -238,6 +239,16 @@ export default class Dehydrator {
       })
     );
 
+    const deProperties$ = component.properties.items$.pipe(
+      switchMap((properties) => {
+        return RxFns.combineLatestOrEmpty(
+          properties.map((property) => {
+            return this.dehydrateBasicProperty$(property);
+          })
+        );
+      })
+    );
+
     const deRootExObjects$ = component.rootExObjects.items$.pipe(
       switchMap((rootExObjects) => {
         log55.debug("dehydrateCustomComponent$.rootExObjects", rootExObjects);
@@ -252,16 +263,19 @@ export default class Dehydrator {
     return combineLatest([
       deParameters$,
       deRootExObjects$,
+      deProperties$,
       component.name$,
     ]).pipe(
-      map(([deParameters, deRootExObjects, name]) => {
+      map(([deParameters, deRootExObjects, deProperties, name]) => {
         log55.debug("dehydrateCustomComponent$.combineLatest");
-        return {
+        const deComponent: DehydratedCustomComponent = {
           id: component.id,
           name,
           parameters: deParameters,
+          properties: deProperties,
           rootExObjects: deRootExObjects,
         };
+        return deComponent;
       })
     );
   }

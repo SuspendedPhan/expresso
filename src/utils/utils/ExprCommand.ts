@@ -49,6 +49,8 @@ const ctxEffect = Effect.gen(function* () {
 
     getCommands(query: string, expr: Expr) {
       return Effect.gen(function* () {
+        log55.debug("getCommands.start", { query, expr });
+
         const commands: ExprCommand[] = [];
         const value = parseFloat(query);
         if (!isNaN(value)) {
@@ -74,14 +76,16 @@ const ctxEffect = Effect.gen(function* () {
         }
 
         const exprCommands = getExprCommands(expr);
-        Effect.promise(async () => {
+        yield* Effect.promise(async () => {
           for await (const command of exprCommands) {
+            log55.debug("getCommands.command.start", command);
             const command2 = await DexRuntime.runPromise(command);
             const blank = query === "";
             const includes = command2.label.includes(query);
             if (blank || includes) {
               commands.push(command2);
             }
+            log55.debug("getCommands.command.end", command);
           }
         });
 
