@@ -12,6 +12,7 @@
   import { RxFns } from "src/utils/utils/Utils";
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
   import { log5 } from "src/utils/utils/Log5";
+  import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 
   const log55 = log5("AppLayoutView.svelte");
 
@@ -34,7 +35,7 @@
     });
 
   onMount(() => {
-    // FirebaseAuthentication.init();
+    FirebaseAuthentication.init();
   });
 </script>
 

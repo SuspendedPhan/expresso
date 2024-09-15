@@ -30,6 +30,7 @@ export const Library = {
           name,
         });
         library.libraryProjects.push(libraryProject);
+        return libraryProject;
       });
     },
   }),

@@ -402,13 +402,5 @@ export default function createRehydrator() {
 
   return {
     rehydrateProject,
-    rehydrateExFunc,
-    rehydrateExFuncParameter,
-    rehydrateCustomComponent,
-    rehydrateComponentParameter,
-    rehydrateExObject,
-    rehydrateComponentProperty,
-    rehydrateBasicProperty,
-    rehydrateCloneCountProperty,
   };
 }

@@ -1,4 +1,5 @@
 import { Layer, ManagedRuntime } from "effect";
+import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { ExObjectCtxLive } from "src/ctx/ExObjectCtx";
 import { ExprCtxLive } from "src/ctx/ExprCtx";
 import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
@@ -32,6 +33,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ExObjectCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
   Layer.provideMerge(FocusCtxLive),
+  Layer.provideMerge(ComponentCtxLive),
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);

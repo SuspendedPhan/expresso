@@ -1,12 +1,12 @@
 <script lang="ts">
   import { ResizeSensor } from "css-element-queries";
-  import { mergeAll, of, ReplaySubject, switchMap } from "rxjs";
+  import { of, ReplaySubject, switchAll, switchMap } from "rxjs";
 
   import { Effect } from "effect";
-  import { LibraryCtx } from "src/ctx/LibraryCtx";
 
+  import { EditorAction } from "src/actions/EditorAction";
   import type { ExObject } from "src/ex-object/ExObject";
-  import { Library } from "src/ex-object/Library";
+  import { Project } from "src/ex-object/Project";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
@@ -15,7 +15,6 @@
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  import { Project } from "src/ex-object/Project";
 
   // @ts-ignore
   const log55 = log5("EditorView.svelte");
@@ -24,13 +23,15 @@
 
   RxFns.onMount$()
     .pipe(
-      switchMap(async () => {
+      switchMap(() => {
         log55.debug("onMount");
-        const project = await DexRuntime.runPromise(Project.activeProject);
+        return DexRuntime.runPromise(Project.activeProject$);
+      }),
+      switchAll(),
+      switchMap((project) => {
         log55.debug("project", project);
         return project.rootExObjects.items$;
-      }),
-      mergeAll()
+      })
     )
     .subscribe((rootExObjects2) => {
       log55.debug("rootExObjects2", rootExObjects2);
@@ -51,13 +52,8 @@
 
   const newActionsFocused$ = of(false);
 
-  async function handleClickNewProject() {
-    DexRuntime.runPromise(
-      Effect.gen(function* () {
-        const library = yield* LibraryCtx.library;
-        Library.Methods(library).addProjectBlank();
-      })
-    );
+  function handleClickNewProject() {
+    DexRuntime.runPromise(EditorAction.newProject());
   }
 
   function addRootExObjectBlank() {

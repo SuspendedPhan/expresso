@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { BehaviorSubject, firstValueFrom, Subject, switchMap } from "rxjs";
+import { BehaviorSubject, firstValueFrom, shareReplay, Subject, switchMap } from "rxjs";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import {
@@ -87,13 +87,16 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 export const Project = {
   get activeProject$() {
     return Effect.gen(function* () {
+      log55.debug("activeProject$");
       const libraryProjectCtx = yield* LibraryProjectCtx;
       const activeLibraryProject$ = libraryProjectCtx.activeLibraryProject$;
       const result = activeLibraryProject$.pipe(
         switchMap(libraryProject => {
           const project$: OBS<Project> = libraryProject.project$;
           return project$;
-        })
+        }),
+        log55.tapDebug("activeProject$.switchMap"),
+        shareReplay(1),
       );
       return result;
     });

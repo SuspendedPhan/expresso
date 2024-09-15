@@ -1,8 +1,7 @@
 import { Effect, Layer } from "effect";
 import { ReplaySubject } from "rxjs";
 import {
-  LibraryProjectFactory2,
-  type LibraryProject,
+  type LibraryProject
 } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
@@ -16,7 +15,6 @@ export class LibraryProjectCtx extends Effect.Tag("LibraryProjectCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const activeLibraryProject$ = new ReplaySubject<LibraryProject>(1);
-  activeLibraryProject$.next(yield* LibraryProjectFactory2({ordinal: 0}));
   log55.debug("activeLibraryProject$");
 
   return {

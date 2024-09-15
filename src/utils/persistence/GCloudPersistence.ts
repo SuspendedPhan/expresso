@@ -10,6 +10,7 @@ const storage = getStorage();
 
 export default class GCloudPersistence implements PersistService {
   async readFile(name: string): Promise<string | null> {
+    log55.debug("Reading file", name);
     const storageRef = ref(storage, name);
     let blob;
     try {
@@ -25,6 +26,7 @@ export default class GCloudPersistence implements PersistService {
     return text;
   }
   writeFile(name: string, content: string): Promise<void> {
+    log55.debug("Writing file", name);
     const storageRef = ref(storage, name);
 
     // Raw string is the default if no format is provided
