@@ -152,7 +152,17 @@ export default function createRehydrator() {
     });
   }
 
-  function assignExFuncs() {}
+  function assignExFuncs() {
+    return Effect.gen(function* () {
+      for (const reCallExpr of rehydratedCallExprs.values()) {
+        const exFunc = customExFuncById.get(
+          reCallExpr.dehydratedCallExpr.exFuncId
+        );
+        assert(exFunc !== undefined);
+        reCallExpr.callExpr.exFunc = exFunc;
+      }
+    });
+  }
 
   function rehydrateExFunc(deExFunc: DehydratedExFunc) {
     return Effect.gen(function* () {
@@ -160,12 +170,14 @@ export default function createRehydrator() {
       const exFuncParameterArr = yield* Effect.all(
         deExFunc.parameters.map(rehydrateExFuncParameter)
       );
-      return yield* CustomExFuncFactory2.Custom({
+      const exFunc = yield* CustomExFuncFactory2.Custom({
         id: deExFunc.id,
         name: deExFunc.name,
         expr,
         exFuncParameterArr,
       });
+      customExFuncById.set(exFunc.id, exFunc);
+      return exFunc;
     });
   }
 
@@ -360,6 +372,10 @@ export default function createRehydrator() {
       const expr = yield* ExprFactory2.Call({
         id: deExpr.id,
         args,
+      });
+      rehydratedCallExprs.set(expr.id, {
+        callExpr: expr,
+        dehydratedCallExpr: deExpr
       });
       return expr;
     });

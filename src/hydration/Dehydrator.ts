@@ -2,19 +2,18 @@ import assert from "assert-ts";
 import {
   combineLatest,
   combineLatestWith,
-  firstValueFrom,
   map,
   of,
   switchMap,
   tap,
-  type Observable,
+  type Observable
 } from "rxjs";
 import type { ComponentFactory, ComponentKind } from "src/ex-object/Component";
 import type {
   ComponentParameterFactory,
   ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import type { CustomExFunc, CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory, type CustomExFunc, type SystemExFuncFactory } from "src/ex-object/ExFunc";
 import type { ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
@@ -22,7 +21,6 @@ import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
-import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
 import {
@@ -34,8 +32,6 @@ import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
 
-const DEHYDRATED_EXPR_TAG = "DehydratedExpr";
-
 type DehydratedExpr_ = {
   Number: {
     id: string;
@@ -45,6 +41,7 @@ type DehydratedExpr_ = {
     id: string;
     args: DehydratedExpr[];
     exFuncKind: typeof CustomExFuncFactory.output.type | TypesOf<typeof SystemExFuncFactory>;
+    exFuncId: string | null;
   };
   ReferenceExpr: {
     id: string;
@@ -53,7 +50,7 @@ type DehydratedExpr_ = {
 };
 
 export const DehydratedExpr = scoped(
-  DEHYDRATED_EXPR_TAG,
+  "DehydratedExpr",
   typed<DexVariantUnion<DehydratedExpr_>>({
     Number: pass,
     CallExpr: pass,
@@ -465,6 +462,7 @@ export default class Dehydrator {
           id: expr.id,
           args: deArgs,
           exFuncKind: exFunc.type,
+          exFuncId: exFunc.type === CustomExFuncFactory.output.type ? exFunc.id : null,
         });
       })
     )
