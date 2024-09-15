@@ -23,12 +23,11 @@ export function ExFuncParameterFactory2(
   creationArgs: ExFuncParameterCreationArgs
 ) {
   return Effect.gen(function* () {
-    const project = yield* Project.activeProject;
     const creationArgs2: Required<ExFuncParameterCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("ex-func-param"),
       name:
         creationArgs.name ??
-        `Parameter ${yield* Project.Methods(project).getAndIncrementOrdinal()}`,
+        `Parameter ${yield* Project.Methods(yield* Project.activeProject).getAndIncrementOrdinal()}`,
     };
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);

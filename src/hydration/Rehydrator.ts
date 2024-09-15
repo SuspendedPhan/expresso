@@ -174,10 +174,18 @@ export default function createRehydrator() {
 
   function rehydrateExFunc(deExFunc: DehydratedExFunc) {
     return Effect.gen(function* () {
+      log55.debug("rehydrateExFunc.start", deExFunc);
+      
       const expr = yield* rehydrateExpr(deExFunc.expr);
+
+      log55.debug("rehydrateExFunc.expr", expr);
+
       const exFuncParameterArr = yield* Effect.all(
         deExFunc.parameters.map(rehydrateExFuncParameter)
       );
+
+      log55.debug("rehydrateExFunc.exFuncParameterArr", exFuncParameterArr);
+      
       const exFunc = yield* CustomExFuncFactory2.Custom({
         id: deExFunc.id,
         name: deExFunc.name,
@@ -185,6 +193,8 @@ export default function createRehydrator() {
         exFuncParameterArr,
       });
       customExFuncById.set(exFunc.id, exFunc);
+
+      log55.debug("rehydrateExFunc.end", exFunc);
       return exFunc;
     });
   }
@@ -193,11 +203,14 @@ export default function createRehydrator() {
     deExFuncParameter: DehydratedExFuncParameter
   ) {
     return Effect.gen(function* () {
+      log55.debug("rehydrateExFuncParameter.start", deExFuncParameter);
       const parameter = yield* ExFuncParameterFactory2({
         id: deExFuncParameter.id,
         name: deExFuncParameter.name,
       });
       targetById.set(parameter.id, parameter);
+
+      log55.debug("rehydrateExFuncParameter.end", parameter);
       return parameter;
     });
   }
