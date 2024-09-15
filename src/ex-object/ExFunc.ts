@@ -36,7 +36,7 @@ type CustomExFunc_ = ExItemBase & {
 
 type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
 
-export const SystemExFuncFactory = dexScopedVariant("ExFunc/System", {
+export const SystemExFuncFactory = dexScopedVariant("ExFunc.System", {
   Add: () => ({ name: "Add", parameterCount: 2 }),
 });
 
@@ -44,7 +44,7 @@ export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
 export type SystemExFuncKind = DexVariantKind<typeof SystemExFuncFactory>;
 
 export const CustomExFuncFactory = variation(
-  "ExFunc/Custom",
+  "ExFunc.Custom",
   fields<CustomExFunc2_>()
 );
 export type CustomExFunc = ReturnType<typeof CustomExFuncFactory>;

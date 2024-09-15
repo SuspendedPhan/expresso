@@ -463,9 +463,10 @@ export default class Dehydrator {
         if (exFunc.type === CustomExFuncFactory.output.type) {
           exFuncKind = CustomExFuncFactory.output.type;
         } else {
+          log55.debug("exFunc", exFunc);
           const vv = descope(exFunc);
-          const vv2 = descope(vv);
-          exFuncKind = vv2.type;
+          log55.debug("vv", vv);
+          exFuncKind = vv.type;
         }
 
         return DehydratedExpr.CallExpr({
