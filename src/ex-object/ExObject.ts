@@ -48,16 +48,18 @@ interface ExObjectCreationArgs {
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
+    log55.debug("ExObjectFactory2.start");
     const exObjectCtx = yield* ExObjectCtx;
-    const project = yield* Project.activeProject;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
+
+    log55.debug("ExObjectFactory2.component", component);
 
     const creationArgs2: Required<ExObjectCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("ex-object"),
       component,
       name:
         creationArgs.name ??
-        `Object ${yield* Project.Methods(project).getAndIncrementOrdinal()}`,
+        `Object ${yield* Project.Methods(yield* Project.activeProject).getAndIncrementOrdinal()}`,
       componentProperties:
         creationArgs.componentProperties ??
         (yield* createComponentProperties(component)),
@@ -67,6 +69,8 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
     };
+
+    log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);
     const exObject = ExObjectFactory({

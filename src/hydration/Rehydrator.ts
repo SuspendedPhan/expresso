@@ -16,7 +16,7 @@ import {
   ComponentParameterFactory2,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import { CustomExFuncFactory2 } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExFuncParameterFactory2 } from "src/ex-object/ExFuncParameter";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
 import {
@@ -57,16 +57,23 @@ interface RehydratedComponentParameterProperty {
   dehydratedProperty: DehydratedComponentProperty;
 }
 
+interface RehydratedCallExpr {
+  callExpr: ExprKind["Call"];
+  dehydratedCallExpr: DehydratedExprKind["CallExpr"];
+}
+
 export default function createRehydrator() {
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
   const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] =
     [];
+  const rehydratedCallExprs = new Map<string, RehydratedCallExpr>();
   const targetById = new Map<string, ReferenceTarget>();
   const componentParameterById = new Map<
     string,
     ComponentParameterKind["Custom"]
   >();
+  const customExFuncById = new Map<string, CustomExFunc>();
 
   function rehydrateProject(deProject: DehydratedProject) {
     return Effect.gen(function* () {
@@ -89,8 +96,12 @@ export default function createRehydrator() {
         deProject.rootExObjects.map(rehydrateExObject)
       );
 
+      log55.debug("rehydrateProject.rootExObjects.end", rootExObjects);
+
       yield* assignTargets();
       yield* assignComponentParameters();
+
+      log55.debug("rehydrateProject.assignTargets.end");
 
       const project: Project = yield* ProjectFactory2({
         id: deProject.id,
@@ -99,7 +110,7 @@ export default function createRehydrator() {
         exFuncs: exFuncArr,
       });
 
-      log55.debug("Project loaded", project);
+      log55.debug("rehydrateProject.project.end", project);
 
       const libraryProject = yield* LibraryProjectFactory2({
         id: deProject.id,
@@ -109,6 +120,8 @@ export default function createRehydrator() {
 
       const library = yield* LibraryCtx.library;
       library.libraryProjects.push(libraryProject);
+
+      log55.debug("rehydrateProject.end");
 
       return libraryProject;
     });
@@ -138,6 +151,8 @@ export default function createRehydrator() {
       }
     });
   }
+
+  function assignExFuncs() {}
 
   function rehydrateExFunc(deExFunc: DehydratedExFunc) {
     return Effect.gen(function* () {
@@ -213,26 +228,38 @@ export default function createRehydrator() {
     ExprCtx | ComponentCtx | PropertyCtx | ExObjectCtx | LibraryProjectCtx
   > {
     const effect = Effect.gen(function* () {
+      log55.debug("rehydrateExObject.start", deExObject);
+
       const component = yield* getComponent(
         deExObject.componentId,
         deExObject.componentType
       );
 
+      log55.debug("rehydrateExObject.component", component);
+
       const componentPropertyL = yield* Effect.all(
         deExObject.componentProperties.map(rehydrateComponentProperty)
       );
+
+      log55.debug("rehydrateExObject.componentPropertyL", componentPropertyL);
 
       const basicPropertyL = yield* Effect.all(
         deExObject.basicProperties.map(rehydrateBasicProperty)
       );
 
+      log55.debug("rehydrateExObject.basicPropertyL", basicPropertyL);
+
       const cloneCountProperty = yield* rehydrateCloneCountProperty(
         deExObject.cloneProperty
       );
 
+      log55.debug("rehydrateExObject.cloneCountProperty", cloneCountProperty);
+
       const children = yield* Effect.all(
         deExObject.children.map(rehydrateExObject)
       );
+
+      log55.debug("rehydrateExObject.children", children);
 
       const exObject: ExObject = yield* ExObjectFactory2({
         component,
@@ -244,6 +271,7 @@ export default function createRehydrator() {
         children,
       });
 
+      log55.debug("rehydrateExObject.end", exObject);
       return exObject;
     });
     return effect;

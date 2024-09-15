@@ -2,6 +2,7 @@ import assert from "assert-ts";
 import {
   combineLatest,
   combineLatestWith,
+  firstValueFrom,
   map,
   of,
   switchMap,
@@ -13,7 +14,7 @@ import type {
   ComponentParameterFactory,
   ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import type { CustomExFunc } from "src/ex-object/ExFunc";
+import type { CustomExFunc, CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import type { ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
@@ -21,6 +22,7 @@ import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
 import {
@@ -42,6 +44,7 @@ type DehydratedExpr_ = {
   CallExpr: {
     id: string;
     args: DehydratedExpr[];
+    exFuncKind: typeof CustomExFuncFactory.output.type | TypesOf<typeof SystemExFuncFactory>;
   };
   ReferenceExpr: {
     id: string;
@@ -455,14 +458,16 @@ export default class Dehydrator {
       })
     );
 
-    const result: Observable<DehydratedExprKind["CallExpr"]> = deArgs$.pipe(
-      map((deArgs) => {
+    const result: Observable<DehydratedExprKind["CallExpr"]> = combineLatest([expr.exFunc$, deArgs$]).pipe(
+      map(([exFunc, deArgs]) => {
+        assert(exFunc != null);
         return DehydratedExpr.CallExpr({
           id: expr.id,
           args: deArgs,
+          exFuncKind: exFunc.type,
         });
       })
-    );
+    )
 
     return result;
   }

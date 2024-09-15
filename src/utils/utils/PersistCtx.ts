@@ -11,8 +11,8 @@ import Persistence from "src/utils/persistence/Persistence";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
-const reset = true;
-// const reset = false;
+// const reset = true;
+const reset = false;
 
 const log55 = log5("Persist.ts");
 
