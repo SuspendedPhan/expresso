@@ -223,6 +223,10 @@ export default function createRehydrator() {
         deCustomComponent.parameters.map(rehydrateComponentParameter)
       );
 
+      const propertyArr = yield* Effect.all(
+        deCustomComponent.properties.map(rehydrateBasicProperty)
+      );
+
       const rootExObjectArr = yield* Effect.all(
         deCustomComponent.rootExObjects.map(rehydrateExObject)
       );
@@ -231,6 +235,7 @@ export default function createRehydrator() {
         id: deCustomComponent.id,
         name: deCustomComponent.name,
         parameters: parameterArr,
+        properties: propertyArr,
         rootExObjects: rootExObjectArr,
       });
 
