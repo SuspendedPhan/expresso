@@ -27,7 +27,7 @@ import {
   type DexVariantKind,
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import { matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
+import { descope, matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
@@ -40,7 +40,7 @@ type DehydratedExpr_ = {
   CallExpr: {
     id: string;
     args: DehydratedExpr[];
-    exFuncKind: typeof CustomExFuncFactory.output.type | TypesOf<typeof SystemExFuncFactory>;
+    exFuncKind: typeof CustomExFuncFactory.output.type | keyof typeof SystemExFuncFactory;
     exFuncId: string | null;
   };
   ReferenceExpr: {
@@ -458,10 +458,20 @@ export default class Dehydrator {
     const result: Observable<DehydratedExprKind["CallExpr"]> = combineLatest([expr.exFunc$, deArgs$]).pipe(
       map(([exFunc, deArgs]) => {
         assert(exFunc != null);
+
+        let exFuncKind: DehydratedExprKind["CallExpr"]["exFuncKind"];
+        if (exFunc.type === CustomExFuncFactory.output.type) {
+          exFuncKind = CustomExFuncFactory.output.type;
+        } else {
+          const vv = descope(exFunc);
+          const vv2 = descope(vv);
+          exFuncKind = vv2.type;
+        }
+
         return DehydratedExpr.CallExpr({
           id: expr.id,
           args: deArgs,
-          exFuncKind: exFunc.type,
+          exFuncKind,
           exFuncId: exFunc.type === CustomExFuncFactory.output.type ? exFunc.id : null,
         });
       })

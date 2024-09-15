@@ -16,7 +16,7 @@ import {
   ComponentParameterFactory2,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory, CustomExFuncFactory2, SystemExFuncFactory, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExFuncParameterFactory2 } from "src/ex-object/ExFuncParameter";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
 import {
@@ -100,8 +100,9 @@ export default function createRehydrator() {
 
       yield* assignTargets();
       yield* assignComponentParameters();
+      yield* assignExFuncs();
 
-      log55.debug("rehydrateProject.assignTargets.end");
+      log55.debug("rehydrateProject.assign.end");
 
       const project: Project = yield* ProjectFactory2({
         id: deProject.id,
@@ -155,11 +156,18 @@ export default function createRehydrator() {
   function assignExFuncs() {
     return Effect.gen(function* () {
       for (const reCallExpr of rehydratedCallExprs.values()) {
-        const exFunc = customExFuncById.get(
-          reCallExpr.dehydratedCallExpr.exFuncId
-        );
-        assert(exFunc !== undefined);
-        reCallExpr.callExpr.exFunc = exFunc;
+        if (reCallExpr.dehydratedCallExpr.exFuncKind === CustomExFuncFactory.output.type) {
+          const { exFuncId } = reCallExpr.dehydratedCallExpr;
+          assert(exFuncId !== null);
+          const exFunc = customExFuncById.get(exFuncId);
+          assert(exFunc !== undefined);
+          reCallExpr.callExpr.exFunc$.next(exFunc);
+        } else {
+          const systemExFuncKind = reCallExpr.dehydratedCallExpr.exFuncKind;
+          const factory = SystemExFuncFactory[systemExFuncKind];
+          const exFunc = factory();
+          reCallExpr.callExpr.exFunc$.next(exFunc);
+        }
       }
     });
   }
@@ -375,7 +383,7 @@ export default function createRehydrator() {
       });
       rehydratedCallExprs.set(expr.id, {
         callExpr: expr,
-        dehydratedCallExpr: deExpr
+        dehydratedCallExpr: deExpr,
       });
       return expr;
     });
