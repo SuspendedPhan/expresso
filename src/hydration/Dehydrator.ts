@@ -368,10 +368,12 @@ export default class Dehydrator {
       }),
       map((dehydratedExpr) => {
         logger.log("map", "dehydratedExpr", dehydratedExpr);
+        const { componentParameter } = property;
+        assert(componentParameter != null);
         const deProperty: DehydratedComponentProperty = {
           id: property.id,
-          componentParameterId: property.componentParameter.id,
-          componentParameterKind: property.componentParameter.type,
+          componentParameterId: componentParameter.id,
+          componentParameterKind: componentParameter.type,
           expr: dehydratedExpr,
         };
         return deProperty;

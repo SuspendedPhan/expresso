@@ -32,7 +32,7 @@ interface PropertyBase extends ExItemBase {
 }
 
 interface ComponentParameterProperty extends PropertyBase {
-  componentParameter: ComponentParameter|null;
+  componentParameter: ComponentParameter | null;
 }
 
 interface BasicProperty extends PropertyBase {
@@ -153,9 +153,10 @@ export const Property = {
   Methods: (property: Property) => ({
     getName$(): OBS<string> {
       return matcher(property)
-        .when(PropertyFactory.ComponentParameterProperty, (p) =>
-          ComponentParameter.getName$(p.componentParameter)
-        )
+        .when(PropertyFactory.ComponentParameterProperty, (p) => {
+          assert(p.componentParameter !== null);
+          return ComponentParameter.getName$(p.componentParameter);
+        })
         .when(PropertyFactory.BasicProperty, (p) => p.name$)
         .when(PropertyFactory.CloneCountProperty, () =>
           of(Property.CloneCountPropertyName)
