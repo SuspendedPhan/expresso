@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
-import { LibraryCtx } from "src/ctx/LibraryCtx";
 import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import type { PropertyCtx } from "src/ctx/PropertyCtx";
 import {
@@ -25,7 +24,6 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
-import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import {
@@ -111,20 +109,9 @@ export default function createRehydrator() {
         exFuncs: exFuncArr,
       });
 
-      log55.debug("rehydrateProject.project.end", project);
+      log55.debug("rehydrateProject.end", project);
 
-      const libraryProject = yield* LibraryProjectFactory2({
-        id: deProject.id,
-        name: deProject.name,
-        project,
-      });
-
-      const library = yield* LibraryCtx.library;
-      library.libraryProjects.push(libraryProject);
-
-      log55.debug("rehydrateProject.end");
-
-      return libraryProject;
+      return project;
     });
   }
 

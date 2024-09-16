@@ -40,15 +40,6 @@ export default class Persistence {
       });
     });
 
-  // public static readProject$ = new Observable<DehydratedProject | null>(
-  //   (subscriber) => {
-  //     const project: DehydratedProject | null =
-  //       this.readObject(projectFilename)
-  //     subscriber.next(project);
-  //     subscriber.complete();
-  //   }
-  // );
-
   public static writeProject(project: DehydratedProject): void {
     this.writeObject(projectFilename, project);
   }

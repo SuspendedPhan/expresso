@@ -1,13 +1,15 @@
+import assert from "assert-ts";
 import { Effect, Layer } from "effect";
-import { debounceTime, switchMap } from "rxjs";
+import { debounceTime, map, switchMap } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { Library } from "src/ex-object/Library";
+import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { Project } from "src/ex-object/Project";
 import Dehydrator from "src/hydration/Dehydrator";
-import createRehydrator from "src/hydration/Rehydrator";
 import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 import Persistence from "src/utils/persistence/Persistence";
+import { Persistence2 } from "src/utils/persistence/Persistence2";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -30,24 +32,29 @@ const ctxEffect = Effect.gen(function* () {
 
   Persistence.listFiles();
 
-  Persistence.readProject$.subscribe((deProject) => {
-    DexRuntime.runPromise(
-      Effect.gen(function* () {
-        if (deProject === null || reset) {
-          log55.debug("No project found, creating blank project");
-          const library = yield* LibraryCtx.library;
-          const libraryProject = yield* Library.Methods(library).addProjectBlank();
-          (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
-          return;
-        }
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const project = yield* Persistence2.readProject("test-id");
+      if (project === null || reset) {
+        log55.debug("No project found, creating blank project");
+        const library = yield* LibraryCtx.library;
+        const libraryProject = yield* Library.Methods(
+          library
+        ).addProjectBlank();
+        (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
+        return;
+      }
 
-        const project = yield* createRehydrator().rehydrateProject(deProject);
-        (yield* LibraryProjectCtx.activeLibraryProject$).next(project);
+      const libraryProject = yield* LibraryProjectFactory2({
+        id: "test-id",
+        project,
+      });
+      (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
+      (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
 
-        log55.debug("Project loaded", project);
-      })
-    );
-  });
+      log55.debug("Project loaded", project);
+    })
+  );
 
   const dehydrator = new Dehydrator();
 
@@ -55,15 +62,22 @@ const ctxEffect = Effect.gen(function* () {
   (yield* Project.activeProject$)
     .pipe(
       log55.tapDebug("Project changed"),
-      switchMap((project) => dehydrator.dehydrateProject$(project)),
+      switchMap((project) =>
+        dehydrator
+          .dehydrateProject$(project)
+          .pipe(map((deProject) => ({ project, deProject })))
+      ),
       log55.tapDebug("Pre-bounce"),
       debounceTime(1000),
       log55.tapDebug("Post-bounce")
     )
-    .subscribe((deProject) => {
+    .subscribe(({ project, deProject }) => {
       log55.debug("Persisting project", deProject);
-      Persistence.writeProject(deProject);
+      const { libraryProject } = project;
+      assert(libraryProject !== null);
+      DexRuntime.runPromise(Persistence2.writeProject("test-id", deProject));
     });
+
   return {};
 });
 

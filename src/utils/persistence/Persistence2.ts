@@ -6,7 +6,7 @@ import type { ExprCtx } from "src/ctx/ExprCtx";
 import type { LibraryCtx } from "src/ctx/LibraryCtx";
 import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import type { PropertyCtx } from "src/ctx/PropertyCtx";
-import { LibraryProject } from "src/ex-object/LibraryProject";
+import type { Project } from "src/ex-object/Project";
 import type { DehydratedProject } from "src/hydration/Dehydrator";
 import createRehydrator from "src/hydration/Rehydrator";
 import GCloudPersistence from "src/utils/persistence/GCloudPersistence";
@@ -15,10 +15,10 @@ import { log5 } from "src/utils/utils/Log5";
 const log55 = log5("Persistence2.ts");
 
 export const Persistence2 = {
-  readLibraryProject(
-    id: string
+  readProject(
+    libraryProjectId: string
   ): Effect.Effect<
-    LibraryProject,
+    Project | null,
     UnknownException,
     | LibraryCtx
     | ExprCtx
@@ -33,15 +33,14 @@ export const Persistence2 = {
       const rehydrator = createRehydrator();
 
       // Read the file from GCloudPersistence
-      const filePath = `projects/${id}.json`;
+      const filePath = `projects/${libraryProjectId}.json`;
       const fileContent = yield* Effect.tryPromise(() =>
         gCloudPersistence.readFile(filePath)
       );
 
       if (fileContent === null) {
-        return yield* Effect.die(
-          new Error(`Project file not found: ${filePath}`)
-        );
+        log55.debug("Project file not found");
+        return null;
       }
 
       // JSON decode and cast to DehydratedProject
@@ -49,26 +48,23 @@ export const Persistence2 = {
       try {
         dehydratedProject = JSON.parse(fileContent) as DehydratedProject;
       } catch (error) {
-        return yield* Effect.die(
-          new Error(`Failed to parse project file: ${error}`)
-        );
+        log55.debug("Error parsing project file:", error);
+        return null;
       }
 
       log55.debug("Dehydrated project:", dehydratedProject);
 
       // Rehydrate the object
-      const libraryProject = yield* rehydrator.rehydrateProject(
-        dehydratedProject
-      );
+      const project = yield* rehydrator.rehydrateProject(dehydratedProject);
 
-      log55.debug("Rehydrated library project:", libraryProject);
+      log55.debug("Rehydrated project:", project);
 
       // Return the rehydrated library project
-      return libraryProject;
+      return project;
     });
   },
 
-  writeLibraryProject(
+  writeProject(
     libraryProjectId: string,
     dehydratedProject: DehydratedProject
   ): Effect.Effect<void, Error, never> {
