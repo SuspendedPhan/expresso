@@ -16,7 +16,7 @@ export interface PersistService {
 }
 
 export default class Persistence {
-  public static readFile(path: string): void {
+  public static readFile(path: string): string {
 
   }
 

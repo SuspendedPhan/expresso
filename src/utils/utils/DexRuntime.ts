@@ -36,4 +36,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ComponentCtxLive),
 );
 
+export type MainRequirements = typeof mainLayer extends Layer.Layer<infer I, never, never> ? I : never;
+
 export const DexRuntime = ManagedRuntime.make(mainLayer);
