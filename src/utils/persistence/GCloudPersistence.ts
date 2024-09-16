@@ -9,9 +9,9 @@ Firebase.init();
 const storage = getStorage();
 
 export default class GCloudPersistence implements PersistService {
-  async readFile(name: string): Promise<string | null> {
-    log55.debug("Reading file", name);
-    const storageRef = ref(storage, name);
+  async readFile(path: string): Promise<string | null> {
+    log55.debug("Reading file", path);
+    const storageRef = ref(storage, path);
     let blob;
     try {
         blob = await getBlob(storageRef);
@@ -25,9 +25,9 @@ export default class GCloudPersistence implements PersistService {
     const text = await blob.text();
     return text;
   }
-  writeFile(name: string, content: string): Promise<void> {
-    log55.debug("Writing file", name);
-    const storageRef = ref(storage, name);
+  writeFile(path: string, content: string): Promise<void> {
+    log55.debug("Writing file", path);
+    const storageRef = ref(storage, path);
 
     // Raw string is the default if no format is provided
     return uploadString(storageRef, content).then((_snapshot) => {

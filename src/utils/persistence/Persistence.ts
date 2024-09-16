@@ -15,6 +15,18 @@ export interface PersistService {
 }
 
 export default class Persistence {
+  public static readFile(path: string): void {
+
+  }
+
+  public static writeFile(path: string, content: any): void {
+    
+  }
+
+  public static listFiles(): void {
+
+  }
+
   public static readProject$: OBS<DehydratedProject | null> =
     new Observable<DehydratedProject | null>((subscriber) => {
       FirebaseAuthentication.userLoggedIn$.subscribe({
