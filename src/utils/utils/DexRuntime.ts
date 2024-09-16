@@ -12,6 +12,7 @@ import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
+import { RehydratorCtxLive } from "src/hydration/Rehydrator";
 import { PersistCtx0Live } from "src/utils/persistence/PersistCtx0";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
@@ -22,10 +23,11 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(ExprFocusCtxLive),
   Layer.provideMerge(KeyboardCtxLive),
-  
+
   Layer.provideMerge(ExprCommandCtxLive),
   Layer.provideMerge(PersistCtxLive),
   Layer.provideMerge(PersistCtx0Live),
+
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(PropertyCtxLive),
@@ -36,8 +38,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(CommandCardCtxLive),
   Layer.provideMerge(FocusCtxLive),
   Layer.provideMerge(ComponentCtxLive),
+  Layer.provideMerge(RehydratorCtxLive)
 );
-
-export type MainRequirements = typeof mainLayer extends Layer.Layer<infer I, never, never> ? I : never;
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);
