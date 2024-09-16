@@ -1,7 +1,23 @@
+import { Effect } from "effect";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
+import type { Project } from "src/ex-object/Project";
+import createRehydrator from "src/hydration/Rehydrator";
+import Persistence from "src/utils/persistence/Persistence";
+
 export const Persistence2 = {
-  readProject() {},
+  readLibraryProject(id: string): Effect.Effect<Project> {
+    /*
+    read the file from Persistence
+    decode file to dehydratedObject
+    rehydrate the object
+    return the rehydrated object
+    */
+  },
 
-  writeProject() {},
+  writeLibraryProject(project: LibraryProject) {
+  },
 
-  listProjects() {},
+  listLibraryProjects(): Effect.Effect<LibraryProject[]> {
+    throw new Error("Not implemented");
+  },
 };
