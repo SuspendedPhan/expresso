@@ -12,6 +12,7 @@ import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
+import { PersistCtx0Live } from "src/utils/persistence/PersistCtx0";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
 import { PersistCtxLive } from "src/utils/utils/PersistCtx";
@@ -24,6 +25,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   
   Layer.provideMerge(ExprCommandCtxLive),
   Layer.provideMerge(PersistCtxLive),
+  Layer.provideMerge(PersistCtx0Live),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(PropertyCtxLive),

@@ -8,8 +8,8 @@ import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { Project } from "src/ex-object/Project";
 import Dehydrator from "src/hydration/Dehydrator";
 import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
+import { PersistCtx0 } from "src/utils/persistence/PersistCtx0";
 import Persistence from "src/utils/persistence/Persistence";
-import { Persistence2 } from "src/utils/persistence/Persistence2";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -34,7 +34,7 @@ const ctxEffect = Effect.gen(function* () {
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      const project = yield* Persistence2.readProject("test-id");
+      const project = yield* PersistCtx0.readProject("test-id");
       if (project === null || reset) {
         log55.debug("No project found, creating blank project");
         const library = yield* LibraryCtx.library;
@@ -75,7 +75,7 @@ const ctxEffect = Effect.gen(function* () {
       log55.debug("Persisting project", deProject);
       const { libraryProject } = project;
       assert(libraryProject !== null);
-      DexRuntime.runPromise(Persistence2.writeProject("test-id", deProject));
+      DexRuntime.runPromise(PersistCtx0.writeProject("test-id", deProject));
     });
 
   return {};
