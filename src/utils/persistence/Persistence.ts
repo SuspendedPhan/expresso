@@ -12,6 +12,7 @@ const projectFilename = "project.json";
 export interface PersistService {
   readFile(name: string): Promise<string | null>;
   writeFile(name: string, content: any): Promise<void>;
+  listFiles(path: string): void;
 }
 
 export default class Persistence {
@@ -20,11 +21,11 @@ export default class Persistence {
   }
 
   public static writeFile(path: string, content: any): void {
-    
+
   }
 
   public static listFiles(): void {
-
+    service.listFiles("");
   }
 
   public static readProject$: OBS<DehydratedProject | null> =

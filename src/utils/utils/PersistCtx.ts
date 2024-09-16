@@ -28,6 +28,8 @@ const ctxEffect = Effect.gen(function* () {
     };
   });
 
+  Persistence.listFiles();
+
   Persistence.readProject$.subscribe((deProject) => {
     DexRuntime.runPromise(
       Effect.gen(function* () {
