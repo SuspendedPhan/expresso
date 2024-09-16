@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
@@ -43,7 +43,7 @@ import {
 import { log5 } from "src/utils/utils/Log5";
 import { matcher, type TypesOf } from "variant";
 
-const log55 = log5("Rehydrator.ts");
+const log55 = log5("RehydratorCtx.ts");
 
 interface RehydratedReferenceExpr {
   referenceExpr: ExprKind["Reference"];
@@ -60,17 +60,18 @@ interface RehydratedCallExpr {
   dehydratedCallExpr: DehydratedExprKind["CallExpr"];
 }
 
-export default function createRehydrator() {
+export class RehydratorCtx extends Effect.Tag("RehydratorCtx")<
+  RehydratorCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
+
+const ctxEffect = Effect.gen(function* () {
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
-  const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] =
-    [];
+  const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] = [];
   const rehydratedCallExprs = new Map<string, RehydratedCallExpr>();
   const targetById = new Map<string, ReferenceTarget>();
-  const componentParameterById = new Map<
-    string,
-    ComponentParameterKind["Custom"]
-  >();
+  const componentParameterById = new Map<string, ComponentParameterKind["Custom"]>();
   const customExFuncById = new Map<string, CustomExFunc>();
 
   function rehydrateProject(deProject: DehydratedProject) {
@@ -460,4 +461,6 @@ export default function createRehydrator() {
   return {
     rehydrateProject,
   };
-}
+});
+
+export const RehydratorCtxLive = Layer.effect(RehydratorCtx, ctxEffect);

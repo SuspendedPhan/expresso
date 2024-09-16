@@ -1,12 +1,4 @@
 import { Effect, Layer } from "effect";
-import type { UnknownException } from "effect/Cause";
-import type { ComponentCtx } from "src/ctx/ComponentCtx";
-import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
-import type { ExprCtx } from "src/ctx/ExprCtx";
-import type { LibraryCtx } from "src/ctx/LibraryCtx";
-import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
-import type { PropertyCtx } from "src/ctx/PropertyCtx";
-import type { Project } from "src/ex-object/Project";
 import type { DehydratedProject } from "src/hydration/Dehydrator";
 import createRehydrator from "src/hydration/Rehydrator";
 import GCloudPersistence from "src/utils/persistence/GCloudPersistence";
@@ -23,16 +15,7 @@ const ctxEffect = Effect.gen(function* () {
   return {
     readProject(
       libraryProjectId: string
-    ): Effect.Effect<
-      Project | null,
-      UnknownException,
-      | LibraryCtx
-      | ExprCtx
-      | LibraryProjectCtx
-      | PropertyCtx
-      | ComponentCtx
-      | ExObjectCtx
-    > {
+    ) {
       return Effect.gen(function* () {
         // Create instances
         const gCloudPersistence = new GCloudPersistence();
