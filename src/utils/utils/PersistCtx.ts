@@ -44,10 +44,10 @@ const ctxEffect = Effect.gen(function* () {
         yield* persistCtx0.readActiveLibraryProjectId();
       if (activeLibraryProjectId === null) {
         log55.debug("No active library project found");
-        return;
+        return yield* createBlankProject();
       }
 
-      const project = yield* persistCtx0.readProject("test-id");
+      const project = yield* persistCtx0.readProject(activeLibraryProjectId);
       if (project === null || reset) {
         return yield* createBlankProject();
       }
