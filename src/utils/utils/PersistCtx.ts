@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Either, Layer } from "effect";
+import { Effect, Layer } from "effect";
 import { debounceTime, map, switchMap } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
@@ -13,7 +13,7 @@ import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
 // const reset = true;
-const reset = false;
+// const reset = false;
 
 const log55 = log5("PersistCtx.ts");
 
@@ -34,6 +34,8 @@ const ctxEffect = Effect.gen(function* () {
   });
 
   const activeLibraryProjectId = persistCtx0.readActiveLibraryProjectId();
+
+
   yield* Effect.matchEffect(activeLibraryProjectId, {
     onSuccess: (activeLibraryProjectId) => {
       log55.debug("Active library project found", activeLibraryProjectId);
