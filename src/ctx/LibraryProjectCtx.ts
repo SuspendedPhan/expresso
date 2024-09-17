@@ -18,7 +18,9 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("activeLibraryProject$");
 
   return {
-    activeLibraryProject$,
+    get activeLibraryProject$() {
+      return activeLibraryProject$;
+    },
     get activeLibraryProject() {
       return EffectUtils.firstValueFrom(this.activeLibraryProject$);
     },

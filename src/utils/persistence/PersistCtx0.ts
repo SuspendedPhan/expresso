@@ -4,7 +4,7 @@ import { RehydratorCtx } from "src/hydration/Rehydrator";
 import GCloudPersistence from "src/utils/persistence/GCloudPersistence";
 import { log5 } from "src/utils/utils/Log5";
 
-const log55 = log5("Persistence2.ts");
+const log55 = log5("PersistCtx0.ts");
 
 export class PersistCtx0 extends Effect.Tag("PersistCtx0")<
   PersistCtx0,

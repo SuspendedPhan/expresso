@@ -9,14 +9,13 @@ import { Project } from "src/ex-object/Project";
 import Dehydrator from "src/hydration/Dehydrator";
 import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 import { PersistCtx0 } from "src/utils/persistence/PersistCtx0";
-import Persistence from "src/utils/persistence/Persistence";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
 // const reset = true;
 const reset = false;
 
-const log55 = log5("Persist.ts");
+const log55 = log5("PersistCtx.ts");
 
 export class PersistCtx extends Effect.Tag("PersistCtx")<
   PersistCtx,
@@ -34,8 +33,6 @@ const ctxEffect = Effect.gen(function* () {
     };
   });
 
-  Persistence.listFiles();
-
   DexRuntime.runPromise(
     Effect.gen(function* () {
       const activeLibraryProjectId =
@@ -50,15 +47,14 @@ const ctxEffect = Effect.gen(function* () {
         return yield* createBlankProject();
       }
 
-      // todp: handle id
       const libraryProject = yield* LibraryProjectFactory2({
-        id: "test-id",
+        id: activeLibraryProjectId,
         project,
       });
+      log55.debug("LibraryProject loaded and created", libraryProject);
+
       (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
       (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
-
-      log55.debug("Project loaded", project);
     })
   );
 
