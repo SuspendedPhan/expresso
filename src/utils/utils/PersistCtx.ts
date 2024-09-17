@@ -36,8 +36,6 @@ const ctxEffect = Effect.gen(function* () {
 
   Persistence.listFiles();
 
-  DexRuntime.runPromise(PersistCtx0.writeActiveLibraryProjectId("test-id"));
-
   DexRuntime.runPromise(
     Effect.gen(function* () {
       const activeLibraryProjectId =
@@ -52,6 +50,7 @@ const ctxEffect = Effect.gen(function* () {
         return yield* createBlankProject();
       }
 
+      // todp: handle id
       const libraryProject = yield* LibraryProjectFactory2({
         id: "test-id",
         project,
@@ -82,7 +81,8 @@ const ctxEffect = Effect.gen(function* () {
       log55.debug("Persisting project", deProject);
       const { libraryProject } = project;
       assert(libraryProject !== null);
-      DexRuntime.runPromise(PersistCtx0.writeProject("test-id", deProject));
+      DexRuntime.runPromise(PersistCtx0.writeProject(libraryProject.id, deProject));
+      DexRuntime.runPromise(PersistCtx0.writeActiveLibraryProjectId(libraryProject.id));
     });
 
   return {};
