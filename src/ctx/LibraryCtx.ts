@@ -3,7 +3,10 @@ import { BehaviorSubject, ReplaySubject, Subject } from "rxjs";
 import { LibraryFactory, type Library } from "src/ex-object/Library";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { createObservableArrayWithLifetime } from "src/utils/utils/ObservableArray";
+import {
+  createObservableArrayWithLifetime,
+  ObservableArray,
+} from "src/utils/utils/ObservableArray";
 
 export class LibraryCtx extends Effect.Tag("LibraryCtx")<
   LibraryCtx,
@@ -26,15 +29,27 @@ const ctxEffect = Effect.gen(function* () {
         libraryProjects: creationArgs.libraryProjects ?? [],
       };
 
+      const destroy$ = new Subject<void>();
+
+      const libraryProjects = createObservableArrayWithLifetime<LibraryProject>(
+        destroy$,
+        creationArgs2.libraryProjects
+      );
+
+      const libraryProjectById = new Map();
+      ObservableArray.syncMap(
+        libraryProjectById,
+        libraryProjects,
+        (item) => item.id
+      );
+
       const library = LibraryFactory({
         projectOrdinal$: new BehaviorSubject<number>(
           creationArgs2.projectOrdinal
         ),
-        libraryProjects: createObservableArrayWithLifetime<LibraryProject>(
-          new Subject(),
-          creationArgs2.libraryProjects
-        ),
-        destroy$: new Subject<void>(),
+        libraryProjects,
+        destroy$,
+        libraryProjectById,
       });
 
       library$.next(library);

@@ -6,6 +6,11 @@ import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("PersistCtx0.ts");
 
+export interface DehydratedLibraryProject {
+  id: string;
+  name: string;
+}
+
 export class Persist0Ctx extends Effect.Tag("PersistCtx0")<
   Persist0Ctx,
   Effect.Effect.Success<typeof ctxEffect>
@@ -71,6 +76,26 @@ const ctxEffect = Effect.gen(function* () {
 
     writeActiveLibraryProjectId(id: string) {
       return gCloudPersistence.writeFile("activeLibraryProjectId", id);
+    },
+
+    readLibraryProjectList() {
+      return Effect.gen(function* () {
+        const result: DehydratedLibraryProject[] = [];
+        const filepath = yield* gCloudPersistence.listFiles("projects");
+        for (const filename of filepath) {
+          // Extract id (everything before the first underscore)
+          const id = filename.substring(0, filename.indexOf("_"));
+
+          // Extract name (everything between the first underscore and the last dot
+          const name = filename.substring(
+            filename.indexOf("_") + 1,
+            filename.lastIndexOf(".")
+          );
+
+          result.push({ id, name });
+        }
+        return result;
+      });
     },
   };
 });

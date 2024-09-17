@@ -4,9 +4,7 @@ import {
   type OBS,
 } from "src/utils/utils/Utils";
 
-export type ArrayEvent<T> =
-  | ItemAdded<T>
-  | ItemRemoved<T>
+export type ArrayEvent<T> = ItemAdded<T> | ItemRemoved<T>;
 
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
@@ -78,3 +76,24 @@ export namespace ObservableArrayFns {
     return r;
   }
 }
+
+export const ObservableArray = {
+  syncMap<K, V>(
+    map: Map<K, V>,
+    observableArray: ObservableArray<V>,
+    getKey: (item: V) => K
+  ) {
+    observableArray.events$.subscribe((event) => {
+      switch (event.type) {
+        case "ItemAdded": {
+          map.set(getKey(event.item), event.item);
+          break;
+        }
+        case "ItemRemoved": {
+          map.delete(getKey(event.item));
+          break;
+        }
+      }
+    });
+  },
+};

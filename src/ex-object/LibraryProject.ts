@@ -18,7 +18,7 @@ export const LibraryProjectFactory = variation(
 );
 export type LibraryProject = ReturnType<typeof LibraryProjectFactory>;
 
-interface LibraryProjectCreationArgs {
+export interface LibraryProjectCreationArgs {
   id?: string;
   name?: string;
   project?: Project | null;

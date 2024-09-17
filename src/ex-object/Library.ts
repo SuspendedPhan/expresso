@@ -12,6 +12,7 @@ import { fields, variation } from "variant";
 interface Library_ {
   projectOrdinal$: BehaviorSubject<number>;
   libraryProjects: ObservableArray<LibraryProject>;
+  libraryProjectById: Map<string, LibraryProject>;
   destroy$: Subject<void>;
 }
 
