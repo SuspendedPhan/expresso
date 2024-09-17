@@ -8,7 +8,7 @@ import { LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { Project } from "src/ex-object/Project";
 import Dehydrator from "src/hydration/Dehydrator";
 import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
-import { PersistCtx0 } from "src/utils/persistence/PersistCtx0";
+import { Persist0Ctx } from "src/utils/persistence/Persist0Ctx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -25,7 +25,7 @@ export class PersistCtx extends Effect.Tag("PersistCtx")<
 const ctxEffect = Effect.gen(function* () {
   const libraryCtx = yield* LibraryCtx;
   const libraryProjectCtx = yield* LibraryProjectCtx;
-  const persistCtx0 = yield* PersistCtx0;
+  const persistCtx0 = yield* Persist0Ctx;
 
   FirebaseAuthentication.userLoggedIn$.subscribe(() => {
     complete: () => {
@@ -33,30 +33,27 @@ const ctxEffect = Effect.gen(function* () {
     };
   });
 
-  DexRuntime.runPromise(
-    Effect.gen(function* () {
-      const activeLibraryProjectId =
-        yield* persistCtx0.readActiveLibraryProjectId();
-      if (activeLibraryProjectId === null) {
-        log55.debug("No active library project found");
-        return yield* createBlankProject();
-      }
+  const activeLibraryProjectId =
+    yield* persistCtx0.readActiveLibraryProjectId();
+  if (activeLibraryProjectId === null) {
+    log55.debug("No active library project found");
+    return yield* createBlankProject();
+  }
 
-      const project = yield* persistCtx0.readProject(activeLibraryProjectId);
-      if (project === null || reset) {
-        return yield* createBlankProject();
-      }
+  const project = yield* persistCtx0.readProject(activeLibraryProjectId);
+  // todo: catch error
+  if (project === null || reset) {
+    return yield* createBlankProject();
+  }
 
-      const libraryProject = yield* LibraryProjectFactory2({
-        id: activeLibraryProjectId,
-        project,
-      });
-      log55.debug("LibraryProject loaded and created", libraryProject);
+  const libraryProject = yield* LibraryProjectFactory2({
+    id: activeLibraryProjectId,
+    project,
+  });
+  log55.debug("LibraryProject loaded and created", libraryProject);
 
-      (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
-      (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
-    })
-  );
+  (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
+  (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
 
   const dehydrator = new Dehydrator();
 
@@ -77,8 +74,12 @@ const ctxEffect = Effect.gen(function* () {
       log55.debug("Persisting project", deProject);
       const { libraryProject } = project;
       assert(libraryProject !== null);
-      DexRuntime.runPromise(PersistCtx0.writeProject(libraryProject.id, deProject));
-      DexRuntime.runPromise(PersistCtx0.writeActiveLibraryProjectId(libraryProject.id));
+      DexRuntime.runPromise(
+        Persist0Ctx.writeProject(libraryProject.id, deProject)
+      );
+      DexRuntime.runPromise(
+        Persist0Ctx.writeActiveLibraryProjectId(libraryProject.id)
+      );
     });
 
   return {};

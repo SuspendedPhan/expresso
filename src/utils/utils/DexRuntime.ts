@@ -13,7 +13,8 @@ import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
 import { RehydratorCtxLive } from "src/hydration/Rehydrator";
-import { PersistCtx0Live } from "src/utils/persistence/PersistCtx0";
+import { GCloudPersistCtx00Live } from "src/utils/persistence/GCloudPersist00Ctx";
+import { PersistCtx0Live } from "src/utils/persistence/Persist0Ctx";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
 import { PersistCtxLive } from "src/utils/utils/PersistCtx";
@@ -38,7 +39,8 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(CommandCardCtxLive),
   Layer.provideMerge(FocusCtxLive),
   Layer.provideMerge(ComponentCtxLive),
-  Layer.provideMerge(RehydratorCtxLive)
+  Layer.provideMerge(RehydratorCtxLive),
+  Layer.provideMerge(GCloudPersistCtx00Live)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer);

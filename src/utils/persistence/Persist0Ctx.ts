@@ -1,29 +1,25 @@
 import { Effect, Layer } from "effect";
 import type { DehydratedProject } from "src/hydration/Dehydrator";
 import { RehydratorCtx } from "src/hydration/Rehydrator";
-import GCloudPersistence from "src/utils/persistence/GCloudPersistence";
+import { Persist00Ctx } from "src/utils/persistence/GCloudPersist00Ctx";
 import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("PersistCtx0.ts");
 
-export class PersistCtx0 extends Effect.Tag("PersistCtx0")<
-  PersistCtx0,
+export class Persist0Ctx extends Effect.Tag("PersistCtx0")<
+  Persist0Ctx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
   const rehydratorCtx = yield* RehydratorCtx;
-  const gCloudPersistence = new GCloudPersistence();
+  const gCloudPersistence = yield* Persist00Ctx;
 
   return {
-    readProject(
-      libraryProjectId: string
-    ) {
+    readProject(libraryProjectId: string) {
       return Effect.gen(function* () {
         const filePath = `projects/${libraryProjectId}.json`;
-        const fileContent = yield* Effect.tryPromise(() =>
-          gCloudPersistence.readFile(filePath)
-        );
+        const fileContent = yield* gCloudPersistence.readFile(filePath);
 
         if (fileContent === null) {
           log55.debug("Project file not found");
@@ -42,7 +38,9 @@ const ctxEffect = Effect.gen(function* () {
         log55.debug("Dehydrated project:", dehydratedProject);
 
         // Rehydrate the object
-        const project = yield* rehydratorCtx.rehydrateProject(dehydratedProject);
+        const project = yield* rehydratorCtx.rehydrateProject(
+          dehydratedProject
+        );
 
         log55.debug("Rehydrated project:", project);
 
@@ -58,16 +56,14 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         const filePath = `projects/${libraryProjectId}.json`;
         const fileContent = JSON.stringify(dehydratedProject);
-        yield* Effect.tryPromise(() =>
-          gCloudPersistence.writeFile(filePath, fileContent)
-        );
+        yield* gCloudPersistence.writeFile(filePath, fileContent);
       });
     },
 
     readActiveLibraryProjectId() {
       return Effect.gen(function* () {
-        const fileContent = yield* Effect.tryPromise(() =>
-          gCloudPersistence.readFile("activeLibraryProjectId")
+        const fileContent = yield* gCloudPersistence.readFile(
+          "activeLibraryProjectId"
         );
 
         if (fileContent === null) {
@@ -80,13 +76,9 @@ const ctxEffect = Effect.gen(function* () {
     },
 
     writeActiveLibraryProjectId(id: string) {
-      return Effect.gen(function* () {
-        yield* Effect.tryPromise(() =>
-          gCloudPersistence.writeFile("activeLibraryProjectId", id)
-        );
-      });
-    }
+      return gCloudPersistence.writeFile("activeLibraryProjectId", id);
+    },
   };
 });
 
-export const PersistCtx0Live = Layer.effect(PersistCtx0, ctxEffect);
+export const PersistCtx0Live = Layer.effect(Persist0Ctx, ctxEffect);
