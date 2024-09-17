@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Layer } from "effect";
+import { Effect, Either, Layer } from "effect";
 import { debounceTime, map, switchMap } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
@@ -33,27 +33,36 @@ const ctxEffect = Effect.gen(function* () {
     };
   });
 
-  const activeLibraryProjectId =
-    yield* persistCtx0.readActiveLibraryProjectId();
-  if (activeLibraryProjectId === null) {
-    log55.debug("No active library project found");
-    return yield* createBlankProject();
-  }
+  const activeLibraryProjectId = persistCtx0.readActiveLibraryProjectId();
+  yield* Effect.matchEffect(activeLibraryProjectId, {
+    onSuccess: (activeLibraryProjectId) => {
+      log55.debug("Active library project found", activeLibraryProjectId);
+      const project = persistCtx0.readProject(activeLibraryProjectId);
+      return Effect.matchEffect(project, {
+        onSuccess: (project) => {
+          return Effect.gen(function* () {
+            const libraryProject = yield* LibraryProjectFactory2({
+              id: activeLibraryProjectId,
+              project,
+            });
+            log55.debug("LibraryProject loaded and created", libraryProject);
 
-  const project = yield* persistCtx0.readProject(activeLibraryProjectId);
-  // todo: catch error
-  if (project === null || reset) {
-    return yield* createBlankProject();
-  }
-
-  const libraryProject = yield* LibraryProjectFactory2({
-    id: activeLibraryProjectId,
-    project,
+            (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
+            (yield* LibraryProjectCtx.activeLibraryProject$).next(
+              libraryProject
+            );
+          });
+        },
+        onFailure: () => {
+          return createBlankProject();
+        },
+      });
+    },
+    onFailure: () => {
+      log55.debug("No active library project found");
+      return createBlankProject();
+    },
   });
-  log55.debug("LibraryProject loaded and created", libraryProject);
-
-  (yield* LibraryCtx.library).libraryProjects.push(libraryProject);
-  (yield* LibraryProjectCtx.activeLibraryProject$).next(libraryProject);
 
   const dehydrator = new Dehydrator();
 

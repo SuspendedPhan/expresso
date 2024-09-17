@@ -52,7 +52,7 @@ const ctxEffect = Effect.gen(function* () {
     writeProject(
       libraryProjectId: string,
       dehydratedProject: DehydratedProject
-    ): Effect.Effect<void, Error, never> {
+    ): Effect.Effect<void, void, never> {
       return Effect.gen(function* () {
         const filePath = `projects/${libraryProjectId}.json`;
         const fileContent = JSON.stringify(dehydratedProject);
@@ -65,12 +65,6 @@ const ctxEffect = Effect.gen(function* () {
         const fileContent = yield* gCloudPersistence.readFile(
           "activeLibraryProjectId"
         );
-
-        if (fileContent === null) {
-          log55.debug("Active library project ID not found");
-          return null;
-        }
-
         return fileContent;
       });
     },
