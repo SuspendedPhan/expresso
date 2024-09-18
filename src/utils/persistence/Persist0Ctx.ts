@@ -1,4 +1,5 @@
 import { Effect, Layer } from "effect";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { DehydratedProject } from "src/hydration/Dehydrator";
 import { RehydratorCtx } from "src/hydration/Rehydrator";
 import { Persist00Ctx } from "src/utils/persistence/GCloudPersist00Ctx";
@@ -55,11 +56,11 @@ const ctxEffect = Effect.gen(function* () {
     },
 
     writeProject(
-      libraryProjectId: string,
+      libraryProject: LibraryProject,
       dehydratedProject: DehydratedProject
     ): Effect.Effect<void, void, never> {
       return Effect.gen(function* () {
-        const filePath = `projects/${libraryProjectId}.json`;
+        const filePath = `projects/${libraryProject.id}_${libraryProject.name}.json`;
         const fileContent = JSON.stringify(dehydratedProject);
         yield* gCloudPersistence.writeFile(filePath, fileContent);
       });

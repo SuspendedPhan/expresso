@@ -89,9 +89,8 @@ const ctxEffect = Effect.gen(function* () {
     },
   });
 
-  const dehydrator = new Dehydrator();
-
   log55.debug("Subscribing to project changes");
+  const dehydrator = new Dehydrator();
   (yield* Project.activeProject$)
     .pipe(
       log55.tapDebug("Project changed"),
