@@ -6,17 +6,22 @@ import {
   of,
   switchMap,
   tap,
-  type Observable
+  type Observable,
 } from "rxjs";
 import type { ComponentFactory, ComponentKind } from "src/ex-object/Component";
 import type {
   ComponentParameterFactory,
   ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import { CustomExFuncFactory, type CustomExFunc, type SystemExFuncFactory } from "src/ex-object/ExFunc";
+import {
+  CustomExFuncFactory,
+  type CustomExFunc,
+  type SystemExFuncFactory,
+} from "src/ex-object/ExFunc";
 import type { ExFuncParameter } from "src/ex-object/ExFuncParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
@@ -27,7 +32,14 @@ import {
   type DexVariantKind,
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import { descope, matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
+import {
+  descope,
+  matcher,
+  scoped,
+  typed,
+  type TypesOf,
+  type VariantOf,
+} from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts");
@@ -40,7 +52,9 @@ type DehydratedExpr_ = {
   CallExpr: {
     id: string;
     args: DehydratedExpr[];
-    exFuncKind: typeof CustomExFuncFactory.output.type | keyof typeof SystemExFuncFactory;
+    exFuncKind:
+      | typeof CustomExFuncFactory.output.type
+      | keyof typeof SystemExFuncFactory;
     exFuncId: string | null;
   };
   ReferenceExpr: {
@@ -59,6 +73,12 @@ export const DehydratedExpr = scoped(
 );
 export type DehydratedExpr = VariantOf<typeof DehydratedExpr>;
 export type DehydratedExprKind = DexVariantKind<typeof DehydratedExpr>;
+
+export interface DehydratedLibraryProject {
+  libraryProjectId: string;
+  name: string;
+  project: DehydratedProject;
+}
 
 export interface DehydratedProject {
   id: string;
@@ -123,6 +143,24 @@ export interface DehydratedCloneCountProperty {
 }
 
 export default class Dehydrator {
+  public dehydrateLibraryProject$(
+    libraryProject: LibraryProject
+  ): Observable<DehydratedLibraryProject> {
+    return libraryProject.project$.pipe(
+      switchMap((project) => {
+        return this.dehydrateProject$(project);
+      }),
+      map((deProject) => {
+        const vv: DehydratedLibraryProject = {
+          libraryProjectId: libraryProject.id,
+          name: libraryProject.name,
+          project: deProject,
+        };
+        return vv;
+      }),
+    );
+  }
+
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
     const deExObjects$ = project.rootExObjects.items$.pipe(
       log55.tapDebug("dehydrateProject$.exObjects.start"),
@@ -469,7 +507,10 @@ export default class Dehydrator {
       })
     );
 
-    const result: Observable<DehydratedExprKind["CallExpr"]> = combineLatest([expr.exFunc$, deArgs$]).pipe(
+    const result: Observable<DehydratedExprKind["CallExpr"]> = combineLatest([
+      expr.exFunc$,
+      deArgs$,
+    ]).pipe(
       map(([exFunc, deArgs]) => {
         assert(exFunc != null);
 
@@ -487,10 +528,11 @@ export default class Dehydrator {
           id: expr.id,
           args: deArgs,
           exFuncKind,
-          exFuncId: exFunc.type === CustomExFuncFactory.output.type ? exFunc.id : null,
+          exFuncId:
+            exFunc.type === CustomExFuncFactory.output.type ? exFunc.id : null,
         });
       })
-    )
+    );
 
     return result;
   }

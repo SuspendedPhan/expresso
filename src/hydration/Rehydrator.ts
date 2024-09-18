@@ -3,7 +3,7 @@ import { Effect, Layer } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
-import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import type { PropertyCtx } from "src/ctx/PropertyCtx";
 import {
   ComponentFactory,
@@ -24,6 +24,7 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
+import { LibraryProject, LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
 import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import {
@@ -37,6 +38,7 @@ import {
   type DehydratedExFuncParameter,
   type DehydratedExObject,
   type DehydratedExprKind,
+  type DehydratedLibraryProject,
   type DehydratedProject,
 } from "src/hydration/Dehydrator";
 
@@ -73,6 +75,18 @@ const ctxEffect = Effect.gen(function* () {
   const targetById = new Map<string, ReferenceTarget>();
   const componentParameterById = new Map<string, ComponentParameterKind["Custom"]>();
   const customExFuncById = new Map<string, CustomExFunc>();
+
+  function rehydrateLibraryProject(deProject: DehydratedLibraryProject) {
+    return Effect.gen(function* () {
+      const project = yield* rehydrateProject(deProject.project);
+      const libraryProject: LibraryProject = yield* LibraryProjectFactory2({
+        id: deProject.libraryProjectId,
+        name: deProject.name,
+        project,
+      });
+      return libraryProject;
+    });
+  }
 
   function rehydrateProject(deProject: DehydratedProject) {
     return Effect.gen(function* () {
@@ -459,6 +473,7 @@ const ctxEffect = Effect.gen(function* () {
   }
 
   return {
+    rehydrateLibraryProject,
     rehydrateProject,
   };
 });

@@ -14,8 +14,8 @@ const log55 = log5("GCloudPersistenceCtx.ts");
 Firebase.init();
 const storage = getStorage();
 
-export class Persist00Ctx extends Effect.Tag("GCloudPersistenceCtx")<
-  Persist00Ctx,
+export class PersistCtx extends Effect.Tag("GCloudPersistenceCtx")<
+  PersistCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
@@ -61,4 +61,4 @@ const ctxEffect = Effect.gen(function* () {
   };
 });
 
-export const GCloudPersistCtx00Live = Layer.effect(Persist00Ctx, ctxEffect);
+export const GCloudPersistCtx00Live = Layer.effect(PersistCtx, ctxEffect);
