@@ -17,7 +17,20 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         log55.debug("Reading projects");
         // TODO: read all projects
-        return yield* persistCtx.listFiles("projects");
+        const filenames = yield* persistCtx.listFiles("projects");
+        const encodedProjects = new Array<string>();
+        for (const filename of filenames) {
+          const encodedProject_ = yield* persistCtx.readFile(`projects/${filename}`);
+          const encodedProject = yield* Option.match(encodedProject_, {
+            onSome: (file) => Effect.succeed(file),
+            onNone: () => {
+              log55.error("File not found", filename);
+              return Effect.fail("File not found");
+            }
+          });
+          encodedProjects.push(encodedProject);
+        }
+        return encodedProjects;
       });
     },
 

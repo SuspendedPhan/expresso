@@ -60,6 +60,9 @@ const ctxEffect = Effect.gen(function* () {
     });
   }
 
+  /**
+   * Returns filenames.
+   */
   function listFiles(path: string): Effect.Effect<string[], void, never> {
     return Effect.gen(function* () {
       log55.debug("Listing files", path);
