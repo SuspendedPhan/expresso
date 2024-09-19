@@ -1,4 +1,4 @@
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Option } from "effect";
 import { map, merge, switchMap } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
@@ -46,9 +46,10 @@ const ctxEffect_ = Effect.gen(function* () {
       return;
     }
 
+    
     for (const project of libraryProjects) {
       library.libraryProjects.push(project);
-      if (project.id === activeLibraryProjectId) {
+      if (project.id === Option.getOrUndefined(activeLibraryProjectId)) {
         libraryProjectCtx.activeLibraryProject$.next(project);
       }
     }
