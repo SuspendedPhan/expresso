@@ -16,6 +16,7 @@ const ctxEffect = Effect.gen(function* () {
     readProjects(): Effect.Effect<string[], void, never> {
       return Effect.gen(function* () {
         log55.debug("Reading projects");
+        // TODO: read all projects
         return yield* persistCtx.listFiles("projects");
       });
     },

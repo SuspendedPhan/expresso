@@ -58,21 +58,21 @@ const ctxEffect_ = Effect.gen(function* () {
 
   // Save projects to persistence when they change
   yield* Effect.gen(function* () {
-    log55.debug("Save projects to persistence when they change");
+    log55.debug("Saving library project: start subscription");
     const library = yield* libraryCtx.library;
 
     const dehydratedLibraryProject$ = library.libraryProjects.items$.pipe(
-      log55.tapDebug("Saving: detected library projects change"),
+      log55.tapDebug("Saving library project: detected library projects change"),
       switchMap((libraryProjects) => {
         const vv = libraryProjects.map((libraryProject) => {
-          log55.debug("Saving: dehydrating library project");
+          log55.debug("Saving library project: dehydrating library project");
           const deProject$ =
             dehydrator.dehydrateLibraryProject$(libraryProject);
           return deProject$;
         });
         return merge(...vv);
       }),
-      log55.tapDebug("Saving: dehydrated library project"),
+      log55.tapDebug("Saving library project: dehydrated library project")
     );
 
     const dehydratedLibraryProjectStream = EffectUtils.obsToStream(
@@ -84,11 +84,30 @@ const ctxEffect_ = Effect.gen(function* () {
         dehydratedLibraryProjectStream,
         (dehydratedLibraryProject) => {
           return Effect.gen(function* () {
-            log55.debug("Saving: saving library project to persistence");
+            log55.debug("Saving library project: saving to persistence");
             yield* loadCtx.saveProject(dehydratedLibraryProject);
           });
         }
       )
+    );
+  });
+
+  // Save active project ID to persistence when it changes
+  yield* Effect.gen(function* () {
+    log55.debug("Saving active library project ID: start subscription");
+    const libraryProject$ = libraryProjectCtx.activeLibraryProject$;
+    const libraryProjectStream = EffectUtils.obsToStream(libraryProject$);
+    yield* Effect.fork(
+      Stream.runForEach(libraryProjectStream, (libraryProject) => {
+        return Effect.gen(function* () {
+          log55.debug(
+            "Saving active library project ID: saving to persistence"
+          );
+          yield* libraryPersistCtx.writeActiveLibraryProjectId(
+            libraryProject.id
+          );
+        });
+      })
     );
   });
 
