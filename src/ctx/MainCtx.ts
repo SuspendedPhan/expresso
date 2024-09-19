@@ -1,20 +1,24 @@
 import { Effect, Layer } from "effect";
+import { map, merge, switchMap } from "rxjs";
+import { LibraryCtx } from "src/ctx/LibraryCtx";
+import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+import { Library } from "src/ex-object/Library";
 import { ExObjectFocusCtx } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtx } from "src/focus/ExprFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
-import { LoadCtx } from "src/utils/persistence/LoadCtx";
-import { LibraryPersistCtx } from "src/utils/persistence/LibraryPersistCtx";
-import { LibraryCtx } from "src/ctx/LibraryCtx";
-import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
-import { map, merge, mergeAll, mergeMap, switchMap } from "rxjs";
 import Dehydrator from "src/hydration/Dehydrator";
+import { LibraryPersistCtx } from "src/utils/persistence/LibraryPersistCtx";
+import { LoadCtx } from "src/utils/persistence/LoadCtx";
+import { log5 } from "src/utils/utils/Log5";
+
+const log55 = log5("MainCtx.ts");
 
 export class MainCtx extends Effect.Tag("MainCtx")<
   MainCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
-const ctxEffect = Effect.gen(function* () {
+const ctxEffect_ = Effect.gen(function* () {
   yield* FocusCtx.register();
   yield* ExprFocusCtx.register();
   yield* ExObjectFocusCtx.register();
@@ -27,10 +31,20 @@ const ctxEffect = Effect.gen(function* () {
 
   // Load projects from persistence and add them to the library
   yield* Effect.gen(function* () {
+    log55.debug("Loading projects from persistence");
+
     const activeLibraryProjectId =
       yield* libraryPersistCtx.readActiveLibraryProjectId();
+
+    log55.debug("Active library project ID", activeLibraryProjectId);
     const libraryProjects = yield* loadCtx.loadProjects();
     const library = yield* libraryCtx.library;
+
+    if (libraryProjects.length === 0) {
+      log55.debug("No projects found, adding blank project");
+      yield* Library.Methods(library).addProjectBlank();
+      return;
+    }
 
     for (const project of libraryProjects) {
       library.libraryProjects.push(project);
@@ -42,22 +56,26 @@ const ctxEffect = Effect.gen(function* () {
 
   // Save projects to persistence when they change
   yield* Effect.gen(function* () {
+    log55.debug("Save projects to persistence when they change");
     const library = yield* libraryCtx.library;
     library.libraryProjects.items$.pipe(
       switchMap((libraryProjects) => {
         const vv = libraryProjects.map((libraryProject) => {
-          const deProject$ = dehydrator.dehydrateLibraryProject$(libraryProject);
+          const deProject$ =
+            dehydrator.dehydrateLibraryProject$(libraryProject);
           return deProject$;
         });
         return merge(...vv);
       }),
       map((deProject) => {
         return loadCtx.saveProject(deProject);
-      }),
-    )
+      })
+    );
   });
 
   return {};
 });
+
+const ctxEffect = ctxEffect_;
 
 export const MainCtxLive = Layer.effect(MainCtx, ctxEffect);

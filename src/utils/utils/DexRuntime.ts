@@ -13,11 +13,12 @@ import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
 import { RehydratorCtxLive } from "src/hydration/Rehydrator";
-import { GCloudPersistCtx00Live } from "src/utils/persistence/GCloudPersistCtx";
-import { PersistCtx0Live } from "src/utils/persistence/Persist0Ctx";
+import { EncodeCtxLive } from "src/utils/persistence/EncodeCtx";
+import { GCloudPersistCtx00Live } from "src/utils/persistence/GCloudPersist00Ctx";
+import { LibraryPersistCtxLive } from "src/utils/persistence/LibraryPersistCtx";
+import { LoadCtxLive } from "src/utils/persistence/LoadCtx";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
-import { PersistCtxLive } from "src/utils/utils/PersistCtx";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -26,8 +27,11 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(KeyboardCtxLive),
 
   Layer.provideMerge(ExprCommandCtxLive),
-  Layer.provideMerge(PersistCtxLive),
-  Layer.provideMerge(PersistCtx0Live),
+  
+  Layer.provideMerge(LoadCtxLive),
+  Layer.provideMerge(EncodeCtxLive),
+  Layer.provideMerge(LibraryPersistCtxLive),
+  Layer.provideMerge(GCloudPersistCtx00Live),
 
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
@@ -40,7 +44,9 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(FocusCtxLive),
   Layer.provideMerge(ComponentCtxLive),
   Layer.provideMerge(RehydratorCtxLive),
-  Layer.provideMerge(GCloudPersistCtx00Live)
 );
 
-export const DexRuntime = ManagedRuntime.make(mainLayer);
+const mainLayer2 = mainLayer.pipe(
+);
+
+export const DexRuntime = ManagedRuntime.make(mainLayer2);
