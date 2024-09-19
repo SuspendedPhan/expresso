@@ -35,6 +35,11 @@ export function log5(topic: string) {
     debug2(...args: any[]) {
       log3(11, `[${topic}]`, ...args);
     },
+    
+    error(...args: any[]) {
+      console.error(`[${topic}]`, ...args);
+    },
+
     /**
      * @param level Lower levels get filtered out.
      */
