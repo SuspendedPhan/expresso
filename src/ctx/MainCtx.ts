@@ -42,11 +42,11 @@ const ctxEffect_ = Effect.gen(function* () {
 
     if (libraryProjects.length === 0) {
       log55.debug("No projects found, adding blank project");
-      yield* Library.Methods(library).addProjectBlank();
+      const libraryProject = yield* Library.Methods(library).addProjectBlank();
+      libraryProjectCtx.activeLibraryProject$.next(libraryProject);
       return;
     }
 
-    
     for (const project of libraryProjects) {
       library.libraryProjects.push(project);
       if (project.id === Option.getOrUndefined(activeLibraryProjectId)) {
