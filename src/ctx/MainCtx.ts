@@ -79,7 +79,7 @@ const ctxEffect_ = Effect.gen(function* () {
       dehydratedLibraryProject$
     );
 
-    yield* Effect.fork(
+    yield* Effect.forkDaemon(
       Stream.runForEach(
         dehydratedLibraryProjectStream,
         (dehydratedLibraryProject) => {
