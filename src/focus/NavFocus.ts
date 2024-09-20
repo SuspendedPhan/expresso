@@ -1,20 +1,26 @@
-
-
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { pass, type VariantOf } from "variant";
+import { fields, pass, variation, type VariantOf } from "variant";
 
 interface NavFocus_ {
-    Project: {}
-    Library: {}
+  Project: {};
+  Library: {};
 }
 
-export const NavFocusFactory = dexVariant.scoped("NavFocus")(dexVariant.typed<NavFocus_>({
+export const NavFocusFactory = dexVariant.scoped("NavFocus")(
+  dexVariant.typed<NavFocus_>({
     Project: pass,
     Library: pass,
-}));
+  })
+);
 
 export type NavFocus = VariantOf<typeof NavFocusFactory>;
 export type NavFocusKind = DexVariantKind<typeof NavFocusFactory>;
+
+export const NavProjectNameFocusFactory = variation(
+  "NavProjectNameFocus",
+  fields<{isEditing: boolean}>()
+);
+export type NavProjectNameFocus = ReturnType<typeof NavProjectNameFocusFactory>;
 
 // export function createNavFocusCtx(ctx: MainContext) {
 //   register(ctx);

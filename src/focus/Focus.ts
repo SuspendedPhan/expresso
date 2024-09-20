@@ -4,7 +4,7 @@ import type { ExFuncFocus } from "src/focus/ExFuncFocus";
 import type { ExItemFocus } from "src/focus/ExItemFocus";
 import type { ExObjectFocus } from "src/focus/ExObjectFocus";
 import type { ExprFocus } from "src/focus/ExprFocus";
-import type { NavFocus } from "src/focus/NavFocus";
+import type { NavFocus, NavProjectNameFocus } from "src/focus/NavFocus";
 import type { ProjectComponentWindowFocus } from "src/focus/ProjectComponentWindowFocus";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { pass, type VariantOf } from "variant";
@@ -30,6 +30,7 @@ export type Focus =
   | ProjectComponentWindowFocus
   | EditorFocus
   | ComponentFocus
-  | ExFuncFocus;
+  | ExFuncFocus
+  | NavProjectNameFocus;
 
 export type EditingFocus = Focus & { isEditing: boolean };

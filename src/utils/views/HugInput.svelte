@@ -13,7 +13,7 @@
 <div class="text-left relative">
   <input
     bind:this={input}
-    class="text-emphatic outline-none absolute left-0 w-full"
+    class="text-emphatic outline-none absolute left-0 w-full bg-transparent"
     {value}
     readonly={!isEditing}
     on:input
