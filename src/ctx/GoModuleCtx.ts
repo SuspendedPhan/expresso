@@ -43,10 +43,13 @@ const ctxEffect = Effect.gen(function* () {
     withGoModule<A, E, R>(
       callback: (goModule: GoModule) => Effect.Effect<A, E, R>
     ) {
+      log55.debug("withGoModule");
       return sem.withPermits(1)(
         Effect.gen(function* () {
+          log55.debug("Acquire goModule");
           const goModule = yield* goModule_;
-          return yield* callback(goModule);
+          yield* callback(goModule);
+          log55.debug("Release goModule");
         })
       );
     },

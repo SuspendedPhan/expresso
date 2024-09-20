@@ -1,16 +1,15 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
-import { first, firstValueFrom, mergeMap, switchMap } from "rxjs";
+import { first, switchMap } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { PropertyCtx } from "src/ctx/PropertyCtx";
-import { ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import { isType, matcher } from "variant";
+import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
@@ -24,118 +23,139 @@ const ctxEffect = Effect.gen(function* () {
 
   const goModuleCtx = yield* GoModuleCtx;
   const exObjectCtx = yield* ExObjectCtx;
-  const goModule = yield* goModuleCtx.goModule;
   const project$ = yield* Project.activeProject$;
+  const exprCtx = yield* ExprCtx;
   log55.debug("Ctx loaded");
   const propertyCtx = yield* PropertyCtx;
 
-  project$.subscribe(() => {
-    goModule.Evaluator.reset();
-  });
+  const project$2 = EffectUtils.obsToStream(project$);
+  yield* Effect.forkDaemon(
+    Stream.runForEach(project$2, () => {
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          goModule.Evaluator.reset();
+        });
+      });
+    })
+  );
 
   const rootExObjectEvents$_ = project$.pipe(
     switchMap((project) => project.rootExObjects.events$)
   );
 
   const rootExObjectEvents$ = EffectUtils.obsToStream(rootExObjectEvents$_);
-  Stream.runForEach(rootExObjectEvents$, (evt) => {
-    return Effect.gen(function* () {
-      switch (evt.type) {
-        case "ItemAdded":
-          log55.debug("Adding RootExObject", evt.item.id);
-          goModule.Evaluator.addRootExObject(evt.item.id);
-          break;
-      }
-    });
-  });
-
-  const exObjectEvents$ = EffectUtils.obsToStream(exObjectCtx.exObjects.events$);
-  Stream.runForEach(exObjectEvents$, (evt) => {
-    return Effect.gen(function* () {
-      switch (evt.type) {
-        case "ItemAdded":
-          const exObject = evt.item;
-          log55.debug("Adding ExObject", exObject.id);
-
-          goModule.ExObject.create(exObject.id);
-          goModule.ExObject.setCloneCountProperty(
-            exObject.id,
-            exObject.cloneCountProperty.id
-          );
-
-          for (const property of exObject.componentParameterProperties) {
-            goModule.ExObject.addComponentParameterProperty(
-              exObject.id,
-              property.id
-            );
+  yield* Effect.forkDaemon(
+    Stream.runForEach(rootExObjectEvents$, (evt) => {
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          switch (evt.type) {
+            case "ItemAdded":
+              log55.debug("Adding RootExObject", evt.item.id);
+              goModule.Evaluator.addRootExObject(evt.item.id);
+              break;
           }
-
-          break;
-      }
-    });
-  });
-
-  exObjectCtx.exObjects.items$
-    .pipe(
-      mergeMap((exObjects) => exObjects),
-      mergeMap((exObject) => exObject.basicProperties.events$)
-    )
-    .subscribe(async (evt) => {
-      switch (evt.type) {
-        case "ItemAdded":
-          const property = evt.item;
-          log55.debug("Adding BasicProperty", property.id);
-          const exObject = await firstValueFrom(property.parent$);
-          assert(isType(exObject, ExObjectFactory));
-          goModule.ExObject.addBasicProperty(exObject.id, property.id);
-          break;
-      }
-    });
-
-  propertyCtx.properties.events$.subscribe((evt) => {
-    switch (evt.type) {
-      case "ItemAdded":
-        const property = evt.item;
-        log55.debug("Adding Property", property.id);
-        goModule.Property.create(property.id);
-        property.expr$.subscribe((expr) => {
-          goModule.Property.setExpr(property.id, expr.id);
         });
-        break;
-    }
-  });
+      });
+    })
+  );
 
-  (yield* ExprCtx).exprs.events$.subscribe((evt) => {
-    if (evt.type !== "ItemAdded") return;
+  const exObjectEvents$ = EffectUtils.obsToStream(
+    exObjectCtx.exObjects.events$
+  );
+  yield* Effect.forkDaemon(
+    Stream.runForEach(exObjectEvents$, (evt) => {
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          switch (evt.type) {
+            case "ItemAdded":
+              const exObject = evt.item;
+              log55.debug("Adding ExObject", exObject.id);
 
-    const expr = evt.item;
+              goModule.ExObject.create(exObject.id);
+              goModule.ExObject.setCloneCountProperty(
+                exObject.id,
+                exObject.cloneCountProperty.id
+              );
 
-    matcher(expr)
-      .when(ExprFactory.Number, (expr) => {
-        goModule.NumberExpr.create(expr.id);
-        goModule.NumberExpr.setValue(expr.id, expr.value);
-      })
-      .when(ExprFactory.Reference, (expr_) => {
-        assert(expr_.target !== null);
-        goModule.ReferenceExpr.create(expr_.id, expr_.target.id, expr_.target.type);
-      })
-      .when(ExprFactory.Call, (expr) => {
-        goModule.CallExpr.create(expr.id);
-        expr.args$.pipe(first()).subscribe((args) => {
-          const arg0 = args[0];
-          const arg1 = args[1];
+              for (const property of exObject.componentParameterProperties) {
+                goModule.ExObject.addComponentParameterProperty(
+                  exObject.id,
+                  property.id
+                );
+              }
 
-          if (arg0 === undefined || arg1 === undefined) {
-            console.error("CallExpr must have 2 args");
-            return;
+              break;
           }
-
-          goModule.CallExpr.setArg0(expr.id, arg0.id);
-          goModule.CallExpr.setArg1(expr.id, arg1.id);
         });
-      })
-      .complete();
-  });
+      });
+    })
+  );
+
+  const propertyEvents$ = EffectUtils.obsToStream(
+    propertyCtx.properties.events$
+  );
+
+  yield* Effect.forkDaemon(
+    Stream.runForEach(propertyEvents$, (evt) => {
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          switch (evt.type) {
+            case "ItemAdded":
+              const property = evt.item;
+              log55.debug("Adding Property", property.id);
+              goModule.Property.create(property.id);
+              property.expr$.subscribe((expr) => {
+                goModule.Property.setExpr(property.id, expr.id);
+              });
+              break;
+          }
+        });
+      });
+    })
+  );
+
+  const exprEvents$ = EffectUtils.obsToStream(exprCtx.exprs.events$);
+  yield* Effect.forkDaemon(
+    Stream.runForEach(exprEvents$, (evt) => {
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          if (evt.type !== "ItemAdded") return;
+
+          const expr = evt.item;
+
+          matcher(expr)
+            .when(ExprFactory.Number, (expr) => {
+              goModule.NumberExpr.create(expr.id);
+              goModule.NumberExpr.setValue(expr.id, expr.value);
+            })
+            .when(ExprFactory.Reference, (expr_) => {
+              assert(expr_.target !== null);
+              goModule.ReferenceExpr.create(
+                expr_.id,
+                expr_.target.id,
+                expr_.target.type
+              );
+            })
+            .when(ExprFactory.Call, (expr) => {
+              goModule.CallExpr.create(expr.id);
+              expr.args$.pipe(first()).subscribe((args) => {
+                const arg0 = args[0];
+                const arg1 = args[1];
+
+                if (arg0 === undefined || arg1 === undefined) {
+                  console.error("CallExpr must have 2 args");
+                  return;
+                }
+
+                goModule.CallExpr.setArg0(expr.id, arg0.id);
+                goModule.CallExpr.setArg1(expr.id, arg1.id);
+              });
+            })
+            .complete();
+        });
+      });
+    })
+  );
 
   return {};
 });
