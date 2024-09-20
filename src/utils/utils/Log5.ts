@@ -12,6 +12,10 @@ export function log3(level: number, ...args: any[]) {
   }
 }
 
+export function error3(...args: any[]) {
+  console.error(...args);
+}
+
 export const log4 = {
   info(...args: any[]) {
     log3(15, ...args);
@@ -60,3 +64,4 @@ export function log5(topic: string) {
 }
 
 (window as any).log3 = log3;
+(window as any).error3 = error3;

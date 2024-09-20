@@ -9,6 +9,12 @@ import (
 
 var logger = evaluator.NewLogger("go_module.go")
 
+func deferLogger() {
+	if r := recover(); r != nil {
+		logger.Error("Caught error:", r)
+	}
+}
+
 func bootstrapGoModule() {
 	logger.Log("bootstrapGoModule")
 
@@ -122,10 +128,16 @@ func bootstrapGoModule() {
 		}),
 
 		"eval": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			defer deferLogger()
+
 			evaluation := ev.Eval()
 			getResultFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 				attributeSceneInstancePath := args[0].String()
-				return evaluation.GetResult(attributeSceneInstancePath)
+				result, err := evaluation.GetResult(attributeSceneInstancePath)
+				if err != nil {
+					return js.Null
+				}
+				return result
 			})
 
 			var disposeFunc js.Func

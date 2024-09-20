@@ -1,7 +1,13 @@
 package evaluator
 
 import (
+	"errors"
+	"fmt"
 	"strconv"
+)
+
+var (
+	DexError = errors.New("DexError")
 )
 
 func (e *Evaluator) Eval() *Evaluation {
@@ -35,6 +41,7 @@ func (e *Evaluator) Eval() *Evaluation {
 
 func (e *Evaluator) evalCloneCount(exObject *ExObject) Float {
 	if exObject.CloneCountPropertyId == "" {
+		// panic(fmt.Errorf("%w: CloneCountProperty not set for exObject: %s", DexError, exObject.Id))
 		panic("CloneCountProperty not set for exObject: " + exObject.Id)
 	}
 	property := e.getProperty(exObject.CloneCountPropertyId)
@@ -45,6 +52,7 @@ func (e *Evaluator) evalCloneCount(exObject *ExObject) Float {
 func (e *Evaluator) getProperty(propertyId string) *Property {
 	property, found := e.PropertyById[propertyId]
 	if !found {
+		// panic(fmt.Errorf("%w: Property not found: %s", DexError, propertyId))
 		panic("property not found " + propertyId)
 	}
 	return property
@@ -54,10 +62,13 @@ type Evaluation struct {
 	resultByCanvasPropertyPath map[string]Float
 }
 
-func (e *Evaluation) GetResult(canvasPropertyPath string) Float {
+func (e *Evaluation) GetResult(canvasPropertyPath string) (Float, error) {
 	v, ok := e.resultByCanvasPropertyPath[canvasPropertyPath]
 	if !ok {
-		panic("No value for canvasPropertyPath: " + canvasPropertyPath)
+		logger.Error("No value for canvasPropertyPath: " + canvasPropertyPath)
+		return 0, fmt.Errorf("%w: No value for canvasPropertyPath: %s", DexError, canvasPropertyPath)
+		// panic(fmt.Errorf("%w: No value for canvasPropertyPath: %s", DexError, canvasPropertyPath))
+		// panic("No value for canvasPropertyPath: " + canvasPropertyPath)
 	}
-	return v
+	return v, nil
 }
