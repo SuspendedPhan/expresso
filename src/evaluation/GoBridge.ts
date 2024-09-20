@@ -17,11 +17,15 @@ export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
+  log55.debug("Starting GoBridgeCtx");
+
   const goModuleCtx = yield* GoModuleCtx;
   const exObjectCtx = yield* ExObjectCtx;
   const goModule = yield* goModuleCtx.goModule;
   const project = yield* Project.activeProject;
+  log55.debug("Ctx loaded");
   const propertyCtx = yield* PropertyCtx;
+
 
   project.rootExObjects.events$.subscribe((evt) => {
     switch (evt.type) {

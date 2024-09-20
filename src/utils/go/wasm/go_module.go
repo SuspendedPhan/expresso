@@ -7,6 +7,8 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
+var logger = evaluator.NewLogger("go_module.go")
+
 func bootstrapGoModule() {
 	goModule := makeEmptyObject()
 
@@ -14,12 +16,14 @@ func bootstrapGoModule() {
 
 	goModule.Set("ExObject", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.create", args)
 			exObjectId := args[0].String()
 			ev.ExObjectCreate(exObjectId)
 			return nil
 		}),
 
 		"setCloneCountProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.setCloneCountProperty", args)
 			exObjectId := args[0].String()
 			exprId := args[1].String()
 			ev.ExObjectSetCloneCountProperty(exObjectId, exprId)
@@ -27,6 +31,7 @@ func bootstrapGoModule() {
 		}),
 
 		"addComponentParameterProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.addComponentParameterProperty", args)
 			exObjectId := args[0].String()
 			propertyId := args[1].String()
 			ev.ExObjectAddComponentParameterProperty(exObjectId, propertyId)
@@ -85,6 +90,7 @@ func bootstrapGoModule() {
 
 	goModule.Set("Evaluator", js.ValueOf(map[string]interface{}{
 		"addRootExObject": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("Evaluator.addRootExObject", args)
 			exObjectId := args[0].String()
 			ev.AddRootExObject(exObjectId)
 			return nil

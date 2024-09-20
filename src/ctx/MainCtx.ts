@@ -23,6 +23,7 @@ const ctxEffect_ = Effect.gen(function* () {
   yield* FocusCtx.register();
   yield* ExprFocusCtx.register();
   yield* ExObjectFocusCtx.register();
+  // yield* GoBridgeCtx;
 
   const dehydrator = new Dehydrator();
   const loadCtx = yield* LoadCtx;

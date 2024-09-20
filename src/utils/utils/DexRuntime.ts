@@ -2,6 +2,7 @@ import { Layer, ManagedRuntime } from "effect";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { ExObjectCtxLive } from "src/ctx/ExObjectCtx";
 import { ExprCtxLive } from "src/ctx/ExprCtx";
+import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
@@ -10,6 +11,7 @@ import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
 import { PropertyCtxLive } from "src/ctx/PropertyCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
+import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
@@ -23,12 +25,14 @@ import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
+  Layer.provideMerge(GoBridgeCtxLive),
+  Layer.provideMerge(GoModuleCtxLive),
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(ExprFocusCtxLive),
   Layer.provideMerge(KeyboardCtxLive),
 
   Layer.provideMerge(ExprCommandCtxLive),
-  
+
   Layer.provideMerge(LoadCtxLive),
   Layer.provideMerge(EncodeCtxLive),
   Layer.provideMerge(LibraryPersistCtxLive),
@@ -42,13 +46,13 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ViewCtxLive),
   Layer.provideMerge(ExObjectCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
-  Layer.provideMerge(FocusCtxLive),
-  Layer.provideMerge(ComponentCtxLive),
-  Layer.provideMerge(RehydratorCtxLive),
+  Layer.provideMerge(FocusCtxLive)
 );
 
 const mainLayer2 = mainLayer.pipe(
-  Layer.provideMerge(ProjectNameCtxLive),
+  Layer.provideMerge(ComponentCtxLive),
+  Layer.provideMerge(RehydratorCtxLive),
+  Layer.provideMerge(ProjectNameCtxLive)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);

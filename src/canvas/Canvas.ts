@@ -24,10 +24,6 @@ export function CanvasFactory(args: PixiFactoryArgs) {
   const pixiFactory = PixiFactory(args);
   const pool = new CanvasPool(() => pixiFactory.makeCircle());
 
-  return Effect.gen(function* () {
-    
-  });
-
   const effect = Effect.gen(function* () {
     const evaluatorCtx = yield* EvaluatorCtx;
     const project = yield* Project.activeProject;
