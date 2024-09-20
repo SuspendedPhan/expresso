@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Stream } from "effect";
 import { first, firstValueFrom, mergeMap, switchMap } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ExprCtx } from "src/ctx/ExprCtx";
@@ -8,6 +8,7 @@ import { PropertyCtx } from "src/ctx/PropertyCtx";
 import { ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { isType, matcher } from "variant";
 
@@ -32,40 +33,46 @@ const ctxEffect = Effect.gen(function* () {
     goModule.Evaluator.reset();
   });
 
-  const rootExObjectEvents$ = project$.pipe(
+  const rootExObjectEvents$_ = project$.pipe(
     switchMap((project) => project.rootExObjects.events$)
   );
 
-  rootExObjectEvents$.subscribe((evt) => {
-    switch (evt.type) {
-      case "ItemAdded":
-        log55.debug("Adding RootExObject", evt.item.id);
-        goModule.Evaluator.addRootExObject(evt.item.id);
-        break;
-    }
+  const rootExObjectEvents$ = EffectUtils.obsToStream(rootExObjectEvents$_);
+  Stream.runForEach(rootExObjectEvents$, (evt) => {
+    return Effect.gen(function* () {
+      switch (evt.type) {
+        case "ItemAdded":
+          log55.debug("Adding RootExObject", evt.item.id);
+          goModule.Evaluator.addRootExObject(evt.item.id);
+          break;
+      }
+    });
   });
 
-  exObjectCtx.exObjects.events$.subscribe((evt) => {
-    switch (evt.type) {
-      case "ItemAdded":
-        const exObject = evt.item;
-        log55.debug("Adding ExObject", exObject.id);
+  const exObjectEvents$ = EffectUtils.obsToStream(exObjectCtx.exObjects.events$);
+  Stream.runForEach(exObjectEvents$, (evt) => {
+    return Effect.gen(function* () {
+      switch (evt.type) {
+        case "ItemAdded":
+          const exObject = evt.item;
+          log55.debug("Adding ExObject", exObject.id);
 
-        goModule.ExObject.create(exObject.id);
-        goModule.ExObject.setCloneCountProperty(
-          exObject.id,
-          exObject.cloneCountProperty.id
-        );
-
-        for (const property of exObject.componentParameterProperties) {
-          goModule.ExObject.addComponentParameterProperty(
+          goModule.ExObject.create(exObject.id);
+          goModule.ExObject.setCloneCountProperty(
             exObject.id,
-            property.id
+            exObject.cloneCountProperty.id
           );
-        }
 
-        break;
-    }
+          for (const property of exObject.componentParameterProperties) {
+            goModule.ExObject.addComponentParameterProperty(
+              exObject.id,
+              property.id
+            );
+          }
+
+          break;
+      }
+    });
   });
 
   exObjectCtx.exObjects.items$
