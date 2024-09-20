@@ -10,6 +10,8 @@ import (
 var logger = evaluator.NewLogger("go_module.go")
 
 func bootstrapGoModule() {
+	logger.Log("bootstrapGoModule")
+
 	goModule := makeEmptyObject()
 
 	ev := evaluator.NewEvaluator()

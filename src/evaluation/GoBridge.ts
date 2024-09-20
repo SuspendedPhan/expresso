@@ -33,6 +33,7 @@ const ctxEffect = Effect.gen(function* () {
   rootExObjectEvents$.subscribe((evt) => {
     switch (evt.type) {
       case "ItemAdded":
+        log55.debug("Adding RootExObject", evt.item.id);
         goModule.Evaluator.addRootExObject(evt.item.id);
         break;
     }
