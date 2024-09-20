@@ -1,5 +1,5 @@
 import { Effect, Layer } from "effect";
-import { first } from "rxjs";
+import { first, switchMap } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
@@ -22,12 +22,15 @@ const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
   const exObjectCtx = yield* ExObjectCtx;
   const goModule = yield* goModuleCtx.goModule;
-  const project = yield* Project.activeProject;
+  const project$ = yield* Project.activeProject$;
   log55.debug("Ctx loaded");
   const propertyCtx = yield* PropertyCtx;
 
+  const rootExObjectEvents$ = project$.pipe(
+    switchMap((project) => project.rootExObjects.events$)
+  );
 
-  project.rootExObjects.events$.subscribe((evt) => {
+  rootExObjectEvents$.subscribe((evt) => {
     switch (evt.type) {
       case "ItemAdded":
         goModule.Evaluator.addRootExObject(evt.item.id);

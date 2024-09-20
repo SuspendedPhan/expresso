@@ -1,11 +1,14 @@
 import { Effect } from "effect";
-import { BehaviorSubject, firstValueFrom, shareReplay, Subject, switchMap } from "rxjs";
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  shareReplay,
+  Subject,
+  switchMap,
+} from "rxjs";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
-import {
-  CustomExFuncFactory2,
-  type CustomExFunc
-} from "src/ex-object/ExFunc";
+import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
@@ -83,7 +86,6 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
   });
 }
 
-
 export const Project = {
   get activeProject$() {
     return Effect.gen(function* () {
@@ -91,12 +93,12 @@ export const Project = {
       const libraryProjectCtx = yield* LibraryProjectCtx;
       const activeLibraryProject$ = libraryProjectCtx.activeLibraryProject$;
       const result = activeLibraryProject$.pipe(
-        switchMap(libraryProject => {
+        switchMap((libraryProject) => {
           const project$: OBS<Project> = libraryProject.project$;
           return project$;
         }),
         log55.tapDebug("activeProject$.switchMap"),
-        shareReplay(1),
+        shareReplay(1)
       );
       return result;
     });
