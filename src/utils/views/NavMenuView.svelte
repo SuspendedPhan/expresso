@@ -1,29 +1,17 @@
 <script lang="ts">
-  import { Effect, Stream, Ref } from "effect";
+  import { Effect } from "effect";
   import { of } from "rxjs";
-  import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
-  import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+  import { ProjectNameCtx } from "src/ctx/ProjectNameCtx";
   import { ViewCtx } from "src/ctx/ViewCtx";
-  import {
-    NavProjectNameFocusFactory,
-    type NavProjectNameFocus,
-  } from "src/focus/NavFocus";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { EffectUtils } from "src/utils/utils/EffectUtils";
-  import { log5 } from "src/utils/utils/Log5";
   import type { NavSection } from "src/utils/utils/Nav";
   import { type OBS } from "src/utils/utils/Utils";
-  import {
-    createFieldValueData,
-    type FieldValueData,
-  } from "src/utils/views/Field";
+  import { type FieldValueData } from "src/utils/views/Field";
   import FieldValue from "src/utils/views/FieldValue.svelte";
-  import { isType } from "variant";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
-  import { Subject } from "rxjs/internal/Subject";
 
-  const log55 = log5("NavMenuView.svelte");
+  // const log55 = log5("NavMenuView.svelte");
 
   let navCollapsed$: OBS<boolean>;
   let navSections: NavSection[];
@@ -46,51 +34,10 @@
     );
   }
 
-  let projectName$ = new BehaviorSubject<string>("");
   let projectNameFieldData: FieldValueData;
-
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      const libraryProjectCtx = yield* LibraryProjectCtx;
-
-      projectNameFieldData = yield* createFieldValueData<NavProjectNameFocus>({
-        value$: projectName$,
-        focusIsFn: isType(NavProjectNameFocusFactory),
-        createEditingFocusFn: (isEditing) =>
-          NavProjectNameFocusFactory({ isEditing }),
-        filterFn: () => true,
-      });
-      yield* Stream.runForEach(projectNameFieldData.onInput, (value) => {
-        return Effect.gen(function* () {
-          log55.debug("Updating project name: input");
-          const vv = yield* libraryProjectCtx.activeLibraryProject;
-          yield* Ref.set(vv.name, value);
-        });
-      });
-    })
-  );
-
-  DexRuntime.runPromise(
-    Effect.gen(function* () {
-      log55.debug("Updating project name: start");
-      // TODO: leak
-      const libraryProjectCtx = yield* LibraryProjectCtx;
-      const activeLibraryProject = EffectUtils.obsToStream(
-        libraryProjectCtx.activeLibraryProject$
-      );
-      const name = Stream.flatMap(
-        activeLibraryProject,
-        (activeLibraryProject2) => {
-          log55.debug("Updating project name: active library project changed");
-          return activeLibraryProject2.name.changes;
-        },
-        { switch: true }
-      );
-      yield* Stream.runForEach(name, (name2) => {
-        return Effect.gen(function* () {
-          projectName$.next(name2);
-        });
-      });
+      projectNameFieldData = yield* ProjectNameCtx.createProjectNameFieldData();
     })
   );
 </script>
