@@ -58,3 +58,5 @@ export function log5(topic: string) {
     },
   };
 }
+
+(window as any).log3 = log3;

@@ -2,6 +2,7 @@ package evaluator
 
 import (
 	"fmt"
+	"syscall/js"
 )
 
 type Logger struct {
@@ -20,6 +21,6 @@ func (l *Logger) Log(args ...interface{}) {
 		}
 		message += fmt.Sprintf("%v", arg)
 	}
-	// js.Global().Get("Logger").Call("file", l.topic).Call("log", message)
-	fmt.Println(l.topic, message)
+	js.Global().Get("log3").Invoke(10, l.topic, message)
+	// fmt.Println(l.topic, message)
 }
