@@ -1,4 +1,5 @@
 import assert from "assert-ts";
+import { Ref } from "effect";
 import {
   combineLatest,
   combineLatestWith,
@@ -26,6 +27,7 @@ import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
+import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns } from "src/utils/utils/Utils";
 import {
@@ -150,10 +152,11 @@ export default class Dehydrator {
       switchMap((project) => {
         return this.dehydrateProject$(project);
       }),
-      map((deProject) => {
+      switchMap(async (deProject) => {
+        const name = await DexRuntime.runPromise(Ref.get(libraryProject.name));
         const vv: DehydratedLibraryProject = {
           libraryProjectId: libraryProject.id,
-          name: libraryProject.name,
+          name,
           project: deProject,
         };
         return vv;
@@ -205,10 +208,11 @@ export default class Dehydrator {
       deExFuncs$,
     ]).pipe(
       log55.tapDebug("dehydrateProject$.combineLatest.start"),
-      map(([deExObjects, deComponents, deExFuncs]) => {
+      switchMap(async ([deExObjects, deComponents, deExFuncs]) => {
+        const name = await DexRuntime.runPromise(Ref.get(project.libraryProject!.name));
         const deProject: DehydratedProject = {
           id: project.libraryProject!.id,
-          name: project.libraryProject!.name,
+          name,
           rootExObjects: deExObjects,
           customComponents: deComponents,
           exFuncArr: deExFuncs,

@@ -6,9 +6,12 @@
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { EffectUtils } from "src/utils/utils/EffectUtils";
   import type { NavSection } from "src/utils/utils/Nav";
-  import { RxFns, type OBS } from "src/utils/utils/Utils";
+  import { type OBS } from "src/utils/utils/Utils";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
+  import { log5 } from "src/utils/utils/Log5";
+
+  const log55 = log5("NavMenuView.svelte");
 
   let navCollapsed$: OBS<boolean>;
   let navSections: NavSection[];
@@ -35,23 +38,25 @@
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
+      log55.debug("Updating project name: start");
+      // TODO: leak
       const libraryProjectCtx = yield* LibraryProjectCtx;
-      const vv = EffectUtils.obsToStream(
+      const activeLibraryProject = EffectUtils.obsToStream(
         libraryProjectCtx.activeLibraryProject$
       );
-      Stream.runForEach(vv, (activeLibraryProject) => {
+      const name = Stream.flatMap(
+        activeLibraryProject,
+        (activeLibraryProject2) => {
+          log55.debug("Updating project name: active library project changed");
+          return activeLibraryProject2.name.changes;
+        },
+        { switch: true }
+      );
+      yield* Stream.runForEach(name, (name2) => {
         return Effect.gen(function* () {
-          projectName = activeLibraryProject.name;
+          projectName = name2;
         });
       });
-      Stream.map;
-      // yield* Stream
-      RxFns.subscribeScoped(
-        libraryProjectCtx.activeLibraryProject$,
-        (activeLibraryProject) => {
-          projectName = activeLibraryProject.name;
-        }
-      );
     })
   );
 </script>
@@ -77,7 +82,7 @@
 {:else}
   <ul class="bg-base-200 h-full menu">
     <div class="p-4 pr-0 py-2 flex items-center gap-8">
-      <div class="pl-1 text-lg w-max">Hello World</div>
+      <div class="pl-1 text-lg w-max">{projectName}</div>
       <div class="indicator">
         <span
           class="indicator-item indicator-right indicator-bottom badge underline text-xs"
