@@ -98,7 +98,7 @@ const ctxEffect_ = Effect.gen(function* () {
     log55.debug("Saving active library project ID: start subscription");
     const libraryProject$ = libraryProjectCtx.activeLibraryProject$;
     const libraryProjectStream = EffectUtils.obsToStream(libraryProject$);
-    yield* Effect.fork(
+    yield* Effect.forkDaemon(
       Stream.runForEach(libraryProjectStream, (libraryProject) => {
         return Effect.gen(function* () {
           log55.debug(
