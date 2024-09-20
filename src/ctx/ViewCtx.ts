@@ -1,7 +1,10 @@
 import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
+import { log5 } from "src/utils/utils/Log5";
 import type { NavItem, NavSection } from "src/utils/utils/Nav";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
+
+const log55 = log5("ViewCtx.ts");
 
 export enum DexWindow {
   ProjectEditor,
@@ -96,6 +99,8 @@ const ctxEffect = Effect.gen(function* () {
   (section0 as any).navItems = navItems0;
   (section1 as any).navItems = navItems1;
   (section2 as any).navItems = navItems2;
+
+  log55.debug("ViewCtx init complete");
 
   return {
     activeWindow$: new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor),

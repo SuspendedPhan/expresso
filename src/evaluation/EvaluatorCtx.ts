@@ -21,7 +21,7 @@ const ctxEffect = Effect.gen(function* () {
     });
   });
 
-  yield* Effect.repeat(effect, Schedule.fixed(1000));
+  yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000)));
 
   return {
     eval$,

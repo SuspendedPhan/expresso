@@ -26,12 +26,16 @@ export function CanvasFactory(args: PixiFactoryArgs) {
   const pixiFactory = PixiFactory(args);
   const pool = new CanvasPool(() => pixiFactory.makeCircle());
 
+  log55.debug("CanvasFactory");
   const effect = Effect.gen(function* () {
+    log55.debug("Canvas init");
     const evaluatorCtx = yield* EvaluatorCtx;
     const project = yield* Project.activeProject;
     const rootExObjects = project.rootExObjects;
     const goModuleCtx = yield* GoModuleCtx;
     const goModule = yield* goModuleCtx.getUnsafe();
+
+    log55.debug("Canvas init2");
 
     const canvasObjectByCanvasObjectPath = new Map<string, LibCanvasObject>();
 
@@ -145,6 +149,8 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       canvasSetter(canvasObject, result);
     }
   });
+
+  log55.debug("Canvas init complete");
 
   return effect;
 }

@@ -157,6 +157,8 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
+  log55.debug("GoBridgeCtx init complete");
+
   return {};
 });
 

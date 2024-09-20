@@ -8,11 +8,11 @@
 
   import { OverlayScrollbarsComponent } from "overlayscrollbars-svelte";
   import { ViewCtx, ViewMode } from "src/ctx/ViewCtx";
+  import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
   import OverlayContainer from "src/utils/views/OverlayContainer.svelte";
-  import { log5 } from "src/utils/utils/Log5";
-  import { FirebaseAuthentication } from "src/utils/persistence/FirebaseAuthentication";
 
   const log55 = log5("AppLayoutView.svelte");
 
@@ -22,9 +22,11 @@
   RxFns.onMount$()
     .pipe(
       switchMap(() => {
+        log55.debug("onMount");
         return DexRuntime.runPromise(ViewCtx);
       }),
       switchMap((viewCtx) => {
+        log55.debug("viewCtx", viewCtx);
         return combineLatest([viewCtx.activeWindow$, viewCtx.viewMode$]);
       })
     )

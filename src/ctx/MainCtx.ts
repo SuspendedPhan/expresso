@@ -112,6 +112,7 @@ const ctxEffect_ = Effect.gen(function* () {
     );
   });
 
+  log55.debug("MainCtx initialized");
   return {};
 });
 
