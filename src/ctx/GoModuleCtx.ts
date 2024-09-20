@@ -1,4 +1,5 @@
 import { Effect, Layer } from "effect";
+import { makeSemaphore } from "effect/Effect";
 import type GoModule from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -36,15 +37,32 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
+  const sem = yield* makeSemaphore(1);
+
   return {
-    get goModule() {
-      return Effect.gen(function* () {
-        log55.debug("goModule()");
-        const vv = yield* goModule_;
-        log55.debug("goModule() done");
-        return vv;
-      });
+    withGoModule<A, E, R>(
+      callback: (goModule: GoModule) => Effect.Effect<A, E, R>
+    ) {
+      return sem.withPermits(1)(
+        Effect.gen(function* () {
+          const goModule = yield* goModule_;
+          return yield* callback(goModule);
+        })
+      );
+    },
+
+    getUnsafe() {
+      return goModule_;
     }
+
+    // get goModule() {
+    //   return Effect.gen(function* () {
+    //     log55.debug("goModule()");
+    //     const vv = yield* goModule_;
+    //     log55.debug("goModule() done");
+    //     return vv;
+    //   });
+    // }
   };
 });
 

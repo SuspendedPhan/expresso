@@ -5,6 +5,8 @@ export interface PixiFactoryArgs {
   canvasElement: ICanvas;
 }
 
+export type PixiFactory = ReturnType<typeof PixiFactory>;
+
 export function PixiFactory(args: PixiFactoryArgs) {
   const app = new Application();
   app.init({

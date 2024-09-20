@@ -31,7 +31,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
     const project = yield* Project.activeProject;
     const rootExObjects = project.rootExObjects;
     const goModuleCtx = yield* GoModuleCtx;
-    const goModule = yield* goModuleCtx.goModule;
+    const goModule = yield* goModuleCtx.getUnsafe();
 
     const canvasObjectByCanvasObjectPath = new Map<string, LibCanvasObject>();
 
