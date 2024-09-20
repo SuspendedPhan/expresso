@@ -98,7 +98,21 @@ func bootstrapGoModule() {
 			ev.CallExprSetArg1(id, argId)
 			return nil
 		}),
+	})),
+
+	goModule.Set("ReferenceExpr", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			targetId := args[1].String()
+			targetKind := args[2].String()
+	
+			ev.ReferenceExprCreate(id)
+			ev.ReferenceExprSetTargetId(id, targetId)
+			ev.ReferenceExprSetTargetKind(id, targetKind)
+			return nil
+		}),
 	}))
+	
 
 	goModule.Set("Evaluator", js.ValueOf(map[string]interface{}{
 		"addRootExObject": js.FuncOf(func(this js.Value, args []js.Value) interface{} {

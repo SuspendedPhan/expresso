@@ -35,6 +35,10 @@ export default interface GoModule {
     setArg1(exprId: string, argId: string): void;
   };
 
+  ReferenceExpr: {
+    create(id: string, targetId: string, targetKind: string): void;
+  };
+
   Evaluator: {
     addRootExObject(id: string): void;
     eval(): Evaluation;

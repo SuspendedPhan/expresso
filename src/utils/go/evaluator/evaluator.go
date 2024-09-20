@@ -14,9 +14,10 @@ type Evaluator struct {
 }
 
 type Expr struct {
-	Id         string
-	NumberExpr *NumberExpr
-	CallExpr   *CallExpr
+	Id            string
+	NumberExpr    *NumberExpr
+	CallExpr      *CallExpr
+	ReferenceExpr *ReferenceExpr
 }
 
 type NumberExpr struct {
@@ -26,6 +27,11 @@ type NumberExpr struct {
 type CallExpr struct {
 	arg0Id string
 	arg1Id string
+}
+
+type ReferenceExpr struct {
+	TargetId   string
+	TargetKind string
 }
 
 func NewEvaluator() *Evaluator {

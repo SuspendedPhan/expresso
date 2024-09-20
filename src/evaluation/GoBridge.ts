@@ -104,8 +104,9 @@ const ctxEffect = Effect.gen(function* () {
         goModule.NumberExpr.create(expr.id);
         goModule.NumberExpr.setValue(expr.id, expr.value);
       })
-      .when(ExprFactory.Reference, (_expr) => {
-        console.error("ReferenceExpr not implemented");
+      .when(ExprFactory.Reference, (expr_) => {
+        assert(expr_.target !== null);
+        goModule.ReferenceExpr.create(expr_.id, expr_.target.id, expr_.target.type);
       })
       .when(ExprFactory.Call, (expr) => {
         goModule.CallExpr.create(expr.id);
