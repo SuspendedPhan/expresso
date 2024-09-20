@@ -64,5 +64,18 @@ func (e *Evaluator) EvalExpr(exprId string) Float {
 		return arg0 + arg1
 	}
 
+	if expr.ReferenceExpr != nil {
+		targetId := expr.ReferenceExpr.TargetId
+		targetKind := expr.ReferenceExpr.TargetKind
+		if targetKind == "property" {
+			property := e.PropertyById[targetId]
+			return e.EvalExpr(property.ExprId)
+		}
+		if targetKind == "number_expr" {
+			numberExpr := e.ExprById[targetId].NumberExpr
+			return numberExpr.Value
+		}
+	}
+
 	panic("expr is neither a number expr nor a call expr")
 }

@@ -28,6 +28,10 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Ctx loaded");
   const propertyCtx = yield* PropertyCtx;
 
+  project$.subscribe(() => {
+    goModule.Evaluator.reset();
+  });
+
   const rootExObjectEvents$ = project$.pipe(
     switchMap((project) => project.rootExObjects.events$)
   );

@@ -12,22 +12,36 @@ export class LibraryPersistCtx extends Effect.Tag("LibraryPersistCtx")<
 const ctxEffect = Effect.gen(function* () {
   const persistCtx = yield* PersistCtx;
 
+  const readProject = (filename: string): Effect.Effect<string, void, never> => {
+    return Effect.gen(function* () {
+      const encodedProject_ = yield* persistCtx.readFile(`projects/${filename}`);
+      const encodedProject = yield* Option.match(encodedProject_, {
+        onSome: (file) => Effect.succeed(file),
+        onNone: () => {
+          log55.error("File not found", filename);
+          return Effect.fail("File not found");
+        }
+      });
+      return encodedProject;
+    });
+  };
+
   return {
-    readProjects(): Effect.Effect<string[], void, never> {
+    readProject(libraryProjectId: string): Effect.Effect<string, void, never> {
       return Effect.gen(function* () {
+        log55.debug("Reading project", libraryProjectId);
+        return yield* readProject(libraryProjectId);
+      });
+    },
+
+    readProjects(): Effect.Effect<string[], void, never> {
+      return Effect.gen(this, function* () {
         log55.debug("Reading projects");
         // TODO: read all projects
         const filenames = yield* persistCtx.listFiles("projects");
         const encodedProjects = new Array<string>();
         for (const filename of filenames) {
-          const encodedProject_ = yield* persistCtx.readFile(`projects/${filename}`);
-          const encodedProject = yield* Option.match(encodedProject_, {
-            onSome: (file) => Effect.succeed(file),
-            onNone: () => {
-              log55.error("File not found", filename);
-              return Effect.fail("File not found");
-            }
-          });
+          const encodedProject = yield* readProject(filename);
           encodedProjects.push(encodedProject);
         }
         return encodedProjects;

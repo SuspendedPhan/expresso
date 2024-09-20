@@ -42,6 +42,7 @@ export default interface GoModule {
   Evaluator: {
     addRootExObject(id: string): void;
     eval(): Evaluation;
+    reset(): void;
 
     canvasObjectPathAppend(
       basePath: string,
