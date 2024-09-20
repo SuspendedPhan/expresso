@@ -15,7 +15,7 @@ declare var window: any;
 declare var Go: any;
 
 const ctxEffect = Effect.gen(function* () {
-  const goModule_ = Effect.cached(
+  const goModule_ = yield* Effect.cached(
     Effect.gen(function* () {
       log55.debug("Loading Go module");
       const go = new Go();
@@ -41,9 +41,8 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         log55.debug("goModule()");
         const vv = yield* goModule_;
-        const vv2 = yield* vv;
         log55.debug("goModule() done");
-        return vv2;
+        return vv;
       });
     }
   };
