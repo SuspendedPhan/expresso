@@ -21,6 +21,7 @@ func bootstrapGoModule() {
 			logger.Log("ExObject.create", args)
 			exObjectId := args[0].String()
 			ev.ExObjectCreate(exObjectId)
+			spew.Dump(ev)
 			return nil
 		}),
 
@@ -145,6 +146,7 @@ func bootstrapGoModule() {
 	}))
 
 	goModule.Set("hello", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		logger.Log("hello from go_module.go")
 		return "Hello, World!"
 	}))
 
