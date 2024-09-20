@@ -67,6 +67,12 @@ export function CanvasFactory(args: PixiFactoryArgs) {
         exObject,
         parentPath
       );
+
+      if (cloneCount === null) {
+        log55.debug("Clone count is null");
+        return;
+      }
+
       updateExObject1(exObject, evaluation, parentPath, cloneCount);
     }
 
@@ -142,6 +148,11 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       const result = evaluation.getResult(pathString);
 
       log55.debug("Updating canvas property", result);
+
+      if (result === null) {
+        log55.debug("Result is null");
+        return;
+      }
 
       canvasObject.visible = true;
       canvasObject.scale.x = 100;

@@ -33,6 +33,7 @@ const ctxEffect = Effect.gen(function* () {
     Stream.runForEach(project$2, () => {
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
+          log55.debug("Resetting GoModule");
           goModule.Evaluator.reset();
         });
       });

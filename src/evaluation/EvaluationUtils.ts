@@ -13,14 +13,21 @@ export namespace EvaluationUtils {
     evaluation: Evaluation,
     exObject: ExObject,
     parentPath: CanvasObjectPath
-  ): number {
+  ): number | null {
+    if (evaluation === null) {
+      return null;
+    }
+
     const property = exObject.cloneCountProperty;
     const cloneCountCanvasPropertyPath: CloneCountCanvasPropertyPath = {
       parentCanvasObjectPath: parentPath,
       exObjectId: exObject.id,
       cloneCountPropertyId: property.id,
     };
-    const pathString = CanvasObjectUtils.cloneCountCanvasPropertyPathToString(goModule, cloneCountCanvasPropertyPath);
+    const pathString = CanvasObjectUtils.cloneCountCanvasPropertyPathToString(
+      goModule,
+      cloneCountCanvasPropertyPath
+    );
     const result = evaluation.getResult(pathString);
     return result;
   }

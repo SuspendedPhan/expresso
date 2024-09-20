@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 var (
@@ -18,6 +20,7 @@ func (e *Evaluator) Eval() *Evaluation {
 	for _, exObjectId := range e.RootExObjectIds {
 		exObject, found := e.ExObjectById[exObjectId]
 		if !found {
+			spew.Dump(e)
 			panic("exObject not found " + exObjectId)
 		}
 

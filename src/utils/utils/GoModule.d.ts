@@ -66,6 +66,9 @@ export default interface GoModule {
 }
 
 export interface Evaluation {
-  getResult(canvasPropertyPath: string): number;
+  /**
+   * Returns null if there was an error.
+   */
+  getResult(canvasPropertyPath: string): number | null;
   dispose(): void;
 }
