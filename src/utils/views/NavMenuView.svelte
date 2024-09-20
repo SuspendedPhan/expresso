@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { Effect, Stream } from "effect";
+  import { of } from "rxjs";
+  import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+  import { ViewCtx } from "src/ctx/ViewCtx";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { EffectUtils } from "src/utils/utils/EffectUtils";
+  import type { NavSection } from "src/utils/utils/Nav";
+  import { RxFns, type OBS } from "src/utils/utils/Utils";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
-  import { of } from "rxjs";
-  import { Effect } from "effect";
-  import { ViewCtx } from "src/ctx/ViewCtx";
-  import type { OBS } from "src/utils/utils/Utils";
-  import type { NavSection } from "src/utils/utils/Nav";
 
   let navCollapsed$: OBS<boolean>;
   let navSections: NavSection[];
@@ -28,6 +30,30 @@
       })
     );
   }
+
+  let projectName: string;
+
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const libraryProjectCtx = yield* LibraryProjectCtx;
+      const vv = EffectUtils.obsToStream(
+        libraryProjectCtx.activeLibraryProject$
+      );
+      Stream.runForEach(vv, (activeLibraryProject) => {
+        return Effect.gen(function* () {
+          projectName = activeLibraryProject.name;
+        });
+      });
+      Stream.map;
+      // yield* Stream
+      RxFns.subscribeScoped(
+        libraryProjectCtx.activeLibraryProject$,
+        (activeLibraryProject) => {
+          projectName = activeLibraryProject.name;
+        }
+      );
+    })
+  );
 </script>
 
 {#if $navCollapsed$}

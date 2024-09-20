@@ -159,6 +159,10 @@ export namespace RxFns {
       };
     });
   }
+
+  export function subscribeScoped<T>(obs: OBS<T>, next: (value: T) => void) {
+    obs.subscribe(next);
+  }
 }
 
 export namespace Utils {

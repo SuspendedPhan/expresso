@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, SubscriptionRef } from "effect";
 import { ReplaySubject } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ProjectFactory2, type Project } from "src/ex-object/Project";
@@ -8,7 +8,7 @@ import { fields, variation } from "variant";
 
 export interface LibraryProject_ {
   id: string;
-  name: string;
+  name: SubscriptionRef.SubscriptionRef<string>;
   project$: ReplaySubject<Project>;
 }
 
@@ -46,7 +46,7 @@ export function LibraryProjectFactory2(
     const project$ = new ReplaySubject<Project>(1);
     const libraryProject: LibraryProject = LibraryProjectFactory({
       id: creationArgs2.id,
-      name: creationArgs2.name,
+      name: yield* SubscriptionRef.make(creationArgs2.name),
       project$,
     });
 
