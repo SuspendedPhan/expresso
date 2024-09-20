@@ -21,7 +21,6 @@ func bootstrapGoModule() {
 			logger.Log("ExObject.create", args)
 			exObjectId := args[0].String()
 			ev.ExObjectCreate(exObjectId)
-			spew.Dump(ev)
 			return nil
 		}),
 

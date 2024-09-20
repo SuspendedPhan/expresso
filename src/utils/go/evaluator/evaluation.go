@@ -2,8 +2,6 @@ package evaluator
 
 import (
 	"strconv"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func (e *Evaluator) Eval() *Evaluation {
@@ -30,7 +28,7 @@ func (e *Evaluator) Eval() *Evaluation {
 			}
 		}
 	}
-	spew.Dump(e)
+	// spew.Dump(e)
 	// spew.Dump(evaluation)
 	return evaluation
 }
