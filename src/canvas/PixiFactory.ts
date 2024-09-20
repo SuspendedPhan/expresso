@@ -19,6 +19,7 @@ export function PixiFactory(args: PixiFactoryArgs) {
       const ret = new Graphics()
                 .circle(0, 0, 1)
                 .fill(0xffffff);
+      app.stage.addChild(ret);
       return ret;
     },
   };

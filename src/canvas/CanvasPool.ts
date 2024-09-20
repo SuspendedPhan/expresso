@@ -1,5 +1,8 @@
 import deePool from "deepool";
 import type { LibCanvasObject } from "src/canvas/Canvas";
+import { log5 } from "src/utils/utils/Log5";
+
+const log55 = log5("CanvasPool.ts");
 
 export default class CanvasPool {
   private circlePool;
@@ -18,5 +21,9 @@ export default class CanvasPool {
 
   public releaseObject(circle: LibCanvasObject): void {
     this.circlePool.recycle(circle);
+  }
+
+  public log(): void {
+    log55.debug("Used circles", this.usedCircles);
   }
 }

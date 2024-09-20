@@ -15,8 +15,10 @@ import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
 import type { ExObject } from "src/ex-object/ExObject";
 import { Project } from "src/ex-object/Project";
 import type { Evaluation } from "src/utils/utils/GoModule";
+import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
-import Logger from "../utils/logger/Logger";
+
+const log55 = log5("Canvas.ts");
 
 export type LibCanvasObject = Graphics;
 
@@ -37,6 +39,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       .pipe(withLatestFrom(rootExObjects.items$))
       .subscribe(([evaluation, rootExObjects]) => {
         updateRootExObjects(evaluation, rootExObjects);
+        pool.log();
       });
 
     function updateRootExObjects(
@@ -53,6 +56,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       evaluation: Evaluation,
       parentPath: CanvasObjectPath
     ) {
+      log55.debug("Updating ex object", exObject.id);
       const cloneCount = EvaluationUtils.getCloneCount(
         goModule,
         evaluation,
@@ -68,6 +72,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       parentPath: CanvasObjectPath,
       cloneCount: number
     ) {
+      log55.debug("Updating1 ex object", exObject.id);
       for (let i = 0; i < cloneCount; i++) {
         const path = [
           ...parentPath,
@@ -82,17 +87,18 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       evaluation: Evaluation,
       path: CanvasObjectPath
     ): void {
-      Logger.arg("path", path);
+      log55.debug("Updating canvas object", exObject.id);
+
+      const component = exObject.component;
+      if (!isType(component, ComponentFactory.Canvas)) {
+        return;
+      }
+
       const pathString = CanvasObjectUtils.canvasObjectPathToString(path);
       let canvasObject = canvasObjectByCanvasObjectPath.get(pathString);
       if (canvasObject === undefined) {
         canvasObject = pool.takeObject();
         canvasObjectByCanvasObjectPath.set(pathString, canvasObject);
-      }
-
-      const component = exObject.component;
-      if (isType(component, ComponentFactory.Canvas)) {
-        return;
       }
 
       exObject.componentParameterProperties.forEach(
@@ -130,6 +136,8 @@ export function CanvasFactory(args: PixiFactoryArgs) {
         path
       );
       const result = evaluation.getResult(pathString);
+
+      log55.debug("Updating canvas property", result);
 
       canvasObject.visible = true;
       canvasObject.scale.x = 100;
