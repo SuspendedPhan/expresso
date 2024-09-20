@@ -1,13 +1,15 @@
+import assert from "assert-ts";
 import { Effect, Layer } from "effect";
-import { first, switchMap } from "rxjs";
+import { first, firstValueFrom, mergeMap, switchMap } from "rxjs";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { PropertyCtx } from "src/ctx/PropertyCtx";
+import { ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { log5 } from "src/utils/utils/Log5";
-import { matcher } from "variant";
+import { isType, matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
@@ -57,9 +59,27 @@ const ctxEffect = Effect.gen(function* () {
             property.id
           );
         }
+
         break;
     }
   });
+
+  exObjectCtx.exObjects.items$
+    .pipe(
+      mergeMap((exObjects) => exObjects),
+      mergeMap((exObject) => exObject.basicProperties.events$)
+    )
+    .subscribe(async (evt) => {
+      switch (evt.type) {
+        case "ItemAdded":
+          const property = evt.item;
+          log55.debug("Adding BasicProperty", property.id);
+          const exObject = await firstValueFrom(property.parent$);
+          assert(isType(exObject, ExObjectFactory));
+          goModule.ExObject.addBasicProperty(exObject.id, property.id);
+          break;
+      }
+    });
 
   propertyCtx.properties.events$.subscribe((evt) => {
     switch (evt.type) {

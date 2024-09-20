@@ -4,6 +4,7 @@ type ExObject struct {
 	Id                            string
 	ComponentParameterPropertyIds []string
 	CloneCountPropertyId          string
+	BasicPropertyIds              []string
 }
 
 func (e *Evaluator) ExObjectCreate(id string) {
@@ -11,6 +12,7 @@ func (e *Evaluator) ExObjectCreate(id string) {
 		Id:                            id,
 		ComponentParameterPropertyIds: []string{},
 		CloneCountPropertyId:          "",
+		BasicPropertyIds:              []string{},
 	}
 }
 
@@ -32,4 +34,14 @@ func (e *Evaluator) ExObjectSetCloneCountProperty(id string, cloneCountPropertyI
 	}
 
 	exObject.CloneCountPropertyId = cloneCountPropertyId
+}
+
+func (e *Evaluator) ExObjectAddBasicProperty(id string, propertyId string) {
+	exObject, found := e.ExObjectById[id]
+
+	if !found {
+		panic("exObject not found")
+	}
+
+	exObject.BasicPropertyIds = append(exObject.BasicPropertyIds, propertyId)
 }

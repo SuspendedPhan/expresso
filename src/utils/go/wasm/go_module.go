@@ -39,6 +39,16 @@ func bootstrapGoModule() {
 			ev.ExObjectAddComponentParameterProperty(exObjectId, propertyId)
 			return nil
 		}),
+
+		// addBasicProperty(exObjectId: string, propertyId: string): void;
+
+		"addBasicProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.addBasicProperty", args)
+			exObjectId := args[0].String()
+			propertyId := args[1].String()
+			ev.ExObjectAddBasicProperty(exObjectId, propertyId)
+			return nil
+		}),
 	}))
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{
