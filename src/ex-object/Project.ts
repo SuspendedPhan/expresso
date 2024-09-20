@@ -33,6 +33,11 @@ export const ProjectFactory = variation(
       exFuncs: ObservableArray<CustomExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
+
+      /**
+       * All ExObjects in the project.
+       */
+      exObjects: ObservableArray<ExObject>;
     } & ExItemBase
   >()
 );
@@ -81,6 +86,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       ),
       currentOrdinal$,
       destroy$: new Subject<void>(),
+      exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
     });
     return project;
   });
@@ -122,6 +128,7 @@ export const Project = {
         log55.debug("addRootExObjectBlank");
         const exObject = yield* ExObjectFactory2({});
         project.rootExObjects.push(exObject);
+        project.exObjects.push(exObject);
       });
     },
 

@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect } from "effect";
+import { Effect, Option, SubscriptionRef } from "effect";
 import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import {
   CanvasComponentStore,
@@ -31,6 +31,11 @@ interface ExObject_ extends ExItemBase {
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
+
+  /**
+   * The project that this ExObject belongs to, if any. None if this ExObject is part of a component.
+   */
+  project: SubscriptionRef.SubscriptionRef<Option.Option<Project>>;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -44,12 +49,13 @@ interface ExObjectCreationArgs {
   basicProperties?: PropertyKind["BasicProperty"][];
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
+
+  project?: Project | null;
 }
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
     log55.debug("ExObjectFactory2.start");
-    const exObjectCtx = yield* ExObjectCtx;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     log55.debug("ExObjectFactory2.component", component);
@@ -59,7 +65,9 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       component,
       name:
         creationArgs.name ??
-        `Object ${yield* Project.Methods(yield* Project.activeProject).getAndIncrementOrdinal()}`,
+        `Object ${yield* Project.Methods(
+          yield* Project.activeProject
+        ).getAndIncrementOrdinal()}`,
       componentProperties:
         creationArgs.componentProperties ??
         (yield* createComponentProperties(component)),
@@ -68,6 +76,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs.cloneCountProperty ??
         (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
+      project: creationArgs.project ?? null,
     };
 
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
@@ -90,6 +99,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs2.children
       ),
       cloneCountProperty: creationArgs2.cloneCountProperty,
+      project: yield* SubscriptionRef.make(Option.fromNullable(creationArgs2.project)),
     });
 
     creationArgs2.componentProperties.forEach((property) => {
@@ -101,8 +111,6 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     });
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
-
-    exObjectCtx.exObjects.push(exObject);
     return exObject;
   });
 }
@@ -186,7 +194,6 @@ export const ExObject = {
 
     replaceRootExObject(newExObject: ExObject) {
       return Effect.gen(function* () {
-        
         const project = yield* Project.activeProject;
         project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
