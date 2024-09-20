@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Effect, Stream } from "effect";
+  import { Effect, Stream, Ref } from "effect";
   import { of } from "rxjs";
   import { BehaviorSubject } from "rxjs/internal/BehaviorSubject";
   import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
@@ -21,6 +21,7 @@
   import { isType } from "variant";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
+  import { Subject } from "rxjs/internal/Subject";
 
   const log55 = log5("NavMenuView.svelte");
 
@@ -50,12 +51,21 @@
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
+      const libraryProjectCtx = yield* LibraryProjectCtx;
+
       projectNameFieldData = yield* createFieldValueData<NavProjectNameFocus>({
         value$: projectName$,
         focusIsFn: isType(NavProjectNameFocusFactory),
         createEditingFocusFn: (isEditing) =>
           NavProjectNameFocusFactory({ isEditing }),
         filterFn: () => true,
+      });
+      yield* Stream.runForEach(projectNameFieldData.onInput, (value) => {
+        return Effect.gen(function* () {
+          log55.debug("Updating project name: input");
+          const vv = yield* libraryProjectCtx.activeLibraryProject;
+          yield* Ref.set(vv.name, value);
+        });
       });
     })
   );
