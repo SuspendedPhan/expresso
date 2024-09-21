@@ -25,13 +25,13 @@ export function createObservableArrayWithLifetime<T>(
   destroy$: OBS<void>,
   initialItems: T[] = []
 ) {
-  const items$ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
+  const items$_ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
   const events$ = new Subject<ArrayEvent<T>>();
   return {
     kind: "ObservableArray" as const,
 
     get events$() {
-      const currentItemEvents: ItemAdded<T>[] = items$.value.map((item) => ({
+      const currentItemEvents: ItemAdded<T>[] = items$_.value.map((item) => ({
         type: "ItemAdded",
         item,
       }));
@@ -39,18 +39,18 @@ export function createObservableArrayWithLifetime<T>(
     },
 
     get items() {
-      return items$.value;
+      return items$_.value;
     },
 
-    items$,
+    items$: items$_ as OBS<T[]>,
 
     get itemStream() {
-      return EffectUtils.obsToStream(items$);
+      return EffectUtils.obsToStream(items$_);
     },
 
     push(item: T) {
-      items$.value.push(item);
-      items$.next(items$.value);
+      items$_.value.push(item);
+      items$_.next(items$_.value);
       events$.next({ type: "ItemAdded", item });
     },
 
@@ -59,7 +59,8 @@ export function createObservableArrayWithLifetime<T>(
       if (index === -1) {
         throw new Error("Item not found");
       }
-      this.items$.value[index] = newItem;
+      items$_.value[index] = newItem;
+      items$_.next(items$_.value);
       events$.next({ type: "ItemRemoved", item: oldItem });
       events$.next({ type: "ItemAdded", item: newItem });
     },

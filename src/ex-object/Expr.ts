@@ -26,6 +26,7 @@ import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type BSUB,
+  type OBS,
   type SUB,
 } from "src/utils/utils/Utils";
 import {
@@ -47,7 +48,7 @@ export type ReferenceTarget =
   | ExFuncParameter;
 
 interface CallExpr_ extends ExItemBase {
-  args$: SUB<Expr[]>;
+  args$: OBS<Expr[]>;
   args: ObservableArray<Expr>;
   exFunc$: BSUB<ExFunc | null>;
 }
@@ -221,10 +222,7 @@ export const Expr = {
         parent.expr$.next(newExpr);
       } else if (isOfVariant(parent, ExprFactory)) {
         assert(isType(parent, ExprFactory.Call));
-
-        const args = yield* EffectUtils.firstValueFrom(parent.args$);
-        const newArgs = args.map((arg) => (arg === oldExpr ? newExpr : arg));
-        parent.args$.next(newArgs);
+        parent.args.replaceItem(oldExpr, newExpr);
       } else if (isType(parent, CustomExFuncFactory)) {
         parent.expr$.next(newExpr);
       } else {
