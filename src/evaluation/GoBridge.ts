@@ -3,10 +3,12 @@ import { Effect, Layer, Stream } from "effect";
 import { first, switchMap } from "rxjs";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import type { ExObject } from "src/ex-object/ExObject";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
+import type { ArrayEvent } from "src/utils/utils/ObservableArray";
 import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
@@ -56,15 +58,29 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const exObjectEvents$ = EffectUtils.obsToStream(
-    project$.pipe(
-      log55.tapDebug("exObjectEvents$1"),
-      switchMap((project) => project.exObjects.events$),
-      log55.tapDebug("exObjectEvents$2")
-    )
+  const project = EffectUtils.obsToStream(project$);
+  const vvv = Stream.flatten((project, (project_) => project_.exObjectEvents);
+  const exObjectEvents = Stream.flatMap(
+    project,
+    (project_) => {
+      return Effect.succeed(1);
+        // const newLocal = project_.exObjectEvents;
+        // return newLocal;
+    },
+    { switch: true }
   );
+
+  const exObjectEvents2 = Stream.flatMap(
+    exObjectEvents,
+    (exObjectEvents_) => {
+      return exObjectEvents_;
+    }, {switch: true}
+  );
+
+
+  // const exObjectEvents$ =
   yield* Effect.forkDaemon(
-    Stream.runForEach(exObjectEvents$, (evt) => {
+    Stream.runForEach(exObjectEvents, (evt) => {
       log55.debug("Processing ExObject event", evt.type);
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
