@@ -67,7 +67,7 @@ export function createObservableArrayWithLifetime<T>(
 
     get events() {
       return EffectUtils.obsToStream(this.events$);
-    }
+    },
   };
 }
 
