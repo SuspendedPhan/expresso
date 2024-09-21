@@ -2,6 +2,10 @@ import { Effect } from "effect";
 import { ExObject } from "src/ex-object/ExObject";
 import { log5 } from "src/utils/utils/Log5";
 import { ElementLayout } from "./ElementLayout";
+import { Project, ProjectFactory } from "src/ex-object/Project";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import assert from "assert-ts";
+import { isType } from "variant";
 
 const log55 = log5("ExObjectLayout.ts");
 
@@ -16,7 +20,10 @@ export function createExObjectLayout(rootExObject: ExObject) {
       return childrenByExObject.get(exObject) ?? [];
     }
 
-    (yield* ExObjectCtx.exObjects).events$.subscribe((event) => {
+    const project = yield* EffectUtils.firstValueFrom(rootExObject.parent$);
+    assert(isType(project, ProjectFactory));
+
+    project.exObjects.events$.subscribe((event) => {
       if (event.type !== "ItemAdded") {
         return;
       }
