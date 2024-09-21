@@ -13,6 +13,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
+  type ArrayEvent,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
 import {
@@ -74,7 +75,10 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);
-    const children = createObservableArrayWithLifetime(base.destroy$, creationArgs2.children);
+    const children = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.children
+    );
     const exObject = ExObjectFactory({
       ...base,
       name$: createBehaviorSubjectWithLifetime(
@@ -121,10 +125,6 @@ export const ExObject = {
         child.parent$.next(exObject);
         const newChildren = [...children, child];
         exObject.children$.next(newChildren);
-        const project = yield* ExItem.getProject(exObject);
-        if (Option.isSome(project)) {
-          project.value.exObjects.push(child);
-        }
       });
     },
 
@@ -220,10 +220,38 @@ export const ExObject = {
       });
     },
 
-    get descendants2(): Stream.Stream<ExObject> {
-      // Chunk.of([exObject.children$])
-    }
+    get descendants2(): Stream.Stream<ArrayEvent<ExObject>> {
+      /*
+      for each child array event:
+        if add:
+          emit the event in the result stream
+
+      for each descendant array event:
+        if add:
+          emit the event in the result stream
+      */
+
+      const childEvents = exObject.children.events;
+
+      const descendantsForChildren = Stream.flatMap(
+        exObject.children.itemStream,
+        (children: ExObject[]) => {
+          return ExObject.descendantsForExObjects(children);
+        },
+        { switch: true }
+      );
+
+      const result = Stream.merge(childEvents, descendantsForChildren);
+      return result;
+    },
   }),
+
+  descendantsForExObjects(exObjects: ExObject[]) {
+    const vv = exObjects.map(
+      (exObject) => ExObject.Methods(exObject).descendants2
+    );
+    return Stream.mergeAll(vv, { concurrency: "unbounded" });
+  },
 };
 
 // ----------------

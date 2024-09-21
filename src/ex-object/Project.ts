@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import {
   BehaviorSubject,
   firstValueFrom,
@@ -18,6 +18,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
+  type ArrayEvent,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
 import { Utils, type OBS } from "src/utils/utils/Utils";
@@ -36,7 +37,7 @@ export const ProjectFactory = variation(
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
 
-      exObjects: ObservableArray<ExObject>;
+      exObjectEvents: Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>>;
       properties: ObservableArray<Property>;
       exprs: ObservableArray<Expr>;
     } & ExItemBase
@@ -73,6 +74,19 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
+    const exObjectEvents = Effect.gen(function* () {
+      const descendantsForRootExObjects = Stream.flatMap(rootExObjects.itemStream, (rootExObjects) => {
+        return ExObject.descendantsForExObjects(rootExObjects);
+      });
+  
+      const result = Stream.merge(
+        rootExObjects.events,
+        descendantsForRootExObjects
+      );
+
+      return result;
+    });
+
     const project = ProjectFactory({
       ...base,
       libraryProject: null,
@@ -87,24 +101,15 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       ),
       currentOrdinal$,
       destroy$: new Subject<void>(),
-      exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
+      exObjectEvents,
       properties: createObservableArrayWithLifetime<Property>(base.destroy$),
       exprs: createObservableArrayWithLifetime<Expr>(base.destroy$),
     });
 
     for (const exObject of rootExObjects.items) {
-      
+      log55.debug("Adding rootExObject", exObject.id);
+      exObject.parent$.next(project);
     }
-
-    // for (const exObject of rootExObjects.items) {
-    //   log55.debug("Adding rootExObject", exObject.id);
-    //   exObject.parent$.next(project);
-    //   project.exObjects.push(exObject);
-    //   for (const descendant of yield* ExObject.Methods(exObject).descendants) {
-    //     log55.debug("Adding descendant", descendant.id);
-    //     project.exObjects.push(descendant);
-    //   }
-    // }
 
     return project;
   });
@@ -146,7 +151,6 @@ export const Project = {
         log55.debug("addRootExObjectBlank");
         const exObject = yield* ExObjectFactory2({});
         project.rootExObjects.push(exObject);
-        project.exObjects.push(exObject);
       });
     },
 

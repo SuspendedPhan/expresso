@@ -1,4 +1,5 @@
 import { concat, map, Subject } from "rxjs";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
@@ -43,6 +44,10 @@ export function createObservableArrayWithLifetime<T>(
 
     items$,
 
+    get itemStream() {
+      return EffectUtils.obsToStream(items$);
+    },
+
     push(item: T) {
       items$.value.push(item);
       items$.next(items$.value);
@@ -58,6 +63,10 @@ export function createObservableArrayWithLifetime<T>(
       events$.next({ type: "ItemRemoved", item: oldItem });
       events$.next({ type: "ItemAdded", item: newItem });
     },
+
+    get events() {
+      return EffectUtils.obsToStream(this.events$);
+    }
   };
 }
 
