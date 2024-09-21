@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
 import { first, switchMap } from "rxjs";
-import { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { PropertyCtx } from "src/ctx/PropertyCtx";
@@ -22,7 +21,6 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Starting GoBridgeCtx");
 
   const goModuleCtx = yield* GoModuleCtx;
-  const exObjectCtx = yield* ExObjectCtx;
   const project$ = yield* Project.activeProject$;
   const exprCtx = yield* ExprCtx;
   log55.debug("Ctx loaded");
@@ -61,7 +59,7 @@ const ctxEffect = Effect.gen(function* () {
   );
 
   const exObjectEvents$ = EffectUtils.obsToStream(
-    exObjectCtx.exObjects.events$
+    project$.pipe(switchMap((project) => project.exObjects.events$))
   );
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectEvents$, (evt) => {

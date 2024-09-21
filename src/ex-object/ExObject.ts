@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Option, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Option } from "effect";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -30,11 +30,6 @@ interface ExObject_ extends ExItemBase {
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
-
-  /**
-   * The project that this ExObject belongs to, if any. None if this ExObject is part of a component.
-   */
-  project: Stream.Stream<Option.Option<Project>>;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -73,7 +68,6 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs.cloneCountProperty ??
         (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
-      project: creationArgs.project ?? null,
     };
 
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
@@ -96,7 +90,6 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs2.children
       ),
       cloneCountProperty: creationArgs2.cloneCountProperty,
-      project: yield* SubscriptionRef.make(Option.fromNullable(creationArgs2.project)),
     });
 
     creationArgs2.componentProperties.forEach((property) => {
@@ -128,7 +121,10 @@ export const ExObject = {
         child.parent$.next(exObject);
         const newChildren = [...children, child];
         exObject.children$.next(newChildren);
-        yield* Ref.set(child.project, yield* exObject.project.get);
+        const project = yield* ExItem.getProject(exObject);
+        if (Option.isSome(project)) {
+          project.value.exObjects.push(child);
+        }
       });
     },
 

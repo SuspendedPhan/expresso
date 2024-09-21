@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
-import type { ExObjectCtx } from "src/ctx/ExObjectCtx";
 import type { ExprCtx } from "src/ctx/ExprCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import type { PropertyCtx } from "src/ctx/PropertyCtx";
@@ -265,7 +264,7 @@ const ctxEffect = Effect.gen(function* () {
   ): Effect.Effect<
     ExObject,
     never,
-    ExprCtx | ComponentCtx | PropertyCtx | ExObjectCtx | LibraryProjectCtx
+    ExprCtx | ComponentCtx | PropertyCtx | LibraryProjectCtx
   > {
     const effect = Effect.gen(function* () {
       log55.debug("rehydrateExObject.start", deExObject);
