@@ -10,7 +10,7 @@ import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
-import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
+import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
@@ -91,6 +91,10 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
     for (const exObject of rootExObjects.items) {
       exObject.parent$.next(project);
+      project.exObjects.push(exObject);
+      for (const descendant of yield* ExObject.Methods(exObject).descendants) {
+        project.exObjects.push(descendant);
+      }
     }
 
     return project;

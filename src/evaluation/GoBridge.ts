@@ -59,10 +59,15 @@ const ctxEffect = Effect.gen(function* () {
   );
 
   const exObjectEvents$ = EffectUtils.obsToStream(
-    project$.pipe(switchMap((project) => project.exObjects.events$))
+    project$.pipe(
+      log55.tapDebug("exObjectEvents$1"),
+      switchMap((project) => project.exObjects.events$),
+      log55.tapDebug("exObjectEvents$2")
+    )
   );
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectEvents$, (evt) => {
+      log55.debug("Processing ExObject event", evt.type);
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
           switch (evt.type) {

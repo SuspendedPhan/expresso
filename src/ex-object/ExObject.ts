@@ -206,6 +206,19 @@ export const ExObject = {
         }
       })();
     },
+
+    get descendants(): Effect.Effect<ExObject[], never, never> {
+      return Effect.gen(function* () {
+        const result = new Array<ExObject>();
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        for (const child of children) {
+          result.push(child);
+          const descendants = yield* ExObject.Methods(child).descendants;
+          result.push(...descendants);
+        }
+        return result;
+      });
+    },
   }),
 };
 
