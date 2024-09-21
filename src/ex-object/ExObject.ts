@@ -19,6 +19,7 @@ import {
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
+  type OBS,
   type SUB,
 } from "src/utils/utils/Utils";
 import { fields, isType, matcher, variation } from "variant";
@@ -28,7 +29,7 @@ interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
   children: ObservableArray<ExObject>;
-  children$: SUB<ExObject[]>;
+  children$: OBS<ExObject[]>;
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
@@ -121,10 +122,8 @@ export const ExObject = {
 
     addChild(child: ExObject) {
       return Effect.gen(function* () {
-        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
         child.parent$.next(exObject);
-        const newChildren = [...children, child];
-        exObject.children$.next(newChildren);
+        exObject.children.push(child);
       });
     },
 
@@ -176,12 +175,7 @@ export const ExObject = {
           return;
         }
         assert(isType(parent, ExObjectFactory));
-        const children = yield* EffectUtils.firstValueFrom(parent.children$);
-        const index = children.indexOf(exObject);
-        assert(index !== -1);
-        newExObject.parent$.next(parent);
-        children[index] = newExObject;
-        parent.children$.next(children);
+        parent.children.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
       });
     },

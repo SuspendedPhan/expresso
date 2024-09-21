@@ -4,10 +4,13 @@
   import type { Line } from "src/utils/layout/Layout";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
-  import { tick } from "svelte";
+  import { onMount, tick } from "svelte";
   import { ElementLayout } from "./ElementLayout";
+  import { ResizeSensor } from "css-element-queries";
+  import { setTime } from "effect/TestClock";
 
   const log55 = log5("TreeView.svelte");
+  log55.debug("TreeView.svelte init");
 
   export let elementLayout: ElementLayout;
 
@@ -27,27 +30,52 @@
       drawLines(canvas, output.lines);
     });
 
-  RxFns.onMount$()
-    .pipe(switchMap(() => RxFns.resizeSensor$(rootElement)))
-    .subscribe(() => {
-      canvasWidth = rootElement.clientWidth;
-      canvasHeight = rootElement.clientHeight;
-      drawLines(canvas, lines);
-      tick().then(() => {
-        drawLines(canvas, lines);
-      });
-      log55.debug("canvasWidth", canvasWidth);
-      log55.debug("canvasHeight", canvasHeight);
+  // RxFns.onMount$()
+  //   .pipe(switchMap(() => RxFns.resizeSensor$(rootElement)))
+  //   .subscribe(() => {
+  //     setTimeout(() => {
+  //       canvasWidth = rootElement.clientWidth;
+  //       canvasHeight = rootElement.clientHeight;
+  //       log55.debug2("canvasWidth2", canvasWidth);
+  //       log55.debug2("canvasHeight2", canvasHeight);
+
+  //       setTimeout(() => {
+  //         drawLines(canvas, lines);
+  //       }, 100);
+  //     }, 100);
+  //   });
+
+  onMount(() => {
+    new ResizeSensor(rootElement, () => {
+      setTimeout(() => {
+        canvasWidth = rootElement.clientWidth;
+        canvasHeight = rootElement.clientHeight;
+
+        if (canvasWidth > 100) {
+          log55.debug2(`canvas size: ${canvasWidth}x${canvasHeight}`);
+        }
+
+        setTimeout(() => {
+          drawLines(canvas, lines);
+        }, 100);
+      }, 1000);
     });
+  });
 
   function drawLines(canvasElement: HTMLCanvasElement, lines: Line[]) {
+    if (lines.length === 0) {
+      return;
+    }
+    log55.debug("drawLines", lines);
+
     const context = canvasElement.getContext("2d");
     if (!context) {
       throw new Error("Could not get 2d context");
     }
-    context.strokeStyle = "gray";
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
     for (const line of lines) {
       context.beginPath();
+      context.strokeStyle = "gray";
       context.moveTo(line.startX, line.startY);
       context.lineTo(line.endX, line.endY);
       context.stroke();

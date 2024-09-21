@@ -36,6 +36,7 @@
 
         sensor = new ResizeSensor(element, () => {
           tick().then(() => {
+            log55.debug("Recalculating layout");
             elementLayout.recalculate();
           });
         });
@@ -50,11 +51,13 @@
 
 <FlexContainer class="p-window {clazz}">
   {#if elementLayout}
+    <!-- {#key exObject.id} -->
     <TreeView {elementLayout}>
       <div bind:this={element}>
         <ExObjectView {exObject} {elementLayout} />
       </div>
     </TreeView>
+    <!-- {/key} -->
   {/if}
 </FlexContainer>
 

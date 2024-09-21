@@ -26,8 +26,7 @@ import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type BSUB,
-  type OBS,
-  type SUB,
+  type OBS
 } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
