@@ -88,6 +88,11 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       destroy$: new Subject<void>(),
       exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
     });
+
+    for (const exObject of rootExObjects.items) {
+      exObject.parent$.next(project);
+    }
+
     return project;
   });
 }

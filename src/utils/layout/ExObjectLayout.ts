@@ -1,11 +1,11 @@
+import assert from "assert-ts";
 import { Effect } from "effect";
 import { ExObject } from "src/ex-object/ExObject";
-import { log5 } from "src/utils/utils/Log5";
-import { ElementLayout } from "./ElementLayout";
-import { Project, ProjectFactory } from "src/ex-object/Project";
+import { ProjectFactory } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import assert from "assert-ts";
+import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
+import { ElementLayout } from "./ElementLayout";
 
 const log55 = log5("ExObjectLayout.ts");
 
