@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Chunk, Effect, Option, Stream } from "effect";
+import { Effect, Stream } from "effect";
 import {
   CanvasComponentStore,
   ComponentFactory,

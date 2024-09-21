@@ -1,14 +1,11 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
 import { first, switchMap } from "rxjs";
-import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import type { ExObject } from "src/ex-object/ExObject";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import type { ArrayEvent } from "src/utils/utils/ObservableArray";
 import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
@@ -23,7 +20,6 @@ const ctxEffect = Effect.gen(function* () {
 
   const goModuleCtx = yield* GoModuleCtx;
   const project$ = yield* Project.activeProject$;
-  const exprCtx = yield* ExprCtx;
   log55.debug("Ctx loaded");
 
   const project$2 = EffectUtils.obsToStream(project$);
@@ -98,12 +94,15 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const propertyEvents$ = EffectUtils.obsToStream(
-    project$.pipe(switchMap((project) => project.properties.events$))
+  const propertyEvents = activeProject.pipe(
+    Stream.flatMap((project) => Stream.fromEffect(project.propertyEvents), {
+      switch: true,
+    }),
+    Stream.flatMap((propertyEvents) => propertyEvents, { switch: true })
   );
 
   yield* Effect.forkDaemon(
-    Stream.runForEach(propertyEvents$, (evt) => {
+    Stream.runForEach(propertyEvents, (evt) => {
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
           switch (evt.type) {
@@ -121,9 +120,13 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const exprEvents$ = EffectUtils.obsToStream(exprCtx.exprs.events$);
+  const exprEvents = activeProject.pipe(
+    Stream.flatMap((project) => Stream.fromEffect(project.exprEvents), { switch: true }),
+    Stream.flatMap((exprEvents) => exprEvents, { switch: true })
+  );
+
   yield* Effect.forkDaemon(
-    Stream.runForEach(exprEvents$, (evt) => {
+    Stream.runForEach(exprEvents, (evt) => {
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
           if (evt.type !== "ItemAdded") return;

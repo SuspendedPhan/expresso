@@ -1,6 +1,5 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
-import { ExprCtx } from "src/ctx/ExprCtx";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -87,7 +86,6 @@ export const ExprFactory2 = {
         ...base,
         value: creationArgs2.value,
       });
-      (yield* ExprCtx).exprs.push(expr);
       return expr;
     });
   },
@@ -104,7 +102,6 @@ export const ExprFactory2 = {
         ...base,
         target: creationArgs2.target,
       });
-      (yield* ExprCtx).exprs.push(expr);
       return expr;
     });
   },
@@ -142,7 +139,6 @@ export const ExprFactory2 = {
         arg.parent$.next(expr);
       }
 
-      (yield* ExprCtx).exprs.push(expr);
       return expr;
     });
   },

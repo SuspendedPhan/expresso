@@ -38,8 +38,8 @@ export const ProjectFactory = variation(
       destroy$: Subject<void>;
 
       exObjectEvents: Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>>;
-      properties: ObservableArray<Property>;
-      exprs: ObservableArray<Expr>;
+      propertyEvents: Effect.Effect<Stream.Stream<ArrayEvent<Property>>>;
+      exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>>;
     } & ExItemBase
   >()
 );
@@ -87,6 +87,9 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       return result;
     });
 
+    const propertyEvents: Effect.Effect<Stream.Stream<ArrayEvent<Property>>> = Effect.succeed(Stream.make());
+    const exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> = Effect.succeed(Stream.make());
+
     const project = ProjectFactory({
       ...base,
       libraryProject: null,
@@ -102,8 +105,8 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       currentOrdinal$,
       destroy$: new Subject<void>(),
       exObjectEvents,
-      properties: createObservableArrayWithLifetime<Property>(base.destroy$),
-      exprs: createObservableArrayWithLifetime<Expr>(base.destroy$),
+      propertyEvents,
+      exprEvents,
     });
 
     for (const exObject of rootExObjects.items) {
