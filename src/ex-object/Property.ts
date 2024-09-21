@@ -8,7 +8,6 @@
 import assert from "assert-ts";
 import { Effect } from "effect";
 import { firstValueFrom, of } from "rxjs";
-import { PropertyCtx } from "src/ctx/PropertyCtx";
 import {} from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
@@ -72,7 +71,6 @@ export const PropertyFactory2 = {
     createArgs: CreatePropertyArgs["ComponentParameter"]
   ) {
     return Effect.gen(function* () {
-      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
         parameter: createArgs.parameter ?? null,
@@ -89,14 +87,12 @@ export const PropertyFactory2 = {
         componentParameter: createArgs2.parameter,
       });
       createArgs2.expr.parent$.next(property);
-      propertyCtx.properties.push(property);
       return property;
     });
   },
 
   BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
     return Effect.gen(function* () {
-      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
         id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
         expr:
@@ -119,14 +115,12 @@ export const PropertyFactory2 = {
         ),
       });
       createArgs2.expr.parent$.next(property);
-      propertyCtx.properties.push(property);
       return property;
     });
   },
 
   CloneCountProperty(createArgs: CreatePropertyArgs["CloneCount"]) {
     return Effect.gen(function* () {
-      const propertyCtx = yield* PropertyCtx;
       const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
         id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
@@ -141,7 +135,6 @@ export const PropertyFactory2 = {
         ),
       });
       createArgs2.expr.parent$.next(property);
-      propertyCtx.properties.push(property);
       return property;
     });
   },

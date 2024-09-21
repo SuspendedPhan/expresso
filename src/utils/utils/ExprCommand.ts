@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
-import { ExprCtx } from "src/ctx/ExprCtx";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
@@ -30,7 +29,6 @@ export class ExprCommandCtx extends Effect.Tag("ExprCommandCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
-  const exprCtx = yield* ExprCtx;
 
   return {
     onSubmitExprCommand$: new Subject<void>(),
@@ -70,7 +68,7 @@ const ctxEffect = Effect.gen(function* () {
                 });
                 yield* Expr.replaceExpr(expr, callExpr);
               });
-              return Effect.provideService(effect, ExprCtx, exprCtx);
+              return effect;
             },
           });
         }

@@ -1,4 +1,4 @@
-import { Effect, Option, Stream } from "effect";
+import { Effect, Option, Ref, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
@@ -6,6 +6,7 @@ import { type ExObject } from "src/ex-object/ExObject";
 import { type Expr } from "src/ex-object/Expr";
 import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
@@ -28,6 +29,7 @@ export interface ExItemBase {
   readonly id: string;
   readonly ordinal: number;
   readonly parent$: SUB<Parent>;
+  readonly parent: SubscriptionRef.SubscriptionRef<Parent>;
 
   // Completes when destroyed.
   readonly destroy$: SUB<void>;
@@ -46,10 +48,20 @@ export const ExItem = {
     return Effect.gen(function* () {
       const destroy$ = new Subject<void>();
 
+      const parent$ = createBehaviorSubjectWithLifetime<Parent>(destroy$, null);
+      const parent = yield* SubscriptionRef.make<Parent>(null);
+      yield* Effect.forkDaemon(
+        Stream.runForEach(EffectUtils.obsToStream(parent$), (value) => {
+          return Effect.gen(function* () {
+            yield* Ref.set(parent, value);
+          });
+        })
+      );
       const exObjectBase: ExItemBase = {
         id,
         ordinal: 0,
-        parent$: createBehaviorSubjectWithLifetime<Parent>(destroy$, null),
+        parent$,
+        parent,
         destroy$,
       };
       return exObjectBase;
@@ -62,12 +74,17 @@ export const ExItem = {
         log55.error(e);
       });
 
-      const project = yield* Stream.runFoldWhile(vv, Option.none<Project>(), (v => Option.isNone(v)), (_acc, value) => {
-        if (isType(value, ProjectFactory)) {
-          return Option.some<Project>(value);
+      const project = yield* Stream.runFoldWhile(
+        vv,
+        Option.none<Project>(),
+        (v) => Option.isNone(v),
+        (_acc, value) => {
+          if (isType(value, ProjectFactory)) {
+            return Option.some<Project>(value);
+          }
+          return Option.none<Project>();
         }
-        return Option.none<Project>();
-      });
+      );
       if (Option.isNone(project)) {
         log55.error("No project found for item", item.id);
       }

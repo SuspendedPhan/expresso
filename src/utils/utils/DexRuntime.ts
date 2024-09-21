@@ -1,13 +1,11 @@
 import { Layer, ManagedRuntime } from "effect";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
-import { ExprCtxLive } from "src/ctx/ExprCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
 import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
-import { PropertyCtxLive } from "src/ctx/PropertyCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
@@ -39,8 +37,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
 
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
-  Layer.provideMerge(PropertyCtxLive),
-  Layer.provideMerge(ExprCtxLive),
   Layer.provideMerge(ViewCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
   Layer.provideMerge(FocusCtxLive)

@@ -1,9 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
-import type { ExprCtx } from "src/ctx/ExprCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
-import type { PropertyCtx } from "src/ctx/PropertyCtx";
 import {
   ComponentFactory,
   ComponentFactory2,
@@ -14,7 +12,12 @@ import {
   ComponentParameterFactory2,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
-import { CustomExFuncFactory, CustomExFuncFactory2, SystemExFuncFactory, type CustomExFunc } from "src/ex-object/ExFunc";
+import {
+  CustomExFuncFactory,
+  CustomExFuncFactory2,
+  SystemExFuncFactory,
+  type CustomExFunc,
+} from "src/ex-object/ExFunc";
 import { ExFuncParameterFactory2 } from "src/ex-object/ExFuncParameter";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
 import {
@@ -23,7 +26,10 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
-import { LibraryProject, LibraryProjectFactory2 } from "src/ex-object/LibraryProject";
+import {
+  LibraryProject,
+  LibraryProjectFactory2,
+} from "src/ex-object/LibraryProject";
 import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
 import {
@@ -69,10 +75,14 @@ export class RehydratorCtx extends Effect.Tag("RehydratorCtx")<
 const ctxEffect = Effect.gen(function* () {
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
-  const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] = [];
+  const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] =
+    [];
   const rehydratedCallExprs = new Map<string, RehydratedCallExpr>();
   const targetById = new Map<string, ReferenceTarget>();
-  const componentParameterById = new Map<string, ComponentParameterKind["Custom"]>();
+  const componentParameterById = new Map<
+    string,
+    ComponentParameterKind["Custom"]
+  >();
   const customExFuncById = new Map<string, CustomExFunc>();
 
   function rehydrateLibraryProject(deProject: DehydratedLibraryProject) {
@@ -157,7 +167,10 @@ const ctxEffect = Effect.gen(function* () {
   function assignExFuncs() {
     return Effect.gen(function* () {
       for (const reCallExpr of rehydratedCallExprs.values()) {
-        if (reCallExpr.dehydratedCallExpr.exFuncKind === CustomExFuncFactory.output.type) {
+        if (
+          reCallExpr.dehydratedCallExpr.exFuncKind ===
+          CustomExFuncFactory.output.type
+        ) {
           const { exFuncId } = reCallExpr.dehydratedCallExpr;
           assert(exFuncId !== null);
           const exFunc = customExFuncById.get(exFuncId);
@@ -176,7 +189,7 @@ const ctxEffect = Effect.gen(function* () {
   function rehydrateExFunc(deExFunc: DehydratedExFunc) {
     return Effect.gen(function* () {
       log55.debug("rehydrateExFunc.start", deExFunc);
-      
+
       const expr = yield* rehydrateExpr(deExFunc.expr);
 
       log55.debug("rehydrateExFunc.expr", expr);
@@ -186,7 +199,7 @@ const ctxEffect = Effect.gen(function* () {
       );
 
       log55.debug("rehydrateExFunc.exFuncParameterArr", exFuncParameterArr);
-      
+
       const exFunc = yield* CustomExFuncFactory2.Custom({
         id: deExFunc.id,
         name: deExFunc.name,
@@ -261,11 +274,7 @@ const ctxEffect = Effect.gen(function* () {
 
   function rehydrateExObject(
     deExObject: DehydratedExObject
-  ): Effect.Effect<
-    ExObject,
-    never,
-    ExprCtx | ComponentCtx | PropertyCtx | LibraryProjectCtx
-  > {
+  ): Effect.Effect<ExObject, never, ComponentCtx | LibraryProjectCtx> {
     const effect = Effect.gen(function* () {
       log55.debug("rehydrateExObject.start", deExObject);
 
@@ -388,7 +397,7 @@ const ctxEffect = Effect.gen(function* () {
 
   function rehydrateCallExpr(
     deExpr: DehydratedExprKind["CallExpr"]
-  ): Effect.Effect<ExprKind["Call"], never, ExprCtx> {
+  ): Effect.Effect<ExprKind["Call"], never, never> {
     return Effect.gen(function* () {
       let args = new Array<Expr>();
       for (const deArg of deExpr.args) {

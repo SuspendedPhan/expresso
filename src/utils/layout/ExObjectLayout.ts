@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import { ExObject } from "src/ex-object/ExObject";
 import { ProjectFactory } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -20,20 +20,26 @@ export function createExObjectLayout(rootExObject: ExObject) {
       return childrenByExObject.get(exObject) ?? [];
     }
 
+    // TODP: fix this to match ExprLayout.ts
+
     const project = yield* EffectUtils.firstValueFrom(rootExObject.parent$);
     assert(isType(project, ProjectFactory));
 
-    project.exObjects.events$.subscribe((event) => {
-      if (event.type !== "ItemAdded") {
-        return;
-      }
+    yield* Effect.forkDaemon(
+      Stream.runForEach(yield* project.exObjectEvents, (value) => {
+        return Effect.gen(function* () {
+          if (value.type !== "ItemAdded") {
+            return;
+          }
 
-      const exObject = event.item;
-      exObject.children$.subscribe((children) => {
-        childrenByExObject.set(exObject, children);
-      });
-    });
-    
+          const exObject = value.item;
+          exObject.children$.subscribe((children) => {
+            childrenByExObject.set(exObject, children);
+          });
+        });
+      })
+    );
+
     return new ElementLayout(
       () => rootExObject,
       (exObject) => getChildren(exObject),

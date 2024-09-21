@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -17,6 +17,11 @@ import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Property, PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  type ArrayEvent,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   Utils,
@@ -43,6 +48,7 @@ export type ReferenceTarget =
 
 interface CallExpr_ extends ExItemBase {
   args$: SUB<Expr[]>;
+  args: ObservableArray<Expr>;
   exFunc$: BSUB<ExFunc | null>;
 }
 
@@ -126,12 +132,14 @@ export const ExprFactory2 = {
       }
 
       const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const args = createObservableArrayWithLifetime(
+        base.destroy$,
+        creationArgs2.args
+      );
       const expr = ExprFactory.Call({
         ...base,
-        args$: createBehaviorSubjectWithLifetime(
-          base.destroy$,
-          creationArgs2.args
-        ),
+        args$: args.items$,
+        args,
         exFunc$: createBehaviorSubjectWithLifetime(base.destroy$, exFunc),
       });
 
@@ -145,6 +153,33 @@ export const ExprFactory2 = {
 };
 
 export const Expr = {
+  descendants2(expr: Expr): Stream.Stream<ArrayEvent<Expr>> {
+    if (!isType(expr, ExprFactory.Call)) {
+      return Stream.make();
+    }
+
+    const childEvents = expr.args.events;
+
+    const descendantsForChildren = Stream.flatMap(
+      expr.args.itemStream,
+      (children: Expr[]) => {
+        return Expr.descendants3(children);
+      },
+      { switch: true }
+    );
+
+    const result: Stream.Stream<ArrayEvent<Expr>> = Stream.merge(
+      childEvents,
+      descendantsForChildren
+    );
+    return result;
+  },
+
+  descendants3(exprs: Expr[]) {
+    const vv = exprs.map((vv2) => Expr.descendants2(vv2));
+    return Stream.mergeAll(vv, { concurrency: "unbounded" });
+  },
+
   getReferenceTargetName$(target: ReferenceTarget) {
     if (isOfVariant(target, PropertyFactory)) {
       return Property.Methods(target).getName$();
