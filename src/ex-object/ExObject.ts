@@ -1,6 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Option, SubscriptionRef } from "effect";
-import { ExObjectCtx } from "src/ctx/ExObjectCtx";
+import { Effect, Option, Ref, Stream, SubscriptionRef } from "effect";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -35,7 +34,7 @@ interface ExObject_ extends ExItemBase {
   /**
    * The project that this ExObject belongs to, if any. None if this ExObject is part of a component.
    */
-  project: SubscriptionRef.SubscriptionRef<Option.Option<Project>>;
+  project: Stream.Stream<Option.Option<Project>>;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -49,8 +48,6 @@ interface ExObjectCreationArgs {
   basicProperties?: PropertyKind["BasicProperty"][];
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
-
-  project?: Project | null;
 }
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
@@ -131,6 +128,7 @@ export const ExObject = {
         child.parent$.next(exObject);
         const newChildren = [...children, child];
         exObject.children$.next(newChildren);
+        yield* Ref.set(child.project, yield* exObject.project.get);
       });
     },
 

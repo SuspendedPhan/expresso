@@ -1,16 +1,27 @@
-import { Effect } from "effect";
+import { Effect, Option, Stream } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
 import { type ExObject } from "src/ex-object/ExObject";
 import { type Expr } from "src/ex-object/Expr";
+import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
   type SUB,
 } from "src/utils/utils/Utils";
+import { isType } from "variant";
 
-export type ExItem = ComponentKind["Custom"] | ExObject | Expr | CustomExFunc | Property;
+const log55 = log5("ExItem.ts");
+
+export type ExItem =
+  | Project
+  | ComponentKind["Custom"]
+  | ExObject
+  | Expr
+  | CustomExFunc
+  | Property;
 export type Parent = ExItem | null;
 
 export interface ExItemBase {
@@ -42,6 +53,25 @@ export const ExItem = {
         destroy$,
       };
       return exObjectBase;
+    });
+  },
+
+  getProject(item: ExItem) {
+    return Effect.gen(this, function* () {
+      const vv = Stream.fromAsyncIterable(this.getAncestors(item), (e) => {
+        log55.error(e);
+      });
+
+      const project = yield* Stream.runFoldWhile(vv, Option.none<Project>(), (v => Option.isNone(v)), (_acc, value) => {
+        if (isType(value, ProjectFactory)) {
+          return Option.some<Project>(value);
+        }
+        return Option.none<Project>();
+      });
+      if (Option.isNone(project)) {
+        log55.error("No project found for item", item.id);
+      }
+      return project;
     });
   },
 };
