@@ -90,9 +90,11 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
     });
 
     for (const exObject of rootExObjects.items) {
+      log55.debug("Adding rootExObject", exObject.id);
       exObject.parent$.next(project);
       project.exObjects.push(exObject);
       for (const descendant of yield* ExObject.Methods(exObject).descendants) {
+        log55.debug("Adding descendant", descendant.id);
         project.exObjects.push(descendant);
       }
     }
