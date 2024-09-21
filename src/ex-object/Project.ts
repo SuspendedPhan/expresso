@@ -11,7 +11,9 @@ import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
+import type { Expr } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
+import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
@@ -34,10 +36,9 @@ export const ProjectFactory = variation(
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
 
-      /**
-       * All ExObjects in the project.
-       */
       exObjects: ObservableArray<ExObject>;
+      properties: ObservableArray<Property>;
+      exprs: ObservableArray<Expr>;
     } & ExItemBase
   >()
 );
@@ -87,17 +88,23 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       currentOrdinal$,
       destroy$: new Subject<void>(),
       exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
+      properties: createObservableArrayWithLifetime<Property>(base.destroy$),
+      exprs: createObservableArrayWithLifetime<Expr>(base.destroy$),
     });
 
     for (const exObject of rootExObjects.items) {
-      log55.debug("Adding rootExObject", exObject.id);
-      exObject.parent$.next(project);
-      project.exObjects.push(exObject);
-      for (const descendant of yield* ExObject.Methods(exObject).descendants) {
-        log55.debug("Adding descendant", descendant.id);
-        project.exObjects.push(descendant);
-      }
+      
     }
+
+    // for (const exObject of rootExObjects.items) {
+    //   log55.debug("Adding rootExObject", exObject.id);
+    //   exObject.parent$.next(project);
+    //   project.exObjects.push(exObject);
+    //   for (const descendant of yield* ExObject.Methods(exObject).descendants) {
+    //     log55.debug("Adding descendant", descendant.id);
+    //     project.exObjects.push(descendant);
+    //   }
+    // }
 
     return project;
   });

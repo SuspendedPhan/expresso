@@ -3,7 +3,6 @@ import { Effect, Layer, Stream } from "effect";
 import { first, switchMap } from "rxjs";
 import { ExprCtx } from "src/ctx/ExprCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import { PropertyCtx } from "src/ctx/PropertyCtx";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -24,7 +23,6 @@ const ctxEffect = Effect.gen(function* () {
   const project$ = yield* Project.activeProject$;
   const exprCtx = yield* ExprCtx;
   log55.debug("Ctx loaded");
-  const propertyCtx = yield* PropertyCtx;
 
   const project$2 = EffectUtils.obsToStream(project$);
   yield* Effect.forkDaemon(
@@ -96,7 +94,7 @@ const ctxEffect = Effect.gen(function* () {
   );
 
   const propertyEvents$ = EffectUtils.obsToStream(
-    propertyCtx.properties.events$
+    project$.pipe(switchMap((project) => project.properties.events$))
   );
 
   yield* Effect.forkDaemon(

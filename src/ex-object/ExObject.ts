@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Option } from "effect";
+import { Chunk, Effect, Option, Stream } from "effect";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -26,6 +26,7 @@ const log55 = log5("ExObject.ts");
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
+  children: ObservableArray<ExObject>;
   children$: SUB<ExObject[]>;
   componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
@@ -73,6 +74,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);
+    const children = createObservableArrayWithLifetime(base.destroy$, creationArgs2.children);
     const exObject = ExObjectFactory({
       ...base,
       name$: createBehaviorSubjectWithLifetime(
@@ -85,10 +87,8 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         base.destroy$,
         creationArgs2.basicProperties
       ),
-      children$: createBehaviorSubjectWithLifetime(
-        base.destroy$,
-        creationArgs2.children
-      ),
+      children,
+      children$: children.items$,
       cloneCountProperty: creationArgs2.cloneCountProperty,
     });
 
@@ -219,6 +219,10 @@ export const ExObject = {
         return result;
       });
     },
+
+    get descendants2(): Stream.Stream<ExObject> {
+      // Chunk.of([exObject.children$])
+    }
   }),
 };
 
