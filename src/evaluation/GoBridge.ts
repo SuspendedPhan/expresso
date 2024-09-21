@@ -58,27 +58,16 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const project = EffectUtils.obsToStream(project$);
-  const vvv = Stream.flatten((project, (project_) => project_.exObjectEvents);
-  const exObjectEvents = Stream.flatMap(
-    project,
-    (project_) => {
-      return Effect.succeed(1);
-        // const newLocal = project_.exObjectEvents;
-        // return newLocal;
-    },
-    { switch: true }
+  // Get the exObjectEvents from the project
+  const activeProject = EffectUtils.obsToStream(project$);
+
+  const exObjectEvents = activeProject.pipe(
+    Stream.flatMap((project) => Stream.fromEffect(project.exObjectEvents), {
+      switch: true,
+    }),
+    Stream.flatMap((exObjectEvents) => exObjectEvents, { switch: true })
   );
 
-  const exObjectEvents2 = Stream.flatMap(
-    exObjectEvents,
-    (exObjectEvents_) => {
-      return exObjectEvents_;
-    }, {switch: true}
-  );
-
-
-  // const exObjectEvents$ =
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectEvents, (evt) => {
       log55.debug("Processing ExObject event", evt.type);
