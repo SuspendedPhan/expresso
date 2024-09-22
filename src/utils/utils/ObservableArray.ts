@@ -6,7 +6,7 @@ import {
   type OBS,
 } from "src/utils/utils/Utils";
 
-export type ArrayEvent<T> = ItemAdded<T> | ItemRemoved<T>;
+export type ArrayEvent<T> = ItemAdded<T> | ItemRemoved<T> | ItemReplaced<T>;
 
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
@@ -16,6 +16,12 @@ export interface ItemAdded<T> {
 export interface ItemRemoved<T> {
   readonly type: "ItemRemoved";
   readonly item: T;
+}
+
+export interface ItemReplaced<T> {
+  readonly type: "ItemReplaced";
+  readonly oldItem: T;
+  readonly newItem: T;
 }
 
 export type ObservableArray<T> = ReturnType<
@@ -64,6 +70,7 @@ export function createObservableArrayWithLifetime<T>(
       items$_.next(items$_.value);
       events$.next({ type: "ItemRemoved", item: oldItem });
       events$.next({ type: "ItemAdded", item: newItem });
+      events$.next({ type: "ItemReplaced", oldItem, newItem });
     },
 
     get events() {
@@ -108,6 +115,9 @@ export const ObservableArray = {
     });
   },
 
+  /**
+   * Maps the items in the event stream. When an item is added, 
+   */
   mergeMap<T, A>(events: Stream.Stream<ArrayEvent<T>>, itemToStream: (item: T) => Stream.Stream<A>) {
     return events.pipe(
       Stream.flatMap(

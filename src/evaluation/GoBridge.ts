@@ -130,12 +130,15 @@ const ctxEffect = Effect.gen(function* () {
     Stream.runForEach(exprEvents, (evt) => {
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
+          log55.debug("Processing Expr event", evt);
+
           if (evt.type !== "ItemAdded") return;
 
           const expr = evt.item;
 
           matcher(expr)
             .when(ExprFactory.Number, (expr) => {
+              log55.debug("GoModule: Creating NumberExpr", expr.id);
               goModule.NumberExpr.create(expr.id);
               goModule.NumberExpr.setValue(expr.id, expr.value);
             })
@@ -148,6 +151,7 @@ const ctxEffect = Effect.gen(function* () {
               );
             })
             .when(ExprFactory.Call, (expr) => {
+              log55.debug("GoModule: Creating CallExpr", expr.id);
               goModule.CallExpr.create(expr.id);
               expr.args$.pipe(first()).subscribe((args) => {
                 const arg0 = args[0];

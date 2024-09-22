@@ -26,7 +26,7 @@ import {
   createBehaviorSubjectWithLifetime,
   Utils,
   type BSUB,
-  type OBS
+  type OBS,
 } from "src/utils/utils/Utils";
 import {
   dexScopedVariant,
@@ -153,30 +153,40 @@ export const ExprFactory2 = {
 };
 
 export const Expr = {
-  descendants2(expr: Expr): Stream.Stream<ArrayEvent<Expr>> {
-    if (!isType(expr, ExprFactory.Call)) {
-      return Stream.make();
-    }
+  descendants2(expr: Expr): Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> {
+    return Effect.gen(function* () {
+      log55.debug2("descendants2: expr", expr);
+      if (!isType(expr, ExprFactory.Call)) {
+        return Stream.make();
+      }
 
-    const childEvents = expr.args.events;
+      const childEvents = expr.args.events.pipe(
+        Stream.tap((evt) => {
+          return Effect.gen(function* () {
+            log55.debug2("descendants2: childEvents", evt);
+          });
+        })
+      );
 
-    const descendantsForChildren = Stream.flatMap(
-      expr.args.itemStream,
-      (children: Expr[]) => {
-        return Expr.descendants3(children);
-      },
-      { switch: true }
-    );
+      const descendantsForChildren = Stream.flatMap(
+        expr.args.itemStream,
+        (children: Expr[]) => {
+          log55.debug2("descendants2: children", children);
+          return Expr.descendants3(children);
+        },
+        { switch: true }
+      );
 
-    const result: Stream.Stream<ArrayEvent<Expr>> = Stream.merge(
-      childEvents,
-      descendantsForChildren
-    );
-    return result;
+      const result: Stream.Stream<ArrayEvent<Expr>> = Stream.merge(
+        childEvents,
+        descendantsForChildren
+      );
+      return result;
+    });
   },
 
   descendants3(exprs: Expr[]) {
-    const vv = exprs.map((vv2) => Expr.descendants2(vv2));
+    const vv = exprs.map((vv2) => Stream.unwrap(Expr.descendants2(vv2)));
     return Stream.mergeAll(vv, { concurrency: "unbounded" });
   },
 
@@ -211,7 +221,7 @@ export const Expr = {
 
   replaceExpr(oldExpr: Expr, newExpr: Expr) {
     return Effect.gen(function* () {
-      log55.debug("replaceExpr", oldExpr, newExpr);
+      log55.debug2("replaceExpr", oldExpr, newExpr);
       const parent = yield* EffectUtils.firstValueFrom(oldExpr.parent$);
       if (!parent) {
         throw new Error("oldExpr.parent$ is null");

@@ -101,10 +101,10 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         (exObject) => exObject.componentParameterProperties_.events
       );
       const cloneCountPropertyEvents = (yield* exObjectEvents).pipe(
-        Stream.map((exObject) => {
+        Stream.map((event) => {
           const vv: ItemAdded<Property> = {
             type: "ItemAdded",
-            item: exObject.item.cloneCountProperty,
+            item: event.item.cloneCountProperty,
           };
           return vv as ArrayEvent<Property>;
         })
@@ -122,16 +122,18 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
     const exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> =
       Effect.gen(function* () {
+        log55.debug2("exprEvents");
         const result = ObservableArray.mergeMap(
           yield* propertyEvents,
           (property) => {
+            log55.debug2("exprEvents: property", property.id);
             const vv_ = ObservableArray.fromSubscriptionRef(property.expr);
             const vv = property.expr.changes.pipe(
-              Stream.flatMap((expr) => Expr.descendants2(expr), {
+              Stream.flatMap((expr) => Stream.unwrap(Expr.descendants2(expr)), {
                 switch: true,
               })
             );
-            const vv2 = Stream.concat(vv_, vv);
+            const vv2 = Stream.merge(vv_, vv);
             return vv2;
           }
         );
