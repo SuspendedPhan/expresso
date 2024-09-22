@@ -1,4 +1,6 @@
+import type { Property } from "src/ex-object/Property";
 import { CanvasObjectPath } from "src/scene/CanvasObject";
+import type { TypesOf } from "variant";
 
 export default interface GoModule {
   ExFunc: {
@@ -36,6 +38,13 @@ export default interface GoModule {
   };
 
   ReferenceExpr: {
+    /**
+     * - Property/ComponentParameterProperty
+     * - Property/BasicProperty
+     * - Property/CloneCountProperty
+     * - ComponentParameter/Custom
+     * - ExFuncParameter
+     */
     create(id: string, targetId: string, targetKind: string): void;
   };
 

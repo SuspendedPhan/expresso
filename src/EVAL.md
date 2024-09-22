@@ -16,3 +16,5 @@
     - CreatePropertyPathSegment
     - CreateCloneCountPropertyPathSegment
     - AppendPathSegment
+
+- ItemPath.fromItem

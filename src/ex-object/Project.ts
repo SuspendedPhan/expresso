@@ -11,15 +11,16 @@ import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
-import type { Expr } from "src/ex-object/Expr";
+import { Expr } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
+  ObservableArray,
   type ArrayEvent,
-  type ObservableArray,
+  type ItemAdded,
 } from "src/utils/utils/ObservableArray";
 import { Utils, type OBS } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
@@ -75,10 +76,13 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
     const exObjectEvents = Effect.gen(function* () {
-      const descendantsForRootExObjects = Stream.flatMap(rootExObjects.itemStream, (rootExObjects) => {
-        return ExObject.descendantsForExObjects(rootExObjects);
-      });
-  
+      const descendantsForRootExObjects = Stream.flatMap(
+        rootExObjects.itemStream,
+        (rootExObjects) => {
+          return ExObject.descendantsForExObjects(rootExObjects);
+        }
+      );
+
       const result = Stream.merge(
         rootExObjects.events,
         descendantsForRootExObjects
@@ -87,8 +91,53 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       return result;
     });
 
-    const propertyEvents: Effect.Effect<Stream.Stream<ArrayEvent<Property>>> = Effect.succeed(Stream.make());
-    const exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> = Effect.succeed(Stream.make());
+    const propertyEvents = Effect.gen(function* () {
+      const basicPropertyEvents = ObservableArray.mergeMap(
+        yield* exObjectEvents,
+        (exObject) => exObject.basicProperties.events
+      );
+      const componentParameterPropertyEvents = ObservableArray.mergeMap(
+        yield* exObjectEvents,
+        (exObject) => exObject.componentParameterProperties_.events
+      );
+      const cloneCountPropertyEvents = (yield* exObjectEvents).pipe(
+        Stream.map((exObject) => {
+          const vv: ItemAdded<Property> = {
+            type: "ItemAdded",
+            item: exObject.item.cloneCountProperty,
+          };
+          return vv as ArrayEvent<Property>;
+        })
+      );
+      const result = Stream.mergeAll(
+        [
+          basicPropertyEvents,
+          componentParameterPropertyEvents,
+          cloneCountPropertyEvents,
+        ],
+        { concurrency: "unbounded" }
+      );
+      return result;
+    });
+
+    const exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> =
+      Effect.gen(function* () {
+        const result = ObservableArray.mergeMap(
+          yield* propertyEvents,
+          (property) => {
+            const vv_ = ObservableArray.fromSubscriptionRef(property.expr);
+            const vv = property.expr.changes.pipe(
+              Stream.flatMap((expr) => Expr.descendants2(expr), {
+                switch: true,
+              })
+            );
+            const vv2 = Stream.concat(vv_, vv);
+            return vv2;
+          }
+        );
+
+        return result;
+      });
 
     const project = ProjectFactory({
       ...base,

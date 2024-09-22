@@ -30,7 +30,8 @@ interface ExObject_ extends ExItemBase {
   component: Component;
   children: ObservableArray<ExObject>;
   children$: OBS<ExObject[]>;
-  componentParameterProperties: PropertyKind["ComponentParameterProperty"][];
+  componentParameterProperties_: ObservableArray<PropertyKind["ComponentParameterProperty"]>;
+  get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
 }
@@ -76,6 +77,12 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
 
     const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+    const componentParameterProperties_ = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.componentProperties
+    );
+
     const children = createObservableArrayWithLifetime(
       base.destroy$,
       creationArgs2.children
@@ -87,7 +94,10 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs2.name
       ),
       component: creationArgs2.component,
-      componentParameterProperties: creationArgs2.componentProperties,
+      componentParameterProperties_,
+      get componentParameterProperties() {
+        return componentParameterProperties_.items;
+      },
       basicProperties: createObservableArrayWithLifetime(
         base.destroy$,
         creationArgs2.basicProperties

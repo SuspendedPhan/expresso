@@ -6,13 +6,14 @@
  */
 
 import assert from "assert-ts";
-import { Effect } from "effect";
+import { Effect, SubscriptionRef } from "effect";
 import { firstValueFrom, of } from "rxjs";
-import {} from "src/ex-object/Component";
+import { } from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
@@ -27,6 +28,7 @@ import { fields, isType, matcher, type VariantOf } from "variant";
 // const log55 = log5("Property.ts");
 
 interface PropertyBase extends ExItemBase {
+  expr: SubscriptionRef.SubscriptionRef<Expr>;
   expr$: SUB<Expr>;
 }
 
@@ -78,12 +80,14 @@ export const PropertyFactory2 = {
       };
 
       const base = yield* ExItem.createExItemBase(createArgs2.id);
+      const expr$ = createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        createArgs2.expr
+      );
       const property = PropertyFactory.ComponentParameterProperty({
         ...base,
-        expr$: createBehaviorSubjectWithLifetime(
-          base.destroy$,
-          createArgs2.expr
-        ),
+        expr$,
+        expr: yield* EffectUtils.subjectToSubscriptionRef(expr$),
         componentParameter: createArgs2.parameter,
       });
       createArgs2.expr.parent$.next(property);
@@ -103,12 +107,15 @@ export const PropertyFactory2 = {
       };
 
       const base = yield* ExItem.createExItemBase(createArgs2.id);
+      const expr$ = createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        createArgs2.expr
+      );
+
       const property = PropertyFactory.BasicProperty({
         ...base,
-        expr$: createBehaviorSubjectWithLifetime(
-          base.destroy$,
-          createArgs2.expr
-        ),
+        expr$,
+        expr: yield* EffectUtils.subjectToSubscriptionRef(expr$),
         name$: createBehaviorSubjectWithLifetime(
           base.destroy$,
           createArgs2.name
@@ -127,12 +134,15 @@ export const PropertyFactory2 = {
       };
 
       const base = yield* ExItem.createExItemBase(createArgs2.id);
+      const expr$ = createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        createArgs2.expr
+      );
+
       const property = PropertyFactory.CloneCountProperty({
         ...base,
-        expr$: createBehaviorSubjectWithLifetime(
-          base.destroy$,
-          createArgs2.expr
-        ),
+        expr$,
+        expr: yield* EffectUtils.subjectToSubscriptionRef(expr$),
       });
       createArgs2.expr.parent$.next(property);
       return property;

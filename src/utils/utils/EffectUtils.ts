@@ -1,5 +1,13 @@
-import { Chunk, Effect, Option, Stream, StreamEmit } from "effect";
-import { firstValueFrom, Observable } from "rxjs";
+import {
+  Chunk,
+  Effect,
+  Option,
+  Ref,
+  Stream,
+  StreamEmit,
+  SubscriptionRef,
+} from "effect";
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from "rxjs";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 
@@ -14,7 +22,7 @@ export const EffectUtils = {
     const stream = Stream.async(
       (emit: StreamEmit.Emit<never, never, T, void>) => {
         obs.subscribe({
-          next: value => {
+          next: (value) => {
             log55.debug("obsToStream: Emitting value", value);
             return emit(Effect.succeed(Chunk.of(value)));
           },
@@ -27,5 +35,26 @@ export const EffectUtils = {
       }
     );
     return stream;
+  },
+
+  /**
+   * The subscription ref should be readonly. Don't call Ref.set on it.
+   */
+  subjectToSubscriptionRef<T>(
+    subject: BehaviorSubject<T>
+  ): Effect.Effect<SubscriptionRef.SubscriptionRef<T>> {
+    return Effect.gen(this, function* () {
+      const ref = yield* SubscriptionRef.make(subject.value);
+      const values = this.obsToStream(subject);
+      yield* Effect.forkDaemon(
+        Stream.runForEach(values, (value) => {
+          return Effect.gen(function* () {
+            log55.debug("subjectToSubscriptionRef: Updating ref", value);
+            yield* Ref.set(ref, value);
+          });
+        })
+      );
+      return ref;
+    });
   },
 };

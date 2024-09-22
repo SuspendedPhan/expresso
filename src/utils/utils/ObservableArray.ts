@@ -1,3 +1,4 @@
+import { Option, Stream, SubscriptionRef } from "effect";
 import { concat, map, Subject } from "rxjs";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
@@ -106,4 +107,33 @@ export const ObservableArray = {
       }
     });
   },
+
+  mergeMap<T, A>(events: Stream.Stream<ArrayEvent<T>>, itemToStream: (item: T) => Stream.Stream<A>) {
+    return events.pipe(
+      Stream.flatMap(
+        (evt) => {
+          if (evt.type === "ItemAdded") {
+            return itemToStream(evt.item);
+          }
+          return Stream.make();
+        },
+        { concurrency: "unbounded" }
+      )
+    );
+  },
+
+  fromSubscriptionRef<T>(ref: SubscriptionRef.SubscriptionRef<T>): Stream.Stream<ArrayEvent<T>> {
+    return ref.changes.pipe(
+      Stream.mapAccum(Option.none(), (acc: Option.Option<T>, item: T) => {
+        const events = new Array<ArrayEvent<T>>();
+        if (Option.isSome(acc)) {
+          events.push({ type: "ItemRemoved", item: acc.value });
+        }
+        const addEvent: ArrayEvent<T> | null = { type: "ItemAdded", item };
+        events.push(addEvent);
+        return [Option.some(item), Stream.make(...events)];
+      }),
+      Stream.flatten(),
+    )
+  }
 };
