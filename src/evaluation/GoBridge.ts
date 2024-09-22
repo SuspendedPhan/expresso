@@ -8,7 +8,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
 
-const log55 = log5("GoBridge.ts");
+const log55 = log5("GoBridge.ts", 11);
 
 export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
   GoBridgeCtx,
@@ -58,6 +58,7 @@ const ctxEffect = Effect.gen(function* () {
   const activeProject = EffectUtils.obsToStream(project$);
 
   const exObjectEvents = activeProject.pipe(
+    Stream.tap((project) => log55.debugEffect("Project", project.id)),
     Stream.flatMap((project) => Stream.fromEffect(project.exObjectEvents), {
       switch: true,
     }),

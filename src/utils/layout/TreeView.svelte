@@ -1,13 +1,12 @@
 <script lang="ts">
   import { switchMap } from "rxjs";
 
+  import { ResizeSensor } from "css-element-queries";
   import type { Line } from "src/utils/layout/Layout";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { ElementLayout } from "./ElementLayout";
-  import { ResizeSensor } from "css-element-queries";
-  import { setTime } from "effect/TestClock";
 
   const log55 = log5("TreeView.svelte");
   log55.debug("TreeView.svelte init");
@@ -36,8 +35,8 @@
   //     setTimeout(() => {
   //       canvasWidth = rootElement.clientWidth;
   //       canvasHeight = rootElement.clientHeight;
-  //       log55.debug2("canvasWidth2", canvasWidth);
-  //       log55.debug2("canvasHeight2", canvasHeight);
+  //       log55.debug("canvasWidth2", canvasWidth);
+  //       log55.debug("canvasHeight2", canvasHeight);
 
   //       setTimeout(() => {
   //         drawLines(canvas, lines);
@@ -52,7 +51,7 @@
         canvasHeight = rootElement.clientHeight;
 
         if (canvasWidth > 100) {
-          log55.debug2(`canvas size: ${canvasWidth}x${canvasHeight}`);
+          log55.debug(`canvas size: ${canvasWidth}x${canvasHeight}`);
         }
 
         setTimeout(() => {
