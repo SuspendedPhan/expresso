@@ -22,6 +22,8 @@ const ctxEffect = Effect.gen(function* () {
   const project$ = yield* Project.activeProject$;
   log55.debug("Ctx loaded");
 
+  
+
   const project$2 = EffectUtils.obsToStream(project$);
   yield* Effect.forkDaemon(
     Stream.runForEach(project$2, () => {
@@ -34,13 +36,11 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const rootExObjectEvents$_ = project$.pipe(
-    switchMap((project) => project.rootExObjects.events$)
-  );
-
-  const rootExObjectEvents$ = EffectUtils.obsToStream(rootExObjectEvents$_);
+  const rootExObjectEvents = project$2.pipe(
+    Stream.flatMap((project) => Stream.unwrap(project.rootExObjects.events), { switch: true }),
+  )
   yield* Effect.forkDaemon(
-    Stream.runForEach(rootExObjectEvents$, (evt) => {
+    Stream.runForEach(rootExObjectEvents, (evt) => {
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
           switch (evt.type) {
