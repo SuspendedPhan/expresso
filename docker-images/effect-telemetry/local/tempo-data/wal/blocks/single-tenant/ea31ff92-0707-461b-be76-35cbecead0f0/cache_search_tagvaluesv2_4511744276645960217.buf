@@ -1,23 +1,0 @@
-
-
-string/api
-
-string/authN
-
-stringExt. Merchant
-
-string	/dispatch
-
-string/dispatch/search
-
-string/poll
-
-string/pollDriver/{id}
-
-stringclient
-
-string/authZ
-
-stringDB
-
-string/payment Gateway
