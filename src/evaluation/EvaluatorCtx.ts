@@ -17,15 +17,15 @@ const ctxEffect = Effect.gen(function* () {
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
-      log55.debug2("eval");
+      log55.debug("eval");
       const evaluation = goModule.Evaluator.eval();
-      log55.debug2("eval2");
+      log55.debug("eval2");
       eval$.next(evaluation);
-      log55.debug2("eval3");
+      log55.debug("eval3");
       if (evaluation !== null) {
         evaluation.dispose();
       }
-      log55.debug2("eval done");
+      log55.debug("eval done");
     });
   });
 

@@ -16,6 +16,7 @@ export class EventBusCtx extends Effect.Tag("EventBusCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const result = {
+    // todp: rename to attached
     exObjectAdded: yield* PubSub.unbounded<ExObject>(),
     propertyAdded: yield* PubSub.unbounded<Property>(),
     exprAdded: yield* PubSub.unbounded<Expr>(),
@@ -45,17 +46,38 @@ const ctxEffect = Effect.gen(function* () {
         const currentExObjects: ExObject[] = yield* Project.getExObjects(
           project
         );
+
+        // Hmmmm..
         const exObjectAdded = Stream.fromPubSub(this.exObjectAdded).pipe(
+          Stream.tap((value) => {
+            return Effect.gen(function* () {
+              console.log("exObjectAddedForProject.tap", value);
+            });
+          }),
           Stream.filterEffect((exObject) => {
             return Effect.gen(function* () {
+              console.log("exObjectAddedForProject.filterEffect", exObject);
               const project2 = yield* ExItem.getProject(exObject);
               const result = project2 === project;
               // Why isn't this triggering?
-              log55.debug("exObjectAddedForProject.filterEffect", exObject, result);
+              log55.debug(
+                "exObjectAddedForProject.filterEffect",
+                exObject,
+                result
+              );
               return result;
             });
           })
         );
+
+        // yield* Effect.forkDaemon(
+        //   Stream.runForEach(Stream.fromPubSub(this.exObjectAdded), (value) => {
+        //     return Effect.gen(function* () {
+        //       log55.debug("exObjectAddedForProject: exObjectAdded", value);
+        //     });
+        //   })
+        // );
+
         const currentExObjects2 = Stream.make(...currentExObjects);
         const result = Stream.concat(currentExObjects2, exObjectAdded);
         return result;
@@ -64,9 +86,21 @@ const ctxEffect = Effect.gen(function* () {
   };
 
   yield* Effect.forkDaemon(
-    Stream.runForEach(yield* result.exObjectAddedForActiveProject(), (value) => {
+    Stream.runForEach(
+      yield* result.exObjectAddedForActiveProject(),
+      (value) => {
+        return Effect.gen(function* () {
+          log55.debug("exObjectAdded", value);
+        });
+      }
+    )
+  );
+
+  // inspect this
+  yield* Effect.forkDaemon(
+    Stream.runForEach(Stream.fromPubSub(result.exObjectAdded), (value) => {
       return Effect.gen(function* () {
-        log55.debug("exObjectAdded", value);
+        log55.debug("exObjectAdded___", value);
       });
     })
   );

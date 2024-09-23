@@ -25,7 +25,7 @@ import {
 } from "src/utils/utils/Utils";
 import { fields, isType, matcher, variation } from "variant";
 
-const log55 = log5("ExObject.ts");
+const log55 = log5("ExObject.ts", 11);
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
@@ -57,7 +57,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.start");
 
     const eventBusCtx = yield* EventBusCtx;
-    
+
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     log55.debug("ExObjectFactory2.component", component);
@@ -123,7 +123,20 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
 
-    yield* eventBusCtx.exObjectAdded.publish(exObject);
+    const parentChanged_ = exObject.parent.changes;
+    const parentChanged = parentChanged_;
+    yield* Effect.forkDaemon(
+      Stream.runForEachWhile(parentChanged, (parent_) => {
+        return Effect.gen(function* () {
+          if (parent_ === null) {
+            return true;
+          }
+          log55.debug("Publishing exObjectAdded (exObject, parent)", exObject, parent_);
+          yield* eventBusCtx.exObjectAdded.publish(exObject);
+          return false;
+        });
+      })
+    );
     return exObject;
   });
 }
