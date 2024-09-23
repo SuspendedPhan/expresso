@@ -1,4 +1,4 @@
-import { Option, Stream, SubscriptionRef } from "effect";
+import { Effect, Option, PubSub, Stream, SubscriptionRef } from "effect";
 import { concat, map, Subject } from "rxjs";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
@@ -11,6 +11,7 @@ export type ArrayEvent<T> = ItemAdded<T> | ItemRemoved<T> | ItemReplaced<T>;
 export interface ItemAdded<T> {
   readonly type: "ItemAdded";
   readonly item: T;
+  readonly onRemove: PubSub.PubSub<void>;
 }
 
 export interface ItemRemoved<T> {
@@ -32,17 +33,21 @@ export function createObservableArrayWithLifetime<T>(
   destroy$: OBS<void>,
   initialItems: T[] = []
 ) {
+  const items = new Set<T>(initialItems);
   const items$_ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
   const events$ = new Subject<ArrayEvent<T>>();
   return {
     kind: "ObservableArray" as const,
 
     get events$() {
-      const currentItemEvents: ItemAdded<T>[] = items$_.value.map((item) => ({
-        type: "ItemAdded",
-        item,
-      }));
-      return concat(currentItemEvents, events$);
+      return Effect.gen(function* () {
+        const currentItemEvents: ItemAdded<T>[] = items$_.value.map((item) => ({
+          type: "ItemAdded",
+          item,
+          onRemove: yield* PubSub.unbounded<void>(),
+        }));
+        return concat(currentItemEvents, events$);
+      });
     },
 
     get items() {
@@ -56,25 +61,43 @@ export function createObservableArrayWithLifetime<T>(
     },
 
     push(item: T) {
-      items$_.value.push(item);
-      items$_.next(items$_.value);
-      events$.next({ type: "ItemAdded", item });
+      return Effect.gen(function* () {
+        if (items.has(item)) {
+          throw new Error("Item already exists");
+        }
+        items.add(item);
+        items$_.value.push(item);
+        items$_.next(items$_.value);
+        events$.next({
+          type: "ItemAdded",
+          item,
+          onRemove: yield* PubSub.unbounded<void>(),
+        });
+      });
     },
 
     replaceItem(oldItem: T, newItem: T) {
-      const index = this.items.indexOf(oldItem);
-      if (index === -1) {
-        throw new Error("Item not found");
-      }
-      items$_.value[index] = newItem;
-      items$_.next(items$_.value);
-      events$.next({ type: "ItemRemoved", item: oldItem });
-      events$.next({ type: "ItemAdded", item: newItem });
-      events$.next({ type: "ItemReplaced", oldItem, newItem });
+      return Effect.gen(this, function* () {
+        const index = this.items.indexOf(oldItem);
+        if (index === -1) {
+          throw new Error("Item not found");
+        }
+        items$_.value[index] = newItem;
+        items$_.next(items$_.value);
+        events$.next({ type: "ItemRemoved", item: oldItem });
+        events$.next({
+          type: "ItemAdded",
+          item: newItem,
+          onRemove: yield* PubSub.unbounded<void>(),
+        });
+        events$.next({ type: "ItemReplaced", oldItem, newItem });
+      });
     },
 
     get events() {
-      return EffectUtils.obsToStream(this.events$);
+      return Effect.gen(this, function* () {
+        return EffectUtils.obsToStream(yield* this.events$);
+      });
     },
   };
 }
@@ -101,24 +124,29 @@ export const ObservableArray = {
     observableArray: ObservableArray<V>,
     getKey: (item: V) => K
   ) {
-    observableArray.events$.subscribe((event) => {
-      switch (event.type) {
-        case "ItemAdded": {
-          map.set(getKey(event.item), event.item);
-          break;
+    return Effect.gen(function* () {
+      (yield* observableArray.events$).subscribe((event) => {
+        switch (event.type) {
+          case "ItemAdded": {
+            map.set(getKey(event.item), event.item);
+            break;
+          }
+          case "ItemRemoved": {
+            map.delete(getKey(event.item));
+            break;
+          }
         }
-        case "ItemRemoved": {
-          map.delete(getKey(event.item));
-          break;
-        }
-      }
+      });
     });
   },
 
   /**
-   * Maps the items in the event stream. When an item is added, 
+   * Maps the items in the event stream. When an item is added,
    */
-  mergeMap<T, A>(events: Stream.Stream<ArrayEvent<T>>, itemToStream: (item: T) => Stream.Stream<A>) {
+  mergeMap<T, A>(
+    events: Stream.Stream<ArrayEvent<T>>,
+    itemToStream: (item: T) => Stream.Stream<A>
+  ) {
     return events.pipe(
       Stream.flatMap(
         (evt) => {
@@ -132,18 +160,27 @@ export const ObservableArray = {
     );
   },
 
-  fromSubscriptionRef<T>(ref: SubscriptionRef.SubscriptionRef<T>): Stream.Stream<ArrayEvent<T>> {
-    return ref.changes.pipe(
-      Stream.mapAccum(Option.none(), (acc: Option.Option<T>, item: T) => {
-        const events = new Array<ArrayEvent<T>>();
-        if (Option.isSome(acc)) {
-          events.push({ type: "ItemRemoved", item: acc.value });
-        }
-        const addEvent: ArrayEvent<T> | null = { type: "ItemAdded", item };
-        events.push(addEvent);
-        return [Option.some(item), Stream.make(...events)];
+  fromSubscriptionRef<T>(
+    ref: SubscriptionRef.SubscriptionRef<T>
+  ): Stream.Stream<ArrayEvent<T>> {
+    const vv = ref.changes.pipe(
+      Stream.mapAccumEffect(Option.none(), (acc: Option.Option<T>, item: T) => {
+        return Effect.gen(function* () {
+          const events = new Array<ArrayEvent<T>>();
+          if (Option.isSome(acc)) {
+            events.push({ type: "ItemRemoved", item: acc.value });
+          }
+          const addEvent: ArrayEvent<T> | null = {
+            type: "ItemAdded",
+            item,
+            onRemove: yield* PubSub.unbounded<void>(),
+          };
+          events.push(addEvent);
+          return [Option.some(item), Stream.make(...events)];
+        });
       }),
-      Stream.flatten(),
-    )
-  }
+      Stream.flatten()
+    );
+    return vv;
+  },
 };
