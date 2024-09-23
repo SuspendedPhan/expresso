@@ -51,11 +51,17 @@ export function createObservableArrayWithLifetime<T>(
 
     get events$() {
       return Effect.gen(function* () {
-        const currentItemEvents: ItemAdded<T>[] = items$_.value.map((item) => ({
-          type: "ItemAdded",
-          item,
-          onRemove: yield* PubSub.unbounded<void>(),
-        }));
+        const currentItemEvents_: Effect.Effect<ItemAdded<T>>[] =
+          items$_.value.map((item) => {
+            return Effect.gen(function* () {
+              return {
+                type: "ItemAdded",
+                item,
+                onRemove: yield* getOrCreateOnRemove(item),
+              };
+            });
+          });
+        const currentItemEvents = yield* Effect.all(currentItemEvents_);
         return concat(currentItemEvents, events$);
       });
     },

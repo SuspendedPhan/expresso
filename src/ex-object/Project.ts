@@ -16,7 +16,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
-  ObservableArray
+  ObservableArray,
 } from "src/utils/utils/ObservableArray";
 import { Utils, type OBS } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";

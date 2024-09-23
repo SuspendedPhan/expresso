@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -54,6 +55,9 @@ interface ExObjectCreationArgs {
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
     log55.debug("ExObjectFactory2.start");
+
+    const eventBusCtx = yield* EventBusCtx;
+    
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     log55.debug("ExObjectFactory2.component", component);
@@ -118,6 +122,8 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     });
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+    yield* eventBusCtx.exObjectAdded.publish(exObject);
     return exObject;
   });
 }
