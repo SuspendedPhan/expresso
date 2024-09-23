@@ -1,13 +1,8 @@
-import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
-import { first, switchMap } from "rxjs";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
-import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts", 11);
 
@@ -56,120 +51,113 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const activeProject = EffectUtils.obsToStream(project$);
+  // const activeProject = EffectUtils.obsToStream(project$);
 
-  const exObjectAdded = activeProject.pipe(
-    Stream.flatMap((project) => project.exObjectAdded, { switch: true })
-  );
+  // const exObjectAdded = activeProject.pipe(
+  //   Stream.flatMap((project) => project.exObjectAdded, { switch: true })
+  // );
 
-  const propertyAdded = activeProject.pipe(
-    Stream.flatMap((project) => project.propertyAdded, { switch: true })
-  );
+  // const propertyAdded = activeProject.pipe(
+  //   Stream.flatMap((project) => project.propertyAdded, { switch: true })
+  // );
 
-  const exprAdded = activeProject.pipe(
-    Stream.flatMap((project) => project.exprAdded, { switch: true })
-  );
+  // const exprAdded = activeProject.pipe(
+  //   Stream.flatMap((project) => project.exprAdded, { switch: true })
+  // );
 
-  // Add ExObjects
-  yield* Effect.forkDaemon(
-    Stream.runForEach(exObjectAdded, (exObject) => {
-      log55.debug("Processing ExObject", exObject);
-      return goModuleCtx.withGoModule((goModule) => {
-        return Effect.gen(function* () {
-          log55.debug("Adding ExObject", exObject.id);
+  // // Add ExObjects
+  // yield* Effect.forkDaemon(
+  //   Stream.runForEach(exObjectAdded, (exObject) => {
+  //     log55.debug("Processing ExObject", exObject);
+  //     return goModuleCtx.withGoModule((goModule) => {
+  //       return Effect.gen(function* () {
+  //         log55.debug("Adding ExObject", exObject.id);
 
-          goModule.ExObject.create(exObject.id);
-          goModule.ExObject.setCloneCountProperty(
-            exObject.id,
-            exObject.cloneCountProperty.id
-          );
+  //         goModule.ExObject.create(exObject.id);
+  //         goModule.ExObject.setCloneCountProperty(
+  //           exObject.id,
+  //           exObject.cloneCountProperty.id
+  //         );
 
-          for (const property of exObject.componentParameterProperties) {
-            goModule.ExObject.addComponentParameterProperty(
-              exObject.id,
-              property.id
-            );
-          }
-        });
-      });
-    })
-  );
+  //         for (const property of exObject.componentParameterProperties) {
+  //           goModule.ExObject.addComponentParameterProperty(
+  //             exObject.id,
+  //             property.id
+  //           );
+  //         }
+  //       });
+  //     });
+  //   })
+  // );
 
-  // Add Properties
-  yield* Effect.forkDaemon(
-    Stream.runForEach(propertyAdded, (property) => {
-      log55.debug("Processing Property", property);
-      return goModuleCtx.withGoModule((goModule) => {
-        return Effect.gen(function* () {
-          log55.debug("Adding Property", property.id);
-          goModule.Property.create(property.id);
-          yield* Effect.forkDaemon(
-            Stream.runForEach(property.expr.changes, (value) => {
-              return goModuleCtx.withGoModule((goModule_) =>
-                Effect.gen(function* () {
-                  goModule_.Property.setExpr(property.id, value.id);
-                })
-              );
-            })
-          );
-        });
-      });
-    })
-  );
+  // // Add Properties
+  // yield* Effect.forkDaemon(
+  //   Stream.runForEach(propertyAdded, (property) => {
+  //     log55.debug("Processing Property", property);
+  //     return goModuleCtx.withGoModule((goModule) => {
+  //       return Effect.gen(function* () {
+  //         log55.debug("Adding Property", property.id);
+  //         goModule.Property.create(property.id);
+  //         yield* Effect.forkDaemon(
+  //           Stream.runForEach(property.expr.changes, (value) => {
+  //             return goModuleCtx.withGoModule((goModule_) =>
+  //               Effect.gen(function* () {
+  //                 goModule_.Property.setExpr(property.id, value.id);
+  //               })
+  //             );
+  //           })
+  //         );
+  //       });
+  //     });
+  //   })
+  // );
 
+  // // Add Exprs
+  // yield* Effect.forkDaemon(
+  //   Stream.runForEach(exprAdded, (expr) => {
+  //     log55.debug("Processing Expr", expr);
+  //     return goModuleCtx.withGoModule((goModule) => {
+  //       return Effect.gen(function* () {
+  //         log55.debug("Adding Expr", expr.id);
+  //         matcher(expr)
+  //           .when(ExprFactory.Number, (expr) => {
+  //             log55.debug("GoModule: Creating NumberExpr", expr.id);
+  //             goModule.NumberExpr.create(expr.id);
+  //             goModule.NumberExpr.setValue(expr.id, expr.value);
+  //           })
+  //           .when(ExprFactory.Reference, (expr_) => {
+  //             assert(expr_.target !== null);
+  //             goModule.ReferenceExpr.create(
+  //               expr_.id,
+  //               expr_.target.id,
+  //               expr_.target.type
+  //             );
+  //           })
+  //           .when(ExprFactory.Call, (expr) => {
+  //             log55.debug("GoModule: Creating CallExpr", expr.id);
+  //             goModule.CallExpr.create(expr.id);
+  //             Stream.runForEach(expr.args.itemStream, (args) => {
+  //               return goModuleCtx.withGoModule((goModule_) =>
+  //                 Effect.gen(function* () {
+  //                   const arg0 = args[0];
+  //                   const arg1 = args[1];
 
-  const exprEvents = activeProject.pipe(
-    Stream.flatMap((project) => Stream.fromEffect(project.exprEvents), {
-      switch: true,
-    }),
-    Stream.flatMap((exprEvents) => exprEvents, { switch: true })
-  );
+  //                   if (arg0 === undefined || arg1 === undefined) {
+  //                     console.error("CallExpr must have 2 args");
+  //                     return;
+  //                   }
 
-  yield* Effect.forkDaemon(
-    Stream.runForEach(exprEvents, (evt) => {
-      return goModuleCtx.withGoModule((goModule) => {
-        return Effect.gen(function* () {
-          log55.debug("Processing Expr event", evt);
-
-          if (evt.type !== "ItemAdded") return;
-
-          const expr = evt.item;
-
-          matcher(expr)
-            .when(ExprFactory.Number, (expr) => {
-              log55.debug("GoModule: Creating NumberExpr", expr.id);
-              goModule.NumberExpr.create(expr.id);
-              goModule.NumberExpr.setValue(expr.id, expr.value);
-            })
-            .when(ExprFactory.Reference, (expr_) => {
-              assert(expr_.target !== null);
-              goModule.ReferenceExpr.create(
-                expr_.id,
-                expr_.target.id,
-                expr_.target.type
-              );
-            })
-            .when(ExprFactory.Call, (expr) => {
-              log55.debug("GoModule: Creating CallExpr", expr.id);
-              goModule.CallExpr.create(expr.id);
-              expr.args$.pipe(first()).subscribe((args) => {
-                const arg0 = args[0];
-                const arg1 = args[1];
-
-                if (arg0 === undefined || arg1 === undefined) {
-                  console.error("CallExpr must have 2 args");
-                  return;
-                }
-
-                goModule.CallExpr.setArg0(expr.id, arg0.id);
-                goModule.CallExpr.setArg1(expr.id, arg1.id);
-              });
-            })
-            .complete();
-        });
-      });
-    })
-  );
+  //                   goModule_.CallExpr.setArg0(expr.id, arg0.id);
+  //                   goModule_.CallExpr.setArg1(expr.id, arg1.id);
+  //                 })
+  //               );
+  //             });
+  //           })
+  //           .complete();
+  //       });
+  //     });
+  //   })
+  // );
 
   log55.debug("GoBridgeCtx init complete");
 

@@ -1,4 +1,4 @@
-import { Effect, Stream } from "effect";
+import { Effect } from "effect";
 import {
   BehaviorSubject,
   firstValueFrom,
@@ -11,16 +11,12 @@ import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
-import { Expr } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
-import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
-  ObservableArray,
-  type ArrayEvent,
-  type ItemAdded,
+  ObservableArray
 } from "src/utils/utils/ObservableArray";
 import { Utils, type OBS } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
@@ -37,14 +33,6 @@ export const ProjectFactory = variation(
       exFuncs: ObservableArray<CustomExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
-
-      exObjectEvents: Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>>;
-      propertyEvents: Effect.Effect<Stream.Stream<ArrayEvent<Property>>>;
-      exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>>;
-
-      exObjectAdded: Stream.Stream<ExObject>;
-      propertyAdded: Stream.Stream<Property>;
-      exprAdded: Stream.Stream<Expr>;
     } & ExItemBase
   >()
 );
@@ -79,72 +67,6 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
-    const exObjectEvents = Effect.gen(function* () {
-      const descendantsForRootExObjects = Stream.flatMap(
-        rootExObjects.itemStream,
-        (rootExObjects) => {
-          return ExObject.descendantsForExObjects(rootExObjects);
-        }
-      );
-
-      const result = Stream.merge(
-        Stream.unwrap(rootExObjects.events),
-        descendantsForRootExObjects
-      );
-
-      return result;
-    });
-
-    const propertyEvents = Effect.gen(function* () {
-      const basicPropertyEvents = ObservableArray.mergeMap(
-        yield* exObjectEvents,
-        (exObject) => exObject.basicProperties.events
-      );
-      const componentParameterPropertyEvents = ObservableArray.mergeMap(
-        yield* exObjectEvents,
-        (exObject) => exObject.componentParameterProperties_.events
-      );
-      const cloneCountPropertyEvents = (yield* exObjectEvents).pipe(
-        Stream.map((event) => {
-          const vv: ItemAdded<Property> = {
-            type: "ItemAdded",
-            item: event.item.cloneCountProperty,
-          };
-          return vv as ArrayEvent<Property>;
-        })
-      );
-      const result = Stream.mergeAll(
-        [
-          basicPropertyEvents,
-          componentParameterPropertyEvents,
-          cloneCountPropertyEvents,
-        ],
-        { concurrency: "unbounded" }
-      );
-      return result;
-    });
-
-    const exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> =
-      Effect.gen(function* () {
-        log55.debug2("exprEvents");
-        const result = ObservableArray.mergeMap(
-          yield* propertyEvents,
-          (property) => {
-            log55.debug2("exprEvents: property", property.id);
-            const vv_ = ObservableArray.fromSubscriptionRef(property.expr);
-            const vv = property.expr.changes.pipe(
-              Stream.flatMap((expr) => Stream.unwrap(Expr.descendants2(expr)), {
-                switch: true,
-              })
-            );
-            const vv2 = Stream.merge(vv_, vv);
-            return vv2;
-          }
-        );
-
-        return result;
-      });
-
     const project = ProjectFactory({
       ...base,
       libraryProject: null,
@@ -159,9 +81,6 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       ),
       currentOrdinal$,
       destroy$: new Subject<void>(),
-      exObjectEvents,
-      propertyEvents,
-      exprEvents,
     });
 
     for (const exObject of rootExObjects.items) {
@@ -201,6 +120,28 @@ export const Project = {
       return project;
     });
     return effect;
+  },
+
+  get activeProjectStream() {
+    return Effect.gen(function* () {
+      log55.debug("activeProjectStream");
+      const activeProjects$ = yield* Project.activeProject$;
+      return EffectUtils.obsToStream(activeProjects$);
+    });
+  },
+
+  getExObjects: (project: Project) => {
+    // For each root ex object, get all descendants
+    return Effect.gen(function* () {
+      log55.debug("getExObjects");
+      const exObjects: ExObject[] = [];
+      for (const rootExObject of project.rootExObjects.items) {
+        exObjects.push(rootExObject);
+        const descendants = yield* ExObject.Methods(rootExObject).descendants;
+        exObjects.push(...descendants);
+      }
+      return exObjects;
+    });
   },
 
   Methods: (project: Project) => ({

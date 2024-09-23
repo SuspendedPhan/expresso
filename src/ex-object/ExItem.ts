@@ -1,4 +1,4 @@
-import { Effect, Option, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Ref, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
@@ -7,14 +7,13 @@ import { type Expr } from "src/ex-object/Expr";
 import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
   type SUB,
 } from "src/utils/utils/Utils";
 import { isType } from "variant";
 
-const log55 = log5("ExItem.ts");
+// const log55 = log5("ExItem.ts");
 
 export type ExItem =
   | Project
