@@ -34,4 +34,13 @@ export default defineConfig({
       src: "/src",
     }
   },
+  server: {
+    proxy: {
+      // Proxy API requests. Avoid CORS issues.
+      '/v1/traces': {
+        target: 'http://localhost:4318', // The OTEL collector
+        changeOrigin: true,
+      },
+    },
+  }
 });
