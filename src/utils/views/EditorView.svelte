@@ -61,6 +61,8 @@
 
     DexRuntime.runPromise(
       Effect.gen(function* () {
+        log55.debug2("");
+        log55.debug2("Adding blank root ex-object");
         const activeProject = yield* Project.activeProject;
         yield* Project.Methods(activeProject).addRootExObjectBlank();
       })

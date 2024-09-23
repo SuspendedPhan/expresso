@@ -38,7 +38,7 @@ func (e *Evaluator) Eval() *Evaluation {
 		}
 	}
 	// spew.Dump(e)
-	spew.Dump(evaluation)
+	// spew.Dump(evaluation)
 	return evaluation
 }
 

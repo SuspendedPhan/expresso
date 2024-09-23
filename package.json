@@ -21,6 +21,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.598.0",
     "@aws-sdk/credential-providers": "^3.598.0",
+    "@effect/opentelemetry": "^0.37.3",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.53.0",
+    "@opentelemetry/sdk-trace-node": "^1.26.0",
+    "@opentelemetry/sdk-trace-web": "^1.26.0",
     "@types/gapi": "^0.0.47",
     "@types/google-one-tap": "^1.2.6",
     "@types/google.accounts": "^0.0.14",

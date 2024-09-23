@@ -56,12 +56,12 @@ const ctxEffect = Effect.gen(function* () {
           }),
           Stream.filterEffect((exObject) => {
             return Effect.gen(function* () {
-              console.log("exObjectAddedForProject.filterEffect", exObject);
+              console.log("exObjectAddedForProject.filterEffect1", exObject);
               const project2 = yield* ExItem.getProject(exObject);
               const result = project2 === project;
               // Why isn't this triggering?
               log55.debug(
-                "exObjectAddedForProject.filterEffect",
+                "exObjectAddedForProject.filterEffect2",
                 exObject,
                 result
               );
@@ -70,16 +70,16 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        // yield* Effect.forkDaemon(
-        //   Stream.runForEach(Stream.fromPubSub(this.exObjectAdded), (value) => {
-        //     return Effect.gen(function* () {
-        //       log55.debug("exObjectAddedForProject: exObjectAdded", value);
-        //     });
-        //   })
-        // );
+        yield* Effect.forkDaemon(
+          Stream.runForEach(Stream.fromPubSub(this.exObjectAdded), (value) => {
+            return Effect.gen(function* () {
+              log55.debug("exObjectAddedForProject: exObjectAdded", value);
+            });
+          })
+        );
 
         const currentExObjects2 = Stream.make(...currentExObjects);
-        const result = Stream.concat(currentExObjects2, exObjectAdded);
+        const result = Stream.merge(currentExObjects2, exObjectAdded);
         return result;
       });
     },

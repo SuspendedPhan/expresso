@@ -31,6 +31,8 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
+  return {};
+
   const rootExObjectEvents = project$2.pipe(
     Stream.flatMap((project) => Stream.unwrap(project.rootExObjects.events), {
       switch: true,
