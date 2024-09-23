@@ -33,9 +33,19 @@ export function createObservableArrayWithLifetime<T>(
   destroy$: OBS<void>,
   initialItems: T[] = []
 ) {
-  const items = new Set<T>(initialItems);
   const items$_ = createBehaviorSubjectWithLifetime(destroy$, initialItems);
   const events$ = new Subject<ArrayEvent<T>>();
+  const onRemoveByItem = new Map<T, PubSub.PubSub<void>>();
+
+  function getOrCreateOnRemove(item: T) {
+    return Effect.gen(function* () {
+      if (!onRemoveByItem.has(item)) {
+        onRemoveByItem.set(item, yield* PubSub.unbounded<void>());
+      }
+      return onRemoveByItem.get(item)!;
+    });
+  }
+
   return {
     kind: "ObservableArray" as const,
 
@@ -62,16 +72,12 @@ export function createObservableArrayWithLifetime<T>(
 
     push(item: T) {
       return Effect.gen(function* () {
-        if (items.has(item)) {
-          throw new Error("Item already exists");
-        }
-        items.add(item);
         items$_.value.push(item);
         items$_.next(items$_.value);
         events$.next({
           type: "ItemAdded",
           item,
-          onRemove: yield* PubSub.unbounded<void>(),
+          onRemove: yield* getOrCreateOnRemove(item),
         });
       });
     },
@@ -84,11 +90,16 @@ export function createObservableArrayWithLifetime<T>(
         }
         items$_.value[index] = newItem;
         items$_.next(items$_.value);
+
         events$.next({ type: "ItemRemoved", item: oldItem });
+        const onRemove = yield* getOrCreateOnRemove(oldItem);
+        const newLocal = PubSub.publish(onRemove, void 0);
+        yield* newLocal;
+
         events$.next({
           type: "ItemAdded",
           item: newItem,
-          onRemove: yield* PubSub.unbounded<void>(),
+          onRemove: yield* getOrCreateOnRemove(newItem),
         });
         events$.next({ type: "ItemReplaced", oldItem, newItem });
       });
