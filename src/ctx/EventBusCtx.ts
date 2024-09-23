@@ -52,7 +52,7 @@ const ctxEffect = Effect.gen(function* () {
           Stream.tap((value) => {
             return Effect.gen(function* () {
               console.log("exObjectAddedForProject.tap", value);
-            });
+            }).pipe(Effect.withSpan("exObjectAddedForProject.tap"));
           }),
           Stream.filterEffect((exObject) => {
             return Effect.gen(function* () {
@@ -68,6 +68,8 @@ const ctxEffect = Effect.gen(function* () {
               return result;
             });
           })
+        ).pipe(
+          Stream.withSpan("exObjectAdded")
         );
 
         yield* Effect.forkDaemon(
@@ -81,7 +83,7 @@ const ctxEffect = Effect.gen(function* () {
         const currentExObjects2 = Stream.make(...currentExObjects);
         const result = Stream.merge(currentExObjects2, exObjectAdded);
         return result;
-      });
+      }).pipe(Effect.withSpan("EventBusCtx.exObjectAddedForProject"));
     },
   };
 

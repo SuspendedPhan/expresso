@@ -8,7 +8,6 @@ import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
 import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
 import { TelemetryCtxLive } from "src/ctx/TelemetryCtx";
-import { TestTelemetryCtxLive } from "src/ctx/TestTelemetryCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
