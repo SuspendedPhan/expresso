@@ -75,7 +75,6 @@ const ctxEffect = Effect.gen(function* () {
                 log55.debug("exObjectAddedForProject.filterEffect1", exObject);
                 const project2 = yield* ExItem.getProject(exObject);
                 const result = project2 === project;
-                // Why isn't this triggering?
                 log55.debug(
                   "exObjectAddedForProject.filterEffect2",
                   exObject,

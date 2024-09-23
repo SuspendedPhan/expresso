@@ -1,4 +1,5 @@
 import { Effect, Layer, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -15,6 +16,7 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Starting GoBridgeCtx");
 
   const goModuleCtx = yield* GoModuleCtx;
+  const eventBusCtx = yield* EventBusCtx;
 
   const project$ = yield* Project.activeProject$;
   log55.debug("Ctx loaded");
@@ -31,8 +33,6 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  return {};
-
   const rootExObjectEvents = project$2.pipe(
     Stream.flatMap((project) => Stream.unwrap(project.rootExObjects.events), {
       switch: true,
@@ -44,7 +44,7 @@ const ctxEffect = Effect.gen(function* () {
         return Effect.gen(function* () {
           switch (evt.type) {
             case "ItemAdded":
-              log55.debug("Adding RootExObject", evt.item.id);
+              log55.debug("Adding RootExObject");
               goModule.Evaluator.addRootExObject(evt.item.id);
               break;
           }
@@ -53,11 +53,35 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  // const activeProject = EffectUtils.obsToStream(project$);
+  const exObjectAdded = yield* eventBusCtx.exObjectAddedForActiveProject();
+  let exObjectCounter = 0;
+  yield* Effect.forkDaemon(
+    Stream.runForEach(exObjectAdded, (exObject) => {
+      return Effect.gen(function* () {
+        log55.debug("Adding ExObject to Go: received from upstream: ex-object has been added");
+        return yield* goModuleCtx.withGoModule((goModule) => {
+          return Effect.gen(function* () {
+            log55.debug("Adding ExObject to Go: executing: " + ++exObjectCounter);
 
-  // const exObjectAdded = activeProject.pipe(
-  //   Stream.flatMap((project) => project.exObjectAdded, { switch: true })
-  // );
+            goModule.ExObject.create(exObject.id);
+            goModule.ExObject.setCloneCountProperty(
+              exObject.id,
+              exObject.cloneCountProperty.id
+            );
+
+            for (const property of exObject.componentParameterProperties) {
+              goModule.ExObject.addComponentParameterProperty(
+                exObject.id,
+                property.id
+              );
+            }
+          });
+        });
+      });
+    })
+  );
+
+  return {};
 
   // const propertyAdded = activeProject.pipe(
   //   Stream.flatMap((project) => project.propertyAdded, { switch: true })
