@@ -68,27 +68,16 @@ export const ExItem = {
     });
   },
 
-  getProject(item: ExItem) {
-    return Effect.gen(this, function* () {
-      const vv = Stream.fromAsyncIterable(this.getAncestors(item), (e) => {
-        log55.error(e);
-      });
-
-      const project = yield* Stream.runFoldWhile(
-        vv,
-        Option.none<Project>(),
-        (v) => Option.isNone(v),
-        (_acc, value) => {
-          if (isType(value, ProjectFactory)) {
-            return Option.some<Project>(value);
-          }
-          return Option.none<Project>();
-        }
-      );
-      if (Option.isNone(project)) {
-        log55.error("No project found for item", item.id);
+  getProject(item: ExItem): Effect.Effect<Project> {
+    return Effect.gen(function* () {
+      if (isType(item, ProjectFactory)) {
+        return item;
       }
-      return project;
+      const parent = yield* item.parent.get;
+      if (parent === null) {
+        return yield* Effect.die("No project found for item");
+      }
+      return yield* ExItem.getProject(parent);
     });
   },
 };
