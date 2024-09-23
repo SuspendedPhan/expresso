@@ -11,6 +11,7 @@ import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
+import { Expr } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -155,6 +156,20 @@ export const Project = {
         properties.push(...exObject.componentParameterProperties_.items);
       }
       return properties;
+    });
+  },
+
+  getExprs: (project: Project) => {
+    return Effect.gen(function* () {
+      log55.debug("getExprs");
+      const exprs: Expr[] = [];
+      for (const property of yield* Project.getProperties(project)) {
+        const expr = yield* property.expr.get;
+        exprs.push(expr);
+        const descendants = yield* Expr.descendants(expr);
+        exprs.push(...descendants);
+      }
+      return exprs;
     });
   },
 

@@ -209,6 +209,23 @@ export const ExprFactory2 = {
 };
 
 export const Expr = {
+  descendants(expr: Expr): Effect.Effect<Expr[]> {
+    return Effect.gen(function* () {
+      log55.debug2("descendants: expr", expr);
+      if (!isType(expr, ExprFactory.Call)) {
+        return [];
+      }
+
+      const result: Expr[] = [];
+      for (const child of expr.args.items) {
+        result.push(child);
+        const descendantsForChild = yield* Expr.descendants(child);
+        result.push(...descendantsForChild);
+      }
+      return result;
+    });
+  },
+
   descendants2(expr: Expr): Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> {
     return Effect.gen(function* () {
       log55.debug2("descendants2: expr", expr);

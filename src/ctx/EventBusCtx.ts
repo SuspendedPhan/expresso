@@ -141,6 +141,44 @@ const ctxEffect = Effect.gen(function* () {
         return Stream.merge(currentProperties2, propertyAdded_);
       });
     },
+
+    exprAddedForActiveProject(): Effect.Effect<
+      Stream.Stream<Expr>,
+      never,
+      LibraryProjectCtx
+    > {
+      const extracted = Effect.gen(this, function* () {
+        const project = yield* Project.activeProjectStream;
+        const result: Stream.Stream<Expr> = project.pipe(
+          Stream.flatMap(
+            (project) => {
+              return Stream.unwrap(this.exprAddedForProject(project));
+            },
+            { switch: true }
+          )
+        );
+        return result;
+      });
+      return extracted;
+    },
+
+    exprAddedForProject(project: Project) {
+      return Effect.gen(this, function* () {
+        const currentExprs: Expr[] = yield* Project.getExprs(project);
+
+        const exprAdded_ = Stream.fromPubSub(this.exprAdded).pipe(
+          Stream.filterEffect((expr) => {
+            return Effect.gen(function* () {
+              const project2 = yield* ExItem.getProject(expr);
+              return project2 === project;
+            });
+          })
+        );
+
+        const currentExprs2 = Stream.make(...currentExprs);
+        return Stream.merge(currentExprs2, exprAdded_);
+      });
+    },
   };
 });
 
