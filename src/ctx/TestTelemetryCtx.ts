@@ -6,9 +6,6 @@ export class TestTelemetryCtx extends Effect.Tag("TestTelemetryCtx")<
 >() {}
 
 
-import { WebSdk } from "@effect/opentelemetry";
-import { BatchSpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 // Function to simulate a task with possible subtasks
 const task = (
   name: string,
@@ -36,20 +33,7 @@ const program = task("client", 2, [
     ]),
   ]),
 ]);
-const NodeSdkLive = WebSdk.layer(() => ({
-  resource: { serviceName: "example" },
-  spanProcessor: new BatchSpanProcessor(
-    new OTLPTraceExporter({
-      url: "/v1/traces",
-    })
-  ),
-}));
 
-
-const program2 = program.pipe(
-  Effect.provide(NodeSdkLive),
-  Effect.catchAllCause(Effect.logError)
-);
 /*
 Output:
 timestamp=... level=INFO fiber=#0 message=client
@@ -69,7 +53,7 @@ timestamp=... level=INFO fiber=#0 message=/pollDriver/{id}
 
 
 const ctxEffect = Effect.gen(function* () {
-    yield* program2;
+    yield* program;
     return {};
   });
   

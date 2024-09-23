@@ -7,6 +7,7 @@ import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
 import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
+import { TelemetryCtxLive } from "src/ctx/TelemetryCtx";
 import { TestTelemetryCtxLive } from "src/ctx/TestTelemetryCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
@@ -49,7 +50,8 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(ComponentCtxLive),
   Layer.provideMerge(RehydratorCtxLive),
   Layer.provideMerge(ProjectNameCtxLive),
-  Layer.provideMerge(TestTelemetryCtxLive)
+  // Layer.provideMerge(TestTelemetryCtxLive),
+  Layer.provideMerge(TelemetryCtxLive)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);
