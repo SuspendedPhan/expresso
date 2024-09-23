@@ -149,6 +149,7 @@ export const Project = {
       return Effect.gen(function* () {
         log55.debug("addRootExObjectBlank");
         const exObject = yield* ExObjectFactory2({});
+        exObject.parent$.next(project);
         yield* project.rootExObjects.push(exObject);
       });
     },

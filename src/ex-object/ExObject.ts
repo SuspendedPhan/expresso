@@ -25,7 +25,7 @@ import {
 } from "src/utils/utils/Utils";
 import { fields, isType, matcher, variation } from "variant";
 
-const log55 = log5("ExObject.ts", 11);
+const log55 = log5("ExObject.ts", 10);
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
   component: Component;
@@ -129,12 +129,14 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       Stream.runForEachWhile(parentChanged, (parent_) => {
         return Effect.gen(function* () {
           if (parent_ === null) {
+            log55.debug("Skipping publishing exObjectAdded");
             return true;
           }
-          log55.debug("Publishing exObjectAdded (exObject, parent)", exObject, parent_);
+          log55.debug("Publishing exObjectAdded");
+
           yield* eventBusCtx.exObjectAdded.publish(exObject);
           return false;
-        });
+        }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
       })
     );
     return exObject;
