@@ -93,8 +93,8 @@ export function createObservableArrayWithLifetime<T>(
 
         events$.next({ type: "ItemRemoved", item: oldItem });
         const onRemove = yield* getOrCreateOnRemove(oldItem);
-        const newLocal = PubSub.publish(onRemove, void 0);
-        yield* newLocal;
+        yield* PubSub.publish(onRemove, void 0);
+        onRemoveByItem.delete(oldItem);
 
         events$.next({
           type: "ItemAdded",
