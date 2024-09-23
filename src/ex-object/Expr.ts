@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -82,6 +83,8 @@ interface ExprCreationArgs {
 export const ExprFactory2 = {
   Number(creationArgs: ExprCreationArgs["Number"]) {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+
       const creationArgs2: Required<ExprCreationArgs["Number"]> = {
         id: creationArgs.id ?? Utils.createId("expr"),
         value: creationArgs.value ?? 0,
@@ -92,12 +95,30 @@ export const ExprFactory2 = {
         ...base,
         value: creationArgs2.value,
       });
+      const parentChanged_ = expr.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug("Skipping publishing exprAdded");
+              return true;
+            }
+            log55.debug("Publishing exprAdded");
+
+            yield* eventBusCtx.exprAdded.publish(expr);
+            return false;
+          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+        })
+      );
       return expr;
     });
   },
 
   Reference(creationArgs: ExprCreationArgs["Reference"]) {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+      
       const creationArgs2: Required<ExprCreationArgs["Reference"]> = {
         id: creationArgs.id ?? Utils.createId("expr"),
         target: creationArgs.target,
@@ -108,12 +129,30 @@ export const ExprFactory2 = {
         ...base,
         target: creationArgs2.target,
       });
+      const parentChanged_ = expr.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug("Skipping publishing exprAdded");
+              return true;
+            }
+            log55.debug("Publishing exprAdded");
+
+            yield* eventBusCtx.exprAdded.publish(expr);
+            return false;
+          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+        })
+      );
       return expr;
     });
   },
 
   Call: (creationArgs: ExprCreationArgs["CallExpr"]) => {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+
       const creationArgs2: Required<ExprCreationArgs["CallExpr"]> = {
         id: creationArgs.id ?? Utils.createId("call-expr"),
         args: creationArgs.args ?? [],
@@ -146,6 +185,23 @@ export const ExprFactory2 = {
       for (const arg of creationArgs2.args) {
         arg.parent$.next(expr);
       }
+      
+      const parentChanged_ = expr.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug("Skipping publishing exprAdded");
+              return true;
+            }
+            log55.debug("Publishing exprAdded");
+
+            yield* eventBusCtx.exprAdded.publish(expr);
+            return false;
+          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+        })
+      );
 
       return expr;
     });
