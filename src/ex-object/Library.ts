@@ -30,7 +30,7 @@ export const Library = {
           project,
           name,
         });
-        library.libraryProjects.push(libraryProject);
+        yield* library.libraryProjects.push(libraryProject);
         return libraryProject;
       });
     },

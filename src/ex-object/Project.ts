@@ -204,7 +204,7 @@ export const Project = {
       return Effect.gen(function* () {
         log55.debug("addRootExObjectBlank");
         const exObject = yield* ExObjectFactory2({});
-        project.rootExObjects.push(exObject);
+        yield* project.rootExObjects.push(exObject);
       });
     },
 
@@ -221,7 +221,7 @@ export const Project = {
     addComponentBlank() {
       return Effect.gen(function* () {
         const component = yield* ComponentFactory2.Custom({});
-        project.components.push(component);
+        yield* project.components.push(component);
         return component;
       });
     },
@@ -229,7 +229,7 @@ export const Project = {
     addExFuncBlank() {
       return Effect.gen(function* () {
         const exFunc = yield* CustomExFuncFactory2.Custom({});
-        project.exFuncs.push(exFunc);
+        yield* project.exFuncs.push(exFunc);
         return exFunc;
       });
     },

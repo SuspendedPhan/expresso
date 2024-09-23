@@ -160,7 +160,7 @@ export const Expr = {
         return Stream.make();
       }
 
-      const childEvents = expr.args.events.pipe(
+      const childEvents = Stream.unwrap(expr.args.events).pipe(
         Stream.tap((evt) => {
           return Effect.gen(function* () {
             log55.debug2("descendants2: childEvents", evt);
@@ -231,7 +231,7 @@ export const Expr = {
         parent.expr$.next(newExpr);
       } else if (isOfVariant(parent, ExprFactory)) {
         assert(isType(parent, ExprFactory.Call));
-        parent.args.replaceItem(oldExpr, newExpr);
+        yield* parent.args.replaceItem(oldExpr, newExpr);
       } else if (isType(parent, CustomExFuncFactory)) {
         parent.expr$.next(newExpr);
       } else {

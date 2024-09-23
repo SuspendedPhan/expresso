@@ -30,7 +30,9 @@ interface ExObject_ extends ExItemBase {
   component: Component;
   children: ObservableArray<ExObject>;
   children$: OBS<ExObject[]>;
-  componentParameterProperties_: ObservableArray<PropertyKind["ComponentParameterProperty"]>;
+  componentParameterProperties_: ObservableArray<
+    PropertyKind["ComponentParameterProperty"]
+  >;
   get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
@@ -133,7 +135,7 @@ export const ExObject = {
     addChild(child: ExObject) {
       return Effect.gen(function* () {
         child.parent$.next(exObject);
-        exObject.children.push(child);
+        yield* exObject.children.push(child);
       });
     },
 
@@ -141,7 +143,7 @@ export const ExObject = {
       return Effect.gen(function* () {
         const property = yield* PropertyFactory2.BasicProperty({});
         property.parent$.next(exObject);
-        exObject.basicProperties.push(property);
+        yield* exObject.basicProperties.push(property);
       });
     },
 
@@ -185,7 +187,7 @@ export const ExObject = {
           return;
         }
         assert(isType(parent, ExObjectFactory));
-        parent.children.replaceItem(exObject, newExObject);
+        yield* parent.children.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
       });
     },
@@ -193,7 +195,7 @@ export const ExObject = {
     replaceRootExObject(newExObject: ExObject) {
       return Effect.gen(function* () {
         const project = yield* Project.activeProject;
-        project.rootExObjects.replaceItem(exObject, newExObject);
+        yield* project.rootExObjects.replaceItem(exObject, newExObject);
         exObject.destroy$.next();
       });
     },
@@ -224,7 +226,7 @@ export const ExObject = {
       });
     },
 
-    get descendants2(): Stream.Stream<ArrayEvent<ExObject>> {
+    get descendants2(): Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>> {
       /*
       for each child array event:
         if add:
@@ -235,26 +237,31 @@ export const ExObject = {
           emit the event in the result stream
       */
 
-      const childEvents = exObject.children.events;
+      return Effect.gen(function* () {
+        const childEvents = yield* exObject.children.events;
 
-      const descendantsForChildren = Stream.flatMap(
-        exObject.children.itemStream,
-        (children: ExObject[]) => {
-          return ExObject.descendantsForExObjects(children);
-        },
-        { switch: true }
-      );
+        const descendantsForChildren = Stream.flatMap(
+          exObject.children.itemStream,
+          (children: ExObject[]) => {
+            return ExObject.descendantsForExObjects(children);
+          },
+          { switch: true }
+        );
 
-      const result = Stream.merge(childEvents, descendantsForChildren);
-      return result;
+        const result = Stream.merge(childEvents, descendantsForChildren);
+        return result;
+      });
     },
   }),
 
-  descendantsForExObjects(exObjects: ExObject[]) {
-    const vv = exObjects.map(
-      (exObject) => ExObject.Methods(exObject).descendants2
-    );
-    return Stream.mergeAll(vv, { concurrency: "unbounded" });
+  descendantsForExObjects(
+    exObjects: ExObject[]
+  ): Stream.Stream<ArrayEvent<ExObject>> {
+    const vv = exObjects.map((exObject) => {
+      return Stream.unwrap(ExObject.Methods(exObject).descendants2);
+    });
+    const vv2 = Stream.mergeAll(vv, { concurrency: "unbounded" });
+    return vv2;
   },
 };
 

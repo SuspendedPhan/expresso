@@ -75,7 +75,7 @@ export const EditorFocus = {
         Effect.gen(function* () {
           const library = yield* LibraryCtx.library;
           const libraryProject = yield* LibraryProjectFactory2({});
-          library.libraryProjects.push(libraryProject);
+          yield* library.libraryProjects.push(libraryProject);
           focusCtx.popFocus();
         })
       );
@@ -86,7 +86,7 @@ export const EditorFocus = {
         Effect.gen(function* () {
           const project = yield* Project.activeProject;
           const exObject = yield* ExObjectFactory2({});
-          project.rootExObjects.push(exObject);
+          yield* project.rootExObjects.push(exObject);
           focusCtx.popFocus();
         })
       );

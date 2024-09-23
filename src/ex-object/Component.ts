@@ -114,7 +114,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
     addParameterBlank() {
       return Effect.gen(function* () {
         const parameter = yield* ComponentParameterFactory2.Custom({});
-        component.parameters.push(parameter);
+        yield* component.parameters.push(parameter);
         return parameter;
       });
     },
@@ -122,7 +122,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
     addPropertyBlank() {
       return Effect.gen(function* () {
         const property = yield* PropertyFactory2.BasicProperty({});
-        component.properties.push(property);
+        yield* component.properties.push(property);
         return property;
       });
     },
@@ -160,7 +160,7 @@ export const Component = {
     return Effect.gen(function* () {
       const exObject = yield* ExObjectFactory2({});
       exObject.parent$.next(component);
-      component.rootExObjects.push(exObject);
+      yield* component.rootExObjects.push(exObject);
     });
   },
 };

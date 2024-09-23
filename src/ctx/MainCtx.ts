@@ -50,7 +50,7 @@ const ctxEffect_ = Effect.gen(function* () {
     }
 
     for (const project of libraryProjects) {
-      library.libraryProjects.push(project);
+      yield* library.libraryProjects.push(project);
       if (project.id === Option.getOrUndefined(activeLibraryProjectId)) {
         libraryProjectCtx.activeLibraryProject$.next(project);
       }

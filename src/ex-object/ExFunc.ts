@@ -115,7 +115,7 @@ function methodsFactory(exFunc: CustomExFunc_) {
     addParameterBlank() {
       return Effect.gen(function* () {
         const param = yield* ExFuncParameterFactory2({});
-        exFunc.parameters.push(param);
+        yield* exFunc.parameters.push(param);
         return param;
       });
     },
