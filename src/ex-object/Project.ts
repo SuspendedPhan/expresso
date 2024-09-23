@@ -84,7 +84,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       );
 
       const result = Stream.merge(
-        rootExObjects.events,
+        Stream.unwrap(rootExObjects.events),
         descendantsForRootExObjects
       );
 
