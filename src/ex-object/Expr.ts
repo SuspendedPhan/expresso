@@ -101,10 +101,10 @@ export const ExprFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug("Skipping publishing exprAdded");
+              log55.debug2("Skipping publishing exprAdded");
               return true;
             }
-            log55.debug("Publishing exprAdded");
+            log55.debug2("Publishing exprAdded: " + expr.type);
 
             yield* eventBusCtx.exprAdded.publish(expr);
             return false;
@@ -135,10 +135,10 @@ export const ExprFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug("Skipping publishing exprAdded");
+              log55.debug2("Skipping publishing exprAdded");
               return true;
             }
-            log55.debug("Publishing exprAdded");
+            log55.debug2("Publishing exprAdded: " + expr.type);
 
             yield* eventBusCtx.exprAdded.publish(expr);
             return false;
@@ -192,10 +192,10 @@ export const ExprFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug("Skipping publishing exprAdded");
+              log55.debug2("Skipping publishing exprAdded");
               return true;
             }
-            log55.debug("Publishing exprAdded");
+            log55.debug2("Publishing exprAdded: " + expr.type);
 
             yield* eventBusCtx.exprAdded.publish(expr);
             return false;
@@ -211,7 +211,7 @@ export const ExprFactory2 = {
 export const Expr = {
   descendants(expr: Expr): Effect.Effect<Expr[]> {
     return Effect.gen(function* () {
-      log55.debug2("descendants: expr", expr);
+      log55.debug("descendants: expr", expr);
       if (!isType(expr, ExprFactory.Call)) {
         return [];
       }
@@ -228,7 +228,7 @@ export const Expr = {
 
   descendants2(expr: Expr): Effect.Effect<Stream.Stream<ArrayEvent<Expr>>> {
     return Effect.gen(function* () {
-      log55.debug2("descendants2: expr", expr);
+      log55.debug("descendants2: expr", expr);
       if (!isType(expr, ExprFactory.Call)) {
         return Stream.make();
       }
@@ -236,7 +236,7 @@ export const Expr = {
       const childEvents = Stream.unwrap(expr.args.events).pipe(
         Stream.tap((evt) => {
           return Effect.gen(function* () {
-            log55.debug2("descendants2: childEvents", evt);
+            log55.debug("descendants2: childEvents", evt);
           });
         })
       );
@@ -244,7 +244,7 @@ export const Expr = {
       const descendantsForChildren = Stream.flatMap(
         expr.args.itemStream,
         (children: Expr[]) => {
-          log55.debug2("descendants2: children", children);
+          log55.debug("descendants2: children", children);
           return Expr.descendants3(children);
         },
         { switch: true }
@@ -294,7 +294,7 @@ export const Expr = {
 
   replaceExpr(oldExpr: Expr, newExpr: Expr) {
     return Effect.gen(function* () {
-      log55.debug2("replaceExpr", oldExpr, newExpr);
+      log55.debug("replaceExpr", oldExpr, newExpr);
       const parent = yield* EffectUtils.firstValueFrom(oldExpr.parent$);
       if (!parent) {
         throw new Error("oldExpr.parent$ is null");

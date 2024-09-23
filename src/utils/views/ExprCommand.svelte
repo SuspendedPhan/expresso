@@ -39,7 +39,6 @@
       switchAll()
     )
     .subscribe(async () => {
-      log55.debug("onSubmitExprCommand");
       const cmd = await firstValueFrom(selectedCmd$);
       if (cmd) {
         log55.debug("onSubmitExprCommand.cmd", cmd);
@@ -131,7 +130,8 @@
       event.preventDefault();
       DexRuntime.runPromise(
         Effect.gen(function* () {
-          log55.debug("handleKeydown.onSubmitExprCommand");
+          log55.debug2("");
+          log55.debug2("Submitting expr command");
           (yield* ExprCommandCtx.onSubmitExprCommand$).next();
         })
       );

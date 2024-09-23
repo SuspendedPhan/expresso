@@ -167,10 +167,27 @@ const ctxEffect = Effect.gen(function* () {
         const currentExprs: Expr[] = yield* Project.getExprs(project);
 
         const exprAdded_ = Stream.fromPubSub(this.exprAdded).pipe(
+          Stream.tap((expr) => {
+            return Effect.gen(function* () {
+              log55.debug2(
+                "Generating stream: 'Expr added' for specific project: received expr from upstream: " + expr.type
+              );
+            });
+          }),
           Stream.filterEffect((expr) => {
             return Effect.gen(function* () {
+              log55.debug2("Generating stream: 'Expr added' for specific project: filter: getting project");
+              // NumberExpr attaches to CallExpr first. CallExpr has no parent yet.
               const project2 = yield* ExItem.getProject(expr);
+              log55.debug2("Generating stream: 'Expr added' for specific project: filter: got project");
               return project2 === project;
+            });
+          }),
+          Stream.tap((_) => {
+            return Effect.gen(function* () {
+              log55.debug2(
+                "Generating stream: 'Expr added' for specific project: post filter"
+              );
             });
           })
         );
