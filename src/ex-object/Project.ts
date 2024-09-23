@@ -41,6 +41,10 @@ export const ProjectFactory = variation(
       exObjectEvents: Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>>;
       propertyEvents: Effect.Effect<Stream.Stream<ArrayEvent<Property>>>;
       exprEvents: Effect.Effect<Stream.Stream<ArrayEvent<Expr>>>;
+
+      exObjectAdded: Stream.Stream<ExObject>;
+      propertyAdded: Stream.Stream<Property>;
+      exprAdded: Stream.Stream<Expr>;
     } & ExItemBase
   >()
 );

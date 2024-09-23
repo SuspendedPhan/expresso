@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
 import { first, switchMap } from "rxjs";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
@@ -19,10 +20,9 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Starting GoBridgeCtx");
 
   const goModuleCtx = yield* GoModuleCtx;
+
   const project$ = yield* Project.activeProject$;
   log55.debug("Ctx loaded");
-
-  
 
   const project$2 = EffectUtils.obsToStream(project$);
   yield* Effect.forkDaemon(
@@ -37,8 +37,10 @@ const ctxEffect = Effect.gen(function* () {
   );
 
   const rootExObjectEvents = project$2.pipe(
-    Stream.flatMap((project) => Stream.unwrap(project.rootExObjects.events), { switch: true }),
-  )
+    Stream.flatMap((project) => Stream.unwrap(project.rootExObjects.events), {
+      switch: true,
+    })
+  );
   yield* Effect.forkDaemon(
     Stream.runForEach(rootExObjectEvents, (evt) => {
       return goModuleCtx.withGoModule((goModule) => {
@@ -54,75 +56,72 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  // Get the exObjectEvents from the project
   const activeProject = EffectUtils.obsToStream(project$);
 
-  const exObjectEvents = activeProject.pipe(
-    Stream.tap((project) => log55.debugEffect("Project", project.id)),
-    Stream.flatMap((project) => Stream.fromEffect(project.exObjectEvents), {
-      switch: true,
-    }),
-    Stream.flatMap((exObjectEvents) => exObjectEvents, { switch: true })
+  const exObjectAdded = activeProject.pipe(
+    Stream.flatMap((project) => project.exObjectAdded, { switch: true })
   );
 
+  const propertyAdded = activeProject.pipe(
+    Stream.flatMap((project) => project.propertyAdded, { switch: true })
+  );
+
+  const exprAdded = activeProject.pipe(
+    Stream.flatMap((project) => project.exprAdded, { switch: true })
+  );
+
+  // Add ExObjects
   yield* Effect.forkDaemon(
-    Stream.runForEach(exObjectEvents, (evt) => {
-      log55.debug("Processing ExObject event", evt.type);
+    Stream.runForEach(exObjectAdded, (exObject) => {
+      log55.debug("Processing ExObject", exObject);
       return goModuleCtx.withGoModule((goModule) => {
         return Effect.gen(function* () {
-          switch (evt.type) {
-            case "ItemAdded":
-              const exObject = evt.item;
-              log55.debug("Adding ExObject", exObject.id);
+          log55.debug("Adding ExObject", exObject.id);
 
-              goModule.ExObject.create(exObject.id);
-              goModule.ExObject.setCloneCountProperty(
-                exObject.id,
-                exObject.cloneCountProperty.id
+          goModule.ExObject.create(exObject.id);
+          goModule.ExObject.setCloneCountProperty(
+            exObject.id,
+            exObject.cloneCountProperty.id
+          );
+
+          for (const property of exObject.componentParameterProperties) {
+            goModule.ExObject.addComponentParameterProperty(
+              exObject.id,
+              property.id
+            );
+          }
+        });
+      });
+    })
+  );
+
+  // Add Properties
+  yield* Effect.forkDaemon(
+    Stream.runForEach(propertyAdded, (property) => {
+      log55.debug("Processing Property", property);
+      return goModuleCtx.withGoModule((goModule) => {
+        return Effect.gen(function* () {
+          log55.debug("Adding Property", property.id);
+          goModule.Property.create(property.id);
+          yield* Effect.forkDaemon(
+            Stream.runForEach(property.expr.changes, (value) => {
+              return goModuleCtx.withGoModule((goModule_) =>
+                Effect.gen(function* () {
+                  goModule_.Property.setExpr(property.id, value.id);
+                })
               );
-
-              for (const property of exObject.componentParameterProperties) {
-                goModule.ExObject.addComponentParameterProperty(
-                  exObject.id,
-                  property.id
-                );
-              }
-
-              break;
-          }
+            })
+          );
         });
       });
     })
   );
 
-  const propertyEvents = activeProject.pipe(
-    Stream.flatMap((project) => Stream.fromEffect(project.propertyEvents), {
-      switch: true,
-    }),
-    Stream.flatMap((propertyEvents) => propertyEvents, { switch: true })
-  );
-
-  yield* Effect.forkDaemon(
-    Stream.runForEach(propertyEvents, (evt) => {
-      return goModuleCtx.withGoModule((goModule) => {
-        return Effect.gen(function* () {
-          switch (evt.type) {
-            case "ItemAdded":
-              const property = evt.item;
-              log55.debug("Adding Property", property.id);
-              goModule.Property.create(property.id);
-              property.expr$.subscribe((expr) => {
-                goModule.Property.setExpr(property.id, expr.id);
-              });
-              break;
-          }
-        });
-      });
-    })
-  );
 
   const exprEvents = activeProject.pipe(
-    Stream.flatMap((project) => Stream.fromEffect(project.exprEvents), { switch: true }),
+    Stream.flatMap((project) => Stream.fromEffect(project.exprEvents), {
+      switch: true,
+    }),
     Stream.flatMap((exprEvents) => exprEvents, { switch: true })
   );
 
