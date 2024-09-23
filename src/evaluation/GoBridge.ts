@@ -5,7 +5,7 @@ import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 
-const log55 = log5("GoBridge.ts", 11);
+const log55 = log5("GoBridge.ts", 10);
 
 export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
   GoBridgeCtx,
@@ -81,15 +81,35 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
+  const propertyAdded = yield* eventBusCtx.propertyAddedForActiveProject();
+  let propertyCounter = 0;
+  yield* Effect.forkDaemon(
+    Stream.runForEach(propertyAdded, (property) => {
+      return Effect.gen(function* () {
+        log55.debug2("Adding Property to Go: received from upstream: property has been added");
+        return yield* goModuleCtx.withGoModule((goModule) => {
+          return Effect.gen(function* () {
+            log55.debug2("Go: Adding Property " + ++propertyCounter);
+
+            goModule.Property.create(property.id);
+            yield* Effect.forkDaemon(
+              Stream.runForEach(property.expr.changes, (value) => {
+                return goModuleCtx.withGoModule((goModule_) =>
+                  Effect.gen(function* () {
+                    log55.debug2("Go: Setting Expr for Property");
+                    goModule_.Property.setExpr(property.id, value.id);
+                  })
+                );
+              })
+            );
+          });
+        });
+      });
+    })
+  );
+
   return {};
 
-  // const propertyAdded = activeProject.pipe(
-  //   Stream.flatMap((project) => project.propertyAdded, { switch: true })
-  // );
-
-  // const exprAdded = activeProject.pipe(
-  //   Stream.flatMap((project) => project.exprAdded, { switch: true })
-  // );
 
   // // Add ExObjects
   // yield* Effect.forkDaemon(

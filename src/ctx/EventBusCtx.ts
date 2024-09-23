@@ -16,7 +16,7 @@ export class EventBusCtx extends Effect.Tag("EventBusCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const exObjectAdded = yield* PubSub.unbounded<ExObject>();
-  const result = {
+  return {
     // todp: rename to attached
     exObjectAdded,
     propertyAdded: yield* PubSub.unbounded<Property>(),
@@ -99,30 +99,49 @@ const ctxEffect = Effect.gen(function* () {
         return result;
       }).pipe(Effect.withSpan("EventBusCtx.exObjectAddedForProject"));
     },
-  };
 
-  yield* Effect.forkDaemon(
-    Stream.runForEach(
-      yield* result.exObjectAddedForActiveProject(),
-      () => {
-        return Effect.gen(function* () {
-          log55.debug2("Received: ex-object has been added for the active project");
-        });
-      }
-    )
-  );
+    propertyAddedForActiveProject(): Effect.Effect<
+      Stream.Stream<Property>,
+      never,
+      LibraryProjectCtx
+    > {
+      const vv = Effect.gen(this, function* () {
+        const project = yield* Project.activeProjectStream;
 
-  // inspect this
-  yield* Effect.forkDaemon(
-    Stream.runForEach(Stream.fromPubSub(result.exObjectAdded), (value) => {
-      return Effect.gen(function* () {
-        log55.debug("exObjectAdded___", value);
+        // Flatmap the active project to the property added stream
+        const result = project.pipe(
+          Stream.flatMap(
+            (project) => {
+              return Stream.unwrap(this.propertyAddedForProject(project));
+            },
+            { switch: true }
+          )
+        );
+        return result;
       });
-    })
-  );
+      return vv;
+    },
 
-  log55.debug("EventBusCtx created");
-  return result;
+    propertyAddedForProject(project: Project) {
+      return Effect.gen(this, function* () {
+        const currentProperties: Property[] = yield* Project.getProperties(
+          project
+        );
+
+        const propertyAdded_ = Stream.fromPubSub(this.propertyAdded).pipe(
+          Stream.filterEffect((property) => {
+            return Effect.gen(function* () {
+              const project2 = yield* ExItem.getProject(property);
+              return project2 === project;
+            });
+          })
+        );
+
+        const currentProperties2 = Stream.make(...currentProperties);
+        return Stream.merge(currentProperties2, propertyAdded_);
+      });
+    },
+  };
 });
 
 export const EventBusCtxLive = Layer.effect(EventBusCtx, ctxEffect);

@@ -12,6 +12,7 @@ import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
+import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
@@ -141,6 +142,19 @@ export const Project = {
         exObjects.push(...descendants);
       }
       return exObjects;
+    });
+  },
+
+  getProperties: (project: Project) => {
+    return Effect.gen(function* () {
+      log55.debug("getProperties");
+      const properties: Property[] = [];
+      for (const exObject of yield* Project.getExObjects(project)) {
+        properties.push(...exObject.basicProperties.items);
+        properties.push(exObject.cloneCountProperty);
+        properties.push(...exObject.componentParameterProperties_.items);
+      }
+      return properties;
     });
   },
 

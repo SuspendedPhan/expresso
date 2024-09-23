@@ -57,4 +57,14 @@ export const EffectUtils = {
       return ref;
     });
   },
+
+  /**
+   * Not tested yet.
+   */
+  switchMap<T, U>(
+    stream: Stream.Stream<T>,
+    f: (t: T) => Stream.Stream<U>
+  ): Stream.Stream<U> {
+    return stream.pipe(Stream.flatMap(f, { switch: true }));
+  },
 };

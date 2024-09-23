@@ -6,14 +6,16 @@
  */
 
 import assert from "assert-ts";
-import { Effect, SubscriptionRef } from "effect";
+import { Effect, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, of } from "rxjs";
-import { } from "src/ex-object/Component";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
+import {} from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
 import {
   createBehaviorSubjectWithLifetime,
   type OBS,
@@ -25,7 +27,7 @@ import {
 } from "src/utils/utils/VariantUtils4";
 import { fields, isType, matcher, type VariantOf } from "variant";
 
-// const log55 = log5("Property.ts");
+const log55 = log5("Property.ts");
 
 interface PropertyBase extends ExItemBase {
   expr: SubscriptionRef.SubscriptionRef<Expr>;
@@ -73,6 +75,8 @@ export const PropertyFactory2 = {
     createArgs: CreatePropertyArgs["ComponentParameter"]
   ) {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
         parameter: createArgs.parameter ?? null,
@@ -91,12 +95,31 @@ export const PropertyFactory2 = {
         componentParameter: createArgs2.parameter,
       });
       createArgs2.expr.parent$.next(property);
+
+      const parentChanged_ = property.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug2("Skipping publishing propertyAdded");
+              return true;
+            }
+            log55.debug2("Publishing propertyAdded");
+
+            yield* eventBusCtx.propertyAdded.publish(property);
+            return false;
+          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
+        })
+      );
       return property;
     });
   },
 
   BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+
       const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
         id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
         expr:
@@ -122,12 +145,31 @@ export const PropertyFactory2 = {
         ),
       });
       createArgs2.expr.parent$.next(property);
+
+      const parentChanged_ = property.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug2("Skipping publishing propertyAdded");
+              return true;
+            }
+            log55.debug2("Publishing propertyAdded");
+
+            yield* eventBusCtx.propertyAdded.publish(property);
+            return false;
+          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
+        })
+      );
       return property;
     });
   },
 
   CloneCountProperty(createArgs: CreatePropertyArgs["CloneCount"]) {
     return Effect.gen(function* () {
+      const eventBusCtx = yield* EventBusCtx;
+
       const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
         id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
@@ -145,6 +187,23 @@ export const PropertyFactory2 = {
         expr: yield* EffectUtils.subjectToSubscriptionRef(expr$),
       });
       createArgs2.expr.parent$.next(property);
+
+      const parentChanged_ = property.parent.changes;
+      const parentChanged = parentChanged_;
+      yield* Effect.forkDaemon(
+        Stream.runForEachWhile(parentChanged, (parent_) => {
+          return Effect.gen(function* () {
+            if (parent_ === null) {
+              log55.debug2("Skipping publishing propertyAdded");
+              return true;
+            }
+            log55.debug2("Publishing propertyAdded");
+
+            yield* eventBusCtx.propertyAdded.publish(property);
+            return false;
+          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
+        })
+      );
       return property;
     });
   },
