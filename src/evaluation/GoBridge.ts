@@ -1,9 +1,12 @@
+import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
+import { matcher } from "variant";
 
 const log55 = log5("GoBridge.ts", 10);
 
@@ -86,22 +89,74 @@ const ctxEffect = Effect.gen(function* () {
   yield* Effect.forkDaemon(
     Stream.runForEach(propertyAdded, (property) => {
       return Effect.gen(function* () {
-        log55.debug2("Adding Property to Go: received from upstream: property has been added");
+        log55.debug("Adding Property to Go: received from upstream: property has been added");
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug2("Go: Adding Property " + ++propertyCounter);
+            log55.debug("Go: Adding Property " + ++propertyCounter);
 
             goModule.Property.create(property.id);
             yield* Effect.forkDaemon(
               Stream.runForEach(property.expr.changes, (value) => {
                 return goModuleCtx.withGoModule((goModule_) =>
                   Effect.gen(function* () {
-                    log55.debug2("Go: Setting Expr for Property");
+                    log55.debug("Go: Setting Expr for Property");
                     goModule_.Property.setExpr(property.id, value.id);
                   })
                 );
               })
             );
+          });
+        });
+      });
+    })
+  );
+
+  const exprAdded = yield* eventBusCtx.exprAddedForActiveProject();
+  let exprCounter = 0;
+  yield* Effect.forkDaemon(
+    Stream.runForEach(exprAdded, (expr) => {
+      return Effect.gen(function* () {
+        log55.debug2("Adding Expr to Go: received from upstream: expr has been added");
+        return yield* goModuleCtx.withGoModule((goModule) => {
+          return Effect.gen(function* () {
+            log55.debug2("Go: Adding Expr " + ++exprCounter);
+
+            matcher(expr)
+              .when(ExprFactory.Number, (expr) => {
+                log55.debug("GoModule: Creating NumberExpr", expr.id);
+                goModule.NumberExpr.create(expr.id);
+                goModule.NumberExpr.setValue(expr.id, expr.value);
+              })
+              .when(ExprFactory.Reference, (expr_) => {
+                log55.debug("GoModule: Creating ReferenceExpr", expr_.id);
+                assert(expr_.target !== null);
+                goModule.ReferenceExpr.create(
+                  expr_.id,
+                  expr_.target.id,
+                  expr_.target.type
+                );
+              })
+              .when(ExprFactory.Call, (expr) => {
+                log55.debug("GoModule: Creating CallExpr", expr.id);
+                goModule.CallExpr.create(expr.id);
+                Stream.runForEach(expr.args.itemStream, (args) => {
+                  return goModuleCtx.withGoModule((goModule_) =>
+                    Effect.gen(function* () {
+                      const arg0 = args[0];
+                      const arg1 = args[1];
+
+                      if (arg0 === undefined || arg1 === undefined) {
+                        console.error("CallExpr must have 2 args");
+                        return;
+                      }
+
+                      goModule_.CallExpr.setArg0(expr.id, arg0.id);
+                      goModule_.CallExpr.setArg1(expr.id, arg1.id);
+                    })
+                  );
+                });
+              })
+              .complete();
           });
         });
       });

@@ -402,7 +402,7 @@ const ctxEffect = Effect.gen(function* () {
 
   function rehydrateCallExpr(
     deExpr: DehydratedExprKind["CallExpr"]
-  ): Effect.Effect<ExprKind["Call"], never, never> {
+  ): Effect.Effect<ExprKind["Call"], never, EventBusCtx> {
     return Effect.gen(function* () {
       let args = new Array<Expr>();
       for (const deArg of deExpr.args) {
