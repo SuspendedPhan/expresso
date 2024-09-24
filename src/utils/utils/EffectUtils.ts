@@ -7,7 +7,12 @@ import {
   StreamEmit,
   SubscriptionRef,
 } from "effect";
-import { BehaviorSubject, firstValueFrom, Observable, ReplaySubject } from "rxjs";
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  Observable,
+  ReplaySubject,
+} from "rxjs";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 
@@ -26,7 +31,7 @@ export const EffectUtils = {
             log55.debug("obsToStream: Emitting value", value);
             return emit(Effect.succeed(Chunk.of(value)));
           },
-          error: (error) => emit(Effect.fail(error)),
+          // error: (error) => emit(Effect.fail(error)),
           complete: () => {
             log55.debug("obsToStream: Complete");
             return emit(Effect.fail(Option.none()));

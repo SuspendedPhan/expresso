@@ -26,7 +26,6 @@ import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
-import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
@@ -154,6 +153,8 @@ export default class Dehydrator {
   public dehydrateLibraryProject$(
     libraryProject: LibraryProject
   ): Observable<DehydratedLibraryProject> {
+    log55.debug("Dehydrating LibraryProject");
+
     const dehydratedProject$ = libraryProject.project$.pipe(
       switchMap((project) => {
         return this.dehydrateProject$(project);
@@ -178,8 +179,8 @@ export default class Dehydrator {
   }
 
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
+    log55.debug("Dehydrating Project");
     const deExObjects$ = project.rootExObjects.items$.pipe(
-      log55.tapDebug("dehydrateProject$.exObjects.start"),
       switchMap((exObjects) => {
         if (exObjects.length === 0) {
           return of([]);
@@ -190,8 +191,7 @@ export default class Dehydrator {
             return this.dehydrateExObject$(exObject);
           })
         );
-      }),
-      log55.tapDebug("dehydrateProject$.exObjects.end")
+      })
     );
 
     const deComponents$ = project.components.items$.pipe(
@@ -238,6 +238,7 @@ export default class Dehydrator {
   }
 
   public dehydrateExFunc$(exFunc: CustomExFunc): Observable<DehydratedExFunc> {
+    log55.debug("Dehydrating ExFunc");
     const deParameters$ = exFunc.parameters.items$.pipe(
       switchMap((parameters) => {
         return RxFns.combineLatestOrEmpty(
@@ -269,6 +270,7 @@ export default class Dehydrator {
   public dehydrateExFuncParameter$(
     parameter: ExFuncParameter
   ): Observable<DehydratedExFuncParameter> {
+    log55.debug("Dehydrating ExFuncParameter");
     return parameter.name$.pipe(
       map((name) => {
         return {
@@ -280,6 +282,7 @@ export default class Dehydrator {
   }
 
   public dehydrateCustomComponent$(component: ComponentKind["Custom"]) {
+    log55.debug("Dehydrating CustomComponent");
     const deParameters$ = component.parameters.items$.pipe(
       switchMap((parameters) => {
         return RxFns.combineLatestOrEmpty(
@@ -346,11 +349,12 @@ export default class Dehydrator {
   public dehydrateExObject$(
     exObject: ExObject
   ): Observable<DehydratedExObject> {
+    log55.debug("Dehydrating ExObject");
     const deComponentProperties$ = RxFns.combineLatestOrEmpty(
       exObject.componentParameterProperties.map((property) =>
         this.dehydrateComponentProperty$(property).pipe()
       )
-    ).pipe();
+    );
 
     const deBasicProperties$ = exObject.basicProperties.items$.pipe(
       switchMap((properties) => {
@@ -358,7 +362,7 @@ export default class Dehydrator {
           this.dehydrateBasicProperty$(property)
         );
         return RxFns.combineLatestOrEmpty(deProperties);
-      }),
+      })
     );
 
     const deCloneProperty$ = this.dehydrateCloneProperty$(
@@ -376,12 +380,36 @@ export default class Dehydrator {
             return this.dehydrateExObject$(child);
           })
         );
-      }),
+      })
     );
+
+    log55.debug("DEBUG: 123");
 
     const deCloneNumberTarget = this.dehydrateCloneNumberTarget(
       exObject.cloneNumberTarget
     );
+
+    log55.debug("DEBUG: 1234");
+
+    deComponentProperties$.subscribe((deProperties) => {
+      log55.debug("DEBUG: Dehydrated ComponentProperties", deProperties);
+    });
+
+    deBasicProperties$.subscribe((deProperties) => {
+      log55.debug("DEBUG: Dehydrated BasicProperties", deProperties);
+    });
+
+    deCloneProperty$.subscribe((deProperty) => {
+      log55.debug("DEBUG: Dehydrated CloneProperty", deProperty);
+    });
+
+    deChildren$.subscribe((deChildren) => {
+      log55.debug("DEBUG: Dehydrated Children", deChildren);
+    });
+
+    exObject.name$.subscribe((name) => {
+      log55.debug("DEBUG: ExObject Name", name);
+    });
 
     const result = combineLatest([
       deComponentProperties$,
@@ -411,7 +439,7 @@ export default class Dehydrator {
           };
           return deExObject;
         }
-      ),
+      )
     );
 
     return result;
@@ -419,7 +447,12 @@ export default class Dehydrator {
 
   dehydrateCloneNumberTarget(cloneNumberTarget: CloneNumberTarget) {
     const { exObject } = cloneNumberTarget;
+    log55.debug("DEBUG: Dehydrating CloneNumberTarget");
+    if (exObject == null) {
+      console.error("ExObject is null");
+    }
     assert(exObject != null);
+    log55.debug("DEBUG: Dehydrated CloneNumberTarget");
     return {
       id: cloneNumberTarget.id,
       exObjectId: exObject.id,
@@ -430,8 +463,18 @@ export default class Dehydrator {
   public dehydrateComponentProperty$(
     property: PropertyKind["ComponentParameterProperty"]
   ): Observable<DehydratedComponentProperty> {
+    // property.expr$.subscribe((expr) => {
+    //   log55.debug("DEBUG: Dehydrating ComponentProperty: Expr", expr);
+    // });
+
+    return of([1]).pipe(
+      log55.tapDebug("DEBUG: Dehydrating ComponentProperty: Expr")
+    ) as any;
+
+    log55.debug("Dehydrating ComponentProperty", property);
     return property.expr$.pipe(
       switchMap((expr) => {
+        log55.debug("Dehydrating ComponentProperty: Dehydrating Expr");
         return this.dehydrateExpr$(expr);
       }),
       map((dehydratedExpr) => {
@@ -443,6 +486,7 @@ export default class Dehydrator {
           componentParameterKind: componentParameter.type,
           expr: dehydratedExpr,
         };
+        log55.debug("Dehydrated ComponentProperty");
         return deProperty;
       })
     );
@@ -452,21 +496,20 @@ export default class Dehydrator {
   public dehydrateBasicProperty$(
     property: PropertyKind["BasicProperty"]
   ): Observable<DehydratedBasicProperty> {
-    const logger = Logger.logger();
+    log55.debug("Dehydrating BasicProperty");
     return property.expr$.pipe(
       switchMap((expr) => {
         return this.dehydrateExpr$(expr);
       }),
       combineLatestWith(property.name$),
       map(([dehydratedExpr, name]) => {
-        logger.log("map", "dehydratedExpr", dehydratedExpr);
         const deProperty: DehydratedBasicProperty = {
           id: property.id,
           name,
           expr: dehydratedExpr,
         };
         return deProperty;
-      }),
+      })
     );
   }
 
@@ -474,13 +517,12 @@ export default class Dehydrator {
   public dehydrateCloneProperty$(
     property: PropertyKind["CloneCountProperty"]
   ): Observable<DehydratedCloneCountProperty> {
-    const logger = Logger.logger();
+    log55.debug("Dehydrating CloneProperty");
     return property.expr$.pipe(
       switchMap((expr) => {
         return this.dehydrateExpr$(expr);
       }),
       map((dehydratedExpr) => {
-        logger.log("map", "dehydratedExpr", dehydratedExpr);
         const deProperty: DehydratedCloneCountProperty = {
           id: property.id,
           expr: dehydratedExpr,
@@ -492,6 +534,7 @@ export default class Dehydrator {
 
   @loggedMethod
   private dehydrateExpr$(expr: Expr): Observable<DehydratedExpr> {
+    log55.debug("Dehydrating Expr");
     return matcher(expr)
       .when(ExprFactory.Number, (expr) => this.dehydrateNumberExpr$(expr))
       .when(ExprFactory.Call, (expr) => this.dehydrateCallExpr$(expr))
@@ -502,6 +545,7 @@ export default class Dehydrator {
   private dehydrateNumberExpr$(
     expr: ExprKind["Number"]
   ): Observable<DehydratedExprKind["Number"]> {
+    log55.debug("Dehydrating NumberExpr");
     return of(
       DehydratedExpr.Number({
         id: expr.id,
@@ -513,6 +557,7 @@ export default class Dehydrator {
   private dehydrateCallExpr$(
     expr: ExprKind["Call"]
   ): Observable<DehydratedExprKind["CallExpr"]> {
+    log55.debug("Dehydrating CallExpr");
     const deArgs$ = expr.args$.pipe(
       switchMap((args) => {
         return this.dehydrateArgs$(args);
@@ -524,6 +569,7 @@ export default class Dehydrator {
       deArgs$,
     ]).pipe(
       map(([exFunc, deArgs]) => {
+        log55.debug("Dehydrating CallExpr");
         assert(exFunc != null);
 
         let exFuncKind: DehydratedExprKind["CallExpr"]["exFuncKind"];
@@ -550,6 +596,7 @@ export default class Dehydrator {
   private dehydrateReferenceExpr$(
     expr: ExprKind["Reference"]
   ): Observable<DehydratedExprKind["ReferenceExpr"]> {
+    log55.debug("Dehydrating ReferenceExpr");
     const target = expr.target;
     assert(target != null);
 
@@ -562,6 +609,7 @@ export default class Dehydrator {
   }
 
   private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {
+    log55.debug("Dehydrating Args");
     return combineLatest(args.map((arg) => this.dehydrateExpr$(arg)));
   }
 }

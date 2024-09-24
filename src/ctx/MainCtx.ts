@@ -23,6 +23,7 @@ const ctxEffect_ = Effect.gen(function* () {
   yield* FocusCtx.register();
   yield* ExprFocusCtx.register();
   yield* ExObjectFocusCtx.register();
+
   // yield* GoBridgeCtx;
 
   const dehydrator = new Dehydrator();
@@ -62,8 +63,11 @@ const ctxEffect_ = Effect.gen(function* () {
     log55.debug("Saving library project: start subscription");
     const library = yield* libraryCtx.library;
 
+
     const dehydratedLibraryProject$ = library.libraryProjects.items$.pipe(
-      log55.tapDebug("Saving library project: detected library projects change"),
+      // log55.tapDebug(
+      //   "Saving library project: detected library projects change"
+      // ),
       switchMap((libraryProjects) => {
         const vv = libraryProjects.map((libraryProject) => {
           log55.debug("Saving library project: dehydrating library project");
@@ -90,6 +94,12 @@ const ctxEffect_ = Effect.gen(function* () {
           });
         }
       )
+    ).pipe(
+      Effect.catchAll((error) => {
+        return Effect.gen(function* () {
+          log55.error("Error saving library project", error);
+        });
+      })
     );
   });
 
