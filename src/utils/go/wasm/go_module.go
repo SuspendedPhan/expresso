@@ -135,7 +135,7 @@ func bootstrapGoModule() {
 				attributeSceneInstancePath := args[0].String()
 				result, err := evaluation.GetResult(attributeSceneInstancePath)
 				if err != nil {
-					return js.Null
+					return 0
 				}
 				return result
 			})
