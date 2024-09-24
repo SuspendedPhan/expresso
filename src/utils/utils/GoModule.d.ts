@@ -21,6 +21,8 @@ export default interface GoModule {
     addBasicProperty(exObjectId: string, propertyId: string): void;
   };
 
+  // todp CNT add clone number target
+
   Property: {
     create(propertyId: string): void;
     setExpr(propertyId: string, exprId: string): void;

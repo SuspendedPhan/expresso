@@ -57,6 +57,8 @@ func bootstrapGoModule() {
 		}),
 	}))
 
+	// todp CNT
+
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			propertyId := args[0].String()

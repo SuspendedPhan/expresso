@@ -3,6 +3,7 @@
     - object|earth / component|planet / object|circle > property|radius
     - object|earth / component|planet > property|velocity
     - object|earth > clone-count-property
+    - object|earth > clone-number-target
 
 - ItemInstancePath
     - object|earth: 5 / object|moon: 2 > property|radius
@@ -18,3 +19,16 @@
     - AppendPathSegment
 
 - ItemPath.fromItem
+- CloneNumber-ItemInstancePath -> Result
+
+
+
+Operations:
+- Eval ReferenceExpr
+    - CloneNumberTarget
+        Get clone number from target.exObject.ItemPath
+    - Property - Basic
+    - Property - Component Parameter
+    - Property - Clone Count
+    - Parameter - Custom Function
+    - Parameter - Custom Component
