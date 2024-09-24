@@ -2,9 +2,7 @@ import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
 import type { EventBusCtx } from "src/ctx/EventBusCtx";
-import {
-  CloneNumberTargetCtx
-} from "src/ex-object/CloneNumberTarget";
+import { CloneNumberTargetCtx } from "src/ex-object/CloneNumberTarget";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
@@ -146,10 +144,10 @@ const ctxEffect = Effect.gen(function* () {
         for (const property of properties) {
           yield ExprFactory2.Reference({ target: property });
         }
-        
+
         yield Effect.gen(function* () {
           return yield* ExprFactory2.Reference({
-            target: yield* CloneNumberTargetCtx.create({ exObject: ancestor }),
+            target: yield* CloneNumberTargetCtx.create({}),
           });
         });
       } else if (isType(ancestor, ComponentFactory.Custom)) {
