@@ -30,6 +30,7 @@ export interface ExItemBase {
   readonly ordinal: number;
   readonly parent$: SUB<Parent>;
   readonly parent: SubscriptionRef.SubscriptionRef<Parent>;
+  readonly project: Stream.Stream<Project>;
 
   // Completes when destroyed.
   readonly destroy$: SUB<void>;
@@ -53,7 +54,11 @@ export const ExItem = {
       yield* Effect.forkDaemon(
         Stream.runForEach(EffectUtils.obsToStream(parent$), (value) => {
           return Effect.gen(function* () {
-            log55.debug("createExItemBase: Setting parent (item, parent)", id, value);
+            log55.debug(
+              "createExItemBase: Setting parent (item, parent)",
+              id,
+              value
+            );
             yield* Ref.set(parent, value);
           });
         })
@@ -84,5 +89,15 @@ export const ExItem = {
       log55.debug2("getProject: Getting project for parent", parent);
       return yield* ExItem.getProject(parent);
     });
+  },
+
+  // gotta test this
+  getProject2(item: ExItem): Stream.Stream<Project> {
+    return item.parent.changes.pipe(Stream.flatMap((parent) => {
+      if (isType(parent, ProjectFactory)) {
+        return Stream.make(parent);
+      }
+      return parent === null ? Stream.empty : ExItem.getProject2(parent);
+    }));
   },
 };
