@@ -1,7 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
-import { CloneNumberTargetCtx } from "src/ex-object/CloneNumber";
+import { CloneNumberTargetCtx, type CloneNumberTarget } from "src/ex-object/CloneNumber";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -38,6 +38,7 @@ interface ExObject_ extends ExItemBase {
   get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
+  cloneNumberTarget: CloneNumberTarget;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -53,7 +54,8 @@ interface ExObjectCreationArgs {
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
 
-  // TODO: add clone number target here
+  cloneNumberTarget?: CloneNumberTarget;
+
   // TODO: dehydrate clone number target
   // TODO: hydrate clone number target
   // TODO: fix ReferenceExpr
@@ -89,6 +91,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs.cloneCountProperty ??
         (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
+      cloneNumberTarget: creationArgs.cloneNumberTarget ?? (yield* cloneNumberTargetCtx.create({})),
     };
 
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
