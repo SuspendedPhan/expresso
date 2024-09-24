@@ -16,7 +16,7 @@ const ctxEffect = Effect.gen(function* () {
   const eval$ = new Subject<Evaluation>();
 
   const effect = goModuleCtx.withGoModule((goModule) => {
-    return Effect.succeed<void>(void 0);
+    // return Effect.succeed<void>(void 0);
 
     return Effect.gen(function* () {
       log55.debug("eval");
