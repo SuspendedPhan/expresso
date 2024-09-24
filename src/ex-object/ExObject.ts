@@ -134,6 +134,12 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneCountProperty.parent$.next(exObject);
 
+    creationArgs2.children.forEach((child) => {
+      child.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneNumberTarget.parent$.next(exObject);
+
     const parentChanged_ = exObject.parent.changes;
     const parentChanged = parentChanged_;
     yield* Effect.forkDaemon(

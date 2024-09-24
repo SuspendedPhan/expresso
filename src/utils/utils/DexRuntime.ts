@@ -11,6 +11,7 @@ import { TelemetryCtxLive } from "src/ctx/TelemetryCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
+import { CloneNumberTargetCtxLive } from "src/ex-object/CloneNumberTarget";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
@@ -50,7 +51,8 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(RehydratorCtxLive),
   Layer.provideMerge(ProjectNameCtxLive),
   // Layer.provideMerge(TestTelemetryCtxLive),
-  Layer.provideMerge(TelemetryCtxLive)
+  Layer.provideMerge(TelemetryCtxLive),
+  Layer.provideMerge(CloneNumberTargetCtxLive),
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);

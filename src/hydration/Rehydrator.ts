@@ -5,8 +5,7 @@ import type { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import {
   CloneNumberTargetCtx,
-  CloneNumberTargetFactory,
-  type CloneNumberTarget,
+  type CloneNumberTarget
 } from "src/ex-object/CloneNumberTarget";
 import {
   ComponentFactory,

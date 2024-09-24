@@ -29,6 +29,10 @@ export interface ExItemBase {
   readonly id: string;
   readonly ordinal: number;
   readonly parent$: SUB<Parent>;
+
+  /**
+   * Readonly. Use `parent$` to change the parent.
+   */
   readonly parent: SubscriptionRef.SubscriptionRef<Parent>;
 
   // Completes when destroyed.
