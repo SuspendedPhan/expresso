@@ -29,7 +29,7 @@ import type { PropertyKind } from "src/ex-object/Property";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { log5 } from "src/utils/utils/Log5";
-import { RxFns } from "src/utils/utils/Utils";
+import { RxFns, type OBS } from "src/utils/utils/Utils";
 import {
   type DexVariantKind,
   type DexVariantUnion,
@@ -422,12 +422,11 @@ export default class Dehydrator {
   }
 
   dehydrateCloneNumberTarget(cloneNumberTarget: CloneNumberTarget) {
-    const { exObject } = cloneNumberTarget;
-    assert(exObject != null);
-    return {
+    log55.debug("Dehydrating CloneNumberTarget");
+    const extracted: DehydratedCloneNumberTarget = {
       id: cloneNumberTarget.id,
-      exObjectId: exObject.id,
     };
+    return extracted;
   }
 
   @loggedMethod

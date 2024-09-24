@@ -336,8 +336,6 @@ const ctxEffect = Effect.gen(function* () {
         cloneNumberTarget,
       });
 
-      cloneNumberTarget.exObject = exObject;
-
       log55.debug("rehydrateExObject.end", exObject);
       return exObject;
     });
