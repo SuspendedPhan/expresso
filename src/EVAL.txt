@@ -26,9 +26,23 @@
 Operations:
 - Eval ReferenceExpr
     - CloneNumberTarget
-        Get clone number from target.exObject.ItemPath
-    - Property - Basic
-    - Property - Component Parameter
-    - Property - Clone Count
-    - Parameter - Custom Function
-    - Parameter - Custom Component
+        Get ex-object id
+        Get clone number from ex-object in the ctx
+
+    - Property - Basic, Component Parameter, Clone Count
+        Get ItemInstancePath for property
+        Evaluate the property at the ItemInstancePath, if not evaluated yet
+        Add the result to ctx
+    
+    - Parameter - Custom Function, Custom Component
+        Get the evaluated value for the parameter id in the ctx
+
+- Get ItemPath for property
+    Return cached result if available
+    While parent, parent, parent:
+        Construct path
+
+- Get ItemInstancePath from ItemPath
+    For each path segment that is an ex-object:
+        Get the current clone number for this ex-object from the ctx
+        Annotate this segment with the clone number

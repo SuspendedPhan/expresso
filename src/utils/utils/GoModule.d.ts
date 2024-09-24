@@ -52,6 +52,8 @@ export default interface GoModule {
 
   Evaluator: {
     addRootExObject(id: string): void;
+    setParent(childId: string, parentId: string): void;
+    
     eval(): Evaluation;
     reset(): void;
 
