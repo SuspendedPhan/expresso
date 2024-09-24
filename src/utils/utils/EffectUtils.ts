@@ -7,7 +7,7 @@ import {
   StreamEmit,
   SubscriptionRef,
 } from "effect";
-import { BehaviorSubject, firstValueFrom, Observable } from "rxjs";
+import { BehaviorSubject, firstValueFrom, Observable, Subject } from "rxjs";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 
@@ -35,6 +35,21 @@ export const EffectUtils = {
       }
     );
     return stream;
+  },
+
+  streamToObs<T>(stream: Stream.Stream<T>): Effect.Effect<OBS<T>> {
+    return Effect.gen(function* () {
+      const subject = new Subject<T>();
+      yield* Effect.forkDaemon(
+        Stream.runForEach(stream, (value) => {
+          return Effect.gen(function* () {
+            log55.debug("streamToObs: Emitting value", value);
+            subject.next(value);
+          });
+        })
+      );
+      return subject;
+    });
   },
 
   /**

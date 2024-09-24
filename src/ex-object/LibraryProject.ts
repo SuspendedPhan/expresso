@@ -3,13 +3,16 @@ import { ReplaySubject } from "rxjs";
 import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { ProjectFactory2, type Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { Utils } from "src/utils/utils/Utils";
+import { Utils, type OBS } from "src/utils/utils/Utils";
 import { fields, variation } from "variant";
 
 export interface LibraryProject_ {
   id: string;
   name: SubscriptionRef.SubscriptionRef<string>;
   project$: ReplaySubject<Project>;
+
+  /** @deprecated */
+  name$: OBS<string>;
 }
 
 export const LibraryProjectFactory = variation(
@@ -44,9 +47,11 @@ export function LibraryProjectFactory2(
     };
 
     const project$ = new ReplaySubject<Project>(1);
+    const name = yield* SubscriptionRef.make(creationArgs2.name);
     const libraryProject: LibraryProject = LibraryProjectFactory({
       id: creationArgs2.id,
-      name: yield* SubscriptionRef.make(creationArgs2.name),
+      name,
+      name$: yield* EffectUtils.streamToObs(name.changes),
       project$,
     });
 
@@ -54,7 +59,7 @@ export function LibraryProjectFactory2(
     if (project === null) {
       project = yield* ProjectFactory2({});
     }
-    
+
     project$.next(project);
     project.libraryProject = libraryProject;
 

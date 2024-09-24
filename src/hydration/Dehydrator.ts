@@ -148,20 +148,24 @@ export default class Dehydrator {
   public dehydrateLibraryProject$(
     libraryProject: LibraryProject
   ): Observable<DehydratedLibraryProject> {
-    return libraryProject.project$.pipe(
+    const dehydratedProject$ = libraryProject.project$.pipe(
       switchMap((project) => {
         return this.dehydrateProject$(project);
-      }),
-      switchMap(async (deProject) => {
-        const name = await DexRuntime.runPromise(Ref.get(libraryProject.name));
-        const vv: DehydratedLibraryProject = {
+      })
+    );
+
+    const dehydratedLibraryProject$ = combineLatest([dehydratedProject$, libraryProject.name$]).pipe(
+      map(([deProject, name]) => {
+        const extracted: DehydratedLibraryProject = {
           libraryProjectId: libraryProject.id,
           name,
           project: deProject,
         };
-        return vv;
-      }),
+        return extracted;
+      })
     );
+
+    return dehydratedLibraryProject$;
   }
 
   public dehydrateProject$(project: Project): Observable<DehydratedProject> {
