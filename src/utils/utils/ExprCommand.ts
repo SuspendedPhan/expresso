@@ -7,12 +7,13 @@ import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { Expr, ExprFactory2 } from "src/ex-object/Expr";
+import { CloneNumberTargetFactory } from "src/ex-object/ReferenceExpr";
 import { ExprFocusFactory } from "src/focus/ExprFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import type { OBS } from "src/utils/utils/Utils";
+import { Utils, type OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
 
 // @ts-ignore
@@ -109,6 +110,7 @@ const ctxEffect = Effect.gen(function* () {
         const target = (yield* referenceExpr).target;
         assert(target !== null);
         const name = yield* EffectUtils.firstValueFrom(
+          // todp: CNT
           Expr.getReferenceTargetName$(target)
         );
 
@@ -143,6 +145,9 @@ const ctxEffect = Effect.gen(function* () {
         for (const property of properties) {
           yield ExprFactory2.Reference({ target: property });
         }
+        yield ExprFactory2.Reference({
+          target: CloneNumberTargetFactory({ id: ancestor.id }),
+        });
       } else if (isType(ancestor, ComponentFactory.Custom)) {
         for (const parameter of ancestor.parameters.items) {
           yield ExprFactory2.Reference({ target: parameter });

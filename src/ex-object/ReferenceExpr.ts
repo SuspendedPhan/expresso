@@ -3,8 +3,9 @@ import { Effect, Layer } from "effect";
 import type { ExprKind } from "src/ex-object/Expr";
 import { fields, matcher, variation } from "variant";
 
-export const CloneNumberReferenceFactory = variation(
-  "CloneNumberReference",
+
+export const CloneNumberTargetFactory = variation(
+  "CloneNumberTarget",
   fields<{
     /**
      * The id of the ex-object that holds the clone number.
@@ -12,8 +13,8 @@ export const CloneNumberReferenceFactory = variation(
     id: string;
   }>()
 );
-export type CloneNumberReference = ReturnType<
-  typeof CloneNumberReferenceFactory
+export type CloneNumberTarget = ReturnType<
+  typeof CloneNumberTargetFactory
 >;
 
 export class ReferenceExprCtx extends Effect.Tag("ReferenceExprCtx")<
