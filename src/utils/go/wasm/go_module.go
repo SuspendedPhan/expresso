@@ -111,7 +111,12 @@ func bootstrapGoModule() {
 	goModule.Set("ReferenceExpr", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()
-			targetId := args[1].String()
+
+			targetId := ""
+			if args[1].Type() != js.TypeNull {
+				targetId = args[1].String()
+			}
+
 			targetKind := args[2].String()
 
 			ev.ReferenceExprCreate(id)

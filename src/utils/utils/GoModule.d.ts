@@ -45,7 +45,7 @@ export default interface GoModule {
      * - ComponentParameter/Custom
      * - ExFuncParameter
      */
-    create(id: string, targetId: string, targetKind: string): void;
+    create(id: string, targetId: string | null, targetKind: string): void;
   };
 
   Evaluator: {

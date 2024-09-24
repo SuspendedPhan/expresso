@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
-import { CloneNumberReferenceFactory, type CloneNumberReference } from "src/ex-object/CloneNumberReference";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -17,6 +16,7 @@ import {
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Property, PropertyFactory } from "src/ex-object/Property";
+import { type CloneNumberReference, CloneNumberReferenceFactory } from "src/ex-object/ReferenceExpr";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {

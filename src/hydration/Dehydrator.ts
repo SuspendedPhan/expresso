@@ -25,6 +25,7 @@ import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
+import { ReferenceExpr_getTargetIdOrNull } from "src/ex-object/ReferenceExpr";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -61,7 +62,7 @@ type DehydratedExpr_ = {
   };
   ReferenceExpr: {
     id: string;
-    targetId: string;
+    targetId: string | null;
   };
 };
 
@@ -552,10 +553,11 @@ export default class Dehydrator {
 
     const target = expr.target;
     assert(target != null);
+
     return of(
       DehydratedExpr.ReferenceExpr({
         id: expr.id,
-        targetId: target.id,
+        targetId: ReferenceExpr_getTargetIdOrNull(expr),
       })
     );
   }

@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
+import { CloneNumberTargetCtx } from "src/ex-object/CloneNumber";
 import {
   CanvasComponentStore,
   ComponentFactory,
@@ -48,8 +49,17 @@ interface ExObjectCreationArgs {
   name?: string;
   componentProperties?: PropertyKind["ComponentParameterProperty"][];
   basicProperties?: PropertyKind["BasicProperty"][];
+
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
+
+  // TODO: add clone number target here
+  // TODO: dehydrate clone number target
+  // TODO: hydrate clone number target
+  // TODO: fix ReferenceExpr
+  // TODO: add clone number target to GoBridge
+  // TODO: add clone number target to go_module
+  // TODO: eval clone number reference
 }
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
@@ -57,6 +67,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.start");
 
     const eventBusCtx = yield* EventBusCtx;
+    const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
 
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 

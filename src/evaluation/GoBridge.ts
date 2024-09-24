@@ -4,6 +4,7 @@ import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
+import { ReferenceExprCtx } from "src/ex-object/ReferenceExpr";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
@@ -19,6 +20,7 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Starting GoBridgeCtx");
 
   const goModuleCtx = yield* GoModuleCtx;
+  const referenceExprCtx = yield* ReferenceExprCtx;
   const eventBusCtx = yield* EventBusCtx;
 
   const project$ = yield* Project.activeProject$;
@@ -140,9 +142,11 @@ const ctxEffect = Effect.gen(function* () {
                 return Effect.gen(function* () {
                   log55.debug("GoModule: Creating ReferenceExpr", expr_.id);
                   assert(expr_.target !== null);
+                  const targetId = referenceExprCtx.getTargetIdOrNull(expr_);
+
                   goModule.ReferenceExpr.create(
                     expr_.id,
-                    expr_.target.id,
+                    targetId,
                     expr_.target.type
                   );
                 });
