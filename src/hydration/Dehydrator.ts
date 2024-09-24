@@ -383,33 +383,9 @@ export default class Dehydrator {
       })
     );
 
-    log55.debug("DEBUG: 123");
-
     const deCloneNumberTarget = this.dehydrateCloneNumberTarget(
       exObject.cloneNumberTarget
     );
-
-    log55.debug("DEBUG: 1234");
-
-    deComponentProperties$.subscribe((deProperties) => {
-      log55.debug("DEBUG: Dehydrated ComponentProperties", deProperties);
-    });
-
-    deBasicProperties$.subscribe((deProperties) => {
-      log55.debug("DEBUG: Dehydrated BasicProperties", deProperties);
-    });
-
-    deCloneProperty$.subscribe((deProperty) => {
-      log55.debug("DEBUG: Dehydrated CloneProperty", deProperty);
-    });
-
-    deChildren$.subscribe((deChildren) => {
-      log55.debug("DEBUG: Dehydrated Children", deChildren);
-    });
-
-    exObject.name$.subscribe((name) => {
-      log55.debug("DEBUG: ExObject Name", name);
-    });
 
     const result = combineLatest([
       deComponentProperties$,
@@ -447,12 +423,7 @@ export default class Dehydrator {
 
   dehydrateCloneNumberTarget(cloneNumberTarget: CloneNumberTarget) {
     const { exObject } = cloneNumberTarget;
-    log55.debug("DEBUG: Dehydrating CloneNumberTarget");
-    if (exObject == null) {
-      console.error("ExObject is null");
-    }
     assert(exObject != null);
-    log55.debug("DEBUG: Dehydrated CloneNumberTarget");
     return {
       id: cloneNumberTarget.id,
       exObjectId: exObject.id,
@@ -463,14 +434,6 @@ export default class Dehydrator {
   public dehydrateComponentProperty$(
     property: PropertyKind["ComponentParameterProperty"]
   ): Observable<DehydratedComponentProperty> {
-    // property.expr$.subscribe((expr) => {
-    //   log55.debug("DEBUG: Dehydrating ComponentProperty: Expr", expr);
-    // });
-
-    return of([1]).pipe(
-      log55.tapDebug("DEBUG: Dehydrating ComponentProperty: Expr")
-    ) as any;
-
     log55.debug("Dehydrating ComponentProperty", property);
     return property.expr$.pipe(
       switchMap((expr) => {
