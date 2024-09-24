@@ -15,6 +15,7 @@
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
+  import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 
   // @ts-ignore
   const log55 = log5("EditorView.svelte");
@@ -68,6 +69,17 @@
       })
     );
   }
+
+  function debugEvaluator() {
+    // ctx.goModule.Evaluator.debug()
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const goModuleCtx = yield* GoModuleCtx;
+        const goModule = yield* goModuleCtx.getUnsafe();
+        goModule.Evaluator.debug();
+      })
+    );
+  }
 </script>
 
 <div bind:this={rootElement} class="w-max min-w-full">
@@ -88,9 +100,9 @@
         />
       </button>
 
-      <!-- <button on:click={() => ctx.goModule.Evaluator.debug()} class="btn block">
+      <button on:click={debugEvaluator} class="btn block">
         Debug Evaluator
-      </button> -->
+      </button>
     </div>
     <FlexContainer>
       {#if rootExObjects}

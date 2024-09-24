@@ -64,7 +64,7 @@ const ctxEffect = Effect.gen(function* () {
         log55.debug("Adding ExObject to Go: received from upstream: ex-object has been added");
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug("Adding ExObject to Go: executing: " + ++exObjectCounter);
+            log55.debug2("Go: Adding Object" + ++exObjectCounter);
 
             goModule.ExObject.create(exObject.id);
             goModule.ExObject.setCloneCountProperty(
@@ -92,14 +92,14 @@ const ctxEffect = Effect.gen(function* () {
         log55.debug("Adding Property to Go: received from upstream: property has been added");
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug("Go: Adding Property " + ++propertyCounter);
+            log55.debug2("Go: Adding Property " + ++propertyCounter);
 
             goModule.Property.create(property.id);
             yield* Effect.forkDaemon(
               Stream.runForEach(property.expr.changes, (value) => {
                 return goModuleCtx.withGoModule((goModule_) =>
                   Effect.gen(function* () {
-                    log55.debug("Go: Setting Expr for Property");
+                    log55.debug2("Go: Setting Expr for Property");
                     goModule_.Property.setExpr(property.id, value.id);
                   })
                 );
