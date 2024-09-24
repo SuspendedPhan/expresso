@@ -2,6 +2,10 @@ import assert from "assert-ts";
 import { Effect, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
+  CloneNumberTargetCtx,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
+import {
   CanvasComponentStore,
   ComponentFactory,
   type Component,
@@ -37,6 +41,7 @@ interface ExObject_ extends ExItemBase {
   get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
+  cloneNumberTarget: CloneNumberTarget;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -51,6 +56,7 @@ interface ExObjectCreationArgs {
 
   cloneCountProperty?: PropertyKind["CloneCountProperty"];
   children?: ExObject[];
+  cloneNumberTarget?: CloneNumberTarget;
 }
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
@@ -58,6 +64,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     log55.debug("ExObjectFactory2.start");
 
     const eventBusCtx = yield* EventBusCtx;
+    const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
     const component = creationArgs.component ?? CanvasComponentStore.circle;
 
     log55.debug("ExObjectFactory2.component", component);
@@ -78,6 +85,9 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         creationArgs.cloneCountProperty ??
         (yield* PropertyFactory2.CloneCountProperty({})),
       children: creationArgs.children ?? [],
+      cloneNumberTarget:
+        creationArgs.cloneNumberTarget ??
+        (yield* cloneNumberTargetCtx.create({})),
     };
 
     log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
@@ -111,6 +121,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       children,
       children$: children.items$,
       cloneCountProperty: creationArgs2.cloneCountProperty,
+      cloneNumberTarget: creationArgs2.cloneNumberTarget,
     });
 
     creationArgs2.componentProperties.forEach((property) => {

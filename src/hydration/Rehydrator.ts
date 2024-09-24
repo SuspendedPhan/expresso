@@ -4,6 +4,11 @@ import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import {
+  CloneNumberTargetCtx,
+  CloneNumberTargetFactory,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
+import {
   ComponentFactory,
   ComponentFactory2,
   type ComponentKind,
@@ -33,11 +38,11 @@ import {
 } from "src/ex-object/LibraryProject";
 import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
-import { CloneNumberTargetFactory } from "src/ex-object/ReferenceExpr";
 import {
   DehydratedExpr,
   type DehydratedBasicProperty,
   type DehydratedCloneCountProperty,
+  type DehydratedCloneNumberTarget,
   type DehydratedComponentProperty,
   type DehydratedCustomComponent,
   type DehydratedCustomComponentParameter,
@@ -75,6 +80,8 @@ export class RehydratorCtx extends Effect.Tag("RehydratorCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
+  const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
+
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
   const rehydratedComponentParameterProperties: RehydratedComponentParameterProperty[] =
@@ -279,7 +286,7 @@ const ctxEffect = Effect.gen(function* () {
   ): Effect.Effect<
     ExObject,
     never,
-    ComponentCtx | LibraryProjectCtx | EventBusCtx
+    ComponentCtx | LibraryProjectCtx | EventBusCtx | CloneNumberTargetCtx
   > {
     const effect = Effect.gen(function* () {
       log55.debug("rehydrateExObject.start", deExObject);
@@ -315,6 +322,10 @@ const ctxEffect = Effect.gen(function* () {
 
       log55.debug("rehydrateExObject.children", children);
 
+      const cloneNumberTarget = yield* rehydrateCloneNumberTarget(
+        deExObject.cloneNumberTarget
+      );
+
       const exObject: ExObject = yield* ExObjectFactory2({
         component,
         id: deExObject.id,
@@ -323,12 +334,25 @@ const ctxEffect = Effect.gen(function* () {
         basicProperties: basicPropertyL,
         cloneCountProperty,
         children,
+        cloneNumberTarget,
       });
 
       log55.debug("rehydrateExObject.end", exObject);
       return exObject;
     });
     return effect;
+  }
+
+  function rehydrateCloneNumberTarget(
+    deCloneNumberTarget: DehydratedCloneNumberTarget
+  ) {
+    return Effect.gen(function* () {
+      const target: CloneNumberTarget = yield* cloneNumberTargetCtx.create({
+        id: deCloneNumberTarget.id,
+      });
+      targetById.set(target.id, target);
+      return target;
+    });
   }
 
   function rehydrateComponentProperty(deProperty: DehydratedComponentProperty) {
@@ -433,6 +457,7 @@ const ctxEffect = Effect.gen(function* () {
         referenceExpr: reference,
         dehydratedReferenceExpr: deExpr,
       });
+      // todp CNT remove
       const id = deExpr.targetId;
       assert(id !== null);
       const cloneNumberTarget = CloneNumberTargetFactory({ id });

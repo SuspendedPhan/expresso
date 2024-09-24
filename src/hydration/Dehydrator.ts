@@ -9,6 +9,7 @@ import {
   tap,
   type Observable,
 } from "rxjs";
+import type { CloneNumberTarget } from "src/ex-object/CloneNumberTarget";
 import type { ComponentFactory, ComponentKind } from "src/ex-object/Component";
 import type {
   ComponentParameterFactory,
@@ -25,7 +26,6 @@ import { ExprFactory, type Expr, type ExprKind } from "src/ex-object/Expr";
 import type { LibraryProject } from "src/ex-object/LibraryProject";
 import type { Project } from "src/ex-object/Project";
 import type { PropertyKind } from "src/ex-object/Property";
-import { ReferenceExpr_getTargetIdOrNull } from "src/ex-object/ReferenceExpr";
 import Logger from "src/utils/logger/Logger";
 import { loggedMethod } from "src/utils/logger/LoggerDecorator";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -125,6 +125,14 @@ export interface DehydratedExObject {
   basicProperties: DehydratedBasicProperty[];
   cloneProperty: DehydratedCloneCountProperty;
   children: DehydratedExObject[];
+  cloneNumberTarget: DehydratedCloneNumberTarget;
+}
+
+export interface DehydratedCloneNumberTarget {
+  id: string;
+
+  // todp CNT remove?
+  exObjectId: string;
 }
 
 export interface DehydratedComponentProperty {
@@ -383,6 +391,8 @@ export default class Dehydrator {
       log55.tapDebug("dehydrateExObject$.deChildren$.combineLatest.end")
     );
 
+    const deCloneNumberTarget = this.dehydrateCloneNumberTarget(exObject.cloneNumberTarget);
+
     const result = combineLatest([
       deComponentProperties$,
       deBasicProperties$,
@@ -408,6 +418,7 @@ export default class Dehydrator {
             basicProperties: deBasicProperties,
             cloneProperty: deCloneProperty,
             children: deChildren,
+            cloneNumberTarget: deCloneNumberTarget,
           };
           return deExObject;
         }
@@ -416,6 +427,15 @@ export default class Dehydrator {
     );
 
     return result;
+  }
+
+  dehydrateCloneNumberTarget(cloneNumberTarget: CloneNumberTarget) {
+    const { exObject } = cloneNumberTarget;
+    assert(exObject != null);
+    return {
+      id: cloneNumberTarget.id,
+      exObjectId: exObject.id,
+    };
   }
 
   @loggedMethod
