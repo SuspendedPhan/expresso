@@ -95,20 +95,13 @@ export const ExprFactory2 = {
         ...base,
         value: creationArgs2.value,
       });
-      const parentChanged_ = expr.parent.changes;
-      const parentChanged = parentChanged_;
+      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
       yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
+        Stream.runForEach(project, (_) => {
           return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug2("Skipping publishing exprAdded");
-              return true;
-            }
             log55.debug2("Publishing exprAdded: " + expr.type);
-
             yield* eventBusCtx.exprAdded.publish(expr);
-            return false;
-          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+          });
         })
       );
       return expr;
@@ -118,7 +111,7 @@ export const ExprFactory2 = {
   Reference(creationArgs: ExprCreationArgs["Reference"]) {
     return Effect.gen(function* () {
       const eventBusCtx = yield* EventBusCtx;
-      
+
       const creationArgs2: Required<ExprCreationArgs["Reference"]> = {
         id: creationArgs.id ?? Utils.createId("expr"),
         target: creationArgs.target,
@@ -129,20 +122,13 @@ export const ExprFactory2 = {
         ...base,
         target: creationArgs2.target,
       });
-      const parentChanged_ = expr.parent.changes;
-      const parentChanged = parentChanged_;
+      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
       yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
+        Stream.runForEach(project, (_) => {
           return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug2("Skipping publishing exprAdded");
-              return true;
-            }
             log55.debug2("Publishing exprAdded: " + expr.type);
-
             yield* eventBusCtx.exprAdded.publish(expr);
-            return false;
-          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+          });
         })
       );
       return expr;
@@ -185,21 +171,14 @@ export const ExprFactory2 = {
       for (const arg of creationArgs2.args) {
         arg.parent$.next(expr);
       }
-      
-      const parentChanged_ = expr.parent.changes;
-      const parentChanged = parentChanged_;
-      yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
-          return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug2("Skipping publishing exprAdded");
-              return true;
-            }
-            log55.debug2("Publishing exprAdded: " + expr.type);
 
+      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
+      yield* Effect.forkDaemon(
+        Stream.runForEach(project, (_) => {
+          return Effect.gen(function* () {
+            log55.debug2("Publishing exprAdded: " + expr.type);
             yield* eventBusCtx.exprAdded.publish(expr);
-            return false;
-          }).pipe(Effect.withSpan("ExprFactory2.parentChanged"));
+          });
         })
       );
 

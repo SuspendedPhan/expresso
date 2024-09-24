@@ -30,7 +30,6 @@ export interface ExItemBase {
   readonly ordinal: number;
   readonly parent$: SUB<Parent>;
   readonly parent: SubscriptionRef.SubscriptionRef<Parent>;
-  readonly project: Stream.Stream<Project>;
 
   // Completes when destroyed.
   readonly destroy$: SUB<void>;
@@ -78,20 +77,19 @@ export const ExItem = {
   getProject(item: ExItem): Effect.Effect<Project> {
     return Effect.gen(function* () {
       if (isType(item, ProjectFactory)) {
-        log55.debug2("getProject: Returning project", item);
+        log55.debug("getProject: Returning project", item);
         return item;
       }
       const parent = yield* item.parent.get;
       if (parent === null) {
-        log55.debug2("getProject: No parent found for item", item);
+        log55.debug("getProject: No parent found for item", item);
         throw new Error("No parent found for item");
       }
-      log55.debug2("getProject: Getting project for parent", parent);
+      log55.debug("getProject: Getting project for parent", parent);
       return yield* ExItem.getProject(parent);
     });
   },
 
-  // gotta test this
   getProject2(item: ExItem): Stream.Stream<Project> {
     return item.parent.changes.pipe(Stream.flatMap((parent) => {
       if (isType(parent, ProjectFactory)) {
