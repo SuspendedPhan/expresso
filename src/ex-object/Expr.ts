@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
+import { of } from "rxjs";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   ComponentParameterFactory,
@@ -16,7 +17,7 @@ import {
 } from "src/ex-object/ExFuncParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { Property, PropertyFactory } from "src/ex-object/Property";
-import { type CloneNumberReference, CloneNumberReferenceFactory } from "src/ex-object/ReferenceExpr";
+import { type CloneNumberTarget, CloneNumberTargetFactory } from "src/ex-object/ReferenceExpr";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
@@ -47,7 +48,7 @@ export type ReferenceTarget =
   | Property
   | ComponentParameterKind["Custom"]
   | ExFuncParameter
-  | CloneNumberReference;
+  | CloneNumberTarget;
 
 interface CallExpr_ extends ExItemBase {
   args$: OBS<Expr[]>;
@@ -110,7 +111,6 @@ export const ExprFactory2 = {
     });
   },
 
-  // todp CNT ?
   Reference(creationArgs: ExprCreationArgs["Reference"]) {
     return Effect.gen(function* () {
       const eventBusCtx = yield* EventBusCtx;
@@ -258,8 +258,8 @@ export const Expr = {
       return target.name$;
     }
 
-    if (isType(target, CloneNumberReferenceFactory)) {
-      return "Clone Number";
+    if (isType(target, CloneNumberTargetFactory)) {
+      return of("Clone Number");
     }
 
     throw new Error("Unknown target type");

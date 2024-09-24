@@ -33,6 +33,7 @@ import {
 } from "src/ex-object/LibraryProject";
 import { Project, ProjectFactory2 } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { CloneNumberTargetFactory } from "src/ex-object/ReferenceExpr";
 import {
   DehydratedExpr,
   type DehydratedBasicProperty,
@@ -143,9 +144,9 @@ const ctxEffect = Effect.gen(function* () {
   function assignTargets() {
     return Effect.gen(function* () {
       for (const reRefExpr of rehydratedReferenceExprs) {
-        const target = targetById.get(
-          reRefExpr.dehydratedReferenceExpr.targetId
-        );
+        const targetId = reRefExpr.dehydratedReferenceExpr.targetId;
+        assert(targetId !== null);
+        const target = targetById.get(targetId);
         assert(target !== undefined);
         reRefExpr.referenceExpr.target = target;
       }
@@ -422,7 +423,6 @@ const ctxEffect = Effect.gen(function* () {
     });
   }
 
-  // todp CNT
   function rehydrateReferenceExpr(deExpr: DehydratedExprKind["ReferenceExpr"]) {
     return Effect.gen(function* () {
       const reference = yield* ExprFactory2.Reference({
@@ -433,6 +433,10 @@ const ctxEffect = Effect.gen(function* () {
         referenceExpr: reference,
         dehydratedReferenceExpr: deExpr,
       });
+      const id = deExpr.targetId;
+      assert(id !== null);
+      const cloneNumberTarget = CloneNumberTargetFactory({ id });
+      targetById.set(reference.id, cloneNumberTarget);
       return reference;
     });
   }

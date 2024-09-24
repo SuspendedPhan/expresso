@@ -13,7 +13,7 @@ import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import { Utils, type OBS } from "src/utils/utils/Utils";
+import { type OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
 
 // @ts-ignore
@@ -110,7 +110,6 @@ const ctxEffect = Effect.gen(function* () {
         const target = (yield* referenceExpr).target;
         assert(target !== null);
         const name = yield* EffectUtils.firstValueFrom(
-          // todp: CNT
           Expr.getReferenceTargetName$(target)
         );
 

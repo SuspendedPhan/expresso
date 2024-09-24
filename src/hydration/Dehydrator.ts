@@ -554,11 +554,10 @@ export default class Dehydrator {
     const target = expr.target;
     assert(target != null);
 
-    // todp: CNT
     return of(
       DehydratedExpr.ReferenceExpr({
         id: expr.id,
-        targetId: ReferenceExpr_getTargetIdOrNull(expr),
+        targetId: target.id,
       })
     );
   }

@@ -71,6 +71,7 @@ func (e *Evaluator) EvalExpr(exprId string) Float {
 			property := e.PropertyById[targetId]
 			return e.EvalExpr(property.ExprId)
 		}
+		// todp CNT
 		panic("evaluating reference expr: unexpected targetKind " + targetKind)
 	}
 
