@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
+import { CloneNumberReferenceFactory, type CloneNumberReference } from "src/ex-object/CloneNumberReference";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -45,7 +46,8 @@ export interface ExprReplacement {
 export type ReferenceTarget =
   | Property
   | ComponentParameterKind["Custom"]
-  | ExFuncParameter;
+  | ExFuncParameter
+  | CloneNumberReference;
 
 interface CallExpr_ extends ExItemBase {
   args$: OBS<Expr[]>;
@@ -253,6 +255,10 @@ export const Expr = {
 
     if (isType(target, ExFuncParameterFactory)) {
       return target.name$;
+    }
+
+    if (isType(target, CloneNumberReferenceFactory)) {
+      return "Clone Number";
     }
 
     throw new Error("Unknown target type");
