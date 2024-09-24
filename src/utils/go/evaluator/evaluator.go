@@ -48,7 +48,7 @@ func (e *Evaluator) AddRootExObject(exObjectId string) {
 	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
 }
 
-func (e *Evaluator) EvalExpr(exprId string) Float {
+func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, exprId string) Float {
 	expr, found := e.ExprById[exprId]
 	if !found {
 		panic("expr not found " + exprId)
@@ -59,8 +59,8 @@ func (e *Evaluator) EvalExpr(exprId string) Float {
 	}
 
 	if expr.CallExpr != nil {
-		arg0 := e.EvalExpr(expr.CallExpr.arg0Id)
-		arg1 := e.EvalExpr(expr.CallExpr.arg1Id)
+		arg0 := e.EvalExpr(ctx, expr.CallExpr.arg0Id)
+		arg1 := e.EvalExpr(ctx, expr.CallExpr.arg1Id)
 		return arg0 + arg1
 	}
 
@@ -69,7 +69,7 @@ func (e *Evaluator) EvalExpr(exprId string) Float {
 		targetKind := expr.ReferenceExpr.TargetKind
 		if targetKind == "Property/BasicProperty" {
 			property := e.PropertyById[targetId]
-			return e.EvalExpr(property.ExprId)
+			return e.EvalExpr(ctx, property.ExprId)
 		}
 		// todp CNT
 		panic("evaluating reference expr: unexpected targetKind " + targetKind)

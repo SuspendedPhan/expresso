@@ -12,9 +12,17 @@ var (
 	DexError = errors.New("DexError")
 )
 
+type EvaluationCtx struct {
+	evaluation *Evaluation
+}
+
 func (e *Evaluator) Eval() *Evaluation {
 	evaluation := &Evaluation{
 		resultByCanvasPropertyPath: make(map[string]Float),
+	}
+
+	ctx := &EvaluationCtx{
+		evaluation: evaluation,
 	}
 
 	for _, exObjectId := range e.RootExObjectIds {
@@ -24,14 +32,14 @@ func (e *Evaluator) Eval() *Evaluation {
 			panic("exObject not found " + exObjectId)
 		}
 
-		cloneCount := e.evalCloneCount(exObject)
+		cloneCount := e.evalCloneCount(ctx, exObject)
 		cloneCountCanvasPropertyPath := CreateCloneCountCanvasPropertyPath("", exObject.Id, exObject.CloneCountPropertyId)
 		evaluation.resultByCanvasPropertyPath[cloneCountCanvasPropertyPath] = cloneCount
 		for i := 0; i < int(cloneCount); i++ {
 			canvasObjectPath := CanvasObjectPathAppend("", exObject.Id, strconv.Itoa(i))
 			for _, propertyId := range exObject.ComponentParameterPropertyIds {
 				property := e.getProperty(propertyId)
-				value := e.EvalExpr(property.ExprId)
+				value := e.EvalExpr(ctx, property.ExprId)
 				canvasPropertyPath := CreateCanvasPropertyPath(property.Id, canvasObjectPath)
 				evaluation.resultByCanvasPropertyPath[canvasPropertyPath] = value + value*Float(i)
 			}
@@ -42,13 +50,13 @@ func (e *Evaluator) Eval() *Evaluation {
 	return evaluation
 }
 
-func (e *Evaluator) evalCloneCount(exObject *ExObject) Float {
+func (e *Evaluator) evalCloneCount(ctx *EvaluationCtx, exObject *ExObject) Float {
 	if exObject.CloneCountPropertyId == "" {
 		// panic(fmt.Errorf("%w: CloneCountProperty not set for exObject: %s", DexError, exObject.Id))
 		panic("CloneCountProperty not set for exObject: " + exObject.Id)
 	}
 	property := e.getProperty(exObject.CloneCountPropertyId)
-	count := e.EvalExpr(property.ExprId)
+	count := e.EvalExpr(ctx, property.ExprId)
 	return count
 }
 
