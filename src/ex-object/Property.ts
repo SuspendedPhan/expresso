@@ -102,10 +102,10 @@ export const PropertyFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug2("Skipping publishing propertyAdded");
+              log55.debug("Skipping publishing propertyAdded");
               return true;
             }
-            log55.debug2("Publishing propertyAdded");
+            log55.debug("Publishing propertyAdded");
 
             yield* eventBusCtx.propertyAdded.publish(property);
             return false;
@@ -152,10 +152,10 @@ export const PropertyFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug2("Skipping publishing propertyAdded");
+              log55.debug("Skipping publishing propertyAdded");
               return true;
             }
-            log55.debug2("Publishing propertyAdded");
+            log55.debug("Publishing propertyAdded");
 
             yield* eventBusCtx.propertyAdded.publish(property);
             return false;
@@ -194,10 +194,10 @@ export const PropertyFactory2 = {
         Stream.runForEachWhile(parentChanged, (parent_) => {
           return Effect.gen(function* () {
             if (parent_ === null) {
-              log55.debug2("Skipping publishing propertyAdded");
+              log55.debug("Skipping publishing propertyAdded");
               return true;
             }
-            log55.debug2("Publishing propertyAdded");
+            log55.debug("Publishing propertyAdded");
 
             yield* eventBusCtx.propertyAdded.publish(property);
             return false;

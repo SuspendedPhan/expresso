@@ -116,10 +116,11 @@ const ctxEffect = Effect.gen(function* () {
   yield* Effect.forkDaemon(
     Stream.runForEach(exprAdded, (expr) => {
       return Effect.gen(function* () {
-        log55.debug2("Adding Expr to Go: received from upstream: expr has been added");
+        log55.debug("Adding Expr to Go: received from upstream: expr has been added");
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug2("Go: Adding Expr " + ++exprCounter);
+            // log55.debug2("Go: Adding Expr " + ++exprCounter);
+            log55.debug2(`Go: Adding Expr ${++exprCounter} ${expr.type}`);
 
             matcher(expr)
               .when(ExprFactory.Number, (expr) => {

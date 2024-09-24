@@ -99,7 +99,7 @@ export const ExprFactory2 = {
       yield* Effect.forkDaemon(
         Stream.runForEach(project, (_) => {
           return Effect.gen(function* () {
-            log55.debug2("Publishing exprAdded: " + expr.type);
+            log55.debug("Publishing exprAdded: " + expr.type);
             yield* eventBusCtx.exprAdded.publish(expr);
           });
         })
@@ -126,7 +126,7 @@ export const ExprFactory2 = {
       yield* Effect.forkDaemon(
         Stream.runForEach(project, (_) => {
           return Effect.gen(function* () {
-            log55.debug2("Publishing exprAdded: " + expr.type);
+            log55.debug("Publishing exprAdded: " + expr.type);
             yield* eventBusCtx.exprAdded.publish(expr);
           });
         })
@@ -176,7 +176,7 @@ export const ExprFactory2 = {
       yield* Effect.forkDaemon(
         Stream.runForEach(project, (_) => {
           return Effect.gen(function* () {
-            log55.debug2("Publishing exprAdded: " + expr.type);
+            log55.debug("Publishing exprAdded: " + expr.type);
             yield* eventBusCtx.exprAdded.publish(expr);
           });
         })
