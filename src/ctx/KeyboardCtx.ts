@@ -33,7 +33,7 @@ const ctxEffect = Effect.gen(function* () {
       const keyArr = keys.split(",");
 
       return data$.pipe(
-        tap((data) => { log55.debug("onKeydown2$.data", data); }),
+        tap((data) => { log55.log3(9, "onKeydown2$.data", data); }),
         switchMap((data) => {
           if (data === false) {
             return of();

@@ -2,7 +2,7 @@ import deePool from "deepool";
 import type { LibCanvasObject } from "src/canvas/Canvas";
 import { log5 } from "src/utils/utils/Log5";
 
-const log55 = log5("CanvasPool.ts");
+const log55 = log5("CanvasPool.ts", 9);
 
 export default class CanvasPool {
   private circlePool;

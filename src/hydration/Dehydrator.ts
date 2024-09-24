@@ -45,7 +45,7 @@ import {
 } from "variant";
 import { pass } from "variant/lib/typed";
 
-const log55 = log5("Dehydrator.ts");
+const log55 = log5("Dehydrator.ts", 11);
 
 type DehydratedExpr_ = {
   Number: {
@@ -130,9 +130,6 @@ export interface DehydratedExObject {
 
 export interface DehydratedCloneNumberTarget {
   id: string;
-
-  // todp CNT remove?
-  exObjectId: string;
 }
 
 export interface DehydratedComponentProperty {

@@ -8,7 +8,7 @@ import { RxFns, type OBS } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
 import { isType, pass, type VariantOf } from "variant";
 
-const log55 = log5("ExprFocus.ts");
+const log55 = log5("ExprFocus.ts", 9);
 
 interface ExprFocus_ {
   Expr: { expr: Expr; isEditing: boolean };

@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 import { tap } from "rxjs";
 
+/*
+level 9 is for looping logs
+*/
+
 // const level_minimum = 1;
 const level_minimum = 11;
 // const level_minimum = 10;
@@ -39,7 +43,7 @@ export function log5(topic: string, levelOverride?: number) {
       log3(levelOverride ?? 10, `[${topic}]`, ...args);
     },
     debug2(...args: any[]) {
-      log3(11, `[${topic}]`, ...args);
+      log3(levelOverride ?? 11, `[${topic}]`, ...args);
     },
 
     error(...args: any[]) {
@@ -50,16 +54,16 @@ export function log5(topic: string, levelOverride?: number) {
      * @param level Lower levels get filtered out.
      */
     log3(level: number, ...args: any[]) {
-      log3(level, `[${topic}]`, ...args);
+      log3(levelOverride ?? level, `[${topic}]`, ...args);
     },
     tapInfo<T>(...args: any[]) {
       return tap<T>(() => {
-        log4.info(`[${topic}]`, ...args);
+        this.info(`[${topic}]`, ...args);
       });
     },
     tapDebug<T>(...args: any[]) {
       return tap<T>(() => {
-        log4.debug(`[${topic}]`, ...args);
+        this.debug(`[${topic}]`, ...args);
       });
     },
     debugEffect(...args: any[]) {

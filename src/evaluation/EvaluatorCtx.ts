@@ -19,15 +19,15 @@ const ctxEffect = Effect.gen(function* () {
     // return Effect.succeed<void>(void 0);
 
     return Effect.gen(function* () {
-      log55.debug("eval");
+      log55.log3(9, "eval");
       const evaluation = goModule.Evaluator.eval();
-      log55.debug("eval2");
+      log55.log3(9, "eval2");
       eval$.next(evaluation);
-      log55.debug("eval3");
+      log55.log3(9, "eval3");
       if (evaluation !== null) {
         evaluation.dispose();
       }
-      log55.debug("eval done");
+      log55.log3(9, "eval done");
     });
   });
 

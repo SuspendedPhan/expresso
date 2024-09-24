@@ -18,7 +18,7 @@ import type { Evaluation } from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
 
-const log55 = log5("Canvas.ts");
+const log55 = log5("Canvas.ts", 9);
 
 export type LibCanvasObject = Graphics;
 

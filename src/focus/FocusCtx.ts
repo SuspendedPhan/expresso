@@ -5,7 +5,7 @@ import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
 import type { EditableFocus } from "src/utils/views/Field";
 
-const log55 = log5("Focus.ts");
+const log55 = log5("FocusCtx.ts", 9);
 
 export enum Hotkeys {
   Down = "ArrowDown,s",
