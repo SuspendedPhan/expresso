@@ -2,7 +2,6 @@ import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
 import type { EventBusCtx } from "src/ctx/EventBusCtx";
-import { CloneNumberTargetCtx } from "src/ex-object/CloneNumberTarget";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
@@ -115,6 +114,7 @@ const ctxEffect = Effect.gen(function* () {
 
         const targetParent = yield* EffectUtils.firstValueFrom(target.parent$);
         let label;
+        log55.debug2("Creating ExprReference command: Getting parent name for label", targetParent);
         if (isType(targetParent, ExObjectFactory)) {
           const parentName = yield* EffectUtils.firstValueFrom(
             targetParent.name$
@@ -147,7 +147,7 @@ const ctxEffect = Effect.gen(function* () {
 
         yield Effect.gen(function* () {
           return yield* ExprFactory2.Reference({
-            target: yield* CloneNumberTargetCtx.create({}),
+            target: ancestor.cloneNumberTarget,
           });
         });
       } else if (isType(ancestor, ComponentFactory.Custom)) {
