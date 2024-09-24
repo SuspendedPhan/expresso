@@ -95,12 +95,14 @@ func bootstrapGoModule() {
 		"setArg0": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()
 			argId := args[1].String()
+			logger.Log("CallExpr.setArg0", id, argId)
 			ev.CallExprSetArg0(id, argId)
 			return nil
 		}),
 		"setArg1": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()
 			argId := args[1].String()
+			logger.Log("CallExpr.setArg1", id, argId)
 			ev.CallExprSetArg1(id, argId)
 			return nil
 		}),
