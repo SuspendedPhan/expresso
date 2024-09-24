@@ -457,11 +457,8 @@ const ctxEffect = Effect.gen(function* () {
         referenceExpr: reference,
         dehydratedReferenceExpr: deExpr,
       });
-      // todp CNT remove
       const id = deExpr.targetId;
       assert(id !== null);
-      const cloneNumberTarget = CloneNumberTargetFactory({ id });
-      targetById.set(reference.id, cloneNumberTarget);
       return reference;
     });
   }
