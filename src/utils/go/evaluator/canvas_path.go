@@ -1,3 +1,5 @@
+// File: canvas_path.go
+
 package evaluator
 
 func CanvasObjectPathAppend(basePath string, componentId string, cloneId string) string {

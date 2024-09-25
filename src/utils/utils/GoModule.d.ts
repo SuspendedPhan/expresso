@@ -1,3 +1,5 @@
+// File: GoModule.d.ts
+
 import type { Property } from "src/ex-object/Property";
 import { CanvasObjectPath } from "src/scene/CanvasObject";
 import type { TypesOf } from "variant";

@@ -1,3 +1,5 @@
+// File: Canvas.ts
+
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 import { withLatestFrom } from "rxjs";
