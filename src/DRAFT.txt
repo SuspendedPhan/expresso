@@ -1,3 +1,7 @@
+I will construct a project at runtime. The project's root objects will be evaluated on each frame.
+Write a concise spec of how it should be evaluated. Don't need to use full sentences, and you can use symbols where appropriate.
+The spec should be easily grokkable at a glance.
+
 [Project]
   ├─ has → [ExObject] (root objects) *
   ├─ has → [Component] *

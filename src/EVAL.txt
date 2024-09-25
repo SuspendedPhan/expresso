@@ -18,10 +18,16 @@
     - CreateCloneCountPropertyPathSegment
     - AppendPathSegment
 
+- CreatePropertyInstancePath
+- CreateObjectInstancePath
+- CreateComponentInstancePath
+- CreatePropertyInstancePath
+- CreateCloneCountPropertyInstancePath
+- AppendInstancePath
+
 - ItemPath.fromItem
 - CloneNumber-ItemInstancePath -> Result
-
-
+- CreateItemInstancePath
 
 Operations:
 - Eval ReferenceExpr
