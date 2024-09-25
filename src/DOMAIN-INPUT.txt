@@ -1,0 +1,1837 @@
+Create a description of my domain. Don't use full sentences. Use a symbolic language that is concise and easily understandable.. grokkable from a glance, rather than reading sentences.
+
+I'm interested in mapping the relationship between these objects:
+CloneNumberTarget
+Component
+ComponentParameter
+ExFunc
+ExFuncParameter
+ExItem
+ExObject
+Expr
+Project
+Property (basic, etc...)
+
+
+Here are the files:
+// File: CloneNumberTarget.ts
+
+import { Effect, Layer } from "effect";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { Utils } from "src/utils/utils/Utils";
+import { fields, variation } from "variant";
+
+interface CloneNumberTarget_ extends ExItemBase {}
+
+export const CloneNumberTargetFactory = variation(
+  "CloneNumberTarget",
+  fields<CloneNumberTarget_>()
+);
+export type CloneNumberTarget = ReturnType<typeof CloneNumberTargetFactory>;
+
+interface CloneNumberTargetCreationArgs {
+  id?: string;
+}
+
+export class CloneNumberTargetCtx extends Effect.Tag("CloneNumberTargetCtx")<
+  CloneNumberTargetCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
+
+const ctxEffect = Effect.gen(function* () {
+  return {
+    create(creationArgs: CloneNumberTargetCreationArgs) {
+      return Effect.gen(function* () {
+        const creationArgs2: Required<CloneNumberTargetCreationArgs> = {
+          id: creationArgs.id ?? Utils.createId("clone-number-target"),
+        };
+
+        const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+        const cloneNumberTarget: CloneNumberTarget = CloneNumberTargetFactory({
+          ...base,
+        });
+        return cloneNumberTarget;
+      });
+    },
+  };
+});
+
+export const CloneNumberTargetCtxLive = Layer.effect(
+  CloneNumberTargetCtx,
+  ctxEffect
+);
+
+// File: Component.ts
+
+import { Effect } from "effect";
+import { BehaviorSubject, of } from "rxjs";
+import type { LibCanvasObject } from "src/canvas/Canvas";
+import {
+  ComponentParameterFactory,
+  ComponentParameterFactory2,
+  type ComponentParameterKind,
+} from "src/ex-object/ComponentParameter";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import {
+  createObservableArrayWithLifetime,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
+import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
+import { matcher, pass, type VariantOf } from "variant";
+
+// const log55 = log5("Component.ts");
+
+export type CanvasSetter = (
+  canvasObject: LibCanvasObject,
+  value: number
+) => void;
+
+interface CanvasComponent_ {
+  id: string;
+  parameters: ComponentParameterKind["Canvas"][];
+}
+
+interface CustomComponent_ extends ExItemBase {
+  name$: SUB<string>;
+  parameters: ObservableArray<ComponentParameterKind["Custom"]>;
+  rootExObjects: ObservableArray<ExObject>;
+  properties: ObservableArray<PropertyKind["BasicProperty"]>;
+}
+
+type CustomComponent2_ = CustomComponent_ &
+  ReturnType<typeof customComponentMethodsFactory>;
+
+export interface ComponentCreationArgs {
+  Custom: {
+    id?: string;
+    name?: string;
+    parameters?: ComponentParameterKind["Custom"][];
+    rootExObjects?: ExObject[];
+    properties?: PropertyKind["BasicProperty"][];
+  };
+}
+
+interface Component_ {
+  Canvas: CanvasComponent_;
+  Custom: CustomComponent2_;
+}
+
+export const ComponentFactory = dexVariant.scoped("Component")(
+  dexVariant.typed<Component_>({
+    Canvas: pass,
+    Custom: pass,
+  })
+);
+
+export type Component = VariantOf<typeof ComponentFactory>;
+export type ComponentKind = DexVariantKind<typeof ComponentFactory>;
+
+export const ComponentFactory2 = {
+  Custom: (creationArgs: ComponentCreationArgs["Custom"]) =>
+    Effect.gen(function* () {
+      const creationArgs2: Required<ComponentCreationArgs["Custom"]> = {
+        id: creationArgs.id ?? Utils.createId("custom-component"),
+        name: creationArgs.name ?? "Component",
+        parameters: creationArgs.parameters ?? [],
+        rootExObjects: creationArgs.rootExObjects ?? [],
+        properties: creationArgs.properties ?? [],
+      };
+
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+      const component_: CustomComponent_ = {
+        ...base,
+        name$: new BehaviorSubject(creationArgs2.name),
+        parameters: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.parameters
+        ),
+        rootExObjects: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.rootExObjects
+        ),
+        properties: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.properties
+        ),
+      };
+
+      const component2_: CustomComponent2_ = {
+        ...component_,
+        ...customComponentMethodsFactory(component_),
+      };
+
+      const component = ComponentFactory.Custom(component2_);
+
+      creationArgs2.rootExObjects.forEach((rootExObject) => {
+        rootExObject.parent$.next(component);
+      });
+
+      return component;
+    }),
+};
+
+function customComponentMethodsFactory(component: CustomComponent_) {
+  return {
+    addParameterBlank() {
+      return Effect.gen(function* () {
+        const parameter = yield* ComponentParameterFactory2.Custom({});
+        yield* component.parameters.push(parameter);
+        return parameter;
+      });
+    },
+
+    addPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        yield* component.properties.push(property);
+        return property;
+      });
+    },
+  };
+}
+
+export const CanvasComponentStore = {
+  circle: ComponentFactory.Canvas({
+    id: "circle",
+    parameters: [
+      ComponentParameterFactory.Canvas({
+        name: "x",
+        id: "x",
+        canvasSetter: (pixiObject, value) => {
+          pixiObject.x = value;
+        },
+      }),
+    ],
+  }),
+} satisfies Record<string, ComponentKind["Canvas"]>;
+
+export const Component = {
+  getName$(component: Component): OBS<string> {
+    return matcher(component)
+      .when(ComponentFactory.Canvas, (component) => {
+        return of(component.id);
+      })
+      .when(ComponentFactory.Custom, (component) => {
+        return component.name$;
+      })
+      .complete();
+  },
+
+  addRootExObjectBlank(component: ComponentKind["Custom"]) {
+    return Effect.gen(function* () {
+      const exObject = yield* ExObjectFactory2({});
+      exObject.parent$.next(component);
+      yield* component.rootExObjects.push(exObject);
+    });
+  },
+};
+// File: ComponentParameter.ts
+
+import { Effect } from "effect";
+import { BehaviorSubject, of } from "rxjs";
+import type { CanvasSetter } from "src/ex-object/Component";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { type OBS, type SUB, Utils } from "src/utils/utils/Utils";
+import {
+  dexScopedVariant,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
+import { fields, matcher, type VariantOf } from "variant";
+
+interface CanvasComponentParameter {
+  readonly id: string;
+  readonly name: string;
+  readonly canvasSetter: CanvasSetter;
+}
+
+interface CustomComponentParameter extends ExItemBase {
+  readonly id: string;
+  readonly name$: SUB<string>;
+}
+
+export interface ComponentParameterCreationArgs {
+  CustomComponentParameter: {
+    id?: string;
+    name?: string;
+  };
+}
+
+export const ComponentParameterFactory = dexScopedVariant(
+  "ComponentParameter",
+  {
+    Canvas: fields<CanvasComponentParameter>(),
+    Custom: fields<CustomComponentParameter>(),
+  }
+);
+
+export type ComponentParameter = VariantOf<typeof ComponentParameterFactory>;
+export type ComponentParameterKind = DexVariantKind<
+  typeof ComponentParameterFactory
+>;
+
+export const ComponentParameterFactory2 = {
+  Custom(
+    creationArgs: ComponentParameterCreationArgs["CustomComponentParameter"]
+  ) {
+    return Effect.gen(function* () {
+      const creationArgs2: Required<
+        ComponentParameterCreationArgs["CustomComponentParameter"]
+      > = {
+        id: creationArgs.id ?? Utils.createId("custom-component-parameter"),
+        name: creationArgs.name ?? "Parameter",
+      };
+
+      const base = yield* ExItem.createExItemBase(creationArgs2.id);
+      const parameter = ComponentParameterFactory.Custom({
+        ...base,
+        id: creationArgs2.id,
+        name$: new BehaviorSubject(creationArgs2.name),
+      });
+      return parameter;
+    });
+  },
+};
+
+export const ComponentParameter = {
+  getName$(componentParameter: ComponentParameter): OBS<string> {
+    return matcher(componentParameter)
+      .when(ComponentParameterFactory.Canvas, (componentParameter) => {
+        return of(componentParameter.name);
+      })
+      .when(ComponentParameterFactory.Custom, (componentParameter) => {
+        return componentParameter.name$;
+      })
+      .complete();
+  },
+};
+// File: ExFunc.ts
+
+import { Effect } from "effect";
+import { of } from "rxjs";
+import {
+  ExFuncParameterFactory2,
+  type ExFuncParameter,
+} from "src/ex-object/ExFuncParameter";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExprFactory2, type Expr } from "src/ex-object/Expr";
+import { Project } from "src/ex-object/Project";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import {
+  createBehaviorSubjectWithLifetime,
+  Utils,
+  type BSUB,
+} from "src/utils/utils/Utils";
+import {
+  dexScopedVariant,
+  type DexVariantKind,
+} from "src/utils/utils/VariantUtils4";
+import { fields, isType, variation, type VariantOf } from "variant";
+
+const log55 = log5("ExFunc.ts");
+
+export type ExFunc = CustomExFunc | SystemExFunc;
+
+type CustomExFunc_ = ExItemBase & {
+  id: string;
+  name$: BSUB<string>;
+  expr$: BSUB<Expr>;
+  parameters: ObservableArray<ExFuncParameter>;
+};
+
+type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
+
+export const SystemExFuncFactory = dexScopedVariant("ExFunc.System", {
+  Add: () => ({ name: "Add", parameterCount: 2 }),
+});
+
+export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
+export type SystemExFuncKind = DexVariantKind<typeof SystemExFuncFactory>;
+
+export const CustomExFuncFactory = variation(
+  "ExFunc.Custom",
+  fields<CustomExFunc2_>()
+);
+export type CustomExFunc = ReturnType<typeof CustomExFuncFactory>;
+
+interface CustomExFuncCreationArgs {
+  id?: string;
+  name?: string;
+  expr?: Expr;
+  exFuncParameterArr?: ExFuncParameter[];
+}
+
+export const CustomExFuncFactory2 = {
+  Custom(creationArgs: CustomExFuncCreationArgs) {
+    return Effect.gen(function* () {
+      let name = creationArgs.name;
+      if (name === undefined) {
+        const project: Project = yield* Project.activeProject;
+        const ordinal = yield* Project.Methods(project).getAndIncrementOrdinal();
+        name = `Function ${ordinal}`;
+      }
+
+      const creationArgs2: Required<CustomExFuncCreationArgs> = {
+        id: creationArgs.id ?? Utils.createId("ex-func"),
+        name: creationArgs.name ?? `Function ${Utils.createId("ex-func")}`,
+        expr:
+          creationArgs.expr === undefined
+            ? yield* ExprFactory2.Number({})
+            : creationArgs.expr,
+        exFuncParameterArr: creationArgs.exFuncParameterArr ?? [],
+      };
+
+      const base: ExItemBase = yield* ExItem.createExItemBase(creationArgs2.id);
+      const customExFunc_ = {
+        ...base,
+        name$: createBehaviorSubjectWithLifetime(base.destroy$, name),
+        expr$: createBehaviorSubjectWithLifetime(
+          base.destroy$,
+          creationArgs2.expr
+        ),
+        parameters: createObservableArrayWithLifetime(
+          base.destroy$,
+          creationArgs2.exFuncParameterArr
+        ),
+      };
+      const customExFunc2_: CustomExFunc2_ = {
+        ...customExFunc_,
+        ...methodsFactory(customExFunc_),
+      };
+      log55.debug("CustomExFuncFactory2.Custom", customExFunc2_);
+      const exFunc = CustomExFuncFactory(customExFunc2_);
+      creationArgs2.expr.parent$.next(exFunc);
+      return exFunc;
+    });
+  },
+};
+
+export const ExFunc = {
+  name$(exFunc: ExFunc) {
+    if (isType(exFunc, CustomExFuncFactory)) {
+      return exFunc.name$;
+    }
+    return of(exFunc.name);
+  },
+};
+
+function methodsFactory(exFunc: CustomExFunc_) {
+  return {
+    addParameterBlank() {
+      return Effect.gen(function* () {
+        const param = yield* ExFuncParameterFactory2({});
+        yield* exFunc.parameters.push(param);
+        return param;
+      });
+    },
+  };
+}
+
+// File: ExFuncParameter.ts
+
+import { Effect } from "effect";
+
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
+import {
+  type SUB,
+  Utils,
+  createBehaviorSubjectWithLifetime,
+} from "src/utils/utils/Utils";
+import { fields, variation } from "variant";
+
+export const ExFuncParameterFactory = variation(
+  "ExFuncParameter",
+  fields<
+    {
+      name$: SUB<string>;
+    } & ExItemBase
+  >()
+);
+
+export type ExFuncParameter = ReturnType<typeof ExFuncParameterFactory>;
+export function ExFuncParameterFactory2(
+  creationArgs: ExFuncParameterCreationArgs
+) {
+  return Effect.gen(function* () {
+    const creationArgs2: Required<ExFuncParameterCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("ex-func-param"),
+      name:
+        creationArgs.name ??
+        `Parameter ${yield* Project.Methods(yield* Project.activeProject).getAndIncrementOrdinal()}`,
+    };
+
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+    return ExFuncParameterFactory({
+      ...base,
+      name$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.name
+      ),
+    });
+  });
+}
+
+export interface ExFuncParameterCreationArgs {
+  id?: string;
+  name?: string;
+}
+
+// File: ExItem.ts
+
+import { Effect, Ref, Stream, SubscriptionRef } from "effect";
+import { firstValueFrom, Subject } from "rxjs";
+import { type ComponentKind } from "src/ex-object/Component";
+import { type CustomExFunc } from "src/ex-object/ExFunc";
+import { type ExObject } from "src/ex-object/ExObject";
+import { type Expr } from "src/ex-object/Expr";
+import { Project, ProjectFactory } from "src/ex-object/Project";
+import type { Property } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createBehaviorSubjectWithLifetime,
+  type SUB,
+} from "src/utils/utils/Utils";
+import { isType } from "variant";
+
+const log55 = log5("ExItem.ts", 10);
+
+export type ExItem =
+  | Project
+  | ComponentKind["Custom"]
+  | ExObject
+  | Expr
+  | CustomExFunc
+  | Property;
+export type Parent = ExItem | null;
+
+export interface ExItemBase {
+  readonly id: string;
+  readonly ordinal: number;
+  readonly parent$: SUB<Parent>;
+
+  /**
+   * Readonly. Use `parent$` to change the parent.
+   */
+  readonly parent: SubscriptionRef.SubscriptionRef<Parent>;
+
+  // Completes when destroyed.
+  readonly destroy$: SUB<void>;
+}
+
+export const ExItem = {
+  async *getAncestors(item: ExItem): AsyncGenerator<ExItem> {
+    let parent: Parent = await firstValueFrom(item.parent$);
+    while (parent !== null) {
+      yield parent;
+      parent = await firstValueFrom(parent.parent$);
+    }
+  },
+
+  createExItemBase(id: string) {
+    return Effect.gen(function* () {
+      const destroy$ = new Subject<void>();
+
+      const parent$ = createBehaviorSubjectWithLifetime<Parent>(destroy$, null);
+      const parent = yield* SubscriptionRef.make<Parent>(null);
+      yield* Effect.forkDaemon(
+        Stream.runForEach(EffectUtils.obsToStream(parent$), (value) => {
+          return Effect.gen(function* () {
+            log55.debug(
+              "createExItemBase: Setting parent (item, parent)",
+              id,
+              value
+            );
+            yield* Ref.set(parent, value);
+          });
+        })
+      );
+
+      const exObjectBase: ExItemBase = {
+        id,
+        ordinal: 0,
+        parent$,
+        parent,
+        destroy$,
+      };
+      return exObjectBase;
+    });
+  },
+
+  getProject(item: ExItem): Effect.Effect<Project> {
+    return Effect.gen(function* () {
+      if (isType(item, ProjectFactory)) {
+        log55.debug("getProject: Returning project", item);
+        return item;
+      }
+      const parent = yield* item.parent.get;
+      if (parent === null) {
+        log55.debug("getProject: No parent found for item", item);
+        throw new Error("No parent found for item");
+      }
+      log55.debug("getProject: Getting project for parent", parent);
+      return yield* ExItem.getProject(parent);
+    });
+  },
+
+  getProject2(item: ExItem): Stream.Stream<Project> {
+    return item.parent.changes.pipe(Stream.flatMap((parent) => {
+      if (isType(parent, ProjectFactory)) {
+        return Stream.make(parent);
+      }
+      return parent === null ? Stream.empty : ExItem.getProject2(parent);
+    }));
+  },
+};
+// File: ExObject.ts
+
+import assert from "assert-ts";
+import { Effect, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
+import {
+  CloneNumberTargetCtx,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
+import {
+  CanvasComponentStore,
+  ComponentFactory,
+  type Component,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  type ArrayEvent,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import {
+  createBehaviorSubjectWithLifetime,
+  Utils,
+  type OBS,
+  type SUB,
+} from "src/utils/utils/Utils";
+import { fields, isType, matcher, variation } from "variant";
+
+const log55 = log5("ExObject.ts", 10);
+interface ExObject_ extends ExItemBase {
+  name$: SUB<string>;
+  component: Component;
+  children: ObservableArray<ExObject>;
+  children$: OBS<ExObject[]>;
+  componentParameterProperties_: ObservableArray<
+    PropertyKind["ComponentParameterProperty"]
+  >;
+  get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
+  basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
+  cloneCountProperty: PropertyKind["CloneCountProperty"];
+  cloneNumberTarget: CloneNumberTarget;
+}
+
+export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
+export type ExObject = ReturnType<typeof ExObjectFactory>;
+
+interface ExObjectCreationArgs {
+  id?: string;
+  component?: Component;
+  name?: string;
+  componentProperties?: PropertyKind["ComponentParameterProperty"][];
+  basicProperties?: PropertyKind["BasicProperty"][];
+
+  cloneCountProperty?: PropertyKind["CloneCountProperty"];
+  children?: ExObject[];
+  cloneNumberTarget?: CloneNumberTarget;
+}
+
+export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
+  return Effect.gen(function* () {
+    log55.debug("ExObjectFactory2.start");
+
+    const eventBusCtx = yield* EventBusCtx;
+    const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
+    const component = creationArgs.component ?? CanvasComponentStore.circle;
+
+    log55.debug("ExObjectFactory2.component", component);
+
+    const creationArgs2: Required<ExObjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("ex-object"),
+      component,
+      name:
+        creationArgs.name ??
+        `Object ${yield* Project.Methods(
+          yield* Project.activeProject
+        ).getAndIncrementOrdinal()}`,
+      componentProperties:
+        creationArgs.componentProperties ??
+        (yield* createComponentProperties(component)),
+      basicProperties: creationArgs.basicProperties ?? [],
+      cloneCountProperty:
+        creationArgs.cloneCountProperty ??
+        (yield* PropertyFactory2.CloneCountProperty({})),
+      children: creationArgs.children ?? [],
+      cloneNumberTarget:
+        creationArgs.cloneNumberTarget ??
+        (yield* cloneNumberTargetCtx.create({})),
+    };
+
+    log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
+
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+    const componentParameterProperties_ = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.componentProperties
+    );
+
+    const children = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.children
+    );
+    const exObject = ExObjectFactory({
+      ...base,
+      name$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.name
+      ),
+      component: creationArgs2.component,
+      componentParameterProperties_,
+      get componentParameterProperties() {
+        return componentParameterProperties_.items;
+      },
+      basicProperties: createObservableArrayWithLifetime(
+        base.destroy$,
+        creationArgs2.basicProperties
+      ),
+      children,
+      children$: children.items$,
+      cloneCountProperty: creationArgs2.cloneCountProperty,
+      cloneNumberTarget: creationArgs2.cloneNumberTarget,
+    });
+
+    creationArgs2.componentProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.basicProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+    creationArgs2.children.forEach((child) => {
+      child.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneNumberTarget.parent$.next(exObject);
+
+    const parentChanged_ = exObject.parent.changes;
+    const parentChanged = parentChanged_;
+    yield* Effect.forkDaemon(
+      Stream.runForEachWhile(parentChanged, (parent_) => {
+        return Effect.gen(function* () {
+          if (parent_ === null) {
+            log55.debug("Skipping publishing exObjectAdded");
+            return true;
+          }
+          log55.debug("Publishing exObjectAdded");
+
+          yield* eventBusCtx.exObjectAdded.publish(exObject);
+          return false;
+        }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
+      })
+    );
+    return exObject;
+  });
+}
+
+export const ExObject = {
+  Methods: (exObject: ExObject) => ({
+    addChildBlank() {
+      return Effect.gen(this, function* () {
+        log55.debug("addChildBlank");
+        const child = yield* ExObjectFactory2({});
+        yield* this.addChild(child);
+      });
+    },
+
+    addChild(child: ExObject) {
+      return Effect.gen(function* () {
+        child.parent$.next(exObject);
+        yield* exObject.children.push(child);
+      });
+    },
+
+    addBasicPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        property.parent$.next(exObject);
+        yield* exObject.basicProperties.push(property);
+      });
+    },
+
+    getExObject(exItem: ExItem) {
+      return Effect.gen(function* () {
+        let item: ExItem | null = exItem;
+        while (item !== null) {
+          if (isType(item, ExObjectFactory)) {
+            return item;
+          }
+          const parent: Parent = yield* EffectUtils.firstValueFrom(
+            item.parent$
+          );
+          item = parent;
+        }
+        return null;
+      });
+    },
+
+    getRootExObject() {
+      return Effect.gen(function* () {
+        let parent: Parent = exObject;
+        while (true) {
+          const nextParent: Parent = yield* EffectUtils.firstValueFrom(
+            parent.parent$
+          );
+          if (nextParent === null) {
+            assert(isType(parent, ExObjectFactory));
+            return parent;
+          }
+          parent = nextParent;
+        }
+      });
+    },
+
+    replaceExObject(newExObject: ExObject) {
+      return Effect.gen(this, function* () {
+        const parent = yield* EffectUtils.firstValueFrom(exObject.parent$);
+        if (parent === null) {
+          this.replaceRootExObject(newExObject);
+          return;
+        }
+        assert(isType(parent, ExObjectFactory));
+        yield* parent.children.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    replaceRootExObject(newExObject: ExObject) {
+      return Effect.gen(function* () {
+        const project = yield* Project.activeProject;
+        yield* project.rootExObjects.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    get properties() {
+      return (function* () {
+        const basicProperties = exObject.basicProperties.items;
+        yield exObject.cloneCountProperty;
+        for (const property of exObject.componentParameterProperties) {
+          yield property;
+        }
+        for (const property of basicProperties) {
+          yield property;
+        }
+      })();
+    },
+
+    get descendants(): Effect.Effect<ExObject[], never, never> {
+      return Effect.gen(function* () {
+        const result = new Array<ExObject>();
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        for (const child of children) {
+          result.push(child);
+          const descendants = yield* ExObject.Methods(child).descendants;
+          result.push(...descendants);
+        }
+        return result;
+      });
+    },
+
+    get descendants2(): Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>> {
+      /*
+      for each child array event:
+        if add:
+          emit the event in the result stream
+
+      for each descendant array event:
+        if add:
+          emit the event in the result stream
+      */
+
+      return Effect.gen(function* () {
+        const childEvents = yield* exObject.children.events;
+
+        const descendantsForChildren = Stream.flatMap(
+          exObject.children.itemStream,
+          (children: ExObject[]) => {
+            return ExObject.descendantsForExObjects(children);
+          },
+          { switch: true }
+        );
+
+        const result = Stream.merge(childEvents, descendantsForChildren);
+        return result;
+      });
+    },
+  }),
+
+  descendantsForExObjects(
+    exObjects: ExObject[]
+  ): Stream.Stream<ArrayEvent<ExObject>> {
+    const vv = exObjects.map((exObject) => {
+      return Stream.unwrap(ExObject.Methods(exObject).descendants2);
+    });
+    const vv2 = Stream.mergeAll(vv, { concurrency: "unbounded" });
+    return vv2;
+  },
+};
+
+// ----------------
+// Private functions
+// ----------------
+
+function createComponentProperties(component: Component) {
+  return Effect.gen(function* () {
+    return yield* matcher(component)
+      .when(ComponentFactory.Canvas, (component) => {
+        return createCanvasComponentProperties(component);
+      })
+      .when(ComponentFactory.Custom, (component) => {
+        return createCustomComponentProperties(component);
+      })
+      .complete();
+  });
+}
+
+function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
+  return Effect.gen(function* () {
+    const parameters = component.parameters.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({ parameter });
+    });
+    return yield* Effect.all(parameters);
+  });
+}
+
+function createCustomComponentProperties(component: ComponentKind["Custom"]) {
+  return Effect.gen(function* () {
+    const properties = component.parameters.items.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({
+        parameter,
+      });
+    });
+    return yield* Effect.all(properties);
+  });
+}
+// File: ExObject.ts
+
+import assert from "assert-ts";
+import { Effect, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
+import {
+  CloneNumberTargetCtx,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
+import {
+  CanvasComponentStore,
+  ComponentFactory,
+  type Component,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  type ArrayEvent,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import {
+  createBehaviorSubjectWithLifetime,
+  Utils,
+  type OBS,
+  type SUB,
+} from "src/utils/utils/Utils";
+import { fields, isType, matcher, variation } from "variant";
+
+const log55 = log5("ExObject.ts", 10);
+interface ExObject_ extends ExItemBase {
+  name$: SUB<string>;
+  component: Component;
+  children: ObservableArray<ExObject>;
+  children$: OBS<ExObject[]>;
+  componentParameterProperties_: ObservableArray<
+    PropertyKind["ComponentParameterProperty"]
+  >;
+  get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
+  basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
+  cloneCountProperty: PropertyKind["CloneCountProperty"];
+  cloneNumberTarget: CloneNumberTarget;
+}
+
+export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
+export type ExObject = ReturnType<typeof ExObjectFactory>;
+
+interface ExObjectCreationArgs {
+  id?: string;
+  component?: Component;
+  name?: string;
+  componentProperties?: PropertyKind["ComponentParameterProperty"][];
+  basicProperties?: PropertyKind["BasicProperty"][];
+
+  cloneCountProperty?: PropertyKind["CloneCountProperty"];
+  children?: ExObject[];
+  cloneNumberTarget?: CloneNumberTarget;
+}
+
+export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
+  return Effect.gen(function* () {
+    log55.debug("ExObjectFactory2.start");
+
+    const eventBusCtx = yield* EventBusCtx;
+    const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
+    const component = creationArgs.component ?? CanvasComponentStore.circle;
+
+    log55.debug("ExObjectFactory2.component", component);
+
+    const creationArgs2: Required<ExObjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("ex-object"),
+      component,
+      name:
+        creationArgs.name ??
+        `Object ${yield* Project.Methods(
+          yield* Project.activeProject
+        ).getAndIncrementOrdinal()}`,
+      componentProperties:
+        creationArgs.componentProperties ??
+        (yield* createComponentProperties(component)),
+      basicProperties: creationArgs.basicProperties ?? [],
+      cloneCountProperty:
+        creationArgs.cloneCountProperty ??
+        (yield* PropertyFactory2.CloneCountProperty({})),
+      children: creationArgs.children ?? [],
+      cloneNumberTarget:
+        creationArgs.cloneNumberTarget ??
+        (yield* cloneNumberTargetCtx.create({})),
+    };
+
+    log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
+
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+    const componentParameterProperties_ = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.componentProperties
+    );
+
+    const children = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.children
+    );
+    const exObject = ExObjectFactory({
+      ...base,
+      name$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.name
+      ),
+      component: creationArgs2.component,
+      componentParameterProperties_,
+      get componentParameterProperties() {
+        return componentParameterProperties_.items;
+      },
+      basicProperties: createObservableArrayWithLifetime(
+        base.destroy$,
+        creationArgs2.basicProperties
+      ),
+      children,
+      children$: children.items$,
+      cloneCountProperty: creationArgs2.cloneCountProperty,
+      cloneNumberTarget: creationArgs2.cloneNumberTarget,
+    });
+
+    creationArgs2.componentProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.basicProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+    creationArgs2.children.forEach((child) => {
+      child.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneNumberTarget.parent$.next(exObject);
+
+    const parentChanged_ = exObject.parent.changes;
+    const parentChanged = parentChanged_;
+    yield* Effect.forkDaemon(
+      Stream.runForEachWhile(parentChanged, (parent_) => {
+        return Effect.gen(function* () {
+          if (parent_ === null) {
+            log55.debug("Skipping publishing exObjectAdded");
+            return true;
+          }
+          log55.debug("Publishing exObjectAdded");
+
+          yield* eventBusCtx.exObjectAdded.publish(exObject);
+          return false;
+        }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
+      })
+    );
+    return exObject;
+  });
+}
+
+export const ExObject = {
+  Methods: (exObject: ExObject) => ({
+    addChildBlank() {
+      return Effect.gen(this, function* () {
+        log55.debug("addChildBlank");
+        const child = yield* ExObjectFactory2({});
+        yield* this.addChild(child);
+      });
+    },
+
+    addChild(child: ExObject) {
+      return Effect.gen(function* () {
+        child.parent$.next(exObject);
+        yield* exObject.children.push(child);
+      });
+    },
+
+    addBasicPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        property.parent$.next(exObject);
+        yield* exObject.basicProperties.push(property);
+      });
+    },
+
+    getExObject(exItem: ExItem) {
+      return Effect.gen(function* () {
+        let item: ExItem | null = exItem;
+        while (item !== null) {
+          if (isType(item, ExObjectFactory)) {
+            return item;
+          }
+          const parent: Parent = yield* EffectUtils.firstValueFrom(
+            item.parent$
+          );
+          item = parent;
+        }
+        return null;
+      });
+    },
+
+    getRootExObject() {
+      return Effect.gen(function* () {
+        let parent: Parent = exObject;
+        while (true) {
+          const nextParent: Parent = yield* EffectUtils.firstValueFrom(
+            parent.parent$
+          );
+          if (nextParent === null) {
+            assert(isType(parent, ExObjectFactory));
+            return parent;
+          }
+          parent = nextParent;
+        }
+      });
+    },
+
+    replaceExObject(newExObject: ExObject) {
+      return Effect.gen(this, function* () {
+        const parent = yield* EffectUtils.firstValueFrom(exObject.parent$);
+        if (parent === null) {
+          this.replaceRootExObject(newExObject);
+          return;
+        }
+        assert(isType(parent, ExObjectFactory));
+        yield* parent.children.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    replaceRootExObject(newExObject: ExObject) {
+      return Effect.gen(function* () {
+        const project = yield* Project.activeProject;
+        yield* project.rootExObjects.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    get properties() {
+      return (function* () {
+        const basicProperties = exObject.basicProperties.items;
+        yield exObject.cloneCountProperty;
+        for (const property of exObject.componentParameterProperties) {
+          yield property;
+        }
+        for (const property of basicProperties) {
+          yield property;
+        }
+      })();
+    },
+
+    get descendants(): Effect.Effect<ExObject[], never, never> {
+      return Effect.gen(function* () {
+        const result = new Array<ExObject>();
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        for (const child of children) {
+          result.push(child);
+          const descendants = yield* ExObject.Methods(child).descendants;
+          result.push(...descendants);
+        }
+        return result;
+      });
+    },
+
+    get descendants2(): Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>> {
+      /*
+      for each child array event:
+        if add:
+          emit the event in the result stream
+
+      for each descendant array event:
+        if add:
+          emit the event in the result stream
+      */
+
+      return Effect.gen(function* () {
+        const childEvents = yield* exObject.children.events;
+
+        const descendantsForChildren = Stream.flatMap(
+          exObject.children.itemStream,
+          (children: ExObject[]) => {
+            return ExObject.descendantsForExObjects(children);
+          },
+          { switch: true }
+        );
+
+        const result = Stream.merge(childEvents, descendantsForChildren);
+        return result;
+      });
+    },
+  }),
+
+  descendantsForExObjects(
+    exObjects: ExObject[]
+  ): Stream.Stream<ArrayEvent<ExObject>> {
+    const vv = exObjects.map((exObject) => {
+      return Stream.unwrap(ExObject.Methods(exObject).descendants2);
+    });
+    const vv2 = Stream.mergeAll(vv, { concurrency: "unbounded" });
+    return vv2;
+  },
+};
+
+// ----------------
+// Private functions
+// ----------------
+
+function createComponentProperties(component: Component) {
+  return Effect.gen(function* () {
+    return yield* matcher(component)
+      .when(ComponentFactory.Canvas, (component) => {
+        return createCanvasComponentProperties(component);
+      })
+      .when(ComponentFactory.Custom, (component) => {
+        return createCustomComponentProperties(component);
+      })
+      .complete();
+  });
+}
+
+function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
+  return Effect.gen(function* () {
+    const parameters = component.parameters.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({ parameter });
+    });
+    return yield* Effect.all(parameters);
+  });
+}
+
+function createCustomComponentProperties(component: ComponentKind["Custom"]) {
+  return Effect.gen(function* () {
+    const properties = component.parameters.items.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({
+        parameter,
+      });
+    });
+    return yield* Effect.all(properties);
+  });
+}
+// File: ExObject.ts
+
+import assert from "assert-ts";
+import { Effect, Stream } from "effect";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
+import {
+  CloneNumberTargetCtx,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
+import {
+  CanvasComponentStore,
+  ComponentFactory,
+  type Component,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
+import { Project } from "src/ex-object/Project";
+import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  type ArrayEvent,
+  type ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import {
+  createBehaviorSubjectWithLifetime,
+  Utils,
+  type OBS,
+  type SUB,
+} from "src/utils/utils/Utils";
+import { fields, isType, matcher, variation } from "variant";
+
+const log55 = log5("ExObject.ts", 10);
+interface ExObject_ extends ExItemBase {
+  name$: SUB<string>;
+  component: Component;
+  children: ObservableArray<ExObject>;
+  children$: OBS<ExObject[]>;
+  componentParameterProperties_: ObservableArray<
+    PropertyKind["ComponentParameterProperty"]
+  >;
+  get componentParameterProperties(): PropertyKind["ComponentParameterProperty"][];
+  basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
+  cloneCountProperty: PropertyKind["CloneCountProperty"];
+  cloneNumberTarget: CloneNumberTarget;
+}
+
+export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
+export type ExObject = ReturnType<typeof ExObjectFactory>;
+
+interface ExObjectCreationArgs {
+  id?: string;
+  component?: Component;
+  name?: string;
+  componentProperties?: PropertyKind["ComponentParameterProperty"][];
+  basicProperties?: PropertyKind["BasicProperty"][];
+
+  cloneCountProperty?: PropertyKind["CloneCountProperty"];
+  children?: ExObject[];
+  cloneNumberTarget?: CloneNumberTarget;
+}
+
+export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
+  return Effect.gen(function* () {
+    log55.debug("ExObjectFactory2.start");
+
+    const eventBusCtx = yield* EventBusCtx;
+    const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
+    const component = creationArgs.component ?? CanvasComponentStore.circle;
+
+    log55.debug("ExObjectFactory2.component", component);
+
+    const creationArgs2: Required<ExObjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("ex-object"),
+      component,
+      name:
+        creationArgs.name ??
+        `Object ${yield* Project.Methods(
+          yield* Project.activeProject
+        ).getAndIncrementOrdinal()}`,
+      componentProperties:
+        creationArgs.componentProperties ??
+        (yield* createComponentProperties(component)),
+      basicProperties: creationArgs.basicProperties ?? [],
+      cloneCountProperty:
+        creationArgs.cloneCountProperty ??
+        (yield* PropertyFactory2.CloneCountProperty({})),
+      children: creationArgs.children ?? [],
+      cloneNumberTarget:
+        creationArgs.cloneNumberTarget ??
+        (yield* cloneNumberTargetCtx.create({})),
+    };
+
+    log55.debug("ExObjectFactory2.creationArgs2", creationArgs2);
+
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+    const componentParameterProperties_ = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.componentProperties
+    );
+
+    const children = createObservableArrayWithLifetime(
+      base.destroy$,
+      creationArgs2.children
+    );
+    const exObject = ExObjectFactory({
+      ...base,
+      name$: createBehaviorSubjectWithLifetime(
+        base.destroy$,
+        creationArgs2.name
+      ),
+      component: creationArgs2.component,
+      componentParameterProperties_,
+      get componentParameterProperties() {
+        return componentParameterProperties_.items;
+      },
+      basicProperties: createObservableArrayWithLifetime(
+        base.destroy$,
+        creationArgs2.basicProperties
+      ),
+      children,
+      children$: children.items$,
+      cloneCountProperty: creationArgs2.cloneCountProperty,
+      cloneNumberTarget: creationArgs2.cloneNumberTarget,
+    });
+
+    creationArgs2.componentProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.basicProperties.forEach((property) => {
+      property.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneCountProperty.parent$.next(exObject);
+
+    creationArgs2.children.forEach((child) => {
+      child.parent$.next(exObject);
+    });
+
+    creationArgs2.cloneNumberTarget.parent$.next(exObject);
+
+    const parentChanged_ = exObject.parent.changes;
+    const parentChanged = parentChanged_;
+    yield* Effect.forkDaemon(
+      Stream.runForEachWhile(parentChanged, (parent_) => {
+        return Effect.gen(function* () {
+          if (parent_ === null) {
+            log55.debug("Skipping publishing exObjectAdded");
+            return true;
+          }
+          log55.debug("Publishing exObjectAdded");
+
+          yield* eventBusCtx.exObjectAdded.publish(exObject);
+          return false;
+        }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
+      })
+    );
+    return exObject;
+  });
+}
+
+export const ExObject = {
+  Methods: (exObject: ExObject) => ({
+    addChildBlank() {
+      return Effect.gen(this, function* () {
+        log55.debug("addChildBlank");
+        const child = yield* ExObjectFactory2({});
+        yield* this.addChild(child);
+      });
+    },
+
+    addChild(child: ExObject) {
+      return Effect.gen(function* () {
+        child.parent$.next(exObject);
+        yield* exObject.children.push(child);
+      });
+    },
+
+    addBasicPropertyBlank() {
+      return Effect.gen(function* () {
+        const property = yield* PropertyFactory2.BasicProperty({});
+        property.parent$.next(exObject);
+        yield* exObject.basicProperties.push(property);
+      });
+    },
+
+    getExObject(exItem: ExItem) {
+      return Effect.gen(function* () {
+        let item: ExItem | null = exItem;
+        while (item !== null) {
+          if (isType(item, ExObjectFactory)) {
+            return item;
+          }
+          const parent: Parent = yield* EffectUtils.firstValueFrom(
+            item.parent$
+          );
+          item = parent;
+        }
+        return null;
+      });
+    },
+
+    getRootExObject() {
+      return Effect.gen(function* () {
+        let parent: Parent = exObject;
+        while (true) {
+          const nextParent: Parent = yield* EffectUtils.firstValueFrom(
+            parent.parent$
+          );
+          if (nextParent === null) {
+            assert(isType(parent, ExObjectFactory));
+            return parent;
+          }
+          parent = nextParent;
+        }
+      });
+    },
+
+    replaceExObject(newExObject: ExObject) {
+      return Effect.gen(this, function* () {
+        const parent = yield* EffectUtils.firstValueFrom(exObject.parent$);
+        if (parent === null) {
+          this.replaceRootExObject(newExObject);
+          return;
+        }
+        assert(isType(parent, ExObjectFactory));
+        yield* parent.children.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    replaceRootExObject(newExObject: ExObject) {
+      return Effect.gen(function* () {
+        const project = yield* Project.activeProject;
+        yield* project.rootExObjects.replaceItem(exObject, newExObject);
+        exObject.destroy$.next();
+      });
+    },
+
+    get properties() {
+      return (function* () {
+        const basicProperties = exObject.basicProperties.items;
+        yield exObject.cloneCountProperty;
+        for (const property of exObject.componentParameterProperties) {
+          yield property;
+        }
+        for (const property of basicProperties) {
+          yield property;
+        }
+      })();
+    },
+
+    get descendants(): Effect.Effect<ExObject[], never, never> {
+      return Effect.gen(function* () {
+        const result = new Array<ExObject>();
+        const children = yield* EffectUtils.firstValueFrom(exObject.children$);
+        for (const child of children) {
+          result.push(child);
+          const descendants = yield* ExObject.Methods(child).descendants;
+          result.push(...descendants);
+        }
+        return result;
+      });
+    },
+
+    get descendants2(): Effect.Effect<Stream.Stream<ArrayEvent<ExObject>>> {
+      /*
+      for each child array event:
+        if add:
+          emit the event in the result stream
+
+      for each descendant array event:
+        if add:
+          emit the event in the result stream
+      */
+
+      return Effect.gen(function* () {
+        const childEvents = yield* exObject.children.events;
+
+        const descendantsForChildren = Stream.flatMap(
+          exObject.children.itemStream,
+          (children: ExObject[]) => {
+            return ExObject.descendantsForExObjects(children);
+          },
+          { switch: true }
+        );
+
+        const result = Stream.merge(childEvents, descendantsForChildren);
+        return result;
+      });
+    },
+  }),
+
+  descendantsForExObjects(
+    exObjects: ExObject[]
+  ): Stream.Stream<ArrayEvent<ExObject>> {
+    const vv = exObjects.map((exObject) => {
+      return Stream.unwrap(ExObject.Methods(exObject).descendants2);
+    });
+    const vv2 = Stream.mergeAll(vv, { concurrency: "unbounded" });
+    return vv2;
+  },
+};
+
+// ----------------
+// Private functions
+// ----------------
+
+function createComponentProperties(component: Component) {
+  return Effect.gen(function* () {
+    return yield* matcher(component)
+      .when(ComponentFactory.Canvas, (component) => {
+        return createCanvasComponentProperties(component);
+      })
+      .when(ComponentFactory.Custom, (component) => {
+        return createCustomComponentProperties(component);
+      })
+      .complete();
+  });
+}
+
+function createCanvasComponentProperties(component: ComponentKind["Canvas"]) {
+  return Effect.gen(function* () {
+    const parameters = component.parameters.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({ parameter });
+    });
+    return yield* Effect.all(parameters);
+  });
+}
+
+function createCustomComponentProperties(component: ComponentKind["Custom"]) {
+  return Effect.gen(function* () {
+    const properties = component.parameters.items.map((parameter) => {
+      return PropertyFactory2.ComponentParameterProperty({
+        parameter,
+      });
+    });
+    return yield* Effect.all(properties);
+  });
+}
+// File: Project.ts
+
+import { Effect } from "effect";
+import {
+  BehaviorSubject,
+  firstValueFrom,
+  shareReplay,
+  Subject,
+  switchMap,
+} from "rxjs";
+import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
+import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
+import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
+import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
+import { Expr } from "src/ex-object/Expr";
+import type { LibraryProject } from "src/ex-object/LibraryProject";
+import type { Property } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { log5 } from "src/utils/utils/Log5";
+import {
+  createObservableArrayWithLifetime,
+  ObservableArray,
+} from "src/utils/utils/ObservableArray";
+import { Utils, type OBS } from "src/utils/utils/Utils";
+import { fields, variation } from "variant";
+
+const log55 = log5("Project.ts");
+
+export const ProjectFactory = variation(
+  "Project",
+  fields<
+    {
+      libraryProject: LibraryProject | null;
+      rootExObjects: ObservableArray<ExObject>;
+      components: ObservableArray<ComponentKind["Custom"]>;
+      exFuncs: ObservableArray<CustomExFunc>;
+      currentOrdinal$: BehaviorSubject<number>;
+      destroy$: Subject<void>;
+    } & ExItemBase
+  >()
+);
+
+export type Project = ReturnType<typeof ProjectFactory>;
+
+interface ProjectCreationArgs {
+  id?: string;
+  rootExObjects?: ExObject[];
+  components?: ComponentKind["Custom"][];
+  exFuncs?: CustomExFunc[];
+  currentOrdinal?: number;
+}
+
+export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
+  return Effect.gen(function* () {
+    const currentOrdinal = creationArgs.currentOrdinal ?? 0;
+    const creationArgs2: Required<ProjectCreationArgs> = {
+      id: creationArgs.id ?? Utils.createId("project"),
+      rootExObjects: creationArgs.rootExObjects ?? [],
+      components: creationArgs.components ?? [],
+      exFuncs: creationArgs.exFuncs ?? [],
+      currentOrdinal: creationArgs.currentOrdinal ?? 0,
+    };
+
+    const base = yield* ExItem.createExItemBase(creationArgs2.id);
+
+    const rootExObjects = createObservableArrayWithLifetime<ExObject>(
+      base.destroy$,
+      creationArgs2.rootExObjects
+    );
+
+    const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
+
+    const project = ProjectFactory({
+      ...base,
+      libraryProject: null,
+      rootExObjects: rootExObjects,
+      components: createObservableArrayWithLifetime<ComponentKind["Custom"]>(
+        base.destroy$,
+        creationArgs2.components
+      ),
+      exFuncs: createObservableArrayWithLifetime<CustomExFunc>(
+        base.destroy$,
+        creationArgs2.exFuncs
+      ),
+      currentOrdinal$,
+      destroy$: new Subject<void>(),
+    });
+
+    for (const exObject of rootExObjects.items) {
+      log55.debug("Adding rootExObject", exObject.id);
+      exObject.parent$.next(project);
+    }
+
+    return project;
+  });
+}
+
+export const Project = {
+  get activeProject$() {
+    return Effect.gen(function* () {
+      log55.debug("activeProject$");
+      const libraryProjectCtx = yield* LibraryProjectCtx;
+      const activeLibraryProject$ = libraryProjectCtx.activeLibraryProject$;
+      const result = activeLibraryProject$.pipe(
+        switchMap((libraryProject) => {
+          const project$: OBS<Project> = libraryProject.project$;
+          return project$;
+        }),
+        log55.tapDebug("activeProject$.switchMap"),
+        shareReplay(1)
+      );
+      return result;
+    });
+  },
+
+  get activeProject(): Effect.Effect<Project, never, LibraryProjectCtx> {
+    const effect = Effect.gen(function* () {
+      log55.debug("activeProject");
+      const activeProjects$ = yield* Project.activeProject$;
+      const project: Project = yield* Effect.promise(() =>
+        firstValueFrom(activeProjects$)
+      );
+      return project;
+    });
+    return effect;
+  },
+
+  get activeProjectStream() {
+    return Effect.gen(function* () {
+      log55.debug("activeProjectStream");
+      const activeProjects$ = yield* Project.activeProject$;
+      return EffectUtils.obsToStream(activeProjects$);
+    });
+  },
+
+  getExObjects: (project: Project) => {
+    // For each root ex object, get all descendants
+    return Effect.gen(function* () {
+      log55.debug("getExObjects");
+      const exObjects: ExObject[] = [];
+      for (const rootExObject of project.rootExObjects.items) {
+        exObjects.push(rootExObject);
+        const descendants = yield* ExObject.Methods(rootExObject).descendants;
+        exObjects.push(...descendants);
+      }
+      return exObjects;
+    });
+  },
+
+  getProperties: (project: Project) => {
+    return Effect.gen(function* () {
+      log55.debug("getProperties");
+      const properties: Property[] = [];
+      for (const exObject of yield* Project.getExObjects(project)) {
+        properties.push(...exObject.basicProperties.items);
+        properties.push(exObject.cloneCountProperty);
+        properties.push(...exObject.componentParameterProperties_.items);
+      }
+      return properties;
+    });
+  },
+
+  getExprs: (project: Project) => {
+    return Effect.gen(function* () {
+      log55.debug("getExprs");
+      const exprs: Expr[] = [];
+      for (const property of yield* Project.getProperties(project)) {
+        const expr = yield* property.expr.get;
+        exprs.push(expr);
+        const descendants = yield* Expr.descendants(expr);
+        exprs.push(...descendants);
+      }
+      return exprs;
+    });
+  },
+
+  Methods: (project: Project) => ({
+    addRootExObjectBlank() {
+      return Effect.gen(function* () {
+        log55.debug("addRootExObjectBlank");
+        const exObject = yield* ExObjectFactory2({});
+        exObject.parent$.next(project);
+        yield* project.rootExObjects.push(exObject);
+      });
+    },
+
+    getAndIncrementOrdinal() {
+      return Effect.gen(function* () {
+        const ordinal = yield* EffectUtils.firstValueFrom(
+          project.currentOrdinal$
+        );
+        project.currentOrdinal$.next(ordinal + 1);
+        return ordinal;
+      });
+    },
+
+    addComponentBlank() {
+      return Effect.gen(function* () {
+        const component = yield* ComponentFactory2.Custom({});
+        yield* project.components.push(component);
+        return component;
+      });
+    },
+
+    addExFuncBlank() {
+      return Effect.gen(function* () {
+        const exFunc = yield* CustomExFuncFactory2.Custom({});
+        yield* project.exFuncs.push(exFunc);
+        return exFunc;
+      });
+    },
+  }),
+};

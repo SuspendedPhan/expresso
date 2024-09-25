@@ -1,0 +1,26 @@
+[Project]
+  ├─ contains → [ExObject] (root objects) *
+  ├─ contains → [Component] *
+  └─ contains → [ExFunc] *
+
+[ExObject]
+  ├─ has → [Component]
+  ├─ has → [BasicProperty] *
+  ├─ has → [ComponentParameterProperty] *
+  ├─ has → [CloneCountProperty]
+  ├─ has → [CloneNumberTarget]
+  └─ contains → [ExObject] * (children)
+
+[Component]
+  └─ has → [ComponentParameter] *
+
+[Property]
+  ├─ types:
+  │    ├─ [BasicProperty]
+  │    ├─ [ComponentParameterProperty]
+  │    └─ [CloneCountProperty]
+  └─ has → [Expr]
+
+[ExFunc]
+  ├─ has → [ExFuncParameter] *
+  └─ has → [Expr]

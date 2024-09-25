@@ -1,3 +1,5 @@
+// File: Component.ts
+
 import { Effect } from "effect";
 import { BehaviorSubject, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/Canvas";

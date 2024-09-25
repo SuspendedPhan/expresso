@@ -1,3 +1,5 @@
+// File: Library.ts
+
 import { Effect } from "effect";
 import { BehaviorSubject, Subject } from "rxjs";
 import { LibraryProject, LibraryProjectFactory2 } from "src/ex-object/LibraryProject";

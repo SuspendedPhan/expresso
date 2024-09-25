@@ -1,3 +1,5 @@
+// File: ExItem.ts
+
 import { Effect, Ref, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";

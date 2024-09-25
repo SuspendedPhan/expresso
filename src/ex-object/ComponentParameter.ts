@@ -1,3 +1,5 @@
+// File: ComponentParameter.ts
+
 import { Effect } from "effect";
 import { BehaviorSubject, of } from "rxjs";
 import type { CanvasSetter } from "src/ex-object/Component";

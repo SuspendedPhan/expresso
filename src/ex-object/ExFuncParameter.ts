@@ -1,3 +1,5 @@
+// File: ExFuncParameter.ts
+
 import { Effect } from "effect";
 
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
