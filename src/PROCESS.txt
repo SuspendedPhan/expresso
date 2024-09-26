@@ -82,6 +82,8 @@ CanvasPropertyResult:
 - (canvasObject: 2)
 - (property|radius: 50)
 
+// TODO: property lookup -> property setter. Need property data
+
 --->
 MapPropertySetters - Maps extracted properties to their corresponding setter functions.
 --->
