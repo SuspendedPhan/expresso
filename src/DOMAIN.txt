@@ -1,3 +1,7 @@
+---
+Domain
+---
+
 [Project]
   ├─ has → [ExObject] (root objects) *
   ├─ has → [Component] *

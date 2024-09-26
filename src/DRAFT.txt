@@ -1,10 +1,44 @@
-Modify this pseudocode to account for exobject's component if any. Here's an example of an ItemInstancePath in this case:
-object|earth: 5 / component|planet / object|circle: 10 > property|radius
+...
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|x)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|radius)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|x)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|radius)
+PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|x)
+PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|radius)
+...
 
-Don't explain. Show unified diff btwn my input and your changes.
+--->
+Eval
+--->
+
+...
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 10 > property|x, 100)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 10 > property|radius, 25)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 11 > property|x, 125)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 11 > property|radius, 50)
+...
+...
+
+--->
+Group Canvas Objects
+--->
+
+CanvasObjectResult:
+    (property|x: 100)
+    (property|radius: 25)
+CanvasObjectResult:
+    (property|x: 125)
+    (property|radius: 50)
+
+--->
+
+
+
+
+
 
 ---
-Domain spec
+Domain
 ---
 
 [Project]
@@ -59,9 +93,8 @@ Domain spec
   │    ├─ [ExFuncParameter]
   │    └─ [CloneNumberTarget]
 
-
 ---
-Pseudocode
+Evaluation Pseudocode
 ---
 
 # Assuming these functions are defined:
@@ -91,6 +124,9 @@ function EvaluateExObject(exObject, results, parentExObjectInstancePath, exObjec
             currentExObjectInstance: exObjectInstance,
             exObjectInstancePaths: exObjectInstancePaths
         }
+        if exObject has component:
+            currentPath = AppendInstancePath(currentPath, CreateComponentInstancePath(exObject.component))
+            evaluationContext.currentInstancePath = currentPath
         for each property in exObject.properties:
             EvaluateProperty(exObject, property, results, evaluationContext)
         EvalComponentParameters(exObject, results, evaluationContext)

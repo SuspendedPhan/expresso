@@ -1,0 +1,111 @@
+// PROCESS.txt
+
+#######
+Domain
+#######
+
+CanvasObject: TODO
+ObjectInstance: TODO
+PropertyInstance: TODO
+PropertySetter: TODO
+
+#######
+Process
+#######
+
+...
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|x)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|radius)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|x)
+PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|radius)
+PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|x)
+PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|radius)
+...
+
+--->
+Eval - Evaluates property instance paths to compute their corresponding values.
+--->
+
+...
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 10 > property|x, 100)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 10 > property|radius, 25)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 11 > property|x, 125)
+PropertyInstanceResult: (object|earth: 5 / component|planet / object|circle: 11 > property|radius, 50)
+...
+...
+
+--->
+GroupObjectInstances - Nests property results into their object instances.
+--->
+
+ObjectInstanceResult:
+- (property|x: 100)
+- (property|radius: 25)
+
+ObjectInstanceResult:
+- (property|x: 125)
+- (property|radius: 50)
+
+--->
+AcquireCanvasObjects - Acquires CanvasObjects for each object instance.
+--->
+
+CanvasObjectResult:
+- (canvasObject: 1)
+- (canvasObjectResult)
+    - (property|x: 100)
+    - (property|radius: 25)
+
+CanvasObjectResult:
+- (canvasObject: 2)
+- (canvasObjectResult)
+    - (property|x: 125)
+    - (property|radius: 50)
+
+--->
+ExtractCanvasProperties - Extracts individual properties from library canvas objects for further processing.
+--->
+
+CanvasPropertyResult:
+- (canvasObject: 1)
+- (property|x: 100)
+
+CanvasPropertyResult:
+- (canvasObject: 1)
+- (property|radius: 25)
+
+CanvasPropertyResult:
+- (canvasObject: 2)
+- (property|x: 125)
+
+CanvasPropertyResult:
+- (canvasObject: 2)
+- (property|radius: 50)
+
+--->
+MapPropertySetters - Maps extracted properties to their corresponding setter functions.
+--->
+
+PropertySetter:
+- (setter: setX)
+- (canvasObject: 1)
+- (value: 100)
+
+PropertySetter:
+- (setter: setRadius)
+- (canvasObject: 1)
+- (value: 25)
+
+PropertySetter:
+- (setter: setX)
+- (canvasObject: 2)
+- (value: 125)
+
+PropertySetter:
+- (setter: setRadius)
+- (canvasObject: 2)
+- (value: 50)
+
+--->
+ExecutePropertySetters - Applies the setter functions to update the properties on library canvas objects.
+---
