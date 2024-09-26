@@ -4,13 +4,10 @@
 Domain
 #######
 
-CanvasObject: An object representing a visual element on the canvas that can be manipulated through properties and methods.
-
-ObjectInstance: A specific instance of an object within the system, identified by a unique path or identifier, which contains property instances.
-
-PropertyInstance: An instance of a property associated with an ObjectInstance, identified by its path in the object hierarchy and holding a computed value.
-
-PropertySetter: A mapping that associates a property with its corresponding setter function, specifying the canvas object to modify and the value to set.
+ObjectInstance: Represents a specific object on the canvas.
+PropertyInstance: Represents a property on an object instance.
+CanvasObject: An object on the canvas, provided by the rendering library.
+PropertySetter: A function that sets a property on a canvas object.
 
 #######
 Process
