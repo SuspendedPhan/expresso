@@ -25,6 +25,9 @@ function EvaluateExObject(exObject, results, parentExObjectInstancePath, exObjec
             currentExObjectInstance: exObjectInstance,
             exObjectInstancePaths: exObjectInstancePaths
         }
+        if exObject has component:
+            currentPath = AppendInstancePath(currentPath, CreateComponentInstancePath(exObject.component))
+            evaluationContext.currentInstancePath = currentPath
         for each property in exObject.properties:
             EvaluateProperty(exObject, property, results, evaluationContext)
         EvalComponentParameters(exObject, results, evaluationContext)
