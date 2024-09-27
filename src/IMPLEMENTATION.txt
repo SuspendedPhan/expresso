@@ -35,21 +35,41 @@ for object in objects:
 
 
 --->
-ResolveCloneCounts - Evaluates the number of clones for each object.
+AnnotateCloneCounts - Annotates property paths with clone counts.
     - CloneCountPropertyPaths
     - NonCloneCountPropertyPaths
 --->
-yield for path in CloneCountPropertyPaths:
-    object = path.object
-    count = object.get_clone_count()
-    yield CloneCountResult(object, path.property, count)
+CloneCountResults =
+    for path in CloneCountPropertyPaths:
+        count = EvaluateCloneCount(path)
+        yield CloneCountResult(path, count)
 
-yield NonCloneCountPropertyPaths
+yield AnnotatedPropertyPaths =
+    for path in NonCloneCountPropertyPaths:
+        annotatedSegments =
+            for segment in path:
+                yield AnnotatedSegment(segment, CloneCountResults)
+        yield AnnotatedPropertyPath(annotatedSegments)            
 
 
 ---
 ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
+    - AnnotatedPropertyPaths
 --->
+yield PropertyInstancePaths = for path in AnnotatedPropertyPaths:
+    for instance in ExpandInstancePath(path):
+        yield instance
+
+function ExpandInstancePath(AnnotatedPathSegments):
+    firstAnnotatedPathSegment, restAnnotatedPathSegments = ExtractFirstSegment(AnnotatedPathSegments)
+    if firstAnnotatedPropertySegment.hasCloneCount:
+        for i in range(firstAnnotatedPropertySegment.count):
+            firstInstancePath = InstancePath(firstAnnotatedPropertySegment, i)
+            restInstancePaths = ExpandInstancePath(restAnnotatedPathSegments)
+            for instancePath in restInstancePaths:
+                yield PropertyInstancePath = CombinePath(firstInstancePath, instancePath)
+    else:
+        yield* ExpandInstancePath(restAnnotatedPathSegments)
 
 
 ---

@@ -35,6 +35,7 @@ ExtractPropertyPaths - Extracts property paths from the object hierarchy.
 
 CloneCountPropertyPaths:
 - object|earth > clone-count-property
+- object|earth / object|moon > clone-count-property
 - object|earth / component|planet / object|circle > clone-count-property
 
 NonCloneCountPropertyPaths:
@@ -43,17 +44,32 @@ NonCloneCountPropertyPaths:
 - object|earth / component|planet / object|circle > property|radius
 
 --->
-ResolveCloneCounts - Evaluates the number of clones for each object.
+AnnotateCloneCounts - Annotates property paths with clone counts.
 --->
 
-CloneCountResults:
-- object|earth > clone-count-property: 10
-- object|earth / component|planet / object|circle > clone-count-property: 15
+    CloneCountResults:
+    - object|earth > clone-count-property: 10
+    - object|earth / object|moon > clone-count-property: 5
+    - object|earth / component|planet / object|circle > clone-count-property: 15
 
-PropertyPaths:
-- object|earth / object|moon > property|radius
-- object|earth / component|planet > property|velocity
-- object|earth / component|planet / object|circle > property|radius
+AnnotatedPropertyPaths:
+- object|earth: (10) / object|moon: (5) > property|radius
+- object|earth: (10) / component|planet > property|velocity
+- object|earth: (10) / component|planet / object|circle: (15) > property|radius
+
+--->
+ExpandInstanceSegments
+--->
+
+PropertyInstancePathSegment: (object|earth: 5)
+PropertyInstancePathSegment: (component|planet)
+PropertyInstancePathSegment: (object|circle: 10)
+PropertyInstancePathSegment: (property|x)
+PropertyInstancePathSegment: (object|earth: 6)
+PropertyInstancePathSegment: (component|planet)
+PropertyInstancePathSegment: (object|circle: 1)
+PropertyInstancePathSegment: (property|radius)
+
 
 --->
 ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
