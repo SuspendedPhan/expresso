@@ -14,7 +14,7 @@ Process
 #######
 
 ---
-GetRootObjects
+GetRootObjects - Retrieves the root objects from the project.
 --->
 
 Object:
@@ -30,7 +30,7 @@ Object:
 ...
 
 --->
-ExtractPropertyPaths
+ExtractPropertyPaths - Extracts property paths from the object hierarchy.
 --->
 
 CloneCountPropertyPaths:
@@ -43,7 +43,7 @@ NonCloneCountPropertyPaths:
 - object|earth / component|planet / object|circle > property|radius
 
 --->
-EvaluateCloneCounts - Evaluates the number of clones for each object.
+ResolveCloneCounts - Evaluates the number of clones for each object.
 --->
 
 CloneCountResults:
@@ -56,7 +56,7 @@ PropertyPaths:
 - object|earth / component|planet / object|circle > property|radius
 
 --->
-ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths.
+ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
 --->
 
 earth: 1->10

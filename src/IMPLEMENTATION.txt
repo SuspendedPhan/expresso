@@ -1,0 +1,69 @@
+// PROCESS.txt
+
+#######
+Domain
+#######
+
+ObjectInstance: Represents a specific object on the canvas.
+PropertyInstance: Represents a property on an object instance.
+CanvasObject: An object on the canvas, provided by the rendering library.
+PropertySetter: A function that sets a property on a canvas object.
+
+#######
+Process
+#######
+
+---
+GetRootObjects - Retrieves the root objects from the project.
+--->
+ExtractPropertyPaths - Extracts property paths from the object hierarchy.
+--->
+    
+
+
+---
+ResolveCloneCounts - Evaluates the number of clones for each object.
+--->
+
+
+
+---
+ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
+--->
+
+
+
+---
+EvaluatePropertyInstances - Evaluates property instance paths to compute their corresponding values.
+--->
+
+
+
+---
+GroupObjectInstances - Nests property results into their object instances.
+--->
+
+
+
+---
+AcquireCanvasObjects - Acquires CanvasObjects for each object instance.
+--->
+
+
+
+---
+ExtractCanvasProperties - Extracts individual properties from library canvas objects for further processing.
+--->
+
+
+
+---
+MapPropertySetters - Maps extracted properties to their corresponding setter functions.
+    - needs GetPropertySetter(property)
+--->
+
+
+
+---
+ExecutePropertySetters - Applies the setter functions to update the properties on library canvas objects.
+---
