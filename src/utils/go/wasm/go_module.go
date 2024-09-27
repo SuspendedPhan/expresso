@@ -9,7 +9,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-var logger = evaluator.NewLogger("go_module.go")
+var logger = NewLogger("go_module.go")
 
 func deferLogger() {
 	if r := recover(); r != nil {
@@ -22,7 +22,7 @@ func bootstrapGoModule() {
 
 	goModule := makeEmptyObject()
 
-	ev := evaluator.NewEvaluator()
+	ev := evaluator.NewEvaluator(logger)
 
 	goModule.Set("ExObject", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -165,7 +165,7 @@ func bootstrapGoModule() {
 		}),
 
 		"reset": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			ev = evaluator.NewEvaluator()
+			ev = evaluator.NewEvaluator(logger)
 			return nil
 		}),
 

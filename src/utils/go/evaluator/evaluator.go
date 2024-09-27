@@ -1,10 +1,10 @@
 package evaluator
 
-var logger = NewLogger("evaluator.go")
-
 // -- TYPES --
 
 type Float = float64
+
+var logger Logger2
 
 type Evaluator struct {
 	RootExObjectIds []string
@@ -34,7 +34,8 @@ type ReferenceExpr struct {
 	TargetKind string
 }
 
-func NewEvaluator() *Evaluator {
+func NewEvaluator(logger_ Logger2) *Evaluator {
+	logger = logger_
 	return &Evaluator{
 		RootExObjectIds: []string{},
 		ExObjectById:    map[string]*ExObject{},
