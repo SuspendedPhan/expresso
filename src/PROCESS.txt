@@ -13,6 +13,55 @@ PropertySetter: A function that sets a property on a canvas object.
 Process
 #######
 
+---
+GetRootObjects
+--->
+
+Object:
+- object|earth
+    - component|planet
+        - property|velocity
+        - object|circle
+            - property|radius
+    - object|moon
+        - property|radius
+- object|sun
+    ...
+...
+
+--->
+ExtractPropertyPaths
+--->
+
+CloneCountPropertyPaths:
+- object|earth > clone-count-property
+- object|earth / component|planet / object|circle > clone-count-property
+
+NonCloneCountPropertyPaths:
+- object|earth / object|moon > property|radius
+- object|earth / component|planet > property|velocity
+- object|earth / component|planet / object|circle > property|radius
+
+--->
+EvaluateCloneCounts - Evaluates the number of clones for each object.
+--->
+
+CloneCountResults:
+- object|earth > clone-count-property: 10
+- object|earth / component|planet / object|circle > clone-count-property: 15
+
+PropertyPaths:
+- object|earth / object|moon > property|radius
+- object|earth / component|planet > property|velocity
+- object|earth / component|planet / object|circle > property|radius
+
+--->
+ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths.
+--->
+
+earth: 1->10
+    circle: 1->15
+
 ...
 PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|x)
 PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|radius)
@@ -23,7 +72,7 @@ PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > p
 ...
 
 --->
-Eval - Evaluates property instance paths to compute their corresponding values.
+EvaluatePropertyInstances - Evaluates property instance paths to compute their corresponding values.
 --->
 
 ...
@@ -82,10 +131,9 @@ CanvasPropertyResult:
 - (canvasObject: 2)
 - (property|radius: 50)
 
-// TODO: property lookup -> property setter. Need property data
-
 --->
 MapPropertySetters - Maps extracted properties to their corresponding setter functions.
+    - needs GetPropertySetter(property)
 --->
 
 PropertySetter:
