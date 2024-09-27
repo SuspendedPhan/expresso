@@ -53,24 +53,28 @@ yield AnnotatedPropertyPaths =
 
 
 ---
-ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
+ExpandPropertyPaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
     - AnnotatedPropertyPaths
 --->
 yield PropertyInstancePaths = for path in AnnotatedPropertyPaths:
-    for instance in ExpandInstancePath(path):
+    segments = PathSegments(path)
+    for instance in ExpandPath(segments):
         yield instance
 
-function ExpandInstancePath(AnnotatedPathSegments):
-    firstAnnotatedPathSegment, restAnnotatedPathSegments = ExtractFirstSegment(AnnotatedPathSegments)
-    if firstAnnotatedPropertySegment.hasCloneCount:
-        for i in range(firstAnnotatedPropertySegment.count):
-            firstInstancePath = InstancePath(firstAnnotatedPropertySegment, i)
-            restInstancePaths = ExpandInstancePath(restAnnotatedPathSegments)
-            for instancePath in restInstancePaths:
-                yield PropertyInstancePath = CombinePath(firstInstancePath, instancePath)
-    else:
-        yield* ExpandInstancePath(restAnnotatedPathSegments)
+function ExpandPath(PathSegments):
+    if PathSegments.length == 1:
+        return yield PathSegments[0]
 
+    first, rest = PathSegments[0], PathSegments[1:]
+    yield* ExpandPathSegment(first)
+    yield* ExpandPath(rest)
+
+function ExpandPathSegment(PathSegment):
+    if PathSegment.hasCloneCount:
+        for i in range(PathSegment.count):
+            yield PathSegment.clone(i)
+    else:
+        yield PathSegment
 
 ---
 EvaluatePropertyInstances - Evaluates property instance paths to compute their corresponding values.
