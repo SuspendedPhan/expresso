@@ -49,10 +49,10 @@ yield AnnotatedPropertyPaths =
         annotatedSegments =
             for segment in path:
                 yield AnnotatedSegment(segment, CloneCountResults)
-        yield AnnotatedPropertyPath(annotatedSegments)            
+        yield AnnotatedPropertyPath(annotatedSegments)
 
 
----
+--->
 ExpandPropertyPaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
     - AnnotatedPropertyPaths
 --->
@@ -62,51 +62,109 @@ yield PropertyInstancePaths = for path in AnnotatedPropertyPaths:
         yield instance
 
 function ExpandPath(PathSegments):
-    if PathSegments.length == 1:
-        return yield PathSegments[0]
+    FullyExpandedPaths = []
+    PartiallyExpandedPaths = []
+    while PartiallyExpandedPaths is not empty:
+        path = PartiallyExpandedPaths.pop()
+        PartiallyExpandedPaths_ = path.ExpandOnce()
+        for path_ in PartiallyExpandedPaths_:
+            match path_:
+                case FullyExpandedPath:
+                    FullyExpandedPaths.append(path_)
+                case PartiallyExpandedPath:
+                    PartiallyExpandedPaths.append(path_)
+    return FullyExpandedPaths
 
-    first, rest = PathSegments[0], PathSegments[1:]
-    yield* ExpandPathSegment(first)
-    yield* ExpandPath(rest)
+function ExpandOnce(path: PartiallyExpandedPath):
+    if path.IsFullyExpanded:
+        return FullyExpandedPath(path)
 
-function ExpandPathSegment(PathSegment):
-    if PathSegment.hasCloneCount:
-        for i in range(PathSegment.count):
-            yield PathSegment.clone(i)
-    else:
-        yield PathSegment
+    frontSegments, targetSegment, backSegments = path.FirstUnexpandedSegment
+    for i in range(targetSegment.CloneCount):
+        instanceSegment = InstanceSegment(targetSegment, i)
+        path_: PartiallyExpandedPath = Combine(frontSegments, instanceSegment, backSegments)
+        yield path_
 
----
+
+--->
 EvaluatePropertyInstances - Evaluates property instance paths to compute their corresponding values.
+    - PropertyInstancePaths
 --->
+results: Map<PropertyInstancePath, PropertyInstanceResult>
 
+for path in PropertyInstancePaths:
+    if path in results:
+        continue
 
+    result = EvaluatePropertyInstancePath(path)
+    results.append(result)
 
----
+function EvaluatePropertyInstancePath(PropertyInstancePath):
+    if results contains PropertyInstancePath:
+        return results[PropertyInstancePath]
+
+    value = PropertyInstance.Evaluate()
+    return PropertyInstanceResult(PropertyInstancePath, value)
+
+yield* results
+
+--->
 GroupObjectInstances - Nests property results into their object instances.
+    - PropertyInstanceResults
 --->
 
+ObjectInstanceResult:
+    - PropertyInstanceResult:
+        - Property, Value
 
+ObjectInstanceResultByPath = []
 
----
+for result in results:
+    parentPath = result.path.ParentPath
+    ObjectInstanceResult[parentPath].append(result)
+
+yield* ObjectInstanceResultByPath
+
+--->
 AcquireCanvasObjects - Acquires CanvasObjects for each object instance.
+    - ObjectInstanceResults
 --->
 
+CanvasObjectResult:
+    - CanvasObject
+    - ObjectInstanceResult:
+        - PropertyInstanceResult: Property, Value
 
+for result in ObjectInstanceResults:
+    object = AcquireCanvasObject(result.CanvasComponent())
+    yield CanvasObjectResult(object, result)
 
----
+--->
 ExtractCanvasProperties - Extracts individual properties from library canvas objects for further processing.
+    - CanvasObjectResults
 --->
 
+CanvasPropertyResult: (CanvasObject, PropertyInstanceResult)
 
+for result in CanvasObjectResults:
+    for propertyResult in result.ObjectInstanceResult.PropertyInstanceResults:
+        yield CanvasPropertyResult(result.CanvasObject, propertyResult)
 
----
+--->
 MapPropertySetters - Maps extracted properties to their corresponding setter functions.
     - needs GetPropertySetter(property)
+    - CanvasPropertyResults
 --->
 
+PropertySetterInstance: (PropertySetter, CanvasObject, Value)
 
+for result in CanvasPropertyResults:
+    setter = GetPropertySetter(result.Property)
+    yield PropertySetterInstance(setter, result.CanvasObject, result.Value)
 
----
+--->
 ExecutePropertySetters - Applies the setter functions to update the properties on library canvas objects.
 ---
+
+for setterInstance in PropertySetterInstances:
+    setterInstance.Execute()
