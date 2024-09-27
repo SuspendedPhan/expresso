@@ -1,0 +1,83 @@
+// TYPES.txt
+
+#######
+Domain
+#######
+
+- ObjectInstance:
+    - Represents a specific object on the canvas.
+
+- PropertyInstance:
+    - Represents a property on an object instance.
+
+- CanvasObject:
+    - An object on the canvas, provided by the rendering library.
+
+- PropertySetter:
+    - A function that sets a property on a canvas object.
+
+#######
+Process Types
+#######
+
+- PropertyPath:
+    - Sequence representing the path to a property in the object hierarchy.
+
+- CloneCountPropertyPath:
+    - Property path that includes clone count properties.
+
+- NonCloneCountPropertyPath:
+    - Property path that excludes clone count properties.
+
+- CloneCountResult:
+    - Clone count evaluated for a property path.
+
+- AnnotatedSegment:
+    - Segment of a property path annotated with clone count information.
+
+- AnnotatedPropertyPath:
+    - Property path where each segment is annotated with clone counts.
+
+- PropertyInstancePathSegment:
+    - Segment of a property instance path, possibly including clone indices.
+
+- PropertyInstancePath:
+    - Expanded property path representing a specific instance with clone indices.
+
+- PropertyInstanceResult:
+    - Property: The property being evaluated.
+    - Value: The computed value for the property instance.
+
+- ObjectInstanceResult:
+    - PropertyInstanceResults: A collection of evaluated property instances for an object.
+        - Property: The evaluated property.
+        - Value: The computed value for the property.
+
+- CanvasObjectResult:
+    - CanvasObject: The canvas object being processed.
+    - ObjectInstanceResult: Contains the property results for the canvas object.
+        - Property: The evaluated property on the object.
+        - Value: The computed value for the property.
+
+- CanvasPropertyResult:
+    - CanvasObject: The canvas object from which the property is extracted.
+    - PropertyInstanceResult: The evaluated property instance on the canvas object.
+        - Property: The evaluated property.
+        - Value: The computed value.
+
+- PropertySetterInstance:
+    - PropertySetter: The function to set the property.
+    - CanvasObject: The canvas object on which the property is set.
+    - Value: The value to apply via the setter.
+
+- PathSegments:
+    - The individual segments that make up a property path.
+
+- FullyExpandedPath:
+    - A property path where all clone counts have been expanded into specific instances.
+
+- PartiallyExpandedPath:
+    - A property path that has been partially expanded and may require further expansion.
+
+- InstanceSegment:
+    - Segment representing a specific instance of an object after clone expansion.
