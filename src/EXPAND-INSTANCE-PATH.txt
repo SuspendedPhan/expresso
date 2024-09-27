@@ -1,0 +1,47 @@
+AnnotatedPropertyPaths:
+- object|earth: (10) / object|moon: (5) > property|radius
+- object|earth: (10) / component|planet > property|velocity
+- object|earth: (10) / component|planet / object|circle: (15) > property|radius
+
+------
+
+AnnotatedPropertyPath:
+- object|earth: (10) / object|moon: (5) > property|radius
+- object|earth: (10) / component|planet / object|circle: (15) > property|radius
+    
+---> ExpandPath --->
+
+PartiallyExpandedPropertyPaths:
+object|earth: 1, object|moon: (5), property|radius
+object|earth: 2, object|moon: (5), property|radius
+object|earth: 3, object|moon: (5), property|radius
+...
+object|earth: 1, component|planet, object|circle: (15), property|radius
+object|earth: 2, component|planet, object|circle: (15), property|radius
+object|earth: 3, component|planet, object|circle: (15), property|radius
+
+--->
+
+PropertyInstancePaths:
+
+- object|earth: 1 / object|moon: 1 > property|radius
+- object|earth: 1 / object|moon: 2 > property|radius
+- object|earth: 1 / object|moon: 3 > property|radius
+- object|earth: 1 / object|moon: 4 > property|radius
+- object|earth: 1 / object|moon: 5 > property|radius
+
+- object|earth: 2 / object|moon: 1 > property|radius
+- object|earth: 2 / object|moon: 2 > property|radius
+- object|earth: 2 / object|moon: 3 > property|radius
+- object|earth: 2 / object|moon: 4 > property|radius
+- object|earth: 2 / object|moon: 5 > property|radius
+
+- object|earth: 3 / object|moon: 1 > property|radius
+- object|earth: 3 / object|moon: 2 > property|radius
+- object|earth: 3 / object|moon: 3 > property|radius
+- object|earth: 3 / object|moon: 4 > property|radius
+- object|earth: 3 / object|moon: 5 > property|radius
+
+------
+
+function ExpandInstancePath(AnnotatedPathSegments):
