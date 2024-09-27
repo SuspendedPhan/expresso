@@ -16,21 +16,40 @@ Process
 ---
 GetRootObjects - Retrieves the root objects from the project.
 --->
+
+
+--->
 ExtractPropertyPaths - Extracts property paths from the object hierarchy.
+    - Objects
 --->
-    
+for object in objects:
+    for property in object.properties:
+        yield PropertyPath(object, property)
+    for component in object.components:
+        for property in component.properties:
+            yield PropertyPath(object, component, property)
+        for child in component.children:
+            for property in child.properties:
+                yield PropertyPath(object, component, child, property)
+--->
 
 
----
+--->
 ResolveCloneCounts - Evaluates the number of clones for each object.
+    - CloneCountPropertyPaths
+    - NonCloneCountPropertyPaths
 --->
+yield for path in CloneCountPropertyPaths:
+    object = path.object
+    count = object.get_clone_count()
+    yield CloneCountResult(object, path.property, count)
 
+yield NonCloneCountPropertyPaths
 
 
 ---
 ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
 --->
-
 
 
 ---
