@@ -51,7 +51,7 @@ func NewPropertyPath4(object *ExObject, path *PropertyPath) *PropertyPath {
 	return &PropertyPath{segments: newSegments}
 }
 
-func (self PropertyPath) ToString() string {
+func (self PropertyPath) String() string {
 	return pathSegmentsToString(self.segments)
 }
 

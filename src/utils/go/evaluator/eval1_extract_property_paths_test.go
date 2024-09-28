@@ -83,26 +83,26 @@ func TestExtractPropertyPaths(t *testing.T) {
 	// Verify the clone count property paths
 	expectedCloneCountPropertyPaths := []string{
 		"object|earth > clone-count-property",
-		"object|earth / object|moon > clone-count-property",
 		"object|earth / component|planet / object|circle > clone-count-property",
+		"object|earth / object|moon > clone-count-property",
 	}
 
 	for i, path := range cloneCountPropertyPaths {
-		if path.ToString() != expectedCloneCountPropertyPaths[i] {
-			t.Errorf("Expected %s, got %s", expectedCloneCountPropertyPaths[i], path.ToString())
+		if path.String() != expectedCloneCountPropertyPaths[i] {
+			t.Errorf("Expected %s, got %s", expectedCloneCountPropertyPaths[i], path.String())
 		}
 	}
 
 	// Verify the property paths
 	expectedPropertyPaths := []string{
-		"object|earth / object|moon > property|radius",
 		"object|earth / component|planet > property|velocity",
-		"object|earth / component|planet / object|circle > property|radius",
+		"object|earth / component|planet / object|circle > property|circle-radius",
+		"object|earth / object|moon > property|moon-radius",
 	}
 
 	for i, path := range propertyPaths {
-		if path.ToString() != expectedPropertyPaths[i] {
-			t.Errorf("Expected %s, got %s", expectedPropertyPaths[i], path.ToString())
+		if path.String() != expectedPropertyPaths[i] {
+			t.Errorf("Expected %s, got %s", expectedPropertyPaths[i], path.String())
 		}
 	}
 }
