@@ -4,6 +4,7 @@ package evaluator
 
 // Extracts property paths from the object hierarchy.
 func (e *Evaluator) ExtractPropertyPaths(rootExObjects []*ExObject) ([]*CloneCountPropertyPath, []*PropertyPath) {
+	logger.Log3(8, "ExtractPropertyPaths", "rootExObjects", rootExObjects)
 	/*
 		for object in objects:
 		    yield* ExtractPropertyPaths_(object)
@@ -24,6 +25,7 @@ func (e *Evaluator) ExtractPropertyPaths(rootExObjects []*ExObject) ([]*CloneCou
 }
 
 func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object *ExObject) []*PropertyPath {
+	logger.Log3(8, "ExtractNonCloneCountPropertyPaths_", "object", object)
 	/*
 		function ExtractNonCloneCountPropertyPaths_(Object):
 		    for property in Object.properties:
@@ -73,6 +75,7 @@ func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object *ExObject) []*Prop
 }
 
 func ExtractCloneCountPropertyPaths(object *ExObject) []*CloneCountPropertyPath {
+	logger.Log3(8, "ExtractCloneCountPropertyPaths", "object", object)
 	/*
 		function ExtractCloneCountPropertyPaths_(Object):
 			yield CloneCountPropertyPath(Object)

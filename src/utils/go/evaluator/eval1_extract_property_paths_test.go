@@ -50,9 +50,6 @@ func TestExtractPropertyPaths(t *testing.T) {
 
 	// --- Add properties to objects ---
 
-	e.ExObjectSetComponent("earth", "planet")
-	e.ComponentAddRootObject("planet", "circle")
-
 	e.ExObjectSetCloneCountProperty("earth", "earth-clone-count")
 	e.ExObjectSetCloneCountProperty("moon", "moon-clone-count")
 	e.ExObjectSetCloneCountProperty("circle", "circle-clone-count")
@@ -60,6 +57,15 @@ func TestExtractPropertyPaths(t *testing.T) {
 	e.ExObjectAddBasicProperty("moon", "moon-radius")
 	e.ComponentAddBasicProperty("planet", "velocity")
 	e.ExObjectAddBasicProperty("circle", "circle-radius")
+
+	// --- Set relationships ---
+
+	e.ExObjectSetComponent("earth", "planet")
+	e.ComponentAddRootObject("planet", "circle")
+	e.ExObjectAddChild("earth", "moon")
+
+	// --- Add root objects ---
+	e.AddRootExObject("earth")
 
 	// --- Begin test ---
 

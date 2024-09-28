@@ -10,6 +10,8 @@ type ExObject struct {
 	CloneCountPropertyId          string
 	BasicPropertyIds              []string
 
+	ComponentId string // nil if no component
+
 	// ExObjects
 	ChildrenIds []string
 
@@ -63,7 +65,7 @@ func (e *Evaluator) ExObjectSetComponent(id string, componentId string) {
 		panic("exObject not found")
 	}
 
-	exObject.ComponentParameterPropertyIds = append(exObject.ComponentParameterPropertyIds, componentId)
+	exObject.ComponentId = componentId
 }
 
 func (e *Evaluator) ExObjectAddChild(parentId string, childId string) {
