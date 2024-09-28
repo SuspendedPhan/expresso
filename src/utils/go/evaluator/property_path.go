@@ -1,3 +1,5 @@
+// property_path.go
+
 package evaluator
 
 import (
@@ -13,8 +15,8 @@ type PropertyPath struct {
 	segments []PathSegment
 }
 
-func NewPropertyPath1(object *ExObject, property *Property) PropertyPath {
-	return PropertyPath{
+func NewPropertyPath1(object *ExObject, property *Property) *PropertyPath {
+	return &PropertyPath{
 		segments: []PathSegment{
 			{exItem: object},
 			{exItem: property},
@@ -22,8 +24,8 @@ func NewPropertyPath1(object *ExObject, property *Property) PropertyPath {
 	}
 }
 
-func NewPropertyPath2(object *ExObject, component *Component, property *Property) PropertyPath {
-	return PropertyPath{
+func NewPropertyPath2(object *ExObject, component *Component, property *Property) *PropertyPath {
+	return &PropertyPath{
 		segments: []PathSegment{
 			{exItem: object},
 			{exItem: component},
@@ -32,21 +34,21 @@ func NewPropertyPath2(object *ExObject, component *Component, property *Property
 	}
 }
 
-func NewPropertyPath3(object *ExObject, component *Component, path *PropertyPath) PropertyPath {
+func NewPropertyPath3(object *ExObject, component *Component, path *PropertyPath) *PropertyPath {
 	newSegments := []PathSegment{
 		{exItem: object},
 		{exItem: component},
 	}
 	newSegments = append(newSegments, path.segments...)
-	return PropertyPath{segments: newSegments}
+	return &PropertyPath{segments: newSegments}
 }
 
-func NewPropertyPath4(object *ExObject, path *PropertyPath) PropertyPath {
+func NewPropertyPath4(object *ExObject, path *PropertyPath) *PropertyPath {
 	newSegments := []PathSegment{
 		{exItem: object},
 	}
 	newSegments = append(newSegments, path.segments...)
-	return PropertyPath{segments: newSegments}
+	return &PropertyPath{segments: newSegments}
 }
 
 func (self PropertyPath) ToString() string {

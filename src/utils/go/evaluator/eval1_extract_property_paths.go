@@ -3,14 +3,14 @@
 package evaluator
 
 // Extracts property paths from the object hierarchy.
-func (e *Evaluator) ExtractPropertyPaths(rootExObjects []ExObject) ([]CloneCountPropertyPath, []PropertyPath) {
+func (e *Evaluator) ExtractPropertyPaths(rootExObjects []*ExObject) ([]*CloneCountPropertyPath, []*PropertyPath) {
 	/*
 		for object in objects:
 		    yield* ExtractPropertyPaths_(object)
 	*/
 
-	cloneCountPropertyPaths := make([]CloneCountPropertyPath, 0)
-	propertyPaths := make([]PropertyPath, 0)
+	cloneCountPropertyPaths := make([]*CloneCountPropertyPath, 0)
+	propertyPaths := make([]*PropertyPath, 0)
 
 	for _, object := range rootExObjects {
 		paths := e.ExtractNonCloneCountPropertyPaths_(object)
@@ -23,7 +23,7 @@ func (e *Evaluator) ExtractPropertyPaths(rootExObjects []ExObject) ([]CloneCount
 	return cloneCountPropertyPaths, propertyPaths
 }
 
-func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object ExObject) []PropertyPath {
+func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object *ExObject) []*PropertyPath {
 	/*
 		function ExtractNonCloneCountPropertyPaths_(Object):
 		    for property in Object.properties:
@@ -40,7 +40,7 @@ func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object ExObject) []Proper
 		            yield NonCloneCountPropertyPath(Object, path)
 	*/
 
-	paths := make([]PropertyPath, 0)
+	paths := make([]*PropertyPath, 0)
 
 	for _, property := range object.Properties() {
 		path := NewPropertyPath1(object, property)
@@ -50,13 +50,13 @@ func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object ExObject) []Proper
 	if object.Component() != nil {
 		component := object.Component()
 		for _, property := range component.Properties() {
-			path := NewPropertyPath2(object, *component, property)
+			path := NewPropertyPath2(object, component, property)
 			paths = append(paths, path)
 		}
 
 		for _, rootObject := range component.RootObjects() {
 			for _, path := range e.ExtractNonCloneCountPropertyPaths_(rootObject) {
-				path := NewPropertyPath3(object, *component, path)
+				path := NewPropertyPath3(object, component, path)
 				paths = append(paths, path)
 			}
 		}
@@ -72,7 +72,7 @@ func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object ExObject) []Proper
 	return paths
 }
 
-func ExtractCloneCountPropertyPaths(object ExObject) []CloneCountPropertyPath {
+func ExtractCloneCountPropertyPaths(object *ExObject) []*CloneCountPropertyPath {
 	/*
 		function ExtractCloneCountPropertyPaths_(Object):
 			yield CloneCountPropertyPath(Object)
@@ -86,7 +86,7 @@ func ExtractCloneCountPropertyPaths(object ExObject) []CloneCountPropertyPath {
 					yield CloneCountPropertyPath(Object, path)
 	*/
 
-	paths := make([]CloneCountPropertyPath, 0)
+	paths := make([]*CloneCountPropertyPath, 0)
 
 	path := NewCloneCountPropertyPath1(object)
 	paths = append(paths, path)
@@ -95,7 +95,7 @@ func ExtractCloneCountPropertyPaths(object ExObject) []CloneCountPropertyPath {
 		component := object.Component()
 		for _, rootObject := range component.RootObjects() {
 			for _, path := range ExtractCloneCountPropertyPaths(rootObject) {
-				path := NewCloneCountPropertyPath2(object, *component, path)
+				path := NewCloneCountPropertyPath2(object, component, path)
 				paths = append(paths, path)
 			}
 		}

@@ -9,11 +9,11 @@ type Component struct {
 	RootObjectIds                 []string
 }
 
-func (self *Component) Properties() []Property {
+func (self *Component) Properties() []*Property {
 	panic("Not implemented")
 }
 
-func (self *Component) RootObjects() []ExObject {
+func (self *Component) RootObjects() []*ExObject {
 	panic("Not implemented")
 }
 
