@@ -23,17 +23,33 @@ ExtractPropertyPaths - Extracts property paths from the object hierarchy.
     - Objects
 --->
 for object in objects:
-    yield* ExtractPropertyPaths_(object)
+    yield* ExtractCloneCountPropertyPaths_(object)
+    yield* ExtractNonCloneCountPropertyPaths_(object)
 
-function ExtractPropertyPaths_(Object):
+function ExtractCloneCountPropertyPaths_(Object):
+    yield CloneCountPropertyPath(Object)
+    if let component = Object.Component:
+        for rootObject in component.RootObjects:
+            for path in ExtractCloneCountPropertyPaths_(rootObject):
+                yield CloneCountPropertyPath(Object, component, path)
+
+    for child in Object.Children:
+        for path in ExtractCloneCountPropertyPaths_(child):
+            yield CloneCountPropertyPath(Object, path)
+
+function ExtractNonCloneCountPropertyPaths_(Object):
     for property in Object.properties:
-        yield PropertyPath(Object, property)
+        yield NonCloneCountPropertyPath(Object, property)
     if let component = Object.Component:
         for property in component.properties:
-            yield PropertyPath(Object, component, property)
+            yield NonCloneCountPropertyPath(Object, component, property)
         for rootObject in component.RootObjects:
-            for path in ExtractPropertyPaths_(rootObject):
-                yield PropertyPath(Object, component, path)
+            for path in ExtractNonCloneCountPropertyPaths_(rootObject):
+                yield NonCloneCountPropertyPath(Object, component, path)
+
+    for child in Object.Children:
+        for path in ExtractNonCloneCountPropertyPaths_(child):
+            yield NonCloneCountPropertyPath(Object, path)
 
 --->
 

@@ -8,6 +8,7 @@ var logger Logger2
 
 type Evaluator struct {
 	RootExObjectIds []string
+	ComponentById   map[string]*Component
 	ExObjectById    map[string]*ExObject
 	PropertyById    map[string]*Property
 	ExprById        map[string]*Expr
@@ -38,6 +39,7 @@ func NewEvaluator(logger_ Logger2) *Evaluator {
 	logger = logger_
 	return &Evaluator{
 		RootExObjectIds: []string{},
+		ComponentById:   map[string]*Component{},
 		ExObjectById:    map[string]*ExObject{},
 		PropertyById:    map[string]*Property{},
 		ExprById:        map[string]*Expr{},

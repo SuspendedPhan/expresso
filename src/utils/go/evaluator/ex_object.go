@@ -1,3 +1,5 @@
+// ex_object.go
+
 package evaluator
 
 type ExObject struct {
@@ -52,4 +54,12 @@ func (self *ExObject) Properties() []Property {
 
 func (self *ExObject) Component() *Component {
 	panic("Not implemented")
+}
+
+func (self *ExObject) Children() []ExObject {
+	panic("Not implemented")
+}
+
+func (self *ExObject) Name() string {
+	return self.Id
 }

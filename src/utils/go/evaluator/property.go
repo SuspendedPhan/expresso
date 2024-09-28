@@ -1,3 +1,5 @@
+// property.go
+
 package evaluator
 
 type Property struct {
@@ -20,4 +22,8 @@ func (e *Evaluator) PropertySetExpr(propertyId string, exprId string) {
 	}
 
 	property.ExprId = exprId
+}
+
+func (self *Property) Name() string {
+	return self.Id
 }

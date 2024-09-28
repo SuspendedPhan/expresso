@@ -57,19 +57,6 @@ AnnotatedPropertyPaths:
 - object|earth: (10) / component|planet > property|velocity
 - object|earth: (10) / component|planet / object|circle: (15) > property|radius
 
---->
-ExpandInstanceSegments
---->
-
-PropertyInstancePathSegment: (object|earth: 5)
-PropertyInstancePathSegment: (component|planet)
-PropertyInstancePathSegment: (object|circle: 10)
-PropertyInstancePathSegment: (property|x)
-PropertyInstancePathSegment: (object|earth: 6)
-PropertyInstancePathSegment: (component|planet)
-PropertyInstancePathSegment: (object|circle: 1)
-PropertyInstancePathSegment: (property|radius)
-
 
 --->
 ExpandInstancePaths - Converts PropertyPaths to PropertyInstancePaths by expanding clone counts.
