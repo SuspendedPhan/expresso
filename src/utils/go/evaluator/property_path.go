@@ -52,11 +52,15 @@ func NewPropertyPath4(object *ExObject, path *PropertyPath) *PropertyPath {
 }
 
 func (self PropertyPath) ToString() string {
+	return pathSegmentsToString(self.segments)
+}
+
+func pathSegmentsToString(segments []PathSegment) string {
 	var pathParts []string
 	var lastPart string
 
-	segmentCount := len(self.segments)
-	for i, segment := range self.segments {
+	segmentCount := len(segments)
+	for i, segment := range segments {
 		switch item := segment.exItem.(type) {
 		case *ExObject:
 			pathParts = append(pathParts, fmt.Sprintf("object|%s", item.Name()))

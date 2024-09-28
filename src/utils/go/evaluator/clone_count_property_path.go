@@ -29,3 +29,7 @@ func NewCloneCountPropertyPath3(object *ExObject, path *CloneCountPropertyPath) 
 	newSegments = append(newSegments, path.segments...)
 	return &CloneCountPropertyPath{segments: newSegments}
 }
+
+func (self *CloneCountPropertyPath) ToString() string {
+	return pathSegmentsToString(self.segments) + " > clone-count-property"
+}

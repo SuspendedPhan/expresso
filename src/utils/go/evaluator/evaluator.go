@@ -80,3 +80,11 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, exprId string) Float {
 
 	panic("expr is neither a number expr nor a call expr")
 }
+
+func (e *Evaluator) RootExObjects() []*ExObject {
+	objects := []*ExObject{}
+	for _, exObjectId := range e.RootExObjectIds {
+		objects = append(objects, e.ExObjectById[exObjectId])
+	}
+	return objects
+}

@@ -48,6 +48,10 @@ func (e *Evaluator) ExObjectAddBasicProperty(id string, propertyId string) {
 	exObject.BasicPropertyIds = append(exObject.BasicPropertyIds, propertyId)
 }
 
+func (e *Evaluator) ExObjectSetComponent(id string, componentId string) {
+	panic("Not implemented")
+}
+
 func (self *ExObject) Properties() []*Property {
 	panic("Not implemented")
 }
