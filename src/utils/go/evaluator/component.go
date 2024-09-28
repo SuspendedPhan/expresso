@@ -7,14 +7,47 @@ type Component struct {
 	ComponentParameterPropertyIds []string
 	BasicPropertyIds              []string
 	RootObjectIds                 []string
+	Evaluator                     *Evaluator
 }
 
-func (self *Component) Properties() []*Property {
-	panic("Not implemented")
+// Properties retrieves all properties associated with the component.
+func (c *Component) Properties() []*Property {
+	properties := []*Property{}
+
+	// Retrieve Component Parameter Properties
+	for _, propId := range c.ComponentParameterPropertyIds {
+		prop, exists := c.Evaluator.PropertyById[propId]
+		if !exists {
+			panic("Property not found: " + propId)
+		}
+		properties = append(properties, prop)
+	}
+
+	// Retrieve Basic Properties
+	for _, propId := range c.BasicPropertyIds {
+		prop, exists := c.Evaluator.PropertyById[propId]
+		if !exists {
+			panic("Property not found: " + propId)
+		}
+		properties = append(properties, prop)
+	}
+
+	return properties
 }
 
-func (self *Component) RootObjects() []*ExObject {
-	panic("Not implemented")
+// RootObjects retrieves all root objects associated with the component.
+func (c *Component) RootObjects() []*ExObject {
+	rootObjects := []*ExObject{}
+
+	for _, objId := range c.RootObjectIds {
+		obj, exists := c.Evaluator.ExObjectById[objId]
+		if !exists {
+			panic("ExObject not found: " + objId)
+		}
+		rootObjects = append(rootObjects, obj)
+	}
+
+	return rootObjects
 }
 
 func (e *Evaluator) ComponentCreate(id string) {

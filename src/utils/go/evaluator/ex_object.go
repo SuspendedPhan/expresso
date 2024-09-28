@@ -2,11 +2,18 @@
 
 package evaluator
 
+import "fmt"
+
 type ExObject struct {
 	Id                            string
 	ComponentParameterPropertyIds []string
 	CloneCountPropertyId          string
 	BasicPropertyIds              []string
+
+	// ExObjects
+	ChildrenIds []string
+
+	Evaluator *Evaluator
 }
 
 func (e *Evaluator) ExObjectCreate(id string) {
@@ -15,6 +22,7 @@ func (e *Evaluator) ExObjectCreate(id string) {
 		ComponentParameterPropertyIds: []string{},
 		CloneCountPropertyId:          "",
 		BasicPropertyIds:              []string{},
+		Evaluator:                     e,
 	}
 }
 
@@ -49,19 +57,78 @@ func (e *Evaluator) ExObjectAddBasicProperty(id string, propertyId string) {
 }
 
 func (e *Evaluator) ExObjectSetComponent(id string, componentId string) {
-	panic("Not implemented")
+	exObject, found := e.ExObjectById[id]
+
+	if !found {
+		panic("exObject not found")
+	}
+
+	exObject.ComponentParameterPropertyIds = append(exObject.ComponentParameterPropertyIds, componentId)
 }
 
-func (self *ExObject) Properties() []*Property {
-	panic("Not implemented")
+func (e *Evaluator) ExObjectAddChild(parentId string, childId string) {
+	parent, found := e.ExObjectById[parentId]
+	if !found {
+		panic(fmt.Sprintf("Parent ExObject with ID '%s' not found", parentId))
+	}
+
+	_, found = e.ExObjectById[childId]
+	if !found {
+		panic(fmt.Sprintf("Child ExObject with ID '%s' not found", childId))
+	}
+
+	for _, existingChildId := range parent.ChildrenIds {
+		if existingChildId == childId {
+			panic(fmt.Sprintf("Child with ID '%s' is already a child of parent '%s'", childId, parentId))
+		}
+	}
+
+	parent.ChildrenIds = append(parent.ChildrenIds, childId)
+}
+
+// NonCloneCountProperties returns all properties associated with the ExObject
+// excluding the CloneCountProperty.
+func (self *ExObject) NonCloneCountProperties() []*Property {
+	var properties []*Property
+
+	// Helper function to add properties if they are not the CloneCountProperty
+	addProperty := func(propertyIds []string) {
+		for _, id := range propertyIds {
+			if prop, exists := self.Evaluator.PropertyById[id]; exists {
+				properties = append(properties, prop)
+			} else {
+				panic("Property not found")
+			}
+		}
+	}
+
+	addProperty(self.ComponentParameterPropertyIds)
+	addProperty(self.BasicPropertyIds)
+	return properties
 }
 
 func (self *ExObject) Component() *Component {
-	panic("Not implemented")
+	if len(self.ComponentParameterPropertyIds) == 0 {
+		return nil
+	}
+	componentId := self.ComponentParameterPropertyIds[0]
+	component, exists := self.Evaluator.ComponentById[componentId]
+	if !exists {
+		panic("Component not found")
+	}
+	return component
 }
 
 func (self *ExObject) Children() []*ExObject {
-	panic("Not implemented")
+	var children []*ExObject
+	for _, childId := range self.ChildrenIds {
+		child, exists := self.Evaluator.ExObjectById[childId]
+		if !exists {
+			panic("Child not found")
+		}
+		children = append(children, child)
+	}
+	return children
 }
 
 func (self *ExObject) Name() string {
