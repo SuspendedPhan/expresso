@@ -23,14 +23,18 @@ ExtractPropertyPaths - Extracts property paths from the object hierarchy.
     - Objects
 --->
 for object in objects:
-    for property in object.properties:
-        yield PropertyPath(object, property)
-    for component in object.components:
+    yield* ExtractPropertyPaths_(object)
+
+function ExtractPropertyPaths_(Object):
+    for property in Object.properties:
+        yield PropertyPath(Object, property)
+    if let component = Object.Component:
         for property in component.properties:
-            yield PropertyPath(object, component, property)
-        for child in component.children:
-            for property in child.properties:
-                yield PropertyPath(object, component, child, property)
+            yield PropertyPath(Object, component, property)
+        for rootObject in component.RootObjects:
+            for path in ExtractPropertyPaths_(rootObject):
+                yield PropertyPath(Object, component, path)
+
 --->
 
 
