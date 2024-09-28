@@ -2,7 +2,11 @@
 
 package evaluator
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/davecgh/go-spew/spew"
+)
 
 const minLevel = 8
 
@@ -19,6 +23,8 @@ func (l *NoopLogger) Log(args ...interface{})   {}
 func (l *NoopLogger) Error(args ...interface{}) {}
 
 func (l *NoopLogger) Log3(level int, args ...interface{}) {
+	spew.Config.DisablePointerAddresses = true
+
 	if level >= minLevel {
 		fmt.Println(args...)
 	}

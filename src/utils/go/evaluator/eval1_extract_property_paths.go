@@ -2,9 +2,13 @@
 
 package evaluator
 
+import "github.com/davecgh/go-spew/spew"
+
 // Extracts property paths from the object hierarchy.
 func (e *Evaluator) ExtractPropertyPaths(rootExObjects []*ExObject) ([]*CloneCountPropertyPath, []*PropertyPath) {
-	logger.Log3(8, "ExtractPropertyPaths", "rootExObjects", rootExObjects)
+	spew.Config.DisableCapacities = true
+	spew.Config.Indent = "    "
+	logger.Log3(8, "ExtractPropertyPaths", "rootExObjects", spew.Sdump(rootExObjects))
 	/*
 		for object in objects:
 		    yield* ExtractPropertyPaths_(object)

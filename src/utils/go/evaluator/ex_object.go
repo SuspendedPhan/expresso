@@ -10,7 +10,7 @@ type ExObject struct {
 	CloneCountPropertyId          string
 	BasicPropertyIds              []string
 
-	ComponentId string // nil if no component
+	ComponentId string // "" if no component
 
 	// ExObjects
 	ChildrenIds []string
@@ -19,6 +19,7 @@ type ExObject struct {
 }
 
 func (e *Evaluator) ExObjectCreate(id string) {
+	logger.Log3(8, "ExObjectCreate", "id", id)
 	e.ExObjectById[id] = &ExObject{
 		Id:                            id,
 		ComponentParameterPropertyIds: []string{},
@@ -29,6 +30,7 @@ func (e *Evaluator) ExObjectCreate(id string) {
 }
 
 func (e *Evaluator) ExObjectAddComponentParameterProperty(exObjectId string, propertyId string) {
+	logger.Log3(8, "ExObjectAddComponentParameterProperty", "exObjectId", exObjectId, "propertyId", propertyId)
 	exObject, found := e.ExObjectById[exObjectId]
 
 	if !found {
@@ -39,6 +41,7 @@ func (e *Evaluator) ExObjectAddComponentParameterProperty(exObjectId string, pro
 }
 
 func (e *Evaluator) ExObjectSetCloneCountProperty(id string, cloneCountPropertyId string) {
+	logger.Log3(8, "ExObjectSetCloneCountProperty", "id", id, "cloneCountPropertyId", cloneCountPropertyId)
 	exObject, found := e.ExObjectById[id]
 
 	if !found {
@@ -49,6 +52,7 @@ func (e *Evaluator) ExObjectSetCloneCountProperty(id string, cloneCountPropertyI
 }
 
 func (e *Evaluator) ExObjectAddBasicProperty(id string, propertyId string) {
+	logger.Log3(8, "ExObjectAddBasicProperty", "id", id, "propertyId", propertyId)
 	exObject, found := e.ExObjectById[id]
 
 	if !found {
@@ -59,6 +63,7 @@ func (e *Evaluator) ExObjectAddBasicProperty(id string, propertyId string) {
 }
 
 func (e *Evaluator) ExObjectSetComponent(id string, componentId string) {
+	logger.Log3(8, "ExObjectSetComponent", "id", id, "componentId", componentId)
 	exObject, found := e.ExObjectById[id]
 
 	if !found {
@@ -69,6 +74,7 @@ func (e *Evaluator) ExObjectSetComponent(id string, componentId string) {
 }
 
 func (e *Evaluator) ExObjectAddChild(parentId string, childId string) {
+	logger.Log3(8, "ExObjectAddChild", "parentId", parentId, "childId", childId)
 	parent, found := e.ExObjectById[parentId]
 	if !found {
 		panic(fmt.Sprintf("Parent ExObject with ID '%s' not found", parentId))
@@ -91,6 +97,7 @@ func (e *Evaluator) ExObjectAddChild(parentId string, childId string) {
 // NonCloneCountProperties returns all properties associated with the ExObject
 // excluding the CloneCountProperty.
 func (self *ExObject) NonCloneCountProperties() []*Property {
+	logger.Log3(8, "NonCloneCountProperties", "self", self)
 	var properties []*Property
 
 	// Helper function to add properties if they are not the CloneCountProperty
@@ -106,22 +113,27 @@ func (self *ExObject) NonCloneCountProperties() []*Property {
 
 	addProperty(self.ComponentParameterPropertyIds)
 	addProperty(self.BasicPropertyIds)
+	logger.Log3(8, "NonCloneCountProperties end", "return", properties)
 	return properties
 }
 
 func (self *ExObject) Component() *Component {
-	if len(self.ComponentParameterPropertyIds) == 0 {
+	logger.Log3(8, "Component", "self", self)
+	if self.ComponentId == "" {
+		logger.Log3(8, "Component end", "return", nil)
 		return nil
 	}
-	componentId := self.ComponentParameterPropertyIds[0]
-	component, exists := self.Evaluator.ComponentById[componentId]
+
+	component, exists := self.Evaluator.ComponentById[self.ComponentId]
 	if !exists {
 		panic("Component not found")
 	}
+	logger.Log3(8, "Component end", "return", component)
 	return component
 }
 
 func (self *ExObject) Children() []*ExObject {
+	logger.Log3(8, "Children", "self", self)
 	var children []*ExObject
 	for _, childId := range self.ChildrenIds {
 		child, exists := self.Evaluator.ExObjectById[childId]
@@ -130,9 +142,13 @@ func (self *ExObject) Children() []*ExObject {
 		}
 		children = append(children, child)
 	}
+	logger.Log3(8, "Children end", "return", children)
 	return children
 }
 
 func (self *ExObject) Name() string {
-	return self.Id
+	logger.Log3(8, "Name", "self", self)
+	name := self.Id
+	logger.Log3(8, "Name end", "return", name)
+	return name
 }
