@@ -60,6 +60,7 @@ func (e *Evaluator) ComponentCreate(id string) {
 		ComponentParameterPropertyIds: []string{},
 		BasicPropertyIds:              []string{},
 		RootObjectIds:                 []string{},
+		Evaluator:                     e,
 	}
 }
 
