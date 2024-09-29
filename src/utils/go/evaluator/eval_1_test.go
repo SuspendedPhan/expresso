@@ -136,9 +136,9 @@ func TestEval(t *testing.T) {
 
 	// ---Output---
 	// AnnotatedPropertyPaths:
-	// - object|earth: (10) / object|moon: (5) > property|radius
-	// - object|earth: (10) / component|planet > property|velocity
-	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
+	// - object|earth: (4) / object|moon: (3) > property|moon-radius
+	// - object|earth: (4) / component|planet > property|velocity
+	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
 	annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 	if len(annotatedPropertyPaths) != 3 {
@@ -146,9 +146,9 @@ func TestEval(t *testing.T) {
 	}
 
 	expectedAnnotatedPropertyPaths := []string{
-		"object|earth: (10) / component|planet > property|velocity",
-		"object|earth: (10) / component|planet / object|circle: (15) > property|circle-radius",
-		"object|earth: (10) / object|moon: (5) > property|moon-radius",
+		"object|earth: (4) / component|planet > property|velocity",
+		"object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius",
+		"object|earth: (4) / object|moon: (3) > property|moon-radius",
 	}
 
 	for i, path := range annotatedPropertyPaths {
@@ -161,9 +161,9 @@ func TestEval(t *testing.T) {
 
 	// ---Input---
 	// AnnotatedPropertyPaths:
-	// - object|earth: (10) / object|moon: (5) > property|radius
-	// - object|earth: (10) / component|planet > property|velocity
-	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
+	// - object|earth: (4) / object|moon: (3) > property|moon-radius
+	// - object|earth: (4) / component|planet > property|velocity
+	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
 	// ---Output---
 	// PropertyInstancePath: (object|earth: 1 / component|planet > property|velocity)
