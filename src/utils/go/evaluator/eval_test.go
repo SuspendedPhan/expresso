@@ -146,9 +146,9 @@ func TestEval(t *testing.T) {
 	}
 
 	expectedAnnotatedPropertyPaths := []string{
-		"object|earth: (10) / object|moon: (5) > property|moon-radius",
 		"object|earth: (10) / component|planet > property|velocity",
 		"object|earth: (10) / component|planet / object|circle: (15) > property|circle-radius",
+		"object|earth: (10) / object|moon: (5) > property|moon-radius",
 	}
 
 	for i, path := range annotatedPropertyPaths {
