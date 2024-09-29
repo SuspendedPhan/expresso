@@ -103,6 +103,9 @@ func TestEval(t *testing.T) {
 	e.CallExprSetArg0("circle-radius-expr", "circle-radius-expr-arg-0")
 	e.CallExprSetArg1("circle-radius-expr", "circle-radius-expr-arg-1")
 	e.ReferenceExprSetTargetId("circle-radius-expr-arg-0", "planet-velocity")
+	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-0", "Property/BasicProperty")
+	e.ReferenceExprSetTargetId("circle-radius-expr-arg-1", "circle")
+	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-1", "Property/CloneCountProperty")
 
 	// --- Add expr for object|earth / object|moon > property|radius ---
 
