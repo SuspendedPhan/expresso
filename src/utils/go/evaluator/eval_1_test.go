@@ -109,6 +109,17 @@ func TestEval(t *testing.T) {
 
 	// --- Add expr for object|earth / object|moon > property|radius ---
 
+	e.CallExprCreate("moon-radius-expr")
+	e.ReferenceExprCreate("moon-radius-expr-arg-0")
+	e.ReferenceExprCreate("moon-radius-expr-arg-1")
+
+	e.CallExprSetArg0("moon-radius-expr", "moon-radius-expr-arg-0")
+	e.CallExprSetArg1("moon-radius-expr", "moon-radius-expr-arg-1")
+	e.ReferenceExprSetTargetId("moon-radius-expr-arg-0", "earth")
+	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-0", "Property/CloneCountProperty")
+	e.ReferenceExprSetTargetId("moon-radius-expr-arg-1", "moon")
+	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-1", "Property/CloneCountProperty")
+
 	// --- Begin test ---
 
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(e.RootExObjects())
