@@ -2,12 +2,12 @@ package evaluator
 
 type CloneCountPropertyPath struct {
 	// Includes the clone count property itself.
-	segments []*PathSegment
+	segments []*PropertyPathSegment
 }
 
 func NewCloneCountPropertyPath1(object *ExObject) *CloneCountPropertyPath {
 	return &CloneCountPropertyPath{
-		segments: []*PathSegment{
+		segments: []*PropertyPathSegment{
 			{exItem: object},
 			{exItem: object.CloneCountProperty()},
 		},
@@ -15,7 +15,7 @@ func NewCloneCountPropertyPath1(object *ExObject) *CloneCountPropertyPath {
 }
 
 func NewCloneCountPropertyPath2(object *ExObject, component *Component, path *CloneCountPropertyPath) *CloneCountPropertyPath {
-	newSegments := []*PathSegment{
+	newSegments := []*PropertyPathSegment{
 		{exItem: object},
 		{exItem: component},
 	}
@@ -24,7 +24,7 @@ func NewCloneCountPropertyPath2(object *ExObject, component *Component, path *Cl
 }
 
 func NewCloneCountPropertyPath3(object *ExObject, path *CloneCountPropertyPath) *CloneCountPropertyPath {
-	newSegments := []*PathSegment{
+	newSegments := []*PropertyPathSegment{
 		{exItem: object},
 	}
 	newSegments = append(newSegments, path.segments...)

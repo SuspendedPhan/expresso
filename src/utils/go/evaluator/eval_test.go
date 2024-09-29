@@ -156,4 +156,24 @@ func TestEval(t *testing.T) {
 			t.Errorf("Expected %s, got %s", expectedAnnotatedPropertyPaths[i], path.String())
 		}
 	}
+
+	// ------ Test3 ExpandInstancePaths ------
+
+	// ---Input---
+	// AnnotatedPropertyPaths:
+	// - object|earth: (10) / object|moon: (5) > property|radius
+	// - object|earth: (10) / component|planet > property|velocity
+	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
+
+	// ---Output---
+	// ...
+	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|x)
+	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|radius)
+	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|x)
+	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|radius)
+	// PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|x)
+	// PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|radius)
+	// ...
+
+	e.ExpandInstancePaths(annotatedPropertyPaths)
 }

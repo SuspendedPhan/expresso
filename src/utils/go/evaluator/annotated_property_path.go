@@ -88,7 +88,7 @@ func NewAnnotatedPropertyPath(annotatedSegments []*AnnotatedPathSegment) *Annota
 	return &AnnotatedPropertyPath{AnnotatedPathSegments: annotatedSegments}
 }
 
-func NewAnnotatedPathSegment(segment *PathSegment, cloneCountResults []*CloneCountResult) *AnnotatedPathSegment {
+func NewAnnotatedPathSegment(segment *PropertyPathSegment, cloneCountResults []*CloneCountResult) *AnnotatedPathSegment {
 	if _, ok := segment.exItem.(*ExObject); !ok {
 		// Non-ExObject segments are not annotated with clone counts
 		return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: -1}

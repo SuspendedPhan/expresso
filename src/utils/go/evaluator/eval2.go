@@ -1,4 +1,4 @@
-// File: eval2_annotate_clone_counts.go
+// File: eval2.go
 
 package evaluator
 
