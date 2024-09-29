@@ -29,6 +29,8 @@ import (
 // - object|earth / component|planet / object|circle > property|radius
 
 func TestExtractPropertyPaths(t *testing.T) {
+	// ------ Test1 ExtractPropertyPaths ------
+
 	// Create the evaluator
 	e := evaluator.NewEvaluator(&evaluator.NoopLogger{})
 
@@ -103,6 +105,42 @@ func TestExtractPropertyPaths(t *testing.T) {
 	for i, path := range propertyPaths {
 		if path.String() != expectedPropertyPaths[i] {
 			t.Errorf("Expected %s, got %s", expectedPropertyPaths[i], path.String())
+		}
+	}
+
+	// ------ Test2 AnnotateCloneCounts ------
+
+	// ---Input---
+	// CloneCountPropertyPaths:
+	// - object|earth > clone-count-property
+	// - object|earth / object|moon > clone-count-property
+	// - object|earth / component|planet / object|circle > clone-count-property
+
+	// NonCloneCountPropertyPaths:
+	// - object|earth / object|moon > property|radius
+	// - object|earth / component|planet > property|velocity
+	// - object|earth / component|planet / object|circle > property|radius
+
+	// ---Output---
+	// AnnotatedPropertyPaths:
+	// - object|earth: (10) / object|moon: (5) > property|radius
+	// - object|earth: (10) / component|planet > property|velocity
+	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
+
+	annotatedPropertyPaths := evaluator.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+	if len(annotatedPropertyPaths) != 3 {
+		t.Errorf("Expected 3 annotated property paths, got %d", len(annotatedPropertyPaths))
+	}
+
+	expectedAnnotatedPropertyPaths := []string{
+		"object|earth: (10) / object|moon: (5) > property|moon-radius",
+		"object|earth: (10) / component|planet > property|velocity",
+		"object|earth: (10) / component|planet / object|circle: (15) > property|circle-radius",
+	}
+
+	for i, path := range annotatedPropertyPaths {
+		if path.String() != expectedAnnotatedPropertyPaths[i] {
+			t.Errorf("Expected %s, got %s", expectedAnnotatedPropertyPaths[i], path.String())
 		}
 	}
 }

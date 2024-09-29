@@ -19,3 +19,8 @@ func (self AnnotatedPathSegment) CloneCount() int {
 	}
 	return self.cloneCount
 }
+
+func (self AnnotatedPropertyPath) String() string {
+	// TODO
+	panic("Not implemented")
+}
