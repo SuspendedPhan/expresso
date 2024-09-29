@@ -152,3 +152,17 @@ func (self *ExObject) Name() string {
 	logger.Log3(8, "Name end", "return", name)
 	return name
 }
+
+func (self *ExObject) CloneCountProperty() *Property {
+	logger.Log3(8, "CloneCountProperty", "self", self)
+	if self.CloneCountPropertyId == "" {
+		panic("CloneCountProperty not set")
+	}
+
+	prop, exists := self.Evaluator.PropertyById[self.CloneCountPropertyId]
+	if !exists {
+		panic("CloneCountProperty not found")
+	}
+	logger.Log3(8, "CloneCountProperty end", "return", prop)
+	return prop
+}
