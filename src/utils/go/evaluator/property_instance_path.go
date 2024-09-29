@@ -45,7 +45,6 @@ func (p *PropertyInstancePath) String() string {
 	return pathStr
 }
 
-// String method for PropertyInstancePathSegment
 func (s *PropertyInstancePathSegment) String() string {
 	var part string
 	switch item := s.exItem.(type) {
