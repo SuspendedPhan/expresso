@@ -2,6 +2,6 @@
 
 package evaluator
 
-func (e *Evaluator) ExpandInstancePaths(paths []*AnnotatedPropertyPath) {
-
+func (e *Evaluator) ExpandInstancePaths(paths []*AnnotatedPropertyPath) []*PropertyInstancePath {
+	panic("not implemented")
 }

@@ -166,14 +166,39 @@ func TestEval(t *testing.T) {
 	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
 
 	// ---Output---
-	// ...
-	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|x)
-	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 10 > property|radius)
-	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|x)
-	// PropertyInstancePath: (object|earth: 5 / component|planet / object|circle: 11 > property|radius)
-	// PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|x)
-	// PropertyInstancePath: (object|earth: 6 / component|planet / object|circle: 1 > property|radius)
+	// PropertyInstancePath: (object|earth: 1 / component|planet > property|velocity)
+	// PropertyInstancePath: (object|earth: 2 / component|planet > property|velocity)
+	// PropertyInstancePath: (object|earth: 3 / component|planet > property|velocity)
+
+	// PropertyInstancePath: (object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 1 / component|planet / object|circle: 3 > property|circle-radius)
+
+	// PropertyInstancePath: (object|earth: 2 / component|planet / object|circle: 1 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 2 / component|planet / object|circle: 2 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 2 / component|planet / object|circle: 3 > property|circle-radius)
+
+	// PropertyInstancePath: (object|earth: 3 / component|planet / object|circle: 1 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 3 / component|planet / object|circle: 2 > property|circle-radius)
+	// PropertyInstancePath: (object|earth: 3 / component|planet / object|circle: 3 > property|circle-radius)
+
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 1 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 2 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 3 > property|moon-radius)
+
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 1 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 2 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 3 > property|moon-radius)
+
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 1 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 2 > property|moon-radius)
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 3 > property|moon-radius)
+
 	// ...
 
-	e.ExpandInstancePaths(annotatedPropertyPaths)
+	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
+
+	if len(propertyInstancePaths) != 18 {
+		t.Errorf("Expected 18 property instance paths, got %d", len(propertyInstancePaths))
+	}
 }
