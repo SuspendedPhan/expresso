@@ -119,6 +119,5 @@ func NewAnnotatedPathSegment(segment *PathSegment, cloneCountResults []*CloneCou
 		panic(fmt.Sprintf("Clone count result not found for segment: %v", segment.exItem))
 	}
 
-	// Return the annotated path segment with the found clone count
 	return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: cloneCount}
 }
