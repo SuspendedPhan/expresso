@@ -11,11 +11,18 @@ import (
 // ---Input---
 // - object|earth
 //     - component|planet
-//         - property|velocity
+//         - property|planet-velocity
+//             - reference-expr: object|earth > clone-number-target
 //         - object|circle
 //             - property|radius
+//                 - call-expr
+//                     - reference-expr: object|earth > component|planet > property|planet-velocity
+//                     - reference-expr: object|earth > object|circle > clone-number-target
 //     - object|moon
 //         - property|radius
+//             - call-expr
+//                 - reference-expr: object|earth > clone-number-target
+//                 - reference-expr: object|earth > object|moon > clone-number-target
 //
 // ---Output---
 // CloneCountPropertyPaths:
@@ -25,7 +32,7 @@ import (
 
 // NonCloneCountPropertyPaths:
 // - object|earth / object|moon > property|radius
-// - object|earth / component|planet > property|velocity
+// - object|earth / component|planet > property|planet-velocity
 // - object|earth / component|planet / object|circle > property|radius
 
 func TestEval(t *testing.T) {
@@ -47,7 +54,7 @@ func TestEval(t *testing.T) {
 	e.PropertyCreate("circle-clone-count")
 
 	e.PropertyCreate("moon-radius")
-	e.PropertyCreate("velocity")
+	e.PropertyCreate("planet-velocity")
 	e.PropertyCreate("circle-radius")
 
 	// --- Add properties to objects ---
@@ -57,7 +64,7 @@ func TestEval(t *testing.T) {
 	e.ExObjectSetCloneCountProperty("circle", "circle-clone-count")
 
 	e.ExObjectAddBasicProperty("moon", "moon-radius")
-	e.ComponentAddBasicProperty("planet", "velocity")
+	e.ComponentAddBasicProperty("planet", "planet-velocity")
 	e.ExObjectAddBasicProperty("circle", "circle-radius")
 
 	// --- Set relationships ---
@@ -69,7 +76,7 @@ func TestEval(t *testing.T) {
 	// --- Add root objects ---
 	e.AddRootExObject("earth")
 
-	// --- Add exprs ---
+	// --- Add clone count exprs ---
 	e.NumberExprCreate("earth-clone-count-expr")
 	e.NumberExprCreate("moon-clone-count-expr")
 	e.NumberExprCreate("circle-clone-count-expr")
@@ -81,6 +88,23 @@ func TestEval(t *testing.T) {
 	e.PropertySetExpr("earth-clone-count", "earth-clone-count-expr")
 	e.PropertySetExpr("moon-clone-count", "moon-clone-count-expr")
 	e.PropertySetExpr("circle-clone-count", "circle-clone-count-expr")
+
+	// --- Add expr for object|earth / component|planet > property|planet-velocity ---
+
+	e.ReferenceExprCreate("planet-velocity-expr")
+	e.ReferenceExprSetTargetId("planet-velocity-expr", "earth")
+	e.ReferenceExprSetTargetKind("planet-velocity-expr", "Property/CloneCountProperty")
+
+	// --- Add expr for object|earth / component|planet / object|circle > property|radius ---
+	e.CallExprCreate("circle-radius-expr")
+	e.ReferenceExprCreate("circle-radius-expr-arg-0")
+	e.ReferenceExprCreate("circle-radius-expr-arg-1")
+
+	e.CallExprSetArg0("circle-radius-expr", "circle-radius-expr-arg-0")
+	e.CallExprSetArg1("circle-radius-expr", "circle-radius-expr-arg-1")
+	e.ReferenceExprSetTargetId("circle-radius-expr-arg-0", "planet-velocity")
+
+	// --- Add expr for object|earth / object|moon > property|radius ---
 
 	// --- Begin test ---
 
@@ -110,7 +134,7 @@ func TestEval(t *testing.T) {
 
 	// Verify the property paths
 	expectedPropertyPaths := []string{
-		"object|earth / component|planet > property|velocity",
+		"object|earth / component|planet > property|planet-velocity",
 		"object|earth / component|planet / object|circle > property|circle-radius",
 		"object|earth / object|moon > property|moon-radius",
 	}
@@ -131,13 +155,13 @@ func TestEval(t *testing.T) {
 
 	// NonCloneCountPropertyPaths:
 	// - object|earth / object|moon > property|radius
-	// - object|earth / component|planet > property|velocity
+	// - object|earth / component|planet > property|planet-velocity
 	// - object|earth / component|planet / object|circle > property|radius
 
 	// ---Output---
 	// AnnotatedPropertyPaths:
 	// - object|earth: (4) / object|moon: (3) > property|moon-radius
-	// - object|earth: (4) / component|planet > property|velocity
+	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
 	annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
@@ -146,7 +170,7 @@ func TestEval(t *testing.T) {
 	}
 
 	expectedAnnotatedPropertyPaths := []string{
-		"object|earth: (4) / component|planet > property|velocity",
+		"object|earth: (4) / component|planet > property|planet-velocity",
 		"object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius",
 		"object|earth: (4) / object|moon: (3) > property|moon-radius",
 	}
@@ -162,14 +186,14 @@ func TestEval(t *testing.T) {
 	// ---Input---
 	// AnnotatedPropertyPaths:
 	// - object|earth: (4) / object|moon: (3) > property|moon-radius
-	// - object|earth: (4) / component|planet > property|velocity
+	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
 	// ---Output---
-	// PropertyInstancePath: (object|earth: 1 / component|planet > property|velocity)
-	// PropertyInstancePath: (object|earth: 2 / component|planet > property|velocity)
-	// PropertyInstancePath: (object|earth: 3 / component|planet > property|velocity)
-	// PropertyInstancePath: (object|earth: 4 / component|planet > property|velocity)
+	// PropertyInstancePath: (object|earth: 1 / component|planet > property|planet-velocity)
+	// PropertyInstancePath: (object|earth: 2 / component|planet > property|planet-velocity)
+	// PropertyInstancePath: (object|earth: 3 / component|planet > property|planet-velocity)
+	// PropertyInstancePath: (object|earth: 4 / component|planet > property|planet-velocity)
 
 	// PropertyInstancePath: (object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius)
 	// PropertyInstancePath: (object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius)
@@ -224,4 +248,9 @@ func TestEval(t *testing.T) {
 			t.Errorf("Expected %s, got %s", expectedPropertyInstancePaths_[i], path.String())
 		}
 	}
+
+	// ------ Test4 EvaluatePropertyInstances ------
+
+	// ---Output---
+
 }
