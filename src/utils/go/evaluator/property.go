@@ -6,11 +6,13 @@ type Property struct {
 	Id           string
 	ExprId       string
 	PropertyType string
+	Evaluator    *Evaluator
 }
 
 func (e *Evaluator) PropertyCreate(propertyId string) {
 	e.PropertyById[propertyId] = &Property{
-		Id: propertyId,
+		Id:        propertyId,
+		Evaluator: e,
 	}
 }
 
@@ -26,4 +28,14 @@ func (e *Evaluator) PropertySetExpr(propertyId string, exprId string) {
 
 func (self *Property) Name() string {
 	return self.Id
+}
+
+func (self *Property) Expr() *Expr {
+	expr, found := self.Evaluator.ExprById[self.ExprId]
+
+	if !found {
+		panic("expr not found")
+	}
+
+	return expr
 }

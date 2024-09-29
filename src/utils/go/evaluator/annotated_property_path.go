@@ -6,14 +6,14 @@ type AnnotatedPropertyPath struct {
 
 type AnnotatedPathSegment struct {
 	ExItem     ExItem
-	cloneCount int // -1 if not an ex-object
+	cloneCount Float // -1 if not an ex-object
 }
 
 func (self AnnotatedPathSegment) IsCloneCountProperty() bool {
 	return self.cloneCount != -1
 }
 
-func (self AnnotatedPathSegment) CloneCount() int {
+func (self AnnotatedPathSegment) CloneCount() Float {
 	if !self.IsCloneCountProperty() {
 		panic("Not a clone count property")
 	}
@@ -35,7 +35,7 @@ func NewAnnotatedPathSegment(segment *PathSegment, cloneCountResults []*CloneCou
 	}
 
 	// Find the clone count result for the segment
-	cloneCount := -1
+	cloneCount := Float(-1)
 	for _, result := range cloneCountResults {
 		segments := result.PropertyPath.segments
 		for _, segment_ := range segments {

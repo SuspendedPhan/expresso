@@ -2,7 +2,7 @@ package evaluator
 
 type CloneCountResult struct {
 	PropertyPath *CloneCountPropertyPath
-	Count        int
+	Count        Float
 }
 
 // Annotates property paths with clone counts.

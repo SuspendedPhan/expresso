@@ -69,6 +69,19 @@ func TestEval(t *testing.T) {
 	// --- Add root objects ---
 	e.AddRootExObject("earth")
 
+	// --- Add exprs ---
+	e.NumberExprCreate("earth-clone-count-expr")
+	e.NumberExprCreate("moon-clone-count-expr")
+	e.NumberExprCreate("circle-clone-count-expr")
+
+	e.NumberExprSetValue("earth-clone-count-expr", 10)
+	e.NumberExprSetValue("moon-clone-count-expr", 5)
+	e.NumberExprSetValue("circle-clone-count-expr", 15)
+
+	e.PropertySetExpr("earth-clone-count", "earth-clone-count-expr")
+	e.PropertySetExpr("moon-clone-count", "moon-clone-count-expr")
+	e.PropertySetExpr("circle-clone-count", "circle-clone-count-expr")
+
 	// --- Begin test ---
 
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(e.RootExObjects())
