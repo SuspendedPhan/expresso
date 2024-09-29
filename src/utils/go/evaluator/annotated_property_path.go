@@ -24,3 +24,31 @@ func (self AnnotatedPropertyPath) String() string {
 	// TODO
 	panic("Not implemented")
 }
+
+func NewAnnotatedPropertyPath(annotatedSegments []*AnnotatedPathSegment) *AnnotatedPropertyPath {
+	return &AnnotatedPropertyPath{AnnotatedPathSegments: annotatedSegments}
+}
+
+func NewAnnotatedPathSegment(segment *PathSegment, cloneCountResults []*CloneCountResult) *AnnotatedPathSegment {
+	if _, ok := segment.exItem.(*ExObject); !ok {
+		return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: -1}
+	}
+
+	// Find the clone count result for the segment
+	cloneCount := -1
+	for _, result := range cloneCountResults {
+		segments := result.PropertyPath.segments
+		for _, segment_ := range segments {
+			if segment_.exItem == segment.exItem {
+				cloneCount = result.Count
+				break
+			}
+		}
+	}
+
+	if cloneCount == -1 {
+		panic("Clone count result not found")
+	}
+
+	return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: cloneCount}
+}

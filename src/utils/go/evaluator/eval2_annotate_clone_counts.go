@@ -27,5 +27,14 @@ func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPro
 		cloneCountResults = append(cloneCountResults, &CloneCountResult{PropertyPath: path, Count: count})
 	}
 
-	panic("not implemented")
+	annotatedPropertyPaths := make([]*AnnotatedPropertyPath, 0, len(propertyPaths))
+	for _, path := range propertyPaths {
+		annotatedSegments := make([]*AnnotatedPathSegment, 0, len(path.segments))
+		for _, segment := range path.segments {
+			annotatedSegments = append(annotatedSegments, NewAnnotatedPathSegment(segment, cloneCountResults))
+		}
+		annotatedPropertyPaths = append(annotatedPropertyPaths, NewAnnotatedPropertyPath(annotatedSegments))
+	}
+
+	return annotatedPropertyPaths
 }
