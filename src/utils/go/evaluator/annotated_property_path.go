@@ -101,13 +101,13 @@ func NewAnnotatedPathSegment(segment *PathSegment, cloneCountResults []*CloneCou
 	for _, result := range cloneCountResults {
 		segments := result.PropertyPath.segments
 
-		// Ensure the cloneCountResult has at least one segment
-		if len(segments) == 0 {
-			continue
+		// Ensure the cloneCountResult has at least 2 segments
+		if len(segments) < 2 {
+			panic(fmt.Sprintf("Invalid clone count property path: %v", result.PropertyPath))
 		}
 
-		// Check if the current segment is the last segment in the cloneCountResult's path
-		lastSegment := segments[len(segments)-1]
+		// Check if the current segment is the second to last segment in the cloneCountResult's path
+		lastSegment := segments[len(segments)-2]
 		if lastSegment.exItem == segment.exItem {
 			cloneCount = result.Count
 			break // Found the matching clone count, exit the loop
