@@ -4,10 +4,10 @@ package evaluator_test
 
 var expectedPropertyInstancePaths = []string{
 	// Velocity Property Paths
-	"object|earth: 1 / component|planet > property|velocity",
-	"object|earth: 2 / component|planet > property|velocity",
-	"object|earth: 3 / component|planet > property|velocity",
-	"object|earth: 4 / component|planet > property|velocity",
+	"object|earth: 1 / component|planet > property|planet-velocity",
+	"object|earth: 2 / component|planet > property|planet-velocity",
+	"object|earth: 3 / component|planet > property|planet-velocity",
+	"object|earth: 4 / component|planet > property|planet-velocity",
 
 	// Circle Radius Property Paths
 	"object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius",
