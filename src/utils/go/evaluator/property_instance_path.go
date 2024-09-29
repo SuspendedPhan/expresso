@@ -38,11 +38,11 @@ func (p *PropertyInstancePath) String() string {
 	pathStr := strings.Join(pathParts, " / ")
 	if lastPart != "" {
 		if pathStr != "" {
-			return fmt.Sprintf("PropertyInstancePath: (%s > %s)", pathStr, lastPart)
+			return fmt.Sprintf("%s > %s", pathStr, lastPart)
 		}
-		return fmt.Sprintf("PropertyInstancePath: (%s)", lastPart)
+		return lastPart
 	}
-	return fmt.Sprintf("PropertyInstancePath: (%s)", pathStr)
+	return pathStr
 }
 
 // String method for PropertyInstancePathSegment
@@ -51,7 +51,7 @@ func (s *PropertyInstancePathSegment) String() string {
 	switch item := s.exItem.(type) {
 	case *ExObject:
 		if s.IsExObject() {
-			part = fmt.Sprintf("object|%s: (%d)", item.Name(), s.cloneNumber)
+			part = fmt.Sprintf("object|%s: %d", item.Name(), s.cloneNumber)
 		} else {
 			part = fmt.Sprintf("object|%s", item.Name())
 		}
