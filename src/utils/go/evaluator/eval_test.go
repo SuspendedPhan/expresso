@@ -28,7 +28,7 @@ import (
 // - object|earth / component|planet > property|velocity
 // - object|earth / component|planet / object|circle > property|radius
 
-func TestExtractPropertyPaths(t *testing.T) {
+func TestEval(t *testing.T) {
 	// ------ Test1 ExtractPropertyPaths ------
 
 	// Create the evaluator
@@ -127,7 +127,7 @@ func TestExtractPropertyPaths(t *testing.T) {
 	// - object|earth: (10) / component|planet > property|velocity
 	// - object|earth: (10) / component|planet / object|circle: (15) > property|radius
 
-	annotatedPropertyPaths := evaluator.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+	annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 	if len(annotatedPropertyPaths) != 3 {
 		t.Errorf("Expected 3 annotated property paths, got %d", len(annotatedPropertyPaths))
 	}

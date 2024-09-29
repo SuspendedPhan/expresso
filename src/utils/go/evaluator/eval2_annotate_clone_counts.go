@@ -26,4 +26,6 @@ func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPro
 		count := e.evaluateCloneCount(path)
 		cloneCountResults = append(cloneCountResults, &CloneCountResult{PropertyPath: path, Count: count})
 	}
+
+	panic("not implemented")
 }
