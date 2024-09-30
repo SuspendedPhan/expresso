@@ -6,6 +6,7 @@ func (e *Evaluator) ReferenceExprCreate(id string) {
 		ReferenceExpr: &ReferenceExpr{
 			TargetId:   "uninitialized",
 			TargetKind: "uninitialized",
+			Evaluator:  e,
 		},
 	}
 }
@@ -40,4 +41,50 @@ func (e *Evaluator) ReferenceExprSetTargetKind(id string, targetKind string) {
 	}
 
 	refExpr.TargetKind = targetKind
+}
+
+func (expr *ReferenceExpr) GetTargetInstancePath(exprInstancePath *PropertyInstancePath) *PropertyInstancePath {
+	targetProperty := expr.GetTargetProperty()
+	targetPath := targetProperty.GetPropertyPath()
+
+	// For each matching segment, create an instance segment from the exprInstancePath
+	targetInstanceSegments := make([]*PropertyInstancePathSegment, 0)
+	for i, targetSegment := range targetPath.segments {
+		exprInstancePathSegment := exprInstancePath.segments[i]
+		if exprInstancePathSegment.IsExObject() {
+			if targetSegment.exItem != exprInstancePathSegment.exItem {
+				panic("mismatch")
+			}
+
+			targetInstanceSegment := &PropertyInstancePathSegment{
+				exItem:      targetSegment.exItem,
+				cloneNumber: exprInstancePathSegment.cloneNumber,
+			}
+			targetInstanceSegments = append(targetInstanceSegments, targetInstanceSegment)
+		} else {
+			targetInstanceSegment := &PropertyInstancePathSegment{
+				exItem:      targetSegment.exItem,
+				cloneNumber: -1,
+			}
+			targetInstanceSegments = append(targetInstanceSegments, targetInstanceSegment)
+		}
+	}
+
+	return &PropertyInstancePath{
+		segments: targetInstanceSegments,
+	}
+}
+
+func (expr *ReferenceExpr) GetTargetProperty() *Property {
+	targetId := expr.TargetId
+	targetKind := expr.TargetKind
+	if targetKind == "Property/BasicProperty" || targetKind == "Property/CloneCountProperty" || targetKind == "Property/ComponentParameter" {
+		targetProperty, found := expr.Evaluator.PropertyById[targetId]
+		if !found {
+			panic("property not found")
+		}
+		return targetProperty
+	}
+
+	panic("unknown target kind")
 }

@@ -61,7 +61,7 @@ func (e *Evaluator) EvaluatePropertyInstancePath(ctx *EvaluationCtx, path *Prope
 	return result
 }
 
-func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInstancePath) Float {
+func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInstancePath) DexValue {
 	if expr.NumberExpr != nil {
 		return expr.NumberExpr.Value
 	}
@@ -74,30 +74,22 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInsta
 	panic("unknown expr")
 }
 
-func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *PropertyInstancePath) Float {
+func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *PropertyInstancePath) DexValue {
 	return e.EvalExpr(ctx, callExpr.Arg0(), path) + e.EvalExpr(ctx, callExpr.Arg1(), path)
 }
 
-func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *ReferenceExpr, path *PropertyInstancePath) Float {
-	targetId := referenceExpr.TargetId
+func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *ReferenceExpr, path *PropertyInstancePath) DexValue {
 	targetKind := referenceExpr.TargetKind
-	if targetKind == "Property/BasicProperty" {
-		targetProperty, found := e.PropertyById[targetId]
-		if !found {
-			panic("property not found")
-		}
-		targetInstancePath := targetProperty.GetPropertyInstancePathFrom(path)
+	if targetKind == "Property/BasicProperty" || targetKind == "Property/ComponentParameter" {
+		targetInstancePath := referenceExpr.GetTargetInstancePath(path)
 		result := e.EvaluatePropertyInstancePath(ctx, targetInstancePath)
 		return result.Value
 	}
 
 	if targetKind == "Property/CloneCountProperty" {
-		targetProperty, found := e.PropertyById[targetId]
-		if !found {
-			panic("property not found")
-		}
+		targetProperty := referenceExpr.GetTargetProperty()
 		result := ctx.GetCloneCountResult(targetProperty)
-		return Float(result.Count)
+		return result.Count
 	}
 
 	panic("unknown reference kind")

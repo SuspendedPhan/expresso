@@ -68,7 +68,3 @@ func (s *PropertyInstancePathSegment) String() string {
 func (s *PropertyInstancePathSegment) IsExObject() bool {
 	return s.cloneNumber != -1
 }
-
-func (s *Property) GetPropertyInstancePathFrom(path *PropertyInstancePath) *PropertyInstancePath {
-	//
-}

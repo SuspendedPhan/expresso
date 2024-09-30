@@ -1,0 +1,17 @@
+object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius
+
+object|earth > component|planet > property|planet-velocity
+object|earth: 1 > component|planet > property|planet-velocity
+
+
+
+ReferenceExpr.GetTargetInstancePath(exprInstancePath):
+    targetProperty = expr.GetTargetProperty()
+    targetPath = property.GetPropertyPath()
+    // For each matching segment, create an instance segment from the exprInstancePath
+    for each i in exprInstancePath:
+        targetSegment = targetPath.GetSegment(i)
+        currentSegment = exprInstancePath.GetSegment(i)
+        
+        
+

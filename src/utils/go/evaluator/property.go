@@ -39,3 +39,7 @@ func (self *Property) Expr() *Expr {
 
 	return expr
 }
+
+func (self *Property) GetPropertyPath() *PropertyPath {
+	panic("not implemented")
+}
