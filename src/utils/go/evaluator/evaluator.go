@@ -52,36 +52,6 @@ func (e *Evaluator) AddRootExObject(exObjectId string) {
 	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
 }
 
-func (e *Evaluator) EvalExpr(ctx *EvaluationCtx_, exprId string) Float {
-	expr, found := e.ExprById[exprId]
-	if !found {
-		panic("expr not found " + exprId)
-	}
-
-	if expr.NumberExpr != nil {
-		return expr.NumberExpr.Value
-	}
-
-	if expr.CallExpr != nil {
-		arg0 := e.EvalExpr(ctx, expr.CallExpr.arg0Id)
-		arg1 := e.EvalExpr(ctx, expr.CallExpr.arg1Id)
-		return arg0 + arg1
-	}
-
-	if expr.ReferenceExpr != nil {
-		targetId := expr.ReferenceExpr.TargetId
-		targetKind := expr.ReferenceExpr.TargetKind
-		if targetKind == "Property/BasicProperty" {
-			property := e.PropertyById[targetId]
-			return e.EvalExpr(ctx, property.ExprId)
-		}
-		// todp CNT
-		panic("evaluating reference expr: unexpected targetKind " + targetKind)
-	}
-
-	panic("expr is neither a number expr nor a call expr")
-}
-
 func (e *Evaluator) RootExObjects() []*ExObject {
 	objects := []*ExObject{}
 	for _, exObjectId := range e.RootExObjectIds {
