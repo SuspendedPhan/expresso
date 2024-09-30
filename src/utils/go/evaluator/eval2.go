@@ -2,11 +2,6 @@
 
 package evaluator
 
-type CloneCountResult struct {
-	PropertyPath *CloneCountPropertyPath
-	Count        Float
-}
-
 // Annotates property paths with clone counts.
 func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPropertyPath, propertyPaths []*PropertyPath) (cloneCountResults []*CloneCountResult, annotatedPropertyPaths []*AnnotatedPropertyPath) {
 	/*

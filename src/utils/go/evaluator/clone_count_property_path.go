@@ -39,3 +39,14 @@ func (self *CloneCountPropertyPath) String() string {
 	pathString := pathSegmentsToString(segments)
 	return pathString + " > clone-count-property"
 }
+
+func (r *CloneCountPropertyPath) Property() *Property {
+	// Get last segment
+	segment := r.segments[len(r.segments)-1]
+	property, ok := segment.exItem.(*Property)
+	if !ok {
+		panic("last segment is not a property")
+	}
+
+	return property
+}

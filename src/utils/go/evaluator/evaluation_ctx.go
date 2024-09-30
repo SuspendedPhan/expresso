@@ -5,8 +5,14 @@ type EvaluationCtx struct {
 	resultByPropertyInstancePath map[string]*PropertyInstanceResult
 }
 
-func (ctx *EvaluationCtx) GetCloneCountResult(cloneCountProperty *Property) CloneCountResult {
-	panic("not implemented")
+func (ctx *EvaluationCtx) GetCloneCountResult(cloneCountProperty *Property) *CloneCountResult {
+	for _, cloneCountResult := range ctx.cloneCountResults {
+		if cloneCountResult.PropertyPath.Property() == cloneCountProperty {
+			return cloneCountResult
+		}
+	}
+
+	panic("CloneCountResult not found")
 }
 
 // GetPropertyInstanceResult returns the result of the referenced property given the instance path.

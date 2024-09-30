@@ -23,6 +23,12 @@ func (e *Evaluator) ReferenceExprSetTargetId(id string, targetId string) {
 	refExpr.TargetId = targetId
 }
 
+// targetKind can be
+// - Property/ComponentParameterProperty
+// - Property/BasicProperty
+// - Property/CloneCountProperty
+// - ComponentParameter/Custom
+// - ExFuncParameter
 func (e *Evaluator) ReferenceExprSetTargetKind(id string, targetKind string) {
 	expr, found := e.ExprById[id]
 	if !found {

@@ -86,9 +86,19 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		if !found {
 			panic("property not found")
 		}
-		targetInstancePath := targetProperty.GetInstancePathFrom(path)
+		targetInstancePath := targetProperty.GetPropertyInstancePathFrom(path)
 		result := e.EvaluatePropertyInstancePath(ctx, targetInstancePath)
 		return result.Value
 	}
+
+	if targetKind == "Property/CloneCountProperty" {
+		targetProperty, found := e.PropertyById[targetId]
+		if !found {
+			panic("property not found")
+		}
+		result := ctx.GetCloneCountResult(targetProperty)
+		return Float(result.Count)
+	}
+
 	panic("unknown reference kind")
 }
