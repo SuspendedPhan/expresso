@@ -48,6 +48,7 @@ export default interface GoModule {
      * - Property/CloneCountProperty
      * - ComponentParameter/Custom
      * - ExFuncParameter
+     * - CloneNumberTarget
      */
     create(id: string, targetId: string | null, targetKind: string): void;
   };

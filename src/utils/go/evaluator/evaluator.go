@@ -35,6 +35,7 @@ type ReferenceExpr struct {
 	TargetId   string
 	TargetKind string
 	Evaluator  *Evaluator
+	Expr       *Expr
 }
 
 func NewEvaluator(logger_ Logger2) *Evaluator {

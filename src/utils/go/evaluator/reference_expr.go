@@ -1,14 +1,20 @@
 package evaluator
 
+import "fmt"
+
 func (e *Evaluator) ReferenceExprCreate(id string) {
-	e.ExprById[id] = &Expr{
-		Id: id,
-		ReferenceExpr: &ReferenceExpr{
-			TargetId:   "uninitialized",
-			TargetKind: "uninitialized",
-			Evaluator:  e,
-		},
+	r := &ReferenceExpr{
+		TargetId:   "uninitialized",
+		TargetKind: "uninitialized",
+		Evaluator:  e,
+		Expr:       nil,
 	}
+	e1 := &Expr{
+		Id:            id,
+		ReferenceExpr: r,
+	}
+	r.Expr = e1
+	e.ExprById[id] = e1
 }
 
 func (e *Evaluator) ReferenceExprSetTargetId(id string, targetId string) {
@@ -30,6 +36,7 @@ func (e *Evaluator) ReferenceExprSetTargetId(id string, targetId string) {
 // - Property/CloneCountProperty
 // - ComponentParameter/Custom
 // - ExFuncParameter
+// - CloneNumberTarget
 func (e *Evaluator) ReferenceExprSetTargetKind(id string, targetKind string) {
 	expr, found := e.ExprById[id]
 	if !found {
@@ -81,10 +88,14 @@ func (expr *ReferenceExpr) GetTargetProperty() *Property {
 	if targetKind == "Property/BasicProperty" || targetKind == "Property/CloneCountProperty" || targetKind == "Property/ComponentParameter" {
 		targetProperty, found := expr.Evaluator.PropertyById[targetId]
 		if !found {
-			panic("property not found")
+			panic(fmt.Errorf("target property not found for reference expr: %v, %v", targetId, expr))
 		}
 		return targetProperty
 	}
 
 	panic("unknown target kind")
+}
+
+func (expr *ReferenceExpr) String() string {
+	return expr.Expr.Id
 }
