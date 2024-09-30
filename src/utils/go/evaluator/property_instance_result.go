@@ -1,7 +1,7 @@
 package evaluator
 
 type PropertyInstanceResult struct {
-	Path  PropertyInstancePath
+	Path  *PropertyInstancePath
 	Value DexValue
 }
 

@@ -8,7 +8,7 @@ type CloneCountResult struct {
 }
 
 // Annotates property paths with clone counts.
-func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPropertyPath, propertyPaths []*PropertyPath) []*AnnotatedPropertyPath {
+func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPropertyPath, propertyPaths []*PropertyPath) (cloneCountResults []*CloneCountResult, annotatedPropertyPaths []*AnnotatedPropertyPath) {
 	/*
 	   CloneCountResults =
 	       for path in CloneCountPropertyPaths:
@@ -23,20 +23,20 @@ func (e *Evaluator) AnnotateCloneCounts(cloneCountPropertyPaths []*CloneCountPro
 	           yield AnnotatedPropertyPath(annotatedSegments)
 	*/
 
-	cloneCountResults := make([]*CloneCountResult, 0, len(cloneCountPropertyPaths))
+	cloneCountResults_ := make([]*CloneCountResult, 0, len(cloneCountPropertyPaths))
 	for _, path := range cloneCountPropertyPaths {
 		count := e.evaluateCloneCount(path)
-		cloneCountResults = append(cloneCountResults, &CloneCountResult{PropertyPath: path, Count: count})
+		cloneCountResults_ = append(cloneCountResults_, &CloneCountResult{PropertyPath: path, Count: count})
 	}
 
-	annotatedPropertyPaths := make([]*AnnotatedPropertyPath, 0, len(propertyPaths))
+	annotatedPropertyPaths_ := make([]*AnnotatedPropertyPath, 0, len(propertyPaths))
 	for _, path := range propertyPaths {
 		annotatedSegments := make([]*AnnotatedPathSegment, 0, len(path.segments))
 		for _, segment := range path.segments {
-			annotatedSegments = append(annotatedSegments, NewAnnotatedPathSegment(segment, cloneCountResults))
+			annotatedSegments = append(annotatedSegments, NewAnnotatedPathSegment(segment, cloneCountResults_))
 		}
-		annotatedPropertyPaths = append(annotatedPropertyPaths, NewAnnotatedPropertyPath(annotatedSegments))
+		annotatedPropertyPaths_ = append(annotatedPropertyPaths_, NewAnnotatedPropertyPath(annotatedSegments))
 	}
 
-	return annotatedPropertyPaths
+	return cloneCountResults_, annotatedPropertyPaths_
 }

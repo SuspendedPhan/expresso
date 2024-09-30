@@ -19,6 +19,7 @@ type Expr struct {
 	NumberExpr    *NumberExpr
 	CallExpr      *CallExpr
 	ReferenceExpr *ReferenceExpr
+	Evaluator     *Evaluator
 }
 
 type NumberExpr struct {

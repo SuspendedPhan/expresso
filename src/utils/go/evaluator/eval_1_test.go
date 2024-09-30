@@ -178,7 +178,7 @@ func TestEval(t *testing.T) {
 	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
-	annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 	if len(annotatedPropertyPaths) != 3 {
 		t.Errorf("Expected 3 annotated property paths, got %d", len(annotatedPropertyPaths))
 	}
@@ -311,7 +311,7 @@ func TestEval(t *testing.T) {
 	// object|earth: 4 / object|moon: 2 > property|moon-radius = 6
 	// object|earth: 4 / object|moon: 3 > property|moon-radius = 7
 
-	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths)
+	propertyInstanceResults := e.EvaluatePropertyInstances(cloneCountResults, propertyInstancePaths)
 
 	if len(propertyInstanceResults) != len(propertyInstancePaths) {
 		t.Errorf("Expected %d property instance results, got %d", len(propertyInstancePaths), len(propertyInstanceResults))
