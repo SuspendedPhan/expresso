@@ -2,6 +2,8 @@
 
 package evaluator
 
+import "fmt"
+
 type Property struct {
 	Id           string
 	ExprId       string
@@ -34,7 +36,7 @@ func (self *Property) Expr() *Expr {
 	expr, found := self.Evaluator.ExprById[self.ExprId]
 
 	if !found {
-		panic("expr not found")
+		panic(fmt.Errorf("expr not found for property: %v", self.Name()))
 	}
 
 	return expr
