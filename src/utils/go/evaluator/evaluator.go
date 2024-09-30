@@ -51,7 +51,7 @@ func (e *Evaluator) AddRootExObject(exObjectId string) {
 	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
 }
 
-func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, exprId string) Float {
+func (e *Evaluator) EvalExpr(ctx *EvaluationCtx_, exprId string) Float {
 	expr, found := e.ExprById[exprId]
 	if !found {
 		panic("expr not found " + exprId)

@@ -12,7 +12,7 @@ var (
 	DexError = errors.New("DexError")
 )
 
-type EvaluationCtx struct {
+type EvaluationCtx_ struct {
 	evaluation *Evaluation
 }
 
@@ -21,7 +21,7 @@ func (e *Evaluator) Eval() *Evaluation {
 		resultByCanvasPropertyPath: make(map[string]Float),
 	}
 
-	ctx := &EvaluationCtx{
+	ctx := &EvaluationCtx_{
 		evaluation: evaluation,
 	}
 
@@ -50,7 +50,7 @@ func (e *Evaluator) Eval() *Evaluation {
 	return evaluation
 }
 
-func (e *Evaluator) evalCloneCount(ctx *EvaluationCtx, exObject *ExObject) Float {
+func (e *Evaluator) evalCloneCount(ctx *EvaluationCtx_, exObject *ExObject) Float {
 	if exObject.CloneCountPropertyId == "" {
 		// panic(fmt.Errorf("%w: CloneCountProperty not set for exObject: %s", DexError, exObject.Id))
 		panic("CloneCountProperty not set for exObject: " + exObject.Id)

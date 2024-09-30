@@ -266,5 +266,62 @@ func TestEval(t *testing.T) {
 	// ------ Test4 EvaluatePropertyInstances ------
 
 	// ---Output---
+	// object|earth: 1 / component|planet > property|planet-velocity = 1
+	// object|earth: 2 / component|planet > property|planet-velocity = 2
+	// object|earth: 3 / component|planet > property|planet-velocity = 3
+	// object|earth: 4 / component|planet > property|planet-velocity = 4
 
+	// object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius = 2
+	// object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius = 3
+	// object|earth: 1 / component|planet / object|circle: 3 > property|circle-radius = 4
+	// object|earth: 1 / component|planet / object|circle: 4 > property|circle-radius = 5
+	// object|earth: 1 / component|planet / object|circle: 5 > property|circle-radius = 6
+
+	// object|earth: 2 / component|planet / object|circle: 1 > property|circle-radius = 3
+	// object|earth: 2 / component|planet / object|circle: 2 > property|circle-radius = 4
+	// object|earth: 2 / component|planet / object|circle: 3 > property|circle-radius = 5
+	// object|earth: 2 / component|planet / object|circle: 4 > property|circle-radius = 6
+	// object|earth: 2 / component|planet / object|circle: 5 > property|circle-radius = 7
+
+	// object|earth: 3 / component|planet / object|circle: 1 > property|circle-radius = 4
+	// object|earth: 3 / component|planet / object|circle: 2 > property|circle-radius = 5
+	// object|earth: 3 / component|planet / object|circle: 3 > property|circle-radius = 6
+	// object|earth: 3 / component|planet / object|circle: 4 > property|circle-radius = 7
+	// object|earth: 3 / component|planet / object|circle: 5 > property|circle-radius = 8
+
+	// object|earth: 4 / component|planet / object|circle: 1 > property|circle-radius = 5
+	// object|earth: 4 / component|planet / object|circle: 2 > property|circle-radius = 6
+	// object|earth: 4 / component|planet / object|circle: 3 > property|circle-radius = 7
+	// object|earth: 4 / component|planet / object|circle: 4 > property|circle-radius = 8
+	// object|earth: 4 / component|planet / object|circle: 5 > property|circle-radius = 9
+
+	// object|earth: 1 / object|moon: 1 > property|moon-radius = 2
+	// object|earth: 1 / object|moon: 2 > property|moon-radius = 3
+	// object|earth: 1 / object|moon: 3 > property|moon-radius = 4
+
+	// object|earth: 2 / object|moon: 1 > property|moon-radius = 3
+	// object|earth: 2 / object|moon: 2 > property|moon-radius = 4
+	// object|earth: 2 / object|moon: 3 > property|moon-radius = 5
+
+	// object|earth: 3 / object|moon: 1 > property|moon-radius = 4
+	// object|earth: 3 / object|moon: 2 > property|moon-radius = 5
+	// object|earth: 3 / object|moon: 3 > property|moon-radius = 6
+
+	// object|earth: 4 / object|moon: 1 > property|moon-radius = 5
+	// object|earth: 4 / object|moon: 2 > property|moon-radius = 6
+	// object|earth: 4 / object|moon: 3 > property|moon-radius = 7
+
+	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths)
+
+	if len(propertyInstanceResults) != len(propertyInstancePaths) {
+		t.Errorf("Expected %d property instance results, got %d", len(propertyInstancePaths), len(propertyInstanceResults))
+	}
+
+	expectedPropertyInstanceResults_ := expectedPropertyInstanceResults
+
+	for i, result := range propertyInstanceResults {
+		if result.String() != expectedPropertyInstanceResults_[i] {
+			t.Errorf("Expected %s, got %s", expectedPropertyInstanceResults_[i], result.String())
+		}
+	}
 }
