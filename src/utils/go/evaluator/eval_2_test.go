@@ -50,4 +50,21 @@ var expectedPropertyInstancePaths = []string{
 	"object|earth: 4 / object|moon: 1 > property|moon-radius",
 	"object|earth: 4 / object|moon: 2 > property|moon-radius",
 	"object|earth: 4 / object|moon: 3 > property|moon-radius",
+
+	// Moon-x Property Paths
+	"object|earth: 1 / object|moon: 1 > property|moon-x",
+	"object|earth: 1 / object|moon: 2 > property|moon-x",
+	"object|earth: 1 / object|moon: 3 > property|moon-x",
+
+	"object|earth: 2 / object|moon: 1 > property|moon-x",
+	"object|earth: 2 / object|moon: 2 > property|moon-x",
+	"object|earth: 2 / object|moon: 3 > property|moon-x",
+
+	"object|earth: 3 / object|moon: 1 > property|moon-x",
+	"object|earth: 3 / object|moon: 2 > property|moon-x",
+	"object|earth: 3 / object|moon: 3 > property|moon-x",
+
+	"object|earth: 4 / object|moon: 1 > property|moon-x",
+	"object|earth: 4 / object|moon: 2 > property|moon-x",
+	"object|earth: 4 / object|moon: 3 > property|moon-x",
 }

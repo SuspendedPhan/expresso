@@ -23,6 +23,8 @@ import (
 //             - call-expr
 //                 - reference-expr: object|earth > clone-number-target
 //                 - reference-expr: object|earth > object|moon > clone-number-target
+//         - property|moon-x
+//             - number-expr: 7
 //
 // ---Output---
 // CloneCountPropertyPaths:
@@ -34,6 +36,7 @@ import (
 // - object|earth / object|moon > property|radius
 // - object|earth / component|planet > property|planet-velocity
 // - object|earth / component|planet / object|circle > property|radius
+// - object|earth / object|moon > property|moon-x
 
 func TestEval(t *testing.T) {
 	// ------ Test1 ExtractPropertyPaths ------
@@ -56,6 +59,7 @@ func TestEval(t *testing.T) {
 	e.PropertyCreate("moon-radius")
 	e.PropertyCreate("planet-velocity")
 	e.PropertyCreate("circle-radius")
+	e.PropertyCreate("moon-x")
 
 	// --- Add properties to objects ---
 
@@ -64,6 +68,7 @@ func TestEval(t *testing.T) {
 	e.ExObjectSetCloneCountProperty("circle", "circle-clone-count")
 
 	e.ExObjectAddBasicProperty("moon", "moon-radius")
+	e.ExObjectAddBasicProperty("moon", "moon-x")
 	e.ComponentAddBasicProperty("planet", "planet-velocity")
 	e.ExObjectAddBasicProperty("circle", "circle-radius")
 
@@ -126,6 +131,12 @@ func TestEval(t *testing.T) {
 
 	e.PropertySetExpr("moon-radius", "moon-radius-expr")
 
+	// --- Add expr for object|earth / object|moon > property|moon-x ---
+
+	e.NumberExprCreate("moon-x-expr")
+	e.NumberExprSetValue("moon-x-expr", 7)
+	e.PropertySetExpr("moon-x", "moon-x-expr")
+
 	// --- Begin test ---
 
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(e.RootExObjects())
@@ -135,8 +146,8 @@ func TestEval(t *testing.T) {
 		t.Errorf("Expected 3 clone count property paths, got %d", len(cloneCountPropertyPaths))
 	}
 
-	if len(propertyPaths) != 3 {
-		t.Errorf("Expected 3 property paths, got %d", len(propertyPaths))
+	if len(propertyPaths) != 4 {
+		t.Errorf("Expected 4 property paths, got %d", len(propertyPaths))
 	}
 
 	// Verify the clone count property paths
@@ -157,6 +168,7 @@ func TestEval(t *testing.T) {
 		"object|earth / component|planet > property|planet-velocity",
 		"object|earth / component|planet / object|circle > property|circle-radius",
 		"object|earth / object|moon > property|moon-radius",
+		"object|earth / object|moon > property|moon-x",
 	}
 
 	for i, path := range propertyPaths {
@@ -177,6 +189,7 @@ func TestEval(t *testing.T) {
 	// - object|earth / object|moon > property|radius
 	// - object|earth / component|planet > property|planet-velocity
 	// - object|earth / component|planet / object|circle > property|radius
+	// - object|earth / object|moon > property|moon-x
 
 	// ---Output---
 	// CloneCountResults:
@@ -188,6 +201,7 @@ func TestEval(t *testing.T) {
 	// - object|earth: (4) / object|moon: (3) > property|moon-radius
 	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
+	// - object|earth: (4) / object|moon: (3) > property|moon-x
 
 	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 
@@ -195,8 +209,8 @@ func TestEval(t *testing.T) {
 		t.Errorf("Expected 3 clone count results, got %d", len(cloneCountResults))
 	}
 
-	if len(annotatedPropertyPaths) != 3 {
-		t.Errorf("Expected 3 annotated property paths, got %d", len(annotatedPropertyPaths))
+	if len(annotatedPropertyPaths) != 4 {
+		t.Errorf("Expected 4 annotated property paths, got %d", len(annotatedPropertyPaths))
 	}
 
 	expectedCloneCountResults := []string{
@@ -209,6 +223,7 @@ func TestEval(t *testing.T) {
 		"object|earth: (4) / component|planet > property|planet-velocity",
 		"object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius",
 		"object|earth: (4) / object|moon: (3) > property|moon-radius",
+		"object|earth: (4) / object|moon: (3) > property|moon-x",
 	}
 
 	for i, result := range cloneCountResults {
@@ -227,9 +242,10 @@ func TestEval(t *testing.T) {
 
 	// ---Input---
 	// AnnotatedPropertyPaths:
-	// - object|earth: (4) / object|moon: (3) > property|moon-radius
 	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
+	// - object|earth: (4) / object|moon: (3) > property|moon-radius
+	// - object|earth: (4) / object|moon: (3) > property|moon-x
 
 	// ---Output---
 	// PropertyInstancePath: (object|earth: 1 / component|planet > property|planet-velocity)
@@ -277,10 +293,26 @@ func TestEval(t *testing.T) {
 	// PropertyInstancePath: (object|earth: 4 / object|moon: 2 > property|moon-radius)
 	// PropertyInstancePath: (object|earth: 4 / object|moon: 3 > property|moon-radius)
 
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 1 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 2 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 1 / object|moon: 3 > property|moon-x)
+
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 1 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 2 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 2 / object|moon: 3 > property|moon-x)
+
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 1 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 2 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 3 / object|moon: 3 > property|moon-x)
+
+	// PropertyInstancePath: (object|earth: 4 / object|moon: 1 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 4 / object|moon: 2 > property|moon-x)
+	// PropertyInstancePath: (object|earth: 4 / object|moon: 3 > property|moon-x)
+
 	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
 
-	if len(propertyInstancePaths) != 36 {
-		t.Errorf("Expected 36 property instance paths, got %d", len(propertyInstancePaths))
+	if len(propertyInstancePaths) != 48 {
+		t.Errorf("Expected 48 property instance paths, got %d", len(propertyInstancePaths))
 	}
 
 	expectedPropertyInstancePaths_ := expectedPropertyInstancePaths
@@ -338,6 +370,22 @@ func TestEval(t *testing.T) {
 	// object|earth: 4 / object|moon: 1 > property|moon-radius = 5
 	// object|earth: 4 / object|moon: 2 > property|moon-radius = 6
 	// object|earth: 4 / object|moon: 3 > property|moon-radius = 7
+
+	// object|earth: 1 / object|moon: 1 > property|moon-x = 7
+	// object|earth: 1 / object|moon: 2 > property|moon-x = 7
+	// object|earth: 1 / object|moon: 3 > property|moon-x = 7
+
+	// object|earth: 2 / object|moon: 1 > property|moon-x = 7
+	// object|earth: 2 / object|moon: 2 > property|moon-x = 7
+	// object|earth: 2 / object|moon: 3 > property|moon-x = 7
+
+	// object|earth: 3 / object|moon: 1 > property|moon-x = 7
+	// object|earth: 3 / object|moon: 2 > property|moon-x = 7
+	// object|earth: 3 / object|moon: 3 > property|moon-x = 7
+
+	// object|earth: 4 / object|moon: 1 > property|moon-x = 7
+	// object|earth: 4 / object|moon: 2 > property|moon-x = 7
+	// object|earth: 4 / object|moon: 3 > property|moon-x = 7
 
 	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths)
 

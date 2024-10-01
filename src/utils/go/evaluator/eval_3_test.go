@@ -56,4 +56,21 @@ var expectedPropertyInstanceResults = []string{
 	"object|earth: 4 / object|moon: 1 > property|moon-radius = 5",
 	"object|earth: 4 / object|moon: 2 > property|moon-radius = 6",
 	"object|earth: 4 / object|moon: 3 > property|moon-radius = 7",
+
+	// Moon-x Property Results
+	"object|earth: 1 / object|moon: 1 > property|moon-x = 7",
+	"object|earth: 1 / object|moon: 2 > property|moon-x = 7",
+	"object|earth: 1 / object|moon: 3 > property|moon-x = 7",
+
+	"object|earth: 2 / object|moon: 1 > property|moon-x = 7",
+	"object|earth: 2 / object|moon: 2 > property|moon-x = 7",
+	"object|earth: 2 / object|moon: 3 > property|moon-x = 7",
+
+	"object|earth: 3 / object|moon: 1 > property|moon-x = 7",
+	"object|earth: 3 / object|moon: 2 > property|moon-x = 7",
+	"object|earth: 3 / object|moon: 3 > property|moon-x = 7",
+
+	"object|earth: 4 / object|moon: 1 > property|moon-x = 7",
+	"object|earth: 4 / object|moon: 2 > property|moon-x = 7",
+	"object|earth: 4 / object|moon: 3 > property|moon-x = 7",
 }
