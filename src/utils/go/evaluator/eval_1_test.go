@@ -403,6 +403,16 @@ func TestEval(t *testing.T) {
 
 	// ------ Test5 GroupObjectInstances ------
 
-	// ---Output---
+	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)
 
+	expectedObjectInstanceResults_ := expectedObjectInstanceResults
+	if len(objectInstanceResults) != len(expectedObjectInstanceResults_) {
+		t.Errorf("Expected %d object instance results, got %d", len(expectedObjectInstanceResults_), len(objectInstanceResults))
+	}
+
+	for i, result := range objectInstanceResults {
+		if result.String() != expectedObjectInstanceResults_[i] {
+			t.Errorf("Index %v: Expected %s, got %s", i, expectedObjectInstanceResults_[i], result.String())
+		}
+	}
 }

@@ -1,117 +1,98 @@
+// File: eval_5_test.go
+
 package evaluator_test
 
-import (
-	"testing"
+import "strings"
 
-	"expressioni.sta/evaluator"
-)
+var expectedObjectInstanceResults = []string{
+	// Planet Velocities
+	strings.Join([]string{
+		"object|earth: 1 / component|planet > property|planet-velocity = 1",
+		"object|earth: 2 / component|planet > property|planet-velocity = 2",
+		"object|earth: 3 / component|planet > property|planet-velocity = 3",
+		"object|earth: 4 / component|planet > property|planet-velocity = 4",
+	}, "\n"),
 
-// ---Input---
-// - object|earth
-//     - component|planet
-//         - property|planet-velocity
-//             - reference-expr: object|earth > clone-number-target
-//         - object|circle
-//             - property|radius
-//                 - call-expr
-//                     - reference-expr: object|earth > component|planet > property|planet-velocity
-//                     - reference-expr: object|earth > object|circle > clone-number-target
-//     - object|moon
-//         - property|radius
-//             - call-expr
-//                 - reference-expr: object|earth > clone-number-target
-//                 - reference-expr: object|earth > object|moon > clone-number-target
-//         - property|x
-//
+	// Circle Radii for Earth Component Planet
+	strings.Join([]string{
+		"object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius = 2",
+		"object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius = 3",
+		"object|earth: 1 / component|planet / object|circle: 3 > property|circle-radius = 4",
+		"object|earth: 1 / component|planet / object|circle: 4 > property|circle-radius = 5",
+		"object|earth: 1 / component|planet / object|circle: 5 > property|circle-radius = 6",
+	}, "\n"),
 
-func TestEval5(t *testing.T) {
-	return
+	// Circle Radii for Earth Component Planet Level 2
+	strings.Join([]string{
+		"object|earth: 2 / component|planet / object|circle: 1 > property|circle-radius = 3",
+		"object|earth: 2 / component|planet / object|circle: 2 > property|circle-radius = 4",
+		"object|earth: 2 / component|planet / object|circle: 3 > property|circle-radius = 5",
+		"object|earth: 2 / component|planet / object|circle: 4 > property|circle-radius = 6",
+		"object|earth: 2 / component|planet / object|circle: 5 > property|circle-radius = 7",
+	}, "\n"),
 
-	// Create the evaluator
-	e := evaluator.NewEvaluator(&evaluator.NoopLogger{})
+	// Circle Radii for Earth Component Planet Level 3
+	strings.Join([]string{
+		"object|earth: 3 / component|planet / object|circle: 1 > property|circle-radius = 4",
+		"object|earth: 3 / component|planet / object|circle: 2 > property|circle-radius = 5",
+		"object|earth: 3 / component|planet / object|circle: 3 > property|circle-radius = 6",
+		"object|earth: 3 / component|planet / object|circle: 4 > property|circle-radius = 7",
+		"object|earth: 3 / component|planet / object|circle: 5 > property|circle-radius = 8",
+	}, "\n"),
 
-	// --- Create the object hierarchy ---
+	// Circle Radii for Earth Component Planet Level 4
+	strings.Join([]string{
+		"object|earth: 4 / component|planet / object|circle: 1 > property|circle-radius = 5",
+		"object|earth: 4 / component|planet / object|circle: 2 > property|circle-radius = 6",
+		"object|earth: 4 / component|planet / object|circle: 3 > property|circle-radius = 7",
+		"object|earth: 4 / component|planet / object|circle: 4 > property|circle-radius = 8",
+		"object|earth: 4 / component|planet / object|circle: 5 > property|circle-radius = 9",
+	}, "\n"),
 
-	e.ExObjectCreate("earth")
-	e.ExObjectCreate("moon")
-	e.ExObjectCreate("circle")
+	// Moon Radii for Earth Level 1
+	strings.Join([]string{
+		"object|earth: 1 / object|moon: 1 > property|moon-radius = 2",
+		"object|earth: 1 / object|moon: 2 > property|moon-radius = 3",
+		"object|earth: 1 / object|moon: 3 > property|moon-radius = 4",
+	}, "\n"),
 
-	e.ComponentCreate("planet")
+	// Moon Radii for Earth Level 2
+	strings.Join([]string{
+		"object|earth: 2 / object|moon: 1 > property|moon-radius = 3",
+		"object|earth: 2 / object|moon: 2 > property|moon-radius = 4",
+		"object|earth: 2 / object|moon: 3 > property|moon-radius = 5",
+	}, "\n"),
 
-	e.PropertyCreate("earth-clone-count")
-	e.PropertyCreate("moon-clone-count")
-	e.PropertyCreate("circle-clone-count")
+	// Moon Radii for Earth Level 3
+	strings.Join([]string{
+		"object|earth: 3 / object|moon: 1 > property|moon-radius = 4",
+		"object|earth: 3 / object|moon: 2 > property|moon-radius = 5",
+		"object|earth: 3 / object|moon: 3 > property|moon-radius = 6",
+	}, "\n"),
 
-	e.PropertyCreate("moon-radius")
-	e.PropertyCreate("planet-velocity")
-	e.PropertyCreate("circle-radius")
+	// Moon Radii for Earth Level 4
+	strings.Join([]string{
+		"object|earth: 4 / object|moon: 1 > property|moon-radius = 5",
+		"object|earth: 4 / object|moon: 2 > property|moon-radius = 6",
+		"object|earth: 4 / object|moon: 3 > property|moon-radius = 7",
+	}, "\n"),
 
-	// --- Add properties to objects ---
+	// Moon-x Property Results
+	strings.Join([]string{
+		"object|earth: 1 / object|moon: 1 > property|moon-x = 7",
+		"object|earth: 1 / object|moon: 2 > property|moon-x = 7",
+		"object|earth: 1 / object|moon: 3 > property|moon-x = 7",
 
-	e.ExObjectSetCloneCountProperty("earth", "earth-clone-count")
-	e.ExObjectSetCloneCountProperty("moon", "moon-clone-count")
-	e.ExObjectSetCloneCountProperty("circle", "circle-clone-count")
+		"object|earth: 2 / object|moon: 1 > property|moon-x = 7",
+		"object|earth: 2 / object|moon: 2 > property|moon-x = 7",
+		"object|earth: 2 / object|moon: 3 > property|moon-x = 7",
 
-	e.ExObjectAddBasicProperty("moon", "moon-radius")
-	e.ComponentAddBasicProperty("planet", "planet-velocity")
-	e.ExObjectAddBasicProperty("circle", "circle-radius")
+		"object|earth: 3 / object|moon: 1 > property|moon-x = 7",
+		"object|earth: 3 / object|moon: 2 > property|moon-x = 7",
+		"object|earth: 3 / object|moon: 3 > property|moon-x = 7",
 
-	// --- Set relationships ---
-
-	e.ExObjectSetComponent("earth", "planet")
-	e.ComponentAddRootObject("planet", "circle")
-	e.ExObjectAddChild("earth", "moon")
-
-	// --- Add root objects ---
-	e.AddRootExObject("earth")
-
-	// --- Add clone count exprs ---
-	e.NumberExprCreate("earth-clone-count-expr")
-	e.NumberExprCreate("moon-clone-count-expr")
-	e.NumberExprCreate("circle-clone-count-expr")
-
-	e.NumberExprSetValue("earth-clone-count-expr", 4)
-	e.NumberExprSetValue("moon-clone-count-expr", 3)
-	e.NumberExprSetValue("circle-clone-count-expr", 5)
-
-	e.PropertySetExpr("earth-clone-count", "earth-clone-count-expr")
-	e.PropertySetExpr("moon-clone-count", "moon-clone-count-expr")
-	e.PropertySetExpr("circle-clone-count", "circle-clone-count-expr")
-
-	// --- Add expr for object|earth / component|planet > property|planet-velocity ---
-
-	e.ReferenceExprCreate("planet-velocity-expr")
-	e.ReferenceExprSetTargetId("planet-velocity-expr", "earth")
-	e.ReferenceExprSetTargetKind("planet-velocity-expr", "Property/CloneCountProperty")
-
-	e.PropertySetExpr("planet-velocity", "planet-velocity-expr")
-
-	// --- Add expr for object|earth / component|planet / object|circle > property|radius ---
-	e.CallExprCreate("circle-radius-expr")
-	e.ReferenceExprCreate("circle-radius-expr-arg-0")
-	e.ReferenceExprCreate("circle-radius-expr-arg-1")
-
-	e.CallExprSetArg0("circle-radius-expr", "circle-radius-expr-arg-0")
-	e.CallExprSetArg1("circle-radius-expr", "circle-radius-expr-arg-1")
-	e.ReferenceExprSetTargetId("circle-radius-expr-arg-0", "planet-velocity")
-	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-0", "Property/BasicProperty")
-	e.ReferenceExprSetTargetId("circle-radius-expr-arg-1", "circle")
-	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-1", "Property/CloneCountProperty")
-
-	e.PropertySetExpr("circle-radius", "circle-radius-expr")
-
-	// --- Add expr for object|earth / object|moon > property|radius ---
-
-	e.CallExprCreate("moon-radius-expr")
-	e.ReferenceExprCreate("moon-radius-expr-arg-0")
-	e.ReferenceExprCreate("moon-radius-expr-arg-1")
-
-	e.CallExprSetArg0("moon-radius-expr", "moon-radius-expr-arg-0")
-	e.CallExprSetArg1("moon-radius-expr", "moon-radius-expr-arg-1")
-	e.ReferenceExprSetTargetId("moon-radius-expr-arg-0", "earth")
-	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-0", "Property/CloneCountProperty")
-	e.ReferenceExprSetTargetId("moon-radius-expr-arg-1", "moon")
-	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-1", "Property/CloneCountProperty")
-
-	e.PropertySetExpr("moon-radius", "moon-radius-expr")
+		"object|earth: 4 / object|moon: 1 > property|moon-x = 7",
+		"object|earth: 4 / object|moon: 2 > property|moon-x = 7",
+		"object|earth: 4 / object|moon: 3 > property|moon-x = 7",
+	}, "\n"),
 }
