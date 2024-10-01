@@ -2,7 +2,11 @@ package evaluator
 
 import "fmt"
 
-func (e *Evaluator) EvaluatePropertyInstances(cloneCountResults []*CloneCountResult, paths []*PropertyInstancePath) []*PropertyInstanceResult {
+func (e *Evaluator) EvaluatePropertyInstances(
+	cloneCountResults []*CloneCountResult,
+	instancePaths []*PropertyInstancePath,
+	paths []*PropertyPath,
+) []*PropertyInstanceResult {
 	/*
 	   results: Map<PropertyInstancePath, PropertyInstanceResult>
 
@@ -29,7 +33,7 @@ func (e *Evaluator) EvaluatePropertyInstances(cloneCountResults []*CloneCountRes
 		cloneCountResults:            cloneCountResults,
 	}
 
-	for _, path := range paths {
+	for _, path := range instancePaths {
 		e.EvaluatePropertyInstancePath(evaluationCtx, path)
 	}
 
