@@ -3,7 +3,6 @@ package evaluator
 import "fmt"
 
 func (e *Evaluator) EvaluatePropertyInstances(
-	cloneCountResults []*CloneCountResult,
 	instancePaths []*PropertyInstancePath,
 	paths []*PropertyPath,
 ) []*PropertyInstanceResult {
@@ -30,17 +29,13 @@ func (e *Evaluator) EvaluatePropertyInstances(
 	resultByPropertyInstancePath := make(map[string]*PropertyInstanceResult)
 	evaluationCtx := &EvaluationCtx{
 		resultByPropertyInstancePath: resultByPropertyInstancePath,
-		cloneCountResults:            cloneCountResults,
 		propertyPathByProperty:       MakePropertyPathMap(paths),
-	}
-
-	for _, path := range instancePaths {
-		e.EvaluatePropertyInstancePath(evaluationCtx, path)
 	}
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
 
-	for _, path := range instancePaths {
+	for i, path := range instancePaths {
+		fmt.Printf("Evaluating instance path %v: %v\n", i, path)
 		result := e.EvaluatePropertyInstancePath(evaluationCtx, path)
 		results = append(results, result)
 	}
@@ -74,13 +69,18 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInsta
 	fmt.Println("EvalExpr expr:", expr)
 
 	if expr.NumberExpr != nil {
+		fmt.Println("EvalExpr number result:", expr.NumberExpr.Value)
 		return expr.NumberExpr.Value
 	}
 	if expr.CallExpr != nil {
-		return e.EvalCallExpr(ctx, expr.CallExpr, path)
+		result := e.EvalCallExpr(ctx, expr.CallExpr, path)
+		fmt.Println("EvalExpr call result:", result)
+		return result
 	}
 	if expr.ReferenceExpr != nil {
-		return e.EvalReferenceExpr(ctx, expr.ReferenceExpr, path)
+		result := e.EvalReferenceExpr(ctx, expr.ReferenceExpr, path)
+		fmt.Println("EvalExpr reference result:", result)
+		return result
 	}
 	panic("unknown expr")
 }
@@ -99,8 +99,9 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 
 	cloneNumberTarget, ok := referenceExpr.GetCloneNumberTarget()
 	if ok {
-		result := ctx.GetCloneCountResult(cloneNumberTarget)
-		return result.Count
+		fmt.Println("EvalReferenceExpr cloneNumberTarget:", cloneNumberTarget)
+		result := ctx.GetCloneNumber(cloneNumberTarget, path)
+		return Float(result)
 	}
 
 	panic("unknown reference kind")

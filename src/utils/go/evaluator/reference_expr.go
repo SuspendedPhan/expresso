@@ -100,9 +100,9 @@ func (expr *ReferenceExpr) GetTargetProperty() *Property {
 	panic("unknown target kind")
 }
 
-func (expr *ReferenceExpr) GetCloneNumberTarget() (*CloneCountPropertyPath, bool) {
+func (expr *ReferenceExpr) GetCloneNumberTarget() (*ExObject, bool) {
 	if expr.TargetKind != "Property/CloneCountProperty" {
-		return &CloneCountPropertyPath{}, false
+		return nil, false
 	}
 
 	exObject, found := expr.Evaluator.ExObjectById[expr.TargetId]
@@ -110,8 +110,7 @@ func (expr *ReferenceExpr) GetCloneNumberTarget() (*CloneCountPropertyPath, bool
 		panic("ex object not found")
 	}
 
-	path := NewCloneCountPropertyPath1(exObject)
-	return path, true
+	return exObject, true
 }
 
 func (expr *ReferenceExpr) String() string {

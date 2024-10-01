@@ -339,7 +339,7 @@ func TestEval(t *testing.T) {
 	// object|earth: 4 / object|moon: 2 > property|moon-radius = 6
 	// object|earth: 4 / object|moon: 3 > property|moon-radius = 7
 
-	propertyInstanceResults := e.EvaluatePropertyInstances(cloneCountResults, propertyInstancePaths, propertyPaths)
+	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths)
 
 	if len(propertyInstanceResults) != len(propertyInstancePaths) {
 		t.Errorf("Expected %d property instance results, got %d", len(propertyInstancePaths), len(propertyInstanceResults))

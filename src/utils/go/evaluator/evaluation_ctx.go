@@ -1,13 +1,11 @@
 package evaluator
 
-type EvaluationCtx struct {
-	cloneCountResults            []*CloneCountResult
-	resultByPropertyInstancePath map[string]*PropertyInstanceResult
-	propertyPathByProperty       map[*Property]*PropertyPath
-}
+import "fmt"
 
-func (ctx *EvaluationCtx) GetCloneCountResult(path *CloneCountPropertyPath) *CloneCountResult {
-	return GetCloneCountResult(ctx.cloneCountResults, path.Property())
+type EvaluationCtx struct {
+	resultByPropertyInstancePath     map[string]*PropertyInstanceResult
+	propertyPathByProperty           map[*Property]*PropertyPath
+	cloneCountPropertyPathByProperty map[*Property]*CloneCountPropertyPath
 }
 
 // GetPropertyInstanceResult returns the result of the referenced property given the instance path.
@@ -28,4 +26,13 @@ func (ctx *EvaluationCtx) GetPropertyPath(property *Property) *PropertyPath {
 		panic("property path not found")
 	}
 	return path
+}
+
+func (ctx *EvaluationCtx) GetCloneNumber(exObject *ExObject, instancePath *PropertyInstancePath) int {
+	for _, segment := range instancePath.segments {
+		if segment.exItem == exObject {
+			return segment.cloneNumber
+		}
+	}
+	panic(fmt.Errorf("clone number not found for exObject %v in instance path %v", exObject, instancePath))
 }
