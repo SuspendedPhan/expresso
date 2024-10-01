@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 func (e *Evaluator) EvaluatePropertyInstances(cloneCountResults []*CloneCountResult, paths []*PropertyInstancePath) []*PropertyInstanceResult {
 	/*
 	   results: Map<PropertyInstancePath, PropertyInstanceResult>
@@ -24,6 +26,7 @@ func (e *Evaluator) EvaluatePropertyInstances(cloneCountResults []*CloneCountRes
 	resultByPropertyInstancePath := make(map[string]*PropertyInstanceResult)
 	evaluationCtx := &EvaluationCtx{
 		resultByPropertyInstancePath: resultByPropertyInstancePath,
+		cloneCountResults:            cloneCountResults,
 	}
 
 	for _, path := range paths {
@@ -62,6 +65,8 @@ func (e *Evaluator) EvaluatePropertyInstancePath(ctx *EvaluationCtx, path *Prope
 }
 
 func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInstancePath) DexValue {
+	fmt.Println("EvalExpr expr:", expr)
+
 	if expr.NumberExpr != nil {
 		return expr.NumberExpr.Value
 	}
@@ -81,7 +86,7 @@ func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *P
 func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *ReferenceExpr, path *PropertyInstancePath) DexValue {
 	targetKind := referenceExpr.TargetKind
 	if targetKind == "Property/BasicProperty" || targetKind == "Property/ComponentParameter" {
-		targetInstancePath := referenceExpr.GetTargetInstancePath(path)
+		targetInstancePath := referenceExpr.GetTargetInstancePath(ctx, path)
 		result := e.EvaluatePropertyInstancePath(ctx, targetInstancePath)
 		return result.Value
 	}

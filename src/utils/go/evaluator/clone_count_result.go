@@ -8,8 +8,12 @@ type CloneCountResult struct {
 }
 
 func GetCloneCountResult(results []*CloneCountResult, cloneCountProperty *Property) *CloneCountResult {
+	if len(results) == 0 {
+		panic("results is empty")
+	}
+
 	for _, result := range results {
-		if result.PropertyPath.Property() == cloneCountProperty {
+		if result.PropertyPath.Property().Id == cloneCountProperty.Id {
 			return result
 		}
 	}

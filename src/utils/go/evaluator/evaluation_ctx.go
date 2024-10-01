@@ -3,6 +3,7 @@ package evaluator
 type EvaluationCtx struct {
 	cloneCountResults            []*CloneCountResult
 	resultByPropertyInstancePath map[string]*PropertyInstanceResult
+	propertyPathByProperty       map[*Property]*PropertyPath
 }
 
 func (ctx *EvaluationCtx) GetCloneCountResult(path *CloneCountPropertyPath) *CloneCountResult {
@@ -19,4 +20,12 @@ func (ctx *EvaluationCtx) GetPropertyInstanceResult(path *PropertyInstancePath) 
 func (ctx *EvaluationCtx) SetPropertyInstanceResult(path *PropertyInstancePath, result *PropertyInstanceResult) {
 	pathString := path.String()
 	ctx.resultByPropertyInstancePath[pathString] = result
+}
+
+func (ctx *EvaluationCtx) GetPropertyPath(property *Property) *PropertyPath {
+	path, found := ctx.propertyPathByProperty[property]
+	if !found {
+		panic("property path not found")
+	}
+	return path
 }

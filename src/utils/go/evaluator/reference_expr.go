@@ -50,9 +50,9 @@ func (e *Evaluator) ReferenceExprSetTargetKind(id string, targetKind string) {
 	refExpr.TargetKind = targetKind
 }
 
-func (expr *ReferenceExpr) GetTargetInstancePath(exprInstancePath *PropertyInstancePath) *PropertyInstancePath {
+func (expr *ReferenceExpr) GetTargetInstancePath(ctx *EvaluationCtx, exprInstancePath *PropertyInstancePath) *PropertyInstancePath {
 	targetProperty := expr.GetTargetProperty()
-	targetPath := targetProperty.GetPropertyPath()
+	targetPath := ctx.GetPropertyPath(targetProperty)
 
 	// For each matching segment, create an instance segment from the exprInstancePath
 	targetInstanceSegments := make([]*PropertyInstancePathSegment, 0)

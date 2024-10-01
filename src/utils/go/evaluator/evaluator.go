@@ -14,30 +14,6 @@ type Evaluator struct {
 	ExprById        map[string]*Expr
 }
 
-type Expr struct {
-	Id            string
-	NumberExpr    *NumberExpr
-	CallExpr      *CallExpr
-	ReferenceExpr *ReferenceExpr
-	Evaluator     *Evaluator
-}
-
-type NumberExpr struct {
-	Value Float
-}
-
-type CallExpr struct {
-	arg0Id string
-	arg1Id string
-}
-
-type ReferenceExpr struct {
-	TargetId   string
-	TargetKind string
-	Evaluator  *Evaluator
-	Expr       *Expr
-}
-
 func NewEvaluator(logger_ Logger2) *Evaluator {
 	logger = logger_
 	return &Evaluator{
