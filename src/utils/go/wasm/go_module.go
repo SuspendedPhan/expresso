@@ -48,8 +48,6 @@ func bootstrapGoModule() {
 			return nil
 		}),
 
-		// addBasicProperty(exObjectId: string, propertyId: string): void;
-
 		"addBasicProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			logger.Log("ExObject.addBasicProperty", args)
 			exObjectId := args[0].String()
@@ -58,8 +56,6 @@ func bootstrapGoModule() {
 			return nil
 		}),
 	}))
-
-	// todp CNT
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -126,6 +122,46 @@ func bootstrapGoModule() {
 			ev.ReferenceExprCreate(id)
 			ev.ReferenceExprSetTargetId(id, targetId)
 			ev.ReferenceExprSetTargetKind(id, targetKind)
+			return nil
+		}),
+		"setTargetId": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			targetId := args[1].String()
+			logger.Log("ReferenceExpr.setTargetId", id, targetId)
+			ev.ReferenceExprSetTargetId(id, targetId)
+			return nil
+		}),
+		"setTargetKind": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			targetKind := args[1].String()
+			logger.Log("ReferenceExpr.setTargetKind", id, targetKind)
+			ev.ReferenceExprSetTargetKind(id, targetKind)
+			return nil
+		}),
+	}))
+
+	goModule.Set("Component", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			ev.ComponentCreate(componentId)
+			return nil
+		}),
+		"addParameterProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			propertyId := args[1].String()
+			ev.ComponentAddParameterProperty(componentId, propertyId)
+			return nil
+		}),
+		"addBasicProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			propertyId := args[1].String()
+			ev.ComponentAddBasicProperty(componentId, propertyId)
+			return nil
+		}),
+		"addRootObject": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			componentId := args[0].String()
+			rootObjectId := args[1].String()
+			ev.ComponentAddRootObject(componentId, rootObjectId)
 			return nil
 		}),
 	}))
