@@ -86,9 +86,9 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		return result.Value
 	}
 
-	if targetKind == "Property/CloneCountProperty" {
-		targetProperty := referenceExpr.GetTargetProperty()
-		result := ctx.GetCloneCountResult(targetProperty)
+	cloneNumberTarget, ok := referenceExpr.GetCloneNumberTarget()
+	if ok {
+		result := ctx.GetCloneCountResult(cloneNumberTarget)
 		return result.Count
 	}
 
