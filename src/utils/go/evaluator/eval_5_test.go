@@ -14,40 +14,32 @@ var expectedObjectInstanceResults = []string{
 	// }, "\n"),
 
 	// Circle Radii for Earth Component Planet
-	strings.Join([]string{
-		"object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius = 2",
-		"object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius = 3",
-		"object|earth: 1 / component|planet / object|circle: 3 > property|circle-radius = 4",
-		"object|earth: 1 / component|planet / object|circle: 4 > property|circle-radius = 5",
-		"object|earth: 1 / component|planet / object|circle: 5 > property|circle-radius = 6",
-	}, "\n"),
+	"object|earth: 1 / component|planet / object|circle: 1 > property|circle-radius = 2",
+	"object|earth: 1 / component|planet / object|circle: 2 > property|circle-radius = 3",
+	"object|earth: 1 / component|planet / object|circle: 3 > property|circle-radius = 4",
+	"object|earth: 1 / component|planet / object|circle: 4 > property|circle-radius = 5",
+	"object|earth: 1 / component|planet / object|circle: 5 > property|circle-radius = 6",
 
 	// Circle Radii for Earth Component Planet Level 2
-	strings.Join([]string{
-		"object|earth: 2 / component|planet / object|circle: 1 > property|circle-radius = 3",
-		"object|earth: 2 / component|planet / object|circle: 2 > property|circle-radius = 4",
-		"object|earth: 2 / component|planet / object|circle: 3 > property|circle-radius = 5",
-		"object|earth: 2 / component|planet / object|circle: 4 > property|circle-radius = 6",
-		"object|earth: 2 / component|planet / object|circle: 5 > property|circle-radius = 7",
-	}, "\n"),
+	"object|earth: 2 / component|planet / object|circle: 1 > property|circle-radius = 3",
+	"object|earth: 2 / component|planet / object|circle: 2 > property|circle-radius = 4",
+	"object|earth: 2 / component|planet / object|circle: 3 > property|circle-radius = 5",
+	"object|earth: 2 / component|planet / object|circle: 4 > property|circle-radius = 6",
+	"object|earth: 2 / component|planet / object|circle: 5 > property|circle-radius = 7",
 
 	// Circle Radii for Earth Component Planet Level 3
-	strings.Join([]string{
-		"object|earth: 3 / component|planet / object|circle: 1 > property|circle-radius = 4",
-		"object|earth: 3 / component|planet / object|circle: 2 > property|circle-radius = 5",
-		"object|earth: 3 / component|planet / object|circle: 3 > property|circle-radius = 6",
-		"object|earth: 3 / component|planet / object|circle: 4 > property|circle-radius = 7",
-		"object|earth: 3 / component|planet / object|circle: 5 > property|circle-radius = 8",
-	}, "\n"),
+	"object|earth: 3 / component|planet / object|circle: 1 > property|circle-radius = 4",
+	"object|earth: 3 / component|planet / object|circle: 2 > property|circle-radius = 5",
+	"object|earth: 3 / component|planet / object|circle: 3 > property|circle-radius = 6",
+	"object|earth: 3 / component|planet / object|circle: 4 > property|circle-radius = 7",
+	"object|earth: 3 / component|planet / object|circle: 5 > property|circle-radius = 8",
 
 	// Circle Radii for Earth Component Planet Level 4
-	strings.Join([]string{
-		"object|earth: 4 / component|planet / object|circle: 1 > property|circle-radius = 5",
-		"object|earth: 4 / component|planet / object|circle: 2 > property|circle-radius = 6",
-		"object|earth: 4 / component|planet / object|circle: 3 > property|circle-radius = 7",
-		"object|earth: 4 / component|planet / object|circle: 4 > property|circle-radius = 8",
-		"object|earth: 4 / component|planet / object|circle: 5 > property|circle-radius = 9",
-	}, "\n"),
+	"object|earth: 4 / component|planet / object|circle: 1 > property|circle-radius = 5",
+	"object|earth: 4 / component|planet / object|circle: 2 > property|circle-radius = 6",
+	"object|earth: 4 / component|planet / object|circle: 3 > property|circle-radius = 7",
+	"object|earth: 4 / component|planet / object|circle: 4 > property|circle-radius = 8",
+	"object|earth: 4 / component|planet / object|circle: 5 > property|circle-radius = 9",
 
 	// Moon Properties for Earth Level 1
 	strings.Join([]string{
