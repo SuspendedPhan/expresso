@@ -13,7 +13,9 @@ export default interface GoModule {
 
   Component: {
     create(componentId: string): void;
-    setRootExObjects(componentId: string, exObjectIds: string[]): void;
+    addParameterProperty(componentId: string, propertyId: string): void;
+    addBasicProperty(componentId: string, propertyId: string): void;
+    addRootObject(componentId: string, rootObjectId: string): void;
   };
 
   ExObject: {
@@ -22,8 +24,6 @@ export default interface GoModule {
     addComponentParameterProperty(exObjectId: string, propertyId: string): void;
     addBasicProperty(exObjectId: string, propertyId: string): void;
   };
-
-  // todp CNT add clone number target
 
   Property: {
     create(propertyId: string): void;
@@ -37,30 +37,22 @@ export default interface GoModule {
 
   CallExpr: {
     create(id: string): void;
-    setArg0(exprId: string, argId: string): void;
-    setArg1(exprId: string, argId: string): void;
+    setArg0(id: string, argId: string): void;
+    setArg1(id: string, argId: string): void;
   };
 
   ReferenceExpr: {
-    /**
-     * - Property/ComponentParameterProperty
-     * - Property/BasicProperty
-     * - Property/CloneCountProperty
-     * - ComponentParameter/Custom
-     * - ExFuncParameter
-     * - CloneNumberTarget
-     */
     create(id: string, targetId: string | null, targetKind: string): void;
+    setTargetId(id: string, targetId: string): void;
+    setTargetKind(id: string, targetKind: string): void;
   };
 
   Evaluator: {
     addRootExObject(id: string): void;
-    setParent(childId: string, parentId: string): void;
-    
     eval(): Evaluation;
     reset(): void;
 
-    canvasObjectPathAppend(
+    canvasExObjectPathAppend(
       basePath: string,
       objectId: string,
       cloneId: string
@@ -68,17 +60,19 @@ export default interface GoModule {
 
     createCanvasPropertyPath(
       propertyId: string,
-      canvasObjectPath: string
+      canvasExObjectPath: string
     ): string;
 
     createCloneCountCanvasPropertyPath(
-      parentCanvasObjectPath: string,
+      parentCanvasExObjectPath: string,
       exObjectId: string,
       cloneCountPropertyId: string
     ): string;
 
     debug(): void;
   };
+
+  hello(): string;
 }
 
 export interface Evaluation {
