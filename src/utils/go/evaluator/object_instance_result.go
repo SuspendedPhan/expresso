@@ -1,6 +1,9 @@
 package evaluator
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type ObjectInstancePath struct {
 	segments []*PropertyInstancePathSegment
@@ -14,6 +17,7 @@ type ObjectInstanceResult struct {
 func (p *ObjectInstancePath) ExObject() *ExObject {
 	exObject, ok := p.segments[len(p.segments)-1].exItem.(*ExObject)
 	if !ok {
+		fmt.Println(p.segments)
 		panic("ObjectInstancePath does not end with an ExObject")
 	}
 	return exObject
