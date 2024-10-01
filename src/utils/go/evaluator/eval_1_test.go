@@ -141,9 +141,9 @@ func TestEval(t *testing.T) {
 
 	// Verify the clone count property paths
 	expectedCloneCountPropertyPaths := []string{
-		"object|earth > clone-count-property",
-		"object|earth / component|planet / object|circle > clone-count-property",
-		"object|earth / object|moon > clone-count-property",
+		"object|earth > property|earth-clone-count",
+		"object|earth / component|planet / object|circle > property|circle-clone-count",
+		"object|earth / object|moon > property|moon-clone-count",
 	}
 
 	for i, path := range cloneCountPropertyPaths {
@@ -179,20 +179,42 @@ func TestEval(t *testing.T) {
 	// - object|earth / component|planet / object|circle > property|radius
 
 	// ---Output---
+	// CloneCountResults:
+	// - object|earth > earth-clone-count: 4
+	// - object|earth / component|planet / object|circle > circle-clone-count: 5
+	// - object|earth / object|moon > moon-clone-count: 3
+
 	// AnnotatedPropertyPaths:
 	// - object|earth: (4) / object|moon: (3) > property|moon-radius
 	// - object|earth: (4) / component|planet > property|planet-velocity
 	// - object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius
 
 	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+
+	if len(cloneCountResults) != 3 {
+		t.Errorf("Expected 3 clone count results, got %d", len(cloneCountResults))
+	}
+
 	if len(annotatedPropertyPaths) != 3 {
 		t.Errorf("Expected 3 annotated property paths, got %d", len(annotatedPropertyPaths))
+	}
+
+	expectedCloneCountResults := []string{
+		"object|earth > property|earth-clone-count: 4",
+		"object|earth / component|planet / object|circle > property|circle-clone-count: 5",
+		"object|earth / object|moon > property|moon-clone-count: 3",
 	}
 
 	expectedAnnotatedPropertyPaths := []string{
 		"object|earth: (4) / component|planet > property|planet-velocity",
 		"object|earth: (4) / component|planet / object|circle: (5) > property|circle-radius",
 		"object|earth: (4) / object|moon: (3) > property|moon-radius",
+	}
+
+	for i, result := range cloneCountResults {
+		if result.String() != expectedCloneCountResults[i] {
+			t.Errorf("Expected %s, got %s", expectedCloneCountResults[i], result.String())
+		}
 	}
 
 	for i, path := range annotatedPropertyPaths {

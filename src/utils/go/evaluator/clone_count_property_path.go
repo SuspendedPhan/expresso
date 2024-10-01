@@ -33,11 +33,8 @@ func NewCloneCountPropertyPath3(object *ExObject, path *CloneCountPropertyPath) 
 
 func (self *CloneCountPropertyPath) String() string {
 	// Get self.segments except last segment
-	segments := self.segments[:len(self.segments)-1]
-
-	// Convert segments to string
-	pathString := pathSegmentsToString(segments)
-	return pathString + " > clone-count-property"
+	pathString := pathSegmentsToString(self.segments)
+	return pathString
 }
 
 func (r *CloneCountPropertyPath) Property() *Property {

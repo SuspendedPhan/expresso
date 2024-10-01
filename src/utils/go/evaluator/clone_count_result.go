@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 type CloneCountResult struct {
 	PropertyPath *CloneCountPropertyPath
 	Count        Float
@@ -11,5 +13,9 @@ func GetCloneCountResult(results []*CloneCountResult, cloneCountProperty *Proper
 			return result
 		}
 	}
-	panic("CloneCountResult not found")
+	panic(fmt.Errorf("CloneCountResult not found for clone count property: %v", cloneCountProperty))
+}
+
+func (self *CloneCountResult) String() string {
+	return fmt.Sprintf("%s: %s", self.PropertyPath.String(), floatToString(self.Count))
 }
