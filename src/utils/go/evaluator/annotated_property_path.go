@@ -89,35 +89,15 @@ func NewAnnotatedPropertyPath(annotatedSegments []*AnnotatedPathSegment) *Annota
 }
 
 func NewAnnotatedPathSegment(segment *PropertyPathSegment, cloneCountResults []*CloneCountResult) *AnnotatedPathSegment {
-	if _, ok := segment.exItem.(*ExObject); !ok {
+	exObject, ok := segment.exItem.(*ExObject)
+	if !ok {
 		// Non-ExObject segments are not annotated with clone counts
 		return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: -1}
 	}
 
-	// Initialize cloneCount to -1 (not found)
-	cloneCount := Float(-1)
-
-	// Iterate through all cloneCountResults to find a matching path
-	for _, result := range cloneCountResults {
-		segments := result.PropertyPath.segments
-
-		// Ensure the cloneCountResult has at least 2 segments
-		if len(segments) < 2 {
-			panic(fmt.Sprintf("Invalid clone count property path: %v", result.PropertyPath))
-		}
-
-		// Check if the current segment is the second to last segment in the cloneCountResult's path
-		lastSegment := segments[len(segments)-2]
-		if lastSegment.exItem == segment.exItem {
-			cloneCount = result.Count
-			break // Found the matching clone count, exit the loop
-		}
-	}
-
-	// If no matching cloneCountResult was found for this segment, it's an error
-	if cloneCount == -1 {
-		panic(fmt.Sprintf("Clone count result not found for segment: %v", segment.exItem))
-	}
+	property := exObject.CloneCountProperty()
+	cloneCountResult := GetCloneCountResult(cloneCountResults, property)
+	cloneCount := cloneCountResult.Count
 
 	return &AnnotatedPathSegment{ExItem: segment.exItem, cloneCount: cloneCount}
 }
