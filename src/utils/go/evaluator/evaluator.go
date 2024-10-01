@@ -1,3 +1,5 @@
+// File: evaluator.go
+
 package evaluator
 
 // -- TYPES --
@@ -38,4 +40,9 @@ func (e *Evaluator) RootExObjects() []*ExObject {
 	return objects
 }
 
-// func (e *Evaluator) Eval() []*
+func (e *Evaluator) Eval() []map[string]interface{} {
+	rootExObjects := e.RootExObjects()
+	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(rootExObjects)
+
+	// TODO...
+}
