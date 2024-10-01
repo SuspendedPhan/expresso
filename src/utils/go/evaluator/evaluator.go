@@ -37,3 +37,5 @@ func (e *Evaluator) RootExObjects() []*ExObject {
 	}
 	return objects
 }
+
+// func (e *Evaluator) Eval() []*

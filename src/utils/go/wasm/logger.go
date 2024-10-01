@@ -36,3 +36,7 @@ func (l *Logger) Error(args ...interface{}) {
 	}
 	js.Global().Get("error3").Invoke(10, "["+l.topic+"]", message)
 }
+
+func (l *Logger) Log3(level int, args ...interface{}) {
+	js.Global().Get("log3").Invoke(level, "["+l.topic+"]", args)
+}

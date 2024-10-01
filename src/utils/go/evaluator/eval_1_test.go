@@ -3,6 +3,7 @@
 package evaluator_test
 
 import (
+	"reflect"
 	"testing"
 
 	"expressioni.sta/evaluator"
@@ -418,5 +419,18 @@ func TestEval(t *testing.T) {
 
 	for _, result := range objectInstanceResults {
 		t.Log(result.String())
+	}
+
+	// ------ Test6 Create Final Result ------
+
+	finalOutput := e.CreateFinalResult(objectInstanceResults)
+
+	expectedFinalResults_ := expectedFinalResults
+	if !reflect.DeepEqual(finalOutput, expectedFinalResults_) {
+		t.Errorf("Final output does not match expected output.\nExpected: %+v\nGot: %+v", expectedFinalResults_, finalOutput)
+	}
+
+	for _, result := range finalOutput {
+		t.Logf("Final Result: %+v", result)
 	}
 }

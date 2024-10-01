@@ -84,3 +84,13 @@ func (p *PropertyInstancePath) ParentPath() ObjectInstancePath {
 	segmentCount := len(p.segments)
 	return ObjectInstancePath{segments: p.segments[:segmentCount-1]}
 }
+
+func (p *PropertyInstancePath) Property() *Property {
+	lastSegment := p.segments[len(p.segments)-1]
+	vv, ok := lastSegment.exItem.(*Property)
+	if !ok {
+		panic("Expected Property")
+	}
+
+	return vv
+}
