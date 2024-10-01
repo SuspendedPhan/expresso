@@ -349,7 +349,7 @@ func TestEval(t *testing.T) {
 
 	for i, result := range propertyInstanceResults {
 		if result.String() != expectedPropertyInstanceResults_[i] {
-			t.Errorf("Expected %s, got %s", expectedPropertyInstanceResults_[i], result.String())
+			t.Errorf("Index %v: Expected %s, got %s", i, expectedPropertyInstanceResults_[i], result.String())
 		}
 	}
 }

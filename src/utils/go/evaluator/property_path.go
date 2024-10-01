@@ -88,3 +88,17 @@ func pathSegmentsToString(segments []*PropertyPathSegment) string {
 		return pathStr
 	}
 }
+
+func (p *PropertyPath) Property() *Property {
+	lastSegment := p.segments[len(p.segments)-1]
+	property, ok := lastSegment.exItem.(*Property)
+	if !ok {
+		panic("last segment is not a property")
+	}
+	return property
+}
+
+func (p *PropertyPathSegment) IsExObject() bool {
+	_, ok := p.exItem.(*ExObject)
+	return ok
+}

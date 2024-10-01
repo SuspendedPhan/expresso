@@ -54,13 +54,17 @@ func (expr *ReferenceExpr) GetTargetInstancePath(ctx *EvaluationCtx, exprInstanc
 	targetProperty := expr.GetTargetProperty()
 	targetPath := ctx.GetPropertyPath(targetProperty)
 
+	fmt.Printf("GetTargetInstancePath %v /// %v\n", expr, targetPath.Property().Id)
+	fmt.Println(exprInstancePath)
+	fmt.Println(targetPath)
+
 	// For each matching segment, create an instance segment from the exprInstancePath
 	targetInstanceSegments := make([]*PropertyInstancePathSegment, 0)
 	for i, targetSegment := range targetPath.segments {
 		exprInstancePathSegment := exprInstancePath.segments[i]
-		if exprInstancePathSegment.IsExObject() {
+		if targetSegment.IsExObject() {
 			if targetSegment.exItem != exprInstancePathSegment.exItem {
-				panic("mismatch")
+				panic(fmt.Errorf("mismatch: index %v: expected target segment %v to match expr segment %v", i, targetSegment.exItem.Name(), exprInstancePathSegment.exItem.Name()))
 			}
 
 			targetInstanceSegment := &PropertyInstancePathSegment{

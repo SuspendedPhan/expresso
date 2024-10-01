@@ -31,6 +31,7 @@ func (e *Evaluator) EvaluatePropertyInstances(
 	evaluationCtx := &EvaluationCtx{
 		resultByPropertyInstancePath: resultByPropertyInstancePath,
 		cloneCountResults:            cloneCountResults,
+		propertyPathByProperty:       MakePropertyPathMap(paths),
 	}
 
 	for _, path := range instancePaths {
@@ -39,8 +40,9 @@ func (e *Evaluator) EvaluatePropertyInstances(
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
 
-	for _, value := range resultByPropertyInstancePath {
-		results = append(results, value)
+	for _, path := range instancePaths {
+		result := e.EvaluatePropertyInstancePath(evaluationCtx, path)
+		results = append(results, result)
 	}
 
 	return results
@@ -102,4 +104,13 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 	}
 
 	panic("unknown reference kind")
+}
+
+func MakePropertyPathMap(paths []*PropertyPath) map[*Property]*PropertyPath {
+	result := make(map[*Property]*PropertyPath)
+	for _, path := range paths {
+		property := path.Property()
+		result[property] = path
+	}
+	return result
 }
