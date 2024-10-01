@@ -1,4 +1,4 @@
-// property.go
+// File: property.go
 
 package evaluator
 
