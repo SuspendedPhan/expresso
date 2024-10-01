@@ -49,50 +49,59 @@ var expectedObjectInstanceResults = []string{
 		"object|earth: 4 / component|planet / object|circle: 5 > property|circle-radius = 9",
 	}, "\n"),
 
-	// Moon Radii for Earth Level 1
+	// Moon Properties for Earth Level 1
 	strings.Join([]string{
 		"object|earth: 1 / object|moon: 1 > property|moon-radius = 2",
+		"object|earth: 1 / object|moon: 1 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 1 / object|moon: 2 > property|moon-radius = 3",
+		"object|earth: 1 / object|moon: 2 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 1 / object|moon: 3 > property|moon-radius = 4",
+		"object|earth: 1 / object|moon: 3 > property|moon-x = 7",
 	}, "\n"),
 
-	// Moon Radii for Earth Level 2
+	// Moon Properties for Earth Level 2
 	strings.Join([]string{
 		"object|earth: 2 / object|moon: 1 > property|moon-radius = 3",
+		"object|earth: 2 / object|moon: 1 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 2 / object|moon: 2 > property|moon-radius = 4",
+		"object|earth: 2 / object|moon: 2 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 2 / object|moon: 3 > property|moon-radius = 5",
+		"object|earth: 2 / object|moon: 3 > property|moon-x = 7",
 	}, "\n"),
 
-	// Moon Radii for Earth Level 3
+	// Moon Properties for Earth Level 3
 	strings.Join([]string{
 		"object|earth: 3 / object|moon: 1 > property|moon-radius = 4",
+		"object|earth: 3 / object|moon: 1 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 3 / object|moon: 2 > property|moon-radius = 5",
+		"object|earth: 3 / object|moon: 2 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
 		"object|earth: 3 / object|moon: 3 > property|moon-radius = 6",
+		"object|earth: 3 / object|moon: 3 > property|moon-x = 7",
 	}, "\n"),
 
-	// Moon Radii for Earth Level 4
+	// Moon Properties for Earth Level 4
 	strings.Join([]string{
 		"object|earth: 4 / object|moon: 1 > property|moon-radius = 5",
-		"object|earth: 4 / object|moon: 2 > property|moon-radius = 6",
-		"object|earth: 4 / object|moon: 3 > property|moon-radius = 7",
-	}, "\n"),
-
-	// Moon-x Property Results
-	strings.Join([]string{
-		"object|earth: 1 / object|moon: 1 > property|moon-x = 7",
-		"object|earth: 1 / object|moon: 2 > property|moon-x = 7",
-		"object|earth: 1 / object|moon: 3 > property|moon-x = 7",
-
-		"object|earth: 2 / object|moon: 1 > property|moon-x = 7",
-		"object|earth: 2 / object|moon: 2 > property|moon-x = 7",
-		"object|earth: 2 / object|moon: 3 > property|moon-x = 7",
-
-		"object|earth: 3 / object|moon: 1 > property|moon-x = 7",
-		"object|earth: 3 / object|moon: 2 > property|moon-x = 7",
-		"object|earth: 3 / object|moon: 3 > property|moon-x = 7",
-
 		"object|earth: 4 / object|moon: 1 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
+		"object|earth: 4 / object|moon: 2 > property|moon-radius = 6",
 		"object|earth: 4 / object|moon: 2 > property|moon-x = 7",
+	}, "\n"),
+	strings.Join([]string{
+		"object|earth: 4 / object|moon: 3 > property|moon-radius = 7",
 		"object|earth: 4 / object|moon: 3 > property|moon-x = 7",
 	}, "\n"),
 }

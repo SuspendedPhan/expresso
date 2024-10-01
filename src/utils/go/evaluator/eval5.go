@@ -4,6 +4,7 @@ import "fmt"
 
 func (e *Evaluator) GroupObjectInstances(results []*PropertyInstanceResult) []*ObjectInstanceResult {
 	resultByObjectInstancePath := make(map[string]*ObjectInstanceResult)
+	objectInstanceResults := make([]*ObjectInstanceResult, 0)
 
 	for _, result := range results {
 		objectInstancePath := result.Path.ParentPath()
@@ -19,20 +20,16 @@ func (e *Evaluator) GroupObjectInstances(results []*PropertyInstanceResult) []*O
 
 		objectInstanceResult, found := resultByObjectInstancePath[objectInstancePathStr]
 		if !found {
-			fmt.Println("Not found")
+			fmt.Println("Not found", len(objectInstanceResults))
 			objectInstanceResult = &ObjectInstanceResult{
 				ExObject:                exObject,
 				PropertyInstanceResults: []*PropertyInstanceResult{},
 			}
+			objectInstanceResults = append(objectInstanceResults, objectInstanceResult)
 			resultByObjectInstancePath[objectInstancePathStr] = objectInstanceResult
 		}
 
 		objectInstanceResult.PropertyInstanceResults = append(objectInstanceResult.PropertyInstanceResults, result)
-	}
-
-	objectInstanceResults := make([]*ObjectInstanceResult, 0, len(resultByObjectInstancePath))
-	for _, objectInstanceResult := range resultByObjectInstancePath {
-		objectInstanceResults = append(objectInstanceResults, objectInstanceResult)
 	}
 
 	return objectInstanceResults
