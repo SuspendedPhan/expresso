@@ -422,13 +422,8 @@ func TestEval(t *testing.T) {
 
 	// ------ Test6 Create Final Result ------
 
-	// ------ Test6 Create Final Result ------
-
 	finalOutput := e.CreateFinalResult(objectInstanceResults)
-
 	expectedFinalResults_ := expectedFinalResults
-
-	// TODO: verify the final results
 
 	// Verify that the lengths of the final output and expected results match
 	if len(finalOutput) != len(expectedFinalResults_) {
@@ -523,10 +518,5 @@ func TestEval(t *testing.T) {
 				t.Errorf("finalOutput[%d].propertyInstanceResults[%d].value = %v; want %v", i, j, actualValue, expectedValue)
 			}
 		}
-	}
-
-	// Optionally, you can add this at the end of the TestEval function to ensure that all expected results were checked
-	if len(finalOutput) != len(expectedFinalResults_) {
-		t.Fatalf("Mismatch in the number of final output elements. Expected %d, got %d", len(expectedFinalResults_), len(finalOutput))
 	}
 }
