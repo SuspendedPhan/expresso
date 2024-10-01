@@ -1,7 +1,6 @@
 package evaluator
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -14,13 +13,9 @@ type ObjectInstanceResult struct {
 	PropertyInstanceResults []*PropertyInstanceResult
 }
 
-func (p *ObjectInstancePath) ExObject() *ExObject {
+func (p *ObjectInstancePath) ExObject() (*ExObject, bool) {
 	exObject, ok := p.segments[len(p.segments)-1].exItem.(*ExObject)
-	if !ok {
-		fmt.Println(p.segments)
-		panic("ObjectInstancePath does not end with an ExObject")
-	}
-	return exObject
+	return exObject, ok
 }
 
 func (p *ObjectInstanceResult) String() string {

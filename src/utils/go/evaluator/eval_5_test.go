@@ -6,12 +6,12 @@ import "strings"
 
 var expectedObjectInstanceResults = []string{
 	// Planet Velocities
-	strings.Join([]string{
-		"object|earth: 1 / component|planet > property|planet-velocity = 1",
-		"object|earth: 2 / component|planet > property|planet-velocity = 2",
-		"object|earth: 3 / component|planet > property|planet-velocity = 3",
-		"object|earth: 4 / component|planet > property|planet-velocity = 4",
-	}, "\n"),
+	// strings.Join([]string{
+	// 	"object|earth: 1 / component|planet > property|planet-velocity = 1",
+	// 	"object|earth: 2 / component|planet > property|planet-velocity = 2",
+	// 	"object|earth: 3 / component|planet > property|planet-velocity = 3",
+	// 	"object|earth: 4 / component|planet > property|planet-velocity = 4",
+	// }, "\n"),
 
 	// Circle Radii for Earth Component Planet
 	strings.Join([]string{

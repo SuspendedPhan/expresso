@@ -412,7 +412,11 @@ func TestEval(t *testing.T) {
 
 	for i, result := range objectInstanceResults {
 		if result.String() != expectedObjectInstanceResults_[i] {
-			t.Errorf("Index %v: Expected %s, got %s", i, expectedObjectInstanceResults_[i], result.String())
+			t.Errorf("\nIndex: %v\nExpected:\n%s\nGot:\n%s", i, expectedObjectInstanceResults_[i], result.String())
 		}
+	}
+
+	for _, result := range objectInstanceResults {
+		t.Log(result.String())
 	}
 }

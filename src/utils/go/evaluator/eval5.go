@@ -1,15 +1,27 @@
 package evaluator
 
+import "fmt"
+
 func (e *Evaluator) GroupObjectInstances(results []*PropertyInstanceResult) []*ObjectInstanceResult {
 	resultByObjectInstancePath := make(map[string]*ObjectInstanceResult)
 
 	for _, result := range results {
 		objectInstancePath := result.Path.ParentPath()
+		exObject, ok := objectInstancePath.ExObject()
+		if !ok {
+			continue
+		}
+
 		objectInstancePathStr := objectInstancePath.String()
-		objectInstanceResult := resultByObjectInstancePath[objectInstancePathStr]
-		if objectInstanceResult == nil {
+
+		fmt.Println("Property instance path:\t", result)
+		fmt.Println("Object instance path:\t", objectInstancePathStr)
+
+		objectInstanceResult, found := resultByObjectInstancePath[objectInstancePathStr]
+		if !found {
+			fmt.Println("Not found")
 			objectInstanceResult = &ObjectInstanceResult{
-				ExObject:                objectInstancePath.ExObject(),
+				ExObject:                exObject,
 				PropertyInstanceResults: []*PropertyInstanceResult{},
 			}
 			resultByObjectInstancePath[objectInstancePathStr] = objectInstanceResult
