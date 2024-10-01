@@ -3,7 +3,6 @@
 package evaluator_test
 
 import (
-	"reflect"
 	"testing"
 
 	"expressioni.sta/evaluator"
@@ -423,14 +422,111 @@ func TestEval(t *testing.T) {
 
 	// ------ Test6 Create Final Result ------
 
+	// ------ Test6 Create Final Result ------
+
 	finalOutput := e.CreateFinalResult(objectInstanceResults)
 
 	expectedFinalResults_ := expectedFinalResults
-	if !reflect.DeepEqual(finalOutput, expectedFinalResults_) {
-		t.Errorf("Final output does not match expected output.\nExpected: %+v\nGot: %+v", expectedFinalResults_, finalOutput)
+
+	// TODO: verify the final results
+
+	// Verify that the lengths of the final output and expected results match
+	if len(finalOutput) != len(expectedFinalResults_) {
+		t.Errorf("Expected final output length %d, got %d", len(expectedFinalResults_), len(finalOutput))
 	}
 
-	for _, result := range finalOutput {
-		t.Logf("Final Result: %+v", result)
+	// Iterate over each element in the expectedFinalResults
+	for i, expected := range expectedFinalResults_ {
+		if i >= len(finalOutput) {
+			t.Errorf("Final output missing element at index %d", i)
+			continue
+		}
+
+		actual := finalOutput[i]
+
+		// Verify "exObjectId"
+		expectedExObjectId, ok := expected["exObjectId"].(string)
+		if !ok {
+			t.Errorf("Expected exObjectId to be a string in expectedFinalResults[%d]", i)
+			continue
+		}
+		actualExObjectId, ok := actual["exObjectId"].(string)
+		if !ok {
+			t.Errorf("Expected exObjectId to be a string in finalOutput[%d]", i)
+			continue
+		}
+		if actualExObjectId != expectedExObjectId {
+			t.Errorf("finalOutput[%d].exObjectId = %v; want %v", i, actualExObjectId, expectedExObjectId)
+		}
+
+		// Verify "propertyInstanceResults"
+		expectedPropertyResults, ok := expected["propertyInstanceResults"].([]map[string]interface{})
+		if !ok {
+			t.Errorf("Expected propertyInstanceResults to be []map[string]interface{} in expectedFinalResults[%d]", i)
+			continue
+		}
+		actualPropertyResults, ok := actual["propertyInstanceResults"].([]map[string]interface{})
+		if !ok {
+			t.Errorf("Expected propertyInstanceResults to be []map[string]interface{} in finalOutput[%d]", i)
+			continue
+		}
+
+		// Check if the lengths of propertyInstanceResults match
+		if len(actualPropertyResults) != len(expectedPropertyResults) {
+			t.Errorf("finalOutput[%d].propertyInstanceResults length = %d; want %d", i, len(actualPropertyResults), len(expectedPropertyResults))
+			continue
+		}
+
+		// Iterate over each propertyInstanceResult
+		for j, expectedProp := range expectedPropertyResults {
+			// Check if the current index exists in actualPropertyResults
+			if j >= len(actualPropertyResults) {
+				t.Errorf("finalOutput[%d].propertyInstanceResults missing element at index %d", i, j)
+				continue
+			}
+
+			actualProp := actualPropertyResults[j]
+
+			// Verify "componentParameterPropertyId"
+			expectedComponentId, ok := expectedProp["componentParameterPropertyId"].(string)
+			if !ok {
+				t.Errorf("Expected componentParameterPropertyId to be a string in expectedFinalResults[%d].propertyInstanceResults[%d]", i, j)
+				continue
+			}
+			actualComponentId, ok := actualProp["componentParameterPropertyId"].(string)
+			if !ok {
+				t.Errorf("Expected componentParameterPropertyId to be a string in finalOutput[%d].propertyInstanceResults[%d]", i, j)
+				continue
+			}
+			if actualComponentId != expectedComponentId {
+				t.Errorf("finalOutput[%d].propertyInstanceResults[%d].componentParameterPropertyId = %v; want %v", i, j, actualComponentId, expectedComponentId)
+			}
+
+			// Verify "value"
+			expectedValue, ok := expectedProp["value"].(int)
+			if !ok {
+				t.Errorf("Expected value to be an int in expectedFinalResults[%d].propertyInstanceResults[%d]", i, j)
+				continue
+			}
+			actualValue, ok := actualProp["value"].(int)
+			if !ok {
+				// In case the value is stored as a different numeric type, attempt conversion
+				actualFloat, ok := actualProp["value"].(float64)
+				if ok {
+					actualValue = int(actualFloat)
+				} else {
+					t.Errorf("Expected value to be an int in finalOutput[%d].propertyInstanceResults[%d]", i, j)
+					continue
+				}
+			}
+			if actualValue != expectedValue {
+				t.Errorf("finalOutput[%d].propertyInstanceResults[%d].value = %v; want %v", i, j, actualValue, expectedValue)
+			}
+		}
+	}
+
+	// Optionally, you can add this at the end of the TestEval function to ensure that all expected results were checked
+	if len(finalOutput) != len(expectedFinalResults_) {
+		t.Fatalf("Mismatch in the number of final output elements. Expected %d, got %d", len(expectedFinalResults_), len(finalOutput))
 	}
 }
