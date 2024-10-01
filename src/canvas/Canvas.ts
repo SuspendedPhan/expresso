@@ -7,6 +7,7 @@ import { PixiFactory, type PixiFactoryArgs } from "src/canvas/PixiFactory";
 import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("Canvas.ts", 9);
+log55.debug("Canvas.ts");
 
 export type LibCanvasObject = Graphics;
 
@@ -16,6 +17,6 @@ export function CanvasFactory(args: PixiFactoryArgs) {
 
 
   return Effect.gen(function* () {
-  
+    console.log(pool);
   });
 }
