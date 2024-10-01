@@ -49,7 +49,7 @@ export default interface GoModule {
 
   Evaluator: {
     addRootExObject(id: string): void;
-    eval(): ObjectInstanceResult[];
+    eval(): EvaluationResult;
     reset(): void;
 
     canvasExObjectPathAppend(
@@ -88,4 +88,6 @@ export interface EvaluationResult {
 
   getPropertyId(objectResultIndex: number, propertyResultIndex: number): string;
   getPropertyValue(objectResultIndex: number, propertyResultIndex: number): number;
+
+  dispose(): void;
 }

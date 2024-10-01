@@ -1,7 +1,7 @@
 import { Effect, Layer, Schedule } from "effect";
 import { Subject } from "rxjs";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
-import type { Evaluation } from "src/utils/utils/GoModule";
+import type { EvaluationResult } from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
 
 const log55 = log5("EvaluatorCtx.ts");
@@ -13,7 +13,7 @@ export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
-  const eval$ = new Subject<Evaluation>();
+  const eval$ = new Subject<EvaluationResult>();
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     // return Effect.succeed<void>(void 0);
