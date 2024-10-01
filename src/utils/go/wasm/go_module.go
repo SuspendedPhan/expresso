@@ -178,26 +178,46 @@ func bootstrapGoModule() {
 			defer deferLogger()
 
 			evaluation := ev.Eval()
-			getResultFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				attributeSceneInstancePath := args[0].String()
-				result, err := evaluation.GetResult(attributeSceneInstancePath)
-				if err != nil {
-					return 0
-				}
-				return result
+
+			getObjectResultCountFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				return evaluation.GetObjectResultCount()
+			})
+
+			getPropertyResultCountFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				objectResultIndex := args[0].Int()
+				return evaluation.GetPropertyResultCount(objectResultIndex)
+			})
+
+			getPropertyIdFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				objectResultIndex := args[0].Int()
+				propertyResultIndex := args[1].Int()
+				return evaluation.GetPropertyId(objectResultIndex, propertyResultIndex)
+			})
+
+			getPropertyValueFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+				objectResultIndex := args[0].Int()
+				propertyResultIndex := args[1].Int()
+				return evaluation.GetPropertyValue(objectResultIndex, propertyResultIndex)
 			})
 
 			var disposeFunc js.Func
 			disposeFunc = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-				getResultFunc.Release()
-				disposeFunc.Release()
+				getObjectResultCountFunc.Release()
+				getPropertyResultCountFunc.Release()
+				getPropertyIdFunc.Release()
+				getPropertyValueFunc.Release()
+				disposeFunc.Release() // Also release the dispose function itself
 				return nil
 			})
 
-			return js.ValueOf(map[string]interface{}{
-				"getResult": getResultFunc,
-				"dispose":   disposeFunc,
-			})
+			// Expose the functions to JavaScript
+			return map[string]interface{}{
+				"getObjectResultCount":   getObjectResultCountFunc,
+				"getPropertyResultCount": getPropertyResultCountFunc,
+				"getPropertyId":          getPropertyIdFunc,
+				"getPropertyValue":       getPropertyValueFunc,
+				"dispose":                disposeFunc,
+			}
 		}),
 
 		"reset": js.FuncOf(func(this js.Value, args []js.Value) interface{} {

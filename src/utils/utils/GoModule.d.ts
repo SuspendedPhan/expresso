@@ -75,12 +75,17 @@ export default interface GoModule {
   hello(): string;
 }
 
-export interface ObjectInstanceResult {
-  exObjectId: string;
-  propertyResults: PropertyInstanceResult;
-}
+// ObjectInstanceResult
+//   exObjectId: string;
+//   propertyResults: PropertyInstanceResult[];
 
-export interface PropertyInstanceResult {
-  componentParameterPropertyId: string;
-  value: number;
+// PropertyInstanceResult
+//   componentParameterPropertyId: string;
+//   value: number;
+export interface EvaluationResult {
+  getObjectResultCount(): number;
+  getPropertyResultCount(objectResultIndex: number): number;
+
+  getPropertyId(objectResultIndex: number, propertyResultIndex: number): string;
+  getPropertyValue(objectResultIndex: number, propertyResultIndex: number): number;
 }

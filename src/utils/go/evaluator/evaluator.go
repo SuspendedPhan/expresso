@@ -1,4 +1,4 @@
-// File: evaluator.go
+// evaluator.go
 
 package evaluator
 
@@ -16,6 +16,7 @@ type Evaluator struct {
 	ExprById        map[string]*Expr
 }
 
+// NewEvaluator creates a new Evaluator instance with initialized maps.
 func NewEvaluator(logger_ Logger2) *Evaluator {
 	logger = logger_
 	return &Evaluator{
@@ -27,22 +28,46 @@ func NewEvaluator(logger_ Logger2) *Evaluator {
 	}
 }
 
+// AddRootExObject adds an external object ID to the root objects.
 func (e *Evaluator) AddRootExObject(exObjectId string) {
 	logger.Log("AddRootExObject", exObjectId)
 	e.RootExObjectIds = append(e.RootExObjectIds, exObjectId)
 }
 
+// RootExObjects retrieves the root external objects.
 func (e *Evaluator) RootExObjects() []*ExObject {
 	objects := []*ExObject{}
 	for _, exObjectId := range e.RootExObjectIds {
-		objects = append(objects, e.ExObjectById[exObjectId])
+		if obj, exists := e.ExObjectById[exObjectId]; exists {
+			objects = append(objects, obj)
+		} else {
+			logger.Log("RootExObjects", "ExObject not found:", exObjectId)
+		}
 	}
 	return objects
 }
 
-func (e *Evaluator) Eval() []map[string]interface{} {
+// Eval performs the evaluation process and returns the final output.
+func (e *Evaluator) Eval() EvaluationResult {
+	// Step 1: Retrieve Root External Objects
 	rootExObjects := e.RootExObjects()
+
+	// Step 2: Extract Property Paths
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(rootExObjects)
 
-	// TODO...
+	// Step 3: Annotate Clone Counts
+	_, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+
+	// Step 4: Expand Instance Paths
+	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
+
+	// Step 5: Evaluate Property Instances
+	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths)
+
+	// Step 6: Group Object Instances
+	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)
+
+	return EvaluationResult{
+		objectInstanceResults: objectInstanceResults,
+	}
 }
