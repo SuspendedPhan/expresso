@@ -45,6 +45,17 @@ func (p *PropertyInstancePath) String() string {
 	return pathStr
 }
 
+func (p *ObjectInstancePath) String() string {
+	var pathParts []string
+
+	for _, segment := range p.segments {
+		pathParts = append(pathParts, segment.String())
+	}
+
+	pathStr := strings.Join(pathParts, " / ")
+	return pathStr
+}
+
 func (s *PropertyInstancePathSegment) String() string {
 	var part string
 	switch item := s.exItem.(type) {
@@ -67,4 +78,9 @@ func (s *PropertyInstancePathSegment) String() string {
 // Helper method to check if the segment is an ExObject with a valid clone number
 func (s *PropertyInstancePathSegment) IsExObject() bool {
 	return s.cloneNumber != -1
+}
+
+func (p *PropertyInstancePath) ParentPath() ObjectInstancePath {
+	segmentCount := len(p.segments)
+	return ObjectInstancePath{segments: p.segments[:segmentCount-1]}
 }

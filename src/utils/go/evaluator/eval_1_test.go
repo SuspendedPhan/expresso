@@ -352,4 +352,9 @@ func TestEval(t *testing.T) {
 			t.Errorf("Index %v: Expected %s, got %s", i, expectedPropertyInstanceResults_[i], result.String())
 		}
 	}
+
+	// ------ Test5 GroupObjectInstances ------
+
+	// ---Output---
+
 }

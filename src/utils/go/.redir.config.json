@@ -1,0 +1,25 @@
+{
+  "files": {
+    "/evaluator/eval1.go": [
+      "eval"
+    ],
+    "/evaluator/eval2.go": [
+      "eval"
+    ],
+    "/evaluator/eval3.go": [
+      "eval"
+    ],
+    "/evaluator/eval4.go": [
+      "eval"
+    ],
+    "/evaluator/eval_1_test.go": [
+      "eval-test"
+    ],
+    "/evaluator/eval_2_test.go": [
+      "eval-test"
+    ],
+    "/evaluator/eval_3_test.go": [
+      "eval-test"
+    ]
+  }
+}
