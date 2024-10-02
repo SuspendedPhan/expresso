@@ -1,7 +1,5 @@
 package evaluator
 
-import "fmt"
-
 func (e *Evaluator) EvaluatePropertyInstances(
 	instancePaths []*PropertyInstancePath,
 	paths []*PropertyPath,
@@ -34,8 +32,8 @@ func (e *Evaluator) EvaluatePropertyInstances(
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
 
-	for i, path := range instancePaths {
-		fmt.Printf("Evaluating instance path %v: %v\n", i, path)
+	for _, path := range instancePaths {
+		// fmt.Printf("Evaluating instance path %v: %v\n", i, path)
 		result := e.EvaluatePropertyInstancePath(evaluationCtx, path)
 		results = append(results, result)
 	}
@@ -66,20 +64,20 @@ func (e *Evaluator) EvaluatePropertyInstancePath(ctx *EvaluationCtx, path *Prope
 }
 
 func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInstancePath) DexValue {
-	fmt.Println("EvalExpr expr:", expr)
+	// fmt.Println("EvalExpr expr:", expr)
 
 	if expr.NumberExpr != nil {
-		fmt.Println("EvalExpr number result:", expr.NumberExpr.Value)
+		// fmt.Println("EvalExpr number result:", expr.NumberExpr.Value)
 		return expr.NumberExpr.Value
 	}
 	if expr.CallExpr != nil {
 		result := e.EvalCallExpr(ctx, expr.CallExpr, path)
-		fmt.Println("EvalExpr call result:", result)
+		// fmt.Println("EvalExpr call result:", result)
 		return result
 	}
 	if expr.ReferenceExpr != nil {
 		result := e.EvalReferenceExpr(ctx, expr.ReferenceExpr, path)
-		fmt.Println("EvalExpr reference result:", result)
+		// fmt.Println("EvalExpr reference result:", result)
 		return result
 	}
 	panic("unknown expr")
@@ -99,7 +97,7 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 
 	cloneNumberTarget, ok := referenceExpr.GetCloneNumberTarget()
 	if ok {
-		fmt.Println("EvalReferenceExpr cloneNumberTarget:", cloneNumberTarget)
+		// fmt.Println("EvalReferenceExpr cloneNumberTarget:", cloneNumberTarget)
 		result := ctx.GetCloneNumber(cloneNumberTarget, path)
 		return Float(result)
 	}

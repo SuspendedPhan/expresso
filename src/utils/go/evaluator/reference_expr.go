@@ -56,9 +56,9 @@ func (expr *ReferenceExpr) GetTargetInstancePath(ctx *EvaluationCtx, exprInstanc
 	targetProperty := expr.GetTargetProperty()
 	targetPath := ctx.GetPropertyPath(targetProperty)
 
-	fmt.Printf("GetTargetInstancePath %v /// %v\n", expr, targetPath.Property().Id)
-	fmt.Println(exprInstancePath)
-	fmt.Println(targetPath)
+	// fmt.Printf("GetTargetInstancePath %v /// %v\n", expr, targetPath.Property().Id)
+	// fmt.Println(exprInstancePath)
+	// fmt.Println(targetPath)
 
 	// For each matching segment, create an instance segment from the exprInstancePath
 	targetInstanceSegments := make([]*PropertyInstancePathSegment, 0)
