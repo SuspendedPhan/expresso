@@ -136,6 +136,29 @@ export namespace ObservableArrayFns {
 }
 
 export const ObservableArray = {
+  syncMap_<K, V>(
+    map: Map<K, V>,
+    arrayEvents: Stream.Stream<ArrayEvent<V>>,
+    getKey: (item: V) => K
+  ) {
+    return Effect.gen(function* () {
+      yield* Stream.runForEach(arrayEvents, (event) => {
+        return Effect.gen(function* () {
+          switch (event.type) {
+            case "ItemAdded": {
+              map.set(getKey(event.item), event.item);
+              break;
+            }
+            case "ItemRemoved": {
+              map.delete(getKey(event.item));
+              break;
+            }
+          }
+        });
+      });
+    }).pipe(Effect.forkDaemon);
+  },
+
   syncMap<K, V>(
     map: Map<K, V>,
     observableArray: ObservableArray<V>,

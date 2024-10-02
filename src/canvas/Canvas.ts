@@ -1,11 +1,17 @@
 // File: Canvas.ts
 
+import assert from "assert-ts";
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 import CanvasPool from "src/canvas/CanvasPool";
 import { PixiFactory, type PixiFactoryArgs } from "src/canvas/PixiFactory";
 import { EvaluatorCtx } from "src/evaluation/EvaluatorCtx";
+import { ComponentParameterFactory } from "src/ex-object/ComponentParameter";
+import { Project } from "src/ex-object/Project";
+import { PropertyFactory } from "src/ex-object/Property";
+import type { EvaluationResult } from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
+import { isType } from "variant";
 
 const log55 = log5("Canvas.ts", 9);
 log55.debug("Canvas.ts");
@@ -18,10 +24,31 @@ export function CanvasFactory(args: PixiFactoryArgs) {
 
   return Effect.gen(function* () {
     const evaluatorCtx = yield* EvaluatorCtx;
+    const project = yield* Project.activeProject;
+
     evaluatorCtx.onEval.add((result) => {
       return Effect.gen(function* () {
-        
+        updateCanvas(result);
       });
     });
+
+    const updateCanvas = (result: EvaluationResult) => {
+      return Effect.gen(function* () {
+        pool.releaseAll();
+
+        for (let i = 0; i < result.getObjectResultCount(); i++) {          
+          const canvasObject = pool.takeObject();
+          for (let j = 0; i < result.getPropertyResultCount(i); j++) {
+            const propertyId = result.getPropertyId(i, j);
+            const propertyValue = result.getPropertyValue(i, j);
+            const property = project.getProperty(propertyId);
+            assert(isType(property, PropertyFactory.ComponentParameterProperty));
+            const parameter = property.componentParameter;
+            assert(isType(parameter, ComponentParameterFactory.Canvas));
+            parameter.canvasSetter(canvasObject, propertyValue);
+          }
+        }
+      });
+    };
   });
 }

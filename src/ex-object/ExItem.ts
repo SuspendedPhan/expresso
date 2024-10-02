@@ -10,6 +10,7 @@ import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
+import type { ArrayEvent } from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   type SUB,
@@ -103,5 +104,10 @@ export const ExItem = {
       }
       return parent === null ? Stream.empty : ExItem.getProject2(parent);
     }));
+  },
+
+  getPropertyEventsDeep(item: ExItem): Stream.Stream<ArrayEvent<Property>> {
+    // todp
+    throw new Error("Not implemented");
   },
 };

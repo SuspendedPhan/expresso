@@ -9,21 +9,30 @@ export default class CanvasPool {
   private usedCircles = [] as any[]; 
 
   constructor(objectFactory: () => any) {
-    this.circlePool = deePool.create(objectFactory);
+    this.circlePool = deePool.create<LibCanvasObject>(objectFactory);
     this.circlePool.grow(20);
   }
 
   public takeObject(): LibCanvasObject {
-    const circle = this.circlePool.use();
+    const circle: LibCanvasObject = this.circlePool.use();
+    circle.visible = true;
     this.usedCircles.push(circle);
     return circle;
   }
 
   public releaseObject(circle: LibCanvasObject): void {
+    circle.visible = false;
     this.circlePool.recycle(circle);
   }
 
   public log(): void {
     log55.debug("Used circles", this.usedCircles);
+  }
+
+  public releaseAll(): void {
+    this.usedCircles.forEach((circle) => {
+      this.releaseObject(circle);
+    });
+    this.usedCircles = [];
   }
 }

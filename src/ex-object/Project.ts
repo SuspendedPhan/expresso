@@ -37,6 +37,7 @@ export const ProjectFactory = variation(
       exFuncs: ObservableArray<CustomExFunc>;
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
+      getProperty(id: string): Property;
     } & ExItemBase
   >()
 );
@@ -71,6 +72,11 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
+    const propertyById = new Map<string, Property>();
+    const propertyAddedEventsDeep = yield* ExItem.getPropertyEventsDeep(rootExObjects.events);
+
+    // todp: sync map
+
     const project = ProjectFactory({
       ...base,
       libraryProject: null,
@@ -85,6 +91,11 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       ),
       currentOrdinal$,
       destroy$: new Subject<void>(),
+
+      getProperty(id: string): Property {
+        // todp
+        throw new Error("Not implemented");
+      },
     });
 
     for (const exObject of rootExObjects.items) {
