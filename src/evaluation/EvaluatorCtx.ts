@@ -13,38 +13,16 @@ export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
-  const eval$ = new Subject<EvaluationResult>();
-  const goModule = yield* goModuleCtx.getUnsafe();
-
-  const evalResource: Effect.Effect<EvaluationResult, never, never> = Effect.acquireRelease(() => {
-    return Effect.gen(function* () {
-      return goModule.Evaluator.eval();
-    });
-  }, (evaluation: EvaluationResult) => {
-    evaluation.dispose();
-  });
-  const onEval = Stream.fromSchedule(Schedule.fixed(1000)).pipe(
-    Stream.map(() => {
-      const evaluation = goModule.Evaluator.eval();
-      log55.log3(9, "eval2");
-      eval$.next(evaluation);
-      log55.log3(9, "eval3");
-      if (evaluation !== null) {
-        evaluation.dispose();
-      }
-    })
-  );
+  const onEval = new Set<(result: EvaluationResult) => Effect.Effect<void, never, never>>();
 
   const effect = goModuleCtx.withGoModule((goModule) => {
-    // return Effect.succeed<void>(void 0);
-
     return Effect.gen(function* () {
-      log55.log3(9, "eval");
       const evaluation = goModule.Evaluator.eval();
-      log55.log3(9, "eval2");
-      eval$.next(evaluation);
-      log55.log3(9, "eval3");
+
       if (evaluation !== null) {
+        for (const cb of onEval) {
+          yield* cb(evaluation);
+        }
         evaluation.dispose();
       }
       log55.log3(9, "eval done");
@@ -54,7 +32,7 @@ const ctxEffect = Effect.gen(function* () {
   yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000)));
 
   return {
-    eval$,
+    onEval,
   };
 });
 
