@@ -67,6 +67,8 @@ func (e *Evaluator) Eval() EvaluationResult {
 	// Step 6: Group Object Instances
 	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)
 
+	// spew.Dump(objectInstanceResults)
+
 	return EvaluationResult{
 		objectInstanceResults: objectInstanceResults,
 	}
