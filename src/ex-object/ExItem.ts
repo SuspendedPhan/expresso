@@ -1,16 +1,16 @@
 // File: ExItem.ts
 
-import { Effect, Ref, Stream, SubscriptionRef } from "effect";
+import { Chunk, Effect, PubSub, Ref, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
-import { type ComponentKind } from "src/ex-object/Component";
+import { ComponentFactory, type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
-import { type ExObject } from "src/ex-object/ExObject";
+import { ExObjectFactory, type ExObject } from "src/ex-object/ExObject";
 import { type Expr } from "src/ex-object/Expr";
 import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import type { ArrayEvent } from "src/utils/utils/ObservableArray";
+import type { ArrayEvent, ItemAdded } from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   type SUB,
@@ -98,16 +98,67 @@ export const ExItem = {
   },
 
   getProject2(item: ExItem): Stream.Stream<Project> {
-    return item.parent.changes.pipe(Stream.flatMap((parent) => {
-      if (isType(parent, ProjectFactory)) {
-        return Stream.make(parent);
-      }
-      return parent === null ? Stream.empty : ExItem.getProject2(parent);
-    }));
+    return item.parent.changes.pipe(
+      Stream.flatMap((parent) => {
+        if (isType(parent, ProjectFactory)) {
+          return Stream.make(parent);
+        }
+        return parent === null ? Stream.empty : ExItem.getProject2(parent);
+      })
+    );
   },
 
-  getPropertyEventsDeep(item: ExItem): Stream.Stream<ArrayEvent<Property>> {
-    // todp
-    throw new Error("Not implemented");
+  getPropertyAddedEventsDeep(
+    itemEvents: Stream.Stream<ItemAdded<ExItem>>
+  ): Stream.Stream<ItemAdded<Property>> {
+    const vv = Stream.flatMap(
+      itemEvents,
+      (itemEvent) => {
+        const vv = this.getPropertyAddedEventsDeep2(itemEvent.item);
+        return Stream.unwrap(vv);
+      },
+      {
+        switch: true,
+        concurrency: "unbounded",
+      }
+    );
+    return vv;
+  },
+
+  getPropertyAddedEventsDeep2(
+    exItem: ExItem
+  ): Effect.Effect<Stream.Stream<ItemAdded<Property>>> {
+    return Effect.gen(this, function* () {
+      const pub = yield* PubSub.unbounded<ItemAdded<Property>>();
+
+      yield* Effect.forkDaemon(Stream.runForEach(EffectUtils.obsToStream(exItem.destroy$), (value) => {
+        return Effect.gen(function* () {
+          yield* pub.shutdown;
+          
+        });
+      }));
+
+      if (isType(exItem, ExObjectFactory)) {
+        const vv1 = yield* exItem.componentParameterProperties_.events;
+        const vv2 = yield* exItem.basicProperties.events;
+        const vv3 = Stream.concat(vv1, vv2);
+        const vv4 = Stream.filter(vv3, (event) => event.type === "ItemAdded");
+        const vv5 = Stream.concat(
+          vv4,
+          Stream.succeed({ type: "ItemAdded", item: exItem.cloneCountProperty })
+        );
+
+        const cc1 = exItem.children.itemStream;
+        // const cc2 = cc1.
+        const cc2 = this.getPropertyAddedEventsDeep(cc1);
+        return vv5;
+      }
+
+      if (isType(exItem, ComponentFactory.Custom)) {
+        const vv1 = yield* exItem.properties.events;
+        const vv2 = Stream.filter(vv1, (event) => event.type === "ItemAdded");
+        return vv2;
+      }
+    });
   },
 };

@@ -73,7 +73,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
 
     const propertyById = new Map<string, Property>();
-    const propertyAddedEventsDeep = yield* ExItem.getPropertyEventsDeep(rootExObjects.events);
+    const propertyAddedEventsDeep = yield* ExItem.getPropertyAddedEventsDeep(rootExObjects.events);
 
     // todp: sync map
 
