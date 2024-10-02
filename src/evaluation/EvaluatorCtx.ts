@@ -1,4 +1,4 @@
-import { Effect, Layer, Schedule } from "effect";
+import { Effect, Layer, Schedule, Stream } from "effect";
 import { Subject } from "rxjs";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import type { EvaluationResult } from "src/utils/utils/GoModule";
@@ -14,6 +14,26 @@ export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
   const eval$ = new Subject<EvaluationResult>();
+  const goModule = yield* goModuleCtx.getUnsafe();
+
+  const evalResource: Effect.Effect<EvaluationResult, never, never> = Effect.acquireRelease(() => {
+    return Effect.gen(function* () {
+      return goModule.Evaluator.eval();
+    });
+  }, (evaluation: EvaluationResult) => {
+    evaluation.dispose();
+  });
+  const onEval = Stream.fromSchedule(Schedule.fixed(1000)).pipe(
+    Stream.map(() => {
+      const evaluation = goModule.Evaluator.eval();
+      log55.log3(9, "eval2");
+      eval$.next(evaluation);
+      log55.log3(9, "eval3");
+      if (evaluation !== null) {
+        evaluation.dispose();
+      }
+    })
+  );
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     // return Effect.succeed<void>(void 0);
@@ -37,7 +57,6 @@ const ctxEffect = Effect.gen(function* () {
     eval$,
   };
 });
-
 
 export const EvaluatorCtxLive = Layer.effect(EvaluatorCtx, ctxEffect).pipe(
   Layer.provideMerge(GoModuleCtxLive)
