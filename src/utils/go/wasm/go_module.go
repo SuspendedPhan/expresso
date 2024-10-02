@@ -225,26 +225,6 @@ func bootstrapGoModule() {
 			return nil
 		}),
 
-		"canvasExObjectPathAppend": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			basePath := args[0].String()
-			exObjectId := args[1].String()
-			cloneId := args[2].String()
-			return evaluator.CanvasObjectPathAppend(basePath, exObjectId, cloneId)
-		}),
-
-		"createCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			propertyId := args[0].String()
-			canvasExObjectPath := args[1].String()
-			return evaluator.CreateCanvasPropertyPath(propertyId, canvasExObjectPath)
-		}),
-
-		"createCloneCountCanvasPropertyPath": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			parentCanvasExObjectPath := args[0].String()
-			exExObjectId := args[1].String()
-			cloneCountPropertyId := args[2].String()
-			return evaluator.CreateCloneCountCanvasPropertyPath(parentCanvasExObjectPath, exExObjectId, cloneCountPropertyId)
-		}),
-
 		"debug": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			spew.Dump(ev)
 			return nil

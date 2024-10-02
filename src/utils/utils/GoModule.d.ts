@@ -52,23 +52,6 @@ export default interface GoModule {
     eval(): EvaluationResult;
     reset(): void;
 
-    canvasExObjectPathAppend(
-      basePath: string,
-      objectId: string,
-      cloneId: string
-    ): string;
-
-    createCanvasPropertyPath(
-      propertyId: string,
-      canvasExObjectPath: string
-    ): string;
-
-    createCloneCountCanvasPropertyPath(
-      parentCanvasExObjectPath: string,
-      exObjectId: string,
-      cloneCountPropertyId: string
-    ): string;
-
     debug(): void;
   };
 

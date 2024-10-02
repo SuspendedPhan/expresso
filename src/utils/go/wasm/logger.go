@@ -38,5 +38,5 @@ func (l *Logger) Error(args ...interface{}) {
 }
 
 func (l *Logger) Log3(level int, args ...interface{}) {
-	js.Global().Get("log3").Invoke(level, "["+l.topic+"]", args)
+	// js.Global().Get("log3").Invoke(level, "["+l.topic+"]", args)
 }
