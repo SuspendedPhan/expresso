@@ -28,7 +28,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
 
     evaluatorCtx.onEval.add((result) => {
       return Effect.gen(function* () {
-        updateCanvas(result);
+        yield* updateCanvas(result);
       });
     });
 
@@ -36,9 +36,15 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       return Effect.gen(function* () {
         pool.releaseAll();
 
+        console.log("Updating canvas");
+        console.log(result.getObjectResultCount());
+
         for (let i = 0; i < result.getObjectResultCount(); i++) {          
           const canvasObject = pool.takeObject();
-          for (let j = 0; i < result.getPropertyResultCount(i); j++) {
+          console.log("Property result count", result.getPropertyResultCount(i));
+          for (let j = 0; j < result.getPropertyResultCount(i); j++) {
+            console.log("Updating canvas object", i, j);
+
             const propertyId = result.getPropertyId(i, j);
             const propertyValue = result.getPropertyValue(i, j);
             const property = project.getProperty(propertyId);
@@ -46,6 +52,8 @@ export function CanvasFactory(args: PixiFactoryArgs) {
             const parameter = property.componentParameter;
             assert(isType(parameter, ComponentParameterFactory.Canvas));
             parameter.canvasSetter(canvasObject, propertyValue);
+
+            canvasObject.scale.set(100, 100);
           }
         }
       });

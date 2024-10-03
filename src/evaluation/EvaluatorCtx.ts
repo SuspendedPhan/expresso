@@ -17,6 +17,7 @@ const ctxEffect = Effect.gen(function* () {
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
       const evaluation = goModule.Evaluator.eval();
+      // console.log("Got result from Evaluator.eval()");
 
       if (evaluation !== null) {
         for (const cb of onEval) {
