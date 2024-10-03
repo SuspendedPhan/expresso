@@ -227,6 +227,7 @@ func bootstrapGoModule() {
 
 		"debug": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			spew.Dump(ev)
+			// fmt.Println(ev)
 			return nil
 		}),
 	}))

@@ -107,9 +107,10 @@ func (expr *ReferenceExpr) GetCloneNumberTarget() (*ExObject, bool) {
 		return nil, false
 	}
 
+	// todp
 	exObject, found := expr.Evaluator.ExObjectById[expr.TargetId]
 	if !found {
-		panic("ex object not found")
+		panic(fmt.Errorf("ex object not found: %v", expr.TargetId))
 	}
 
 	return exObject, true

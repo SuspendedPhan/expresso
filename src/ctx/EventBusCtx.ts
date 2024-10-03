@@ -17,7 +17,6 @@ export class EventBusCtx extends Effect.Tag("EventBusCtx")<
 const ctxEffect = Effect.gen(function* () {
   const exObjectAdded = yield* PubSub.unbounded<ExObject>();
   return {
-    // todp: rename to attached
     exObjectAdded,
     propertyAdded: yield* PubSub.unbounded<Property>(),
     exprAdded: yield* PubSub.unbounded<Expr>(),

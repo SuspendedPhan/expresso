@@ -36,7 +36,6 @@
 
   const editingName$ = of(false);
 
-  // todp
   function handleNameInput(event: Event) {
     const currentTarget = event.currentTarget as HTMLInputElement;
     const name = currentTarget.value;
