@@ -1,6 +1,15 @@
 // File: ExItem.ts
 
-import { Chunk, Effect, PubSub, Ref, Stream, SubscriptionRef } from "effect";
+import {
+  Chunk,
+  Effect,
+  PubSub,
+  Queue,
+  Ref,
+  Scope,
+  Stream,
+  SubscriptionRef,
+} from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { ComponentFactory, type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
@@ -110,55 +119,89 @@ export const ExItem = {
 
   getPropertyAddedEventsDeep(
     itemEvents: Stream.Stream<ItemAdded<ExItem>>
-  ): Stream.Stream<ItemAdded<Property>> {
-    const vv = Stream.flatMap(
-      itemEvents,
-      (itemEvent) => {
-        const vv = this.getPropertyAddedEventsDeep2(itemEvent.item);
-        return Stream.unwrap(vv);
-      },
-      {
-        switch: true,
-        concurrency: "unbounded",
-      }
-    );
-    return vv;
+  ): Effect.Effect<Stream.Stream<ItemAdded<ExItem>>> {
+    return Effect.gen(this, function* () {
+      const pubsub = yield* PubSub.unbounded<ItemAdded<ExItem>>();
+
+      yield* Effect.forkDaemon(
+        Stream.runForEach(itemEvents, (event) => {
+          return Effect.forkDaemon(
+            Effect.gen(this, function* () {
+              const events = yield* this.getPropertyAddedEventsDeep2(
+                event.item
+              );
+
+              while (!events.isShutdown) {
+                const event_ = yield* Queue.take(events);
+                pubsub.publish(event_);
+              }
+            })
+          );
+        })
+      );
+
+      const vv = Stream.fromPubSub(pubsub);
+      return vv;
+    });
   },
 
   getPropertyAddedEventsDeep2(
     exItem: ExItem
-  ): Effect.Effect<Stream.Stream<ItemAdded<Property>>> {
+  ): Effect.Effect<Stream.Stream<ItemAdded<ExItem>>> {
     return Effect.gen(this, function* () {
       const pub = yield* PubSub.unbounded<ItemAdded<Property>>();
 
-      yield* Effect.forkDaemon(Stream.runForEach(EffectUtils.obsToStream(exItem.destroy$), (value) => {
-        return Effect.gen(function* () {
-          yield* pub.shutdown;
-          
-        });
-      }));
+      yield* Effect.forkDaemon(
+        Stream.runForEach(EffectUtils.obsToStream(exItem.destroy$), () => {
+          return Effect.gen(function* () {
+            yield* pub.shutdown;
+          });
+        })
+      );
 
       if (isType(exItem, ExObjectFactory)) {
         const vv1 = yield* exItem.componentParameterProperties_.events;
         const vv2 = yield* exItem.basicProperties.events;
-        const vv3 = Stream.concat(vv1, vv2);
+        const vv3 = Stream.merge(vv1, vv2);
         const vv4 = Stream.filter(vv3, (event) => event.type === "ItemAdded");
-        const vv5 = Stream.concat(
+        const vv5 = Stream.merge(
           vv4,
           Stream.succeed({ type: "ItemAdded", item: exItem.cloneCountProperty })
         );
 
-        const cc1 = exItem.children.itemStream;
-        // const cc2 = cc1.
-        const cc2 = this.getPropertyAddedEventsDeep(cc1);
-        return vv5;
+        const cc1 = yield* exItem.children.events;
+        const cc2 = Stream.filter(
+          cc1,
+          (event) => event.type === "ItemAdded"
+        );
+
+        const cc3 = Stream.merge(vv5, cc2);
+        
+        const cc4 = Stream.flatMap(cc3, (event) => {
+          return Stream.unwrap(this.getPropertyAddedEventsDeep2(event.item));
+        }, {
+          switch: true,
+          concurrency: "unbounded",
+        });
+        return cc4;
       }
 
       if (isType(exItem, ComponentFactory.Custom)) {
         const vv1 = yield* exItem.properties.events;
         const vv2 = Stream.filter(vv1, (event) => event.type === "ItemAdded");
+
+        const cc1 = yield* exItem.rootExObjects.events;
+        const cc2 = Stream.filter(
+          cc1,
+          (event) => event.type === "ItemAdded"
+        );
+        const cc3 = Stream.merge(vv2, cc2);
+        
         return vv2;
       }
+
+      console.error("Unknown type");
+      throw new Error("Unknown type");
     });
   },
 };

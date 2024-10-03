@@ -1,4 +1,4 @@
-import { Effect, Option, PubSub, Stream, SubscriptionRef } from "effect";
+import { Effect, Fiber, Option, PubSub, Stream, SubscriptionRef } from "effect";
 import { concat, map, Subject } from "rxjs";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
@@ -48,6 +48,29 @@ export function createObservableArrayWithLifetime<T>(
 
   return {
     kind: "ObservableArray" as const,
+
+    get itemAddedDequeue() {
+      return Effect.gen(this, function* () {
+        const pub = yield* PubSub.unbounded<ItemAdded<T>>();
+        const fiber = yield* Effect.forkDaemon(
+          Stream.runForEach(yield* this.events, (value) => {
+            return Effect.gen(function* () {
+              if (value.type === "ItemAdded") {
+                pub.publish(value);
+              }
+            });
+          })
+        );
+
+        yield* Effect.forkDaemon(
+          Stream.runForEach(EffectUtils.obsToStream(destroy$), () => {
+            return Fiber.interrupt(fiber);
+          })
+        );
+
+        return yield* pub.subscribe;
+      });
+    },
 
     get events$() {
       return Effect.gen(function* () {
