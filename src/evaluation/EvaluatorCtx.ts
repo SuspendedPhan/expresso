@@ -1,5 +1,4 @@
-import { Effect, Layer, Schedule, Stream } from "effect";
-import { Subject } from "rxjs";
+import { Effect, Layer, Schedule } from "effect";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import type { EvaluationResult } from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";

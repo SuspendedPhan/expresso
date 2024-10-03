@@ -1,6 +1,7 @@
 // File: Project.ts
 
-import { Effect } from "effect";
+import assert from "assert-ts";
+import { Effect, Stream } from "effect";
 import {
   BehaviorSubject,
   firstValueFrom,
@@ -8,6 +9,7 @@ import {
   Subject,
   switchMap,
 } from "rxjs";
+import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
@@ -54,6 +56,8 @@ interface ProjectCreationArgs {
 
 export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
   return Effect.gen(function* () {
+    const eventBusCtx = yield* EventBusCtx;
+
     const currentOrdinal = creationArgs.currentOrdinal ?? 0;
     const creationArgs2: Required<ProjectCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("project"),
@@ -71,11 +75,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
     );
 
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
-
     const propertyById = new Map<string, Property>();
-    const propertyAddedEventsDeep = yield* ExItem.getPropertyAddedEventsDeep(rootExObjects.events);
-
-    // todp: sync map
 
     const project = ProjectFactory({
       ...base,
@@ -93,8 +93,9 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       destroy$: new Subject<void>(),
 
       getProperty(id: string): Property {
-        // todp
-        throw new Error("Not implemented");
+        const property = propertyById.get(id);
+        assert(property !== undefined, `Property not found: ${id}`);
+        return property;
       },
     });
 
@@ -102,6 +103,18 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       log55.debug("Adding rootExObject", exObject.id);
       exObject.parent$.next(project);
     }
+
+    yield* Effect.forkDaemon(
+      Stream.runForEach(
+        yield* eventBusCtx.propertyAddedForProject(project),
+        (value) => {
+          return Effect.gen(function* () {
+            log55.debug("Adding property to project", value.id);
+            propertyById.set(value.id, value);
+          });
+        }
+      )
+    );
 
     return project;
   });
