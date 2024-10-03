@@ -93,6 +93,18 @@ const ctxEffect = Effect.gen(function* () {
               })
             );
 
+            yield* Effect.forkDaemon(
+              Stream.runForEach(yield* exObject.children.events, (value) => {
+                return Effect.gen(function* () {
+                  if (value.type === "ItemAdded") {
+                    goModule.ExObject.addChild(exObject.id, value.item.id);
+                  } else {
+                    console.error("Not implemented");
+                  }
+                });
+              })
+            );
+
             goModule.ExObject.setCloneNumberTarget(
               exObject.id,
               exObject.cloneNumberTarget.id

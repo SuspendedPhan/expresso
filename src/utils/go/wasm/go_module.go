@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -194,6 +195,8 @@ func bootstrapGoModule() {
 			defer deferLogger()
 
 			evaluation := ev.Eval()
+
+			fmt.Println(evaluation.String())
 
 			getObjectResultCountFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 				return evaluation.GetObjectResultCount()

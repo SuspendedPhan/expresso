@@ -2,6 +2,8 @@
 
 package evaluator
 
+import "fmt"
+
 // -- TYPES --
 
 type Float = float64
@@ -57,6 +59,8 @@ func (e *Evaluator) Eval() EvaluationResult {
 	// Step 2: Extract Property Paths
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(rootExObjects)
 
+	e.debugEval1(cloneCountPropertyPaths, propertyPaths)
+
 	// Step 3: Annotate Clone Counts
 	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 
@@ -73,5 +77,17 @@ func (e *Evaluator) Eval() EvaluationResult {
 
 	return EvaluationResult{
 		objectInstanceResults: objectInstanceResults,
+	}
+}
+
+func (e *Evaluator) debugEval1(cloneCountPropertyPaths []*CloneCountPropertyPath, propertyPaths []*PropertyPath) {
+	fmt.Println("Clone Count Property Paths:")
+	for _, path := range cloneCountPropertyPaths {
+		fmt.Println(path.String())
+	}
+
+	fmt.Println("Property Paths:")
+	for _, path := range propertyPaths {
+		fmt.Println(path.String())
 	}
 }

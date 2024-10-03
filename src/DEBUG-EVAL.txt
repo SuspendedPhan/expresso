@@ -1,0 +1,83 @@
+Evaluator:
+  RootExObjectIds (1):
+    - "ex-object-9720863a-2768-4284-bb8b-79510a85f235"
+  
+  ComponentById: {}
+  
+  ExObjectById (2):
+    "ex-object-9720863a-2768-4284-bb8b-79510a85f235":
+      Id: "ex-object-9720863a-2768-4284-bb8b-79510a85f235"
+      ComponentParameterPropertyIds (1):
+        - "component-parameter-a5b1fe54-696d-44e8-bfe3-e239c6b48819"
+      CloneCountPropertyId: "clone-count-property-71e7953d-1c3e-4d88-8f38-007add579aa5"
+      BasicPropertyIds: []
+      ComponentId: ""
+      ChildrenIds (1):
+        - "ex-object-d36487f4-f6e8-402f-819e-4a5f9a420087"
+      Evaluator:
+        RootExObjectIds (1):
+          - "ex-object-9720863a-2768-4284-bb8b-79510a85f235"
+        ComponentById: {}
+        ExObjectById (2):
+          "ex-object-9720863a-2768-4284-bb8b-79510a85f235":
+            [Already Shown Above]
+          "ex-object-d36487f4-f6e8-402f-819e-4a5f9a420087":
+            Id: "ex-object-d36487f4-f6e8-402f-819e-4a5f9a420087"
+            ComponentParameterPropertyIds (1):
+              - "component-parameter-37e256f1-b6d4-42fe-a809-bda42bedd2e1"
+            CloneCountPropertyId: "clone-count-property-1c40356d-d810-4a4c-96b7-df178e571595"
+            BasicPropertyIds: []
+            ComponentId: ""
+            ChildrenIds: null
+        PropertyById (4):
+          "clone-count-property-71e7953d-1c3e-4d88-8f38-007add579aa5":
+            Id: "clone-count-property-71e7953d-1c3e-4d88-8f38-007add579aa5"
+            ExprId: "expr-498d0f69-220a-48af-950f-fbc2bf2dccc1"
+          "component-parameter-a5b1fe54-696d-44e8-bfe3-e239c6b48819":
+            Id: "component-parameter-a5b1fe54-696d-44e8-bfe3-e239c6b48819"
+            ExprId: "expr-c77ddba9-cdea-4fea-a85b-31187d8b826b"
+          "clone-count-property-1c40356d-d810-4a4c-96b7-df178e571595":
+            Id: "clone-count-property-1c40356d-d810-4a4c-96b7-df178e571595"
+            ExprId: "expr-0c4ec43b-f829-490a-b71f-f08a39b7168d"
+          "component-parameter-37e256f1-b6d4-42fe-a809-bda42bedd2e1":
+            Id: "component-parameter-37e256f1-b6d4-42fe-a809-bda42bedd2e1"
+            ExprId: "expr-b1462451-5af8-43b8-996e-0a4e2b447c27"
+  
+  ExprById (4):
+    "expr-498d0f69-220a-48af-950f-fbc2bf2dccc1":
+      Expr:
+        Id: "expr-498d0f69-220a-48af-950f-fbc2bf2dccc1"
+        NumberExpr: null
+        CallExpr: null
+        ReferenceExpr:
+          TargetId: "clone-number-target-b1671881-b669-48c0-9435-40b5bc97044c"
+          TargetKind: "CloneNumberTarget"
+        Evaluator: null
+    
+    "expr-c77ddba9-cdea-4fea-a85b-31187d8b826b":
+      Expr:
+        Id: "expr-c77ddba9-cdea-4fea-a85b-31187d8b826b"
+        NumberExpr: null
+        CallExpr: null
+        ReferenceExpr: null
+        Evaluator: null
+    
+    "expr-0c4ec43b-f829-490a-b71f-f08a39b7168d":
+      Expr:
+        Id: "expr-0c4ec43b-f829-490a-b71f-f08a39b7168d"
+        NumberExpr: null
+        CallExpr: null
+        ReferenceExpr: null
+        Evaluator: null
+    
+    "expr-b1462451-5af8-43b8-996e-0a4e2b447c27":
+      Expr:
+        Id: "expr-b1462451-5af8-43b8-996e-0a4e2b447c27"
+        NumberExpr: null
+        CallExpr: null
+        ReferenceExpr: null
+        Evaluator: null
+  
+  ExObjectIdByCloneNumberTargetId (2):
+    "clone-number-target-b1671881-b669-48c0-9435-40b5bc97044c": "ex-object-9720863a-2768-4284-bb8b-79510a85f235"
+    "clone-number-target-5d919481-7ef8-428e-b9df-ec5b7ae43e38": "ex-object-d36487f4-f6e8-402f-819e-4a5f9a420087"

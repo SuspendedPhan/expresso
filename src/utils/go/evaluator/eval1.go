@@ -75,6 +75,13 @@ func (e *Evaluator) ExtractNonCloneCountPropertyPaths_(object *ExObject) []*Prop
 		}
 	}
 
+	for _, child := range object.Children() {
+		for _, path := range e.ExtractNonCloneCountPropertyPaths_(child) {
+			path := NewPropertyPath4(object, path)
+			paths = append(paths, path)
+		}
+	}
+
 	return paths
 }
 

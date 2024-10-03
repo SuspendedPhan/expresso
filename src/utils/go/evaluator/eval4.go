@@ -88,7 +88,7 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInsta
 }
 
 func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *PropertyInstancePath) DexValue {
-	return e.EvalExpr(ctx, callExpr.Arg0(), path) + e.EvalExpr(ctx, callExpr.Arg1(), path)
+	return e.EvalExpr(ctx, callExpr.Arg0(), path) * e.EvalExpr(ctx, callExpr.Arg1(), path)
 }
 
 func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *ReferenceExpr, path *PropertyInstancePath) DexValue {
