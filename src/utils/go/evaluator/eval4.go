@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 func (e *Evaluator) EvaluatePropertyInstances(
 	instancePaths []*PropertyInstancePath,
 	paths []*PropertyPath,
@@ -102,7 +104,7 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		return Float(result)
 	}
 
-	panic("unknown reference kind")
+	panic(fmt.Errorf("unknown reference kind: %v", targetKind))
 }
 
 func MakePropertyPathMap(paths []*PropertyPath) map[*Property]*PropertyPath {
