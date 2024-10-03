@@ -66,6 +66,7 @@ const ctxEffect = Effect.gen(function* () {
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
+            // todp set clone number target
             log55.debug2("Go: Adding Object" + ++exObjectCounter);
 
             goModule.ExObject.create(exObject.id);

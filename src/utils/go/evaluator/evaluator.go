@@ -9,22 +9,24 @@ type Float = float64
 var logger Logger2
 
 type Evaluator struct {
-	RootExObjectIds []string
-	ComponentById   map[string]*Component
-	ExObjectById    map[string]*ExObject
-	PropertyById    map[string]*Property
-	ExprById        map[string]*Expr
+	RootExObjectIds                 []string
+	ComponentById                   map[string]*Component
+	ExObjectById                    map[string]*ExObject
+	PropertyById                    map[string]*Property
+	ExprById                        map[string]*Expr
+	ExObjectIdByCloneNumberTargetId map[string]string
 }
 
 // NewEvaluator creates a new Evaluator instance with initialized maps.
 func NewEvaluator(logger_ Logger2) *Evaluator {
 	logger = logger_
 	return &Evaluator{
-		RootExObjectIds: []string{},
-		ComponentById:   map[string]*Component{},
-		ExObjectById:    map[string]*ExObject{},
-		PropertyById:    map[string]*Property{},
-		ExprById:        map[string]*Expr{},
+		RootExObjectIds:                 []string{},
+		ComponentById:                   map[string]*Component{},
+		ExObjectById:                    map[string]*ExObject{},
+		PropertyById:                    map[string]*Property{},
+		ExprById:                        map[string]*Expr{},
+		ExObjectIdByCloneNumberTargetId: map[string]string{},
 	}
 }
 

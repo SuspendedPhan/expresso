@@ -55,6 +55,22 @@ func bootstrapGoModule() {
 			ev.ExObjectAddBasicProperty(exObjectId, propertyId)
 			return nil
 		}),
+
+		"addChild": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.addChild", args)
+			parentId := args[0].String()
+			childId := args[1].String()
+			ev.ExObjectAddChild(parentId, childId)
+			return nil
+		}),
+
+		"setCloneNumberTarget": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.setCloneNumberTarget", args)
+			exObjectId := args[0].String()
+			cloneNumberTargetId := args[1].String()
+			ev.ExObjectSetCloneNumberTarget(exObjectId, cloneNumberTargetId)
+			return nil
+		}),
 	}))
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{

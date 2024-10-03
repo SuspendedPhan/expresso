@@ -23,6 +23,8 @@ export default interface GoModule {
     setCloneCountProperty(exObjectId: string, propertyId: string): void;
     addComponentParameterProperty(exObjectId: string, propertyId: string): void;
     addBasicProperty(exObjectId: string, propertyId: string): void;
+    addChild(exObjectId: string, childId: string): void;
+    setCloneNumberTarget(exObjectId: string, cloneNumberTargetId: string): void;
   };
 
   Property: {

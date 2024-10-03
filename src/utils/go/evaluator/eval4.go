@@ -95,7 +95,7 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		return result.Value
 	}
 
-	cloneNumberTarget, ok := referenceExpr.GetCloneNumberTarget()
+	cloneNumberTarget, ok := referenceExpr.GetCloneNumberTargetParent()
 	if ok {
 		// fmt.Println("EvalReferenceExpr cloneNumberTarget:", cloneNumberTarget)
 		result := ctx.GetCloneNumber(cloneNumberTarget, path)

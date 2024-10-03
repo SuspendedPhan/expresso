@@ -94,6 +94,11 @@ func (e *Evaluator) ExObjectAddChild(parentId string, childId string) {
 	parent.ChildrenIds = append(parent.ChildrenIds, childId)
 }
 
+func (e *Evaluator) ExObjectSetCloneNumberTarget(exObjectId string, cloneNumberTargetId string) {
+	logger.Log3(8, "ExObjectSetCloneNumberTarget", "exObjectId", exObjectId, "cloneNumberTargetId", cloneNumberTargetId)
+	e.ExObjectIdByCloneNumberTargetId[cloneNumberTargetId] = exObjectId
+}
+
 // NonCloneCountProperties returns all properties associated with the ExObject
 // excluding the CloneCountProperty.
 func (self *ExObject) NonCloneCountProperties() []*Property {

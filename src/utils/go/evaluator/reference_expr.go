@@ -102,15 +102,19 @@ func (expr *ReferenceExpr) GetTargetProperty() *Property {
 	panic("unknown target kind")
 }
 
-func (expr *ReferenceExpr) GetCloneNumberTarget() (*ExObject, bool) {
-	if expr.TargetKind != "Property/CloneCountProperty" {
+func (expr *ReferenceExpr) GetCloneNumberTargetParent() (*ExObject, bool) {
+	if expr.TargetKind != "CloneNumberTarget" {
 		return nil, false
 	}
 
-	// todp
-	exObject, found := expr.Evaluator.ExObjectById[expr.TargetId]
+	exObjectId, found := expr.Evaluator.ExObjectIdByCloneNumberTargetId[expr.TargetId]
 	if !found {
-		panic(fmt.Errorf("ex object not found: %v", expr.TargetId))
+		panic(fmt.Errorf("ex object for target not found: %v", expr.TargetId))
+	}
+
+	exObject, found := expr.Evaluator.ExObjectById[exObjectId]
+	if !found {
+		panic(fmt.Errorf("ex object for target was found, but ex object not found: %v", exObjectId))
 	}
 
 	return exObject, true

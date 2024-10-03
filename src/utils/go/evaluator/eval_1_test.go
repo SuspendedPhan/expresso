@@ -72,6 +72,12 @@ func TestEval(t *testing.T) {
 	e.ComponentAddBasicProperty("planet", "planet-velocity")
 	e.ExObjectAddBasicProperty("circle", "circle-radius")
 
+	// --- Set clone number targets ---
+
+	e.ExObjectSetCloneNumberTarget("earth", "earth-clone-number-target")
+	e.ExObjectSetCloneNumberTarget("moon", "moon-clone-number-target")
+	e.ExObjectSetCloneNumberTarget("circle", "circle-clone-number-target")
+
 	// --- Set relationships ---
 
 	e.ExObjectSetComponent("earth", "planet")
@@ -97,8 +103,8 @@ func TestEval(t *testing.T) {
 	// --- Add expr for object|earth / component|planet > property|planet-velocity ---
 
 	e.ReferenceExprCreate("planet-velocity-expr")
-	e.ReferenceExprSetTargetId("planet-velocity-expr", "earth")
-	e.ReferenceExprSetTargetKind("planet-velocity-expr", "Property/CloneCountProperty")
+	e.ReferenceExprSetTargetId("planet-velocity-expr", "earth-clone-number-target")
+	e.ReferenceExprSetTargetKind("planet-velocity-expr", "CloneNumberTarget")
 
 	e.PropertySetExpr("planet-velocity", "planet-velocity-expr")
 
@@ -111,8 +117,8 @@ func TestEval(t *testing.T) {
 	e.CallExprSetArg1("circle-radius-expr", "circle-radius-expr-arg-1")
 	e.ReferenceExprSetTargetId("circle-radius-expr-arg-0", "planet-velocity")
 	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-0", "Property/BasicProperty")
-	e.ReferenceExprSetTargetId("circle-radius-expr-arg-1", "circle")
-	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-1", "Property/CloneCountProperty")
+	e.ReferenceExprSetTargetId("circle-radius-expr-arg-1", "circle-clone-number-target")
+	e.ReferenceExprSetTargetKind("circle-radius-expr-arg-1", "CloneNumberTarget")
 
 	e.PropertySetExpr("circle-radius", "circle-radius-expr")
 
@@ -124,10 +130,10 @@ func TestEval(t *testing.T) {
 
 	e.CallExprSetArg0("moon-radius-expr", "moon-radius-expr-arg-0")
 	e.CallExprSetArg1("moon-radius-expr", "moon-radius-expr-arg-1")
-	e.ReferenceExprSetTargetId("moon-radius-expr-arg-0", "earth")
-	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-0", "Property/CloneCountProperty")
-	e.ReferenceExprSetTargetId("moon-radius-expr-arg-1", "moon")
-	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-1", "Property/CloneCountProperty")
+	e.ReferenceExprSetTargetId("moon-radius-expr-arg-0", "earth-clone-number-target")
+	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-0", "CloneNumberTarget")
+	e.ReferenceExprSetTargetId("moon-radius-expr-arg-1", "moon-clone-number-target")
+	e.ReferenceExprSetTargetKind("moon-radius-expr-arg-1", "CloneNumberTarget")
 
 	e.PropertySetExpr("moon-radius", "moon-radius-expr")
 
