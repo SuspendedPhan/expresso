@@ -39,16 +39,23 @@ export function CanvasFactory(args: PixiFactoryArgs) {
         console.log("Updating canvas");
         console.log(result.getObjectResultCount());
 
-        for (let i = 0; i < result.getObjectResultCount(); i++) {          
+        for (let i = 0; i < result.getObjectResultCount(); i++) {
           const canvasObject = pool.takeObject();
-          console.log("Property result count", result.getPropertyResultCount(i));
+          console.log(
+            "Property result count",
+            result.getPropertyResultCount(i)
+          );
           for (let j = 0; j < result.getPropertyResultCount(i); j++) {
             console.log("Updating canvas object", i, j);
 
             const propertyId = result.getPropertyId(i, j);
             const propertyValue = result.getPropertyValue(i, j);
             const property = project.getProperty(propertyId);
-            assert(isType(property, PropertyFactory.ComponentParameterProperty));
+            
+            if (!isType(property, PropertyFactory.ComponentParameterProperty)) {
+              continue;
+            }
+
             const parameter = property.componentParameter;
             assert(isType(parameter, ComponentParameterFactory.Canvas));
             parameter.canvasSetter(canvasObject, propertyValue);

@@ -81,7 +81,22 @@ const ctxEffect = Effect.gen(function* () {
               );
             }
 
-            goModule.ExObject.setCloneNumberTarget(exObject.id, exObject.cloneNumberTarget.id);
+            yield* Effect.forkDaemon(
+              Stream.runForEach(yield* exObject.basicProperties.events, (value) => {
+                return Effect.gen(function* () {
+                  if (value.type === "ItemAdded") {
+                    goModule.ExObject.addBasicProperty(exObject.id, value.item.id);
+                  } else {
+                    console.error("Not implemented");
+                  }
+                });
+              })
+            );
+
+            goModule.ExObject.setCloneNumberTarget(
+              exObject.id,
+              exObject.cloneNumberTarget.id
+            );
           });
         });
       });
