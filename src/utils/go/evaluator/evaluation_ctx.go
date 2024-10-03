@@ -3,9 +3,9 @@ package evaluator
 import "fmt"
 
 type EvaluationCtx struct {
-	resultByPropertyInstancePath     map[string]*PropertyInstanceResult
-	propertyPathByProperty           map[*Property]*PropertyPath
-	cloneCountPropertyPathByProperty map[*Property]*CloneCountPropertyPath
+	resultByPropertyInstancePath map[string]*PropertyInstanceResult
+	propertyPathByProperty       map[*Property]*PropertyPath
+	cloneCountResults            []*CloneCountResult
 }
 
 // GetPropertyInstanceResult returns the result of the referenced property given the instance path.

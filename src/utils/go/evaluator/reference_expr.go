@@ -120,6 +120,19 @@ func (expr *ReferenceExpr) GetCloneNumberTargetParent() (*ExObject, bool) {
 	return exObject, true
 }
 
+func (expr *ReferenceExpr) GetCloneCountResult(ctx *EvaluationCtx) (*CloneCountResult, bool) {
+	if expr.TargetKind != "Property/CloneCountProperty" {
+		return nil, false
+	}
+
+	for _, cloneCountResult := range ctx.cloneCountResults {
+		if cloneCountResult.PropertyPath.Property().Id == expr.TargetId {
+			return cloneCountResult, true
+		}
+	}
+	panic(fmt.Errorf("clone count result not found for target: %v", expr.TargetId))
+}
+
 func (expr *ReferenceExpr) String() string {
 	return expr.Expr.Id
 }

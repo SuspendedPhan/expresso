@@ -5,6 +5,7 @@ import "fmt"
 func (e *Evaluator) EvaluatePropertyInstances(
 	instancePaths []*PropertyInstancePath,
 	paths []*PropertyPath,
+	cloneCountResults []*CloneCountResult,
 ) []*PropertyInstanceResult {
 	/*
 	   results: Map<PropertyInstancePath, PropertyInstanceResult>
@@ -30,6 +31,7 @@ func (e *Evaluator) EvaluatePropertyInstances(
 	evaluationCtx := &EvaluationCtx{
 		resultByPropertyInstancePath: resultByPropertyInstancePath,
 		propertyPathByProperty:       MakePropertyPathMap(paths),
+		cloneCountResults:            cloneCountResults,
 	}
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
@@ -102,6 +104,10 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		// fmt.Println("EvalReferenceExpr cloneNumberTarget:", cloneNumberTarget)
 		result := ctx.GetCloneNumber(cloneNumberTarget, path)
 		return Float(result)
+	}
+
+	if cloneCountResult, ok := referenceExpr.GetCloneCountResult(ctx); ok {
+		return cloneCountResult.Count
 	}
 
 	panic(fmt.Errorf("unknown reference kind: %v", targetKind))

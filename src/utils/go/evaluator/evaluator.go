@@ -58,13 +58,13 @@ func (e *Evaluator) Eval() EvaluationResult {
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(rootExObjects)
 
 	// Step 3: Annotate Clone Counts
-	_, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
+	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)
 
 	// Step 4: Expand Instance Paths
 	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
 
 	// Step 5: Evaluate Property Instances
-	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths)
+	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths, cloneCountResults)
 
 	// Step 6: Group Object Instances
 	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)
