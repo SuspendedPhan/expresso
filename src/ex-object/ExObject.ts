@@ -2,13 +2,13 @@
 
 import assert from "assert-ts";
 import { Effect, Stream } from "effect";
+import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   CloneNumberTargetCtx,
   type CloneNumberTarget,
 } from "src/ex-object/CloneNumberTarget";
 import {
-  CanvasComponentStore,
   ComponentFactory,
   type Component,
   type ComponentKind,
@@ -63,11 +63,14 @@ interface ExObjectCreationArgs {
 
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
+    const canvasComponentCtx = yield* CanvasComponentCtx;
+    const canvasComponents = canvasComponentCtx.canvasComponents;
+
     log55.debug("ExObjectFactory2.start");
 
     const eventBusCtx = yield* EventBusCtx;
     const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
-    const component = creationArgs.component ?? CanvasComponentStore.circle;
+    const component = creationArgs.component ?? canvasComponents.circle;
 
     log55.debug("ExObjectFactory2.component", component);
 

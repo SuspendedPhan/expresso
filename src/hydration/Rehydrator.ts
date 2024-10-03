@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
+import type { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
@@ -285,7 +286,11 @@ const ctxEffect = Effect.gen(function* () {
   ): Effect.Effect<
     ExObject,
     never,
-    ComponentCtx | LibraryProjectCtx | EventBusCtx | CloneNumberTargetCtx
+    | ComponentCtx
+    | LibraryProjectCtx
+    | EventBusCtx
+    | CloneNumberTargetCtx
+    | CanvasComponentCtx
   > {
     const effect = Effect.gen(function* () {
       log55.debug("rehydrateExObject.start", deExObject);

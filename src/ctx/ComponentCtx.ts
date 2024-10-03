@@ -1,5 +1,6 @@
 import { Effect, Layer } from "effect";
-import { CanvasComponentStore, type ComponentKind } from "src/ex-object/Component";
+import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
+import type { ComponentKind } from "src/ex-object/Component";
 import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
@@ -12,14 +13,17 @@ export class ComponentCtx extends Effect.Tag("ComponentCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
+  const canvasComponentCtx = yield* CanvasComponentCtx;
+  const canvasComponents = canvasComponentCtx.canvasComponents;
+
   const parameterById = new Map<string, ComponentParameterKind["Canvas"]>();
-  CanvasComponentStore.circle.parameters.forEach((parameter) => {
+  canvasComponents.circle.parameters.forEach((parameter) => {
     parameterById.set(parameter.id, parameter);
   });
 
   return {
     getCanvasComponentById(id: string) {
-      const component: ComponentKind["Canvas"] = (CanvasComponentStore as any)[id];
+      const component: ComponentKind["Canvas"] = (canvasComponents as any)[id];
       if (!component) {
         throw new Error(`Canvas component not found: ${id}`);
       }

@@ -4,9 +4,8 @@ import { Effect } from "effect";
 import { BehaviorSubject, of } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/Canvas";
 import {
-  ComponentParameterFactory,
   ComponentParameterFactory2,
-  type ComponentParameterKind,
+  type ComponentParameterKind
 } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
@@ -130,21 +129,6 @@ function customComponentMethodsFactory(component: CustomComponent_) {
     },
   };
 }
-
-export const CanvasComponentStore = {
-  circle: ComponentFactory.Canvas({
-    id: "circle",
-    parameters: [
-      ComponentParameterFactory.Canvas({
-        name: "x",
-        id: "x",
-        canvasSetter: (pixiObject, value) => {
-          pixiObject.x = value;
-        },
-      }),
-    ],
-  }),
-} satisfies Record<string, ComponentKind["Canvas"]>;
 
 export const Component = {
   getName$(component: Component): OBS<string> {

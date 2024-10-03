@@ -1,4 +1,5 @@
 import { Layer, ManagedRuntime } from "effect";
+import { CanvasComponentCtxLive } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { EventBusCtxLive } from "src/ctx/EventBusCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
@@ -53,6 +54,7 @@ const mainLayer2 = mainLayer.pipe(
   // Layer.provideMerge(TestTelemetryCtxLive),
   Layer.provideMerge(TelemetryCtxLive),
   Layer.provideMerge(CloneNumberTargetCtxLive),
+  Layer.provideMerge(CanvasComponentCtxLive)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);
