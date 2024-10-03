@@ -1,25 +1,20 @@
 // File: ExItem.ts
 
 import {
-  Chunk,
   Effect,
-  PubSub,
-  Queue,
   Ref,
-  Scope,
   Stream,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
-import { ComponentFactory, type ComponentKind } from "src/ex-object/Component";
+import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
-import { ExObjectFactory, type ExObject } from "src/ex-object/ExObject";
+import { type ExObject } from "src/ex-object/ExObject";
 import { type Expr } from "src/ex-object/Expr";
 import { Project, ProjectFactory } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import type { ArrayEvent, ItemAdded } from "src/utils/utils/ObservableArray";
 import {
   createBehaviorSubjectWithLifetime,
   type SUB,
