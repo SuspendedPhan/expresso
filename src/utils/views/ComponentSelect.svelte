@@ -10,7 +10,7 @@
     component: string;
   }
 
-  export const exObject: ExObject = null as any;
+  export let exObject: ExObject = null as any;
 
   let options: ComponentOption[] = [
     { label: "Option 1", component: "Option1" },

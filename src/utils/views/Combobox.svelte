@@ -24,6 +24,12 @@
       optionImpls = state.optionImpls;
       onInput = state.onInput;
       onKeydown = state.onKeydown;
+
+      console.log("Combobox ready");
+      console.log(optionImpls);
+      optionImpls.subscribe((options) => {
+        console.log(options);
+      });
       ready = true;
     })
   );

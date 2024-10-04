@@ -1,5 +1,4 @@
 import {
-  Chunk,
   Effect,
   Layer,
   Option,
@@ -140,7 +139,7 @@ const ctxEffect = Effect.gen(function* () {
                 );
               },
               query: yield* streamToReadable(query.changes),
-              optionImpls: yield* streamToReadable(optionImpls),
+              optionImpls: yield* streamToReadable(optionImpls, []),
             };
             return state;
           });
@@ -157,10 +156,11 @@ const ctxEffect = Effect.gen(function* () {
 export const ComboboxCtxLive = Layer.effect(ComboboxCtx, ctxEffect);
 
 function streamToReadable<T>(
-  stream: Stream.Stream<T>
+  stream: Stream.Stream<T>,
+  initialValue?: T
 ): Effect.Effect<Readable<T>> {
   return Effect.gen(function* () {
-    const vv = writable<T>();
+    const vv = writable<T>(initialValue);
 
     yield* Effect.forkDaemon(
       Stream.runForEach(stream, (value) => {
