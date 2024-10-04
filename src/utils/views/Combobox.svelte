@@ -43,7 +43,7 @@
       <input
         class="outline-none"
         type="text"
-        value={query}
+        value={$query}
         on:input={onInput}
         bind:this={inputEl}
         on:keydown={onKeydown}
