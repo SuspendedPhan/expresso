@@ -25,6 +25,7 @@
   import { isType } from "variant";
   import { Component } from "src/ex-object/Component";
   import { FocusCtx } from "src/focus/FocusCtx";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -107,7 +108,7 @@
       class="ex-card w-max flex flex-col"
     >
       <div class="p-card flex flex-col">
-        <!-- <ExObjectHeaderView>Basics</ExObjectHeaderView> -->
+        <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
           <Field fieldData={exObjectNameField} />
           <Field fieldData={componentField} />
@@ -117,7 +118,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <div class="p-card">
-        <!-- <ExObjectHeaderView>Component</ExObjectHeaderView> -->
+        <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           <PropertyView property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
