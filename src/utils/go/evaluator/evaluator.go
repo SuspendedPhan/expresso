@@ -59,7 +59,7 @@ func (e *Evaluator) Eval() EvaluationResult {
 	// Step 2: Extract Property Paths
 	cloneCountPropertyPaths, propertyPaths := e.ExtractPropertyPaths(rootExObjects)
 
-	e.debugEval1(cloneCountPropertyPaths, propertyPaths)
+	// e.debugEval1(cloneCountPropertyPaths, propertyPaths)
 
 	// Step 3: Annotate Clone Counts
 	cloneCountResults, annotatedPropertyPaths := e.AnnotateCloneCounts(cloneCountPropertyPaths, propertyPaths)

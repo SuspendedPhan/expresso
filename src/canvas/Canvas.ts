@@ -36,17 +36,17 @@ export function CanvasFactory(args: PixiFactoryArgs) {
       return Effect.gen(function* () {
         pool.releaseAll();
 
-        console.log("Updating canvas");
-        console.log(result.getObjectResultCount());
+        // console.log("Updating canvas");
+        // console.log(result.getObjectResultCount());
 
         for (let i = 0; i < result.getObjectResultCount(); i++) {
           const canvasObject = pool.takeObject();
-          console.log(
-            "Property result count",
-            result.getPropertyResultCount(i)
-          );
+          // console.log(
+          //   "Property result count",
+          //   result.getPropertyResultCount(i)
+          // );
           for (let j = 0; j < result.getPropertyResultCount(i); j++) {
-            console.log("Updating canvas object", i, j);
+            // console.log("Updating canvas object", i, j);
 
             const propertyId = result.getPropertyId(i, j);
             const propertyValue = result.getPropertyValue(i, j);

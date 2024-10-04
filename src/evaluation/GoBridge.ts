@@ -97,6 +97,7 @@ const ctxEffect = Effect.gen(function* () {
               Stream.runForEach(yield* exObject.children.events, (value) => {
                 return Effect.gen(function* () {
                   if (value.type === "ItemAdded") {
+                    goModule.ExObject.create(value.item.id);
                     goModule.ExObject.addChild(exObject.id, value.item.id);
                   } else {
                     console.error("Not implemented");

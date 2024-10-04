@@ -2,7 +2,9 @@
 
 package evaluator
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type ExObject struct {
 	Id                            string
@@ -20,6 +22,12 @@ type ExObject struct {
 
 func (e *Evaluator) ExObjectCreate(id string) {
 	logger.Log3(8, "ExObjectCreate", "id", id)
+
+	if _, found := e.ExObjectById[id]; found {
+		fmt.Printf("Warning: ExObject with ID '%s' already exists\n", id)
+		return
+	}
+
 	e.ExObjectById[id] = &ExObject{
 		Id:                            id,
 		ComponentParameterPropertyIds: []string{},
