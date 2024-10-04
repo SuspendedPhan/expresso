@@ -1,93 +1,57 @@
 <script lang="ts" generics="T extends { label: string }">
-  import assert from "assert-ts";
-  import { Option } from "effect";
+  import { Effect } from "effect";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import {
+    type ComboboxPropsIn,
+    type ComboboxState,
+  } from "src/utils/views/Combobox";
   import Divider from "src/utils/views/Divider.svelte";
 
-  export let query: string;
-  export let options: T[];
-  export let onQueryChanged: (value: string) => void = () => {};
-  export let onOptionSelected: (option: T) => void = () => {};
-  export let onOptionFocused: (option: T) => void = () => {};
+  export let propsIn: ComboboxPropsIn<T>;
 
-  let optionsImpl = [];
+  let query: ComboboxState<T>["query"];
+  let optionImpls: ComboboxState<T>["optionImpls"];
+  let onInput: ComboboxState<T>["onInput"];
+  let onKeydown: ComboboxState<T>["onKeydown"];
+  let ready = false;
 
-  let focusedIndex = Option.none<number>();
+  let inputEl;
 
-  function handleInput(event: any) {
-    query = event.target.value;
-    onQueryChanged(query);
-  }
-
-  function handleKeydown(event: any) {
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-
-      const vv = Option.map(focusedIndex, (i) => {
-        if (i === options.length - 1) {
-          return i;
-        }
-        return i + 1;
-      });
-      const vv2 = Option.orElse(vv, () => Option.some(0));
-      focusedIndex = vv2;
-      assert(Option.isSome(focusedIndex));
-      const option = options[focusedIndex.value];
-      assert(option !== undefined);
-      onOptionFocused(option);
-    } else if (event.key === "ArrowUp") {
-      event.preventDefault();
-
-      const vv = Option.map(focusedIndex, (i) => {
-        if (i === 0) {
-          return 0;
-        }
-        return i - 1;
-      });
-
-      const vv2 = Option.orElse(vv, () => Option.some(options.length - 1));
-      focusedIndex = vv2;
-      assert(Option.isSome(focusedIndex));
-      const option = options[focusedIndex.value];
-      assert(option !== undefined);
-      onOptionFocused(option);
-    } else if (event.key === "Enter") {
-      event.preventDefault();
-      if (Option.isSome(focusedIndex)) {
-        const option = options[focusedIndex.value];
-        assert(option !== undefined);
-        onOptionSelected(option);
-      }
-    }
-  }
-
-  let input;
-
-  function isIndexFocused(idx: number) {
-    const extracted = Option.filter(focusedIndex, (i) => i === idx);
-    return Option.isSome(extracted);
-  }
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const state = yield* propsIn.createState();
+      query = state.query;
+      optionImpls = state.optionImpls;
+      onInput = state.onInput;
+      onKeydown = state.onKeydown;
+      ready = true;
+    })
+  );
 </script>
 
-<div
-  class="absolute top-full left-0 mt-2 p-2 bg-white ring rounded-sm flex flex-col gap-2"
->
-  <div>
-    <input
-      class="outline-none"
-      type="text"
-      value={query}
-      on:input={handleInput}
-      bind:this={input}
-      on:keydown={handleKeydown}
-    />
+{#if ready}
+  <div
+    class="absolute top-full left-0 mt-2 p-2 bg-white ring rounded-sm flex flex-col gap-2"
+  >
+    <div>
+      <input
+        class="outline-none"
+        type="text"
+        value={query}
+        on:input={onInput}
+        bind:this={inputEl}
+        on:keydown={onKeydown}
+      />
+    </div>
+    <Divider />
+    <div>
+      {#each $optionImpls as option_}
+        <div class:bg-neutral-content={option_.isFocused}>
+          <button on:click={() => option_.select()}
+            >{option_.option.label}</button
+          >
+        </div>
+      {/each}
+    </div>
   </div>
-  <Divider />
-  <div>
-    {#each options as option, idx}
-      <div class:bg-neutral-content={isIndexFocused(idx)}>
-        <button on:click={() => onOptionSelected(option)}>{option.label}</button
-        >
-      </div>
-    {/each}
-  </div>
-</div>
+{/if}

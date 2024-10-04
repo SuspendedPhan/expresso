@@ -23,6 +23,7 @@ import { LibraryPersistCtxLive } from "src/utils/persistence/LibraryPersistCtx";
 import { LoadCtxLive } from "src/utils/persistence/LoadCtx";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
+import { ComboboxCtxLive } from "src/utils/views/Combobox";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -55,6 +56,7 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(TelemetryCtxLive),
   Layer.provideMerge(CloneNumberTargetCtxLive),
   Layer.provideMerge(CanvasComponentCtxLive),
+  Layer.provideMerge(ComboboxCtxLive)
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);

@@ -1,5 +1,8 @@
 <script lang="ts">
+  import { Effect, Stream, Chunk } from "effect";
   import type { ExObject } from "src/ex-object/ExObject";
+  import { DexRuntime } from "src/utils/utils/DexRuntime";
+  import { ComboboxCtx, type ComboboxPropsIn } from "src/utils/views/Combobox";
   import Combobox from "src/utils/views/Combobox.svelte";
 
   interface ComponentOption {
@@ -9,26 +12,38 @@
 
   export const exObject: ExObject = null as any;
 
-  let query: string;
   let options: ComponentOption[] = [
     { label: "Option 1", component: "Option1" },
     { label: "Option 2", component: "Option2" },
     { label: "Option 3", component: "Option3" },
   ];
 
-  function queryChanged(value: string) {
-    console.log(`Query changed: ${value}`);
-    query = value;
-  }
+  let comboboxPropsIn: ComboboxPropsIn<ComponentOption>;
+  DexRuntime.runPromise(
+    Effect.gen(function* () {
+      const comboboxCtx = yield* ComboboxCtx;
+      const props = yield* comboboxCtx.createProps<ComponentOption>({
+        options: Stream.fromChunk(Chunk.make(options)),
+      });
+      comboboxPropsIn = props.propsIn;
 
-  function optionSelected(option: ComponentOption) {
-    console.log(`Selected: ${option.label}`);
-  }
+      yield* Effect.forkDaemon(
+        Stream.runForEach(props.propsOut.onOptionSelected, (value) => {
+          return Effect.gen(function* () {
+            console.log(`Selected: ${value.label}`);
+          });
+        })
+      );
+
+      yield* Effect.forkDaemon(
+        Stream.runForEach(props.propsOut.onQueryChanged, (query) => {
+          return Effect.gen(function* () {
+            console.log(`Query: ${query}`);
+          });
+        })
+      );
+    })
+  );
 </script>
 
-<Combobox
-  {query}
-  {options}
-  onQueryChanged={queryChanged}
-  onOptionSelected={optionSelected}
-/>
+<Combobox propsIn={comboboxPropsIn} />
