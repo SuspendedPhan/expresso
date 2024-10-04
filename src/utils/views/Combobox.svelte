@@ -9,6 +9,8 @@
   export let onOptionSelected: (option: T) => void = () => {};
   export let onOptionFocused: (option: T) => void = () => {};
 
+  let optionsImpl = [];
+
   let focusedIndex = Option.none<number>();
 
   function handleInput(event: any) {
@@ -20,7 +22,12 @@
     if (event.key === "ArrowDown") {
       event.preventDefault();
 
-      const vv = Option.map(focusedIndex, (i) => i + 1);
+      const vv = Option.map(focusedIndex, (i) => {
+        if (i === options.length - 1) {
+          return i;
+        }
+        return i + 1;
+      });
       const vv2 = Option.orElse(vv, () => Option.some(0));
       focusedIndex = vv2;
       assert(Option.isSome(focusedIndex));
@@ -30,7 +37,13 @@
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
 
-      const vv = Option.map(focusedIndex, (i) => i - 1);
+      const vv = Option.map(focusedIndex, (i) => {
+        if (i === 0) {
+          return 0;
+        }
+        return i - 1;
+      });
+
       const vv2 = Option.orElse(vv, () => Option.some(options.length - 1));
       focusedIndex = vv2;
       assert(Option.isSome(focusedIndex));

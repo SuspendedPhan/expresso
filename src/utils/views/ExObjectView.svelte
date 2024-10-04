@@ -26,6 +26,7 @@
   import { Component } from "src/ex-object/Component";
   import { FocusCtx } from "src/focus/FocusCtx";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
+  import ComponentSelect from "src/utils/views/ComponentSelect.svelte";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -120,6 +121,7 @@
       <div class="p-card">
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
+          <ComponentSelect {exObject} />
           <PropertyView property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {property} />

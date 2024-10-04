@@ -54,7 +54,7 @@ const mainLayer2 = mainLayer.pipe(
   // Layer.provideMerge(TestTelemetryCtxLive),
   Layer.provideMerge(TelemetryCtxLive),
   Layer.provideMerge(CloneNumberTargetCtxLive),
-  Layer.provideMerge(CanvasComponentCtxLive)
+  Layer.provideMerge(CanvasComponentCtxLive),
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);

@@ -1,5 +1,5 @@
 <script lang="ts">
-  // import type { ExObject } from "src/ex-object/ExObject";
+  import type { ExObject } from "src/ex-object/ExObject";
   import Combobox from "src/utils/views/Combobox.svelte";
 
   interface ComponentOption {
@@ -7,7 +7,7 @@
     component: string;
   }
 
-  // export let exObject: ExObject;
+  export const exObject: ExObject = null as any;
 
   let query: string;
   let options: ComponentOption[] = [
