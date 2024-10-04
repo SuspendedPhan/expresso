@@ -88,3 +88,9 @@ export const EffectUtils = {
     return stream.pipe(Stream.flatMap(f, { switch: true }));
   },
 };
+
+
+export interface ReadonlySubscriptionRef<T> {
+  readonly value: T;
+  readonly changes: Stream.Stream<T>;
+}

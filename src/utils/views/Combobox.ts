@@ -1,11 +1,12 @@
+import assert from "assert-ts";
 import {
-  Effect,
-  Layer,
-  Option,
-  PubSub,
-  Ref,
-  Stream,
-  SubscriptionRef,
+    Effect,
+    Layer,
+    Option,
+    PubSub,
+    Ref,
+    Stream,
+    SubscriptionRef
 } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { writable, type Readable } from "svelte/store";
@@ -129,7 +130,61 @@ const ctxEffect = Effect.gen(function* () {
           Effect.gen(function* () {
             const state: ComboboxState<T> = {
               onKeydown: (e) => {
-                console.log(e);
+                DexRuntime.runPromise(
+                  Effect.gen(function* () {
+                    // Down:
+                    // If focusedIndex is none, then we should focus the first option.
+                    // If focusedIndex is some, then we should focus the next option.
+                    // If focusedIndex is the last option, then we should leave it as is.
+
+                    // Up:
+                    // If focusedIndex is none, then we should focus the last option.
+                    // If focusedIndex is some, then we should focus the previous option.
+                    // If focusedIndex is the first option, then we should leave it as is.
+
+                    // Enter:
+                    // Select the focused option if any.
+
+                    const vv = Stream.take(optionImpls, 1);
+                    const options = yield* Stream.runHead(vv);
+                    const options2 = Option.getOrThrow(options);
+                    const index = yield* focusedIndex.get;
+
+                    switch (e.key) {
+                      case "ArrowDown": {
+                        const newIndex = Option.match(index, {
+                          onNone: () => Option.some(0),
+                          onSome: (i) => {
+                            return Option.some(Math.min(i + 1, options2.length - 1));
+                          },
+                        });
+                        yield* Ref.set(focusedIndex, newIndex);
+                        break;
+                      }
+                      case "ArrowUp": {
+                        const newIndex = Option.match(index, {
+                          onNone: () => Option.some(options2.length - 1),
+                          onSome: (i) => {
+                            return Option.some(Math.max(i - 1, 0));
+                          },
+                        });
+                        yield* Ref.set(focusedIndex, newIndex);
+                        break;
+                      }
+                      case "Enter": {
+                        Option.match(index, {
+                          onNone: () => {},
+                          onSome: (i) => {
+                            const option = options2[i];
+                            assert(option !== undefined);
+                            option.select();
+                          },
+                        });
+                        break;
+                      }
+                    }
+                  })
+                );
               },
               onInput: (e) => {
                 DexRuntime.runPromise(
