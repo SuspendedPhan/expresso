@@ -113,6 +113,11 @@
         <div class="flex flex-col gap-2 font-mono">
           <Field fieldData={exObjectNameField} />
           <Field fieldData={componentField} />
+          <!-- todp: popup correctly -->
+          <!-- todp: focus blur -->
+          <!-- todp: focus submit -->
+          <!-- todp: component go bridge -->
+          <ComponentSelect {exObject} />
         </div>
       </div>
 
@@ -121,7 +126,6 @@
       <div class="p-card">
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
-          <ComponentSelect {exObject} />
           <PropertyView property={cloneCountProperty} />
           {#each componentParameterProperties as property (property.id)}
             <PropertyView {property} />

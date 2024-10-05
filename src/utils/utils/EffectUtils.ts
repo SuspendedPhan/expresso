@@ -7,7 +7,6 @@ import {
   StreamEmit,
   SubscriptionRef,
 } from "effect";
-import type { EmitOpsPush } from "effect/StreamEmit";
 import {
   BehaviorSubject,
   firstValueFrom,

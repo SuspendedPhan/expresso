@@ -34,6 +34,8 @@
   let comboboxPropsIn: ComboboxPropsIn<ComponentOption>;
   DexRuntime.runPromise(
     Effect.gen(function* () {
+      scope = yield* Scope.make();
+
       const comboboxCtx = yield* ComboboxCtx;
       const optionsPub = yield* PubSub.unbounded<ComponentOption[]>();
       const props = yield* comboboxCtx.createProps<ComponentOption>({
