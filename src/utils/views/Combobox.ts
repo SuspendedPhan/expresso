@@ -1,5 +1,6 @@
 import assert from "assert-ts";
 import {
+  Console,
   Effect,
   Equivalence,
   Layer,
@@ -55,6 +56,8 @@ export class ComboboxCtx extends Effect.Tag("ComboboxCtx")<
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
+let ccc = 0;
+
 const ctxEffect = Effect.gen(function* () {
   return {
     createProps<T extends ComboboxOption>(
@@ -73,20 +76,21 @@ const ctxEffect = Effect.gen(function* () {
           onOptionFocused: Stream.fromPubSub(onOptionFocused),
         };
 
-        yield* Effect.forkDaemon(
-          Stream.runForEach(args.options, (value) => {
-            return Effect.gen(function* () {
-              console.log("Options changed2", value);
-            });
-          })
-        );
+        // yield* Effect.forkDaemon(
+        //   Stream.runForEach(args.options, (_value) => {
+        //     return Effect.gen(function* () {
+        //       //   console.log("Options changed2", value);
+        //     });
+        //   })
+        // );
 
         // Generating the options.
         const optionImpls_: Stream.Stream<_ComboboxOption<T>[]> =
           Stream.flatMap(
             args.options,
             (options) => {
-              console.log("Options changed", options);
+              const ddd = ccc++;
+              console.log("Options changed", options, ddd);
               const extracted = Effect.gen(function* () {
                 if (options.length === 0) {
                   return Stream.succeed([]);
@@ -94,21 +98,21 @@ const ctxEffect = Effect.gen(function* () {
 
                 const optionImpls: Stream.Stream<_ComboboxOption<T>>[] =
                   options.map((option, index) => {
-                    console.log("Mapping option", index, option);
+                    // console.log("Mapping option", index, option);
                     const isFocused = Stream.map(
                       focusedIndex.changes,
                       (focusedIndex_) => {
-                        console.log(
-                          "Focused index changed",
-                          index,
-                          focusedIndex_
-                        );
+                        // console.log(
+                        //   "Focused index changed",
+                        //   index,
+                        //   focusedIndex_
+                        // );
                         return Option.match(focusedIndex_, {
                           onNone: () => false,
                           onSome: (i) => i === index,
                         });
                       }
-                    );
+                    ).pipe(Stream.changes);
 
                     const select = () => {
                       DexRuntime.runPromise(
@@ -124,12 +128,15 @@ const ctxEffect = Effect.gen(function* () {
                         isFocused,
                         select,
                       };
-                      console.log("Computed option", index, extracted);
+                      //   console.log("Computed option", index, extracted);
                       return extracted;
                     });
                   });
 
-                const vv = Stream.zipLatestAll(...optionImpls);
+                const vv = Stream.zipLatestAll(...optionImpls).pipe(
+                  Stream.tap(() => Console.log("Original options", ddd, options)),
+                  Stream.tap((value) => Console.log("Computed options", ddd,value))
+                );
                 return vv;
               });
               return Stream.unwrap(extracted);
@@ -146,6 +153,7 @@ const ctxEffect = Effect.gen(function* () {
         yield* Effect.forkDaemon(
           Stream.runForEach(optionImpls_, (value) => {
             return Effect.gen(function* () {
+              console.log("Setting optionImpls", value);
               yield* Ref.set(optionImpls, value);
             });
           })
@@ -163,9 +171,13 @@ const ctxEffect = Effect.gen(function* () {
                 return i;
               });
 
-              console.log("newIndex", newIndex);
               const eq = Option.getEquivalence(Equivalence.number);
               if (eq(focusedIndex_, newIndex) === false) {
+                console.log(
+                  "Making sure focusedIndex is within bounds",
+                  focusedIndex_,
+                  newIndex
+                );
                 yield* Ref.set(focusedIndex, newIndex);
               }
             });
@@ -204,6 +216,7 @@ const ctxEffect = Effect.gen(function* () {
                             );
                           },
                         });
+                        console.log("Down (old, new)", index, newIndex);
                         yield* Ref.set(focusedIndex, newIndex);
                         break;
                       }
@@ -214,6 +227,7 @@ const ctxEffect = Effect.gen(function* () {
                             return Option.some(Math.max(i - 1, 0));
                           },
                         });
+                        console.log("Up (old, new)", index, newIndex);
                         yield* Ref.set(focusedIndex, newIndex);
                         break;
                       }
@@ -266,7 +280,7 @@ function streamToReadable<T>(
     yield* Effect.forkDaemon(
       Stream.runForEach(stream, (value) => {
         return Effect.gen(function* () {
-          console.log("streamToReadable received a value", JSON.stringify(value));
+          //   console.log("streamToReadable received a value", JSON.stringify(value));
           vv.set(value);
         });
       })
