@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import {
   Effect,
+  Equivalence,
   Layer,
   Option,
   PubSub,
@@ -139,13 +140,20 @@ const ctxEffect = Effect.gen(function* () {
             }
           );
 
-        const optionImpls = yield* Stream.broadcastDynamic(optionImpls_, {
-          capacity: "unbounded",
-        });
+        const optionImpls = yield* SubscriptionRef.make<_ComboboxOption<T>[]>(
+          []
+        );
+        yield* Effect.forkDaemon(
+          Stream.runForEach(optionImpls_, (value) => {
+            return Effect.gen(function* () {
+              yield* Ref.set(optionImpls, value);
+            });
+          })
+        );
 
         // If focusedIndex is bigger than the number of options, then we should reset it to the last option.
         yield* Effect.forkDaemon(
-          Stream.runForEach(optionImpls, (optionImpls_) => {
+          Stream.runForEach(optionImpls.changes, (optionImpls_) => {
             return Effect.gen(function* () {
               const focusedIndex_ = yield* focusedIndex.get;
               const newIndex = Option.map(focusedIndex_, (i) => {
@@ -156,7 +164,10 @@ const ctxEffect = Effect.gen(function* () {
               });
 
               console.log("newIndex", newIndex);
-              //   yield* Ref.set(focusedIndex, newIndex);
+              const eq = Option.getEquivalence(Equivalence.number);
+              if (eq(focusedIndex_, newIndex) === false) {
+                yield* Ref.set(focusedIndex, newIndex);
+              }
             });
           })
         );
@@ -180,9 +191,7 @@ const ctxEffect = Effect.gen(function* () {
                     // Enter:
                     // Select the focused option if any.
 
-                    const vv = Stream.take(optionImpls, 1);
-                    const options = yield* Stream.runHead(vv);
-                    const options2 = Option.getOrThrow(options);
+                    const options = yield* optionImpls.get;
                     const index = yield* focusedIndex.get;
 
                     switch (e.key) {
@@ -191,7 +200,7 @@ const ctxEffect = Effect.gen(function* () {
                           onNone: () => Option.some(0),
                           onSome: (i) => {
                             return Option.some(
-                              Math.min(i + 1, options2.length - 1)
+                              Math.min(i + 1, options.length - 1)
                             );
                           },
                         });
@@ -200,7 +209,7 @@ const ctxEffect = Effect.gen(function* () {
                       }
                       case "ArrowUp": {
                         const newIndex = Option.match(index, {
-                          onNone: () => Option.some(options2.length - 1),
+                          onNone: () => Option.some(options.length - 1),
                           onSome: (i) => {
                             return Option.some(Math.max(i - 1, 0));
                           },
@@ -212,7 +221,7 @@ const ctxEffect = Effect.gen(function* () {
                         Option.match(index, {
                           onNone: () => {},
                           onSome: (i) => {
-                            const option = options2[i];
+                            const option = options[i];
                             assert(option !== undefined);
                             option.select();
                           },
@@ -231,7 +240,7 @@ const ctxEffect = Effect.gen(function* () {
                 );
               },
               query: yield* streamToReadable(query.changes),
-              optionImpls: yield* streamToReadable(optionImpls, []),
+              optionImpls: yield* streamToReadable(optionImpls.changes, []),
             };
             return state;
           });
@@ -257,6 +266,7 @@ function streamToReadable<T>(
     yield* Effect.forkDaemon(
       Stream.runForEach(stream, (value) => {
         return Effect.gen(function* () {
+          console.log("streamToReadable received a value", JSON.stringify(value));
           vv.set(value);
         });
       })

@@ -1,4 +1,4 @@
-import { Effect, Layer, PubSub, Stream } from "effect";
+import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
 import { ComboboxCtx } from "src/utils/views/Combobox";
 
 export interface ComponentOption {
@@ -23,9 +23,9 @@ const ctxEffect = Effect.gen(function* () {
           { label: "Option 3", component: "Option3" },
         ];
 
-        const optionsPub = yield* PubSub.unbounded<ComponentOption[]>();
+        const optionsPub = yield* SubscriptionRef.make<ComponentOption[]>(options);
         const props = yield* comboboxCtx.createProps<ComponentOption>({
-          options: Stream.fromPubSub(optionsPub),
+          options: optionsPub.changes,
         });
 
         yield* Effect.forkDaemon(
@@ -49,7 +49,7 @@ const ctxEffect = Effect.gen(function* () {
 
               console.log("Filtered options", filteredOptions);
 
-              yield* optionsPub.publish(filteredOptions);
+              yield* Ref.set(optionsPub, filteredOptions);
             });
           })
         );
