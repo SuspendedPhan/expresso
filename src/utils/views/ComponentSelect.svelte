@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { Effect, Stream, PubSub } from "effect";
+  import { Effect, Stream, PubSub, Exit, Scope } from "effect";
   import type { ExObject } from "src/ex-object/ExObject";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { ComboboxCtx, type ComboboxPropsIn } from "src/utils/views/Combobox";
   import Combobox from "src/utils/views/Combobox.svelte";
+  import { onMount } from "svelte";
 
   interface ComponentOption {
     label: string;
@@ -17,6 +18,18 @@
     { label: "Option 2", component: "Option2" },
     { label: "Option 3", component: "Option3" },
   ];
+
+  let scope: Scope.CloseableScope = null as any;
+
+  onMount(() => {
+    return () => {
+      DexRuntime.runPromise(
+        Effect.gen(function* () {
+          yield* Scope.close(scope, Exit.succeed(void 0));
+        })
+      );
+    };
+  });
 
   let comboboxPropsIn: ComboboxPropsIn<ComponentOption>;
   DexRuntime.runPromise(
@@ -39,15 +52,21 @@
       yield* Effect.forkDaemon(
         Stream.runForEach(props.propsOut.onQueryChanged, (query) => {
           return Effect.gen(function* () {
-            yield* optionsPub.publish(
-              options.filter((option) =>
-                option.label.toLowerCase().includes(query.toLowerCase())
-              )
-            );
+            console.log(`Query: ${query}`);
+            const filteredOptions = options.filter((option) => {
+              const ok =
+                option.label.toLowerCase().includes(query.toLowerCase()) ||
+                query === "";
+              return ok;
+            });
+
+            console.log("Filtered options", filteredOptions);
+
+            yield* optionsPub.publish(filteredOptions);
           });
         })
       );
-    })
+    }).pipe(Scope.extend(scope))
   );
 </script>
 

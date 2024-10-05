@@ -6,8 +6,9 @@ import {
     PubSub,
     Ref,
     Stream,
-    SubscriptionRef
+    SubscriptionRef,
 } from "effect";
+import type { Scope } from "effect/Scope";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { writable, type Readable } from "svelte/store";
 
@@ -57,7 +58,7 @@ const ctxEffect = Effect.gen(function* () {
   return {
     createProps<T extends ComboboxOption>(
       args: ComboboxArgs<T>
-    ): Effect.Effect<ComboboxProps<T>> {
+    ): Effect.Effect<ComboboxProps<T>, never, Scope> {
       return Effect.gen(function* () {
         const query = yield* SubscriptionRef.make<string>("");
         const onOptionSelected = yield* PubSub.unbounded<T>();
@@ -71,15 +72,30 @@ const ctxEffect = Effect.gen(function* () {
           onOptionFocused: Stream.fromPubSub(onOptionFocused),
         };
 
-        const optionImpls: Stream.Stream<_ComboboxOption<T>[]> = Stream.flatMap(
+        yield* Effect.forkDaemon(
+          Stream.runForEach(args.options, (value) => {
+            return Effect.gen(function* () {
+              console.log("Options changed2", value);
+            });
+          })
+        );
+
+        const optionImpls_: Stream.Stream<_ComboboxOption<T>[]> = Stream.flatMap(
           args.options,
           (options) => {
+            console.log("Options changed", options);
             const extracted = Effect.gen(function* () {
               const optionImpls: Stream.Stream<_ComboboxOption<T>>[] =
                 options.map((option, index) => {
+                  console.log("Mapping option", index, option);
                   const isFocused = Stream.map(
                     focusedIndex.changes,
                     (focusedIndex_) => {
+                      console.log(
+                        "Focused index changed",
+                        index,
+                        focusedIndex_
+                      );
                       return Option.match(focusedIndex_, {
                         onNone: () => false,
                         onSome: (i) => i === index,
@@ -101,6 +117,7 @@ const ctxEffect = Effect.gen(function* () {
                       isFocused,
                       select,
                     };
+                    console.log("Computed option", index, extracted);
                     return extracted;
                   });
                 });
@@ -116,12 +133,22 @@ const ctxEffect = Effect.gen(function* () {
           }
         );
 
+        const optionImpls = yield* Stream.broadcastDynamic(optionImpls_, {capacity: "unbounded"});
+
+        // If focusedIndex is bigger than the number of options, then we should reset it to the last option.
         yield* Effect.forkDaemon(
           Stream.runForEach(optionImpls, (optionImpls_) => {
             return Effect.gen(function* () {
-              for (const optionImpl_ of optionImpls_) {
-                optionImpl_.isFocused;
-              }
+              const focusedIndex_ = yield* focusedIndex.get;
+              const newIndex = Option.map(focusedIndex_, (i) => {
+                if (i >= optionImpls_.length) {
+                  return optionImpls_.length - 1;
+                }
+                return i;
+              });
+
+              console.log("newIndex", newIndex);
+              //   yield* Ref.set(focusedIndex, newIndex);
             });
           })
         );
@@ -155,7 +182,9 @@ const ctxEffect = Effect.gen(function* () {
                         const newIndex = Option.match(index, {
                           onNone: () => Option.some(0),
                           onSome: (i) => {
-                            return Option.some(Math.min(i + 1, options2.length - 1));
+                            return Option.some(
+                              Math.min(i + 1, options2.length - 1)
+                            );
                           },
                         });
                         yield* Ref.set(focusedIndex, newIndex);
