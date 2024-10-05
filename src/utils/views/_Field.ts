@@ -1,10 +1,8 @@
 import { Effect, Stream } from "effect";
-import { firstValueFrom, map, of, Subject } from "rxjs";
+import { firstValueFrom, map, of } from "rxjs";
 import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { Focus } from "src/focus/Focus";
 import { FocusCtx } from "src/focus/FocusCtx";
-import { DexRuntime } from "src/utils/utils/DexRuntime";
-import { EffectUtils } from "src/utils/utils/EffectUtils";
 
 import { log5 } from "src/utils/utils/Log5";
 import { RxFns, type OBS, type SUB } from "src/utils/utils/Utils";
@@ -30,11 +28,8 @@ export type FieldInit<T extends EditableFocus> = FieldValueInit<T> & {
 
 export interface FieldValueData {
   id: string;
-  value$: OBS<string>;
   isEditing$: OBS<boolean>;
   isFocused$: OBS<boolean>;
-  handleInput: (e: Event) => void;
-  onInput: Stream.Stream<string>;
   handleClick: () => void;
 }
 
@@ -73,22 +68,8 @@ export function createFieldValueData<T extends EditableFocus>(
 
     keyboardCtx.registerCancel(editingFocus$);
 
-    const onInput$ = new Subject<string>();
-
     const result: FieldValueData = {
       id: crypto.randomUUID(),
-      handleInput: (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.value === "") {
-          init.value$.next("a");
-          DexRuntime.runPromise(Effect.gen(function* () {
-            onInput$.next("a");
-          }));
-        } else {
-          init.value$.next(target.value);
-          onInput$.next(target.value);
-        }
-      },
       handleClick: async () => {
         log55.debug("click");
 
@@ -102,10 +83,8 @@ export function createFieldValueData<T extends EditableFocus>(
 
         focusCtx.setFocus(init.createEditingFocusFn(false));
       },
-      value$: init.value$,
       isEditing$,
       isFocused$,
-      onInput: EffectUtils.obsToStream(onInput$),
     };
     return result;
   });
