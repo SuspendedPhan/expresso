@@ -2,18 +2,22 @@ import { Effect, type Stream } from "effect";
 import { Subject } from "rxjs";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { log5 } from "src/utils/utils/Log5";
-import { type OBS } from "src/utils/utils/Utils";
+import { type OBS, type SUB } from "src/utils/utils/Utils";
 import {
   createFieldValueData,
   type EditableFocus,
-  type FieldData,
-  type FieldInit,
   type FieldValueData,
-  type FieldValueInit,
+  type FieldValueInit
 } from "src/utils/views/Field";
 
-const log55 = log5("TextField.ts");
+
+export interface TextFieldValueInit<T extends EditableFocus> extends FieldValueInit<T> {
+  value$: SUB<string>;
+}
+
+export type TextFieldInit<T extends EditableFocus> = TextFieldValueInit<T> & {
+  label: string;
+};
 
 export interface TextFieldData extends TextFieldValueData {
   label: string;
@@ -26,7 +30,7 @@ export interface TextFieldValueData extends FieldValueData {
 }
 
 export function createTextFieldValueData<T extends EditableFocus>(
-  init: FieldValueInit<T>
+  init: TextFieldValueInit<T>
 ) {
   return Effect.gen(function* () {
     const fieldValueData = yield* createFieldValueData(init);
@@ -56,12 +60,12 @@ export function createTextFieldValueData<T extends EditableFocus>(
 }
 
 export function createTextFieldData<T extends EditableFocus>(
-  init: FieldInit<T>
+  init: TextFieldInit<T>
 ) {
   return Effect.gen(function* () {
     const fieldValueData = yield* createTextFieldValueData(init);
 
-    const fieldData: FieldData = {
+    const fieldData: TextFieldData = {
       ...fieldValueData,
       label: init.label,
     };

@@ -1,32 +1,32 @@
 <script lang="ts">
+  import { Effect } from "effect";
   import { switchAll, switchMap } from "rxjs";
+  import { Component } from "src/ex-object/Component";
   import { ExObject } from "src/ex-object/ExObject";
   import {
     ExObjectFocus,
     ExObjectFocusFactory,
     type ExObjectFocusKind,
   } from "src/focus/ExObjectFocus";
+  import { FocusCtx } from "src/focus/FocusCtx";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { RxFns } from "src/utils/utils/Utils";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
+  import ComponentSelect from "src/utils/views/ComponentSelect.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
+  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import {
-    createFieldData,
     createReadonlyFieldData,
     type FieldData,
   } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
+  import { isType } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { Effect } from "effect";
-  import { isType } from "variant";
-  import { Component } from "src/ex-object/Component";
-  import { FocusCtx } from "src/focus/FocusCtx";
-  import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import ComponentSelect from "src/utils/views/ComponentSelect.svelte";
+  import { createTextFieldData } from "src/utils/views/TextField";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -50,14 +50,16 @@
   let exObjectNameField: FieldData;
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      exObjectNameField = yield* createFieldData<ExObjectFocusKind["Name"]>({
-        label: "Name",
-        value$: exObject.name$,
-        focusIsFn: isType(ExObjectFocusFactory.Name),
-        createEditingFocusFn: (isEditing) =>
-          ExObjectFocusFactory.Name({ exObject, isEditing }),
-        filterFn: (f) => f.exObject === exObject,
-      });
+      exObjectNameField = yield* createTextFieldData<ExObjectFocusKind["Name"]>(
+        {
+          label: "Name",
+          value$: exObject.name$,
+          focusIsFn: isType(ExObjectFocusFactory.Name),
+          createEditingFocusFn: (isEditing) =>
+            ExObjectFocusFactory.Name({ exObject, isEditing }),
+          filterFn: (f) => f.exObject === exObject,
+        }
+      );
     })
   );
 

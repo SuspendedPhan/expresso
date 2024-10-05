@@ -12,12 +12,15 @@
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import { createFieldData, type FieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
+  import {
+    createTextFieldData,
+    type TextFieldData,
+  } from "src/utils/views/TextField";
   import { isType } from "variant";
 
   const log55 = log5("ExFuncView.svelte");
@@ -26,10 +29,10 @@
 
   const isExFuncFocused$ = of(false);
 
-  let nameFieldData: FieldData;
+  let nameFieldData: TextFieldData;
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      nameFieldData = yield* createFieldData<ExFuncFocusKind["Name"]>({
+      nameFieldData = yield* createTextFieldData<ExFuncFocusKind["Name"]>({
         label: "Name",
         value$: exFunc.name$,
         focusIsFn: isType(ExFuncFocusFactory.Name),
@@ -49,7 +52,7 @@
   const parameterFieldDatas$ = ObservableArrayFns.map2(
     exFunc.parameters.items$,
     (parameter) => {
-      const effect = createFieldData<ExFuncFocusKind["Parameter"]>({
+      const effect = createTextFieldData<ExFuncFocusKind["Parameter"]>({
         label: "Parameter",
         value$: parameter.name$,
         focusIsFn: isType(ExFuncFocusFactory.Parameter),

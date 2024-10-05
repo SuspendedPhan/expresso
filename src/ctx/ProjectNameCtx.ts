@@ -2,15 +2,15 @@ import { Effect, Layer, Ref, Stream } from "effect";
 import { BehaviorSubject } from "rxjs";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import {
-    type NavProjectNameFocus,
-    NavProjectNameFocusFactory,
+  type NavProjectNameFocus,
+  NavProjectNameFocusFactory,
 } from "src/focus/NavFocus";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
-    type FieldValueData,
-    createFieldValueData,
+  type FieldValueData
 } from "src/utils/views/Field";
+import { createTextFieldValueData } from "src/utils/views/TextField";
 import { isType } from "variant";
 
 const log55 = log5("ProjectNameCtx.ts");
@@ -31,7 +31,7 @@ const ctxEffect = Effect.gen(function* () {
             const libraryProjectCtx = yield* LibraryProjectCtx;
 
             const projectNameFieldData =
-              yield* createFieldValueData<NavProjectNameFocus>({
+              yield* createTextFieldValueData<NavProjectNameFocus>({
                 value$: projectName$,
                 focusIsFn: isType(NavProjectNameFocusFactory),
                 createEditingFocusFn: (isEditing) =>
