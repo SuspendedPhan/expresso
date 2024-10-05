@@ -1,12 +1,12 @@
 import assert from "assert-ts";
 import {
-    Effect,
-    Layer,
-    Option,
-    PubSub,
-    Ref,
-    Stream,
-    SubscriptionRef,
+  Effect,
+  Layer,
+  Option,
+  PubSub,
+  Ref,
+  Stream,
+  SubscriptionRef,
 } from "effect";
 import type { Scope } from "effect/Scope";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -80,60 +80,68 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        const optionImpls_: Stream.Stream<_ComboboxOption<T>[]> = Stream.flatMap(
-          args.options,
-          (options) => {
-            console.log("Options changed", options);
-            const extracted = Effect.gen(function* () {
-              const optionImpls: Stream.Stream<_ComboboxOption<T>>[] =
-                options.map((option, index) => {
-                  console.log("Mapping option", index, option);
-                  const isFocused = Stream.map(
-                    focusedIndex.changes,
-                    (focusedIndex_) => {
-                      console.log(
-                        "Focused index changed",
-                        index,
-                        focusedIndex_
-                      );
-                      return Option.match(focusedIndex_, {
-                        onNone: () => false,
-                        onSome: (i) => i === index,
-                      });
-                    }
-                  );
+        // Generating the options.
+        const optionImpls_: Stream.Stream<_ComboboxOption<T>[]> =
+          Stream.flatMap(
+            args.options,
+            (options) => {
+              console.log("Options changed", options);
+              const extracted = Effect.gen(function* () {
+                if (options.length === 0) {
+                  return Stream.succeed([]);
+                }
 
-                  const select = () => {
-                    DexRuntime.runPromise(
-                      Effect.gen(function* () {
-                        yield* PubSub.publish(onOptionSelected, option);
-                      })
+                const optionImpls: Stream.Stream<_ComboboxOption<T>>[] =
+                  options.map((option, index) => {
+                    console.log("Mapping option", index, option);
+                    const isFocused = Stream.map(
+                      focusedIndex.changes,
+                      (focusedIndex_) => {
+                        console.log(
+                          "Focused index changed",
+                          index,
+                          focusedIndex_
+                        );
+                        return Option.match(focusedIndex_, {
+                          onNone: () => false,
+                          onSome: (i) => i === index,
+                        });
+                      }
                     );
-                  };
 
-                  return Stream.map(isFocused, (isFocused) => {
-                    const extracted: _ComboboxOption<T> = {
-                      option,
-                      isFocused,
-                      select,
+                    const select = () => {
+                      DexRuntime.runPromise(
+                        Effect.gen(function* () {
+                          yield* PubSub.publish(onOptionSelected, option);
+                        })
+                      );
                     };
-                    console.log("Computed option", index, extracted);
-                    return extracted;
+
+                    return Stream.map(isFocused, (isFocused) => {
+                      const extracted: _ComboboxOption<T> = {
+                        option,
+                        isFocused,
+                        select,
+                      };
+                      console.log("Computed option", index, extracted);
+                      return extracted;
+                    });
                   });
-                });
 
-              const vv = Stream.zipLatestAll(...optionImpls);
-              return vv;
-            });
-            return Stream.unwrap(extracted);
-          },
-          {
-            switch: true,
-            concurrency: "unbounded",
-          }
-        );
+                const vv = Stream.zipLatestAll(...optionImpls);
+                return vv;
+              });
+              return Stream.unwrap(extracted);
+            },
+            {
+              switch: true,
+              concurrency: "unbounded",
+            }
+          );
 
-        const optionImpls = yield* Stream.broadcastDynamic(optionImpls_, {capacity: "unbounded"});
+        const optionImpls = yield* Stream.broadcastDynamic(optionImpls_, {
+          capacity: "unbounded",
+        });
 
         // If focusedIndex is bigger than the number of options, then we should reset it to the last option.
         yield* Effect.forkDaemon(
