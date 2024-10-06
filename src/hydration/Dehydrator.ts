@@ -350,6 +350,18 @@ export default class Dehydrator {
     exObject: ExObject
   ): Observable<DehydratedExObject> {
     log55.debug("Dehydrating ExObject");
+    const deComponentId$ = exObject.component$.pipe(
+      map((component) => {
+        return component.id;
+      })
+    );
+
+    const deComponentType$ = exObject.component$.pipe(
+      map((component) => {
+        return component.type;
+      })
+    );
+
     const deComponentProperties$ = RxFns.combineLatestOrEmpty(
       exObject.componentParameterProperties.map((property) =>
         this.dehydrateComponentProperty$(property).pipe()
@@ -388,6 +400,8 @@ export default class Dehydrator {
     );
 
     const result = combineLatest([
+      deComponentId$,
+      deComponentType$,
       deComponentProperties$,
       deBasicProperties$,
       deCloneProperty$,
@@ -396,6 +410,8 @@ export default class Dehydrator {
     ]).pipe(
       map(
         ([
+          deComponentId,
+          deComponentType,
           deComponentProperties,
           deBasicProperties,
           deCloneProperty,
@@ -405,8 +421,8 @@ export default class Dehydrator {
           const deExObject: DehydratedExObject = {
             id: exObject.id,
             name,
-            componentId: exObject.component.id,
-            componentType: exObject.component.type,
+            componentId: deComponentId,
+            componentType: deComponentType,
             componentProperties: deComponentProperties,
             basicProperties: deBasicProperties,
             cloneProperty: deCloneProperty,

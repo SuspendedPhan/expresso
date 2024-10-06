@@ -1,7 +1,7 @@
 // File: ExObject.ts
 
 import assert from "assert-ts";
-import { Effect, Stream } from "effect";
+import { Effect, Stream, SubscriptionRef } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
@@ -34,7 +34,8 @@ import { fields, isType, matcher, variation } from "variant";
 const log55 = log5("ExObject.ts", 10);
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
-  component: Component;
+  component: SubscriptionRef.SubscriptionRef<Component>;
+  component$: OBS<Component>;
   children: ObservableArray<ExObject>;
   children$: OBS<ExObject[]>;
   componentParameterProperties_: ObservableArray<
@@ -108,13 +109,15 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       base.destroy$,
       creationArgs2.children
     );
+    const componentStream = yield* SubscriptionRef.make(creationArgs2.component);
     const exObject = ExObjectFactory({
       ...base,
       name$: createBehaviorSubjectWithLifetime(
         base.destroy$,
         creationArgs2.name
       ),
-      component: creationArgs2.component,
+      component: componentStream,
+      component$: yield* EffectUtils.streamToObs(componentStream.changes),
       componentParameterProperties_,
       get componentParameterProperties() {
         return componentParameterProperties_.items;
