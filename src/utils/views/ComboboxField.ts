@@ -1,37 +1,11 @@
-import { Effect } from "effect";
+import type { ComboboxOption, ComboboxPropsIn } from "src/utils/views/Combobox";
 import {
-    type EditableFocus,
-    type FieldValueData,
-    type FieldValueInit,
-    createFieldValueData,
+    type FieldValueData
 } from "src/utils/views/Field";
+import type { Readable } from "svelte/store";
 
-export interface ComboboxFieldValueInit<T extends EditableFocus>
-  extends FieldValueInit<T> {
+export interface ComboboxFieldPropsIn<T extends ComboboxOption> {
+    propsIn: ComboboxPropsIn<T>;
+    fieldValueData: FieldValueData;
+    displayValue: Readable<string>;
 }
-
-export type ComboboxFieldInit<T extends EditableFocus> =
-  ComboboxFieldValueInit<T> & {
-    label: string;
-  };
-
-export interface ComboboxFieldData extends ComboboxFieldValueData {
-  label: string;
-}
-
-export interface ComboboxFieldValueData extends FieldValueData {
-}
-
-export function createComboboxFieldValueData<T extends EditableFocus>(
-    init: ComboboxFieldValueInit<T>
-  ) {
-    return Effect.gen(function* () {
-      const fieldValueData = yield* createFieldValueData(init);
-  
-      const result: ComboboxFieldValueData = {
-        ...fieldValueData,
-      };
-      return result;
-    });
-  }
-  

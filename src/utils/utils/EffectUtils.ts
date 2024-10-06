@@ -15,6 +15,8 @@ import {
 } from "rxjs";
 import { log5 } from "src/utils/utils/Log5";
 import type { OBS } from "src/utils/utils/Utils";
+import type { Readable } from "svelte/motion";
+import { writable } from "svelte/store";
 
 const log55 = log5("EffectUtils.ts");
 
@@ -87,6 +89,26 @@ export const EffectUtils = {
   ): Stream.Stream<U> {
     return stream.pipe(Stream.flatMap(f, { switch: true }));
   },
+
+  streamToReadable<T>(
+    stream: Stream.Stream<T>,
+    initialValue?: T
+  ): Effect.Effect<Readable<T>> {
+    return Effect.gen(function* () {
+      const vv = writable<T>(initialValue);
+  
+      yield* Effect.forkDaemon(
+        Stream.runForEach(stream, (value) => {
+          return Effect.gen(function* () {
+            //   console.log("streamToReadable received a value", JSON.stringify(value));
+            vv.set(value);
+          });
+        })
+      );
+  
+      return vv;
+    });
+  }
 };
 
 

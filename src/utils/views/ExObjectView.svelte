@@ -116,8 +116,6 @@
           <Field fieldData={exObjectNameField} />
           <Field fieldData={componentField} />
           <!-- todp: popup correctly -->
-          <!-- todp: focus blur -->
-          <!-- todp: focus submit -->
           <!-- todp: component go bridge -->
           <ComponentSelect {exObject} />
         </div>

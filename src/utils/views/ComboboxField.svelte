@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends ComboboxOption">
+  import type { Readable } from "svelte/store";
+
   import type {
     ComboboxOption,
     ComboboxPropsIn,
@@ -7,11 +9,10 @@
   import type { FieldValueData } from "src/utils/views/Field";
   import FocusView from "src/utils/views/FocusView.svelte";
   import HugInput from "src/utils/views/HugInput.svelte";
-  import { Stream } from "effect";
 
   export let propsIn: ComboboxPropsIn<T>;
   export let fieldValueData: FieldValueData;
-  export let displayValue: Stream.Stream<string>;
+  export let displayValue: Readable<string>;
 
   const isFocused$ = fieldValueData.isFocused$;
   const isEditing$ = fieldValueData.isEditing$;
@@ -23,6 +24,6 @@
   focused={$isFocused$}
   class="text-emphatic font-mono"
 >
-  <HugInput isEditing={$isEditing$} value={$value$}></HugInput>
+  <HugInput isEditing={$isEditing$} value={$displayValue}></HugInput>
   <Combobox {propsIn} />
 </FocusView>

@@ -1,7 +1,12 @@
 import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
 import type { ExObject } from "src/ex-object/ExObject";
-import { ExObjectFocusFactory, type ExObjectFocusKind } from "src/focus/ExObjectFocus";
+import {
+    ExObjectFocusFactory
+} from "src/focus/ExObjectFocus";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { ComboboxCtx } from "src/utils/views/Combobox";
+import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
+import { createFieldValueData } from "src/utils/views/Field";
 import { isType } from "variant";
 
 export interface ComponentOption {
@@ -16,7 +21,7 @@ export class ComponentSelectCtx extends Effect.Tag("ComponentSelectCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    createComboboxProps(exObject: ExObject) {
+    createComboboxFieldPropsIn(exObject: ExObject) {
       return Effect.gen(function* () {
         const comboboxCtx = yield* ComboboxCtx;
 
@@ -29,15 +34,7 @@ const ctxEffect = Effect.gen(function* () {
         const optionsPub = yield* SubscriptionRef.make<ComponentOption[]>(
           options
         );
-        const props = yield* comboboxCtx.createProps<
-          ComponentOption,
-          ExObjectFocusKind["Component"]
-        >({
-          fieldInit: {
-            createEditingFocusFn: (isEditing) => ExObjectFocusFactory.Component({ exObject, isEditing }),
-            filterFn: (focus) => focus.exObject === exObject,
-            focusIsFn: (focus) => isType(focus, ExObjectFocusFactory.Component),
-          },
+        const props = yield* comboboxCtx.createProps<ComponentOption>({
           options: optionsPub.changes,
         });
 
@@ -67,7 +64,20 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        return props.propsIn;
+        const result: ComboboxFieldPropsIn<ComponentOption> = {
+          propsIn: props.propsIn,
+          fieldValueData: yield* createFieldValueData({
+            createEditingFocusFn: (isEditing) =>
+              ExObjectFocusFactory.Component({ exObject, isEditing }),
+            focusIsFn: (focus) => isType(focus, ExObjectFocusFactory.Component),
+            filterFn: (focus) => focus.exObject === exObject,
+          }),
+          // todp: read exObject.component stream
+          displayValue: yield* EffectUtils.streamToReadable(
+            Stream.make("component")
+          ),
+        };
+        return result;
       });
     },
   };

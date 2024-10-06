@@ -1,26 +1,21 @@
 import assert from "assert-ts";
 import {
-  Console,
-  Effect,
-  Equivalence,
-  Layer,
-  Option,
-  PubSub,
-  Ref,
-  Stream,
-  SubscriptionRef,
+    Console,
+    Effect,
+    Equivalence,
+    Layer,
+    Option,
+    PubSub,
+    Ref,
+    Stream,
+    SubscriptionRef,
 } from "effect";
 import type { Scope } from "effect/Scope";
 import type { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
-import {
-  createFieldValueData,
-  type EditableFocus,
-  type FieldValueData,
-  type FieldValueInit,
-} from "src/utils/views/Field";
-import { writable, type Readable } from "svelte/store";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { type Readable } from "svelte/store";
 
 export interface ComboboxOption {
   label: string;
@@ -33,10 +28,7 @@ export interface _ComboboxOption<T extends ComboboxOption> {
 }
 
 export interface ComboboxArgs<
-  T extends ComboboxOption,
-  F extends EditableFocus
-> {
-  fieldInit: FieldValueInit<F>;
+  T extends ComboboxOption> {
   options: Stream.Stream<T[]>;
 }
 
@@ -56,7 +48,6 @@ export interface ComboboxPropsOut<T extends ComboboxOption> {
 }
 
 export interface ComboboxState<T extends ComboboxOption> {
-  fieldValueData: FieldValueData;
   onKeydown: (e: any) => void;
   onInput: (e: any) => void;
   query: Readable<string>;
@@ -72,8 +63,8 @@ let ccc = 0;
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    createProps<T extends ComboboxOption, F extends EditableFocus>(
-      args: ComboboxArgs<T, F>
+    createProps<T extends ComboboxOption>(
+      args: ComboboxArgs<T>
     ): Effect.Effect<ComboboxProps<T>, never, Scope | FocusCtx | KeyboardCtx> {
       return Effect.gen(function* () {
         const query = yield* SubscriptionRef.make<string>("");
@@ -83,7 +74,6 @@ const ctxEffect = Effect.gen(function* () {
         const focusedIndex = yield* SubscriptionRef.make(Option.none<number>());
 
         const propsOut: ComboboxPropsOut<T> = {
-          fieldValueData: yield* createFieldValueData(args.fieldInit),
           onQueryChanged: query.changes,
           onOptionSelected: Stream.fromPubSub(onOptionSelected),
           onOptionFocused: Stream.fromPubSub(onOptionFocused),
@@ -270,8 +260,8 @@ const ctxEffect = Effect.gen(function* () {
                   })
                 );
               },
-              query: yield* streamToReadable(query.changes),
-              optionImpls: yield* streamToReadable(optionImpls.changes, []),
+              query: yield* EffectUtils.streamToReadable(query.changes),
+              optionImpls: yield* EffectUtils.streamToReadable(optionImpls.changes, []),
             };
             return state;
           });
@@ -286,23 +276,3 @@ const ctxEffect = Effect.gen(function* () {
 });
 
 export const ComboboxCtxLive = Layer.effect(ComboboxCtx, ctxEffect);
-
-function streamToReadable<T>(
-  stream: Stream.Stream<T>,
-  initialValue?: T
-): Effect.Effect<Readable<T>> {
-  return Effect.gen(function* () {
-    const vv = writable<T>(initialValue);
-
-    yield* Effect.forkDaemon(
-      Stream.runForEach(stream, (value) => {
-        return Effect.gen(function* () {
-          //   console.log("streamToReadable received a value", JSON.stringify(value));
-          vv.set(value);
-        });
-      })
-    );
-
-    return vv;
-  });
-}

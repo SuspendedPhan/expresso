@@ -1,9 +1,11 @@
+<!-- todp rename to componentfield -->
 <script lang="ts">
   import { Effect, Exit, Scope } from "effect";
   import type { ExObject } from "src/ex-object/ExObject";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { type ComboboxPropsIn } from "src/utils/views/Combobox";
   import Combobox from "src/utils/views/Combobox.svelte";
+  import ComboboxField from "src/utils/views/ComboboxField.svelte";
   import {
     ComponentSelectCtx,
     type ComponentOption,
@@ -29,13 +31,17 @@
     Effect.gen(function* () {
       const componentSelectCtx = yield* ComponentSelectCtx;
 
+      // todp: reference fieldvaluedata
       scope = yield* Scope.make();
-      comboboxPropsIn = yield* Scope.extend(
-        componentSelectCtx.createComboboxProps(),
+      const comboboxFieldPropsIn = yield* Scope.extend(
+        componentSelectCtx.createComboboxFieldPropsIn(exObject),
         scope
       );
+      comboboxPropsIn = comboboxFieldPropsIn.propsIn;
     })
   );
 </script>
 
+<!-- todp use comboboxfield -->
+<!-- <ComboboxField propsIn={comboboxPropsIn} displayValue /> -->
 <Combobox propsIn={comboboxPropsIn} />
