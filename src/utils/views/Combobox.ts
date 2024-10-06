@@ -50,13 +50,13 @@ export interface ComboboxPropsIn<T extends ComboboxOption> {
 }
 
 export interface ComboboxPropsOut<T extends ComboboxOption> {
-  fieldValueData: FieldValueData;
   onQueryChanged: Stream.Stream<string>;
   onOptionSelected: Stream.Stream<T>;
   onOptionFocused: Stream.Stream<T>;
 }
 
 export interface ComboboxState<T extends ComboboxOption> {
+  fieldValueData: FieldValueData;
   onKeydown: (e: any) => void;
   onInput: (e: any) => void;
   query: Readable<string>;
