@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Effect } from "effect";
   import { switchAll, switchMap } from "rxjs";
-  import { Component } from "src/ex-object/Component";
   import { ExObject } from "src/ex-object/ExObject";
   import {
     ExObjectFocus,
@@ -15,18 +14,15 @@
   import ComponentSelect from "src/utils/views/ComponentSelect.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
-  import {
-    createReadonlyFieldData,
-    type FieldData,
-  } from "src/utils/views/Field";
+  import { type FieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/Field.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
+  import { createTextFieldData } from "src/utils/views/TextField";
   import { isType } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import PropertyView from "./PropertyView.svelte";
-  import { createTextFieldData } from "src/utils/views/TextField";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -60,21 +56,6 @@
           filterFn: (f) => f.exObject === exObject,
         }
       );
-    })
-  );
-
-  let componentField: FieldData;
-  DexRuntime.runPromise(
-    Effect.gen(function* () {
-      componentField = yield* createReadonlyFieldData<
-        ExObjectFocusKind["Component"]
-      >({
-        label: "Component",
-        value$: Component.getName$(exObject.component),
-        createFocusFn: () => ExObjectFocusFactory.Component({ exObject }),
-        filterFn: (f) => f.exObject === exObject,
-        focusIsFn: isType(ExObjectFocusFactory.Component),
-      });
     })
   );
 
@@ -114,7 +95,6 @@
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
           <Field fieldData={exObjectNameField} />
-          <Field fieldData={componentField} />
           <!-- todp: popup correctly -->
           <!-- todp: component go bridge -->
           <ComponentSelect {exObject} />
