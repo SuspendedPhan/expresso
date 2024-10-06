@@ -18,7 +18,7 @@ import {
 interface ExObjectFocus_ {
   ExObject: { exObject: ExObject };
   Name: { exObject: ExObject; isEditing: boolean };
-  Component: { exObject: ExObject };
+  Component: { exObject: ExObject, isEditing: boolean };
   PropertyName: { property: Property; isEditing: boolean };
 
   ExObjectRefactorCommand: { exObject: ExObject };

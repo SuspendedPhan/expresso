@@ -1,5 +1,8 @@
 import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
+import type { ExObject } from "src/ex-object/ExObject";
+import { ExObjectFocusFactory, type ExObjectFocusKind } from "src/focus/ExObjectFocus";
 import { ComboboxCtx } from "src/utils/views/Combobox";
+import { isType } from "variant";
 
 export interface ComponentOption {
   label: string;
@@ -13,7 +16,7 @@ export class ComponentSelectCtx extends Effect.Tag("ComponentSelectCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    createComboboxProps() {
+    createComboboxProps(exObject: ExObject) {
       return Effect.gen(function* () {
         const comboboxCtx = yield* ComboboxCtx;
 
@@ -23,8 +26,18 @@ const ctxEffect = Effect.gen(function* () {
           { label: "Option 3", component: "Option3" },
         ];
 
-        const optionsPub = yield* SubscriptionRef.make<ComponentOption[]>(options);
-        const props = yield* comboboxCtx.createProps<ComponentOption>({
+        const optionsPub = yield* SubscriptionRef.make<ComponentOption[]>(
+          options
+        );
+        const props = yield* comboboxCtx.createProps<
+          ComponentOption,
+          ExObjectFocusKind["Component"]
+        >({
+          fieldInit: {
+            createEditingFocusFn: (isEditing) => ExObjectFocusFactory.Component({ exObject, isEditing }),
+            filterFn: (focus) => focus.exObject === exObject,
+            focusIsFn: (focus) => isType(focus, ExObjectFocusFactory.Component),
+          },
           options: optionsPub.changes,
         });
 

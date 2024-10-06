@@ -11,7 +11,15 @@ import {
   SubscriptionRef,
 } from "effect";
 import type { Scope } from "effect/Scope";
+import type { KeyboardCtx } from "src/ctx/KeyboardCtx";
+import type { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
+import {
+  createFieldValueData,
+  type EditableFocus,
+  type FieldValueData,
+  type FieldValueInit,
+} from "src/utils/views/Field";
 import { writable, type Readable } from "svelte/store";
 
 export interface ComboboxOption {
@@ -24,7 +32,11 @@ export interface _ComboboxOption<T extends ComboboxOption> {
   select: () => void;
 }
 
-export interface ComboboxArgs<T extends ComboboxOption> {
+export interface ComboboxArgs<
+  T extends ComboboxOption,
+  F extends EditableFocus
+> {
+  fieldInit: FieldValueInit<F>;
   options: Stream.Stream<T[]>;
 }
 
@@ -34,11 +46,11 @@ export interface ComboboxProps<T extends ComboboxOption> {
 }
 
 export interface ComboboxPropsIn<T extends ComboboxOption> {
-  args: ComboboxArgs<T>;
   createState: () => Effect.Effect<ComboboxState<T>>;
 }
 
 export interface ComboboxPropsOut<T extends ComboboxOption> {
+  fieldValueData: FieldValueData;
   onQueryChanged: Stream.Stream<string>;
   onOptionSelected: Stream.Stream<T>;
   onOptionFocused: Stream.Stream<T>;
@@ -60,9 +72,9 @@ let ccc = 0;
 
 const ctxEffect = Effect.gen(function* () {
   return {
-    createProps<T extends ComboboxOption>(
-      args: ComboboxArgs<T>
-    ): Effect.Effect<ComboboxProps<T>, never, Scope> {
+    createProps<T extends ComboboxOption, F extends EditableFocus>(
+      args: ComboboxArgs<T, F>
+    ): Effect.Effect<ComboboxProps<T>, never, Scope | FocusCtx | KeyboardCtx> {
       return Effect.gen(function* () {
         const query = yield* SubscriptionRef.make<string>("");
         const onOptionSelected = yield* PubSub.unbounded<T>();
@@ -71,6 +83,7 @@ const ctxEffect = Effect.gen(function* () {
         const focusedIndex = yield* SubscriptionRef.make(Option.none<number>());
 
         const propsOut: ComboboxPropsOut<T> = {
+          fieldValueData: yield* createFieldValueData(args.fieldInit),
           onQueryChanged: query.changes,
           onOptionSelected: Stream.fromPubSub(onOptionSelected),
           onOptionFocused: Stream.fromPubSub(onOptionFocused),
@@ -134,8 +147,12 @@ const ctxEffect = Effect.gen(function* () {
                   });
 
                 const vv = Stream.zipLatestAll(...optionImpls).pipe(
-                  Stream.tap(() => Console.log("Original options", ddd, options)),
-                  Stream.tap((value) => Console.log("Computed options", ddd,value))
+                  Stream.tap(() =>
+                    Console.log("Original options", ddd, options)
+                  ),
+                  Stream.tap((value) =>
+                    Console.log("Computed options", ddd, value)
+                  )
                 );
                 return vv;
               });
