@@ -9,6 +9,8 @@
 
   export let propsIn: ComboboxPropsIn<T>;
 
+  // todp: use fieldValueData.
+
   let query: ComboboxState<T>["query"];
   let optionImpls: ComboboxState<T>["optionImpls"];
   let onInput: ComboboxState<T>["onInput"];
