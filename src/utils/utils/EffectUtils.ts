@@ -80,15 +80,15 @@ export const EffectUtils = {
     });
   },
 
-  /**
-   * Not tested yet.
-   */
-  switchMap<T, U>(
-    stream: Stream.Stream<T>,
-    f: (t: T) => Stream.Stream<U>
-  ): Stream.Stream<U> {
-    return stream.pipe(Stream.flatMap(f, { switch: true }));
-  },
+  // /**
+  //  * Not tested yet.
+  //  */
+  // switchMap<T, U>(
+  //   stream: Stream.Stream<T>,
+  //   f: (t: T) => Stream.Stream<U>
+  // ): Stream.Stream<U> {
+  //   return stream.pipe(Stream.flatMap(f, { switch: true }));
+  // },
 
   streamToReadable<T>(
     stream: Stream.Stream<T>,
@@ -96,7 +96,7 @@ export const EffectUtils = {
   ): Effect.Effect<Readable<T>> {
     return Effect.gen(function* () {
       const vv = writable<T>(initialValue);
-  
+
       yield* Effect.forkDaemon(
         Stream.runForEach(stream, (value) => {
           return Effect.gen(function* () {
@@ -105,12 +105,20 @@ export const EffectUtils = {
           });
         })
       );
-  
+
       return vv;
     });
-  }
-};
+  },
 
+  switchMap<T, O>(
+    f: (a: T) => Stream.Stream<O>
+  ): (thisStream: Stream.Stream<T>) => Stream.Stream<O> {
+    return Stream.flatMap(f, {
+      switch: true,
+      concurrency: "unbounded",
+    });
+  },
+};
 
 export interface ReadonlySubscriptionRef<T> {
   readonly value: T;

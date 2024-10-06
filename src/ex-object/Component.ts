@@ -1,7 +1,7 @@
 // File: Component.ts
 
-import { Effect } from "effect";
-import { BehaviorSubject, of } from "rxjs";
+import { Effect, Stream } from "effect";
+import { BehaviorSubject } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/Canvas";
 import {
   ComponentParameterFactory2,
@@ -10,13 +10,14 @@ import {
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,
   type ObservableArray,
 } from "src/utils/utils/ObservableArray";
-import { Utils, type OBS, type SUB } from "src/utils/utils/Utils";
+import { Utils, type SUB } from "src/utils/utils/Utils";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
-import { matcher, pass, type VariantOf } from "variant";
+import { pass, type VariantOf } from "variant";
 
 // const log55 = log5("Component.ts");
 
@@ -31,6 +32,7 @@ interface CanvasComponent_ {
 }
 
 interface CustomComponent_ extends ExItemBase {
+  name: Stream.Stream<string>;
   name$: SUB<string>;
   parameters: ObservableArray<ComponentParameterKind["Custom"]>;
   rootExObjects: ObservableArray<ExObject>;
@@ -78,9 +80,11 @@ export const ComponentFactory2 = {
 
       const base = yield* ExItem.createExItemBase(creationArgs2.id);
 
+      const name$ = new BehaviorSubject(creationArgs2.name);
       const component_: CustomComponent_ = {
         ...base,
-        name$: new BehaviorSubject(creationArgs2.name),
+        name$,
+        name: EffectUtils.obsToStream(name$),
         parameters: createObservableArrayWithLifetime(
           base.destroy$,
           creationArgs2.parameters
@@ -131,17 +135,6 @@ function customComponentMethodsFactory(component: CustomComponent_) {
 }
 
 export const Component = {
-  getName$(component: Component): OBS<string> {
-    return matcher(component)
-      .when(ComponentFactory.Canvas, (component) => {
-        return of(component.id);
-      })
-      .when(ComponentFactory.Custom, (component) => {
-        return component.name$;
-      })
-      .complete();
-  },
-
   addRootExObjectBlank(component: ComponentKind["Custom"]) {
     return Effect.gen(function* () {
       const exObject = yield* ExObjectFactory2({});

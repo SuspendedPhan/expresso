@@ -1,9 +1,10 @@
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Stream } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
-import type { ComponentKind } from "src/ex-object/Component";
+import { ComponentFactory, type Component, type ComponentKind } from "src/ex-object/Component";
 import type { ComponentParameterKind } from "src/ex-object/ComponentParameter";
 import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
+import { matcher } from "variant";
 
 const log55 = log5("ComponentCtx.ts");
 
@@ -39,6 +40,13 @@ const ctxEffect = Effect.gen(function* () {
       }
       return parameter;
     },
+
+    getName(component: Component): Stream.Stream<string> {
+      return matcher(component)
+        .when(ComponentFactory.Canvas, (c) => Stream.make(c.id))
+        .when(ComponentFactory.Custom, (c) => c.name)
+        .complete();
+    }
   };
 });
 

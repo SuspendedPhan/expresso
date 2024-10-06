@@ -1,4 +1,5 @@
 import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
+import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObject } from "src/ex-object/ExObject";
 import {
     ExObjectFocusFactory
@@ -24,6 +25,7 @@ const ctxEffect = Effect.gen(function* () {
     createComboboxFieldPropsIn(exObject: ExObject) {
       return Effect.gen(function* () {
         const comboboxCtx = yield* ComboboxCtx;
+        const componentCtx = yield* ComponentCtx;
 
         const options: ComponentOption[] = [
           { label: "Option 1", component: "Option1" },
@@ -74,7 +76,9 @@ const ctxEffect = Effect.gen(function* () {
           }),
           // todp: read exObject.component stream
           displayValue: yield* EffectUtils.streamToReadable(
-            Stream.make("component")
+            exObject.component.changes.pipe(
+                EffectUtils.switchMap((component) => componentCtx.getName(component))
+            )
           ),
         };
         return result;
