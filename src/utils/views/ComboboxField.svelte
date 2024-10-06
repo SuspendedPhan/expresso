@@ -1,29 +1,29 @@
 <script lang="ts" generics="T extends ComboboxOption">
-  import type { Readable } from "svelte/store";
+  import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
 
-  import type {
-    ComboboxOption,
-    ComboboxPropsIn,
-  } from "src/utils/views/Combobox";
+  import type { ComboboxOption } from "src/utils/views/Combobox";
   import Combobox from "src/utils/views/Combobox.svelte";
-  import type { FieldValueData } from "src/utils/views/Field";
   import FocusView from "src/utils/views/FocusView.svelte";
-  import HugInput from "src/utils/views/HugInput.svelte";
+  import FieldLabel from "src/utils/views/FieldLabel.svelte";
 
-  export let propsIn: ComboboxPropsIn<T>;
-  export let fieldValueData: FieldValueData;
-  export let displayValue: Readable<string>;
+  export let propsIn: ComboboxFieldPropsIn<T>;
+
+  let comboboxPropsIn = propsIn.propsIn;
+  let fieldValueData = propsIn.fieldValueData;
+  let displayValue = propsIn.displayValue;
 
   const isFocused$ = fieldValueData.isFocused$;
-  const isEditing$ = fieldValueData.isEditing$;
   const handleClick = fieldValueData.handleClick;
 </script>
 
-<FocusView
-  on:mousedown={handleClick}
-  focused={$isFocused$}
-  class="text-emphatic font-mono"
->
-  <HugInput isEditing={$isEditing$} value={$displayValue}></HugInput>
-  <Combobox {propsIn} />
-</FocusView>
+<div class="flex flex-row">
+  <FieldLabel label={propsIn.label} />
+  <FocusView
+    on:mousedown={handleClick}
+    focused={$isFocused$}
+    class="text-emphatic font-mono"
+  >
+    <pre class="text-emphatic">{$displayValue}</pre>
+    <Combobox propsIn={comboboxPropsIn} />
+  </FocusView>
+</div>

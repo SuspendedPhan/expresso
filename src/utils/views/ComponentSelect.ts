@@ -68,6 +68,7 @@ const ctxEffect = Effect.gen(function* () {
 
         const result: ComboboxFieldPropsIn<ComponentOption> = {
           propsIn: props.propsIn,
+          label: "Component",
           fieldValueData: yield* createFieldValueData({
             createEditingFocusFn: (isEditing) =>
               ExObjectFocusFactory.Component({ exObject, isEditing }),

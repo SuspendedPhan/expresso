@@ -3,8 +3,8 @@
   import { Effect, Exit, Scope } from "effect";
   import type { ExObject } from "src/ex-object/ExObject";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { type ComboboxPropsIn } from "src/utils/views/Combobox";
-  import Combobox from "src/utils/views/Combobox.svelte";
+  import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
+  import ComboboxField from "src/utils/views/ComboboxField.svelte";
   import {
     ComponentSelectCtx,
     type ComponentOption,
@@ -25,22 +25,25 @@
     };
   });
 
-  let comboboxPropsIn: ComboboxPropsIn<ComponentOption>;
+  let comboboxFieldPropsIn: ComboboxFieldPropsIn<ComponentOption>;
+  let ready = false;
+
   DexRuntime.runPromise(
     Effect.gen(function* () {
       const componentSelectCtx = yield* ComponentSelectCtx;
 
       // todp: reference fieldvaluedata
       scope = yield* Scope.make();
-      const comboboxFieldPropsIn = yield* Scope.extend(
+      comboboxFieldPropsIn = yield* Scope.extend(
         componentSelectCtx.createComboboxFieldPropsIn(exObject),
         scope
       );
-      comboboxPropsIn = comboboxFieldPropsIn.propsIn;
+
+      ready = true;
     })
   );
 </script>
 
-<!-- todp use comboboxfield -->
-<!-- <ComboboxField propsIn={comboboxPropsIn} displayValue /> -->
-<Combobox propsIn={comboboxPropsIn} />
+{#if ready}
+  <ComboboxField propsIn={comboboxFieldPropsIn} />
+{/if}

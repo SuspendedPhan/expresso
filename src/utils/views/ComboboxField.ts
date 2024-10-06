@@ -6,6 +6,7 @@ import type { Readable } from "svelte/store";
 
 export interface ComboboxFieldPropsIn<T extends ComboboxOption> {
     propsIn: ComboboxPropsIn<T>;
+    label: string;
     fieldValueData: FieldValueData;
     displayValue: Readable<string>;
 }
