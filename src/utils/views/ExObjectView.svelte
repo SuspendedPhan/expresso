@@ -95,7 +95,6 @@
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
           <Field fieldData={exObjectNameField} />
-          <!-- todp: popup correctly -->
           <!-- todp: component go bridge -->
           <ComponentSelect {exObject} />
         </div>

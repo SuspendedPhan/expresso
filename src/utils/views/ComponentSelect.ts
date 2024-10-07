@@ -75,7 +75,6 @@ const ctxEffect = Effect.gen(function* () {
             focusIsFn: (focus) => isType(focus, ExObjectFocusFactory.Component),
             filterFn: (focus) => focus.exObject === exObject,
           }),
-          // todp: read exObject.component stream
           displayValue: yield* EffectUtils.streamToReadable(
             exObject.component.changes.pipe(
                 EffectUtils.switchMap((component) => componentCtx.getName(component))

@@ -32,7 +32,6 @@
     Effect.gen(function* () {
       const componentSelectCtx = yield* ComponentSelectCtx;
 
-      // todp: reference fieldvaluedata
       scope = yield* Scope.make();
       comboboxFieldPropsIn = yield* Scope.extend(
         componentSelectCtx.createComboboxFieldPropsIn(exObject),

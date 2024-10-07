@@ -13,7 +13,10 @@
   let displayValue = propsIn.displayValue;
 
   const isFocused$ = fieldValueData.isFocused$;
+  const isEditing$ = fieldValueData.isEditing$;
   const handleClick = fieldValueData.handleClick;
+
+  // todp: popover API
 </script>
 
 <div class="flex flex-row">
@@ -24,6 +27,8 @@
     class="text-emphatic font-mono"
   >
     <pre class="text-emphatic">{$displayValue}</pre>
-    <Combobox propsIn={comboboxPropsIn} />
+    {#if $isEditing$}
+      <Combobox propsIn={comboboxPropsIn} />
+    {/if}
   </FocusView>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts" generics="T extends { label: string }">
+  import { onMount } from "svelte";
   import { Effect } from "effect";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import {
@@ -15,7 +16,7 @@
   let onKeydown: ComboboxState<T>["onKeydown"];
   let ready = false;
 
-  let inputEl;
+  let inputEl: HTMLInputElement;
 
   DexRuntime.runPromise(
     Effect.gen(function* () {
@@ -33,6 +34,10 @@
       ready = true;
     })
   );
+
+  onMount(() => {
+    inputEl.focus();
+  });
 </script>
 
 {#if ready}
