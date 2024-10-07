@@ -150,7 +150,8 @@ const ctxEffect = Effect.gen(function* () {
             },
             {
               switch: true,
-              concurrency: "unbounded",
+              concurrency: 1,
+              // concurrency: "unbounded",
             }
           );
 
