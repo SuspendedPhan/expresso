@@ -1,14 +1,13 @@
 import assert from "assert-ts";
 import {
-    Console,
-    Effect,
-    Equivalence,
-    Layer,
-    Option,
-    PubSub,
-    Ref,
-    Stream,
-    SubscriptionRef,
+  Effect,
+  Equivalence,
+  Layer,
+  Option,
+  PubSub,
+  Ref,
+  Stream,
+  SubscriptionRef
 } from "effect";
 import type { Scope } from "effect/Scope";
 import type { KeyboardCtx } from "src/ctx/KeyboardCtx";

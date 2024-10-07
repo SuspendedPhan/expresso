@@ -1,9 +1,8 @@
-import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer, PubSub, Ref, Stream, SubscriptionRef } from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObject } from "src/ex-object/ExObject";
-import {
-    ExObjectFocusFactory
-} from "src/focus/ExObjectFocus";
+import { Project } from "src/ex-object/Project";
+import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { ComboboxCtx } from "src/utils/views/Combobox";
 import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
@@ -26,18 +25,33 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         const comboboxCtx = yield* ComboboxCtx;
         const componentCtx = yield* ComponentCtx;
+        const project = yield* Project.activeProject;
 
-        const options: ComponentOption[] = [
-          { label: "Option 1", component: "Option1" },
-          { label: "Option 2", component: "Option2" },
-          { label: "Option 3", component: "Option3" },
-        ];
-
-        const optionsPub = yield* SubscriptionRef.make<ComponentOption[]>(
-          options
+        const options = project.components.itemStream.pipe(
+          Stream.map((components) =>
+            components.map((component) => ({
+              label: yield* Stream.runHead(component.name.pipe(Stream.take(1))),
+              component: component.id,
+            }))
+          )
         );
+
+        const query = yield* SubscriptionRef.make("");
+        const filteredOptions = Stream.zipLatest(
+          options,
+          query.changes
+        ).pipe(
+          Stream.map(([options_, query_]) =>
+            options_.filter(
+              (option) =>
+                option.label.toLowerCase().includes(query_.toLowerCase()) ||
+                query_ === ""
+            )
+          )
+        );
+
         const props = yield* comboboxCtx.createProps<ComponentOption>({
-          options: optionsPub.changes,
+          options: filteredOptions,
         });
 
         yield* Effect.forkDaemon(
@@ -49,19 +63,9 @@ const ctxEffect = Effect.gen(function* () {
         );
 
         yield* Effect.forkDaemon(
-          Stream.runForEach(props.propsOut.onQueryChanged, (query) => {
+          Stream.runForEach(props.propsOut.onQueryChanged, (query_) => {
             return Effect.gen(function* () {
-              console.log(`Query: ${query}`);
-              const filteredOptions = options.filter((option) => {
-                const ok =
-                  option.label.toLowerCase().includes(query.toLowerCase()) ||
-                  query === "";
-                return ok;
-              });
-
-              console.log("Filtered options", filteredOptions);
-
-              yield* Ref.set(optionsPub, filteredOptions);
+              yield* Ref.set(query, query_);
             });
           })
         );
@@ -78,7 +82,9 @@ const ctxEffect = Effect.gen(function* () {
           }),
           displayValue: yield* EffectUtils.streamToReadable(
             exObject.component.changes.pipe(
-                EffectUtils.switchMap((component) => componentCtx.getName(component))
+              EffectUtils.switchMap((component) =>
+                componentCtx.getName(component)
+              )
             )
           ),
         };
