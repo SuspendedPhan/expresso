@@ -1,4 +1,11 @@
-import { Effect, Layer, PubSub, Ref, Stream, SubscriptionRef } from "effect";
+import {
+  Effect,
+  Layer,
+  Option,
+  Ref,
+  Stream,
+  SubscriptionRef
+} from "effect";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import type { ExObject } from "src/ex-object/ExObject";
 import { Project } from "src/ex-object/Project";
@@ -28,19 +35,24 @@ const ctxEffect = Effect.gen(function* () {
         const project = yield* Project.activeProject;
 
         const options = project.components.itemStream.pipe(
-          Stream.map((components) =>
-            components.map((component) => ({
-              label: yield* Stream.runHead(component.name.pipe(Stream.take(1))),
-              component: component.id,
-            }))
+          Stream.mapEffect((components) =>
+            Effect.all(
+              components.map((component) =>
+                Effect.gen(function* () {
+                  return {
+                    label: Option.getOrThrow(
+                      yield* Stream.runHead(component.name.pipe(Stream.take(1)))
+                    ),
+                    component: component.id,
+                  };
+                })
+              )
+            )
           )
         );
 
         const query = yield* SubscriptionRef.make("");
-        const filteredOptions = Stream.zipLatest(
-          options,
-          query.changes
-        ).pipe(
+        const filteredOptions = Stream.zipLatest(options, query.changes).pipe(
           Stream.map(([options_, query_]) =>
             options_.filter(
               (option) =>
