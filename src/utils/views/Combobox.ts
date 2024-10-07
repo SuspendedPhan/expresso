@@ -59,7 +59,7 @@ export class ComboboxCtx extends Effect.Tag("ComboboxCtx")<
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
-let ccc = 0;
+// let ccc = 0;
 
 const ctxEffect = Effect.gen(function* () {
   return {
@@ -92,8 +92,8 @@ const ctxEffect = Effect.gen(function* () {
           Stream.flatMap(
             args.options,
             (options) => {
-              const ddd = ccc++;
-              console.log("Options changed", options, ddd);
+              // const ddd = ccc++;
+              // console.log("Options changed", options, ddd);
               const extracted = Effect.gen(function* () {
                 if (options.length === 0) {
                   return Stream.succeed([]);
@@ -137,12 +137,12 @@ const ctxEffect = Effect.gen(function* () {
                   });
 
                 const vv = Stream.zipLatestAll(...optionImpls).pipe(
-                  Stream.tap(() =>
-                    Console.log("Original options", ddd, options)
-                  ),
-                  Stream.tap((value) =>
-                    Console.log("Computed options", ddd, value)
-                  )
+                  // Stream.tap(() =>
+                  //   Console.log("Original options", ddd, options)
+                  // ),
+                  // Stream.tap((value) =>
+                  //   Console.log("Computed options", ddd, value)
+                  // )
                 );
                 return vv;
               });
@@ -150,8 +150,6 @@ const ctxEffect = Effect.gen(function* () {
             },
             {
               switch: true,
-              concurrency: 1,
-              // concurrency: "unbounded",
             }
           );
 
@@ -224,7 +222,7 @@ const ctxEffect = Effect.gen(function* () {
                             );
                           },
                         });
-                        console.log("Down (old, new)", index, newIndex);
+                        // console.log("Down (old, new)", index, newIndex);
                         yield* Ref.set(focusedIndex, newIndex);
                         break;
                       }
@@ -235,7 +233,7 @@ const ctxEffect = Effect.gen(function* () {
                             return Option.some(Math.max(i - 1, 0));
                           },
                         });
-                        console.log("Up (old, new)", index, newIndex);
+                        // console.log("Up (old, new)", index, newIndex);
                         yield* Ref.set(focusedIndex, newIndex);
                         break;
                       }
