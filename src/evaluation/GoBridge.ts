@@ -61,7 +61,6 @@ const ctxEffect = Effect.gen(function* () {
     )
   );
 
-  // const exObjectAdded = yield* eventBusCtx.exObjectAddedForActiveProject();
   let exObjectCounter = 0;
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectAdded, (exObject) => {
