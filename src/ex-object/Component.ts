@@ -118,6 +118,7 @@ function customComponentMethodsFactory(component: CustomComponent_) {
   return {
     addParameterBlank() {
       return Effect.gen(function* () {
+        // todp: update all exobjects who use this parameter and create a parameter property
         const parameter = yield* ComponentParameterFactory2.Custom({});
         yield* component.parameters.push(parameter);
         return parameter;

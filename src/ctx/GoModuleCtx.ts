@@ -40,7 +40,7 @@ const ctxEffect = Effect.gen(function* () {
   const sem = yield* makeSemaphore(1);
 
   return {
-    withGoModule<A, E, R>(
+    withGoModule2<A, E, R>(
       callback: (goModule: GoModule) => Effect.Effect<A, E, R>
     ) {
       log55.debug("withGoModule");
@@ -54,9 +54,17 @@ const ctxEffect = Effect.gen(function* () {
       );
     },
 
+    withGoModule<A, E, R>(
+      callback: (goModule: GoModule) => Effect.Effect<A, E, R>
+    ) {
+      return Effect.gen(function* () {
+        yield* callback(yield* goModule_);
+      });
+    },
+
     getUnsafe() {
       return goModule_;
-    }
+    },
 
     // get goModule() {
     //   return Effect.gen(function* () {
