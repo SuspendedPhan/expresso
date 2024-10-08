@@ -89,7 +89,7 @@ const ctxEffect_ = Effect.gen(function* () {
         dehydratedLibraryProjectStream,
         (dehydratedLibraryProject) => {
           return Effect.gen(function* () {
-            log55.debug("Saving library project: saving to persistence");
+            log55.log3(15, "Saving library project: saving to persistence", dehydratedLibraryProject);
             yield* loadCtx.saveProject(dehydratedLibraryProject);
           });
         }

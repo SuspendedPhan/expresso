@@ -1,11 +1,6 @@
 // File: ExItem.ts
 
-import {
-  Effect,
-  Ref,
-  Stream,
-  SubscriptionRef
-} from "effect";
+import { Effect, Exit, Ref, Scope, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
@@ -44,6 +39,8 @@ export interface ExItemBase {
 
   // Completes when destroyed.
   readonly destroy$: SUB<void>;
+
+  readonly scope: Scope.Scope;
 }
 
 export const ExItem = {
@@ -57,6 +54,7 @@ export const ExItem = {
 
   createExItemBase(id: string) {
     return Effect.gen(function* () {
+      const scope = yield* Scope.make();
       const destroy$ = new Subject<void>();
 
       const parent$ = createBehaviorSubjectWithLifetime<Parent>(destroy$, null);
@@ -74,12 +72,23 @@ export const ExItem = {
         })
       );
 
+      yield* EffectUtils.obsToStream(destroy$).pipe(
+        Stream.runForEach(() => {
+          return Effect.gen(function* () {
+            log55.debug("createExItemBase: Destroying item", id);
+            yield* Scope.close(scope, Exit.succeed(void 0));
+          });
+        }),
+        Effect.forkIn(scope)
+      );
+
       const exObjectBase: ExItemBase = {
         id,
         ordinal: 0,
         parent$,
         parent,
         destroy$,
+        scope,
       };
       return exObjectBase;
     });

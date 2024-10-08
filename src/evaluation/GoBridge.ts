@@ -8,7 +8,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
 
-const log55 = log5("GoBridge.ts", 10);
+const log55 = log5("GoBridge.ts", 12);
 
 export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
   GoBridgeCtx,

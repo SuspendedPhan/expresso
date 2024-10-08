@@ -3,6 +3,9 @@ import type { DehydratedLibraryProject } from "src/hydration/Dehydrator";
 import { RehydratorCtx } from "src/hydration/Rehydrator";
 import { EncodeCtx } from "src/utils/persistence/EncodeCtx";
 import { LibraryPersistCtx } from "src/utils/persistence/LibraryPersistCtx";
+import { log5 } from "src/utils/utils/Log5";
+
+const log55 = log5("LoadCtx.ts");
 
 export class LoadCtx extends Effect.Tag("LoadCtx")<
   LoadCtx,
@@ -19,6 +22,8 @@ const ctxEffect = Effect.gen(function* () {
       const decodedProject = yield* decodeCtx.decode<DehydratedLibraryProject>(
         encodedProject
       );
+      
+      log55.log3(15, "decodedProject", decodedProject);
       return yield* rehydrator.rehydrateLibraryProject(decodedProject);
     });
   };
