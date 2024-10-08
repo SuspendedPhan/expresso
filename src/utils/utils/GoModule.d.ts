@@ -13,7 +13,7 @@ export default interface GoModule {
 
   Component: {
     create(componentId: string): void;
-    addParameterProperty(componentId: string, propertyId: string): void;
+    addParameter(componentId: string, parameterId: string): void;
     addBasicProperty(componentId: string, propertyId: string): void;
     addRootObject(componentId: string, rootObjectId: string): void;
   };

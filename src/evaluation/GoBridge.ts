@@ -244,14 +244,37 @@ const ctxEffect = Effect.gen(function* () {
         const component = event.item;
         log55.log3(14, "Go: Adding Component", component.id);
         goModule.Component.create(component.id);
-        component.parameters.itemAddedStream.pipe(
+        yield* (yield* component.parameters.itemAddedStream).pipe(
           Stream.runForEach((event) => {
             return Effect.gen(function* () {
-              log55.log3(14, "Go: Component: Adding Parameter", event.item.id);
-              goModule.Component.addParameterProperty(component.id, event.item.id);
+              const parameter = event.item;
+              log55.log3(14, "Go: Component: Adding Parameter", parameter.id);
+              goModule.Component.addParameter(component.id, parameter.id);
             });
           }),
-          Effect.forkDaemon
+          Effect.forkIn(component.scope)
+        );
+
+        yield* (yield* component.properties.itemAddedStream).pipe(
+          Stream.runForEach((event) => {
+            return Effect.gen(function* () {
+              const property = event.item;
+              log55.log3(14, "Go: Component: Adding Property", property.id);
+              goModule.Component.addBasicProperty(component.id, property.id);
+            });
+          }),
+          Effect.forkIn(component.scope)
+        );
+
+        yield* (yield* component.rootExObjects.itemAddedStream).pipe(
+          Stream.runForEach((event) => {
+            return Effect.gen(function* () {
+              const rootExObject = event.item;
+              log55.log3(14, "Go: Component: Adding RootExObject", rootExObject.id);
+              goModule.Component.addRootObject(component.id, rootExObject.id);
+            });
+          }),
+          Effect.forkIn(component.scope)
         );
       });
     }),
