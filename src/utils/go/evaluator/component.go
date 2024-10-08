@@ -3,25 +3,16 @@
 package evaluator
 
 type Component struct {
-	Id                            string
-	ComponentParameterPropertyIds []string
-	BasicPropertyIds              []string
-	RootObjectIds                 []string
-	Evaluator                     *Evaluator
+	Id                    string
+	ComponentParameterIds []string
+	BasicPropertyIds      []string
+	RootObjectIds         []string
+	Evaluator             *Evaluator
 }
 
 // Properties retrieves all properties associated with the component.
 func (c *Component) Properties() []*Property {
 	properties := []*Property{}
-
-	// Retrieve Component Parameter Properties
-	for _, propId := range c.ComponentParameterPropertyIds {
-		prop, exists := c.Evaluator.PropertyById[propId]
-		if !exists {
-			panic("Property not found: " + propId)
-		}
-		properties = append(properties, prop)
-	}
 
 	// Retrieve Basic Properties
 	for _, propId := range c.BasicPropertyIds {
@@ -56,21 +47,21 @@ func (e *Evaluator) ComponentCreate(id string) {
 	}
 
 	e.ComponentById[id] = &Component{
-		Id:                            id,
-		ComponentParameterPropertyIds: []string{},
-		BasicPropertyIds:              []string{},
-		RootObjectIds:                 []string{},
-		Evaluator:                     e,
+		Id:                    id,
+		ComponentParameterIds: []string{},
+		BasicPropertyIds:      []string{},
+		RootObjectIds:         []string{},
+		Evaluator:             e,
 	}
 }
 
-func (e *Evaluator) ComponentAddParameterProperty(componentId string, propertyId string) {
+func (e *Evaluator) ComponentAddParameter(componentId string, parameterId string) {
 	component, found := e.ComponentById[componentId]
 	if !found {
 		panic("Component not found")
 	}
 
-	component.ComponentParameterPropertyIds = append(component.ComponentParameterPropertyIds, propertyId)
+	component.ComponentParameterIds = append(component.ComponentParameterIds, parameterId)
 }
 
 func (e *Evaluator) ComponentAddBasicProperty(componentId string, propertyId string) {

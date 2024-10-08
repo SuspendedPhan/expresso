@@ -164,8 +164,8 @@ func bootstrapGoModule() {
 		}),
 		"addParameterProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			componentId := args[0].String()
-			propertyId := args[1].String()
-			ev.ComponentAddParameterProperty(componentId, propertyId)
+			parameterId := args[1].String()
+			ev.ComponentAddParameter(componentId, parameterId)
 			return nil
 		}),
 		"addBasicProperty": js.FuncOf(func(this js.Value, args []js.Value) interface{} {

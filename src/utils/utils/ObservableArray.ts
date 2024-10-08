@@ -49,26 +49,11 @@ export function createObservableArrayWithLifetime<T>(
   return {
     kind: "ObservableArray" as const,
 
-    get itemAddedDequeue() {
+    get itemAddedStream() {
       return Effect.gen(this, function* () {
-        const pub = yield* PubSub.unbounded<ItemAdded<T>>();
-        const fiber = yield* Effect.forkDaemon(
-          Stream.runForEach(yield* this.events, (value) => {
-            return Effect.gen(function* () {
-              if (value.type === "ItemAdded") {
-                pub.publish(value);
-              }
-            });
-          })
+        return (yield* this.events).pipe(
+          Stream.filter((event) => event.type === "ItemAdded")
         );
-
-        yield* Effect.forkDaemon(
-          Stream.runForEach(EffectUtils.obsToStream(destroy$), () => {
-            return Fiber.interrupt(fiber);
-          })
-        );
-
-        return yield* pub.subscribe;
       });
     },
 
@@ -159,7 +144,7 @@ export function createObservableArrayWithLifetime<T>(
           yield* this.push(item);
         }
       });
-    }
+    },
   };
 }
 
