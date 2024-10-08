@@ -1,6 +1,5 @@
 // File: Canvas.ts
 
-import assert from "assert-ts";
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 import CanvasPool from "src/canvas/CanvasPool";
@@ -57,7 +56,10 @@ export function CanvasFactory(args: PixiFactoryArgs) {
             }
 
             const parameter = property.componentParameter;
-            assert(isType(parameter, ComponentParameterFactory.Canvas));
+
+            if (!isType(parameter, ComponentParameterFactory.Canvas)) {
+              continue;
+            };
             parameter.canvasSetter(canvasObject, propertyValue);
 
             canvasObject.scale.set(100, 100);
