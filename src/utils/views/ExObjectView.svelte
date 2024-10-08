@@ -27,7 +27,8 @@
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
 
-  const componentParameterProperties = exObject.componentParameterProperties;
+  const componentParameterProperties$ =
+    exObject.componentParameterProperties_.items$;
   const cloneCountProperty = exObject.cloneCountProperty;
   const basicProperties$ = exObject.basicProperties.items$;
   const children$ = exObject.children$;
@@ -106,7 +107,7 @@
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
           <PropertyView property={cloneCountProperty} />
-          {#each componentParameterProperties as property (property.id)}
+          {#each $componentParameterProperties$ as property (property.id)}
             <PropertyView {property} />
           {/each}
         </div>

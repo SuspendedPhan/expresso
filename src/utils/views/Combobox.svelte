@@ -29,6 +29,7 @@
       console.log("Combobox ready");
       console.log(optionImpls);
       optionImpls.subscribe((options) => {
+        // todp: why is this getting logged multiple times?
         console.log(options);
       });
       ready = true;

@@ -1,8 +1,9 @@
 // File: ExObject.ts
 
 import assert from "assert-ts";
-import { Effect, Stream, SubscriptionRef } from "effect";
+import { Effect, Ref, Stream, SubscriptionRef } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
+import { ComponentCtx } from "src/ctx/ComponentCtx";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   CloneNumberTargetCtx,
@@ -13,6 +14,7 @@ import {
   type Component,
   type ComponentKind,
 } from "src/ex-object/Component";
+import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase, type Parent } from "src/ex-object/ExItem";
 import { Project } from "src/ex-object/Project";
 import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
@@ -45,6 +47,8 @@ interface ExObject_ extends ExItemBase {
   basicProperties: ObservableArray<PropertyKind["BasicProperty"]>;
   cloneCountProperty: PropertyKind["CloneCountProperty"];
   cloneNumberTarget: CloneNumberTarget;
+
+  setComponent(component: Component): Effect.Effect<void, never, EventBusCtx>;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());
@@ -65,6 +69,7 @@ interface ExObjectCreationArgs {
 export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
   return Effect.gen(function* () {
     const canvasComponentCtx = yield* CanvasComponentCtx;
+    const componentCtx = yield* ComponentCtx;
     const canvasComponents = canvasComponentCtx.canvasComponents;
 
     log55.debug("ExObjectFactory2.start");
@@ -109,15 +114,15 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       base.destroy$,
       creationArgs2.children
     );
-    const componentStream = yield* SubscriptionRef.make(creationArgs2.component);
+    const componentRef = yield* SubscriptionRef.make(creationArgs2.component);
     const exObject = ExObjectFactory({
       ...base,
       name$: createBehaviorSubjectWithLifetime(
         base.destroy$,
         creationArgs2.name
       ),
-      component: componentStream,
-      component$: yield* EffectUtils.streamToObs(componentStream.changes),
+      component: componentRef,
+      component$: yield* EffectUtils.streamToObs(componentRef.changes),
       componentParameterProperties_,
       get componentParameterProperties() {
         return componentParameterProperties_.items;
@@ -130,6 +135,59 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       children$: children.items$,
       cloneCountProperty: creationArgs2.cloneCountProperty,
       cloneNumberTarget: creationArgs2.cloneNumberTarget,
+      setComponent(component) {
+        return Effect.gen(this, function* () {
+          console.log("setComponent", component);
+          // todp: what about references to old component properties?
+
+          // Convert old component parameter properties to basic properties, with component as the prefix.
+
+          const oldComponent = yield* Ref.get(componentRef);
+          const componentName = yield* componentCtx.getName(oldComponent).pipe(EffectUtils.getFirstOrThrow);
+          const basicProperties_ = yield* Effect.all(
+            componentParameterProperties_.items.map((property) => {
+              return Effect.gen(function* () {
+                const parameter = property.componentParameter;
+                assert(parameter !== null);
+                const propertyName = yield* EffectUtils.firstValueFrom(
+                  ComponentParameter.getName$(parameter)
+                );
+
+                const expr = yield* property.expr.get;
+
+                return yield* PropertyFactory2.BasicProperty({
+                  name: `${componentName}_${propertyName}`,
+                  expr,
+                });
+              });
+            })
+          );
+
+          console.log("basicProperties", basicProperties_);
+
+          for (const basicProperty of basicProperties_) {
+            basicProperty.parent$.next(exObject);
+            yield* this.basicProperties.push(basicProperty);
+          }
+
+          // Make all component parameter properties for the new component.
+
+          const componentProperties = yield* createComponentProperties(
+            component
+          );
+          const oldComponentProperties = [...componentParameterProperties_.items]
+          yield* componentParameterProperties_.removeAll();
+          for (const p of oldComponentProperties) {
+            p.destroy$.next();
+          }
+
+          yield* componentParameterProperties_.pushAll(componentProperties);
+
+          console.log("componentProperties", componentProperties);
+
+          yield* Ref.set(componentRef, component);
+        });
+      },
     });
 
     creationArgs2.componentProperties.forEach((property) => {

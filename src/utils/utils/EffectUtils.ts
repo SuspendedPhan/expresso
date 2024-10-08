@@ -5,7 +5,7 @@ import {
   Ref,
   Stream,
   StreamEmit,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
 import {
   BehaviorSubject,
@@ -118,6 +118,13 @@ export const EffectUtils = {
       concurrency: "unbounded",
     });
   },
+
+  getFirstOrThrow<T>(stream: Stream.Stream<T>): Effect.Effect<T> {
+    return Effect.gen(function* () {
+      const first = yield* stream.pipe(Stream.take(1), Stream.runHead);
+      return Option.getOrThrow(first);
+    });
+  }
 };
 
 export interface ReadonlySubscriptionRef<T> {

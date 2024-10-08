@@ -1,15 +1,11 @@
-import {
-  Effect,
-  Layer,
-  Option,
-  Ref,
-  Stream,
-  SubscriptionRef
-} from "effect";
+import { Effect, Layer, Option, Ref, Stream, SubscriptionRef } from "effect";
+import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
+import type { Component } from "src/ex-object/Component";
 import type { ExObject } from "src/ex-object/ExObject";
 import { Project } from "src/ex-object/Project";
 import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
+import { FocusCtx } from "src/focus/FocusCtx";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { ComboboxCtx } from "src/utils/views/Combobox";
 import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
@@ -18,7 +14,7 @@ import { isType } from "variant";
 
 export interface ComponentOption {
   label: string;
-  component: string;
+  component: Component;
 }
 
 export class ComponentSelectCtx extends Effect.Tag("ComponentSelectCtx")<
@@ -32,22 +28,29 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         const comboboxCtx = yield* ComboboxCtx;
         const componentCtx = yield* ComponentCtx;
+        const focusCtx = yield* FocusCtx;
+        const canvasComponentCtx = yield* CanvasComponentCtx;
+
         const project = yield* Project.activeProject;
 
         const options = project.components.itemStream.pipe(
           Stream.mapEffect((components) =>
-            Effect.all(
-              components.map((component) =>
+            Effect.all([
+              ...components.map((component) =>
                 Effect.gen(function* () {
                   return {
                     label: Option.getOrThrow(
                       yield* Stream.runHead(component.name.pipe(Stream.take(1)))
                     ),
-                    component: component.id,
+                    component,
                   };
                 })
-              )
-            )
+              ),
+              Effect.succeed({
+                label: canvasComponentCtx.canvasComponents.circle.id,
+                component: canvasComponentCtx.canvasComponents.circle,
+              }),
+            ])
           )
         );
 
@@ -82,7 +85,15 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        // todp: submit component
+        yield* Effect.forkDaemon(
+          Stream.runForEach(props.propsOut.onOptionSelected, (value) => {
+            return Effect.gen(function* () {
+              yield* exObject.setComponent(value.component);
+              focusCtx.popFocus();
+            });
+          })
+        );
+
         const result: ComboboxFieldPropsIn<ComponentOption> = {
           propsIn: props.propsIn,
           label: "Component",

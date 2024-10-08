@@ -3,8 +3,8 @@
 
   import type { ComboboxOption } from "src/utils/views/Combobox";
   import Combobox from "src/utils/views/Combobox.svelte";
-  import FocusView from "src/utils/views/FocusView.svelte";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
+  import FocusView from "src/utils/views/FocusView.svelte";
 
   export let propsIn: ComboboxFieldPropsIn<T>;
 

@@ -139,6 +139,27 @@ export function createObservableArrayWithLifetime<T>(
         return EffectUtils.obsToStream(yield* this.events$);
       });
     },
+
+    removeAll() {
+      return Effect.gen(this, function* () {
+        const items = items$_.value;
+        items$_.next([]);
+        for (const item of items) {
+          events$.next({ type: "ItemRemoved", item });
+          const onRemove = yield* getOrCreateOnRemove(item);
+          yield* PubSub.publish(onRemove, void 0);
+          onRemoveByItem.delete(item);
+        }
+      });
+    },
+
+    pushAll(items: T[]) {
+      return Effect.gen(this, function* () {
+        for (const item of items) {
+          yield* this.push(item);
+        }
+      });
+    }
   };
 }
 

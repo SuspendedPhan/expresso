@@ -158,7 +158,7 @@ const ctxEffect = Effect.gen(function* () {
         yield* Effect.forkDaemon(
           Stream.runForEach(optionImpls_, (value) => {
             return Effect.gen(function* () {
-              console.log("Setting optionImpls", value);
+              // console.log("Setting optionImpls", value);
               yield* Ref.set(optionImpls, value);
             });
           })
