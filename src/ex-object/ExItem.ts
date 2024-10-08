@@ -136,11 +136,15 @@ export const ExItem = {
             if (isType(parent, ProjectFactory)) {
               return Stream.make(parent);
             }
-            return parent === null ? Stream.empty : ExItem.getProject3(parent).pipe(Stream.unwrap);
+            return parent === null
+              ? Stream.empty
+              : ExItem.getProject3(parent).pipe(Stream.unwrap);
           },
           { switch: true }
         )
       );
-    });
+    }).pipe(
+      Effect.withSpan("ExItem.getProject3", { attributes: { itemId: item.id } })
+    );
   },
 };
