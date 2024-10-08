@@ -217,6 +217,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       Stream.take(1),
       Stream.runForEach((project) => {
         return Effect.gen(function* () {
+          console.log("Pushing exObject to project", exObject.id);
           log55.debug("Publishing exObjectAdded");
           yield* project.exObjects.push(exObject);
 
