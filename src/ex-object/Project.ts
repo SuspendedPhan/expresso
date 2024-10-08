@@ -40,6 +40,11 @@ export const ProjectFactory = variation(
       currentOrdinal$: BehaviorSubject<number>;
       destroy$: Subject<void>;
       getProperty(id: string): Property;
+
+      /**
+       * All ex objects, including root ex objects, their descendants, and any ex objects in components.
+       */
+      exObjects: ObservableArray<ExObject>;
     } & ExItemBase
   >()
 );
@@ -97,6 +102,8 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         assert(property !== undefined, `Property not found: ${id}`);
         return property;
       },
+
+      exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
     });
 
     for (const exObject of rootExObjects.items) {
@@ -119,6 +126,15 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         }
       )
     );
+
+    // yield* (yield* rootExObjects.itemAddedStream).pipe(
+    //   Stream.runForEach((event) => {
+    //     return Effect.gen(function* () {
+    //       yield* project.exObjects.push(event.item);
+    //     });
+    //   }),
+    //   Effect.forkIn(base.scope)
+    // );
 
     return project;
   });

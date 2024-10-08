@@ -5,3 +5,5 @@ From the `local` dir, run the following command to build and run the image:
 ```bash
 docker-compose up
 ```
+
+Then, visit http://localhost:3000/explore

@@ -61,11 +61,13 @@ const ctxEffect = Effect.gen(function* () {
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectAdded, (exObject) => {
       return Effect.gen(function* () {
+        console.log("Adding ExObject to Go: received upstream", exObject.id);
         log55.debug(
           "Adding ExObject to Go: received from upstream: ex-object has been added"
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
+            console.log("Adding ExObject to Go", exObject.id);
             log55.log3(14, "Go: Adding Object" + ++exObjectCounter);
 
             goModule.ExObject.create(exObject.id);

@@ -1,4 +1,4 @@
-import { Effect, Layer, PubSub, Stream } from "effect";
+import { Effect, Layer, Logger, LogLevel, PubSub, Stream } from "effect";
 import type { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject } from "src/ex-object/ExObject";
@@ -7,7 +7,7 @@ import { Project } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { log5 } from "src/utils/utils/Log5";
 
-const log55 = log5("EventBusCtx.ts", 10);
+const log55 = log5("EventBusCtx.ts", 15);
 
 export class EventBusCtx extends Effect.Tag("EventBusCtx")<
   EventBusCtx,
@@ -16,6 +16,14 @@ export class EventBusCtx extends Effect.Tag("EventBusCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const exObjectAdded = yield* PubSub.unbounded<ExObject>();
+  yield* Effect.gen(function* () {
+    const q = yield* exObjectAdded.subscribe;
+    while (true) {
+      const v = yield* q.take;
+      console.log("EventBus: received exObjectAdded raw stream", v.id);
+    }
+  }).pipe(Effect.scoped, Effect.forkDaemon);
+
   return {
     exObjectAdded,
     propertyAdded: yield* PubSub.unbounded<Property>(),
@@ -54,6 +62,14 @@ const ctxEffect = Effect.gen(function* () {
         );
         const currentExObjects: ExObject[] = yield* Project.getExObjects(
           project
+        );
+
+        yield* Effect.forkDaemon(
+          Stream.runForEach(Stream.fromPubSub(exObjectAdded), (value) => {
+            return Effect.gen(function* () {
+              console.log("EventBus: received exObjectAdded raw stream2", value.id);
+            });
+          })
         );
 
         log55.debug(
@@ -169,16 +185,21 @@ const ctxEffect = Effect.gen(function* () {
           Stream.tap((expr) => {
             return Effect.gen(function* () {
               log55.debug(
-                "Generating stream: 'Expr added' for specific project: received expr from upstream: " + expr.type
+                "Generating stream: 'Expr added' for specific project: received expr from upstream: " +
+                  expr.type
               );
             });
           }),
           Stream.filterEffect((expr) => {
             return Effect.gen(function* () {
-              log55.debug("Generating stream: 'Expr added' for specific project: filter: getting project");
+              log55.debug(
+                "Generating stream: 'Expr added' for specific project: filter: getting project"
+              );
               // NumberExpr attaches to CallExpr first. CallExpr has no parent yet.
               const project2 = yield* ExItem.getProject(expr);
-              log55.debug("Generating stream: 'Expr added' for specific project: filter: got project");
+              log55.debug(
+                "Generating stream: 'Expr added' for specific project: filter: got project"
+              );
               return project2 === project;
             });
           }),
@@ -198,4 +219,4 @@ const ctxEffect = Effect.gen(function* () {
   };
 });
 
-export const EventBusCtxLive = Layer.effect(EventBusCtx, ctxEffect);
+export const EventBusCtxLive = Layer.effect(EventBusCtx, ctxEffect.pipe(Logger.withMinimumLogLevel(LogLevel.Debug)));

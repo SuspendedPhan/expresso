@@ -2,6 +2,8 @@
 
 package evaluator
 
+import "fmt"
+
 type Component struct {
 	Id                    string
 	ComponentParameterIds []string
@@ -81,7 +83,7 @@ func (e *Evaluator) ComponentAddRootObject(componentId string, rootObjectId stri
 
 	// Optionally, verify that the rootObjectId exists in ExObjectById
 	if _, exists := e.ExObjectById[rootObjectId]; !exists {
-		panic("Root Object not found")
+		panic(fmt.Errorf("root Object not found: %s", rootObjectId))
 	}
 
 	component.RootObjectIds = append(component.RootObjectIds, rootObjectId)

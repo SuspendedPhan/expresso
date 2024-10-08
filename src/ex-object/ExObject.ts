@@ -210,10 +210,12 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
     creationArgs2.cloneNumberTarget.parent$.next(exObject);
 
 
-    yield* ExItem.getProject2(exObject).pipe(
+    yield* ExItem.getProject3(exObject).pipe(
+      Stream.unwrap,
       Stream.take(1),
       Stream.runForEach(() => {
         return Effect.gen(function* () {
+          console.log("Publishing exObjectAdded", exObject.id);
           log55.debug("Publishing exObjectAdded");
           yield* eventBusCtx.exObjectAdded.publish(exObject);
         });

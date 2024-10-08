@@ -1,6 +1,13 @@
 // File: ExItem.ts
 
-import { Effect, Exit, Ref, Scope, Stream, SubscriptionRef } from "effect";
+import {
+  Effect,
+  Exit,
+  Ref,
+  Scope,
+  Stream,
+  SubscriptionRef
+} from "effect";
 import { firstValueFrom, Subject } from "rxjs";
 import { type ComponentKind } from "src/ex-object/Component";
 import { type CustomExFunc } from "src/ex-object/ExFunc";
@@ -111,7 +118,6 @@ export const ExItem = {
   },
 
   getProject2(item: ExItem): Stream.Stream<Project> {
-    console.log("getProject2: item", item.id);
     return item.parent.changes.pipe(
       Stream.flatMap(
         (parent) => {
@@ -126,25 +132,33 @@ export const ExItem = {
     );
   },
 
-  getProject3(item: ExItem): Effect.Effect<Stream.Stream<Project>> {
+  getProject3(item: ExItem, path?: string): Effect.Effect<Stream.Stream<Project>> {
     return Effect.gen(function* () {
-      console.log("getProject3: item", item.id);
-      return item.parent.changes.pipe(
-        Stream.flatMap(
-          (parent) => {
-            // console.log("getProject3: parent", parent?.id ?? "null");
-            if (isType(parent, ProjectFactory)) {
-              return Stream.make(parent);
-            }
-            return parent === null
-              ? Stream.empty
-              : ExItem.getProject3(parent).pipe(Stream.unwrap);
-          },
-          { switch: true }
-        )
-      );
-    }).pipe(
-      Effect.withSpan("ExItem.getProject3", { attributes: { itemId: item.id } })
-    );
+      const newPath = `${path} -> ${item.id}`;
+      console.log(newPath);
+
+      return yield* Effect.gen(function* () {
+        // console.log("getProject3: item", item.id);
+        return item.parent.changes.pipe(
+          Stream.flatMap(
+            (parent) => {
+              // console.log(
+              //   "getProject3: received parent for item",
+              //   item.id,
+              //   parent?.id ?? "null"
+              // );
+              if (isType(parent, ProjectFactory)) {
+                console.log("getProject3: returning project", newPath);
+                return Stream.make(parent);
+              }
+              return parent === null
+                ? Stream.empty
+                : ExItem.getProject3(parent, newPath).pipe(Stream.unwrap);
+            },
+            { switch: true }
+          )
+        );
+      }).pipe(Effect.withSpan("ExItem.getProject3", { attributes: { path } }));
+    });
   },
 };
