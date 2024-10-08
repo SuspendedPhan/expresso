@@ -362,10 +362,10 @@ export default class Dehydrator {
       })
     );
 
-    const deComponentProperties$ = RxFns.combineLatestOrEmpty(
-      exObject.componentParameterProperties.map((property) =>
-        this.dehydrateComponentProperty$(property).pipe()
-      )
+    const deComponentProperties$ = exObject.componentParameterProperties_.items$.pipe(
+      switchMap((properties) => {
+        return RxFns.combineLatestOrEmpty(properties.map((property) => this.dehydrateComponentProperty$(property)));
+      }),
     );
 
     const deBasicProperties$ = exObject.basicProperties.items$.pipe(

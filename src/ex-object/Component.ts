@@ -109,6 +109,10 @@ export const ComponentFactory2 = {
         property.parent$.next(component);
       }
 
+      for (const parameter of creationArgs2.parameters) {
+        parameter.parent$.next(component);
+      }
+
       return component;
     }),
 };

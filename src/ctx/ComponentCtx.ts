@@ -1,8 +1,17 @@
 import { Effect, Layer, Stream } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
-import { ComponentFactory, type Component, type ComponentKind } from "src/ex-object/Component";
-import { ComponentParameterFactory2, type ComponentParameterKind } from "src/ex-object/ComponentParameter";
+import {
+  ComponentFactory,
+  type Component,
+  type ComponentKind,
+} from "src/ex-object/Component";
+import {
+  ComponentParameterFactory2,
+  type ComponentParameterKind,
+} from "src/ex-object/ComponentParameter";
+import { ExItem } from "src/ex-object/ExItem";
 import { PropertyFactory2 } from "src/ex-object/Property";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
 import { matcher } from "variant";
@@ -51,10 +60,26 @@ const ctxEffect = Effect.gen(function* () {
 
     addParameterBlank(component: ComponentKind["Custom"]) {
       return Effect.gen(function* () {
-        // todp: update all exobjects who use this parameter and create a parameter property
         const parameter = yield* ComponentParameterFactory2.Custom({});
         yield* component.parameters.push(parameter);
         parameter.parent$.next(component);
+
+        // Create a parameter property for all exobjects who use this component.
+        const project = yield* ExItem.getProject3(component).pipe(
+          Stream.unwrap,
+          EffectUtils.getFirstOrThrow
+        );
+        for (const exObject of project.exObjects.items) {
+          const other = yield* exObject.component.get;
+          if (other === component) {
+            const property = yield* PropertyFactory2.ComponentParameterProperty(
+              {
+                parameter,
+              }
+            );
+            yield* exObject.componentParameterProperties_.push(property);
+          }
+        }
         return parameter;
       });
     },
