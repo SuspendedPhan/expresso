@@ -2,7 +2,6 @@ import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import type { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
-import type { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import {
   CloneNumberTargetCtx,
@@ -288,7 +287,6 @@ const ctxEffect = Effect.gen(function* () {
     never,
     | ComponentCtx
     | LibraryProjectCtx
-    | EventBusCtx
     | CloneNumberTargetCtx
     | CanvasComponentCtx
   > {
@@ -431,7 +429,7 @@ const ctxEffect = Effect.gen(function* () {
 
   function rehydrateCallExpr(
     deExpr: DehydratedExprKind["CallExpr"]
-  ): Effect.Effect<ExprKind["Call"], never, EventBusCtx> {
+  ): Effect.Effect<ExprKind["Call"], never, never> {
     return Effect.gen(function* () {
       let args = new Array<Expr>();
       for (const deArg of deExpr.args) {

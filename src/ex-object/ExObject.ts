@@ -4,7 +4,6 @@ import assert from "assert-ts";
 import { Effect, Ref, Scope, Stream, SubscriptionRef } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
 import {
   CloneNumberTargetCtx,
   type CloneNumberTarget,
@@ -48,7 +47,7 @@ interface ExObject_ extends ExItemBase {
   cloneCountProperty: PropertyKind["CloneCountProperty"];
   cloneNumberTarget: CloneNumberTarget;
 
-  setComponent(component: Component): Effect.Effect<void, never, EventBusCtx>;
+  setComponent(component: Component): Effect.Effect<void, never, never>;
 }
 
 export const ExObjectFactory = variation("ExObject", fields<ExObject_>());

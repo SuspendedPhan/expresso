@@ -9,7 +9,6 @@ import {
   Subject,
   switchMap,
 } from "rxjs";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { ComponentFactory2, type ComponentKind } from "src/ex-object/Component";
 import { CustomExFuncFactory2, type CustomExFunc } from "src/ex-object/ExFunc";
@@ -71,8 +70,6 @@ interface ProjectCreationArgs {
 
 export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
   return Effect.gen(function* () {
-    const eventBusCtx = yield* EventBusCtx;
-
     const currentOrdinal = creationArgs.currentOrdinal ?? 0;
     const creationArgs2: Required<ProjectCreationArgs> = {
       id: creationArgs.id ?? Utils.createId("project"),
@@ -92,6 +89,9 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
     const currentOrdinal$ = new BehaviorSubject<number>(currentOrdinal);
     const propertyById = new Map<string, Property>();
 
+    const properties = createObservableArrayWithLifetime<Property>(
+      base.destroy$
+    );
     const project = ProjectFactory({
       ...base,
       libraryProject: null,
@@ -114,7 +114,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       },
 
       exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
-      properties: createObservableArrayWithLifetime<Property>(base.destroy$),
+      properties,
       exprs: createObservableArrayWithLifetime<Expr>(base.destroy$),
     });
 
@@ -127,16 +127,15 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       component.parent$.next(project);
     }
 
-    yield* Effect.forkDaemon(
-      Stream.runForEach(
-        yield* eventBusCtx.propertyAddedForProject(project),
-        (value) => {
-          return Effect.gen(function* () {
-            log55.debug("Adding property to project", value.id);
-            propertyById.set(value.id, value);
-          });
-        }
-      )
+    yield* properties.addedItems.pipe(
+      Stream.unwrap,
+      Stream.runForEach((property) => {
+        return Effect.gen(function* () {
+          console.log("Adding property to project", property.id);
+          propertyById.set(property.id, property);
+        });
+      }),
+      Effect.forkIn(project.scope)
     );
 
     return project;

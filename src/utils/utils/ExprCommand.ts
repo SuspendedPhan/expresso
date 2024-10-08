@@ -1,7 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
-import type { EventBusCtx } from "src/ctx/EventBusCtx";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
@@ -20,7 +19,7 @@ const log55 = log5("ExprCommand.ts");
 
 export interface ExprCommand {
   label: string;
-  execute: () => Effect.Effect<void, never, EventBusCtx>;
+  execute: () => Effect.Effect<void, never, never>;
 }
 
 export class ExprCommandCtx extends Effect.Tag("ExprCommandCtx")<

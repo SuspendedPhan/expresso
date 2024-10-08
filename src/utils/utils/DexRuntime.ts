@@ -1,7 +1,6 @@
 import { Layer, ManagedRuntime } from "effect";
 import { CanvasComponentCtxLive } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
-import { EventBusCtxLive } from "src/ctx/EventBusCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
@@ -41,7 +40,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(LibraryPersistCtxLive),
   Layer.provideMerge(GCloudPersistCtx00Live),
 
-  Layer.provideMerge(EventBusCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(ViewCtxLive),
