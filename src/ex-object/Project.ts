@@ -104,6 +104,10 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       exObject.parent$.next(project);
     }
 
+    for (const component of creationArgs2.components) {
+      component.parent$.next(project);
+    }
+
     yield* Effect.forkDaemon(
       Stream.runForEach(
         yield* eventBusCtx.propertyAddedForProject(project),
@@ -222,6 +226,7 @@ export const Project = {
     addComponentBlank() {
       return Effect.gen(function* () {
         const component = yield* ComponentFactory2.Custom({});
+        component.parent$.next(project);
         yield* project.components.push(component);
         return component;
       });

@@ -111,13 +111,36 @@ export const ExItem = {
   },
 
   getProject2(item: ExItem): Stream.Stream<Project> {
+    console.log("getProject2: item", item.id);
     return item.parent.changes.pipe(
-      Stream.flatMap((parent) => {
-        if (isType(parent, ProjectFactory)) {
-          return Stream.make(parent);
-        }
-        return parent === null ? Stream.empty : ExItem.getProject2(parent);
-      })
+      Stream.flatMap(
+        (parent) => {
+          // console.log("getProject2: parent", parent?.id ?? "null");
+          if (isType(parent, ProjectFactory)) {
+            return Stream.make(parent);
+          }
+          return parent === null ? Stream.empty : ExItem.getProject2(parent);
+        },
+        { switch: true }
+      )
     );
+  },
+
+  getProject3(item: ExItem): Effect.Effect<Stream.Stream<Project>> {
+    return Effect.gen(function* () {
+      console.log("getProject3: item", item.id);
+      return item.parent.changes.pipe(
+        Stream.flatMap(
+          (parent) => {
+            // console.log("getProject3: parent", parent?.id ?? "null");
+            if (isType(parent, ProjectFactory)) {
+              return Stream.make(parent);
+            }
+            return parent === null ? Stream.empty : ExItem.getProject3(parent).pipe(Stream.unwrap);
+          },
+          { switch: true }
+        )
+      );
+    });
   },
 };

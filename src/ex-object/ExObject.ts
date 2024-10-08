@@ -209,22 +209,34 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneNumberTarget.parent$.next(exObject);
 
-    const parentChanged_ = exObject.parent.changes;
-    const parentChanged = parentChanged_;
-    yield* Effect.forkDaemon(
-      Stream.runForEachWhile(parentChanged, (parent_) => {
-        return Effect.gen(function* () {
-          if (parent_ === null) {
-            log55.debug("Skipping publishing exObjectAdded");
-            return true;
-          }
-          log55.debug("Publishing exObjectAdded");
 
+    yield* ExItem.getProject2(exObject).pipe(
+      Stream.take(1),
+      Stream.runForEach(() => {
+        return Effect.gen(function* () {
+          log55.debug("Publishing exObjectAdded");
           yield* eventBusCtx.exObjectAdded.publish(exObject);
-          return false;
-        }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
-      })
+        });
+      }),
+      Effect.forkIn(exObject.scope)
     );
+
+    // const parentChanged_ = exObject.parent.changes;
+    // const parentChanged = parentChanged_;
+    // yield* Effect.forkDaemon(
+    //   Stream.runForEachWhile(parentChanged, (parent_) => {
+    //     return Effect.gen(function* () {
+    //       if (parent_ === null) {
+    //         log55.debug("Skipping publishing exObjectAdded");
+    //         return true;
+    //       }
+    //       log55.debug("Publishing exObjectAdded");
+
+    //       yield* eventBusCtx.exObjectAdded.publish(exObject);
+    //       return false;
+    //     }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
+    //   })
+    // );
     return exObject;
   });
 }
