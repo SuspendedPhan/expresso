@@ -137,7 +137,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
       cloneNumberTarget: creationArgs2.cloneNumberTarget,
       setComponent(component) {
         return Effect.gen(this, function* () {
-          console.log("setComponent", component);
+          // console.log("setComponent", component);
           // todp: what about references to old component properties?
 
           // Convert old component parameter properties to basic properties, with component as the prefix.
@@ -163,7 +163,7 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
             })
           );
 
-          console.log("basicProperties", basicProperties_);
+          // console.log("basicProperties", basicProperties_);
 
           for (const basicProperty of basicProperties_) {
             basicProperty.parent$.next(exObject);
@@ -181,9 +181,12 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
             p.destroy$.next();
           }
 
+          for (const componentProperty of componentProperties) {
+            componentProperty.parent$.next(exObject);
+          }
           yield* componentParameterProperties_.pushAll(componentProperties);
 
-          console.log("componentProperties", componentProperties);
+          // console.log("componentProperties", componentProperties);
 
           yield* Ref.set(componentRef, component);
         });

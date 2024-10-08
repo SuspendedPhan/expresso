@@ -8,7 +8,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { matcher } from "variant";
 
-const log55 = log5("GoBridge.ts", 12);
+const log55 = log5("GoBridge.ts");
 
 export class GoBridgeCtx extends Effect.Tag("GoBridgeCtx")<
   GoBridgeCtx,
@@ -66,7 +66,7 @@ const ctxEffect = Effect.gen(function* () {
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug2("Go: Adding Object" + ++exObjectCounter);
+            log55.log3(14, "Go: Adding Object" + ++exObjectCounter);
 
             goModule.ExObject.create(exObject.id);
             goModule.ExObject.setCloneCountProperty(
@@ -126,14 +126,14 @@ const ctxEffect = Effect.gen(function* () {
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            log55.debug2("Go: Adding Property " + ++propertyCounter);
+            log55.log3(14, "Go: Adding Property " + ++propertyCounter, property.id);
 
             goModule.Property.create(property.id);
             yield* Effect.forkDaemon(
               Stream.runForEach(property.expr.changes, (value) => {
                 return goModuleCtx.withGoModule((goModule_) =>
                   Effect.gen(function* () {
-                    log55.debug2("Go: Setting Expr for Property");
+                    log55.log3(14, "Go: Setting Expr for Property", property.id, value.id);
                     goModule_.Property.setExpr(property.id, value.id);
                   })
                 );
@@ -155,8 +155,8 @@ const ctxEffect = Effect.gen(function* () {
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            // log55.debug2("Go: Adding Expr " + ++exprCounter);
-            log55.debug2(`Go: Adding Expr ${++exprCounter} ${expr.type}`);
+            // log55.log3(14, "Go: Adding Expr " + ++exprCounter);
+            log55.log3(14, `Go: Adding Expr ${++exprCounter} ${expr.type}`);
 
             yield* matcher(expr)
               .when(ExprFactory.Number, (expr) => {
@@ -199,7 +199,7 @@ const ctxEffect = Effect.gen(function* () {
                               return;
                             }
 
-                            log55.debug2("Go: Setting CallExpr args");
+                            log55.log3(14, "Go: Setting CallExpr args");
                             goModule_.CallExpr.setArg0(expr.id, arg0.id);
                             goModule_.CallExpr.setArg1(expr.id, arg1.id);
                           })
