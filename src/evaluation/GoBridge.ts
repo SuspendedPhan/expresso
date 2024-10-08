@@ -56,7 +56,14 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const exObjectAdded = yield* eventBusCtx.exObjectAddedForActiveProject();
+  const exObjectAdded = project$2.pipe(
+    Stream.flatMap(
+      (project) => project.exObjects.addedItems.pipe(Stream.unwrap),
+      { switch: true }
+    )
+  );
+
+  // const exObjectAdded = yield* eventBusCtx.exObjectAddedForActiveProject();
   let exObjectCounter = 0;
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectAdded, (exObject) => {
@@ -272,7 +279,11 @@ const ctxEffect = Effect.gen(function* () {
           Stream.runForEach((event) => {
             return Effect.gen(function* () {
               const rootExObject = event.item;
-              log55.log3(14, "Go: Component: Adding RootExObject", rootExObject.id);
+              log55.log3(
+                14,
+                "Go: Component: Adding RootExObject",
+                rootExObject.id
+              );
               goModule.Component.addRootObject(component.id, rootExObject.id);
             });
           }),

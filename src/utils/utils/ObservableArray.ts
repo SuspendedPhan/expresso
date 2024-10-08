@@ -57,6 +57,14 @@ export function createObservableArrayWithLifetime<T>(
       });
     },
 
+    get addedItems() {
+      return Effect.gen(this, function* () {
+        return (yield* this.itemAddedStream).pipe(
+          Stream.map((event) => event.item)
+        );
+      });
+    },
+
     get events$() {
       return Effect.gen(function* () {
         const currentItemEvents_: Effect.Effect<ItemAdded<T>>[] =
@@ -143,6 +151,22 @@ export function createObservableArrayWithLifetime<T>(
         for (const item of items) {
           yield* this.push(item);
         }
+      });
+    },
+
+    remove(item: T) {
+      return Effect.gen(this, function* () {
+        const index = items$_.value.indexOf(item);
+        if (index === -1) {
+          throw new Error("Item not found");
+        }
+        items$_.value.splice(index, 1);
+        items$_.next(items$_.value);
+
+        events$.next({ type: "ItemRemoved", item });
+        const onRemove = yield* getOrCreateOnRemove(item);
+        yield* PubSub.publish(onRemove, void 0);
+        onRemoveByItem.delete(item);
       });
     },
   };

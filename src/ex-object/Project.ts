@@ -126,16 +126,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         }
       )
     );
-
-    // yield* (yield* rootExObjects.itemAddedStream).pipe(
-    //   Stream.runForEach((event) => {
-    //     return Effect.gen(function* () {
-    //       yield* project.exObjects.push(event.item);
-    //     });
-    //   }),
-    //   Effect.forkIn(base.scope)
-    // );
-
+    
     return project;
   });
 }

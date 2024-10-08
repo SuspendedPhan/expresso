@@ -1,7 +1,7 @@
 // File: ExObject.ts
 
 import assert from "assert-ts";
-import { Effect, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Ref, Scope, Stream, SubscriptionRef } from "effect";
 import { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import { EventBusCtx } from "src/ctx/EventBusCtx";
@@ -143,7 +143,9 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
           // Convert old component parameter properties to basic properties, with component as the prefix.
 
           const oldComponent = yield* Ref.get(componentRef);
-          const componentName = yield* componentCtx.getName(oldComponent).pipe(EffectUtils.getFirstOrThrow);
+          const componentName = yield* componentCtx
+            .getName(oldComponent)
+            .pipe(EffectUtils.getFirstOrThrow);
           const basicProperties_ = yield* Effect.all(
             componentParameterProperties_.items.map((property) => {
               return Effect.gen(function* () {
@@ -175,7 +177,9 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
           const componentProperties = yield* createComponentProperties(
             component
           );
-          const oldComponentProperties = [...componentParameterProperties_.items]
+          const oldComponentProperties = [
+            ...componentParameterProperties_.items,
+          ];
           yield* componentParameterProperties_.removeAll();
           for (const p of oldComponentProperties) {
             p.destroy$.next();
@@ -209,36 +213,25 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
 
     creationArgs2.cloneNumberTarget.parent$.next(exObject);
 
-
     yield* ExItem.getProject3(exObject).pipe(
       Stream.unwrap,
       Stream.take(1),
-      Stream.runForEach(() => {
+      Stream.runForEach((project) => {
         return Effect.gen(function* () {
           console.log("Publishing exObjectAdded", exObject.id);
           log55.debug("Publishing exObjectAdded");
-          yield* eventBusCtx.exObjectAdded.publish(exObject);
+          yield* project.exObjects.push(exObject);
+
+          yield* Scope.addFinalizer(
+            base.scope,
+            Effect.gen(function* () {
+              yield* project.exObjects.remove(exObject);
+            })
+          );
         });
       }),
       Effect.forkIn(exObject.scope)
     );
-
-    // const parentChanged_ = exObject.parent.changes;
-    // const parentChanged = parentChanged_;
-    // yield* Effect.forkDaemon(
-    //   Stream.runForEachWhile(parentChanged, (parent_) => {
-    //     return Effect.gen(function* () {
-    //       if (parent_ === null) {
-    //         log55.debug("Skipping publishing exObjectAdded");
-    //         return true;
-    //       }
-    //       log55.debug("Publishing exObjectAdded");
-
-    //       yield* eventBusCtx.exObjectAdded.publish(exObject);
-    //       return false;
-    //     }).pipe(Effect.withSpan("ExObjectFactory2.parentChanged"));
-    //   })
-    // );
     return exObject;
   });
 }
