@@ -50,6 +50,11 @@ export const ProjectFactory = variation(
        * All properties, including properties of ex objects and components.
        */
       properties: ObservableArray<Property>;
+
+      /**
+       * All exprs, including exprs in ex objects and components.
+       */
+      exprs: ObservableArray<Expr>;
     } & ExItemBase
   >()
 );
@@ -110,6 +115,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
 
       exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
       properties: createObservableArrayWithLifetime<Property>(base.destroy$),
+      exprs: createObservableArrayWithLifetime<Expr>(base.destroy$),
     });
 
     for (const exObject of rootExObjects.items) {

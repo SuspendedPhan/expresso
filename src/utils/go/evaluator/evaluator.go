@@ -2,7 +2,9 @@
 
 package evaluator
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // -- TYPES --
 

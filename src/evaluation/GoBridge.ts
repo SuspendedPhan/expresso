@@ -1,6 +1,5 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
@@ -19,7 +18,6 @@ const ctxEffect = Effect.gen(function* () {
   log55.debug("Starting GoBridgeCtx");
 
   const goModuleCtx = yield* GoModuleCtx;
-  const eventBusCtx = yield* EventBusCtx;
 
   const project$ = yield* Project.activeProject$;
   log55.debug("Ctx loaded");
@@ -175,7 +173,12 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const exprAdded = yield* eventBusCtx.exprAddedForActiveProject();
+  const exprAdded = project$2.pipe(
+    Stream.flatMap((project) => project.exprs.addedItems.pipe(Stream.unwrap), {
+      switch: true,
+    })
+  );
+
   let exprCounter = 0;
   yield* Effect.forkDaemon(
     Stream.runForEach(exprAdded, (expr) => {

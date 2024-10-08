@@ -1,10 +1,9 @@
 // File: Expr.ts
 
 import assert from "assert-ts";
-import { Effect, Stream } from "effect";
+import { Effect, Scope, Stream } from "effect";
 import { of } from "rxjs";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
-import { type CloneNumberTarget, CloneNumberTargetFactory } from "src/ex-object/CloneNumberTarget";
+import { CloneNumberTargetFactory, type CloneNumberTarget } from "src/ex-object/CloneNumberTarget";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
@@ -88,8 +87,6 @@ interface ExprCreationArgs {
 export const ExprFactory2 = {
   Number(creationArgs: ExprCreationArgs["Number"]) {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const creationArgs2: Required<ExprCreationArgs["Number"]> = {
         id: creationArgs.id ?? Utils.createId("expr"),
         value: creationArgs.value ?? 0,
@@ -100,23 +97,13 @@ export const ExprFactory2 = {
         ...base,
         value: creationArgs2.value,
       });
-      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
-      yield* Effect.forkDaemon(
-        Stream.runForEach(project, (_) => {
-          return Effect.gen(function* () {
-            log55.debug("Publishing exprAdded: " + expr.type);
-            yield* eventBusCtx.exprAdded.publish(expr);
-          });
-        })
-      );
+      yield* addToProject(expr);
       return expr;
     });
   },
 
   Reference(creationArgs: ExprCreationArgs["Reference"]) {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const creationArgs2: Required<ExprCreationArgs["Reference"]> = {
         id: creationArgs.id ?? Utils.createId("expr"),
         target: creationArgs.target,
@@ -127,23 +114,13 @@ export const ExprFactory2 = {
         ...base,
         target: creationArgs2.target,
       });
-      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
-      yield* Effect.forkDaemon(
-        Stream.runForEach(project, (_) => {
-          return Effect.gen(function* () {
-            log55.debug("Publishing exprAdded: " + expr.type);
-            yield* eventBusCtx.exprAdded.publish(expr);
-          });
-        })
-      );
+      yield* addToProject(expr);
       return expr;
     });
   },
 
   Call: (creationArgs: ExprCreationArgs["CallExpr"]) => {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const creationArgs2: Required<ExprCreationArgs["CallExpr"]> = {
         id: creationArgs.id ?? Utils.createId("call-expr"),
         args: creationArgs.args ?? [],
@@ -177,16 +154,7 @@ export const ExprFactory2 = {
         arg.parent$.next(expr);
       }
 
-      const project = ExItem.getProject2(expr).pipe(Stream.take(1));
-      yield* Effect.forkDaemon(
-        Stream.runForEach(project, (_) => {
-          return Effect.gen(function* () {
-            log55.debug("Publishing exprAdded: " + expr.type);
-            yield* eventBusCtx.exprAdded.publish(expr);
-          });
-        })
-      );
-
+      yield* addToProject(expr);
       return expr;
     });
   },
@@ -303,3 +271,26 @@ export const Expr = {
     });
   },
 };
+
+function addToProject(expr: Expr): Effect.Effect<void, never, never> {
+  return Effect.gen(function* () {
+    yield* ExItem.getProject3(expr).pipe(
+      Stream.unwrap,
+      Stream.take(1),
+      Stream.runForEach((project) => {
+        return Effect.gen(function* () {
+          log55.debug("Pushing expr to project");
+          yield* project.exprs.push(expr);
+
+          yield* Scope.addFinalizer(
+            expr.scope,
+            Effect.gen(function* () {
+              yield* project.exprs.remove(expr);
+            })
+          );
+        });
+      }),
+      Effect.forkIn(expr.scope)
+    );
+  });
+}
