@@ -71,6 +71,14 @@ func bootstrapGoModule() {
 			ev.ExObjectSetCloneNumberTarget(exObjectId, cloneNumberTargetId)
 			return nil
 		}),
+
+		"setComponent": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			logger.Log("ExObject.setComponent", args)
+			exObjectId := args[0].String()
+			componentId := args[1].String()
+			ev.ExObjectSetComponent(exObjectId, componentId)
+			return nil
+		}),
 	}))
 
 	goModule.Set("Property", js.ValueOf(map[string]interface{}{

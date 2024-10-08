@@ -1,6 +1,7 @@
 import assert from "assert-ts";
 import { Effect, Layer, Stream } from "effect";
 import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+import { ComponentFactory } from "src/ex-object/Component";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -119,6 +120,26 @@ const ctxEffect = Effect.gen(function* () {
             goModule.ExObject.setCloneNumberTarget(
               exObject.id,
               exObject.cloneNumberTarget.id
+            );
+
+            yield* exObject.component.changes.pipe(
+              Stream.runForEach((component) => {
+                return Effect.gen(function* () {
+                  log55.log3(
+                    14,
+                    "Go: Setting Component for ExObject",
+                    exObject.id,
+                    component.id
+                  );
+
+                  const cId = matcher(component)
+                    .when(ComponentFactory.Canvas, () => "")
+                    .when(ComponentFactory.Custom, (c) => c.id)
+                    .complete();
+                  goModule.ExObject.setComponent(exObject.id, cId);
+                });
+              }),
+              Effect.forkDaemon
             );
           });
         });

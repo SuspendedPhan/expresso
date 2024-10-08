@@ -139,7 +139,7 @@ func (self *ExObject) Component() *Component {
 
 	component, exists := self.Evaluator.ComponentById[self.ComponentId]
 	if !exists {
-		panic("Component not found")
+		panic(fmt.Errorf("component not found: %s", self.ComponentId))
 	}
 	logger.Log3(8, "Component end", "return", component)
 	return component

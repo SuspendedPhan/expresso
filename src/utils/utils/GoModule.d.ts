@@ -25,6 +25,7 @@ export default interface GoModule {
     addBasicProperty(exObjectId: string, propertyId: string): void;
     addChild(exObjectId: string, childId: string): void;
     setCloneNumberTarget(exObjectId: string, cloneNumberTargetId: string): void;
+    setComponent(exObjectId: string, componentId: string): void;
   };
 
   Property: {
