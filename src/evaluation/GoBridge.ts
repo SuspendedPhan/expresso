@@ -68,14 +68,12 @@ const ctxEffect = Effect.gen(function* () {
   yield* Effect.forkDaemon(
     Stream.runForEach(exObjectAdded, (exObject) => {
       return Effect.gen(function* () {
-        console.log("Adding ExObject to Go: received upstream", exObject.id);
         log55.debug(
           "Adding ExObject to Go: received from upstream: ex-object has been added"
         );
         return yield* goModuleCtx.withGoModule((goModule) => {
           return Effect.gen(function* () {
-            console.log("Adding ExObject to Go", exObject.id);
-            log55.log3(14, "Go: Adding Object" + ++exObjectCounter);
+            log55.log3(14, "Go: Adding Object", ++exObjectCounter, exObject.id);
 
             goModule.ExObject.create(exObject.id);
             goModule.ExObject.setCloneCountProperty(
@@ -131,7 +129,15 @@ const ctxEffect = Effect.gen(function* () {
     })
   );
 
-  const propertyAdded = yield* eventBusCtx.propertyAddedForActiveProject();
+  const propertyAdded = project$2.pipe(
+    Stream.flatMap(
+      (project) => project.properties.addedItems.pipe(Stream.unwrap),
+      {
+        switch: true,
+      }
+    )
+  );
+
   let propertyCounter = 0;
   yield* Effect.forkDaemon(
     Stream.runForEach(propertyAdded, (property) => {

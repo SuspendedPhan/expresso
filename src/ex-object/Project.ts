@@ -45,6 +45,11 @@ export const ProjectFactory = variation(
        * All ex objects, including root ex objects, their descendants, and any ex objects in components.
        */
       exObjects: ObservableArray<ExObject>;
+
+      /**
+       * All properties, including properties of ex objects and components.
+       */
+      properties: ObservableArray<Property>;
     } & ExItemBase
   >()
 );
@@ -104,6 +109,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       },
 
       exObjects: createObservableArrayWithLifetime<ExObject>(base.destroy$),
+      properties: createObservableArrayWithLifetime<Property>(base.destroy$),
     });
 
     for (const exObject of rootExObjects.items) {
@@ -126,7 +132,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
         }
       )
     );
-    
+
     return project;
   });
 }

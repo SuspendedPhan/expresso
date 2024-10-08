@@ -135,20 +135,12 @@ export const ExItem = {
   getProject3(item: ExItem, path?: string): Effect.Effect<Stream.Stream<Project>> {
     return Effect.gen(function* () {
       const newPath = `${path} -> ${item.id}`;
-      console.log(newPath);
 
       return yield* Effect.gen(function* () {
-        // console.log("getProject3: item", item.id);
         return item.parent.changes.pipe(
           Stream.flatMap(
             (parent) => {
-              // console.log(
-              //   "getProject3: received parent for item",
-              //   item.id,
-              //   parent?.id ?? "null"
-              // );
               if (isType(parent, ProjectFactory)) {
-                console.log("getProject3: returning project", newPath);
                 return Stream.make(parent);
               }
               return parent === null

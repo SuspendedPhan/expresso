@@ -8,10 +8,9 @@
  */
 
 import assert from "assert-ts";
-import { Effect, Stream, SubscriptionRef } from "effect";
+import { Effect, Scope, Stream, SubscriptionRef } from "effect";
 import { firstValueFrom, of } from "rxjs";
-import { EventBusCtx } from "src/ctx/EventBusCtx";
-import {} from "src/ex-object/Component";
+import { } from "src/ex-object/Component";
 import { ComponentParameter } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
@@ -77,8 +76,6 @@ export const PropertyFactory2 = {
     createArgs: CreatePropertyArgs["ComponentParameter"]
   ) {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const createArgs2: Required<CreatePropertyArgs["ComponentParameter"]> = {
         id: createArgs.id ?? "component-parameter-" + crypto.randomUUID(),
         parameter: createArgs.parameter ?? null,
@@ -98,30 +95,13 @@ export const PropertyFactory2 = {
       });
       createArgs2.expr.parent$.next(property);
 
-      const parentChanged_ = property.parent.changes;
-      const parentChanged = parentChanged_;
-      yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
-          return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug("Skipping publishing propertyAdded");
-              return true;
-            }
-            log55.debug("Publishing propertyAdded");
-
-            yield* eventBusCtx.propertyAdded.publish(property);
-            return false;
-          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
-        })
-      );
+      yield* addToProject(property);
       return property;
     });
   },
 
   BasicProperty(createArgs: CreatePropertyArgs["Basic"]) {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const createArgs2: Required<CreatePropertyArgs["Basic"]> = {
         id: createArgs.id ?? "basic-property-" + crypto.randomUUID(),
         expr:
@@ -148,30 +128,13 @@ export const PropertyFactory2 = {
       });
       createArgs2.expr.parent$.next(property);
 
-      const parentChanged_ = property.parent.changes;
-      const parentChanged = parentChanged_;
-      yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
-          return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug("Skipping publishing propertyAdded");
-              return true;
-            }
-            log55.debug("Publishing propertyAdded");
-
-            yield* eventBusCtx.propertyAdded.publish(property);
-            return false;
-          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
-        })
-      );
+      yield* addToProject(property);
       return property;
     });
   },
 
   CloneCountProperty(createArgs: CreatePropertyArgs["CloneCount"]) {
     return Effect.gen(function* () {
-      const eventBusCtx = yield* EventBusCtx;
-
       const createArgs2: Required<CreatePropertyArgs["CloneCount"]> = {
         id: createArgs.id ?? "clone-count-property-" + crypto.randomUUID(),
         expr: createArgs.expr ?? (yield* ExprFactory2.Number({})),
@@ -190,22 +153,7 @@ export const PropertyFactory2 = {
       });
       createArgs2.expr.parent$.next(property);
 
-      const parentChanged_ = property.parent.changes;
-      const parentChanged = parentChanged_;
-      yield* Effect.forkDaemon(
-        Stream.runForEachWhile(parentChanged, (parent_) => {
-          return Effect.gen(function* () {
-            if (parent_ === null) {
-              log55.debug("Skipping publishing propertyAdded");
-              return true;
-            }
-            log55.debug("Publishing propertyAdded");
-
-            yield* eventBusCtx.propertyAdded.publish(property);
-            return false;
-          }).pipe(Effect.withSpan("PropertyFactory2.parentChanged"));
-        })
-      );
+      yield* addToProject(property);
       return property;
     });
   },
@@ -257,3 +205,26 @@ export const Property = {
     },
   }),
 };
+
+function addToProject(property: Property): Effect.Effect<void, never, never> {
+  return Effect.gen(function* () {
+    yield* ExItem.getProject3(property).pipe(
+      Stream.unwrap,
+      Stream.take(1),
+      Stream.runForEach((project) => {
+        return Effect.gen(function* () {
+          log55.debug("Pushing property to project");
+          yield* project.properties.push(property);
+
+          yield* Scope.addFinalizer(
+            property.scope,
+            Effect.gen(function* () {
+              yield* project.properties.remove(property);
+            })
+          );
+        });
+      }),
+      Effect.forkIn(property.scope)
+    );
+  });
+}

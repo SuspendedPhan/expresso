@@ -7,7 +7,7 @@ import { Project } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 import { log5 } from "src/utils/utils/Log5";
 
-const log55 = log5("EventBusCtx.ts", 15);
+const log55 = log5("EventBusCtx.ts");
 
 export class EventBusCtx extends Effect.Tag("EventBusCtx")<
   EventBusCtx,
@@ -16,13 +16,6 @@ export class EventBusCtx extends Effect.Tag("EventBusCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const exObjectAdded = yield* PubSub.unbounded<ExObject>();
-  yield* Effect.gen(function* () {
-    const q = yield* exObjectAdded.subscribe;
-    while (true) {
-      const v = yield* q.take;
-      console.log("EventBus: received exObjectAdded raw stream", v.id);
-    }
-  }).pipe(Effect.scoped, Effect.forkDaemon);
 
   return {
     exObjectAdded,
