@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Effect } from "effect";
   import { map, of, switchAll } from "rxjs";
+  import { ComponentCtx } from "src/ctx/ComponentCtx";
   import { Component, type ComponentKind } from "src/ex-object/Component";
   import {
     ComponentFocusFactory,
@@ -77,11 +78,21 @@
   );
 
   function addParameter() {
-    DexRuntime.runPromise(component.addParameterBlank());
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const componentCtx = yield* ComponentCtx;
+        yield* componentCtx.addParameterBlank(component);
+      })
+    );
   }
 
   function addProperty() {
-    DexRuntime.runPromise(component.addPropertyBlank());
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const componentCtx = yield* ComponentCtx;
+        yield* componentCtx.addPropertyBlank(component);
+      })
+    );
   }
 </script>
 

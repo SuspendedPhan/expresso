@@ -4,12 +4,11 @@ import { Effect, Stream } from "effect";
 import { BehaviorSubject } from "rxjs";
 import type { LibCanvasObject } from "src/canvas/Canvas";
 import {
-  ComponentParameterFactory2,
   type ComponentParameterKind
 } from "src/ex-object/ComponentParameter";
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExObjectFactory2, type ExObject } from "src/ex-object/ExObject";
-import { PropertyFactory2, type PropertyKind } from "src/ex-object/Property";
+import { type PropertyKind } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import {
   createObservableArrayWithLifetime,
@@ -39,9 +38,6 @@ interface CustomComponent_ extends ExItemBase {
   properties: ObservableArray<PropertyKind["BasicProperty"]>;
 }
 
-type CustomComponent2_ = CustomComponent_ &
-  ReturnType<typeof customComponentMethodsFactory>;
-
 export interface ComponentCreationArgs {
   Custom: {
     id?: string;
@@ -54,7 +50,7 @@ export interface ComponentCreationArgs {
 
 interface Component_ {
   Canvas: CanvasComponent_;
-  Custom: CustomComponent2_;
+  Custom: CustomComponent_;
 }
 
 export const ComponentFactory = dexVariant.scoped("Component")(
@@ -99,9 +95,8 @@ export const ComponentFactory2 = {
         ),
       };
 
-      const component2_: CustomComponent2_ = {
+      const component2_: CustomComponent_ = {
         ...component_,
-        ...customComponentMethodsFactory(component_),
       };
 
       const component = ComponentFactory.Custom(component2_);
@@ -110,30 +105,13 @@ export const ComponentFactory2 = {
         rootExObject.parent$.next(component);
       });
 
+      for (const property of creationArgs2.properties) {
+        property.parent$.next(component);
+      }
+
       return component;
     }),
 };
-
-function customComponentMethodsFactory(component: CustomComponent_) {
-  return {
-    addParameterBlank() {
-      return Effect.gen(function* () {
-        // todp: update all exobjects who use this parameter and create a parameter property
-        const parameter = yield* ComponentParameterFactory2.Custom({});
-        yield* component.parameters.push(parameter);
-        return parameter;
-      });
-    },
-
-    addPropertyBlank() {
-      return Effect.gen(function* () {
-        const property = yield* PropertyFactory2.BasicProperty({});
-        yield* component.properties.push(property);
-        return property;
-      });
-    },
-  };
-}
 
 export const Component = {
   addRootExObjectBlank(component: ComponentKind["Custom"]) {
