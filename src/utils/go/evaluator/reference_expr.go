@@ -137,17 +137,12 @@ func (expr *ReferenceExpr) String() string {
 	return expr.Expr.Id
 }
 
-func (expr *ReferenceExpr) GetComponentParameterValue(ctx *EvaluationCtx) (DexValue, bool) {
+// path - the instance path of the expr's property
+func (expr *ReferenceExpr) GetComponentParameterPropertyInstancePath(ctx *EvaluationCtx, path *PropertyInstancePath) (*PropertyInstancePath, bool) {
 	if expr.TargetKind != "ComponentParameter/Custom" {
-		return 0, false
+		return nil, false
 	}
 
-	value, found := ctx.scopedValueByComponentParameterId[expr.TargetId]
-	if !found {
-		panic(fmt.Errorf("component parameter not found: %v", expr.TargetId))
-	}
-
-	// todp: set the scoped value somewhere
-
-	return value, true
+	parameterPath := ctx.GetComponentParameterPropertyInstancePath(expr.TargetId, path)
+	return parameterPath, true
 }

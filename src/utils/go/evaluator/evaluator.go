@@ -93,3 +93,11 @@ func (e *Evaluator) debugEval1(cloneCountPropertyPaths []*CloneCountPropertyPath
 		fmt.Println(path.String())
 	}
 }
+
+func (e *Evaluator) Property(id string) *Property {
+	prop, exists := e.PropertyById[id]
+	if !exists {
+		panic("Property not found")
+	}
+	return prop
+}

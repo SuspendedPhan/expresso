@@ -5,10 +5,12 @@ package evaluator
 import "fmt"
 
 type Property struct {
-	Id           string
-	ExprId       string
-	PropertyType string
-	Evaluator    *Evaluator
+	Id        string
+	ExprId    string
+	Evaluator *Evaluator
+
+	// "" if not a component parameter property
+	ComponentParameterId string
 }
 
 func (e *Evaluator) PropertyCreate(propertyId string) {
@@ -26,6 +28,16 @@ func (e *Evaluator) PropertySetExpr(propertyId string, exprId string) {
 	}
 
 	property.ExprId = exprId
+}
+
+func (e *Evaluator) PropertySetComponentParameterId(propertyId string, componentParameterId string) {
+	property, found := e.PropertyById[propertyId]
+
+	if !found {
+		panic("property not found")
+	}
+
+	property.ComponentParameterId = componentParameterId
 }
 
 func (self *Property) Name() string {

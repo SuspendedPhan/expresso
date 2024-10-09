@@ -29,10 +29,10 @@ func (e *Evaluator) EvaluatePropertyInstances(
 
 	resultByPropertyInstancePath := make(map[string]*PropertyInstanceResult)
 	evaluationCtx := &EvaluationCtx{
-		resultByPropertyInstancePath:      resultByPropertyInstancePath,
-		propertyPathByProperty:            MakePropertyPathMap(paths),
-		cloneCountResults:                 cloneCountResults,
-		scopedValueByComponentParameterId: make(map[string]DexValue),
+		resultByPropertyInstancePath: resultByPropertyInstancePath,
+		propertyPathByProperty:       MakePropertyPathMap(paths),
+		cloneCountResults:            cloneCountResults,
+		evaluator:                    e,
 	}
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
@@ -111,8 +111,9 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 		return cloneCountResult.Count
 	}
 
-	if componentParameterValue, ok := referenceExpr.GetComponentParameterValue(ctx); ok {
-		return componentParameterValue
+	if componentParameterPropertyInstancePath, ok := referenceExpr.GetComponentParameterPropertyInstancePath(ctx, path); ok {
+		result := e.EvaluatePropertyInstancePath(ctx, componentParameterPropertyInstancePath)
+		return result.Value
 	}
 
 	panic(fmt.Errorf("unknown reference kind: %v", targetKind))
