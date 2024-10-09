@@ -44,9 +44,9 @@ export default interface GoModule {
 
   CallExpr: {
     create(id: string): void;
-    setArg0(id: string, argId: string): void;
-    setArg1(id: string, argId: string): void;
+    setArgs(id: string, argIds: string[]): void;
     setExFunc(id: string, exFuncId: string): void;
+    setExFuncType(id: string, type: string): void;
   };
 
   ReferenceExpr: {
@@ -55,9 +55,12 @@ export default interface GoModule {
     setTargetKind(id: string, targetKind: string): void;
   };
 
-  ExFunc: {
+  // todp: update gobridge to use this
+  // - update gomodule
+  // - test if system ex func works
+  // - check for the call expr ex func type in eval4.. ExFunc.System/Add, etc..
+  CustomExFunc: {
     create(id: string): void;
-    setType(id: string, type: string): void;
     setExpr(id: string, exprId: string): void;
     setParameters(id: string, parameterIds: string[]);
   };

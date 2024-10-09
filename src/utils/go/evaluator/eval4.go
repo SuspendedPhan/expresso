@@ -89,7 +89,19 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInsta
 }
 
 func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *PropertyInstancePath) DexValue {
-	return e.EvalExpr(ctx, callExpr.Arg0(), path) * e.EvalExpr(ctx, callExpr.Arg1(), path)
+	exFunc := callExpr.ExFunc()
+	args := callExpr.Args()
+	switch exFunc.ExFuncType {
+	case "Custom":
+		panic("Custom exFunc not implemented")
+	case "System":
+		if len(args) != 2 {
+			panic(fmt.Errorf("expected 2 args, got %v", len(args)))
+		}
+		return e.EvalExpr(ctx, args[0], path) * e.EvalExpr(ctx, args[1], path)
+	default:
+		panic(fmt.Errorf("unknown exFunc type: %v", exFunc.ExFuncType))
+	}
 }
 
 func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *ReferenceExpr, path *PropertyInstancePath) DexValue {

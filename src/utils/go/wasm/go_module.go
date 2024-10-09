@@ -123,18 +123,19 @@ func bootstrapGoModule() {
 			ev.CallExprCreate(id)
 			return nil
 		}),
-		"setArg0": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		"setArgs": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()
-			argId := args[1].String()
-			logger.Log("CallExpr.setArg0", id, argId)
-			ev.CallExprSetArg0(id, argId)
+			argIds := make([]string, args[1].Length())
+			for i := 0; i < args[1].Length(); i++ {
+				argIds[i] = args[1].Index(i).String()
+			}
+			ev.CallExprSetArgs(id, argIds)
 			return nil
 		}),
-		"setArg1": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		"setExFuncType": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			id := args[0].String()
-			argId := args[1].String()
-			logger.Log("CallExpr.setArg1", id, argId)
-			ev.CallExprSetArg1(id, argId)
+			exFuncType := args[1].String()
+			ev.CallExprSetExFuncType(id, exFuncType)
 			return nil
 		}),
 		"setExFunc": js.FuncOf(func(this js.Value, args []js.Value) interface{} {

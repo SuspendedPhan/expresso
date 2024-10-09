@@ -254,6 +254,25 @@ const ctxEffect = Effect.gen(function* () {
                   Effect.gen(function* () {
                     log55.debug("GoModule: Creating CallExpr", expr.id);
                     goModule.CallExpr.create(expr.id);
+
+                    EffectUtils.obsToStream(expr.exFunc$).pipe(
+                      Stream.runForEach((exFunc) => {
+                        return Effect.gen(function* () {
+                          assert(exFunc !== null);
+                          if (exFunc.type === "ExFunc.Custom") {
+                            log55.debug(
+                              "GoModule: Setting CallExpr ExFunc",
+                              expr.id,
+                              exFunc.id
+                            );
+                            goModule.CallExpr.setExFunc(expr.id, exFunc.id);
+                          } else {
+                            goModule.CallExpr.setExFuncType(expr.id, exFunc.type);
+                          }
+                        });
+                      })
+                    )
+
                     yield* Effect.forkDaemon(
                       Stream.runForEach(expr.args.itemStream, (args) => {
                         log55.debug2(
@@ -261,17 +280,9 @@ const ctxEffect = Effect.gen(function* () {
                         );
                         return goModuleCtx.withGoModule((goModule_) =>
                           Effect.gen(function* () {
-                            const arg0 = args[0];
-                            const arg1 = args[1];
-
-                            if (arg0 === undefined || arg1 === undefined) {
-                              console.error("CallExpr must have 2 args");
-                              return;
-                            }
-
+                            const argIds = args.map(arg => arg.id);
                             log55.log3(14, "Go: Setting CallExpr args");
-                            goModule_.CallExpr.setArg0(expr.id, arg0.id);
-                            goModule_.CallExpr.setArg1(expr.id, arg1.id);
+                            goModule_.CallExpr.setArgs(expr.id, argIds);
                           })
                         );
                       })

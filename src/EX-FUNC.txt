@@ -8,3 +8,4 @@ TODO:
 - GoBridge
     - CallExpr
     - ExFunc
+    - "Custom"/"System" type
