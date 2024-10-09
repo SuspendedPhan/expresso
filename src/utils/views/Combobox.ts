@@ -7,7 +7,7 @@ import {
   PubSub,
   Ref,
   Stream,
-  SubscriptionRef
+  SubscriptionRef,
 } from "effect";
 import type { Scope } from "effect/Scope";
 import type { KeyboardCtx } from "src/ctx/KeyboardCtx";
@@ -26,8 +26,7 @@ export interface _ComboboxOption<T extends ComboboxOption> {
   select: () => void;
 }
 
-export interface ComboboxArgs<
-  T extends ComboboxOption> {
+export interface ComboboxArgs<T extends ComboboxOption> {
   options: Stream.Stream<T[]>;
 }
 
@@ -43,7 +42,7 @@ export interface ComboboxPropsIn<T extends ComboboxOption> {
 export interface ComboboxPropsOut<T extends ComboboxOption> {
   onQueryChanged: Stream.Stream<string>;
   onOptionSelected: Stream.Stream<T>;
-  onOptionFocused: Stream.Stream<T>;
+  focusedOption: Stream.Stream<Option.Option<T>>;
 }
 
 export interface ComboboxState<T extends ComboboxOption> {
@@ -68,14 +67,26 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         const query = yield* SubscriptionRef.make<string>("");
         const onOptionSelected = yield* PubSub.unbounded<T>();
-        const onOptionFocused = yield* PubSub.unbounded<T>();
 
         const focusedIndex = yield* SubscriptionRef.make(Option.none<number>());
+
+        const focusedOption = Stream.zipLatest(
+          focusedIndex.changes,
+          args.options
+        ).pipe(
+          Stream.map(([focusedIndex_, options]) => {
+            return Option.map(focusedIndex_, i => {
+              const opt = options[i];
+              assert(opt !== undefined);
+              return opt;
+            });
+          })
+        );
 
         const propsOut: ComboboxPropsOut<T> = {
           onQueryChanged: query.changes,
           onOptionSelected: Stream.fromPubSub(onOptionSelected),
-          onOptionFocused: Stream.fromPubSub(onOptionFocused),
+          focusedOption,
         };
 
         // yield* Effect.forkDaemon(
@@ -104,11 +115,11 @@ const ctxEffect = Effect.gen(function* () {
                     const isFocused = Stream.map(
                       focusedIndex.changes,
                       (focusedIndex_) => {
-                        // console.log(
-                        //   "Focused index changed",
-                        //   index,
-                        //   focusedIndex_
-                        // );
+                        console.log(
+                          "Focused index changed",
+                          index,
+                          focusedIndex_
+                        );
                         return Option.match(focusedIndex_, {
                           onNone: () => false,
                           onSome: (i) => i === index,
@@ -130,19 +141,20 @@ const ctxEffect = Effect.gen(function* () {
                         isFocused,
                         select,
                       };
-                      //   console.log("Computed option", index, extracted);
+                        console.log("Computed option", index, extracted);
                       return extracted;
                     });
                   });
 
-                const vv = Stream.zipLatestAll(...optionImpls).pipe(
+                const vv = Stream.zipLatestAll(...optionImpls)
+                  .pipe
                   // Stream.tap(() =>
                   //   Console.log("Original options", ddd, options)
                   // ),
                   // Stream.tap((value) =>
                   //   Console.log("Computed options", ddd, value)
                   // )
-                );
+                  ();
                 return vv;
               });
               return Stream.unwrap(extracted);
@@ -168,22 +180,39 @@ const ctxEffect = Effect.gen(function* () {
         yield* Effect.forkDaemon(
           Stream.runForEach(optionImpls.changes, (optionImpls_) => {
             return Effect.gen(function* () {
+              console.log("Options changed 1");
               const focusedIndex_ = yield* focusedIndex.get;
               const newIndex = Option.map(focusedIndex_, (i) => {
                 if (i >= optionImpls_.length) {
+                  console.log("Options changed 2");
                   return optionImpls_.length - 1;
                 }
+
+                if (i < 0) {
+                  console.log("Options changed 2.1");
+                  return 0;
+                }
+                console.log("Options changed 3");
                 return i;
+              });
+              const newIndex2 = Option.orElse(newIndex, () => {
+                console.log("Options changed 4");
+                if (optionImpls_.length > 0) {
+                  console.log("Options changed 5");
+                  return Option.some(0);
+                }
+                console.log("Options changed 6");
+                return Option.none();
               });
 
               const eq = Option.getEquivalence(Equivalence.number);
-              if (eq(focusedIndex_, newIndex) === false) {
+              if (eq(focusedIndex_, newIndex2) === false) {
                 // console.log(
                 //   "Making sure focusedIndex is within bounds",
                 //   focusedIndex_,
                 //   newIndex
                 // );
-                yield* Ref.set(focusedIndex, newIndex);
+                yield* Ref.set(focusedIndex, newIndex2);
               }
             });
           })
@@ -259,7 +288,10 @@ const ctxEffect = Effect.gen(function* () {
                 );
               },
               query: yield* EffectUtils.streamToReadable(query.changes),
-              optionImpls: yield* EffectUtils.streamToReadable(optionImpls.changes, []),
+              optionImpls: yield* EffectUtils.streamToReadable(
+                optionImpls.changes,
+                []
+              ),
             };
             return state;
           });

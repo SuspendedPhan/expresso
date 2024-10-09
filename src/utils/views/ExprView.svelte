@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { of, switchMap, type Observable, map, tap } from "rxjs";
+  import { map, of, switchMap, type Observable } from "rxjs";
 
   import assert from "assert-ts";
   import { Effect } from "effect";

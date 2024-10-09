@@ -58,12 +58,29 @@ const ctxEffect = Effect.gen(function* () {
         yield* Effect.forkDaemon(
           Stream.runForEach(props.propsOut.onOptionSelected, (value) => {
             return Effect.gen(function* () {
-              value.execute();
+              yield* value.execute();
               focusCtx.popFocus();
             });
           })
         );
+
+        // yield* EffectUtils.obsToStream(this.onSubmitExprCommand$).pipe(
+        //   Stream.runForEach(() => {
+        //     return Effect.gen(function* () {
+        //       console.log("onSubmitExprCommand$");
+        //       const option = yield* props.propsOut.focusedOption.pipe(
+        //         EffectUtils.getFirstOrThrow
+        //       );
+        //       if (Option.isNone(option)) {
+        //         return;
+        //       }
         
+        //       yield* option.value.execute();
+        //     });
+        //   }),
+        //   Effect.forkIn(expr.scope)
+        // );
+
         return props.propsIn;
       });
     },

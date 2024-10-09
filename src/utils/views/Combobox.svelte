@@ -33,6 +33,10 @@
       // console.log(options);
       // });
       ready = true;
+
+      optionImpls.subscribe((options) => {
+        console.log("svelte", JSON.stringify(options, null, 2));
+      });
     })
   );
 
