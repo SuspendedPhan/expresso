@@ -70,14 +70,6 @@ const ctxEffect = Effect.gen(function* () {
         });
 
         yield* Effect.forkDaemon(
-          Stream.runForEach(props.propsOut.onOptionSelected, (value) => {
-            return Effect.gen(function* () {
-              console.log(`Selected: ${value.label}`);
-            });
-          })
-        );
-
-        yield* Effect.forkDaemon(
           Stream.runForEach(props.propsOut.onQueryChanged, (query_) => {
             return Effect.gen(function* () {
               yield* Ref.set(query, query_);

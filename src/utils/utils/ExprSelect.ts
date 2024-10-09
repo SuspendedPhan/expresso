@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
 import { Observable, Subject, switchMap } from "rxjs";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
@@ -13,6 +13,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
+import { ComboboxCtx } from "../views/Combobox";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -22,8 +23,8 @@ export interface ExprSelectOption {
   execute: () => Effect.Effect<void, never, never>;
 }
 
-export class ExprCommandCtx extends Effect.Tag("ExprCommandCtx")<
-  ExprCommandCtx,
+export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
+  ExprSelectCtx,
   Effect.Effect.Success<typeof ctxEffect>
 >() {}
 
@@ -31,6 +32,42 @@ const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
 
   return {
+    createComboboxPropsIn(expr: Expr) {
+      return Effect.gen(this, function* () {
+        const comboboxCtx = yield* ComboboxCtx;
+        const focusCtx = yield* FocusCtx;
+
+        const query = yield* SubscriptionRef.make("");
+
+        const filteredOptions = query.changes.pipe(
+          Stream.mapEffect((query) => this.getCommands(query, expr))
+        );
+
+        const props = yield* comboboxCtx.createProps<ExprSelectOption>({
+          options: filteredOptions,
+        });
+
+        yield* Effect.forkDaemon(
+          Stream.runForEach(props.propsOut.onQueryChanged, (query_) => {
+            return Effect.gen(function* () {
+              yield* Ref.set(query, query_);
+            });
+          })
+        );
+
+        yield* Effect.forkDaemon(
+          Stream.runForEach(props.propsOut.onOptionSelected, (value) => {
+            return Effect.gen(function* () {
+              value.execute();
+              focusCtx.popFocus();
+            });
+          })
+        );
+
+        return props.propsIn;
+      });
+    },
+
     onSubmitExprCommand$: new Subject<void>(),
 
     getReplacementCommands$(
@@ -185,4 +222,4 @@ const ctxEffect = Effect.gen(function* () {
   }
 });
 
-export const ExprCommandCtxLive = Layer.effect(ExprCommandCtx, ctxEffect);
+export const ExprCommandCtxLive = Layer.effect(ExprSelectCtx, ctxEffect);

@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { Effect, Scope, Exit } from "effect";
+  import { Effect, Exit, Scope } from "effect";
   import type { Expr } from "src/ex-object/Expr";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
 
   import { onMount } from "svelte";
+  import { ExprSelectCtx, type ExprSelectOption } from "../utils/ExprSelect";
+  import type { ComboboxPropsIn } from "./Combobox";
   import Combobox from "./Combobox.svelte";
-  import type { ComboboxFieldPropsIn } from "./ComboboxField";
-  import type { ExprSelectOption } from "../utils/ExprSelect";
 
   export let expr: Expr;
 
@@ -22,7 +22,7 @@
     };
   });
 
-  let comboboxProps: ComboboxFieldPropsIn<ExprSelectOption>;
+  let comboboxProps: ComboboxPropsIn<ExprSelectOption>;
   let ready = false;
 
   Effect.gen(function* () {
@@ -30,7 +30,7 @@
 
     scope = yield* Scope.make();
     comboboxProps = yield* Scope.extend(
-      exprSelectCtx.createComboboxFieldPropsIn(expr),
+      exprSelectCtx.createComboboxPropsIn(expr),
       scope
     );
 
