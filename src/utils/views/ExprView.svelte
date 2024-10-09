@@ -117,10 +117,6 @@
         {/if}
         <span>{$text$}</span>
 
-        {#if $isEditing$}
-          <ExprSelect {expr} />
-        {/if}
-
         <div class="pl-2">
           {#each $args$ as arg (arg.id)}
             <svelte:self expr={arg} {elementLayout} />
@@ -128,6 +124,10 @@
         </div>
       </div>
     </FocusView>
+
+    {#if $isEditing$}
+      <ExprSelect {expr} />
+    {/if}
   </NodeView>
 {/if}
 

@@ -141,7 +141,7 @@ const ctxEffect = Effect.gen(function* () {
                         isFocused,
                         select,
                       };
-                        console.log("Computed option", index, extracted);
+                        // console.log("Computed option", index, extracted);
                       return extracted;
                     });
                   });

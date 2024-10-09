@@ -1,11 +1,10 @@
 <script lang="ts" generics="T extends { label: string }">
   import {
-    arrow,
+    autoUpdate,
     computePosition,
     flip,
     offset,
     shift,
-    autoUpdate,
   } from "@floating-ui/dom";
   import { Effect } from "effect";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -52,35 +51,13 @@
       function updatePosition() {
         computePosition(rootEl, childEl, {
           placement: "bottom-start",
-          middleware: [
-            // offset(6),
-            // flip(),
-            // shift({ padding: 5 }),
-            // arrow({ element: arrowElement }),
-          ],
-        }).then(({ x, y, placement, middlewareData }) => {
+          strategy: "fixed",
+          middleware: [offset(10), flip(), shift({ padding: 5 })],
+        }).then(({ x, y }) => {
           Object.assign(childEl.style, {
             left: `${x}px`,
             top: `${y}px`,
           });
-
-          // Accessing the data
-          // const { x: arrowX, y: arrowY } = middlewareData.arrow;
-
-          // const staticSide = {
-          //   top: "bottom",
-          //   right: "left",
-          //   bottom: "top",
-          //   left: "right",
-          // }[placement.split("-")[0]!];
-
-          // Object.assign(arrowElement.style, {
-          //   left: arrowX != null ? `${arrowX}px` : "",
-          //   top: arrowY != null ? `${arrowY}px` : "",
-          //   right: "",
-          //   bottom: "",
-          //   [staticSide]: "-4px",
-          // });
         });
       }
 
