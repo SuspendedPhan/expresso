@@ -280,6 +280,7 @@ function addToProject(expr: Expr): Effect.Effect<void, never, never> {
       Stream.runForEach((project) => {
         return Effect.gen(function* () {
           log55.debug("Pushing expr to project");
+          console.log("Pushing expr to project", expr.id);
           yield* project.exprs.push(expr);
 
           yield* Scope.addFinalizer(

@@ -127,6 +127,10 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       component.parent$.next(project);
     }
 
+    for (const exFunc of creationArgs2.exFuncs) {
+      exFunc.parent$.next(project);
+    }
+
     yield* properties.addedItems.pipe(
       Stream.unwrap,
       Stream.runForEach((property) => {
