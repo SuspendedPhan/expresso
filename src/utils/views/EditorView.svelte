@@ -80,6 +80,16 @@
       })
     );
   }
+
+  function evaluate() {
+    DexRuntime.runPromise(
+      Effect.gen(function* () {
+        const goModuleCtx = yield* GoModuleCtx;
+        const goModule = yield* goModuleCtx.getUnsafe();
+        goModule.Evaluator.eval();
+      })
+    );
+  }
 </script>
 
 <div bind:this={rootElement} class="w-max min-w-full">
@@ -103,6 +113,8 @@
       <button on:click={debugEvaluator} class="btn block">
         Debug Evaluator
       </button>
+
+      <button on:click={evaluate} class="btn block"> Evaluate </button>
     </div>
     <FlexContainer>
       {#if rootExObjects}
