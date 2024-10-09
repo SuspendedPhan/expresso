@@ -44,7 +44,7 @@ import {
 } from "variant";
 import { pass } from "variant/lib/typed";
 
-const log55 = log5("Dehydrator.ts", 11);
+const log55 = log5("Dehydrator.ts", 15);
 
 type DehydratedExpr_ = {
   Number: {
@@ -588,6 +588,6 @@ export default class Dehydrator {
 
   private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {
     log55.debug("Dehydrating Args");
-    return combineLatest(args.map((arg) => this.dehydrateExpr$(arg)));
+    return RxFns.combineLatestOrEmpty(args.map((arg) => this.dehydrateExpr$(arg)));
   }
 }

@@ -386,6 +386,16 @@ const ctxEffect = Effect.gen(function* () {
           }),
           Effect.forkIn(exFunc.scope)
         );
+
+        yield* EffectUtils.obsToStream(exFunc.expr$).pipe(
+          Stream.runForEach((expr) => {
+            return Effect.gen(function* () {
+              log55.log3(14, "Go: ExFunc: Setting Expr", expr.id);
+              goModule.CustomExFunc.setExpr(exFunc.id, expr.id);
+            });
+          }),
+          Effect.forkIn(exFunc.scope)
+        )
       });
     }),
     Effect.forkDaemon

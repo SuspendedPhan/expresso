@@ -1,5 +1,7 @@
 package evaluator
 
+import "fmt"
+
 type CustomExFunc struct {
 	Id        string
 	Evaluator *Evaluator
@@ -43,7 +45,7 @@ func (e *Evaluator) ExFuncSetParameters(id string, parameterIds []string) {
 func (exFunc *CustomExFunc) Expr() *Expr {
 	expr, found := exFunc.Evaluator.ExprById[exFunc.ExprId]
 	if !found {
-		panic("Expr not found")
+		panic(fmt.Errorf("Expr not found: %v", exFunc.ExprId))
 	}
 
 	return expr
