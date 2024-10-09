@@ -43,21 +43,29 @@ func (ctx *EvaluationCtx) GetComponentParameterPropertyInstancePath(componentPar
 	// Walk up the path until we hit the right ex-object, then grab the component parameter property.
 	// The ex-object is the one that has the component parameter property.
 
-	segment := path.segments[len(path.segments)-1]
+	// println("0::", path.String())
+
 	for i := len(path.segments) - 1; i >= 0; i-- {
+		segment := path.segments[i]
 		if segment.exItem == nil {
 			panic("component parameter not found")
 		}
+
+		// println("1::", segment.exItem.Name())
 
 		exObject, ok := segment.exItem.(*ExObject)
 		if !ok {
 			continue
 		}
 
+		// println("2:: ...")
+
 		for _, id := range exObject.ComponentParameterPropertyIds {
+			// println("3::", id)
 			property := ctx.evaluator.Property(id)
 
 			if property.ComponentParameterId == componentParameterId {
+				// println("4::")
 				return ctx.NewPropertyInstancePath(path, i, property)
 			}
 		}

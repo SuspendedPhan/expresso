@@ -12,12 +12,12 @@ export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
-  const onEval = new Set<(result: EvaluationResult) => Effect.Effect<void, never, never>>();
+  const onEval = new Set<
+    (result: EvaluationResult) => Effect.Effect<void, never, never>
+  >();
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
-      return;
-
       const evaluation = goModule.Evaluator.eval();
       // console.log("Got result from Evaluator.eval()");
 

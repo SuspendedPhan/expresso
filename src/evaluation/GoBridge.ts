@@ -4,9 +4,10 @@ import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 import { ComponentFactory } from "src/ex-object/Component";
 import { ExprFactory } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
+import { PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import { matcher } from "variant";
+import { isType, matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
 
@@ -172,6 +173,22 @@ const ctxEffect = Effect.gen(function* () {
             );
 
             goModule.Property.create(property.id);
+
+            if (isType(property, PropertyFactory.ComponentParameterProperty)) {
+              const componentParameter = property.componentParameter;
+              assert(componentParameter !== null);
+              log55.log3(
+                14,
+                "Go: Setting ComponentParameter for Property",
+                property.id,
+                componentParameter.id
+              );
+              goModule.Property.setComponentParameterId(
+                property.id,
+                componentParameter.id
+              );
+            }
+
             yield* Effect.forkDaemon(
               Stream.runForEach(property.expr.changes, (value) => {
                 return goModuleCtx.withGoModule((goModule_) =>

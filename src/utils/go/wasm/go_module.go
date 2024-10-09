@@ -94,6 +94,13 @@ func bootstrapGoModule() {
 			ev.PropertySetExpr(propertyId, exprId)
 			return nil
 		}),
+
+		"setComponentParameterId": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			propertyId := args[0].String()
+			componentParameterId := args[1].String()
+			ev.PropertySetComponentParameterId(propertyId, componentParameterId)
+			return nil
+		}),
 	}))
 
 	goModule.Set("NumberExpr", js.ValueOf(map[string]interface{}{

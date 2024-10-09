@@ -31,6 +31,7 @@ export default interface GoModule {
   Property: {
     create(propertyId: string): void;
     setExpr(propertyId: string, exprId: string): void;
+    setComponentParameterId(propertyId: string, componentParameterId: string): void;
   };
 
   NumberExpr: {

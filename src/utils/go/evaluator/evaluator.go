@@ -75,7 +75,7 @@ func (e *Evaluator) Eval() EvaluationResult {
 	// Step 6: Group Object Instances
 	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)
 
-	// spew.Dump(objectInstanceResults)
+	// e.debugResults(objectInstanceResults)
 
 	return EvaluationResult{
 		objectInstanceResults: objectInstanceResults,
@@ -100,4 +100,10 @@ func (e *Evaluator) Property(id string) *Property {
 		panic("Property not found")
 	}
 	return prop
+}
+
+func (e *Evaluator) debugResults(results []*ObjectInstanceResult) {
+	for _, result := range results {
+		fmt.Println(result.String())
+	}
 }
