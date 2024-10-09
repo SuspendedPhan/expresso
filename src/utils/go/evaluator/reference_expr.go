@@ -136,3 +136,18 @@ func (expr *ReferenceExpr) GetCloneCountResult(ctx *EvaluationCtx) (*CloneCountR
 func (expr *ReferenceExpr) String() string {
 	return expr.Expr.Id
 }
+
+func (expr *ReferenceExpr) GetComponentParameterValue(ctx *EvaluationCtx) (DexValue, bool) {
+	if expr.TargetKind != "ComponentParameter/Custom" {
+		return 0, false
+	}
+
+	value, found := ctx.scopedValueByComponentParameterId[expr.TargetId]
+	if !found {
+		panic(fmt.Errorf("component parameter not found: %v", expr.TargetId))
+	}
+
+	// todp: set the scoped value somewhere
+
+	return value, true
+}
