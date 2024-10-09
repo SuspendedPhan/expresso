@@ -9,7 +9,7 @@
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
-  import ExprCommand from "src/utils/views/ExprCommand.svelte";
+  import ExprCommand from "src/utils/views/ExprSelect.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
@@ -55,6 +55,7 @@
       return of(number.value.toString());
     })
     .when(ExprFactory.Call, (call) => {
+      assert(call.exFunc$.value !== null);
       return ExFunc.name$(call.exFunc$.value);
     })
     .when(ExprFactory.Reference, (reference) => {

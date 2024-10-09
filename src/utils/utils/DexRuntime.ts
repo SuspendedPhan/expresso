@@ -1,4 +1,4 @@
-import { Layer, ManagedRuntime } from "effect";
+import { Layer, Logger, LogLevel, ManagedRuntime } from "effect";
 import { CanvasComponentCtxLive } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
@@ -21,7 +21,7 @@ import { GCloudPersistCtx00Live } from "src/utils/persistence/GCloudPersist00Ctx
 import { LibraryPersistCtxLive } from "src/utils/persistence/LibraryPersistCtx";
 import { LoadCtxLive } from "src/utils/persistence/LoadCtx";
 import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
-import { ExprCommandCtxLive } from "src/utils/utils/ExprCommand";
+import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 
@@ -56,7 +56,8 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(CloneNumberTargetCtxLive),
   Layer.provideMerge(CanvasComponentCtxLive),
   Layer.provideMerge(ComboboxCtxLive),
-  Layer.provideMerge(ComponentSelectCtxLive)
+  Layer.provideMerge(ComponentSelectCtxLive),
+  Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All))
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);

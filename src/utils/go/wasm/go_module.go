@@ -181,6 +181,7 @@ func bootstrapGoModule() {
 
 	goModule.Set("CustomExFunc", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			println("CustomExFunc.create", args)
 			exFuncId := args[0].String()
 			ev.ExFuncCreate(exFuncId)
 			return nil

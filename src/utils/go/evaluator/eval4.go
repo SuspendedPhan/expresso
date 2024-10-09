@@ -92,8 +92,9 @@ func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *P
 	args := callExpr.Args()
 
 	if callExpr.exFuncType == "ExFunc.Custom" {
-		// exFunc := callExpr.ExFunc()
-		panic("Custom exFunc not implemented")
+		exFunc := callExpr.ExFunc()
+		rootExpr := exFunc.Expr()
+		return e.EvalExpr(ctx, rootExpr, path)
 	}
 
 	if len(args) != 2 {

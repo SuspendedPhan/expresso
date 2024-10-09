@@ -32,6 +32,7 @@ func NewEvaluator(logger_ Logger2) *Evaluator {
 		PropertyById:                    map[string]*Property{},
 		ExprById:                        map[string]*Expr{},
 		ExObjectIdByCloneNumberTargetId: map[string]string{},
+		ExFuncById:                      map[string]*CustomExFunc{},
 	}
 }
 

@@ -14,8 +14,9 @@ func (e *Evaluator) ExFuncCreate(id string) {
 	}
 
 	e.ExFuncById[id] = &CustomExFunc{
-		Id:        id,
-		Evaluator: e,
+		Id:           id,
+		Evaluator:    e,
+		ParameterIds: make([]string, 0),
 	}
 }
 
@@ -37,4 +38,13 @@ func (e *Evaluator) ExFuncSetParameters(id string, parameterIds []string) {
 	}
 
 	exFunc.ParameterIds = parameterIds
+}
+
+func (exFunc *CustomExFunc) Expr() *Expr {
+	expr, found := exFunc.Evaluator.ExprById[exFunc.ExprId]
+	if !found {
+		panic("Expr not found")
+	}
+
+	return expr
 }

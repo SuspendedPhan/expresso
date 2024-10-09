@@ -278,7 +278,7 @@ const ctxEffect = Effect.gen(function* () {
                         });
                       }),
                       Effect.forkIn(expr.scope)
-                    )
+                    );
 
                     yield* Effect.forkDaemon(
                       Stream.runForEach(expr.args.itemStream, (args) => {
@@ -287,7 +287,7 @@ const ctxEffect = Effect.gen(function* () {
                         );
                         return goModuleCtx.withGoModule((goModule_) =>
                           Effect.gen(function* () {
-                            const argIds = args.map(arg => arg.id);
+                            const argIds = args.map((arg) => arg.id);
                             log55.log3(14, "Go: Setting CallExpr args");
                             goModule_.CallExpr.setArgs(expr.id, argIds);
                           })
@@ -352,6 +352,43 @@ const ctxEffect = Effect.gen(function* () {
             });
           }),
           Effect.forkIn(component.scope)
+        );
+      });
+    }),
+    Effect.forkDaemon
+  );
+
+  yield* project$2.pipe(
+    Stream.flatMap(
+      (project) => project.exFuncs.itemAddedStream.pipe(Stream.unwrap),
+      {
+        switch: true,
+      }
+    ),
+    Stream.runForEach((event) => {
+      return Effect.gen(function* () {
+        const goModule = yield* goModuleCtx.getUnsafe();
+        const exFunc = event.item;
+        log55.log3(14, "Go: Adding ExFunc", exFunc.id);
+        goModule.CustomExFunc.create(exFunc.id);
+
+        console.log("hi");
+        console.log("ExFunc parameters", exFunc.parameters.items);
+
+        yield* exFunc.parameters.itemStream.pipe(
+          Stream.runForEach((parameters) => {
+            return Effect.gen(function* () {
+              console.log("ExFunc parameters", parameters);
+              const parameterIds = parameters.map((parameter) => parameter.id);
+              log55.log3(
+                14,
+                "Go: ExFunc: Setting Parameters",
+                JSON.stringify(parameterIds)
+              );
+              goModule.CustomExFunc.setParameters(exFunc.id, parameterIds);
+            });
+          }),
+          Effect.forkIn(exFunc.scope)
         );
       });
     }),

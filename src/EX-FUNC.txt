@@ -1,11 +1,2 @@
 TODO:
-- Go
-    - Eval4
-    - Parameter reference
-    - CallExpr arg list
-    - System ex func eval
-
-- GoBridge
-    - CallExpr
-    - ExFunc
-    - "Custom"/"System" type
+// - check for the call expr ex func type in eval4.. ExFunc.System/Add, etc..

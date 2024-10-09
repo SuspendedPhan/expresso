@@ -5,7 +5,7 @@ import { CanvasObjectPath } from "src/scene/CanvasObject";
 import type { TypesOf } from "variant";
 
 export default interface GoModule {
-  ExFunc: {
+  CustomExFunc: {
     create(id: string): void;
     setExpr(id: string, exprId: string): void;
     setParameters(id: string, parameterIds: string[]): void;
@@ -53,16 +53,6 @@ export default interface GoModule {
     create(id: string, targetId: string | null, targetKind: string): void;
     setTargetId(id: string, targetId: string): void;
     setTargetKind(id: string, targetKind: string): void;
-  };
-
-  // todp: update gobridge to use this
-  // - update gomodule
-  // - test if system ex func works
-  // - check for the call expr ex func type in eval4.. ExFunc.System/Add, etc..
-  CustomExFunc: {
-    create(id: string): void;
-    setExpr(id: string, exprId: string): void;
-    setParameters(id: string, parameterIds: string[]);
   };
 
   Evaluator: {
