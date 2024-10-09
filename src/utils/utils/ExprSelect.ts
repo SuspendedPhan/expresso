@@ -1,20 +1,19 @@
 import assert from "assert-ts";
 import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
-import { Observable, Subject, switchMap } from "rxjs";
+import { Subject } from "rxjs";
 import { ComponentFactory } from "src/ex-object/Component";
 import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { Expr, ExprFactory2 } from "src/ex-object/Expr";
+import { Project } from "src/ex-object/Project";
 import { ExprFocusFactory } from "src/focus/ExprFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import { type OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
 import { ComboboxCtx } from "../views/Combobox";
-import { Project } from "src/ex-object/Project";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -31,18 +30,18 @@ export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
-  const project = yield* Project.activeProject;
 
   return {
     createComboboxPropsIn(expr: Expr) {
       return Effect.gen(this, function* () {
         const comboboxCtx = yield* ComboboxCtx;
         const focusCtx = yield* FocusCtx;
+        const project = yield* Project.activeProject;
 
         const query = yield* SubscriptionRef.make("");
 
         const filteredOptions = query.changes.pipe(
-          Stream.mapEffect((query) => this.getCommands(query, expr))
+          Stream.mapEffect((query) => this.getCommands(query, expr, project))
         );
 
         const props = yield* comboboxCtx.createProps<ExprSelectOption>({
@@ -66,42 +65,13 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        // yield* EffectUtils.obsToStream(this.onSubmitExprCommand$).pipe(
-        //   Stream.runForEach(() => {
-        //     return Effect.gen(function* () {
-        //       console.log("onSubmitExprCommand$");
-        //       const option = yield* props.propsOut.focusedOption.pipe(
-        //         EffectUtils.getFirstOrThrow
-        //       );
-        //       if (Option.isNone(option)) {
-        //         return;
-        //       }
-
-        //       yield* option.value.execute();
-        //     });
-        //   }),
-        //   Effect.forkIn(expr.scope)
-        // );
-
         return props.propsIn;
       });
     },
 
     onSubmitExprCommand$: new Subject<void>(),
 
-    getReplacementCommands$(
-      expr: Expr,
-      query$: OBS<string>
-    ): Observable<ExprSelectOption[]> {
-      return query$.pipe(
-        switchMap(async (query) => {
-          const commands = this.getCommands(query, expr);
-          return DexRuntime.runPromise(commands);
-        })
-      );
-    },
-
-    getCommands(query: string, expr: Expr) {
+    getCommands(query: string, expr: Expr, project: Project) {
       return Effect.gen(function* () {
         log55.debug("getCommands.start", { query, expr });
 
@@ -129,7 +99,7 @@ const ctxEffect = Effect.gen(function* () {
           });
         }
 
-        const exprCommands = getExprCommands(expr);
+        const exprCommands = getExprCommands(expr, project);
         yield* Effect.promise(async () => {
           for await (const command of exprCommands) {
             log55.debug("getCommands.command.start", command);
@@ -151,15 +121,17 @@ const ctxEffect = Effect.gen(function* () {
   /**
    * @returns Generator of Effect. Not an Effect.
    */
-  async function* getExprCommands(currentExpr: Expr) {
+  async function* getExprCommands(currentExpr: Expr, project: Project) {
     for await (const ancestor of ExItem.getAncestors(currentExpr)) {
       yield* getExprCommands2(currentExpr, ancestor);
     }
-    console.log(getExFuncCommands);
-    // yield* getExFuncCommands(currentExpr);
+    yield* getExFuncCommands(project, currentExpr);
   }
 
-  function getExFuncCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
+  function getExFuncCommands(
+    project: Project,
+    currentExpr: Expr
+  ): Effect.Effect<ExprSelectOption>[] {
     return project.exFuncs.items.map((exFunc) => {
       const extracted = {
         label: exFunc.name$.value,
