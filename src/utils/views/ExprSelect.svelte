@@ -34,6 +34,7 @@
       scope
     );
 
+    yield* Effect.sleep(0);
     ready = true;
   }).pipe(DexRuntime.runPromise);
 </script>

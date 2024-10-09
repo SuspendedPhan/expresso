@@ -47,24 +47,9 @@ export function createFieldValueData<T extends EditableFocus>(
       .editingFocus$(init.focusIsFn, true)
       .pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
 
-    const notEditingFocus$ = focusCtx
-      .editingFocus$(init.focusIsFn, false)
-      .pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
-
     const isEditing$ = editingFocus$.pipe(map((f) => f !== false));
 
-    keyboardCtx
-      .onKeydown2$({
-        keys: "e",
-        data$: notEditingFocus$,
-        preventDefault: true,
-      })
-      .subscribe(() => {
-        log55.debug("edit");
-
-        focusCtx.setFocus(init.createEditingFocusFn(true));
-      });
-
+    yield* keyboardCtx.registerEditKey(init);
     keyboardCtx.registerCancel(editingFocus$);
 
     const result: FieldValueData = {

@@ -1,5 +1,13 @@
 import { Effect, Layer } from "effect";
-import { filter, fromEvent, map, of, switchMap, tap } from "rxjs";
+import {
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+  of,
+  switchMap,
+  tap,
+} from "rxjs";
 import type { Focus } from "src/focus/Focus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { log5 } from "src/utils/utils/Log5";
@@ -66,7 +74,10 @@ const ctxEffect = Effect.gen(function* () {
     },
 
     registerCancel<T>(data$: OBS<T | false>) {
-      this.onKeydown$("Escape", data$).subscribe(() => {
+      this.onKeydown$(
+        "Escape",
+        data$.pipe(distinctUntilChanged<T | false>())
+      ).subscribe(() => {
         focusCtx.popFocus();
       });
     },

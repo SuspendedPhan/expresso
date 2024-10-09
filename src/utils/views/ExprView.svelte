@@ -1,47 +1,26 @@
 <script lang="ts">
-  import { of, switchAll, switchMap, type Observable } from "rxjs";
+  import { of, switchMap, type Observable, map, tap } from "rxjs";
 
   import assert from "assert-ts";
+  import { Effect } from "effect";
+  import { KeyboardCtx } from "src/ctx/KeyboardCtx";
   import { ExFunc } from "src/ex-object/ExFunc";
   import { Expr, ExprFactory } from "src/ex-object/Expr";
-  import {
-    ExprFocus,
-    ExprFocusFactory,
-    type ExprFocusKind,
-  } from "src/focus/ExprFocus";
+  import { ExprFocusFactory, type ExprFocusKind } from "src/focus/ExprFocus";
   import { FocusCtx } from "src/focus/FocusCtx";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { log5 } from "src/utils/utils/Log5";
-  import { RxFns } from "src/utils/utils/Utils";
+  import { RxFns, type OBS } from "src/utils/utils/Utils";
   import ExprSelect from "src/utils/views/ExprSelect.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import { Effect } from "effect";
-  import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 
   const log55 = log5("ExprView.svelte");
 
   export let expr: Expr;
   export let elementLayout: ElementLayout;
-
-  let exprFocused = false;
-  let exprCommandFocused = false;
-  RxFns.onMount$()
-    .pipe(
-      switchMap(() => DexRuntime.runPromise(FocusCtx.focus$)),
-      switchAll()
-    )
-    .subscribe((focus) => {
-      if (isType(focus, ExprFocusFactory.Expr) && focus.expr === expr) {
-        exprFocused = focus.expr === expr;
-        exprCommandFocused = focus.isEditing;
-      } else {
-        exprFocused = false;
-        exprCommandFocused = false;
-      }
-    });
 
   let args$: Observable<readonly Expr[]>;
   if (isType(expr, ExprFactory.Call)) {
@@ -92,44 +71,65 @@
     );
   }
 
+  let ready = false;
+  let isEditing$: OBS<boolean>;
+  let exprFocused$: OBS<boolean>;
+
   Effect.gen(function* () {
     const keyboardCtx = yield* KeyboardCtx;
+    const focusCtx = yield* FocusCtx;
+
     yield* keyboardCtx.registerEditKey<ExprFocusKind["Expr"]>({
       createEditingFocusFn: (isEditing) =>
         ExprFocusFactory.Expr({ expr, isEditing }),
       focusIsFn: isType(ExprFocusFactory.Expr),
       filterFn: (f) => f.expr === expr,
     });
+
+    exprFocused$ = focusCtx.mapFocus$(
+      (f) => isType(f, ExprFocusFactory.Expr) && f.expr === expr
+    );
+
+    isEditing$ = focusCtx.mapFocus$(
+      (f) => isType(f, ExprFocusFactory.Expr) && f.expr === expr && f.isEditing
+    );
+
+    keyboardCtx.registerCancel(isEditing$.pipe(map((isEditing) => !isEditing)));
+    ready = true;
   }).pipe(DexRuntime.runPromise);
 </script>
 
-<NodeView {elementLayout} elementKey={expr.id}>
-  <FocusView focused={exprFocused} on:mousedown={handleMousedown}>
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-    <div
-      class="rounded-sm card card-compact card-bordered px-2 container bg-base-100 font-mono"
-      on:mouseover={handleMouseOver}
-      on:mouseleave={handleMouseLeave}
-    >
-      {#if tooltipVisible}
-        <span
-          class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2 z-10"
-          >Expr {expr.ordinal}</span
-        >
-      {/if}
-      <span>{$text$}</span>
+{#if ready}
+  <NodeView {elementLayout} elementKey={expr.id}>
+    <FocusView focused={$exprFocused$} on:mousedown={handleMousedown}>
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+      <div
+        class="rounded-sm card card-compact card-bordered px-2 container bg-base-100 font-mono"
+        on:mouseover={handleMouseOver}
+        on:mouseleave={handleMouseLeave}
+      >
+        {#if tooltipVisible}
+          <span
+            class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2 z-10"
+            >Expr {expr.ordinal}</span
+          >
+        {/if}
+        <span>{$text$}</span>
 
-      <ExprSelect {expr} />
+        {#if $isEditing$}
+          <ExprSelect {expr} />
+        {/if}
 
-      <div class="pl-2">
-        {#each $args$ as arg (arg.id)}
-          <svelte:self expr={arg} {elementLayout} />
-        {/each}
+        <div class="pl-2">
+          {#each $args$ as arg (arg.id)}
+            <svelte:self expr={arg} {elementLayout} />
+          {/each}
+        </div>
       </div>
-    </div>
-  </FocusView>
-</NodeView>
+    </FocusView>
+  </NodeView>
+{/if}
 
 <style>
 </style>
