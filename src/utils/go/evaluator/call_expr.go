@@ -69,7 +69,7 @@ func (expr *CallExpr) Arg(index int) *Expr {
 	return arg
 }
 
-func (expr *CallExpr) ExFunc() *ExFunc {
+func (expr *CallExpr) ExFunc() *CustomExFunc {
 	exFunc, found := expr.Evaluator.ExFuncById[expr.exFuncId]
 	if !found {
 		panic("exFunc not found")

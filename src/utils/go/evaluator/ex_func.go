@@ -1,11 +1,9 @@
 package evaluator
 
-type ExFunc struct {
-	Id         string
-	ExFuncType string
-	Evaluator  *Evaluator
+type CustomExFunc struct {
+	Id        string
+	Evaluator *Evaluator
 
-	// Only on CustomExFuncs
 	ExprId       string
 	ParameterIds []string
 }
@@ -15,20 +13,10 @@ func (e *Evaluator) ExFuncCreate(id string) {
 		println("Warning: ExFunc with this ID already exists")
 	}
 
-	e.ExFuncById[id] = &ExFunc{
+	e.ExFuncById[id] = &CustomExFunc{
 		Id:        id,
 		Evaluator: e,
 	}
-}
-
-func (e *Evaluator) ExFuncSetType(id string, exFuncType string) {
-	exFunc, found := e.ExFuncById[id]
-
-	if !found {
-		panic("ExFunc not found")
-	}
-
-	exFunc.ExFuncType = exFuncType
 }
 
 func (e *Evaluator) ExFuncSetExpr(id string, exprId string) {

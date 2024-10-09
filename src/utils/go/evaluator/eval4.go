@@ -89,18 +89,31 @@ func (e *Evaluator) EvalExpr(ctx *EvaluationCtx, expr *Expr, path *PropertyInsta
 }
 
 func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *PropertyInstancePath) DexValue {
-	exFunc := callExpr.ExFunc()
 	args := callExpr.Args()
-	switch exFunc.ExFuncType {
-	case "Custom":
+
+	if callExpr.exFuncType == "ExFunc.Custom" {
+		// exFunc := callExpr.ExFunc()
 		panic("Custom exFunc not implemented")
-	case "System":
-		if len(args) != 2 {
-			panic(fmt.Errorf("expected 2 args, got %v", len(args)))
-		}
-		return e.EvalExpr(ctx, args[0], path) * e.EvalExpr(ctx, args[1], path)
+	}
+
+	if len(args) != 2 {
+		panic(fmt.Errorf("expected 2 args, got %v", len(args)))
+	}
+
+	arg0 := e.EvalExpr(ctx, args[0], path)
+	arg1 := e.EvalExpr(ctx, args[1], path)
+
+	switch callExpr.exFuncType {
+	case "ExFunc.System/Add":
+		return arg0 + arg1
+	case "ExFunc.System/Subtract":
+		return arg0 - arg1
+	case "ExFunc.System/Multiply":
+		return arg0 * arg1
+	case "ExFunc.System/Divide":
+		return arg0 / arg1
 	default:
-		panic(fmt.Errorf("unknown exFunc type: %v", exFunc.ExFuncType))
+		panic(fmt.Errorf("unknown exFunc type: %v", callExpr.exFuncType))
 	}
 }
 

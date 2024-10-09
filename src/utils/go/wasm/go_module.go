@@ -179,16 +179,10 @@ func bootstrapGoModule() {
 		}),
 	}))
 
-	goModule.Set("ExFunc", js.ValueOf(map[string]interface{}{
+	goModule.Set("CustomExFunc", js.ValueOf(map[string]interface{}{
 		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			exFuncId := args[0].String()
 			ev.ExFuncCreate(exFuncId)
-			return nil
-		}),
-		"setType": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
-			exFuncId := args[0].String()
-			exFuncType := args[1].String()
-			ev.ExFuncSetType(exFuncId, exFuncType)
 			return nil
 		}),
 		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {

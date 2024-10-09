@@ -255,22 +255,29 @@ const ctxEffect = Effect.gen(function* () {
                     log55.debug("GoModule: Creating CallExpr", expr.id);
                     goModule.CallExpr.create(expr.id);
 
-                    EffectUtils.obsToStream(expr.exFunc$).pipe(
+                    yield* EffectUtils.obsToStream(expr.exFunc$).pipe(
                       Stream.runForEach((exFunc) => {
                         return Effect.gen(function* () {
                           assert(exFunc !== null);
+                          log55.log3(
+                            14,
+                            "GoModule: Setting CallExpr ExFuncType",
+                            expr.id,
+                            exFunc.type
+                          );
+                          goModule.CallExpr.setExFuncType(expr.id, exFunc.type);
                           if (exFunc.type === "ExFunc.Custom") {
-                            log55.debug(
+                            log55.log3(
+                              14,
                               "GoModule: Setting CallExpr ExFunc",
                               expr.id,
                               exFunc.id
                             );
                             goModule.CallExpr.setExFunc(expr.id, exFunc.id);
-                          } else {
-                            goModule.CallExpr.setExFuncType(expr.id, exFunc.type);
                           }
                         });
-                      })
+                      }),
+                      Effect.forkIn(expr.scope)
                     )
 
                     yield* Effect.forkDaemon(
