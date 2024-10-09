@@ -14,6 +14,7 @@ import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
 import { isType } from "variant";
 import { ComboboxCtx } from "../views/Combobox";
+import { Project } from "src/ex-object/Project";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -30,6 +31,7 @@ export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
+  const project = yield* Project.activeProject;
 
   return {
     createComboboxPropsIn(expr: Expr) {
@@ -74,7 +76,7 @@ const ctxEffect = Effect.gen(function* () {
         //       if (Option.isNone(option)) {
         //         return;
         //       }
-        
+
         //       yield* option.value.execute();
         //     });
         //   }),
@@ -153,7 +155,25 @@ const ctxEffect = Effect.gen(function* () {
     for await (const ancestor of ExItem.getAncestors(currentExpr)) {
       yield* getExprCommands2(currentExpr, ancestor);
     }
+    console.log(getExFuncCommands);
+    // yield* getExFuncCommands(currentExpr);
   }
+
+  function getExFuncCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
+    return project.exFuncs.items.map((exFunc) => {
+      const extracted = {
+        label: exFunc.name$.value,
+        execute() {
+          return Effect.gen(function* () {
+            const callExpr = yield* ExprFactory2.Call({ exFunc });
+            yield* Expr.replaceExpr(currentExpr, callExpr);
+          });
+        },
+      };
+      return Effect.succeed(extracted);
+    });
+  }
+
   function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {
     const referenceExprs = getReferences();
     for (const referenceExpr of referenceExprs) {
