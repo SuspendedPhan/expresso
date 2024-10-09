@@ -19,7 +19,7 @@
   // todp: popover API
 </script>
 
-<div class="flex flex-row">
+<div class="flex flex-row relative">
   <FieldLabel label={propsIn.label} />
   <FocusView
     on:mousedown={handleClick}

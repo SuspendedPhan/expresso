@@ -372,13 +372,9 @@ const ctxEffect = Effect.gen(function* () {
         log55.log3(14, "Go: Adding ExFunc", exFunc.id);
         goModule.CustomExFunc.create(exFunc.id);
 
-        console.log("hi");
-        console.log("ExFunc parameters", exFunc.parameters.items);
-
         yield* exFunc.parameters.itemStream.pipe(
           Stream.runForEach((parameters) => {
             return Effect.gen(function* () {
-              console.log("ExFunc parameters", parameters);
               const parameterIds = parameters.map((parameter) => parameter.id);
               log55.log3(
                 14,

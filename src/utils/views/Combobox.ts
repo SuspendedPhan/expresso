@@ -115,11 +115,11 @@ const ctxEffect = Effect.gen(function* () {
                     const isFocused = Stream.map(
                       focusedIndex.changes,
                       (focusedIndex_) => {
-                        console.log(
-                          "Focused index changed",
-                          index,
-                          focusedIndex_
-                        );
+                        // console.log(
+                        //   "Focused index changed",
+                        //   index,
+                        //   focusedIndex_
+                        // );
                         return Option.match(focusedIndex_, {
                           onNone: () => false,
                           onSome: (i) => i === index,
@@ -180,28 +180,21 @@ const ctxEffect = Effect.gen(function* () {
         yield* Effect.forkDaemon(
           Stream.runForEach(optionImpls.changes, (optionImpls_) => {
             return Effect.gen(function* () {
-              console.log("Options changed 1");
               const focusedIndex_ = yield* focusedIndex.get;
               const newIndex = Option.map(focusedIndex_, (i) => {
                 if (i >= optionImpls_.length) {
-                  console.log("Options changed 2");
                   return optionImpls_.length - 1;
                 }
 
                 if (i < 0) {
-                  console.log("Options changed 2.1");
                   return 0;
                 }
-                console.log("Options changed 3");
                 return i;
               });
               const newIndex2 = Option.orElse(newIndex, () => {
-                console.log("Options changed 4");
                 if (optionImpls_.length > 0) {
-                  console.log("Options changed 5");
                   return Option.some(0);
                 }
-                console.log("Options changed 6");
                 return Option.none();
               });
 
