@@ -38,6 +38,19 @@ func (e *Evaluator) CallExprSetArg1(id string, argId string) {
 	callExpr.arg1Id = argId
 }
 
+func (e *Evaluator) CallExprSetExFunc(id string, exFuncId string) {
+	expr, found := e.ExprById[id]
+	if !found {
+		panic("expr not found")
+	}
+	callExpr := expr.CallExpr
+	if callExpr == nil {
+		panic("expr is not a call expr")
+	}
+
+	callExpr.exFuncId = exFuncId
+}
+
 func (expr *CallExpr) Arg0() *Expr {
 	arg, found := expr.Evaluator.ExprById[expr.arg0Id]
 	if !found {
@@ -52,4 +65,12 @@ func (expr *CallExpr) Arg1() *Expr {
 		panic("arg1 not found")
 	}
 	return arg
+}
+
+func (expr *CallExpr) ExFunc() *ExFunc {
+	exFunc, found := expr.Evaluator.ExFuncById[expr.exFuncId]
+	if !found {
+		panic("exFunc not found")
+	}
+	return exFunc
 }

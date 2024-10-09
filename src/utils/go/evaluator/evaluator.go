@@ -19,6 +19,7 @@ type Evaluator struct {
 	PropertyById                    map[string]*Property
 	ExprById                        map[string]*Expr
 	ExObjectIdByCloneNumberTargetId map[string]string
+	ExFuncById                      map[string]*ExFunc
 }
 
 // NewEvaluator creates a new Evaluator instance with initialized maps.

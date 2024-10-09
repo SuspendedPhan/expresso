@@ -31,7 +31,10 @@ export default interface GoModule {
   Property: {
     create(propertyId: string): void;
     setExpr(propertyId: string, exprId: string): void;
-    setComponentParameterId(propertyId: string, componentParameterId: string): void;
+    setComponentParameterId(
+      propertyId: string,
+      componentParameterId: string
+    ): void;
   };
 
   NumberExpr: {
@@ -43,12 +46,20 @@ export default interface GoModule {
     create(id: string): void;
     setArg0(id: string, argId: string): void;
     setArg1(id: string, argId: string): void;
+    setExFunc(id: string, exFuncId: string): void;
   };
 
   ReferenceExpr: {
     create(id: string, targetId: string | null, targetKind: string): void;
     setTargetId(id: string, targetId: string): void;
     setTargetKind(id: string, targetKind: string): void;
+  };
+
+  ExFunc: {
+    create(id: string): void;
+    setType(id: string, type: string): void;
+    setExpr(id: string, exprId: string): void;
+    setParameters(id: string, parameterIds: string[]);
   };
 
   Evaluator: {
@@ -74,7 +85,10 @@ export interface EvaluationResult {
   getPropertyResultCount(objectResultIndex: number): number;
 
   getPropertyId(objectResultIndex: number, propertyResultIndex: number): string;
-  getPropertyValue(objectResultIndex: number, propertyResultIndex: number): number;
+  getPropertyValue(
+    objectResultIndex: number,
+    propertyResultIndex: number
+  ): number;
 
   dispose(): void;
 }

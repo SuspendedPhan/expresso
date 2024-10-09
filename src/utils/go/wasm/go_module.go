@@ -137,6 +137,13 @@ func bootstrapGoModule() {
 			ev.CallExprSetArg1(id, argId)
 			return nil
 		}),
+		"setExFunc": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			id := args[0].String()
+			exFuncId := args[1].String()
+			logger.Log("CallExpr.setExFunc", id, exFuncId)
+			ev.CallExprSetExFunc(id, exFuncId)
+			return nil
+		}),
 	}))
 
 	goModule.Set("ReferenceExpr", js.ValueOf(map[string]interface{}{
@@ -167,6 +174,35 @@ func bootstrapGoModule() {
 			targetKind := args[1].String()
 			logger.Log("ReferenceExpr.setTargetKind", id, targetKind)
 			ev.ReferenceExprSetTargetKind(id, targetKind)
+			return nil
+		}),
+	}))
+
+	goModule.Set("ExFunc", js.ValueOf(map[string]interface{}{
+		"create": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			exFuncId := args[0].String()
+			ev.ExFuncCreate(exFuncId)
+			return nil
+		}),
+		"setType": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			exFuncId := args[0].String()
+			exFuncType := args[1].String()
+			ev.ExFuncSetType(exFuncId, exFuncType)
+			return nil
+		}),
+		"setExpr": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			exFuncId := args[0].String()
+			exprId := args[1].String()
+			ev.ExFuncSetExpr(exFuncId, exprId)
+			return nil
+		}),
+		"setParameters": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			exFuncId := args[0].String()
+			parameterIds := make([]string, args[1].Length())
+			for i := 0; i < args[1].Length(); i++ {
+				parameterIds[i] = args[1].Index(i).String()
+			}
+			ev.ExFuncSetParameters(exFuncId, parameterIds)
 			return nil
 		}),
 	}))

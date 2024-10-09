@@ -1,0 +1,10 @@
+TODO:
+- Go
+    - Eval4
+    - Parameter reference
+    - CallExpr arg list
+    - System ex func eval
+
+- GoBridge
+    - CallExpr
+    - ExFunc
