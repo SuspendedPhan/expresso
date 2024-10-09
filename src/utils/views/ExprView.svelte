@@ -4,7 +4,11 @@
   import assert from "assert-ts";
   import { ExFunc } from "src/ex-object/ExFunc";
   import { Expr, ExprFactory } from "src/ex-object/Expr";
-  import { ExprFocusFactory } from "src/focus/ExprFocus";
+  import {
+    ExprFocus,
+    ExprFocusFactory,
+    type ExprFocusKind,
+  } from "src/focus/ExprFocus";
   import { FocusCtx } from "src/focus/FocusCtx";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { log5 } from "src/utils/utils/Log5";
@@ -14,6 +18,8 @@
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import { Effect } from "effect";
+  import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 
   const log55 = log5("ExprView.svelte");
 
@@ -85,6 +91,16 @@
       FocusCtx.setFocus(ExprFocusFactory.Expr({ expr, isEditing: false }))
     );
   }
+
+  Effect.gen(function* () {
+    const keyboardCtx = yield* KeyboardCtx;
+    yield* keyboardCtx.registerEditKey<ExprFocusKind["Expr"]>({
+      createEditingFocusFn: (isEditing) =>
+        ExprFocusFactory.Expr({ expr, isEditing }),
+      focusIsFn: isType(ExprFocusFactory.Expr),
+      filterFn: (f) => f.expr === expr,
+    });
+  }).pipe(DexRuntime.runPromise);
 </script>
 
 <NodeView {elementLayout} elementKey={expr.id}>

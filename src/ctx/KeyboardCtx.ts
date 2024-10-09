@@ -1,10 +1,18 @@
 import { Effect, Layer } from "effect";
 import { filter, fromEvent, map, of, switchMap, tap } from "rxjs";
+import type { Focus } from "src/focus/Focus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { log5 } from "src/utils/utils/Log5";
-import type { DexEffectSuccess, OBS } from "src/utils/utils/Utils";
+import { RxFns, type DexEffectSuccess, type OBS } from "src/utils/utils/Utils";
+import type { EditableFocus } from "src/utils/views/Field";
 
 const log55 = log5("KeyboardCtx.ts");
+
+interface RegisterEditArgs<T extends EditableFocus> {
+  focusIsFn: (focus: Focus) => focus is T;
+  createEditingFocusFn: (isEditing: boolean) => Focus;
+  filterFn(focus: T): boolean;
+}
 
 export enum KeyboardResult {
   OutOfScope,
@@ -33,7 +41,9 @@ const ctxEffect = Effect.gen(function* () {
       const keyArr = keys.split(",");
 
       return data$.pipe(
-        tap((data) => { log55.log3(9, "onKeydown2$.data", data); }),
+        tap((data) => {
+          log55.log3(9, "onKeydown2$.data", data);
+        }),
         switchMap((data) => {
           if (data === false) {
             return of();
@@ -58,6 +68,23 @@ const ctxEffect = Effect.gen(function* () {
     registerCancel<T>(data$: OBS<T | false>) {
       this.onKeydown$("Escape", data$).subscribe(() => {
         focusCtx.popFocus();
+      });
+    },
+
+    registerEditKey<T extends EditableFocus>(args: RegisterEditArgs<T>) {
+      return Effect.gen(this, function* () {
+        const notEditingFocus$ = focusCtx
+          .editingFocus$(args.focusIsFn, false)
+          .pipe(RxFns.getOrFalse((f) => args.filterFn(f)));
+
+        this.onKeydown2$({
+          keys: "e",
+          data$: notEditingFocus$,
+          preventDefault: true,
+        }).subscribe(() => {
+          log55.debug("edit");
+          focusCtx.setFocus(args.createEditingFocusFn(true));
+        });
       });
     },
   };
