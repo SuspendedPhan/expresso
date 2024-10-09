@@ -14,6 +14,8 @@
   import { isType, matcher } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import ExprSelect from "src/utils/views/ExprSelect.svelte";
+  import Field from "./Field.svelte";
 
   const log55 = log5("ExprView.svelte");
 
@@ -104,9 +106,7 @@
       {/if}
       <span>{$text$}</span>
 
-      {#if exprCommandFocused}
-        <ExprCommand {expr} />
-      {/if}
+      <ExprSelect {expr} />
 
       <div class="pl-2">
         {#each $args$ as arg (arg.id)}

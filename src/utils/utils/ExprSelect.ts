@@ -17,7 +17,7 @@ import { isType } from "variant";
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
 
-export interface ExprCommand {
+export interface ExprSelectOption {
   label: string;
   execute: () => Effect.Effect<void, never, never>;
 }
@@ -36,7 +36,7 @@ const ctxEffect = Effect.gen(function* () {
     getReplacementCommands$(
       expr: Expr,
       query$: OBS<string>
-    ): Observable<ExprCommand[]> {
+    ): Observable<ExprSelectOption[]> {
       return query$.pipe(
         switchMap(async (query) => {
           const commands = this.getCommands(query, expr);
@@ -49,7 +49,7 @@ const ctxEffect = Effect.gen(function* () {
       return Effect.gen(function* () {
         log55.debug("getCommands.start", { query, expr });
 
-        const commands: ExprCommand[] = [];
+        const commands: ExprSelectOption[] = [];
         const value = parseFloat(query);
         if (!isNaN(value)) {
           const numberExpr = yield* ExprFactory2.Number({ value });
@@ -170,7 +170,7 @@ const ctxEffect = Effect.gen(function* () {
     label: string,
     oldExpr: Expr,
     newExpr: Expr
-  ): ExprCommand {
+  ): ExprSelectOption {
     return {
       label,
       execute() {
