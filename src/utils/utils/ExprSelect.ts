@@ -15,6 +15,7 @@ import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
 import { ComboboxCtx } from "../views/Combobox";
+import { DexUtils } from "./DexUtils";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -134,20 +135,21 @@ const ctxEffect = Effect.gen(function* () {
     });
   }
 
-  function getSystemExFuncCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
-    return Object.values(systemExFuncCtx.systemExFuncs).map(
-      (systemExFunc) =>
-        Effect.succeed({
-          label: systemExFunc.shortLabel,
-          execute() {
-            return Effect.gen(function* () {
-              const callExpr = yield* ExprFactory2.Call({
-                exFunc: systemExFunc,
-              });
-              yield* Expr.replaceExpr(currentExpr, callExpr);
+  function getSystemExFuncCommands(
+    currentExpr: Expr
+  ): Effect.Effect<ExprSelectOption>[] {
+    return Object.values(systemExFuncCtx.systemExFuncs).map((systemExFunc) =>
+      Effect.succeed({
+        label: systemExFunc.shortLabel,
+        execute() {
+          return Effect.gen(function* () {
+            const callExpr = yield* ExprFactory2.Call({
+              exFunc: systemExFunc,
             });
-          },
-        } as ExprSelectOption)
+            yield* Expr.replaceExpr(currentExpr, callExpr);
+          });
+        },
+      } as ExprSelectOption)
     );
   }
 
@@ -162,20 +164,27 @@ const ctxEffect = Effect.gen(function* () {
           Expr.getReferenceTargetName$(target)
         );
 
-        const targetParent = yield* EffectUtils.firstValueFrom(target.parent$);
-        let label;
-        log55.debug(
-          "Creating ExprReference command: Getting parent name for label",
-          targetParent
-        );
-        if (isType(targetParent, ExObjectFactory)) {
-          const parentName = yield* EffectUtils.firstValueFrom(
-            targetParent.name$
+        const getLabel = Effect.gen(function* () {
+          if (DexUtils.hasTag(target)) {
+            assert(target._tag === "GlobalProperty");
+            return target.id;
+          }
+
+          const targetParent = yield* EffectUtils.firstValueFrom(
+            target.parent$
           );
-          label = `${parentName}.${name}`;
-        } else {
-          label = name;
-        }
+
+          if (isType(targetParent, ExObjectFactory)) {
+            const parentName = yield* EffectUtils.firstValueFrom(
+              targetParent.name$
+            );
+            return `${parentName}.${name}`;
+          } else {
+            return name;
+          }
+        });
+
+        const label = yield* getLabel;
 
         return {
           label,
