@@ -282,6 +282,7 @@ export const Expr = {
 
 function addToProject(expr: Expr): Effect.Effect<void, never, never> {
   return Effect.gen(function* () {
+    console.log("addToProject", expr.id);
     yield* ExItem.getProject3(expr).pipe(
       Stream.unwrap,
       Stream.take(1),

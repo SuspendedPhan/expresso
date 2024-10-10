@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Effect } from "effect";
   import { map, of, switchAll } from "rxjs";
-  import { type CustomExFunc } from "src/ex-object/ExFunc";
+  import { ExFunc, type CustomExFunc } from "src/ex-object/ExFunc";
   import {
     ExFuncFocusFactory,
     type ExFuncFocusKind,
@@ -73,7 +73,7 @@
   function handleMouseDown() {}
 
   function addParameter() {
-    DexRuntime.runPromise(exFunc.addParameterBlank());
+    ExFunc.addParameterBlank(exFunc).pipe(DexRuntime.runPromise);
   }
 </script>
 

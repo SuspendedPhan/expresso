@@ -32,8 +32,6 @@ type CustomExFunc_ = ExItemBase & {
   parameters: ObservableArray<ExFuncParameter>;
 };
 
-type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
-
 interface SystemExFunc_ {
   id: string;
   shortLabel: string;
@@ -49,7 +47,7 @@ export type SystemExFunc = ReturnType<typeof SystemExFuncFactory>;
 
 export const CustomExFuncFactory = variation(
   "ExFunc.Custom",
-  fields<CustomExFunc2_>()
+  fields<CustomExFunc_>()
 );
 export type CustomExFunc = ReturnType<typeof CustomExFuncFactory>;
 
@@ -93,12 +91,9 @@ export const CustomExFuncFactory2 = {
           creationArgs2.exFuncParameterArr
         ),
       };
-      const customExFunc2_: CustomExFunc2_ = {
-        ...customExFunc_,
-        ...methodsFactory(customExFunc_),
-      };
-      log55.debug("CustomExFuncFactory2.Custom", customExFunc2_);
-      const exFunc = CustomExFuncFactory(customExFunc2_);
+      
+      log55.debug("CustomExFuncFactory2.Custom", customExFunc_);
+      const exFunc = CustomExFuncFactory(customExFunc_);
       creationArgs2.expr.parent$.next(exFunc);
       return exFunc;
     });
@@ -112,16 +107,12 @@ export const ExFunc = {
     }
     return of(exFunc.id);
   },
-};
 
-function methodsFactory(exFunc: CustomExFunc_) {
-  return {
-    addParameterBlank() {
-      return Effect.gen(function* () {
-        const param = yield* ExFuncParameterFactory2({});
-        yield* exFunc.parameters.push(param);
-        return param;
-      });
-    },
-  };
-}
+  addParameterBlank(exFunc: CustomExFunc) {
+    return Effect.gen(function* () {
+      const param = yield* ExFuncParameterFactory2({});
+      yield* exFunc.parameters.push(param);
+      return param;
+    });
+  },
+};

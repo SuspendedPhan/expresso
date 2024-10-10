@@ -135,6 +135,7 @@ export const ExItem = {
   getProject3(item: ExItem, path?: string): Effect.Effect<Stream.Stream<Project>> {
     return Effect.gen(function* () {
       const newPath = `${path} -> ${item.id}`;
+      console.log("getProject3: item", newPath);
 
       return yield* Effect.gen(function* () {
         return item.parent.changes.pipe(

@@ -258,6 +258,7 @@ export const Project = {
       return Effect.gen(function* () {
         const exFunc = yield* CustomExFuncFactory2.Custom({});
         yield* project.exFuncs.push(exFunc);
+        exFunc.parent$.next(project);
         return exFunc;
       });
     },
