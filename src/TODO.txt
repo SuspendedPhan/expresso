@@ -1,0 +1,5 @@
+TODO:
+- Clone count 0
+- Remove old ex items from go module
+- File system API
+- Global properties
