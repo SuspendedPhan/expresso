@@ -3,15 +3,17 @@
 import assert from "assert-ts";
 import { Effect, Scope, Stream } from "effect";
 import { of } from "rxjs";
-import { CloneNumberTargetFactory, type CloneNumberTarget } from "src/ex-object/CloneNumberTarget";
+import {
+  CloneNumberTargetFactory,
+  type CloneNumberTarget,
+} from "src/ex-object/CloneNumberTarget";
 import {
   ComponentParameterFactory,
   type ComponentParameterKind,
 } from "src/ex-object/ComponentParameter";
 import {
   CustomExFuncFactory,
-  SystemExFuncFactory,
-  type ExFunc,
+  type ExFunc
 } from "src/ex-object/ExFunc";
 import {
   ExFuncParameterFactory,
@@ -128,13 +130,19 @@ export const ExprFactory2 = {
       };
 
       const { exFunc } = creationArgs2;
-      const isExFunc = isOfVariant(exFunc, SystemExFuncFactory);
       const argsEmpty = creationArgs2.args.length === 0;
-      const makeArgs = argsEmpty && isExFunc;
-      if (makeArgs) {
-        for (let index = 0; index < exFunc.parameterCount; index++) {
-          const arg = yield* ExprFactory2.Number({ value: 0 });
-          creationArgs2.args.push(arg);
+      if (argsEmpty) {
+        if (exFunc?.type === "ExFunc.Custom") {
+          const params = exFunc.parameters.items;
+          for (const _ of params) {
+            const arg = yield* ExprFactory2.Number({ value: 0 });
+            creationArgs2.args.push(arg);
+          }
+        } else if (exFunc !== null) {
+          for (let index = 0; index < exFunc.parameterCount; index++) {
+            const arg = yield* ExprFactory2.Number({ value: 0 });
+            creationArgs2.args.push(arg);
+          }
         }
       }
 

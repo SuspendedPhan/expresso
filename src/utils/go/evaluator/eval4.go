@@ -29,10 +29,11 @@ func (e *Evaluator) EvaluatePropertyInstances(
 
 	resultByPropertyInstancePath := make(map[string]*PropertyInstanceResult)
 	evaluationCtx := &EvaluationCtx{
-		resultByPropertyInstancePath: resultByPropertyInstancePath,
-		propertyPathByProperty:       MakePropertyPathMap(paths),
-		cloneCountResults:            cloneCountResults,
-		evaluator:                    e,
+		resultByPropertyInstancePath:            resultByPropertyInstancePath,
+		propertyPathByProperty:                  MakePropertyPathMap(paths),
+		cloneCountResults:                       cloneCountResults,
+		evaluator:                               e,
+		scopedParameterValueByExFuncParameterId: make(map[string]DexValue),
 	}
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
@@ -92,9 +93,25 @@ func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *P
 	args := callExpr.Args()
 
 	if callExpr.exFuncType == "ExFunc.Custom" {
+		paramIds := callExpr.ExFunc().ParameterIds
+		if len(paramIds) != len(args) {
+			panic(fmt.Errorf("expected %v args, got %v", len(paramIds), len(args)))
+		}
+
+		for i, arg := range args {
+			paramId := paramIds[i]
+			value := e.EvalExpr(ctx, arg, path)
+			ctx.SetExFuncParameterValue(paramId, value)
+		}
+
 		exFunc := callExpr.ExFunc()
 		rootExpr := exFunc.Expr()
-		return e.EvalExpr(ctx, rootExpr, path)
+		value := e.EvalExpr(ctx, rootExpr, path)
+		for _, id := range paramIds {
+			ctx.DeleteExFuncParameterValue(id)
+		}
+
+		return value
 	}
 
 	if len(args) != 2 {
@@ -140,6 +157,10 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 	if componentParameterPropertyInstancePath, ok := referenceExpr.GetComponentParameterPropertyInstancePath(ctx, path); ok {
 		result := e.EvaluatePropertyInstancePath(ctx, componentParameterPropertyInstancePath)
 		return result.Value
+	}
+
+	if exFuncParameterValue, ok := referenceExpr.GetExFuncParameterValue(ctx); ok {
+		return exFuncParameterValue
 	}
 
 	panic(fmt.Errorf("unknown reference kind: %v", targetKind))

@@ -146,3 +146,11 @@ func (expr *ReferenceExpr) GetComponentParameterPropertyInstancePath(ctx *Evalua
 	parameterPath := ctx.GetComponentParameterPropertyInstancePath(expr.TargetId, path)
 	return parameterPath, true
 }
+
+func (expr *ReferenceExpr) GetExFuncParameterValue(ctx *EvaluationCtx) (DexValue, bool) {
+	if expr.TargetKind != "ExFuncParameter" {
+		return 0, false
+	}
+
+	return ctx.GetExFuncParameterValue(expr.TargetId), true
+}

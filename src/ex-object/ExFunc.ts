@@ -40,6 +40,9 @@ type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
 
 export const SystemExFuncFactory = dexScopedVariant("ExFunc.System", {
   Add: () => ({ name: "Add", parameterCount: 2 }),
+  Subtract: () => ({ name: "Subtract", parameterCount: 2 }),
+  Multiply: () => ({ name: "Multiply", parameterCount: 2 }),
+  Divide: () => ({ name: "Divide", parameterCount: 2 }),
 });
 
 export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;

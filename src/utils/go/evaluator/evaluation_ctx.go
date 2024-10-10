@@ -3,10 +3,11 @@ package evaluator
 import "fmt"
 
 type EvaluationCtx struct {
-	resultByPropertyInstancePath map[string]*PropertyInstanceResult
-	propertyPathByProperty       map[*Property]*PropertyPath
-	cloneCountResults            []*CloneCountResult
-	evaluator                    *Evaluator
+	resultByPropertyInstancePath            map[string]*PropertyInstanceResult
+	propertyPathByProperty                  map[*Property]*PropertyPath
+	cloneCountResults                       []*CloneCountResult
+	evaluator                               *Evaluator
+	scopedParameterValueByExFuncParameterId map[string]DexValue
 }
 
 // GetPropertyInstanceResult returns the result of the referenced property given the instance path.
@@ -87,4 +88,21 @@ func (ctx *EvaluationCtx) NewPropertyInstancePath(path *PropertyInstancePath, in
 	})
 
 	return &PropertyInstancePath{segments: segments}
+}
+
+// GetExFuncParameterValue
+func (ctx *EvaluationCtx) GetExFuncParameterValue(parameterId string) DexValue {
+	value, found := ctx.scopedParameterValueByExFuncParameterId[parameterId]
+	if !found {
+		panic(fmt.Errorf("parameter value not found: %v", parameterId))
+	}
+	return value
+}
+
+func (ctx *EvaluationCtx) SetExFuncParameterValue(parameterId string, value DexValue) {
+	ctx.scopedParameterValueByExFuncParameterId[parameterId] = value
+}
+
+func (ctx *EvaluationCtx) DeleteExFuncParameterValue(parameterId string) {
+	delete(ctx.scopedParameterValueByExFuncParameterId, parameterId)
 }
