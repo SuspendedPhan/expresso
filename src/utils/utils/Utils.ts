@@ -16,7 +16,9 @@ import { onMount } from "svelte";
 
 const log55 = log5("Utils.ts");
 
-export type DexEffectSuccess<T> = T extends Effect.Effect<infer A, any, any> ? A : never;
+export type DexEffectSuccess<T> = T extends Effect.Effect<infer A, any, any>
+  ? A
+  : never;
 
 export type OBS<T> = Observable<T>;
 export type SUB<T> = Subject<T>;
@@ -119,7 +121,9 @@ export namespace RxFns {
     );
   }
 
-  export function getOrFalsePred<T, T2 extends T>(predicate: (obj: T) => obj is T2) {
+  export function getOrFalsePred<T, T2 extends T>(
+    predicate: (obj: T) => obj is T2
+  ) {
     return pipe(
       map((obj: T | false) => {
         if (obj === false) {
@@ -178,5 +182,12 @@ export namespace Utils {
     predicate: (obj: T) => boolean
   ): T | false {
     return predicate(obj) ? obj : false;
+  }
+
+  export function typeOrTag<T extends { type: string } | { _tag: string }>(
+    obj: T
+  ): string {
+    const obj2 = obj as any;
+    return obj2.type ?? obj2._tag;
   }
 }

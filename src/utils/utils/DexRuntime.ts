@@ -13,6 +13,7 @@ import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
 import { CloneNumberTargetCtxLive } from "src/ex-object/CloneNumberTarget";
+import { GlobalPropertyCtxLive } from "src/ex-object/GlobalProperty";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { FocusCtxLive } from "src/focus/FocusCtx";
@@ -59,6 +60,7 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(ComboboxCtxLive),
   Layer.provideMerge(ComponentSelectCtxLive),
   Layer.provideMerge(SystemExFuncCtxLive),
+  Layer.provideMerge(GlobalPropertyCtxLive),
   Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All))
 );
 

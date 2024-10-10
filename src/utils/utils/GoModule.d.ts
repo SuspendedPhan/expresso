@@ -57,13 +57,18 @@ export default interface GoModule {
 
   Evaluator: {
     addRootExObject(id: string): void;
-    eval(): EvaluationResult;
+    eval(globalPropertyValues: GlobalPropertyValue[]): EvaluationResult;
     reset(): void;
 
     debug(): void;
   };
 
   hello(): string;
+}
+
+export interface GlobalPropertyValue {
+  id: string;
+  value: number;
 }
 
 // ObjectInstanceResult

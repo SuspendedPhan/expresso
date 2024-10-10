@@ -39,6 +39,7 @@ import {
   type DexVariantKind,
 } from "src/utils/utils/VariantUtils4";
 import { fields, isOfVariant, isType, type VariantOf } from "variant";
+import type { GlobalProperty } from "./GlobalProperty";
 
 const log55 = log5("Expr.ts");
 
@@ -51,7 +52,8 @@ export type ReferenceTarget =
   | Property
   | ComponentParameterKind["Custom"]
   | ExFuncParameter
-  | CloneNumberTarget;
+  | CloneNumberTarget
+| GlobalProperty;
 
 interface CallExpr_ extends ExItemBase {
   args$: OBS<Expr[]>;
@@ -226,6 +228,11 @@ export const Expr = {
   getReferenceTargetName$(target: ReferenceTarget) {
     if (isOfVariant(target, PropertyFactory)) {
       return Property.Methods(target).getName$();
+    }
+
+    if ("_tag" in target) {
+      assert(target._tag === "GlobalProperty");
+      return of(target.id);
     }
 
     if (isType(target, ComponentParameterFactory.Custom)) {

@@ -240,7 +240,16 @@ func bootstrapGoModule() {
 		"eval": js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 			defer deferLogger()
 
-			evaluation := ev.Eval()
+			gps := args[0]
+			gpById := make(map[string]evaluator.DexValue)
+			for i := 0; i < gps.Length(); i++ {
+				gp := gps.Index(i)
+				gpId := gp.Get("id").String()
+				gpValue := gp.Get("value").Float()
+				gpById[gpId] = gpValue
+			}
+
+			evaluation := ev.Eval(gpById)
 
 			// fmt.Println(evaluation.String())
 

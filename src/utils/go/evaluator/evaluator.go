@@ -56,7 +56,7 @@ func (e *Evaluator) RootExObjects() []*ExObject {
 }
 
 // Eval performs the evaluation process and returns the final output.
-func (e *Evaluator) Eval() EvaluationResult {
+func (e *Evaluator) Eval(globalPropertyById map[string]DexValue) EvaluationResult {
 	// Step 1: Retrieve Root External Objects
 	rootExObjects := e.RootExObjects()
 
@@ -72,6 +72,7 @@ func (e *Evaluator) Eval() EvaluationResult {
 	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
 
 	// Step 5: Evaluate Property Instances
+	// todp: pass gpById to Evaluate
 	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths, cloneCountResults)
 
 	// Step 6: Group Object Instances

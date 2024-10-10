@@ -1,5 +1,6 @@
 import { Effect, Layer, Schedule } from "effect";
 import { GoModuleCtx, GoModuleCtxLive } from "src/ctx/GoModuleCtx";
+import { GlobalPropertyCtx } from "src/ex-object/GlobalProperty";
 import type { EvaluationResult } from "src/utils/utils/GoModule";
 import { log5 } from "src/utils/utils/Log5";
 
@@ -12,13 +13,20 @@ export class EvaluatorCtx extends Effect.Tag("EvaluatorCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const goModuleCtx = yield* GoModuleCtx;
+  const globalPropertyCtx = yield* GlobalPropertyCtx;
+
   const onEval = new Set<
     (result: EvaluationResult) => Effect.Effect<void, never, never>
   >();
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
-      const evaluation = goModule.Evaluator.eval();
+      const gps = globalPropertyCtx.globalProperties.map((gp) => ({
+        id: gp.id,
+        value: gp.eval(),
+      }));
+      const evaluation = goModule.Evaluator.eval(gps);
+      
       // console.log("Got result from Evaluator.eval()");
 
       if (evaluation !== null) {

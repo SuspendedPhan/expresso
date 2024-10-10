@@ -7,6 +7,7 @@ import { Project } from "src/ex-object/Project";
 import { PropertyFactory } from "src/ex-object/Property";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
+import { Utils } from "src/utils/utils/Utils";
 import { isType, matcher } from "variant";
 
 const log55 = log5("GoBridge.ts");
@@ -245,7 +246,7 @@ const ctxEffect = Effect.gen(function* () {
                   goModule.ReferenceExpr.create(
                     expr_.id,
                     targetId,
-                    expr_.target.type
+                    Utils.typeOrTag(expr_.target)
                   );
                 });
               })
