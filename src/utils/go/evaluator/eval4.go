@@ -6,6 +6,7 @@ func (e *Evaluator) EvaluatePropertyInstances(
 	instancePaths []*PropertyInstancePath,
 	paths []*PropertyPath,
 	cloneCountResults []*CloneCountResult,
+	globalPropertyValueById map[string]DexValue,
 ) []*PropertyInstanceResult {
 	/*
 	   results: Map<PropertyInstancePath, PropertyInstanceResult>
@@ -34,6 +35,7 @@ func (e *Evaluator) EvaluatePropertyInstances(
 		cloneCountResults:                       cloneCountResults,
 		evaluator:                               e,
 		scopedParameterValueByExFuncParameterId: make(map[string]DexValue),
+		globalPropertyValueByPropertyId:         globalPropertyValueById,
 	}
 
 	results := make([]*PropertyInstanceResult, 0, len(resultByPropertyInstancePath))
@@ -161,6 +163,10 @@ func (e *Evaluator) EvalReferenceExpr(ctx *EvaluationCtx, referenceExpr *Referen
 
 	if exFuncParameterValue, ok := referenceExpr.GetExFuncParameterValue(ctx); ok {
 		return exFuncParameterValue
+	}
+
+	if globalPropertyValue, ok := referenceExpr.GetGlobalPropertyValue(ctx); ok {
+		return globalPropertyValue
 	}
 
 	panic(fmt.Errorf("unknown reference kind: %v", targetKind))

@@ -154,3 +154,11 @@ func (expr *ReferenceExpr) GetExFuncParameterValue(ctx *EvaluationCtx) (DexValue
 
 	return ctx.GetExFuncParameterValue(expr.TargetId), true
 }
+
+func (expr *ReferenceExpr) GetGlobalPropertyValue(ctx *EvaluationCtx) (DexValue, bool) {
+	if expr.TargetKind != "GlobalProperty" {
+		return 0, false
+	}
+
+	return ctx.GetGlobalPropertyValue(expr.TargetId), true
+}

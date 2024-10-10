@@ -72,8 +72,7 @@ func (e *Evaluator) Eval(globalPropertyById map[string]DexValue) EvaluationResul
 	propertyInstancePaths := e.ExpandInstancePaths(annotatedPropertyPaths)
 
 	// Step 5: Evaluate Property Instances
-	// todp: pass gpById to Evaluate
-	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths, cloneCountResults)
+	propertyInstanceResults := e.EvaluatePropertyInstances(propertyInstancePaths, propertyPaths, cloneCountResults, globalPropertyById)
 
 	// Step 6: Group Object Instances
 	objectInstanceResults := e.GroupObjectInstances(propertyInstanceResults)

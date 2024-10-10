@@ -8,6 +8,7 @@ type EvaluationCtx struct {
 	cloneCountResults                       []*CloneCountResult
 	evaluator                               *Evaluator
 	scopedParameterValueByExFuncParameterId map[string]DexValue
+	globalPropertyValueByPropertyId         map[string]DexValue
 }
 
 // GetPropertyInstanceResult returns the result of the referenced property given the instance path.
@@ -105,4 +106,12 @@ func (ctx *EvaluationCtx) SetExFuncParameterValue(parameterId string, value DexV
 
 func (ctx *EvaluationCtx) DeleteExFuncParameterValue(parameterId string) {
 	delete(ctx.scopedParameterValueByExFuncParameterId, parameterId)
+}
+
+func (ctx *EvaluationCtx) GetGlobalPropertyValue(propertyId string) DexValue {
+	value, found := ctx.globalPropertyValueByPropertyId[propertyId]
+	if !found {
+		panic(fmt.Errorf("global property value not found: %v", propertyId))
+	}
+	return value
 }
