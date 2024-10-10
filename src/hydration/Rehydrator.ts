@@ -31,6 +31,7 @@ import {
   type ExprKind,
   type ReferenceTarget,
 } from "src/ex-object/Expr";
+import { GlobalPropertyCtx } from "src/ex-object/GlobalProperty";
 import {
   LibraryProject,
   LibraryProjectFactory2,
@@ -81,6 +82,7 @@ export class RehydratorCtx extends Effect.Tag("RehydratorCtx")<
 const ctxEffect = Effect.gen(function* () {
   const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
   const systemExFuncCtx = yield* SystemExFuncCtx;
+  const globalPropertyCtx = yield* GlobalPropertyCtx;
 
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
@@ -93,6 +95,10 @@ const ctxEffect = Effect.gen(function* () {
     ComponentParameterKind["Custom"]
   >();
   const customExFuncById = new Map<string, CustomExFunc>();
+
+  for (const globalProperty of globalPropertyCtx.globalProperties) {
+    targetById.set(globalProperty.id, globalProperty);
+  }
 
   function rehydrateLibraryProject(deProject: DehydratedLibraryProject) {
     return Effect.gen(function* () {

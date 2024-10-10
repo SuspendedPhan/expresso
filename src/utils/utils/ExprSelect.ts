@@ -16,6 +16,7 @@ import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
 import { ComboboxCtx } from "../views/Combobox";
 import { DexUtils } from "./DexUtils";
+import { GlobalPropertyCtx } from "src/ex-object/GlobalProperty";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -33,6 +34,7 @@ export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
   const systemExFuncCtx = yield* SystemExFuncCtx;
+  const globalPropertyCtx = yield* GlobalPropertyCtx;
 
   return {
     createComboboxPropsIn(expr: Expr) {
@@ -114,6 +116,7 @@ const ctxEffect = Effect.gen(function* () {
     }
 
     yield* getCustomExFuncCommands(project, currentExpr);
+    yield* getGlobalPropertyCommands(currentExpr);
     yield* getSystemExFuncCommands(currentExpr);
   }
 
@@ -151,6 +154,22 @@ const ctxEffect = Effect.gen(function* () {
         },
       } as ExprSelectOption)
     );
+  }
+
+  function getGlobalPropertyCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
+    return globalPropertyCtx.globalProperties.map((globalProperty) => {
+      return Effect.succeed({
+        label: globalProperty.id,
+        execute() {
+          return Effect.gen(function* () {
+            const globalPropertyExpr = yield* ExprFactory2.Reference({
+              target: globalProperty,
+            });
+            yield* Expr.replaceExpr(currentExpr, globalPropertyExpr);
+          });
+        },
+      } as ExprSelectOption);
+    });
   }
 
   function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {
