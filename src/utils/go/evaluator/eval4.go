@@ -1,6 +1,9 @@
 package evaluator
 
-import "fmt"
+import (
+	"fmt"
+	"math"
+)
 
 func (e *Evaluator) EvaluatePropertyInstances(
 	instancePaths []*PropertyInstancePath,
@@ -132,6 +135,8 @@ func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *P
 		return arg0 * arg1
 	case "Divide":
 		return arg0 / arg1
+	case "Modulo":
+		return math.Mod(arg0, arg1)
 	default:
 		panic(fmt.Errorf("unknown exFunc type: %v", callExpr.exFuncType))
 	}

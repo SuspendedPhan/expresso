@@ -34,13 +34,7 @@ import {
   type DexVariantKind,
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
-import {
-  matcher,
-  scoped,
-  typed,
-  type TypesOf,
-  type VariantOf
-} from "variant";
+import { matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
 const log55 = log5("Dehydrator.ts", 15);
@@ -554,8 +548,7 @@ export default class Dehydrator {
         log55.debug("Dehydrating CallExpr");
         assert(exFunc != null);
 
-        let exFuncKind: DehydratedExprKind["CallExpr"]["exFuncKind"];
-        exFuncKind = CustomExFuncFactory.output.type;
+        let exFuncKind = exFunc.type;
 
         return DehydratedExpr.CallExpr({
           id: expr.id,

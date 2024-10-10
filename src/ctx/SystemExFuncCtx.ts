@@ -29,6 +29,11 @@ const ctxEffect = Effect.gen(function* () {
             shortLabel: "/",
             parameterCount: 2,
         }),
+        "Modulo": SystemExFuncFactory({
+            id: "Modulo",
+            shortLabel: "%",
+            parameterCount: 2,
+        }),
     } as Record<string, SystemExFunc>,
   };
 });
