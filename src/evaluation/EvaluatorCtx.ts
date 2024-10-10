@@ -39,7 +39,7 @@ const ctxEffect = Effect.gen(function* () {
     });
   });
 
-  yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000/20)));
+  yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000/45)));
 
   return {
     onEval,

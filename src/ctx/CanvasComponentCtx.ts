@@ -20,6 +20,20 @@ const ctxEffect = Effect.gen(function* () {
                 pixiObject.x = value;
               },
             }),
+            ComponentParameterFactory.Canvas({
+              name: "y",
+              id: "y",
+              canvasSetter: (pixiObject, value) => {
+                pixiObject.y = value;
+              },
+            }),
+            ComponentParameterFactory.Canvas({
+              name: "radius",
+              id: "radius",
+              canvasSetter: (pixiObject, value) => {
+                pixiObject.scale.set(value, value);
+              },
+            }),
           ],
         }),
       } satisfies Record<string, ComponentKind["Canvas"]>

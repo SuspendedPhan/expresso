@@ -62,7 +62,7 @@ export function CanvasFactory(args: PixiFactoryArgs) {
             };
             parameter.canvasSetter(canvasObject, propertyValue);
 
-            canvasObject.scale.set(100, 100);
+            // canvasObject.scale.set(100, 100);
           }
         }
       });
