@@ -1,6 +1,6 @@
 // File: ExFunc.ts
 
-import { Effect } from "effect";
+import { Effect, Stream } from "effect";
 import { of } from "rxjs";
 import {
   ExFuncParameterFactory2,
@@ -9,6 +9,7 @@ import {
 import { ExItem, type ExItemBase } from "src/ex-object/ExItem";
 import { ExprFactory2, type Expr } from "src/ex-object/Expr";
 import { Project } from "src/ex-object/Project";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import {
   createObservableArrayWithLifetime,
@@ -41,7 +42,7 @@ interface SystemExFunc_ {
 export const SystemExFuncFactory = variation(
   "ExFunc.System",
   fields<SystemExFunc_>()
-)
+);
 
 export type SystemExFunc = ReturnType<typeof SystemExFuncFactory>;
 
@@ -64,7 +65,9 @@ export const CustomExFuncFactory2 = {
       let name = creationArgs.name;
       if (name === undefined) {
         const project: Project = yield* Project.activeProject;
-        const ordinal = yield* Project.Methods(project).getAndIncrementOrdinal();
+        const ordinal = yield* Project.Methods(
+          project
+        ).getAndIncrementOrdinal();
         name = `Function ${ordinal}`;
       }
 
@@ -91,7 +94,7 @@ export const CustomExFuncFactory2 = {
           creationArgs2.exFuncParameterArr
         ),
       };
-      
+
       log55.debug("CustomExFuncFactory2.Custom", customExFunc_);
       const exFunc = CustomExFuncFactory(customExFunc_);
       creationArgs2.expr.parent$.next(exFunc);
@@ -110,8 +113,30 @@ export const ExFunc = {
 
   addParameterBlank(exFunc: CustomExFunc) {
     return Effect.gen(function* () {
+      console.log("addParameterBlank");
       const param = yield* ExFuncParameterFactory2({});
       yield* exFunc.parameters.push(param);
+
+      console.log("addParameterBlank2");
+
+      const project = yield* ExItem.getProject3(exFunc).pipe(
+        Stream.unwrap,
+        EffectUtils.getFirstOrThrow,
+        Effect.timeout(1000)
+      );
+
+      console.log("addParameterBlank3");
+
+      for (const expr of project.exprs.items) {
+        console.log("addParameterBlank4");
+        if (expr.type !== "Expr/Call") continue;
+
+        console.log("addParameterBlank5");
+        const arg = yield* ExprFactory2.Number({ value: 0 });
+        arg.parent$.next(expr);
+        yield* expr.args.push(arg);
+      }
+
       return param;
     });
   },
