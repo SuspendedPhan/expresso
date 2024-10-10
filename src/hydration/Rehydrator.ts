@@ -3,6 +3,7 @@ import { Effect, Layer } from "effect";
 import type { CanvasComponentCtx } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtx } from "src/ctx/ComponentCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
+import { SystemExFuncCtx } from "src/ctx/SystemExFuncCtx";
 import {
   CloneNumberTargetCtx,
   type CloneNumberTarget,
@@ -20,8 +21,7 @@ import {
 import {
   CustomExFuncFactory,
   CustomExFuncFactory2,
-  SystemExFuncFactory,
-  type CustomExFunc,
+  type CustomExFunc
 } from "src/ex-object/ExFunc";
 import { ExFuncParameterFactory2 } from "src/ex-object/ExFuncParameter";
 import { ExObject, ExObjectFactory2 } from "src/ex-object/ExObject";
@@ -80,6 +80,7 @@ export class RehydratorCtx extends Effect.Tag("RehydratorCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const cloneNumberTargetCtx = yield* CloneNumberTargetCtx;
+  const systemExFuncCtx = yield* SystemExFuncCtx;
 
   const customComponentById = new Map<string, ComponentKind["Custom"]>();
   const rehydratedReferenceExprs: RehydratedReferenceExpr[] = [];
@@ -185,9 +186,10 @@ const ctxEffect = Effect.gen(function* () {
           assert(exFunc !== undefined);
           reCallExpr.callExpr.exFunc$.next(exFunc);
         } else {
-          const systemExFuncKind = reCallExpr.dehydratedCallExpr.exFuncKind;
-          const factory = SystemExFuncFactory[systemExFuncKind];
-          const exFunc = factory();
+          const { exFuncId } = reCallExpr.dehydratedCallExpr;
+          assert(exFuncId !== null);
+          const exFunc = systemExFuncCtx.systemExFuncs[exFuncId];
+          assert(exFunc !== undefined);
           reCallExpr.callExpr.exFunc$.next(exFunc);
         }
       }

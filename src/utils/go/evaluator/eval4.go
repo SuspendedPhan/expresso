@@ -121,14 +121,14 @@ func (e *Evaluator) EvalCallExpr(ctx *EvaluationCtx, callExpr *CallExpr, path *P
 	arg0 := e.EvalExpr(ctx, args[0], path)
 	arg1 := e.EvalExpr(ctx, args[1], path)
 
-	switch callExpr.exFuncType {
-	case "ExFunc.System/Add":
+	switch callExpr.exFuncId {
+	case "Add":
 		return arg0 + arg1
-	case "ExFunc.System/Subtract":
+	case "Subtract":
 		return arg0 - arg1
-	case "ExFunc.System/Multiply":
+	case "Multiply":
 		return arg0 * arg1
-	case "ExFunc.System/Divide":
+	case "Divide":
 		return arg0 / arg1
 	default:
 		panic(fmt.Errorf("unknown exFunc type: %v", callExpr.exFuncType))

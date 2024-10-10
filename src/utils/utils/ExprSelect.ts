@@ -1,8 +1,9 @@
 import assert from "assert-ts";
 import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
 import { Subject } from "rxjs";
+import { SystemExFuncCtx } from "src/ctx/SystemExFuncCtx";
 import { ComponentFactory } from "src/ex-object/Component";
-import { CustomExFuncFactory, SystemExFuncFactory } from "src/ex-object/ExFunc";
+import { CustomExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { Expr, ExprFactory2 } from "src/ex-object/Expr";
@@ -30,6 +31,7 @@ export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const focusCtx = yield* FocusCtx;
+  const systemExFuncCtx = yield* SystemExFuncCtx;
 
   return {
     createComboboxPropsIn(expr: Expr) {
@@ -83,22 +85,6 @@ const ctxEffect = Effect.gen(function* () {
           commands.push(command);
         }
 
-        if (query === "+") {
-          commands.push({
-            label: "+",
-            execute: () => {
-              const effect = Effect.gen(function* () {
-                const systemExFunc = SystemExFuncFactory.Add();
-                const callExpr = yield* ExprFactory2.Call({
-                  exFunc: systemExFunc,
-                });
-                yield* Expr.replaceExpr(expr, callExpr);
-              });
-              return effect;
-            },
-          });
-        }
-
         const exprCommands = getExprCommands(expr, project);
         yield* Effect.promise(async () => {
           for await (const command of exprCommands) {
@@ -125,10 +111,12 @@ const ctxEffect = Effect.gen(function* () {
     for await (const ancestor of ExItem.getAncestors(currentExpr)) {
       yield* getExprCommands2(currentExpr, ancestor);
     }
-    yield* getExFuncCommands(project, currentExpr);
+
+    yield* getCustomExFuncCommands(project, currentExpr);
+    yield* getSystemExFuncCommands(currentExpr);
   }
 
-  function getExFuncCommands(
+  function getCustomExFuncCommands(
     project: Project,
     currentExpr: Expr
   ): Effect.Effect<ExprSelectOption>[] {
@@ -144,6 +132,23 @@ const ctxEffect = Effect.gen(function* () {
       };
       return Effect.succeed(extracted);
     });
+  }
+
+  function getSystemExFuncCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
+    return Object.values(systemExFuncCtx.systemExFuncs).map(
+      (systemExFunc) =>
+        Effect.succeed({
+          label: systemExFunc.shortLabel,
+          execute() {
+            return Effect.gen(function* () {
+              const callExpr = yield* ExprFactory2.Call({
+                exFunc: systemExFunc,
+              });
+              yield* Expr.replaceExpr(currentExpr, callExpr);
+            });
+          },
+        } as ExprSelectOption)
+    );
   }
 
   function* getExprCommands2(currentExpr: Expr, ancestor: ExItem) {

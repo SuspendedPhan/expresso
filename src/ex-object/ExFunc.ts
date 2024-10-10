@@ -19,11 +19,7 @@ import {
   Utils,
   type BSUB,
 } from "src/utils/utils/Utils";
-import {
-  dexScopedVariant,
-  type DexVariantKind,
-} from "src/utils/utils/VariantUtils4";
-import { fields, isType, variation, type VariantOf } from "variant";
+import { fields, isType, variation } from "variant";
 
 const log55 = log5("ExFunc.ts");
 
@@ -38,15 +34,18 @@ type CustomExFunc_ = ExItemBase & {
 
 type CustomExFunc2_ = CustomExFunc_ & ReturnType<typeof methodsFactory>;
 
-export const SystemExFuncFactory = dexScopedVariant("ExFunc.System", {
-  Add: () => ({ name: "Add", parameterCount: 2 }),
-  Subtract: () => ({ name: "Subtract", parameterCount: 2 }),
-  Multiply: () => ({ name: "Multiply", parameterCount: 2 }),
-  Divide: () => ({ name: "Divide", parameterCount: 2 }),
-});
+interface SystemExFunc_ {
+  id: string;
+  shortLabel: string;
+  parameterCount: number;
+}
 
-export type SystemExFunc = VariantOf<typeof SystemExFuncFactory>;
-export type SystemExFuncKind = DexVariantKind<typeof SystemExFuncFactory>;
+export const SystemExFuncFactory = variation(
+  "ExFunc.System",
+  fields<SystemExFunc_>()
+)
+
+export type SystemExFunc = ReturnType<typeof SystemExFuncFactory>;
 
 export const CustomExFuncFactory = variation(
   "ExFunc.Custom",
@@ -111,7 +110,7 @@ export const ExFunc = {
     if (isType(exFunc, CustomExFuncFactory)) {
       return exFunc.name$;
     }
-    return of(exFunc.name);
+    return of(exFunc.id);
   },
 };
 

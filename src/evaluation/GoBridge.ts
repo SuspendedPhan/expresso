@@ -266,15 +266,7 @@ const ctxEffect = Effect.gen(function* () {
                             exFunc.type
                           );
                           goModule.CallExpr.setExFuncType(expr.id, exFunc.type);
-                          if (exFunc.type === "ExFunc.Custom") {
-                            log55.log3(
-                              14,
-                              "GoModule: Setting CallExpr ExFunc",
-                              expr.id,
-                              exFunc.id
-                            );
-                            goModule.CallExpr.setExFunc(expr.id, exFunc.id);
-                          }
+                          goModule.CallExpr.setExFunc(expr.id, exFunc.id);
                         });
                       }),
                       Effect.forkIn(expr.scope)

@@ -7,6 +7,7 @@ import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
 import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
+import { SystemExFuncCtxLive } from "src/ctx/SystemExFuncCtx";
 import { TelemetryCtxLive } from "src/ctx/TelemetryCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
 import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
@@ -57,6 +58,7 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(CanvasComponentCtxLive),
   Layer.provideMerge(ComboboxCtxLive),
   Layer.provideMerge(ComponentSelectCtxLive),
+  Layer.provideMerge(SystemExFuncCtxLive),
   Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All))
 );
 

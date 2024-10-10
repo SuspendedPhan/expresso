@@ -35,12 +35,11 @@ import {
   type DexVariantUnion,
 } from "src/utils/utils/VariantUtils4";
 import {
-  descope,
   matcher,
   scoped,
   typed,
   type TypesOf,
-  type VariantOf,
+  type VariantOf
 } from "variant";
 import { pass } from "variant/lib/typed";
 
@@ -56,7 +55,7 @@ type DehydratedExpr_ = {
     args: DehydratedExpr[];
     exFuncKind:
       | typeof CustomExFuncFactory.output.type
-      | keyof typeof SystemExFuncFactory;
+      | typeof SystemExFuncFactory.output.type;
     exFuncId: string | null;
   };
   ReferenceExpr: {
@@ -362,11 +361,16 @@ export default class Dehydrator {
       })
     );
 
-    const deComponentProperties$ = exObject.componentParameterProperties_.items$.pipe(
-      switchMap((properties) => {
-        return RxFns.combineLatestOrEmpty(properties.map((property) => this.dehydrateComponentProperty$(property)));
-      }),
-    );
+    const deComponentProperties$ =
+      exObject.componentParameterProperties_.items$.pipe(
+        switchMap((properties) => {
+          return RxFns.combineLatestOrEmpty(
+            properties.map((property) =>
+              this.dehydrateComponentProperty$(property)
+            )
+          );
+        })
+      );
 
     const deBasicProperties$ = exObject.basicProperties.items$.pipe(
       switchMap((properties) => {
@@ -551,19 +555,13 @@ export default class Dehydrator {
         assert(exFunc != null);
 
         let exFuncKind: DehydratedExprKind["CallExpr"]["exFuncKind"];
-        if (exFunc.type === CustomExFuncFactory.output.type) {
-          exFuncKind = CustomExFuncFactory.output.type;
-        } else {
-          const vv = descope(exFunc);
-          exFuncKind = vv.type;
-        }
+        exFuncKind = CustomExFuncFactory.output.type;
 
         return DehydratedExpr.CallExpr({
           id: expr.id,
           args: deArgs,
           exFuncKind,
-          exFuncId:
-            exFunc.type === CustomExFuncFactory.output.type ? exFunc.id : null,
+          exFuncId: exFunc.id,
         });
       })
     );
@@ -588,6 +586,8 @@ export default class Dehydrator {
 
   private dehydrateArgs$(args: readonly Expr[]): Observable<DehydratedExpr[]> {
     log55.debug("Dehydrating Args");
-    return RxFns.combineLatestOrEmpty(args.map((arg) => this.dehydrateExpr$(arg)));
+    return RxFns.combineLatestOrEmpty(
+      args.map((arg) => this.dehydrateExpr$(arg))
+    );
   }
 }
