@@ -21,12 +21,17 @@ const ctxEffect = Effect.gen(function* () {
 
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
-      const gps = globalPropertyCtx.globalProperties.map((gp) => ({
-        id: gp.id,
-        value: gp.eval(),
-      }));
-      const evaluation = goModule.Evaluator.eval(gps);
-      
+      const gps = globalPropertyCtx.globalProperties.map((gp) => {
+        return Effect.gen(function* () {
+          return {
+            id: gp.id,
+            value: yield* gp.eval(),
+          };
+        });
+      });
+      const gps2 = yield* Effect.all(gps);
+      const evaluation = goModule.Evaluator.eval(gps2);
+
       // console.log("Got result from Evaluator.eval()");
 
       if (evaluation !== null) {
@@ -39,7 +44,7 @@ const ctxEffect = Effect.gen(function* () {
     });
   });
 
-  yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000/45)));
+  yield* Effect.forkDaemon(Effect.repeat(effect, Schedule.fixed(1000 / 45)));
 
   return {
     onEval,

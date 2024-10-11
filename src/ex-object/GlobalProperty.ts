@@ -1,10 +1,10 @@
-import { Data, Effect, Layer } from "effect";
+import { Data, Effect, Layer, Ref } from "effect";
 
 
 export interface GlobalProperty {
   _tag: string;
   id: string;
-  eval(): number;
+  eval(): Effect.Effect<number>;
 }
 
 const GlobalProperty = Data.tagged<GlobalProperty>("GlobalProperty");
@@ -15,24 +15,30 @@ export class GlobalPropertyCtx extends Effect.Tag("GlobalPropertyCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
+  const canvasWidth = yield* Ref.make(1000);
+  const canvasHeight = yield* Ref.make(1000);
+
   return {
+    canvasWidth,
+    canvasHeight,
+
     globalProperties: [
       GlobalProperty({
         id: "Time",
         eval() {
-          return Date.now();
+          return Effect.succeed(Date.now());
         },
       }),
       GlobalProperty({
         id: "CanvasWidth",
         eval() {
-          return 1000;
+          return canvasWidth.get;
         },
       }),
       GlobalProperty({
         id: "CanvasHeight",
         eval() {
-          return 1000;
+          return canvasHeight.get;
         },
       }),
     ] as GlobalProperty[],

@@ -108,7 +108,7 @@ export const ExFunc = {
     if (isType(exFunc, CustomExFuncFactory)) {
       return exFunc.name$;
     }
-    return of(exFunc.id);
+    return of(exFunc.shortLabel);
   },
 
   addParameterBlank(exFunc: CustomExFunc) {
