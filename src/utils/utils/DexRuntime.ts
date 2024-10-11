@@ -36,7 +36,6 @@ import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
-import type { E } from "vitest/dist/chunks/environment.C5eAp3K6";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),

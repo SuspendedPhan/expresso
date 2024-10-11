@@ -2,15 +2,14 @@
   import { switchMap } from "rxjs";
 
   import { ResizeSensor } from "css-element-queries";
+  import { Effect, Stream } from "effect";
   import type { Line } from "src/utils/layout/Layout";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
   import { onMount } from "svelte";
-  import { ElementLayout } from "./ElementLayout";
-  import { TreeViewCtx } from "./TreeView";
   import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
   import { DexUtils } from "../utils/DexUtils";
-  import { Effect, Stream } from "effect";
+  import { ElementLayout } from "./ElementLayout";
 
   const log55 = log5("TreeView.svelte");
   log55.debug("TreeView.svelte init");
@@ -33,42 +32,13 @@
       drawLines(canvas, output.lines);
     });
 
-  // RxFns.onMount$()
-  //   .pipe(switchMap(() => RxFns.resizeSensor$(rootElement)))
-  //   .subscribe(() => {
-  //     setTimeout(() => {
-  //       canvasWidth = rootElement.clientWidth;
-  //       canvasHeight = rootElement.clientHeight;
-  //       log55.debug("canvasWidth2", canvasWidth);
-  //       log55.debug("canvasHeight2", canvasHeight);
-
-  //       setTimeout(() => {
-  //         drawLines(canvas, lines);
-  //       }, 100);
-  //     }, 100);
-  //   });
-
-  onMount(() => {
-    new ResizeSensor(rootElement, () => {
-      setTimeout(() => {
-        canvasWidth = rootElement.clientWidth;
-        canvasHeight = rootElement.clientHeight;
-
-        if (canvasWidth > 100) {
-          log55.debug(`canvas size: ${canvasWidth}x${canvasHeight}`);
-        }
-
-        setTimeout(() => {
-          drawLines(canvas, lines);
-        }, 100);
-      }, 1000);
-    });
-  });
-
   dexMakeSvelteScope().then((scope) =>
     DexUtils.observeResize(rootElement).pipe(
       Stream.runForEach(() =>
         Effect.gen(function* () {
+          canvasWidth = rootElement.clientWidth;
+          canvasHeight = rootElement.clientHeight;
+          yield* Effect.sleep(0);
           drawLines(canvas, lines);
         })
       ),
