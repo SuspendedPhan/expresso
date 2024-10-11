@@ -25,6 +25,8 @@
             console.log("height", height);
             yield* Ref.set(globalPropertyCtx.canvasWidth, width);
             yield* Ref.set(globalPropertyCtx.canvasHeight, height);
+            canvasElement.width = width;
+            canvasElement.height = height;
           }
         }).pipe(DexRuntime.runPromise);
       }).observe(viewportElement);
@@ -32,7 +34,7 @@
   });
 </script>
 
-<div bind:this={viewportElement} class="fixed w-full h-full">
+<div bind:this={viewportElement} class=" h-full">
   <canvas bind:this={canvasElement} />
 </div>
 

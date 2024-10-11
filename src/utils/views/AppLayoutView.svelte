@@ -47,11 +47,11 @@
   <div class="flex h-full">
     <NavMenuView />
 
-    <OverlayScrollbarsComponent defer class="shrink-1 basis-1/2">
+    <OverlayScrollbarsComponent defer class="shrink basis-1/2">
       <svelte:component this={activeWindowSvelteComponent} />
     </OverlayScrollbarsComponent>
 
-    <div class="shrink-1 basis-1/2">
+    <div class="shrink basis-1/2 min-w-0">
       <CanvasView />
     </div>
   </div>
