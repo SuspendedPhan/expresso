@@ -19,17 +19,22 @@ const ctxEffect = Effect.gen(function* () {
     (result: EvaluationResult) => Effect.Effect<void, never, never>
   >();
 
+  const globalPropertyValueById = Effect.gen(function* () {
+    const gps = globalPropertyCtx.globalProperties.map((gp) => {
+      return Effect.gen(function* () {
+        return {
+          id: gp.id,
+          value: yield* gp.eval(),
+        };
+      });
+    });
+    const gps2 = yield* Effect.all(gps);
+    return gps2;
+  });
+
   const effect = goModuleCtx.withGoModule((goModule) => {
     return Effect.gen(function* () {
-      const gps = globalPropertyCtx.globalProperties.map((gp) => {
-        return Effect.gen(function* () {
-          return {
-            id: gp.id,
-            value: yield* gp.eval(),
-          };
-        });
-      });
-      const gps2 = yield* Effect.all(gps);
+      const gps2 = yield* globalPropertyValueById;
       const evaluation = goModule.Evaluator.eval(gps2);
 
       // console.log("Got result from Evaluator.eval()");
@@ -48,6 +53,7 @@ const ctxEffect = Effect.gen(function* () {
 
   return {
     onEval,
+    globalPropertyValueById
   };
 });
 

@@ -1,12 +1,10 @@
 <script lang="ts">
   import { switchMap } from "rxjs";
 
-  import { ResizeSensor } from "css-element-queries";
   import { Effect, Stream } from "effect";
   import type { Line } from "src/utils/layout/Layout";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns } from "src/utils/utils/Utils";
-  import { onMount } from "svelte";
   import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
   import { DexUtils } from "../utils/DexUtils";
   import { ElementLayout } from "./ElementLayout";

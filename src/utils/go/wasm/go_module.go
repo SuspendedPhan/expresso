@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"expressioni.sta/evaluator"
@@ -249,9 +250,16 @@ func bootstrapGoModule() {
 				gpById[gpId] = gpValue
 			}
 
+			shouldLog := false
+			if len(args) > 1 {
+				shouldLog = args[1].Bool()
+			}
+
 			evaluation := ev.Eval(gpById)
 
-			// fmt.Println(evaluation.String())
+			if shouldLog {
+				fmt.Println(evaluation.String())
+			}
 
 			getObjectResultCountFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 				return evaluation.GetObjectResultCount()

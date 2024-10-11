@@ -37,7 +37,7 @@ import {
 import { matcher, scoped, typed, type TypesOf, type VariantOf } from "variant";
 import { pass } from "variant/lib/typed";
 
-const log55 = log5("Dehydrator.ts", 15);
+const log55 = log5("Dehydrator.ts");
 
 type DehydratedExpr_ = {
   Number: {

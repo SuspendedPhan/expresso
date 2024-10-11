@@ -5,6 +5,8 @@
   import { Effect } from "effect";
 
   import { EditorAction } from "src/actions/EditorAction";
+  import { GoModuleCtx } from "src/ctx/GoModuleCtx";
+  import { EvaluatorCtx } from "src/evaluation/EvaluatorCtx";
   import type { ExObject } from "src/ex-object/ExObject";
   import { Project } from "src/ex-object/Project";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -15,7 +17,6 @@
   import { Constants } from "../utils/ViewUtils";
   import FlexContainer from "./FlexContainer.svelte";
   import KbdShortcutSpan from "./KbdShortcutSpan.svelte";
-  import { GoModuleCtx } from "src/ctx/GoModuleCtx";
 
   // @ts-ignore
   const log55 = log5("EditorView.svelte");
@@ -86,7 +87,11 @@
       Effect.gen(function* () {
         const goModuleCtx = yield* GoModuleCtx;
         const goModule = yield* goModuleCtx.getUnsafe();
-        goModule.Evaluator.eval();
+        const evaluatorCtx = yield* EvaluatorCtx;
+        goModule.Evaluator.eval(
+          yield* evaluatorCtx.globalPropertyValueById,
+          true
+        );
       })
     );
   }

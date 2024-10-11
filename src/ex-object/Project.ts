@@ -135,7 +135,7 @@ export function ProjectFactory2(creationArgs: ProjectCreationArgs) {
       Stream.unwrap,
       Stream.runForEach((property) => {
         return Effect.gen(function* () {
-          console.log("Adding property to project", property.id);
+          // console.log("Adding property to project", property.id);
           propertyById.set(property.id, property);
         });
       }),

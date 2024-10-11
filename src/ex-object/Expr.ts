@@ -289,14 +289,13 @@ export const Expr = {
 
 function addToProject(expr: Expr): Effect.Effect<void, never, never> {
   return Effect.gen(function* () {
-    console.log("addToProject", expr.id);
+    // console.log("addToProject", expr.id);
     yield* ExItem.getProject3(expr).pipe(
       Stream.unwrap,
       Stream.take(1),
       Stream.runForEach((project) => {
         return Effect.gen(function* () {
           log55.debug("Pushing expr to project");
-          console.log("Pushing expr to project", expr.id);
           yield* project.exprs.push(expr);
 
           yield* Scope.addFinalizer(

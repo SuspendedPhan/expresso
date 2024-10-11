@@ -6,7 +6,7 @@ level 9 is for looping logs
 */
 
 // const level_minimum = 1;
-const level_minimum = 14;
+const level_minimum = 15;
 // const level_minimum = 10;
 
 /**
