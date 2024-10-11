@@ -1,4 +1,13 @@
-import { Layer, Logger, LogLevel, ManagedRuntime } from "effect";
+import {
+  Effect,
+  Exit,
+  Layer,
+  Logger,
+  LogLevel,
+  ManagedRuntime,
+  Scope,
+} from "effect";
+import { CanvasViewCtxLive } from "src/canvas/CanvasView";
 import { CanvasComponentCtxLive } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
@@ -26,6 +35,7 @@ import { CommandCardCtxLive } from "src/utils/utils/CommandCard";
 import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
+import { onMount } from "svelte";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -61,7 +71,49 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(ComponentSelectCtxLive),
   Layer.provideMerge(SystemExFuncCtxLive),
   Layer.provideMerge(GlobalPropertyCtxLive),
+  Layer.provideMerge(CanvasViewCtxLive),
   Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All))
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);
+
+export function dexRunPromiseWithSvelteScope(
+  effect: Parameters<typeof DexRuntime.runPromise>["0"]
+) {
+  let scope: Scope.CloseableScope;
+  onMount(() => {
+    const v = Effect.gen(function* () {
+      scope = yield* Scope.make();
+      const x = effect.pipe(Scope.extend(scope));
+      yield* x;
+    });
+
+    DexRuntime.runPromise(v);
+
+    return () => {
+      Effect.gen(function* () {
+        yield* Scope.close(scope, Exit.succeed(undefined));
+      }).pipe(DexRuntime.runPromise);
+    };
+  });
+}
+
+export function dexMakeSvelteScope(): Promise<Scope.Scope> {
+  return new Promise((resolve) => {
+    let scope: Scope.CloseableScope;
+    onMount(() => {
+      const v = Effect.gen(function* () {
+        scope = yield* Scope.make();
+        resolve(scope);
+      });
+  
+      DexRuntime.runPromise(v);
+  
+      return () => {
+        Effect.gen(function* () {
+          yield* Scope.close(scope, Exit.succeed(undefined));
+        }).pipe(DexRuntime.runPromise);
+      };
+    });
+  });
+}
