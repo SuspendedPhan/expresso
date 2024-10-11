@@ -36,6 +36,7 @@ import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
+import type { E } from "vitest/dist/chunks/environment.C5eAp3K6";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -76,27 +77,6 @@ const mainLayer2 = mainLayer.pipe(
 );
 
 export const DexRuntime = ManagedRuntime.make(mainLayer2);
-
-export function dexRunPromiseWithSvelteScope(
-  effect: Parameters<typeof DexRuntime.runPromise>["0"]
-) {
-  let scope: Scope.CloseableScope;
-  onMount(() => {
-    const v = Effect.gen(function* () {
-      scope = yield* Scope.make();
-      const x = effect.pipe(Scope.extend(scope));
-      yield* x;
-    });
-
-    DexRuntime.runPromise(v);
-
-    return () => {
-      Effect.gen(function* () {
-        yield* Scope.close(scope, Exit.succeed(undefined));
-      }).pipe(DexRuntime.runPromise);
-    };
-  });
-}
 
 export function dexMakeSvelteScope(): Promise<Scope.Scope> {
   return new Promise((resolve) => {

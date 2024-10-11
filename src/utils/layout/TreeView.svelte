@@ -7,6 +7,10 @@
   import { RxFns } from "src/utils/utils/Utils";
   import { onMount } from "svelte";
   import { ElementLayout } from "./ElementLayout";
+  import { TreeViewCtx } from "./TreeView";
+  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
+  import { DexUtils } from "../utils/DexUtils";
+  import { Effect, Stream } from "effect";
 
   const log55 = log5("TreeView.svelte");
   log55.debug("TreeView.svelte init");
@@ -60,6 +64,18 @@
       }, 1000);
     });
   });
+
+  dexMakeSvelteScope().then((scope) =>
+    DexUtils.observeResize(rootElement).pipe(
+      Stream.runForEach(() =>
+        Effect.gen(function* () {
+          drawLines(canvas, lines);
+        })
+      ),
+      Effect.forkIn(scope),
+      DexRuntime.runPromise
+    )
+  );
 
   function drawLines(canvasElement: HTMLCanvasElement, lines: Line[]) {
     if (lines.length === 0) {
