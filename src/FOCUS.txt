@@ -1,0 +1,77 @@
+--- Editor ---
+Root Objects
+    Self
+        Name
+        Component
+        Component Parameter Properties
+            Name
+            Root Expr
+        Basic Properties
+            Name
+            Root Expr
+    Children   
+        ...
+
+--- Components ---
+Components
+    Name
+    Parameters
+    Properties
+    Root Objects
+        ...
+
+--- Functions ---
+Functions
+    Name
+    Parameters
+    Root Expr
+
+
+
+RootObjects: object => [
+    () => Focus(object.name),
+    () => Focus(object.component),
+    () => object.componentParameterProperties.map(componentParameterProperty => [
+        () => Focus(componentParameterProperty, "Name"),
+        () => Expr(componentParameterProperty.expr)
+    ]),
+    basicProperties.map(basicProperty => [
+        () => Focus(basicProperty, "Name"),
+        () => Expr(basicProperty.rootExpr)
+    ]),
+    object.children.map(child => [
+        ...
+    ])
+]
+
+const Expr = (expr) => [
+    () => Focus(expr),
+    () => Expr(expr.children[0])
+]
+
+
+RootObjects = FocusMaker(
+    RootObjects,
+    [
+        FocusMaker(Object/Name, o => Focus(o.name)),
+        FocusMaker(Object/Component, o => Focus(o.component)),
+        FocusMaker(Object/ComponentParameterProperty, [
+            FocusMaker(Name, o => Focus(o.name)),
+            FocusMaker(RootExpr, ...)
+        ])
+        FocusMaker(Object/BasicProperty, [
+            FocusMaker(Name, o => Focus(o.name)),
+            FocusMaker(RootExpr, ...)
+        ]),
+        FocusMaker(Children, ...)
+    ]
+)
+
+FocusMaker {
+    parent: FocusMaker
+    children: FocusMaker[]
+    maker: (object) => Focus
+}
+
+focusMakers = RootObjects.Flatten()
+
