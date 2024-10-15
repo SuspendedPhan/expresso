@@ -27,7 +27,7 @@ export class FocusTarget extends Data.TaggedClass("Focus2")<{
 
 class Focus2 extends Data.TaggedClass("Focus2")<{
   target: FocusTarget;
-  isEditing: boolean;
+  isEditing: SubscriptionRef.SubscriptionRef<boolean>;
   scope: Scope.CloseableScope;
 }> {}
 

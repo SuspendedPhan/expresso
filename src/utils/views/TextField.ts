@@ -1,74 +1,75 @@
-import { Effect, type Stream } from "effect";
+import { Effect, Layer, PubSub, Scope, Stream } from "effect";
 import { Subject } from "rxjs";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
-import { type OBS, type SUB } from "src/utils/utils/Utils";
-import {
-  createFieldValueData,
-  type EditableFocus,
-  type FieldValueData,
-  type FieldValueInit
-} from "src/utils/views/Field";
+import type { Readable } from "svelte/motion";
+import { writable } from "svelte/store";
 
+export type TextFieldPropIn = (
+  svelteScope: Scope.Scope
+) => Effect.Effect<TextFieldState>;
 
-export interface TextFieldValueInit extends FieldValueInit {
-  value$: SUB<string>;
+export interface TextFieldPropOut {
+  value: Stream.Stream<string>;
 }
 
-export type TextFieldInit = TextFieldValueInit & {
+export interface TextFieldState {
   label: string;
-};
-
-export interface TextFieldData extends TextFieldValueData {
-  label: string;
+  value: Readable<string>;
+  onInput: (e: InputEvent) => void;
 }
 
-export interface TextFieldValueData extends FieldValueData {
-  onInput: Stream.Stream<string>;
-  handleInput: (e: Event) => void;
-  value$: OBS<string>;
-}
+export class TextFieldCtx extends Effect.Tag("TextFieldCtx")<
+  TextFieldCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
 
-export function createTextFieldValueData(
-  init: TextFieldValueInit
-) {
-  return Effect.gen(function* () {
-    const fieldValueData = yield* createFieldValueData(init);
-    const onInput$ = new Subject<string>();
+const ctxEffect = Effect.gen(function* () {
+  return {
+    createProps: (
+      label: string,
+      value: Stream.Stream<string>
+    ): Effect.Effect<[TextFieldPropIn, TextFieldPropOut]> => {
+      return Effect.gen(function* () {
+        const valueOut = yield* PubSub.unbounded<string>();
 
-    const result: TextFieldValueData = {
-      ...fieldValueData,
-      handleInput: (e: Event) => {
-        const target = e.target as HTMLInputElement;
-        if (target.value === "") {
-          init.value$.next("a");
-          DexRuntime.runPromise(
-            Effect.gen(function* () {
-              onInput$.next("a");
-            })
-          );
-        } else {
-          init.value$.next(target.value);
-          onInput$.next(target.value);
-        }
-      },
-      value$: init.value$,
-      onInput: EffectUtils.obsToStream(onInput$),
-    };
-    return result;
-  });
-}
+        const createState = (svelteScope: Scope.Scope) => {
+          return Effect.gen(function* () {
+            Scope.addFinalizer(svelteScope, valueOut.shutdown);
 
-export function createTextFieldData(
-  init: TextFieldInit
-) {
-  return Effect.gen(function* () {
-    const fieldValueData = yield* createTextFieldValueData(init);
+            const value_ = writable("");
 
-    const fieldData: TextFieldData = {
-      ...fieldValueData,
-      label: init.label,
-    };
-    return fieldData;
-  });
-}
+            yield* value.pipe(
+              Stream.runForEachScoped((v) =>
+                Effect.gen(function* () {
+                  value_.set(v);
+                })
+              ),
+              Scope.extend(svelteScope)
+            );
+
+            const vv: TextFieldState = {
+              label: label,
+              value: value_,
+              onInput: (e: any) =>
+                Effect.gen(function* () {
+                  const v = e.target.value;
+                  const v2 = v === "" ? "a" : v;
+                  yield* valueOut.publish(v2);
+                }).pipe(DexRuntime.runPromise),
+            };
+            return vv;
+          });
+        };
+
+        const propOut: TextFieldPropOut = {
+          value: Stream.fromPubSub(valueOut),
+        };
+
+        return [createState, propOut];
+      });
+    },
+  };
+});
+
+export const TextFieldCtxLive = Layer.effect(TextFieldCtx, ctxEffect);
