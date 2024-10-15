@@ -2,12 +2,14 @@ import {
   Brand,
   Data,
   Effect,
+  Equal,
+  Exit,
   Layer,
   Option,
   Ref,
   Scope,
   Stream,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
 import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import type { ExObject } from "src/ex-object/ExObject";
@@ -15,17 +17,17 @@ import type { Expr } from "src/ex-object/Expr";
 import { Project, ProjectCtx } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 
-type FocusKind = string & Brand.Brand<"FocusKind">;
-const FocusKind = Brand.nominal<FocusKind>();
+export type FocusKind2 = string & Brand.Brand<"FocusKind2">;
+export const FocusKind2 = Brand.nominal<FocusKind2>();
 
 export class FocusTarget extends Data.TaggedClass("Focus2")<{
-  kind: FocusKind;
+  kind: FocusKind2;
   item: any;
 }> {}
 
 class Focus2 extends Data.TaggedClass("Focus2")<{
   target: FocusTarget;
-  scope: Scope.Scope;
+  scope: Scope.CloseableScope;
 }> {}
 
 export class Focus2Ctx extends Effect.Tag("Focus2Ctx")<
@@ -72,6 +74,19 @@ const ctxEffect = Effect.gen(function* () {
   vv.pipe(Stream.runForEach((vv) => focusTargets.pipe(Ref.set(vv))));
 
   return {
+    setFocus(target: FocusTarget) {
+      return Effect.gen(this, function* () {
+        const f = yield* this.focus.get;
+        if (Option.isSome(f)) {
+          yield* Scope.close(f.value.scope, Exit.succeed(undefined));
+        }
+
+        const scope = yield* Scope.make();
+        const vv = Option.some(new Focus2({ target, scope }));
+        yield* this.focus.pipe(Ref.set(vv));
+      });
+    },
+
     focus: yield* SubscriptionRef.make(Option.none<Focus2>()),
 
     navigateDown() {
@@ -108,6 +123,16 @@ const ctxEffect = Effect.gen(function* () {
         yield* this.focus.pipe(Ref.set(vv));
       });
     },
+
+    focusByTarget(target: FocusTarget) {
+      return Effect.gen(this, function* () {
+        return this.focus.changes.pipe(
+          Stream.filter((f) => Option.isSome(f)),
+          Stream.map((f) => f.value),
+          Stream.filter((f) => Equal.equals(f.target, target))
+        );
+      });
+    },
   };
 });
 
@@ -130,9 +155,9 @@ const createFocusTargets = {
 
   forExObject(exObject: ExObject): Stream.Stream<FocusTarget[]> {
     const results = [
-      new FocusTarget({ kind: FocusKind("ExObjectName"), item: exObject }),
+      new FocusTarget({ kind: FocusKind2("ExObjectName"), item: exObject }),
       new FocusTarget({
-        kind: FocusKind("ExObjectComponent"),
+        kind: FocusKind2("ExObjectComponent"),
         item: exObject,
       }),
     ];
@@ -178,7 +203,7 @@ const createFocusTargets = {
   },
 
   forExpr(expr: Expr): Stream.Stream<FocusTarget[]> {
-    const results = [new FocusTarget({ kind: FocusKind("Expr"), item: expr })];
+    const results = [new FocusTarget({ kind: FocusKind2("Expr"), item: expr })];
     let stream: Stream.Stream<FocusTarget[]> = Stream.make();
     if (expr.type === "Expr/Call") {
       const vv = expr.args.itemStream.pipe(

@@ -87,11 +87,7 @@
 
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
-    <FocusView
-      focused={exObjectFocused}
-      on:mousedown={handleClick}
-      class="ex-card w-max flex flex-col"
-    >
+    <FocusView class="ex-card w-max flex flex-col">
       <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
