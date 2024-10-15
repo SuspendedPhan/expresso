@@ -25,6 +25,10 @@ export const EffectUtils = {
     return Effect.promise(() => firstValueFrom(source));
   },
 
+  makeStreamFromObs<T>(obs: OBS<T>): Stream.Stream<T, never, never> {
+    return this.obsToStream(obs);
+  },
+
   obsToStream<T>(obs: Observable<T>): Stream.Stream<T, never, never> {
     const stream = Stream.async(
       (emit: StreamEmit.Emit<never, never, T, void>) => {

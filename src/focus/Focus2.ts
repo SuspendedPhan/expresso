@@ -1,15 +1,31 @@
-import { Brand, Data, Effect, Layer, Stream } from "effect";
+import {
+  Brand,
+  Data,
+  Effect,
+  Layer,
+  Option,
+  Ref,
+  Scope,
+  Stream,
+  SubscriptionRef,
+} from "effect";
+import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";
-import type { Project } from "src/ex-object/Project";
+import { Project, ProjectCtx } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
 
 type FocusKind = string & Brand.Brand<"FocusKind">;
 const FocusKind = Brand.nominal<FocusKind>();
 
-export class Focus2 extends Data.TaggedClass("Focus2")<{
+export class FocusTarget extends Data.TaggedClass("Focus2")<{
   kind: FocusKind;
-  target: any;
+  item: any;
+}> {}
+
+class Focus2 extends Data.TaggedClass("Focus2")<{
+  target: FocusTarget;
+  scope: Scope.Scope;
 }> {}
 
 export class Focus2Ctx extends Effect.Tag("Focus2Ctx")<
@@ -18,85 +34,170 @@ export class Focus2Ctx extends Effect.Tag("Focus2Ctx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
-  return {};
+  const viewCtx = yield* ViewCtx;
+  const projectCtx = yield* ProjectCtx;
+
+  const vv = viewCtx.activeWindow.pipe(
+    Stream.flatMap(
+      (window) => {
+        const vv = Effect.gen(function* () {
+          switch (window) {
+            case DexWindow.ProjectEditor:
+              const vv = projectCtx.activeProject.changes.pipe(
+                Stream.flatMap(
+                  (project) =>
+                    project.pipe(
+                      Option.match({
+                        onSome: (project) => {
+                          return createFocusTargets.forEditorView(project);
+                        },
+                        onNone: () => Stream.make([]),
+                      })
+                    ),
+                  { switch: true }
+                )
+              );
+              return vv;
+            default:
+              return Stream.empty;
+          }
+        });
+        return vv.pipe(Stream.unwrap);
+      },
+      { switch: true }
+    )
+  );
+
+  const focusTargets = yield* SubscriptionRef.make(new Array<FocusTarget>());
+  vv.pipe(Stream.runForEach((vv) => focusTargets.pipe(Ref.set(vv))));
+
+  return {
+    focus: yield* SubscriptionRef.make(Option.none<Focus2>()),
+
+    navigateDown() {
+      return Effect.gen(this, function* () {
+        const focus_ = yield* this.focus.get;
+        const focusTargets_ = yield* focusTargets.get;
+
+        if (Option.isNone(focus_)) {
+          const target = focusTargets_[0];
+          if (target === undefined) {
+            return;
+          }
+          const scope = yield* Scope.make();
+          const vv = Option.some(new Focus2({ target, scope }));
+          yield* this.focus.pipe(Ref.set(vv));
+          return;
+        }
+
+        const index = focusTargets_.findIndex(
+          (target) => target === focus_.value.target
+        );
+        if (index === -1) {
+          throw new Error("Focus target not found");
+        }
+
+        const nextIndex = index + 1;
+        if (nextIndex >= focusTargets_.length) {
+          return;
+        }
+
+        const target = focusTargets_[nextIndex]!;
+        const scope = yield* Scope.make();
+        const vv = Option.some(new Focus2({ target, scope }));
+        yield* this.focus.pipe(Ref.set(vv));
+      });
+    },
+  };
 });
 
 export const Focus2CtxLive = Layer.effect(Focus2Ctx, ctxEffect);
 
-const createFocusList = {
-  forEditorView(project: Project): Stream.Stream<Focus2[]> {
-    project.rootExObjects.itemStream.pipe(
-      Stream.map((o) => createFocusList.forExObject(o))
+const createFocusTargets = {
+  forEditorView(project: Project): Stream.Stream<FocusTarget[]> {
+    const v = project.rootExObjects.itemStream.pipe(
+      Stream.flatMap(
+        (oo) =>
+          Stream.zipLatestAll(
+            ...oo.map((o) => createFocusTargets.forExObject(o))
+          ),
+        { switch: true }
+      ),
+      Stream.map((oo) => oo.flat())
+    );
+    return v;
+  },
+
+  forExObject(exObject: ExObject): Stream.Stream<FocusTarget[]> {
+    const results = [
+      new FocusTarget({ kind: FocusKind("ExObjectName"), item: exObject }),
+      new FocusTarget({
+        kind: FocusKind("ExObjectComponent"),
+        item: exObject,
+      }),
+    ];
+
+    const v1 = exObject.componentParameterProperties_.itemStream.pipe(
+      Stream.flatMap(
+        (pp) =>
+          Stream.zipLatestAll(
+            ...pp.map((p) => createFocusTargets.forProperty(p))
+          ),
+        { switch: true }
+      ),
+      Stream.map((vv) => vv.flat())
     );
 
-    return Effect.gen(function* () {
-      const vv = yield* Effect.all(
-        project.rootExObjects.items.map((o) => createFocusList.forExObject(o))
-      );
-      return vv.flat();
-    });
+    const v2 = exObject.basicProperties.itemStream.pipe(
+      Stream.flatMap(
+        (pp) =>
+          Stream.zipLatestAll(
+            ...pp.map((p) => createFocusTargets.forProperty(p))
+          ),
+        { switch: true }
+      ),
+      Stream.map((vv) => vv.flat())
+    );
+
+    const v3 = createFocusTargets.forProperty(exObject.cloneCountProperty);
+
+    const vv = Stream.zipLatestAll(v1, v2, v3).pipe(
+      Stream.map(([vv1, vv2, vv3]) => [...results, ...vv1, ...vv2, ...vv3])
+    );
+
+    return vv;
   },
 
-  forExObject(exObject: ExObject): Stream.Stream<Focus2[]> {
+  forProperty(property: Property): Stream.Stream<FocusTarget[]> {
+    const vv = property.expr.changes.pipe(
+      Stream.flatMap((expr) => createFocusTargets.forExpr(expr)),
+      Stream.map((vv) => vv.flat())
+    );
 
-
-    
-
-    throw new Error("Not implemented");
-
-    return Effect.gen(function* () {
-      const results = [
-        new Focus2({ kind: FocusKind("ExObjectName"), target: exObject }),
-        new Focus2({ kind: FocusKind("ExObjectComponent"), target: exObject }),
-      ];
-
-      const vv1 = yield* Effect.all(
-        exObject.componentParameterProperties_.items.map((p) =>
-          createFocusList.forProperty(p)
-        )
-      );
-      const vv2 = yield* Effect.all(
-        exObject.basicProperties.items.map((p) =>
-          createFocusList.forProperty(p)
-        )
-      );
-      const vv3 = yield* createFocusList.forProperty(
-        exObject.cloneCountProperty
-      );
-
-      results.push(...vv1.flat());
-      results.push(...vv2.flat());
-      results.push(...vv3);
-      return results;
-    });
+    return vv;
   },
 
-  forProperty(property: Property): Stream.Stream<Focus2[]> {
-    return Effect.gen(function* () {
-      const results = [
-        new Focus2({ kind: FocusKind("PropertyName"), target: property }),
-      ];
+  forExpr(expr: Expr): Stream.Stream<FocusTarget[]> {
+    const results = [new FocusTarget({ kind: FocusKind("Expr"), item: expr })];
+    let stream: Stream.Stream<FocusTarget[]> = Stream.make();
+    if (expr.type === "Expr/Call") {
+      const vv = expr.args.itemStream.pipe(
+        Stream.flatMap(
+          (aa) =>
+            Stream.zipLatestAll(
+              ...aa.map((a) => createFocusTargets.forExpr(a))
+            ),
+          { switch: true }
+        ),
+        Stream.map((vv) => vv.flat())
+      );
+      stream = vv;
+    }
 
-      const vv = yield* createFocusList.forExpr(yield* property.expr.get);
-      results.push(...vv);
-      return results;
-    });
-  },
+    const vv = stream.pipe(
+      Stream.flatMap((vv) => Stream.make([...results, ...vv]))
+    );
 
-  forExpr(expr: Expr): Stream.Stream<Focus2[]> {
-    return Effect.gen(function* () {
-      const results = [
-        new Focus2({ kind: FocusKind("Expr"), target: expr }),
-      ];
-
-      if (expr.type === "Expr/Call") {
-        const vv = yield* Effect.all(
-          expr.args.items.map((c) => createFocusList.forExpr(c))
-        );
-        results.push(...vv.flat());
-      }
-
-      return results;
-    });
+    return vv;
   },
 };

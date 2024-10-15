@@ -1,7 +1,7 @@
 // File: Project.ts
 
 import assert from "assert-ts";
-import { Effect, Stream } from "effect";
+import { Effect, Layer, Option, Ref, Stream, SubscriptionRef } from "effect";
 import {
   BehaviorSubject,
   firstValueFrom,
@@ -264,3 +264,26 @@ export const Project = {
     },
   }),
 };
+
+export class ProjectCtx extends Effect.Tag("ProjectCtx")<
+  ProjectCtx,
+  Effect.Effect.Success<typeof ctxEffect>
+>() {}
+
+const ctxEffect = Effect.gen(function* () {
+  const activeProject = yield* SubscriptionRef.make(Option.none<Project>());
+  yield* (yield* Project.activeProjectStream).pipe(
+    Stream.runForEach((project) => {
+      return Effect.gen(function* () {
+        yield* Ref.set(activeProject, Option.some(project));
+      });
+    }),
+    Effect.forkDaemon
+  );
+
+  return {
+    activeProject,
+  };
+});
+
+export const ProjectCtxLive = Layer.effect(ProjectCtx, ctxEffect);

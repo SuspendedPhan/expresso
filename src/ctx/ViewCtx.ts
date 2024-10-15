@@ -1,5 +1,6 @@
 import { Effect, Layer } from "effect";
 import { BehaviorSubject, map } from "rxjs";
+import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
 import type { NavItem, NavSection } from "src/utils/utils/Nav";
 import type { DexEffectSuccess } from "src/utils/utils/Utils";
@@ -102,15 +103,18 @@ const ctxEffect = Effect.gen(function* () {
 
   log55.debug("ViewCtx init complete");
 
+  const activeWindow$ = new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor);
   return {
-    activeWindow$: new BehaviorSubject<DexWindow>(DexWindow.ProjectEditor),
+    activeWindow$: activeWindow$,
     navCollapsed$: new BehaviorSubject<boolean>(false),
     navSections: [section0, section1, section2],
     viewMode$: new BehaviorSubject<ViewMode>(ViewMode.Default),
 
     activeWindowEqualTo$(window: DexWindow) {
-        return this.activeWindow$.pipe(map((w) => w === window));
-      }
+      return this.activeWindow$.pipe(map((w) => w === window));
+    },
+
+    activeWindow: EffectUtils.makeStreamFromObs(activeWindow$),
   };
 });
 
