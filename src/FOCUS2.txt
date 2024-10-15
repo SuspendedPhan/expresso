@@ -1,0 +1,34 @@
+ProjectTree
+    MultiTree: p => p.rootObjects, ExObjectTreeProto, ExObject
+
+ExObjectTreeProto
+    Leaf: ExObjectName
+    Leaf: ExObjectComponent
+    MultiTree: componentParameterProperties, PropertyTreeProto, ComponentParameterProperty
+    MultiTree: basicProperties, PropertyTreeProto, BasicProperty
+    Tree: cloneCountProperty, PropertyTreeProto, CloneCountProperty
+    Tree: o => o.children, ExObjectTreeProto, ExObject
+
+PropertyTreeProto
+    PropertyName: Leaf
+    Tree: p => p.expr, ExprTreeProto, undefined
+
+ExprTreeProto
+    Leaf: Expr
+    children: Multi(Expr)
+
+TreeProto:
+    members: MultiTree | Tree | Leaf
+
+MultiTree:
+    accessor: (v: Item) => Item
+    proto: TreeProto
+    itemTag: string
+
+Tree:
+    accessor: (v: Item) => Item
+    proto: TreeProto
+    itemTag: string
+
+Leaf:
+    focusTag: string
