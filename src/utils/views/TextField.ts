@@ -11,11 +11,11 @@ import {
 } from "src/utils/views/Field";
 
 
-export interface TextFieldValueInit<T extends EditableFocus> extends FieldValueInit<T> {
+export interface TextFieldValueInit extends FieldValueInit {
   value$: SUB<string>;
 }
 
-export type TextFieldInit<T extends EditableFocus> = TextFieldValueInit<T> & {
+export type TextFieldInit = TextFieldValueInit & {
   label: string;
 };
 
@@ -29,8 +29,8 @@ export interface TextFieldValueData extends FieldValueData {
   value$: OBS<string>;
 }
 
-export function createTextFieldValueData<T extends EditableFocus>(
-  init: TextFieldValueInit<T>
+export function createTextFieldValueData(
+  init: TextFieldValueInit
 ) {
   return Effect.gen(function* () {
     const fieldValueData = yield* createFieldValueData(init);
@@ -59,8 +59,8 @@ export function createTextFieldValueData<T extends EditableFocus>(
   });
 }
 
-export function createTextFieldData<T extends EditableFocus>(
-  init: TextFieldInit<T>
+export function createTextFieldData(
+  init: TextFieldInit
 ) {
   return Effect.gen(function* () {
     const fieldValueData = yield* createTextFieldValueData(init);

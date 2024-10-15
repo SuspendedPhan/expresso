@@ -27,6 +27,7 @@ export class FocusTarget extends Data.TaggedClass("Focus2")<{
 
 class Focus2 extends Data.TaggedClass("Focus2")<{
   target: FocusTarget;
+  isEditing: boolean;
   scope: Scope.CloseableScope;
 }> {}
 
@@ -82,7 +83,7 @@ const ctxEffect = Effect.gen(function* () {
         }
 
         const scope = yield* Scope.make();
-        const vv = Option.some(new Focus2({ target, scope }));
+        const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
         yield* this.focus.pipe(Ref.set(vv));
       });
     },
@@ -100,7 +101,7 @@ const ctxEffect = Effect.gen(function* () {
             return;
           }
           const scope = yield* Scope.make();
-          const vv = Option.some(new Focus2({ target, scope }));
+          const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
           yield* this.focus.pipe(Ref.set(vv));
           return;
         }
@@ -119,7 +120,7 @@ const ctxEffect = Effect.gen(function* () {
 
         const target = focusTargets_[nextIndex]!;
         const scope = yield* Scope.make();
-        const vv = Option.some(new Focus2({ target, scope }));
+        const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
         yield* this.focus.pipe(Ref.set(vv));
       });
     },

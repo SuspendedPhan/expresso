@@ -5,14 +5,10 @@
 
   export let fieldData: TextFieldValueData;
 
-  const { isFocused$, isEditing$, value$ } = fieldData;
+  const { focusViewPropIn, isEditing$, value$ } = fieldData;
 </script>
 
-<FocusView
-  on:mousedown={fieldData.handleClick}
-  focused={$isFocused$}
-  class="text-emphatic font-mono"
->
+<FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
   <HugInput
     isEditing={$isEditing$}
     on:input={fieldData.handleInput}

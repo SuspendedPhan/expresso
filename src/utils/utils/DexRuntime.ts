@@ -23,8 +23,10 @@ import { EvaluatorCtxLive } from "src/evaluation/EvaluatorCtx";
 import { GoBridgeCtxLive } from "src/evaluation/GoBridge";
 import { CloneNumberTargetCtxLive } from "src/ex-object/CloneNumberTarget";
 import { GlobalPropertyCtxLive } from "src/ex-object/GlobalProperty";
+import { ProjectCtxLive } from "src/ex-object/Project";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
 import { ExprFocusCtxLive } from "src/focus/ExprFocus";
+import { Focus2CtxLive } from "src/focus/Focus2";
 import { FocusCtxLive } from "src/focus/FocusCtx";
 import { RehydratorCtxLive } from "src/hydration/Rehydrator";
 import { EncodeCtxLive } from "src/utils/persistence/EncodeCtx";
@@ -36,6 +38,7 @@ import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
+import { FocusViewCtxLive } from "../views/FocusView";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
@@ -44,6 +47,8 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(ExprFocusCtxLive),
   Layer.provideMerge(KeyboardCtxLive),
+  Layer.provideMerge(FocusViewCtxLive),
+  Layer.provideMerge(Focus2CtxLive),
 
   Layer.provideMerge(ExprCommandCtxLive),
 
@@ -52,6 +57,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(LibraryPersistCtxLive),
   Layer.provideMerge(GCloudPersistCtx00Live),
 
+  Layer.provideMerge(ProjectCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(ViewCtxLive),

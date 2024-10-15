@@ -1,20 +1,19 @@
 import { Effect, Stream } from "effect";
 import { firstValueFrom, map, of } from "rxjs";
-import { KeyboardCtx } from "src/ctx/KeyboardCtx";
 import type { Focus } from "src/focus/Focus";
 import { FocusCtx } from "src/focus/FocusCtx";
 
 import { log5 } from "src/utils/utils/Log5";
-import { RxFns, type OBS } from "src/utils/utils/Utils";
+import { type OBS } from "src/utils/utils/Utils";
+import type { FocusViewPropIn } from "./FocusView";
 
 const log55 = log5("Field.ts");
 
 export type EditableFocus = Focus & { isEditing: boolean };
 
-export interface FieldValueInit<T extends EditableFocus> {
-  focusIsFn: (focus: Focus) => focus is T;
+export interface FieldValueInit {
   createEditingFocusFn: (isEditing: boolean) => Focus;
-  filterFn(focus: T): boolean;
+  focusViewPropIn: FocusViewPropIn;
 }
 
 export type FieldData = FieldValueData & {
@@ -28,30 +27,13 @@ export type FieldInit<T extends EditableFocus> = FieldValueInit<T> & {
 export interface FieldValueData {
   id: string;
   isEditing$: OBS<boolean>;
-  isFocused$: OBS<boolean>;
-  handleClick: () => void;
+  focusViewPropIn: FocusViewPropIn;
 }
 
-export function createFieldValueData<T extends EditableFocus>(
-  init: FieldValueInit<T>
+export function createFieldValueData(
+  init: FieldValueInit,
 ) {
   return Effect.gen(function* () {
-    const focusCtx = yield* FocusCtx;
-    const keyboardCtx = yield* KeyboardCtx;
-
-    const isFocused$ = focusCtx
-      .focusOrFalse$(init.focusIsFn)
-      .pipe(map((f) => f !== false && init.filterFn(f)));
-
-    const editingFocus$ = focusCtx
-      .editingFocus$(init.focusIsFn, true)
-      .pipe(RxFns.getOrFalse((f) => init.filterFn(f)));
-
-    const isEditing$ = editingFocus$.pipe(map((f) => f !== false));
-
-    yield* keyboardCtx.registerEditKey(init);
-    keyboardCtx.registerCancel(editingFocus$);
-
     const result: FieldValueData = {
       id: crypto.randomUUID(),
       handleClick: async () => {

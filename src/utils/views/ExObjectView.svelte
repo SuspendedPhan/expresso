@@ -7,7 +7,6 @@
     ExObjectFocusFactory,
     type ExObjectFocusKind,
   } from "src/focus/ExObjectFocus";
-  import { FocusCtx } from "src/focus/FocusCtx";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import { RxFns } from "src/utils/utils/Utils";
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
@@ -22,7 +21,9 @@
   import { isType } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
+  import { FocusViewCtx, type FocusViewPropIn } from "./FocusView";
   import PropertyView from "./PropertyView.svelte";
+  import { FocusTarget } from "src/focus/Focus2";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;
@@ -32,8 +33,6 @@
   const cloneCountProperty = exObject.cloneCountProperty;
   const basicProperties$ = exObject.basicProperties.items$;
   const children$ = exObject.children$;
-
-  let exObjectFocused = false;
 
   RxFns.onMount$()
     .pipe(
@@ -60,14 +59,6 @@
     })
   );
 
-  function handleClick() {
-    DexRuntime.runPromise(
-      Effect.gen(function* () {
-        FocusCtx.setFocus(ExObjectFocusFactory.ExObject({ exObject }));
-      })
-    );
-  }
-
   function addChild() {
     DexRuntime.runPromise(
       Effect.gen(function* () {
@@ -87,7 +78,7 @@
 
 <NodeView elementKey={exObject.id} {elementLayout}>
   <div>
-    <FocusView class="ex-card w-max flex flex-col">
+    <FlexContainer class="ex-card w-max flex flex-col">
       <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
@@ -119,7 +110,7 @@
       <div class="p-card self-center">
         <ExObjectButton on:click={addChild}>Add Child Object</ExObjectButton>
       </div>
-    </FocusView>
+    </FlexContainer>
     {#if $children$}
       {#each $children$ as child (child.id)}
         <svelte:self exObject={child} {elementLayout} />
