@@ -1,12 +1,33 @@
 <script lang="ts">
-  import type { FieldData } from "src/utils/views/Field";
+  import { Effect } from "effect";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
-  import FieldValue from "src/utils/views/FieldValue.svelte";
+  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
+  import type { TextFieldPropIn, TextFieldState } from "./TextField";
+  import FocusView from "./FocusView.svelte";
 
-  export let fieldData: FieldData;
+  export let propIn: TextFieldPropIn;
+
+  let label: TextFieldState["label"];
+  let value: TextFieldState["value"];
+  let onInput: TextFieldState["onInput"];
+
+  dexMakeSvelteScope().then((scope) => {
+    Effect.gen(function* () {
+      const state = yield* propIn(scope);
+      label = state.label;
+      value = state.value;
+      onInput = state.onInput;
+    }).pipe(DexRuntime.runPromise);
+  });
 </script>
 
 <div class="flex flex-row">
-  <FieldLabel label={fieldData.label} />
-  <FieldValue {fieldData} />
+  <FieldLabel {label} />
+  <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
+    <HugInput
+      isEditing={$isEditing$}
+      on:input={fieldData.handleInput}
+      value={$value$}
+    ></HugInput>
+  </FocusView>
 </div>

@@ -3,9 +3,10 @@ import {
   Effect,
   Option,
   Ref,
+  Scope,
   Stream,
   StreamEmit,
-  SubscriptionRef
+  SubscriptionRef,
 } from "effect";
 import {
   BehaviorSubject,
@@ -114,6 +115,26 @@ export const EffectUtils = {
     });
   },
 
+  streamToReadableScoped<T>(
+    stream: Stream.Stream<T>,
+    scope: Scope.Scope,
+    initialValue?: T,
+  ): Effect.Effect<Readable<T>> {
+    return Effect.gen(function* () {
+      const v = writable<T>(initialValue);
+      const v2 = stream.pipe(
+        Stream.runForEachScoped((value) =>
+          Effect.gen(function* () {
+            v.set(value);
+          })
+        ),
+        Scope.extend(scope)
+      );
+      yield* v2;
+      return v;
+    });
+  },
+
   switchMap<T, O>(
     f: (a: T) => Stream.Stream<O>
   ): (thisStream: Stream.Stream<T>) => Stream.Stream<O> {
@@ -128,7 +149,7 @@ export const EffectUtils = {
       const first = yield* stream.pipe(Stream.take(1), Stream.runHead);
       return Option.getOrThrow(first);
     });
-  }
+  },
 };
 
 export interface ReadonlySubscriptionRef<T> {

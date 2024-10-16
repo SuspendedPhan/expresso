@@ -1,9 +1,8 @@
 import { Effect, Layer, PubSub, Scope, Stream } from "effect";
-import { Subject } from "rxjs";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
-import { EffectUtils } from "src/utils/utils/EffectUtils";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";
+import type { FocusViewPropIn } from "./FocusView";
 
 export type TextFieldPropIn = (
   svelteScope: Scope.Scope
@@ -17,6 +16,7 @@ export interface TextFieldState {
   label: string;
   value: Readable<string>;
   onInput: (e: InputEvent) => void;
+  focusViewPropIn: FocusViewPropIn;
 }
 
 export class TextFieldCtx extends Effect.Tag("TextFieldCtx")<
