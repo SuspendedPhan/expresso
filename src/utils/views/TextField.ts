@@ -57,12 +57,7 @@ const ctxEffect = Effect.gen(function* () {
               label: label,
               value: value_,
               isEditing: yield* EffectUtils.streamToReadableScoped(
-                focusViewProp[1].isEditing.pipe(
-                  Deferred.await,
-                  Effect.timeout(500),
-                  Effect.orDie,
-                  Stream.unwrap
-                ),
+                focusViewProp[1].isEditing,
                 svelteScope
               ),
               onInput: (e: any) =>

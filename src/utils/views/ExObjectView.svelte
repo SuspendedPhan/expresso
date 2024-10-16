@@ -15,7 +15,10 @@
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import { type FieldData } from "src/utils/views/Field";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
-  import { createTextFieldData } from "src/utils/views/TextField";
+  import {
+    createTextFieldData,
+    type TextFieldPropIn,
+  } from "src/utils/views/TextField";
   import Field from "src/utils/views/TextField.svelte";
   import { isType } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
@@ -40,21 +43,7 @@
       exObjectFocused = exObject !== false && exObject === exObject;
     });
 
-  let exObjectNameField: FieldData;
-  DexRuntime.runPromise(
-    Effect.gen(function* () {
-      exObjectNameField = yield* createTextFieldData<ExObjectFocusKind["Name"]>(
-        {
-          label: "Name",
-          value$: exObject.name$,
-          focusIsFn: isType(ExObjectFocusFactory.Name),
-          createEditingFocusFn: (isEditing) =>
-            ExObjectFocusFactory.Name({ exObject, isEditing }),
-          filterFn: (f) => f.exObject === exObject,
-        }
-      );
-    })
-  );
+  let exObjectNameField: TextFieldPropIn;
 
   function addChild() {
     DexRuntime.runPromise(

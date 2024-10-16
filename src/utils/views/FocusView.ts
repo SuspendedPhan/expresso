@@ -1,5 +1,5 @@
 import assert from "assert-ts";
-import { Chunk, Deferred, Effect, Equal, Layer, Scope, Stream } from "effect";
+import { Chunk, Effect, Equal, Layer, Ref, Scope, Stream, SubscriptionRef } from "effect";
 import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
 import { writable, type Readable } from "svelte/store";
 
@@ -13,7 +13,7 @@ export type FocusViewPropIn = (
 ) => Effect.Effect<FocusViewState>;
 
 export type FocusViewPropOut = {
-  isEditing: Deferred.Deferred<Stream.Stream<boolean>>;
+  isEditing: Stream.Stream<boolean>;
 };
 
 export type FocusViewProp = [FocusViewPropIn, FocusViewPropOut];
@@ -32,21 +32,24 @@ const ctxEffect = Effect.gen(function* () {
       editable: boolean
     ): Effect.Effect<[FocusViewPropIn, FocusViewPropOut]> {
       return Effect.gen(function* () {
+        const isEditing = yield* SubscriptionRef.make(false);
+        
         const propOut: FocusViewPropOut = {
-          isEditing: yield* Deferred.make<Stream.Stream<boolean>>(),
+          isEditing: isEditing.changes
         };
 
         const focused = writable(false);
 
         const vv: FocusViewPropIn = (svelteScope) => {
           return Effect.gen(function* () {
-            const isEditing_ = focus2Ctx.focusByTarget(target).pipe(
+            focus2Ctx.focusByTarget(target).pipe(
               Stream.unwrap,
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
-              })
+              }),
+              Stream.runForEachScoped((editing) => Ref.set(isEditing, editing)),
+              Scope.extend(svelteScope)
             );
-            yield* propOut.isEditing.pipe(Deferred.succeed(isEditing_));
 
             const vv = focus2Ctx.focusByTarget(target).pipe(
               Stream.unwrap,

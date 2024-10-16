@@ -35,7 +35,8 @@ const ctxEffect = Effect.gen(function* () {
     ) {
       const createState = (svelteScope: Scope.Scope) =>
         Effect.gen(function* () {
-          const [focusViewPropIn, focusViewPropOut] = yield* focusViewCtx.createProps(focusTarget, true);
+          const [focusViewPropIn, focusViewPropOut] =
+            yield* focusViewCtx.createProps(focusTarget, true);
           const vv: ComboboxFieldState<T> = {
             label: label,
             value: yield* EffectUtils.streamToReadableScoped(
@@ -43,7 +44,7 @@ const ctxEffect = Effect.gen(function* () {
               svelteScope
             ),
             isEditing: yield* EffectUtils.streamToReadableScoped(
-              yield* focusViewPropOut.isEditing.pipe(Deferred.await, Effect.timeout(500)),
+              focusViewPropOut.isEditing,
               svelteScope
             ),
             focusViewPropIn,
