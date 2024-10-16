@@ -1,4 +1,4 @@
-import { Effect, Layer, Scope, Stream } from "effect";
+import { Deferred, Effect, Layer, Scope, Stream } from "effect";
 import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
 import type { ComboboxOption, ComboboxPropsIn } from "src/utils/views/Combobox";
 import { type Readable } from "svelte/store";
@@ -25,7 +25,6 @@ export class ComboboxFieldCtx extends Effect.Tag("ComboboxFieldCtx")<
 
 const ctxEffect = Effect.gen(function* () {
   const focusViewCtx = yield* FocusViewCtx;
-  const focus2Ctx = yield* Focus2Ctx;
 
   return {
     createProps<T extends ComboboxOption>(
@@ -36,11 +35,7 @@ const ctxEffect = Effect.gen(function* () {
     ) {
       const createState = (svelteScope: Scope.Scope) =>
         Effect.gen(function* () {
-          const focusViewPropIn = focusViewCtx.createProps(focusTarget, true);
-          const isEditing = focus2Ctx.focusByTarget(focusTarget).pipe(
-            Stream.unwrap,
-            Stream.flatMap((focus) => focus.isEditing.changes, { switch: true })
-          );
+          const [focusViewPropIn, focusViewPropOut] = yield* focusViewCtx.createProps(focusTarget, true);
           const vv: ComboboxFieldState<T> = {
             label: label,
             value: yield* EffectUtils.streamToReadableScoped(
@@ -48,7 +43,7 @@ const ctxEffect = Effect.gen(function* () {
               svelteScope
             ),
             isEditing: yield* EffectUtils.streamToReadableScoped(
-              isEditing,
+              yield* focusViewPropOut.isEditing.pipe(Deferred.await, Effect.timeout(500)),
               svelteScope
             ),
             focusViewPropIn,

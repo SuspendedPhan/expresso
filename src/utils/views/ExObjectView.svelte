@@ -14,7 +14,7 @@
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import { type FieldData } from "src/utils/views/Field";
-  import Field from "src/utils/views/Field.svelte";
+  import Field from "src/utils/views/TextField.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import { createTextFieldData } from "src/utils/views/TextField";

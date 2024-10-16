@@ -12,7 +12,7 @@
   import { ObservableArrayFns } from "src/utils/utils/ObservableArray";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import Field from "src/utils/views/Field.svelte";
+  import Field from "src/utils/views/TextField.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";

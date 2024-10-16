@@ -1,8 +1,10 @@
-import { Effect, Layer, PubSub, Scope, Stream } from "effect";
+import { Deferred, Effect, Layer, PubSub, Scope, Stream } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";
-import type { FocusViewPropIn } from "./FocusView";
+import type { FocusViewProp, FocusViewPropIn } from "./FocusView";
+import type { FocusTarget } from "src/focus/Focus2";
+import { EffectUtils } from "../utils/EffectUtils";
 
 export type TextFieldPropIn = (
   svelteScope: Scope.Scope
@@ -15,7 +17,8 @@ export interface TextFieldPropOut {
 export interface TextFieldState {
   label: string;
   value: Readable<string>;
-  onInput: (e: InputEvent) => void;
+  isEditing: Readable<boolean>;
+  onInput: (e: any) => void;
   focusViewPropIn: FocusViewPropIn;
 }
 
@@ -28,7 +31,8 @@ const ctxEffect = Effect.gen(function* () {
   return {
     createProps: (
       label: string,
-      value: Stream.Stream<string>
+      value: Stream.Stream<string>,
+      focusViewProp: FocusViewProp
     ): Effect.Effect<[TextFieldPropIn, TextFieldPropOut]> => {
       return Effect.gen(function* () {
         const valueOut = yield* PubSub.unbounded<string>();
@@ -51,12 +55,22 @@ const ctxEffect = Effect.gen(function* () {
             const vv: TextFieldState = {
               label: label,
               value: value_,
+              isEditing: yield* EffectUtils.streamToReadableScoped(
+                focusViewProp[1].isEditing.pipe(
+                  Deferred.await,
+                  Effect.timeout(500),
+                  Effect.orDie,
+                  Stream.unwrap
+                ),
+                svelteScope
+              ),
               onInput: (e: any) =>
                 Effect.gen(function* () {
                   const v = e.target.value;
                   const v2 = v === "" ? "a" : v;
                   yield* valueOut.publish(v2);
                 }).pipe(DexRuntime.runPromise),
+              focusViewPropIn: focusViewProp[0],
             };
             return vv;
           });

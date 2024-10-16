@@ -16,6 +16,8 @@ export type FocusViewPropOut = {
   isEditing: Deferred.Deferred<Stream.Stream<boolean>>;
 };
 
+export type FocusViewProp = [FocusViewPropIn, FocusViewPropOut];
+
 export class FocusViewCtx extends Effect.Tag("FocusViewCtx")<
   FocusViewCtx,
   Effect.Effect.Success<typeof ctxEffect>
