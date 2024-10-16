@@ -1,4 +1,4 @@
-import { Deferred, Effect, Layer, PubSub, Scope, Stream } from "effect";
+import { Effect, Layer, PubSub, Scope, Stream } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";

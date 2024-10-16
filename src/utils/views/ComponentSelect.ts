@@ -8,9 +8,10 @@ import { ExObjectFocusFactory } from "src/focus/ExObjectFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { ComboboxCtx } from "src/utils/views/Combobox";
-import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
+import type { ComboboxFieldPropIn } from "src/utils/views/ComboboxField";
 import { createFieldValueData } from "src/utils/views/Field";
 import { isType } from "variant";
+
 
 export interface ComponentOption {
   label: string;
@@ -86,7 +87,7 @@ const ctxEffect = Effect.gen(function* () {
           })
         );
 
-        const result: ComboboxFieldPropsIn<ComponentOption> = {
+        const result: ComboboxFieldPropIn<ComponentOption> = {
           propsIn: props.propsIn,
           label: "Component",
           fieldValueData: yield* createFieldValueData({

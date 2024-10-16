@@ -2,7 +2,7 @@
   import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
 
   import type {
-    ComboboxFieldPropsIn,
+    ComboboxFieldPropIn,
     ComboboxFieldState,
   } from "src/utils/views/ComboboxField";
 
@@ -12,7 +12,7 @@
   import FocusView from "src/utils/views/FocusView.svelte";
   import { Effect } from "effect";
 
-  export let propsIn: ComboboxFieldPropsIn<T>;
+  export let propsIn: ComboboxFieldPropIn<T>;
 
   let label: ComboboxFieldState<T>["label"];
   let value: ComboboxFieldState<T>["value"];

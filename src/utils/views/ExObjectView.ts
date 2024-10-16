@@ -1,14 +1,15 @@
 import { Effect, Layer } from "effect";
-import type { DexSetup } from "../utils/EffectUtils";
-import { TextFieldCtx, type TextFieldProp } from "./TextField";
 import type { ExObject } from "src/ex-object/ExObject";
-import { FocusViewCtx } from "./FocusView";
 import { FocusKind2, FocusTarget } from "src/focus/Focus2";
+import type { DexSetup } from "../utils/EffectUtils";
+import { FocusViewCtx } from "./FocusView";
+import { TextFieldCtx, type TextFieldProp } from "./TextField";
 
 interface ExObjectViewPropOut {}
 
 interface ExObjectViewState {
   nameFieldProp: TextFieldProp;
+  componentFieldProp: ComponentComboboxFieldProp;
 }
 
 interface ExObjectViewProp {

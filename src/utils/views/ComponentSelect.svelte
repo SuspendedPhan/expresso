@@ -3,7 +3,7 @@
   import { Effect, Exit, Scope } from "effect";
   import type { ExObject } from "src/ex-object/ExObject";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import type { ComboboxFieldPropsIn } from "src/utils/views/ComboboxField";
+  import type { ComboboxFieldPropIn } from "src/utils/views/ComboboxField";
   import ComboboxField from "src/utils/views/ComboboxField.svelte";
   import {
     ComponentSelectCtx,
@@ -25,7 +25,7 @@
     };
   });
 
-  let comboboxFieldPropsIn: ComboboxFieldPropsIn<ComponentOption>;
+  let comboboxFieldPropsIn: ComboboxFieldPropIn<ComponentOption>;
   let ready = false;
 
   DexRuntime.runPromise(

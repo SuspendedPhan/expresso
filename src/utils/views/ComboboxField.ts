@@ -1,13 +1,15 @@
-import { Deferred, Effect, Layer, Scope, Stream } from "effect";
-import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
+import { Effect, Layer, Scope, Stream } from "effect";
+import { type FocusTarget } from "src/focus/Focus2";
 import type { ComboboxOption, ComboboxPropsIn } from "src/utils/views/Combobox";
 import { type Readable } from "svelte/store";
 import { EffectUtils } from "../utils/EffectUtils";
 import { FocusViewCtx, type FocusViewPropIn } from "./FocusView";
 
-export type ComboboxFieldPropsIn<T extends ComboboxOption> = (
+export type ComboboxFieldPropIn<T extends ComboboxOption> = (
   svelteScope: Scope.Scope
 ) => Effect.Effect<ComboboxFieldState<T>>;
+
+export type ComboboxFieldProp<T extends ComboboxOption> = ComboboxFieldPropIn<T>;
 
 export interface ComboboxFieldState<T extends ComboboxOption> {
   label: string;
