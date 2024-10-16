@@ -7,10 +7,6 @@ import {
 } from "src/focus/NavFocus";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 import { log5 } from "src/utils/utils/Log5";
-import {
-  type FieldValueData
-} from "src/utils/views/Field";
-import { createTextFieldValueData } from "src/utils/views/TextField";
 import { isType } from "variant";
 
 const log55 = log5("ProjectNameCtx.ts");

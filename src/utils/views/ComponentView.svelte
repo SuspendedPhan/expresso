@@ -13,16 +13,11 @@
   import BasicPropertyList from "src/utils/views/BasicPropertyList.svelte";
   import Divider from "src/utils/views/Divider.svelte";
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
-  import { type FieldData } from "src/utils/views/Field";
   import Field from "src/utils/views/TextField.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExObjectView from "src/utils/views/RootExObjectView.svelte";
-  import {
-    createTextFieldData,
-    createTextFieldValueData,
-  } from "src/utils/views/TextField";
   import { isType } from "variant";
 
   export let component: ComponentKind["Custom"];

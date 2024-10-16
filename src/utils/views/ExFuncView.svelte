@@ -17,10 +17,6 @@
   import FocusView from "src/utils/views/FocusView.svelte";
   import ListInput from "src/utils/views/ListInput.svelte";
   import RootExprView from "src/utils/views/RootExprView.svelte";
-  import {
-    createTextFieldData,
-    type TextFieldData,
-  } from "src/utils/views/TextField";
   import { isType } from "variant";
 
   const log55 = log5("ExFuncView.svelte");

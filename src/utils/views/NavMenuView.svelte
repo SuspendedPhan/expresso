@@ -6,7 +6,6 @@
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import type { NavSection } from "src/utils/utils/Nav";
   import { type OBS } from "src/utils/utils/Utils";
-  import { type FieldValueData } from "src/utils/views/Field";
   import FieldValue from "src/utils/views/FieldValue.svelte";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
