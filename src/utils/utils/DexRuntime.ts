@@ -11,7 +11,6 @@ import { CanvasViewCtxLive } from "src/canvas/CanvasView";
 import { CanvasComponentCtxLive } from "src/ctx/CanvasComponentCtx";
 import { ComponentCtxLive } from "src/ctx/ComponentCtx";
 import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
-import { KeyboardCtxLive } from "src/ctx/KeyboardCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
@@ -25,7 +24,6 @@ import { CloneNumberTargetCtxLive } from "src/ex-object/CloneNumberTarget";
 import { GlobalPropertyCtxLive } from "src/ex-object/GlobalProperty";
 import { ProjectCtxLive } from "src/ex-object/Project";
 import { ExObjectFocusCtxLive } from "src/focus/ExObjectFocusCtx";
-import { ExprFocusCtxLive } from "src/focus/ExprFocus";
 import { Focus2CtxLive } from "src/focus/Focus2";
 import { FocusCtxLive } from "src/focus/FocusCtx";
 import { RehydratorCtxLive } from "src/hydration/Rehydrator";
@@ -39,14 +37,15 @@ import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
 import { FocusViewCtxLive } from "../views/FocusView";
+import { ComboboxFieldCtxLive } from "../views/ComboboxField";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
+  Layer.provideMerge(ComponentSelectCtxLive),
   Layer.provideMerge(GoBridgeCtxLive),
   Layer.provideMerge(GoModuleCtxLive),
   Layer.provideMerge(ExObjectFocusCtxLive),
-  Layer.provideMerge(ExprFocusCtxLive),
-  Layer.provideMerge(KeyboardCtxLive),
+  Layer.provideMerge(ComboboxFieldCtxLive),
   Layer.provideMerge(FocusViewCtxLive),
   Layer.provideMerge(Focus2CtxLive),
 
@@ -65,8 +64,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(FocusCtxLive)
 );
 
-const mainLayer2 = mainLayer.pipe(
-  Layer.provideMerge(ComponentCtxLive),
+const mainLayer2 = ComponentCtxLive.pipe(
   Layer.provideMerge(RehydratorCtxLive),
   Layer.provideMerge(ProjectNameCtxLive),
   // Layer.provideMerge(TestTelemetryCtxLive),
@@ -74,14 +72,15 @@ const mainLayer2 = mainLayer.pipe(
   Layer.provideMerge(CloneNumberTargetCtxLive),
   Layer.provideMerge(CanvasComponentCtxLive),
   Layer.provideMerge(ComboboxCtxLive),
-  Layer.provideMerge(ComponentSelectCtxLive),
   Layer.provideMerge(SystemExFuncCtxLive),
   Layer.provideMerge(GlobalPropertyCtxLive),
   Layer.provideMerge(CanvasViewCtxLive),
   Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All))
 );
 
-export const DexRuntime = ManagedRuntime.make(mainLayer2);
+const mainLayer3 = mainLayer.pipe(Layer.provideMerge(mainLayer2));
+
+export const DexRuntime = ManagedRuntime.make(mainLayer3);
 
 export function dexMakeSvelteScope(): Promise<Scope.Scope> {
   return new Promise((resolve) => {
@@ -91,9 +90,9 @@ export function dexMakeSvelteScope(): Promise<Scope.Scope> {
         scope = yield* Scope.make();
         resolve(scope);
       });
-  
+
       DexRuntime.runPromise(v);
-  
+
       return () => {
         Effect.gen(function* () {
           yield* Scope.close(scope, Exit.succeed(undefined));

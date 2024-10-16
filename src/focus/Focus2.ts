@@ -9,7 +9,7 @@ import {
   Ref,
   Scope,
   Stream,
-  SubscriptionRef
+  SubscriptionRef,
 } from "effect";
 import { DexWindow, ViewCtx } from "src/ctx/ViewCtx";
 import type { ExObject } from "src/ex-object/ExObject";
@@ -83,7 +83,13 @@ const ctxEffect = Effect.gen(function* () {
         }
 
         const scope = yield* Scope.make();
-        const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
+        const vv = Option.some(
+          new Focus2({
+            target,
+            scope,
+            isEditing: yield* SubscriptionRef.make(false),
+          })
+        );
         yield* this.focus.pipe(Ref.set(vv));
       });
     },
@@ -101,7 +107,13 @@ const ctxEffect = Effect.gen(function* () {
             return;
           }
           const scope = yield* Scope.make();
-          const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
+          const vv = Option.some(
+            new Focus2({
+              target,
+              scope,
+              isEditing: yield* SubscriptionRef.make(false),
+            })
+          );
           yield* this.focus.pipe(Ref.set(vv));
           return;
         }
@@ -120,7 +132,13 @@ const ctxEffect = Effect.gen(function* () {
 
         const target = focusTargets_[nextIndex]!;
         const scope = yield* Scope.make();
-        const vv = Option.some(new Focus2({ target, scope, isEditing: false }));
+        const vv = Option.some(
+          new Focus2({
+            target,
+            scope,
+            isEditing: yield* SubscriptionRef.make(false),
+          })
+        );
         yield* this.focus.pipe(Ref.set(vv));
       });
     },

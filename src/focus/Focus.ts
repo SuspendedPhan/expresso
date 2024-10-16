@@ -3,7 +3,6 @@ import type { EditorFocus } from "src/focus/EditorFocus";
 import type { ExFuncFocus } from "src/focus/ExFuncFocus";
 import type { ExItemFocus } from "src/focus/ExItemFocus";
 import type { ExObjectFocus } from "src/focus/ExObjectFocus";
-import type { ExprFocus } from "src/focus/ExprFocus";
 import type { NavFocus, NavProjectNameFocus } from "src/focus/NavFocus";
 import type { ProjectComponentWindowFocus } from "src/focus/ProjectComponentWindowFocus";
 import { dexVariant, type DexVariantKind } from "src/utils/utils/VariantUtils4";
@@ -25,7 +24,6 @@ export type Focus =
   | VariantOf<typeof FocusFactory>
   | ExItemFocus
   | ExObjectFocus
-  | ExprFocus
   | NavFocus
   | ProjectComponentWindowFocus
   | EditorFocus

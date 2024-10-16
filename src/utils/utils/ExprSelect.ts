@@ -7,8 +7,9 @@ import { CustomExFuncFactory } from "src/ex-object/ExFunc";
 import { ExItem } from "src/ex-object/ExItem";
 import { ExObject, ExObjectFactory } from "src/ex-object/ExObject";
 import { Expr, ExprFactory2 } from "src/ex-object/Expr";
+import { GlobalPropertyCtx } from "src/ex-object/GlobalProperty";
 import { Project } from "src/ex-object/Project";
-import { ExprFocusFactory } from "src/focus/ExprFocus";
+import { Focus2Ctx, FocusKind2, FocusTarget } from "src/focus/Focus2";
 import { FocusCtx } from "src/focus/FocusCtx";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
@@ -16,7 +17,6 @@ import { log5 } from "src/utils/utils/Log5";
 import { isType } from "variant";
 import { ComboboxCtx } from "../views/Combobox";
 import { DexUtils } from "./DexUtils";
-import { GlobalPropertyCtx } from "src/ex-object/GlobalProperty";
 
 // @ts-ignore
 const log55 = log5("ExprCommand.ts");
@@ -32,9 +32,9 @@ export class ExprSelectCtx extends Effect.Tag("ExprCommandCtx")<
 >() {}
 
 const ctxEffect = Effect.gen(function* () {
-  const focusCtx = yield* FocusCtx;
   const systemExFuncCtx = yield* SystemExFuncCtx;
   const globalPropertyCtx = yield* GlobalPropertyCtx;
+  const focus2ctx = yield* Focus2Ctx;
 
   return {
     createComboboxPropsIn(expr: Expr) {
@@ -156,7 +156,9 @@ const ctxEffect = Effect.gen(function* () {
     );
   }
 
-  function getGlobalPropertyCommands(currentExpr: Expr): Effect.Effect<ExprSelectOption>[] {
+  function getGlobalPropertyCommands(
+    currentExpr: Expr
+  ): Effect.Effect<ExprSelectOption>[] {
     return globalPropertyCtx.globalProperties.map((globalProperty) => {
       return Effect.succeed({
         label: globalProperty.id,
@@ -255,8 +257,11 @@ const ctxEffect = Effect.gen(function* () {
       execute() {
         return Effect.gen(function* () {
           yield* Expr.replaceExpr(oldExpr, newExpr);
-          focusCtx.setFocus(
-            ExprFocusFactory.Expr({ expr: newExpr, isEditing: false })
+          focus2ctx.setFocus(
+            new FocusTarget({
+              item: newExpr,
+              kind: FocusKind2("Expr"),
+            })
           );
         });
       },

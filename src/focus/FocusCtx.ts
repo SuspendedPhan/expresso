@@ -3,7 +3,6 @@ import { BehaviorSubject, map } from "rxjs";
 import { FocusFactory, type Focus } from "src/focus/Focus";
 import { log5 } from "src/utils/utils/Log5";
 import { type OBS } from "src/utils/utils/Utils";
-import type { EditableFocus } from "src/utils/views/Field";
 
 const log55 = log5("FocusCtx.ts", 9);
 
@@ -53,21 +52,6 @@ const ctxEffect = Effect.gen(function* () {
 
     mapFocus$<T>(mapperFn: (focus: Focus) => T) {
       return focus$.pipe(map(mapperFn));
-    },
-
-    editingFocus$<T extends EditableFocus>(
-      predicate: (f: Focus) => f is T,
-      isEditing: boolean
-    ): OBS<T | false> {
-      return this.focusOrFalse$(predicate).pipe(
-        map((f) => {
-          if (f === false) {
-            return false;
-          }
-          const match = f.isEditing === isEditing;
-          return match ? f : false;
-        })
-      );
     },
 
     register() {

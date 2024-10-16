@@ -4,7 +4,6 @@ import { LibraryCtx } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtx } from "src/ctx/LibraryProjectCtx";
 import { Library } from "src/ex-object/Library";
 import { ExObjectFocusCtx } from "src/focus/ExObjectFocusCtx";
-import { ExprFocusCtx } from "src/focus/ExprFocus";
 import { FocusCtx } from "src/focus/FocusCtx";
 import Dehydrator from "src/hydration/Dehydrator";
 import { LibraryPersistCtx } from "src/utils/persistence/LibraryPersistCtx";
@@ -21,7 +20,6 @@ export class MainCtx extends Effect.Tag("MainCtx")<
 
 const ctxEffect_ = Effect.gen(function* () {
   yield* FocusCtx.register();
-  yield* ExprFocusCtx.register();
   yield* ExObjectFocusCtx.register();
 
   // yield* GoBridgeCtx;
