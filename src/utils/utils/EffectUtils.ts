@@ -21,6 +21,8 @@ import { writable } from "svelte/store";
 
 const log55 = log5("EffectUtils.ts");
 
+export type DexSetup<T> = (s: Scope.Scope) => Effect.Effect<T>;
+
 export const EffectUtils = {
   firstValueFrom<T>(source: OBS<T>): Effect.Effect<T> {
     return Effect.promise(() => firstValueFrom(source));

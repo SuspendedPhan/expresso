@@ -14,16 +14,13 @@
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import { type FieldData } from "src/utils/views/Field";
-  import Field from "src/utils/views/TextField.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
-  import FocusView from "src/utils/views/FocusView.svelte";
   import { createTextFieldData } from "src/utils/views/TextField";
+  import Field from "src/utils/views/TextField.svelte";
   import { isType } from "variant";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
-  import { FocusViewCtx, type FocusViewPropIn } from "./FocusView";
   import PropertyView from "./PropertyView.svelte";
-  import { FocusTarget } from "src/focus/Focus2";
 
   export let exObject: ExObject;
   export let elementLayout: ElementLayout;

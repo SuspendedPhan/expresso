@@ -35,6 +35,7 @@ import { fields, isType, matcher, variation } from "variant";
 const log55 = log5("ExObject.ts", 10);
 interface ExObject_ extends ExItemBase {
   name$: SUB<string>;
+  name: Stream.Stream<string>;
   component: SubscriptionRef.SubscriptionRef<Component>;
   component$: OBS<Component>;
   children: ObservableArray<ExObject>;
@@ -120,6 +121,9 @@ export function ExObjectFactory2(creationArgs: ExObjectCreationArgs) {
         base.destroy$,
         creationArgs2.name
       ),
+      get name() {
+        return EffectUtils.makeStreamFromObs(this.name$);
+      },
       component: componentRef,
       component$: yield* EffectUtils.streamToObs(componentRef.changes),
       componentParameterProperties_,

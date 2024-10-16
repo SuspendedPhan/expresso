@@ -2,9 +2,8 @@ import { Deferred, Effect, Layer, PubSub, Scope, Stream } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";
-import type { FocusViewProp, FocusViewPropIn } from "./FocusView";
-import type { FocusTarget } from "src/focus/Focus2";
 import { EffectUtils } from "../utils/EffectUtils";
+import type { FocusViewProp, FocusViewPropIn } from "./FocusView";
 
 export type TextFieldPropIn = (
   svelteScope: Scope.Scope
@@ -13,6 +12,8 @@ export type TextFieldPropIn = (
 export interface TextFieldPropOut {
   value: Stream.Stream<string>;
 }
+
+export type TextFieldProp = [TextFieldPropIn, TextFieldPropOut];
 
 export interface TextFieldState {
   label: string;
