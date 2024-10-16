@@ -9,11 +9,9 @@ import {
   Stream,
   SubscriptionRef,
 } from "effect";
-import type { Scope } from "effect/Scope";
-import type { KeyboardCtx } from "src/ctx/KeyboardCtx";
-import type { FocusCtx } from "src/focus/FocusCtx";
+import { Scope } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
-import { EffectUtils } from "src/utils/utils/EffectUtils";
+import { EffectUtils, type DexSetup } from "src/utils/utils/EffectUtils";
 import { type Readable } from "svelte/store";
 
 export interface ComboboxOption {
@@ -36,7 +34,7 @@ export interface ComboboxProps<T extends ComboboxOption> {
 }
 
 export interface ComboboxPropsIn<T extends ComboboxOption> {
-  createState: () => Effect.Effect<ComboboxState<T>>;
+  createState: DexSetup<ComboboxState<T>>;
 }
 
 export interface ComboboxPropsOut<T extends ComboboxOption> {
@@ -63,7 +61,7 @@ const ctxEffect = Effect.gen(function* () {
   return {
     createProps<T extends ComboboxOption>(
       args: ComboboxArgs<T>
-    ): Effect.Effect<ComboboxProps<T>, never, Scope | FocusCtx | KeyboardCtx> {
+    ): Effect.Effect<ComboboxProps<T>> {
       return Effect.gen(function* () {
         const query = yield* SubscriptionRef.make<string>("");
         const onOptionSelected = yield* PubSub.unbounded<T>();
@@ -75,7 +73,7 @@ const ctxEffect = Effect.gen(function* () {
           args.options
         ).pipe(
           Stream.map(([focusedIndex_, options]) => {
-            return Option.map(focusedIndex_, i => {
+            return Option.map(focusedIndex_, (i) => {
               const opt = options[i];
               assert(opt !== undefined);
               return opt;
@@ -141,7 +139,7 @@ const ctxEffect = Effect.gen(function* () {
                         isFocused,
                         select,
                       };
-                        // console.log("Computed option", index, extracted);
+                      // console.log("Computed option", index, extracted);
                       return extracted;
                     });
                   });
@@ -167,52 +165,51 @@ const ctxEffect = Effect.gen(function* () {
         const optionImpls = yield* SubscriptionRef.make<_ComboboxOption<T>[]>(
           []
         );
-        yield* Effect.forkDaemon(
-          Stream.runForEach(optionImpls_, (value) => {
-            return Effect.gen(function* () {
-              // console.log("Setting optionImpls", value);
-              yield* Ref.set(optionImpls, value);
-            });
-          })
-        );
 
-        // If focusedIndex is bigger than the number of options, then we should reset it to the last option.
-        yield* Effect.forkDaemon(
-          Stream.runForEach(optionImpls.changes, (optionImpls_) => {
-            return Effect.gen(function* () {
-              const focusedIndex_ = yield* focusedIndex.get;
-              const newIndex = Option.map(focusedIndex_, (i) => {
-                if (i >= optionImpls_.length) {
-                  return optionImpls_.length - 1;
-                }
-
-                if (i < 0) {
-                  return 0;
-                }
-                return i;
-              });
-              const newIndex2 = Option.orElse(newIndex, () => {
-                if (optionImpls_.length > 0) {
-                  return Option.some(0);
-                }
-                return Option.none();
-              });
-
-              const eq = Option.getEquivalence(Equivalence.number);
-              if (eq(focusedIndex_, newIndex2) === false) {
-                // console.log(
-                //   "Making sure focusedIndex is within bounds",
-                //   focusedIndex_,
-                //   newIndex
-                // );
-                yield* Ref.set(focusedIndex, newIndex2);
-              }
-            });
-          })
-        );
-
-        const createState = () =>
+        const createState = (svelteScope: Scope.Scope) =>
           Effect.gen(function* () {
+            yield* Scope.addFinalizer(svelteScope, onOptionSelected.shutdown);
+
+            yield* Stream.runForEach(optionImpls_, (value) => {
+              return Effect.gen(function* () {
+                // console.log("Setting optionImpls", value);
+                yield* Ref.set(optionImpls, value);
+              });
+            }).pipe(Effect.forkIn(svelteScope));
+
+            // If focusedIndex is bigger than the number of options, then we should reset it to the last option.
+            yield* Stream.runForEach(optionImpls.changes, (optionImpls_) => {
+              return Effect.gen(function* () {
+                const focusedIndex_ = yield* focusedIndex.get;
+                const newIndex = Option.map(focusedIndex_, (i) => {
+                  if (i >= optionImpls_.length) {
+                    return optionImpls_.length - 1;
+                  }
+            
+                  if (i < 0) {
+                    return 0;
+                  }
+                  return i;
+                });
+                const newIndex2 = Option.orElse(newIndex, () => {
+                  if (optionImpls_.length > 0) {
+                    return Option.some(0);
+                  }
+                  return Option.none();
+                });
+            
+                const eq = Option.getEquivalence(Equivalence.number);
+                if (eq(focusedIndex_, newIndex2) === false) {
+                  // console.log(
+                  //   "Making sure focusedIndex is within bounds",
+                  //   focusedIndex_,
+                  //   newIndex
+                  // );
+                  yield* Ref.set(focusedIndex, newIndex2);
+                }
+              });
+            }).pipe(Effect.forkIn(svelteScope));
+
             const state: ComboboxState<T> = {
               onKeydown: (e) => {
                 DexRuntime.runPromise(
@@ -280,9 +277,13 @@ const ctxEffect = Effect.gen(function* () {
                   })
                 );
               },
-              query: yield* EffectUtils.streamToReadable(query.changes),
-              optionImpls: yield* EffectUtils.streamToReadable(
+              query: yield* EffectUtils.streamToReadableScoped(
+                query.changes,
+                svelteScope
+              ),
+              optionImpls: yield* EffectUtils.streamToReadableScoped(
                 optionImpls.changes,
+                svelteScope,
                 []
               ),
             };

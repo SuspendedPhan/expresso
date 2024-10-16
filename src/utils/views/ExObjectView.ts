@@ -1,18 +1,31 @@
-import { Effect, Layer } from "effect";
+import { Effect, Layer, Stream } from "effect";
 import type { ExObject } from "src/ex-object/ExObject";
 import { FocusKind2, FocusTarget } from "src/focus/Focus2";
-import type { DexSetup } from "../utils/EffectUtils";
+import { EffectUtils, type DexSetup } from "../utils/EffectUtils";
 import { FocusViewCtx } from "./FocusView";
 import { TextFieldCtx, type TextFieldProp } from "./TextField";
+import {
+  ComponentSelectCtx,
+  type ComponentSelectProp,
+} from "./ComponentSelect";
+import type { Property, PropertyKind } from "src/ex-object/Property";
+import { writable, type Readable } from "svelte/store";
 
-interface ExObjectViewPropOut {}
+export interface ExObjectViewPropOut {}
 
-interface ExObjectViewState {
+export interface ExObjectViewState {
+  exObject: ExObject;
+
   nameFieldProp: TextFieldProp;
-  componentFieldProp: ComponentComboboxFieldProp;
+  componentFieldProp: ComponentSelectProp;
+
+  componentParameterProperties: Readable<Property[]>;
+  cloneCountProperty: Readable<Property>;
+  basicProperties: Readable<PropertyKind["BasicProperty"][]>;
+  children: Readable<ExObject[]>;
 }
 
-interface ExObjectViewProp {
+export interface ExObjectViewProp {
   setup: DexSetup<ExObjectViewState>;
   out: ExObjectViewPropOut;
 }
@@ -25,6 +38,7 @@ export class ExObjectViewCtx extends Effect.Tag("ExObjectViewCtx")<
 const ctxEffect = Effect.gen(function* () {
   const textFieldCtx = yield* TextFieldCtx;
   const focusViewCtx = yield* FocusViewCtx;
+  const componentSelectCtx = yield* ComponentSelectCtx;
 
   return {
     createProp: (exObject: ExObject): Effect.Effect<ExObjectViewProp> => {
@@ -33,6 +47,7 @@ const ctxEffect = Effect.gen(function* () {
           setup: (svelteScope) =>
             Effect.gen(function* () {
               const state: ExObjectViewState = {
+                exObject,
                 nameFieldProp: yield* textFieldCtx.createProps(
                   "Name",
                   exObject.name,
@@ -43,6 +58,28 @@ const ctxEffect = Effect.gen(function* () {
                     }),
                     true
                   )
+                ),
+
+                componentFieldProp: yield* componentSelectCtx.createProp(
+                  exObject
+                ),
+
+                componentParameterProperties:
+                  yield* EffectUtils.makeScopedReadableFromStream(
+                    exObject.componentParameterProperties_.itemStream,
+                    svelteScope
+                  ),
+
+                cloneCountProperty: writable(exObject.cloneCountProperty),
+                basicProperties:
+                  yield* EffectUtils.makeScopedReadableFromStream(
+                    exObject.basicProperties.itemStream,
+                    svelteScope
+                  ),
+
+                children: yield* EffectUtils.makeScopedReadableFromStream(
+                  exObject.children.itemStream,
+                  svelteScope
                 ),
               };
               return state;

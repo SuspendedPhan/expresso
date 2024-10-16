@@ -120,7 +120,7 @@ export const EffectUtils = {
   streamToReadableScoped<T>(
     stream: Stream.Stream<T>,
     scope: Scope.Scope,
-    initialValue?: T,
+    initialValue?: T
   ): Effect.Effect<Readable<T>> {
     return Effect.gen(function* () {
       const v = writable<T>(initialValue);
@@ -135,6 +135,14 @@ export const EffectUtils = {
       yield* v2;
       return v;
     });
+  },
+
+  makeScopedReadableFromStream<T>(
+    stream: Stream.Stream<T>,
+    scope: Scope.Scope,
+    initialValue?: T
+  ): Effect.Effect<Readable<T>> {
+    return this.streamToReadableScoped(stream, scope, initialValue);
   },
 
   switchMap<T, O>(

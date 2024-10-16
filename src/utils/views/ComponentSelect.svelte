@@ -1,48 +1,19 @@
-<!-- todp rename to componentfield -->
 <script lang="ts">
-  import { Effect, Exit, Scope } from "effect";
-  import type { ExObject } from "src/ex-object/ExObject";
-  import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import type { ComboboxFieldPropIn } from "src/utils/views/ComboboxField";
-  import ComboboxField from "src/utils/views/ComboboxField.svelte";
-  import {
-    ComponentSelectCtx,
-    type ComponentOption,
-  } from "src/utils/views/ComponentSelect";
-  import { onMount } from "svelte";
+  import { Effect } from "effect";
+  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
+  import type { DexSetup } from "../utils/EffectUtils";
+  import ComboboxField from "./ComboboxField.svelte";
+  import type { ComponentSelectState } from "./ComponentSelect";
 
-  export let exObject: ExObject = null as any;
+  export let setup: DexSetup<ComponentSelectState>;
+  let comboboxFieldProp: ComponentSelectState["comboboxFieldProp"];
 
-  let scope: Scope.CloseableScope = null as any;
-
-  onMount(() => {
-    return () => {
-      DexRuntime.runPromise(
-        Effect.gen(function* () {
-          yield* Scope.close(scope, Exit.succeed(void 0));
-        })
-      );
-    };
-  });
-
-  let comboboxFieldPropsIn: ComboboxFieldPropIn<ComponentOption>;
-  let ready = false;
-
-  DexRuntime.runPromise(
+  dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
-      const componentSelectCtx = yield* ComponentSelectCtx;
-
-      scope = yield* Scope.make();
-      comboboxFieldPropsIn = yield* Scope.extend(
-        componentSelectCtx.createComboboxFieldPropsIn(exObject),
-        scope
-      );
-
-      ready = true;
-    })
-  );
+      const state = yield* setup(scope);
+      comboboxFieldProp = state.comboboxFieldProp;
+    }).pipe(DexRuntime.runPromise);
+  });
 </script>
 
-{#if ready}
-  <ComboboxField propsIn={comboboxFieldPropsIn} />
-{/if}
+<ComboboxField propsIn={comboboxFieldProp} />
