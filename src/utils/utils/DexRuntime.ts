@@ -47,7 +47,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(ExObjectFocusCtxLive),
   Layer.provideMerge(ComboboxFieldCtxLive),
   Layer.provideMerge(FocusViewCtxLive),
-  Layer.provideMerge(Focus2CtxLive),
 
   Layer.provideMerge(ExprCommandCtxLive),
 
@@ -56,6 +55,7 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(LibraryPersistCtxLive),
   Layer.provideMerge(GCloudPersistCtx00Live),
 
+  Layer.provideMerge(Focus2CtxLive),
   Layer.provideMerge(ProjectCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),

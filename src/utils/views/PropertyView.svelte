@@ -1,65 +1,35 @@
 <script lang="ts">
-  import { map, of, switchAll, switchMap } from "rxjs";
-  import { ExprFactory } from "src/ex-object/Expr";
-  import { Property, PropertyFactory } from "src/ex-object/Property";
-  import { ExObjectFocus } from "src/focus/ExObjectFocus";
-  import { DexRuntime } from "src/utils/utils/DexRuntime";
-  import { log5 } from "src/utils/utils/Log5";
-
-  import { rxEquals, RxFns } from "src/utils/utils/Utils";
-  import FocusView from "src/utils/views/FocusView.svelte";
-  import HugInput from "src/utils/views/HugInput.svelte";
+  import { Effect } from "effect";
   import RootExprView from "src/utils/views/RootExprView.svelte";
-  import { isType } from "variant";
+  import type { Readable } from "svelte/store";
+  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
+  import type { DexSetup } from "../utils/EffectUtils";
+  import type { PropertyViewState } from "./PropertyView";
+  import type { RootExprViewState } from "./RootExprView";
+  import type { TextFieldPropIn } from "./TextField";
+  import TextField from "./TextField.svelte";
 
-  const log55 = log5("PropertyView.svelte");
+  let nameFieldPropIn: TextFieldPropIn;
+  let rootExprViewSetup: DexSetup<RootExprViewState>;
+  let isNumberExpr: Readable<boolean>;
 
-  export let property: Property;
+  export let setup: DexSetup<PropertyViewState>;
 
-  const name$ = Property.Methods(property).getName$();
-
-  const expr$ = property.expr$;
-  const exprId$ = expr$.pipe(map((expr) => expr.id));
-
-  const isNumberExpr$ = expr$.pipe(map(isType(ExprFactory.Number)));
-
-  let isFocused = false;
-  RxFns.onMount$()
-    .pipe(
-      switchMap(() => DexRuntime.runPromise(ExObjectFocus.propertyFocus$)),
-      switchAll(),
-      rxEquals(property)
-    )
-    .subscribe((isFocused2) => {
-      isFocused = isFocused2;
-    });
-
-  const editingName$ = of(false);
-
-  function handleNameInput(event: Event) {
-    const currentTarget = event.currentTarget as HTMLInputElement;
-    const name = currentTarget.value;
-    if (!isType(property, PropertyFactory.BasicProperty)) {
-      throw new Error("Cannot edit name of non-basic property");
-    }
-
-    property.name$.next(name);
-  }
+  dexMakeSvelteScope().then((scope) => {
+    Effect.gen(function* () {
+      const state = yield* setup(scope);
+      nameFieldPropIn = state.nameFieldPropIn;
+      rootExprViewSetup = state.rootExprViewSetup;
+      isNumberExpr = state.isNumberExpr;
+    }).pipe(DexRuntime.runPromise);
+  });
 </script>
 
-<div class:flex={$isNumberExpr$} class="items-center font-mono">
+<div class:flex={$isNumberExpr} class="items-center font-mono">
   <div class="flex flex-row">
-    <FocusView focused={isFocused} class="w-max grow-0">
-      <HugInput
-        value={$name$}
-        isEditing={$editingName$}
-        on:input={handleNameInput}
-      />
-    </FocusView>
+    <TextField propIn={nameFieldPropIn} />
     <pre class="text-style-secondary"> = </pre>
   </div>
 
-  {#key $exprId$}
-    <RootExprView expr={$expr$} />
-  {/key}
+  <RootExprView setup={rootExprViewSetup} />
 </div>

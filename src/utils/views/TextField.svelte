@@ -26,7 +26,9 @@
 </script>
 
 <div class="flex flex-row">
-  <FieldLabel {label} />
+  {#if label}
+    <FieldLabel {label} />
+  {/if}
   <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
     <HugInput isEditing={$isEditing} on:input={onInput} value={$value}
     ></HugInput>

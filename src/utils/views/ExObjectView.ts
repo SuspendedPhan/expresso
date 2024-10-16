@@ -1,15 +1,15 @@
-import { Effect, Layer, Stream } from "effect";
+import { Effect, Layer } from "effect";
 import type { ExObject } from "src/ex-object/ExObject";
+import type { Property, PropertyKind } from "src/ex-object/Property";
 import { FocusKind2, FocusTarget } from "src/focus/Focus2";
+import { writable, type Readable } from "svelte/store";
 import { EffectUtils, type DexSetup } from "../utils/EffectUtils";
-import { FocusViewCtx } from "./FocusView";
-import { TextFieldCtx, type TextFieldProp } from "./TextField";
 import {
   ComponentSelectCtx,
   type ComponentSelectProp,
 } from "./ComponentSelect";
-import type { Property, PropertyKind } from "src/ex-object/Property";
-import { writable, type Readable } from "svelte/store";
+import { FocusViewCtx } from "./FocusView";
+import { TextFieldCtx, type TextFieldProp } from "./TextField";
 
 export interface ExObjectViewPropOut {}
 

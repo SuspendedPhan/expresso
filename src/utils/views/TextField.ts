@@ -1,4 +1,4 @@
-import { Effect, Layer, PubSub, Scope, Stream } from "effect";
+import { Effect, Layer, Option, PubSub, Scope, Stream } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";
@@ -16,7 +16,7 @@ export interface TextFieldPropOut {
 export type TextFieldProp = [TextFieldPropIn, TextFieldPropOut];
 
 export interface TextFieldState {
-  label: string;
+  label: string|null;
   value: Readable<string>;
   isEditing: Readable<boolean>;
   onInput: (e: any) => void;
@@ -31,7 +31,7 @@ export class TextFieldCtx extends Effect.Tag("TextFieldCtx")<
 const ctxEffect = Effect.gen(function* () {
   return {
     createProps: (
-      label: string,
+      label: Option.Option<string>,
       value: Stream.Stream<string>,
       focusViewProp: FocusViewProp
     ): Effect.Effect<[TextFieldPropIn, TextFieldPropOut]> => {
@@ -54,7 +54,7 @@ const ctxEffect = Effect.gen(function* () {
             );
 
             const vv: TextFieldState = {
-              label: label,
+              label: Option.getOrNull(label),
               value: value_,
               isEditing: yield* EffectUtils.streamToReadableScoped(
                 focusViewProp[1].isEditing,
