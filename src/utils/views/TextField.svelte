@@ -24,6 +24,8 @@
       value = state.value;
       onInput = state.onInput;
       focusViewPropIn = state.focusViewPropIn;
+
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 </script>

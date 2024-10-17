@@ -35,13 +35,6 @@
       nameFieldProp = state.nameFieldProp;
       componentFieldProp = state.componentFieldProp;
       componentParameterProperties = state.componentParameterProperties;
-      // console.log(
-      //   `componentParameterProperties`,
-      //   get(componentParameterProperties)
-      // );
-      componentParameterProperties.subscribe((value) => {
-        console.log(`componentParameterProperties`, value);
-      });
       cloneCountProperty = state.cloneCountProperty;
       basicProperties = state.basicProperties;
       children = state.children;
