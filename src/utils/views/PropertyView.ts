@@ -2,11 +2,11 @@ import { Effect, Layer, Option, Scope, Stream } from "effect";
 import type { Readable } from "svelte/motion";
 import { EffectUtils, type DexSetup } from "../utils/EffectUtils";
 import { RootExprViewCtx, type RootExprViewState } from "./RootExprView";
-import { TextFieldCtx, type DexSetup<TextFieldState> } from "./TextField";
 import { FocusViewCtx } from "./FocusView";
 import { Property } from "src/ex-object/Property";
 import { FocusKind2, FocusTarget } from "src/focus/Focus2";
 import assert from "assert-ts";
+import { type TextFieldState, TextFieldCtx } from "./TextField";
 
 export interface PropertyViewPropOut {}
 
