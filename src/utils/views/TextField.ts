@@ -33,7 +33,6 @@ const ctxEffect = Effect.gen(function* () {
       focusViewProp: FocusViewProp
     ): Effect.Effect<[DexSetup<TextFieldState>, TextFieldPropOut]> => {
       return Effect.gen(function* () {
-        console.log(`focusViewProp`, focusViewProp);
         const valueOut = yield* PubSub.unbounded<string>();
 
         const createState = (svelteScope: Scope.Scope) => {
