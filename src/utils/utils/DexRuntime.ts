@@ -38,10 +38,27 @@ import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
 import { FocusViewCtxLive } from "../views/FocusView";
 import { ComboboxFieldCtxLive } from "../views/ComboboxField";
+import { ExObjectViewCtxLive } from "../views/ExObjectView";
+import { PropertyViewCtxLive } from "../views/PropertyView";
+import { ExprViewCtxLive } from "../views/ExprView";
+import { RootExprViewCtxLive } from "../views/RootExprView";
+import { BasicPropertyListCtxLive } from "../views/BasicPropertyList";
+import { TextFieldCtxLive } from "../views/TextField";
 
 const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(MainCtxLive),
+
+  // View layer
+  Layer.provideMerge(ExObjectViewCtxLive),
+  Layer.provideMerge(BasicPropertyListCtxLive),
+  Layer.provideMerge(PropertyViewCtxLive),
+  Layer.provideMerge(RootExprViewCtxLive),
+  Layer.provideMerge(ExprViewCtxLive),
+
+  // Inputs
+  Layer.provideMerge(TextFieldCtxLive),
   Layer.provideMerge(ComponentSelectCtxLive),
+
   Layer.provideMerge(GoBridgeCtxLive),
   Layer.provideMerge(GoModuleCtxLive),
   Layer.provideMerge(ExObjectFocusCtxLive),
@@ -53,18 +70,18 @@ const mainLayer = EvaluatorCtxLive.pipe(
   Layer.provideMerge(LoadCtxLive),
   Layer.provideMerge(EncodeCtxLive),
   Layer.provideMerge(LibraryPersistCtxLive),
-  Layer.provideMerge(GCloudPersistCtx00Live),
+  Layer.provideMerge(GCloudPersistCtx00Live)
+);
 
+const mainLayer2 = ComponentCtxLive.pipe(
   Layer.provideMerge(Focus2CtxLive),
   Layer.provideMerge(ProjectCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
   Layer.provideMerge(ViewCtxLive),
   Layer.provideMerge(CommandCardCtxLive),
-  Layer.provideMerge(FocusCtxLive)
-);
 
-const mainLayer2 = ComponentCtxLive.pipe(
+  Layer.provideMerge(FocusCtxLive),
   Layer.provideMerge(RehydratorCtxLive),
   Layer.provideMerge(ProjectNameCtxLive),
   // Layer.provideMerge(TestTelemetryCtxLive),

@@ -2,6 +2,7 @@
   import { ResizeSensor } from "css-element-queries";
   import type { ExObject } from "src/ex-object/ExObject";
 
+  import { Effect } from "effect";
   import type { ElementLayout } from "src/utils/layout/ElementLayout";
   import { createExObjectLayout } from "src/utils/layout/ExObjectLayout";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
@@ -10,6 +11,9 @@
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
   import { onMount, tick } from "svelte";
   import TreeView from "../layout/TreeView.svelte";
+  import { dexMakeSvelteScope } from "../utils/DexRuntime";
+  import type { DexSetup } from "../utils/EffectUtils";
+  import { ExObjectViewCtx, type ExObjectViewState } from "./ExObjectView";
 
   const log55 = log5("RootExObjectView.svelte");
 
@@ -20,6 +24,15 @@
   let elementLayout: ElementLayout;
   let element: HTMLElement;
   let sensor: ResizeSensor;
+  let exObjectSetup: DexSetup<ExObjectViewState>;
+
+  dexMakeSvelteScope().then((_scope) => {
+    Effect.gen(function* () {
+      const exobjectviewctx = yield* ExObjectViewCtx;
+      const prop = yield* exobjectviewctx.createProp(exObject);
+      exObjectSetup = prop.setup;
+    }).pipe(DexRuntime.runPromise);
+  });
 
   onMount(() => {
     log55.debug("onMount");
@@ -54,7 +67,7 @@
     <!-- {#key exObject.id} -->
     <TreeView {elementLayout}>
       <div bind:this={element}>
-        <ExObjectView {exObject} {elementLayout} />
+        <ExObjectView setup={exObjectSetup} {elementLayout} />
       </div>
     </TreeView>
     <!-- {/key} -->
