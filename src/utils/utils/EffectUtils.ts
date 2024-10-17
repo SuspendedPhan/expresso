@@ -147,12 +147,12 @@ export const EffectUtils = {
     return Effect.gen(function* () {
       const v = writable<T>(initialValue);
       const v2 = stream.pipe(
-        Stream.runForEachScoped((value) =>
+        Stream.runForEach((value) =>
           Effect.gen(function* () {
             v.set(value);
           })
         ),
-        Scope.extend(scope)
+        Effect.forkIn(scope)
       );
       yield* v2;
       return v;

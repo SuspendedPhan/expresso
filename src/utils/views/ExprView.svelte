@@ -17,9 +17,11 @@
   let expr: Expr;
   let text: Readable<string>;
   let isEditing: Readable<boolean>;
-  let args: Readable<Expr[]>;
+  let args: ExprViewState["args"];
   let elementLayout: ElementLayout;
   let focusViewPropIn: FocusViewPropIn;
+
+  let ready = false;
 
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
@@ -30,37 +32,43 @@
       args = state.args;
       elementLayout = state.elementLayout;
       focusViewPropIn = state.focusViewPropIn;
+
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 </script>
 
-<NodeView {elementLayout} elementKey={expr.id}>
-  <FocusView propIn={focusViewPropIn}>
-    <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <!-- svelte-ignore a11y-mouse-events-have-key-events -->
-    <div
-      class="rounded-sm card card-compact card-bordered px-2 container bg-base-100 font-mono"
-    >
-      {#if false}
-        <span
-          class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2 z-10"
-          >Expr {expr.ordinal}</span
-        >
-      {/if}
-      <span>{$text}</span>
+{#if ready}
+  <NodeView {elementLayout} elementKey={expr.id}>
+    <FocusView propIn={focusViewPropIn}>
+      <!-- svelte-ignore a11y-no-static-element-interactions -->
+      <!-- svelte-ignore a11y-mouse-events-have-key-events -->
+      <div
+        class="rounded-sm card card-compact card-bordered px-2 container bg-base-100 font-mono"
+      >
+        {#if false}
+          <span
+            class="absolute w-max rounded-sm pointer-events-none border-base-200 border bg-base-100 top-0 left-full ml-2 tooltip p-2 z-10"
+            >Expr {expr.ordinal}</span
+          >
+        {/if}
+        <span>{$text}</span>
 
-      <div class="pl-2">
-        {#each $args as arg (arg.id)}
-          <svelte:self expr={arg} {elementLayout} />
-        {/each}
+        <div class="pl-2">
+          {#if $args}
+            {#each $args as arg (arg.id)}
+              <svelte:self setup={arg.setup} />
+            {/each}
+          {/if}
+        </div>
       </div>
-    </div>
-  </FocusView>
+    </FocusView>
 
-  {#if $isEditing}
-    <ExprSelect {expr} />
-  {/if}
-</NodeView>
+    {#if $isEditing}
+      <ExprSelect {expr} />
+    {/if}
+  </NodeView>
+{/if}
 
 <style>
 </style>

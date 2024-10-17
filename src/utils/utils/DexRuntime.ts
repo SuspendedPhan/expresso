@@ -35,13 +35,13 @@ import { ExprCommandCtxLive } from "src/utils/utils/ExprSelect";
 import { ComboboxCtxLive } from "src/utils/views/Combobox";
 import { ComponentSelectCtxLive } from "src/utils/views/ComponentSelect";
 import { onMount } from "svelte";
-import { FocusViewCtxLive } from "../views/FocusView";
+import { BasicPropertyListCtxLive } from "../views/BasicPropertyList";
 import { ComboboxFieldCtxLive } from "../views/ComboboxField";
 import { ExObjectViewCtxLive } from "../views/ExObjectView";
-import { PropertyViewCtxLive } from "../views/PropertyView";
 import { ExprViewCtxLive } from "../views/ExprView";
+import { FocusViewCtxLive } from "../views/FocusView";
+import { PropertyViewCtxLive } from "../views/PropertyView";
 import { RootExprViewCtxLive } from "../views/RootExprView";
-import { BasicPropertyListCtxLive } from "../views/BasicPropertyList";
 import { TextFieldCtxLive } from "../views/TextField";
 
 const mainLayer = EvaluatorCtxLive.pipe(

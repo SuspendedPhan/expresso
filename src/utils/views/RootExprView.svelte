@@ -13,16 +13,20 @@
 
   let exprViewSetup: DexSetup<ExprViewState>;
   let elementLayout: ElementLayout;
+  let ready = false;
 
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
       exprViewSetup = state.exprViewSetup;
       elementLayout = state.elementLayout;
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 </script>
 
-<TreeView {elementLayout}>
-  <ExprView setup={exprViewSetup} />
-</TreeView>
+{#if ready}
+  <TreeView {elementLayout}>
+    <ExprView setup={exprViewSetup} />
+  </TreeView>
+{/if}

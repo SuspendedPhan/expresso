@@ -42,12 +42,12 @@ const ctxEffect = Effect.gen(function* () {
             const value_ = writable("");
 
             yield* value.pipe(
-              Stream.runForEachScoped((v) =>
+              Stream.runForEach((v) =>
                 Effect.gen(function* () {
                   value_.set(v);
                 })
               ),
-              Scope.extend(svelteScope)
+              Effect.forkIn(svelteScope)
             );
 
             const vv: TextFieldState = {

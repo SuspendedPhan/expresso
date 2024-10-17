@@ -12,21 +12,29 @@
 
   export let setup: DexSetup<PropertyViewState>;
 
+  let ready = false;
+
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
       nameFieldPropIn = state.nameFieldPropIn;
       rootExprViewSetup = state.rootExprViewSetup;
       isNumberExpr = state.isNumberExpr;
+
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 </script>
 
-<div class:flex={$isNumberExpr} class="items-center font-mono">
-  <div class="flex flex-row">
-    <TextField setup={nameFieldPropIn} />
-    <pre class="text-style-secondary"> = </pre>
-  </div>
+{#if ready}
+  <div class:flex={$isNumberExpr} class="items-center font-mono">
+    <div class="flex flex-row">
+      <TextField setup={nameFieldPropIn} />
+      <pre class="text-style-secondary"> = </pre>
+    </div>
 
-  <RootExprView setup={$rootExprViewSetup} />
-</div>
+    {#if $rootExprViewSetup}
+      <RootExprView setup={$rootExprViewSetup} />
+    {/if}
+  </div>
+{/if}

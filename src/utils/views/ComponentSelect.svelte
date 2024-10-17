@@ -7,13 +7,16 @@
 
   export let setup: DexSetup<ComponentSelectState>;
   let comboboxFieldProp: ComponentSelectState["comboboxFieldProp"];
-
+  let ready = false;
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
       comboboxFieldProp = state.comboboxFieldProp;
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 </script>
 
-<ComboboxField propsIn={comboboxFieldProp} />
+{#if ready}
+  <ComboboxField propsIn={comboboxFieldProp} />
+{/if}

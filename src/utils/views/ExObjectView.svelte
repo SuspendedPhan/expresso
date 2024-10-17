@@ -30,13 +30,23 @@
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
+      console.log(state);
       exObject = state.exObject;
       nameFieldProp = state.nameFieldProp;
       componentFieldProp = state.componentFieldProp;
       componentParameterProperties = state.componentParameterProperties;
+      // console.log(
+      //   `componentParameterProperties`,
+      //   get(componentParameterProperties)
+      // );
+      componentParameterProperties.subscribe((value) => {
+        console.log(`componentParameterProperties`, value);
+      });
       cloneCountProperty = state.cloneCountProperty;
       basicProperties = state.basicProperties;
       children = state.children;
+
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 
@@ -67,16 +77,20 @@
           <ExObjectHeaderView>Component</ExObjectHeaderView>
           <div class="flex flex-col gap-2">
             <PropertyView setup={$cloneCountProperty} />
-            {#each $componentParameterProperties as property (property.id)}
-              <PropertyView setup={property.setup} />
-            {/each}
+            {#if $componentParameterProperties}
+              {#each $componentParameterProperties as property (property.id)}
+                <PropertyView setup={property.setup} />
+              {/each}
+            {/if}
           </div>
         </div>
 
         <!-- Divider -->
         <div class="divider m-0 h-0"></div>
         <FlexContainer centered={false} class="flex flex-col p-card">
-          <BasicPropertyList setup={$basicProperties} />
+          {#if $basicProperties}
+            <BasicPropertyList setup={$basicProperties} />
+          {/if}
         </FlexContainer>
 
         <!-- Divider -->
@@ -87,7 +101,7 @@
       </FlexContainer>
       {#if $children}
         {#each $children as child (child.id)}
-          <svelte:self exObject={child} {elementLayout} />
+          <svelte:self setup={child.setup} {elementLayout} />
         {/each}
       {/if}
     </div>

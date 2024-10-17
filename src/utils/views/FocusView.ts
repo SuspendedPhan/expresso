@@ -47,8 +47,8 @@ const ctxEffect = Effect.gen(function* () {
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
               }),
-              Stream.runForEachScoped((editing) => Ref.set(isEditing, editing)),
-              Scope.extend(svelteScope)
+              Stream.runForEach((editing) => Ref.set(isEditing, editing)),
+              Effect.forkIn(svelteScope)
             );
 
             const vv = focus2Ctx.focusByTarget(target).pipe(

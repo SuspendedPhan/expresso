@@ -19,7 +19,7 @@
   let isEditing: ComboboxFieldState<T>["isEditing"];
   let comboboxPropsIn: ComboboxFieldState<T>["comboboxPropsIn"];
   let focusViewPropIn: ComboboxFieldState<T>["focusViewPropIn"];
-
+  let ready = false;
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* propsIn(scope);
@@ -28,18 +28,21 @@
       isEditing = state.isEditing;
       comboboxPropsIn = state.comboboxPropsIn;
       focusViewPropIn = state.focusViewPropIn;
+      ready = true;
     }).pipe(DexRuntime.runPromise);
   });
 
   // todp: popover API
 </script>
 
-<div class="flex flex-row relative">
-  <FieldLabel {label} />
-  <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
-    <pre class="text-emphatic">{$value}</pre>
-    {#if $isEditing}
-      <Combobox propsIn={comboboxPropsIn} />
-    {/if}
-  </FocusView>
-</div>
+{#if ready}
+  <div class="flex flex-row relative">
+    <FieldLabel {label} />
+    <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
+      <pre class="text-emphatic">{$value}</pre>
+      {#if $isEditing}
+        <Combobox propsIn={comboboxPropsIn} />
+      {/if}
+    </FocusView>
+  </div>
+{/if}

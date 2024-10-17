@@ -29,7 +29,7 @@ export interface ExObjectViewState {
   >;
   cloneCountProperty: Readable<DexSetup<PropertyViewState>>;
   basicProperties: Readable<DexSetup<BasicPropertyListState>>;
-  children: Readable<ExObject[]>;
+  children: Readable<Array<DexSetupItem<ExObjectViewState>>>;
 }
 
 export interface ExObjectViewProp {
@@ -50,7 +50,9 @@ const ctxEffect = Effect.gen(function* () {
   const basicpropertylistctx = yield* BasicPropertyListCtx;
 
   return {
-    createProp: (exObject: ExObject): Effect.Effect<ExObjectViewProp> => {
+    createProp(exObject: ExObject): Effect.Effect<ExObjectViewProp> {
+      const exObjectViewCreateProp = (exObject: ExObject) => this.createProp(exObject);
+
       return Effect.gen(function* () {
         const prop: ExObjectViewProp = {
           setup: (svelteScope) =>
@@ -85,14 +87,31 @@ const ctxEffect = Effect.gen(function* () {
                     yield* prop.out.onAddProperty.pipe(
                       Stream.runForEach(() => {
                         return Effect.gen(function* () {
-                          yield* ExObject.Methods(exObject).addBasicPropertyBlank();
-                        })
+                          yield* ExObject.Methods(
+                            exObject
+                          ).addBasicPropertyBlank();
+                        });
                       }),
-                      Effect.forkIn(svelteScope),
-                    )
+                      Effect.forkIn(svelteScope)
+                    );
                     return prop.setup;
                   });
                 })
+              );
+
+              const children = exObject.children.itemStream.pipe(
+                Stream.map((children) =>
+                  children.map((child): DexSetupItem<ExObjectViewState> => {
+                    return {
+                      id: child.id,
+                      setup: (svelteScope) =>
+                        Effect.gen(function* () {
+                          const prop = yield* exObjectViewCreateProp(child);
+                          return yield* prop.setup(svelteScope);
+                        }),
+                    };
+                  })
+                )
               );
 
               const state: ExObjectViewState = {
@@ -127,7 +146,7 @@ const ctxEffect = Effect.gen(function* () {
                   ),
 
                 children: yield* EffectUtils.makeScopedReadableFromStream(
-                  exObject.children.itemStream,
+                  children,
                   svelteScope
                 ),
               };

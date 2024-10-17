@@ -70,7 +70,9 @@
       <!-- {#key exObject.id} -->
       <TreeView {elementLayout}>
         <div bind:this={element}>
-          <ExObjectView setup={exObjectSetup} {elementLayout} />
+          {#if exObjectSetup}
+            <ExObjectView setup={exObjectSetup} {elementLayout} />
+          {/if}
         </div>
       </TreeView>
       <!-- {/key} -->
