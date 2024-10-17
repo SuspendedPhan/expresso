@@ -2,9 +2,7 @@
   import { switchMap } from "rxjs";
   import { log5 } from "src/utils/utils/Log5";
   import { RxFns, type OBS } from "src/utils/utils/Utils";
-  import type { FieldValueData } from "src/utils/views/Field";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
-  import FieldValue from "src/utils/views/FieldValue.svelte";
 
   const log55 = log5("ListInput.svelte");
 

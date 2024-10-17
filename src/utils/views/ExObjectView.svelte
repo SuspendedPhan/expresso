@@ -6,14 +6,14 @@
   import ExObjectButton from "src/utils/views/ExObjectButton.svelte";
   import ExObjectHeaderView from "src/utils/views/ExObjectHeaderView.svelte";
   import FlexContainer from "src/utils/views/FlexContainer.svelte";
-  import { type TextFieldPropIn } from "src/utils/views/TextField";
-  import Field from "src/utils/views/TextField.svelte";
+  import TextField from "src/utils/views/TextField.svelte";
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import type { DexSetup } from "../utils/EffectUtils";
   import type { ExObjectViewState } from "./ExObjectView";
   import PropertyView from "./PropertyView.svelte";
   import ComponentSelect from "./ComponentSelect.svelte";
+  import type { TextFieldState } from "./TextField";
 
   export let setup: DexSetup<ExObjectViewState>;
   export let elementLayout: ElementLayout;
@@ -26,7 +26,7 @@
   let basicProperties: ExObjectViewState["basicProperties"];
   let children: ExObjectViewState["children"];
 
-  let exObjectNameField: TextFieldPropIn;
+  let exObjectNameField: DexSetup<TextFieldState>;
 
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
@@ -56,7 +56,7 @@
       <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
-          <Field propIn={exObjectNameField} />
+          <TextField setup={exObjectNameField} />
           <ComponentSelect setup={componentFieldProp.setup} />
         </div>
       </div>

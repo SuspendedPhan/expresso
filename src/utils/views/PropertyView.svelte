@@ -24,7 +24,7 @@
 
 <div class:flex={$isNumberExpr} class="items-center font-mono">
   <div class="flex flex-row">
-    <TextField propIn={nameFieldPropIn} />
+    <TextField setup={nameFieldPropIn} />
     <pre class="text-style-secondary"> = </pre>
   </div>
 

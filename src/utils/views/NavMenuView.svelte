@@ -6,9 +6,9 @@
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import type { NavSection } from "src/utils/utils/Nav";
   import { type OBS } from "src/utils/utils/Utils";
-  import FieldValue from "src/utils/views/FieldValue.svelte";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
+  import TextField from "./TextField.svelte";
 
   // const log55 = log5("NavMenuView.svelte");
 
@@ -63,7 +63,7 @@
   <ul class="bg-base-200 h-full menu">
     <div class="p-4 pr-0 py-2 flex items-center gap-8">
       <div class="pl-1 text-lg w-max">
-        <FieldValue fieldData={projectNameFieldData} />
+        <TextField setup={projectNameFieldData} />
       </div>
       <div class="indicator">
         <span

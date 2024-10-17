@@ -2,21 +2,18 @@ import { Effect, Layer, Option, PubSub, Scope, Stream } from "effect";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import type { Readable } from "svelte/motion";
 import { writable } from "svelte/store";
-import { EffectUtils } from "../utils/EffectUtils";
+import { EffectUtils, type DexSetup } from "../utils/EffectUtils";
 import type { FocusViewProp, FocusViewPropIn } from "./FocusView";
 
-export type TextFieldPropIn = (
-  svelteScope: Scope.Scope
-) => Effect.Effect<TextFieldState>;
 
 export interface TextFieldPropOut {
   value: Stream.Stream<string>;
 }
 
-export type TextFieldProp = [TextFieldPropIn, TextFieldPropOut];
+export type TextFieldProp = [DexSetup<TextFieldState>, TextFieldPropOut];
 
 export interface TextFieldState {
-  label: string|null;
+  label: string | null;
   value: Readable<string>;
   isEditing: Readable<boolean>;
   onInput: (e: any) => void;
@@ -34,7 +31,7 @@ const ctxEffect = Effect.gen(function* () {
       label: Option.Option<string>,
       value: Stream.Stream<string>,
       focusViewProp: FocusViewProp
-    ): Effect.Effect<[TextFieldPropIn, TextFieldPropOut]> => {
+    ): Effect.Effect<[DexSetup<TextFieldState>, TextFieldPropOut]> => {
       return Effect.gen(function* () {
         const valueOut = yield* PubSub.unbounded<string>();
 

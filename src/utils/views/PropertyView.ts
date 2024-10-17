@@ -2,7 +2,7 @@ import { Effect, Layer, Option, Scope, Stream } from "effect";
 import type { Readable } from "svelte/motion";
 import { EffectUtils, type DexSetup } from "../utils/EffectUtils";
 import { RootExprViewCtx, type RootExprViewState } from "./RootExprView";
-import { TextFieldCtx, type TextFieldPropIn } from "./TextField";
+import { TextFieldCtx, type DexSetup<TextFieldState> } from "./TextField";
 import { FocusViewCtx } from "./FocusView";
 import { Property } from "src/ex-object/Property";
 import { FocusKind2, FocusTarget } from "src/focus/Focus2";
@@ -11,7 +11,7 @@ import assert from "assert-ts";
 export interface PropertyViewPropOut {}
 
 export interface PropertyViewState {
-  nameFieldPropIn: TextFieldPropIn;
+  nameFieldPropIn: DexSetup<TextFieldState>;
   rootExprViewSetup: Readable<DexSetup<RootExprViewState>>;
   isNumberExpr: Readable<boolean>;
 }

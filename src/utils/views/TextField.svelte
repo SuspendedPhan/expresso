@@ -2,11 +2,12 @@
   import { Effect } from "effect";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
   import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
-  import type { TextFieldPropIn, TextFieldState } from "./TextField";
   import FocusView from "./FocusView.svelte";
   import HugInput from "./HugInput.svelte";
+  import type { TextFieldState } from "./TextField";
+  import type { DexSetup } from "../utils/EffectUtils";
 
-  export let propIn: TextFieldPropIn;
+  export let setup: DexSetup<TextFieldState>;
 
   let label: TextFieldState["label"];
   let value: TextFieldState["value"];
@@ -16,7 +17,7 @@
 
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
-      const state = yield* propIn(scope);
+      const state = yield* setup(scope);
       label = state.label;
       value = state.value;
       onInput = state.onInput;
