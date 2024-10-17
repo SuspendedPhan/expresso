@@ -14,7 +14,6 @@ import { GoModuleCtxLive } from "src/ctx/GoModuleCtx";
 import { LibraryCtxLive } from "src/ctx/LibraryCtx";
 import { LibraryProjectCtxLive } from "src/ctx/LibraryProjectCtx";
 import { MainCtxLive } from "src/ctx/MainCtx";
-import { ProjectNameCtxLive } from "src/ctx/ProjectNameCtx";
 import { SystemExFuncCtxLive } from "src/ctx/SystemExFuncCtx";
 import { TelemetryCtxLive } from "src/ctx/TelemetryCtx";
 import { ViewCtxLive } from "src/ctx/ViewCtx";
@@ -83,7 +82,6 @@ const mainLayer2 = ComponentCtxLive.pipe(
 
   Layer.provideMerge(FocusCtxLive),
   Layer.provideMerge(RehydratorCtxLive),
-  Layer.provideMerge(ProjectNameCtxLive),
   // Layer.provideMerge(TestTelemetryCtxLive),
   Layer.provideMerge(TelemetryCtxLive),
   Layer.provideMerge(CloneNumberTargetCtxLive),

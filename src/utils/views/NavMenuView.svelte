@@ -1,14 +1,19 @@
 <script lang="ts">
-  import { Effect } from "effect";
+  import { Effect, Option, Stream } from "effect";
   import { of } from "rxjs";
-  import { ProjectNameCtx } from "src/ctx/ProjectNameCtx";
   import { ViewCtx } from "src/ctx/ViewCtx";
+  import { ProjectCtx } from "src/ex-object/Project";
   import { DexRuntime } from "src/utils/utils/DexRuntime";
   import type { NavSection } from "src/utils/utils/Nav";
   import { type OBS } from "src/utils/utils/Utils";
+  import type { DexSetup } from "../utils/EffectUtils";
   import NavCollapsedSectionView from "./NavCollapsedSectionView.svelte";
   import NavSectionView from "./NavSectionView.svelte";
+  import { TextFieldCtx, type TextFieldState } from "./TextField";
   import TextField from "./TextField.svelte";
+  import assert from "assert-ts";
+  import { FocusViewCtx } from "./FocusView";
+  import { FocusKind2, FocusTarget } from "src/focus/Focus2";
 
   // const log55 = log5("NavMenuView.svelte");
 
@@ -33,10 +38,32 @@
     );
   }
 
-  let projectNameFieldData: FieldValueData;
+  let projectNameFieldData: DexSetup<TextFieldState>;
   DexRuntime.runPromise(
     Effect.gen(function* () {
-      projectNameFieldData = yield* ProjectNameCtx.createProjectNameFieldData();
+      const projectctx = yield* ProjectCtx;
+      const focusviewctx = yield* FocusViewCtx;
+      const prop = yield* TextFieldCtx.createProps(
+        Option.none(),
+        projectctx.activeProject.changes.pipe(
+          Stream.flatMap(
+            (p) => {
+              assert(Option.isSome(p));
+              return projectctx.getName(p.value).changes;
+            },
+            { switch: true }
+          )
+        ),
+        yield* focusviewctx.createProps(
+          new FocusTarget({
+            item: null,
+            kind: FocusKind2("NavProjectName"),
+          }),
+          true
+        )
+      );
+
+      projectNameFieldData = prop[0];
     })
   );
 </script>

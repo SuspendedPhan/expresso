@@ -283,6 +283,12 @@ const ctxEffect = Effect.gen(function* () {
 
   return {
     activeProject,
+
+    getName(project: Project) {
+      const lib = project.libraryProject;
+      assert(lib !== null, "Library project is null");
+      return lib.name;
+    }
   };
 });
 
