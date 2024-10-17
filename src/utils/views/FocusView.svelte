@@ -16,6 +16,9 @@
       const state = yield* propIn(scope);
       focused = state.focused;
       onMouseDown = state.onMouseDown;
+      // focused.subscribe((v) => {
+      //   console.log(`v`, v);
+      // });
     }).pipe(DexRuntime.runPromise);
   });
 </script>

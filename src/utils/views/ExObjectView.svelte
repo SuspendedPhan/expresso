@@ -30,7 +30,6 @@
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
-      console.log(state);
       exObject = state.exObject;
       nameFieldProp = state.nameFieldProp;
       componentFieldProp = state.componentFieldProp;

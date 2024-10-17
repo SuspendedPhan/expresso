@@ -1,7 +1,17 @@
 import assert from "assert-ts";
-import { Chunk, Effect, Equal, Layer, Ref, Scope, Stream, SubscriptionRef } from "effect";
+import {
+  Chunk,
+  Effect,
+  Equal,
+  Layer,
+  Ref,
+  Scope,
+  Stream,
+  SubscriptionRef,
+} from "effect";
 import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
 import { writable, type Readable } from "svelte/store";
+import { DexRuntime } from "../utils/DexRuntime";
 
 export interface FocusViewState {
   focused: Readable<boolean>;
@@ -33,21 +43,50 @@ const ctxEffect = Effect.gen(function* () {
     ): Effect.Effect<[FocusViewPropIn, FocusViewPropOut]> {
       return Effect.gen(function* () {
         const isEditing = yield* SubscriptionRef.make(false);
-        
+
         const propOut: FocusViewPropOut = {
-          isEditing: isEditing.changes
+          isEditing: isEditing.changes,
         };
 
         const focused = writable(false);
 
         const vv: FocusViewPropIn = (svelteScope) => {
           return Effect.gen(function* () {
+            console.log("createProps");
+
             focus2Ctx.focusByTarget(target).pipe(
               Stream.unwrap,
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
               }),
               Stream.runForEach((editing) => Ref.set(isEditing, editing)),
+              Effect.forkIn(svelteScope)
+            );
+
+            yield* Stream.asyncScoped((emit) =>
+              Effect.acquireRelease(
+                Effect.gen(function* () {
+                  console.log("acquire");
+                  const vv = () => {
+                    console.log("mousedown");
+                    return emit(Effect.succeed(Chunk.of(undefined)));
+                  };
+
+                  document.addEventListener("mousedown", vv);
+                  return vv;
+                }),
+                (vv) =>
+                  Effect.gen(function* () {
+                    document.removeEventListener("mousedown", vv);
+                  })
+              )
+            ).pipe(
+              Stream.runForEach(() =>
+                Effect.gen(function* () {
+                  console.log("mousedown");
+                  focus2Ctx.setFocus(target);
+                })
+              ),
               Effect.forkIn(svelteScope)
             );
 
@@ -64,30 +103,7 @@ const ctxEffect = Effect.gen(function* () {
                     })
                   );
 
-                  if (editable) {
-                    Stream.asyncScoped((emit) =>
-                      Effect.acquireRelease(
-                        Effect.gen(function* () {
-                          const vv = () =>
-                            emit(Effect.succeed(Chunk.of(undefined)));
-
-                          document.addEventListener("mousedown", vv);
-                          return vv;
-                        }),
-                        (vv) =>
-                          Effect.gen(function* () {
-                            document.removeEventListener("mousedown", vv);
-                          })
-                      )
-                    ).pipe(
-                      Stream.runForEach(() =>
-                        Effect.gen(function* () {
-                          focus2Ctx.setFocus(target);
-                        })
-                      ),
-                      Effect.forkIn(focus.scope)
-                    );
-                  }
+                  console.log(editable);
                 })
               ),
               Effect.forkIn(svelteScope)
@@ -96,7 +112,11 @@ const ctxEffect = Effect.gen(function* () {
             const propIn = {
               focused,
               onMouseDown: () => {
-                focus2Ctx.setFocus(target);
+                DexRuntime.runPromise(
+                  Effect.gen(function* () {
+                    yield* focus2Ctx.setFocus(target);
+                  })
+                );
               },
             };
             return propIn;
