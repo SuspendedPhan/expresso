@@ -15,6 +15,8 @@
   let onInput: TextFieldState["onInput"];
   let focusViewPropIn: TextFieldState["focusViewPropIn"];
 
+  let ready = false;
+
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
@@ -26,12 +28,14 @@
   });
 </script>
 
-<div class="flex flex-row">
-  {#if label}
-    <FieldLabel {label} />
-  {/if}
-  <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
-    <HugInput isEditing={$isEditing} on:input={onInput} value={$value}
-    ></HugInput>
-  </FocusView>
-</div>
+{#if ready}
+  <div class="flex flex-row">
+    {#if label}
+      <FieldLabel {label} />
+    {/if}
+    <FocusView propIn={focusViewPropIn} class="text-emphatic font-mono">
+      <HugInput isEditing={$isEditing} on:input={onInput} value={$value}
+      ></HugInput>
+    </FocusView>
+  </div>
+{/if}

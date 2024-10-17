@@ -25,6 +25,8 @@
   let basicProperties: ExObjectViewState["basicProperties"];
   let children: ExObjectViewState["children"];
 
+  let ready = false;
+
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
       const state = yield* setup(scope);
@@ -47,45 +49,47 @@
   }
 </script>
 
-<NodeView elementKey={exObject.id} {elementLayout}>
-  <div>
-    <FlexContainer class="ex-card w-max flex flex-col">
-      <div class="p-card flex flex-col">
-        <ExObjectHeaderView>Basics</ExObjectHeaderView>
-        <div class="flex flex-col gap-2 font-mono">
-          <TextField setup={nameFieldProp[0]} />
-          <ComponentSelect setup={componentFieldProp.setup} />
+{#if ready}
+  <NodeView elementKey={exObject.id} {elementLayout}>
+    <div>
+      <FlexContainer class="ex-card w-max flex flex-col">
+        <div class="p-card flex flex-col">
+          <ExObjectHeaderView>Basics</ExObjectHeaderView>
+          <div class="flex flex-col gap-2 font-mono">
+            <TextField setup={nameFieldProp[0]} />
+            <ComponentSelect setup={componentFieldProp.setup} />
+          </div>
         </div>
-      </div>
 
-      <!-- Divider -->
-      <div class="divider m-0 h-0"></div>
-      <div class="p-card">
-        <ExObjectHeaderView>Component</ExObjectHeaderView>
-        <div class="flex flex-col gap-2">
-          <PropertyView setup={$cloneCountProperty} />
-          {#each $componentParameterProperties as property (property.id)}
-            <PropertyView setup={property.setup} />
-          {/each}
+        <!-- Divider -->
+        <div class="divider m-0 h-0"></div>
+        <div class="p-card">
+          <ExObjectHeaderView>Component</ExObjectHeaderView>
+          <div class="flex flex-col gap-2">
+            <PropertyView setup={$cloneCountProperty} />
+            {#each $componentParameterProperties as property (property.id)}
+              <PropertyView setup={property.setup} />
+            {/each}
+          </div>
         </div>
-      </div>
 
-      <!-- Divider -->
-      <div class="divider m-0 h-0"></div>
-      <FlexContainer centered={false} class="flex flex-col p-card">
-        <BasicPropertyList setup={$basicProperties} />
+        <!-- Divider -->
+        <div class="divider m-0 h-0"></div>
+        <FlexContainer centered={false} class="flex flex-col p-card">
+          <BasicPropertyList setup={$basicProperties} />
+        </FlexContainer>
+
+        <!-- Divider -->
+        <div class="divider m-0 h-0"></div>
+        <div class="p-card self-center">
+          <ExObjectButton on:click={addChild}>Add Child Object</ExObjectButton>
+        </div>
       </FlexContainer>
-
-      <!-- Divider -->
-      <div class="divider m-0 h-0"></div>
-      <div class="p-card self-center">
-        <ExObjectButton on:click={addChild}>Add Child Object</ExObjectButton>
-      </div>
-    </FlexContainer>
-    {#if $children}
-      {#each $children as child (child.id)}
-        <svelte:self exObject={child} {elementLayout} />
-      {/each}
-    {/if}
-  </div>
-</NodeView>
+      {#if $children}
+        {#each $children as child (child.id)}
+          <svelte:self exObject={child} {elementLayout} />
+        {/each}
+      {/if}
+    </div>
+  </NodeView>
+{/if}
