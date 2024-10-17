@@ -12,7 +12,7 @@ export interface PropertyViewPropOut {}
 
 export interface PropertyViewState {
   nameFieldPropIn: TextFieldPropIn;
-  rootExprViewSetup: DexSetup<RootExprViewState>;
+  rootExprViewSetup: Readable<DexSetup<RootExprViewState>>;
   isNumberExpr: Readable<boolean>;
 }
 
@@ -69,12 +69,19 @@ const ctxEffect = Effect.gen(function* () {
                 Stream.map((expr) => expr.type === "Expr/Number")
               );
 
-              rootexprviewctx.createProp(property.expr);
+              const rootExprViewSetup = property.expr.changes.pipe(
+                Stream.mapEffect((expr) => {
+                  return Effect.gen(function* () {
+                    const prop = yield* rootexprviewctx.createProp(expr);
+                    return prop.setup;
+                  })
+                })
+              )
 
               const state: PropertyViewState = {
                 nameFieldPropIn,
                 isNumberExpr: yield* EffectUtils.makeScopedReadableFromStream(isNumberExpr, svelteScope),
-                rootExprViewSetup
+                rootExprViewSetup: yield* EffectUtils.makeScopedReadableFromStream(rootExprViewSetup, svelteScope),
               };
               return state;
             }),

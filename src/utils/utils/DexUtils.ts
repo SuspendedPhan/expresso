@@ -1,5 +1,11 @@
 import assert from "assert-ts";
 import { Chunk, Effect, Stream } from "effect";
+import type { DexSetup } from "./EffectUtils";
+
+export interface DexSetupItem<T> {
+  id: string;
+  setup: DexSetup<T>;
+}
 
 export const DexUtils = {
   hasTag(obj: any): obj is { _tag: string } {

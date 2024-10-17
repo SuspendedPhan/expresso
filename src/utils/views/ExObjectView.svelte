@@ -48,14 +48,6 @@
       })
     );
   }
-
-  function addProperty() {
-    DexRuntime.runPromise(
-      Effect.gen(function* () {
-        yield* ExObject.Methods(exObject).addBasicPropertyBlank();
-      })
-    );
-  }
 </script>
 
 <NodeView elementKey={exObject.id} {elementLayout}>
@@ -74,9 +66,9 @@
       <div class="p-card">
         <ExObjectHeaderView>Component</ExObjectHeaderView>
         <div class="flex flex-col gap-2">
-          <PropertyView property={$cloneCountProperty} />
+          <PropertyView setup={$cloneCountProperty} />
           {#each $componentParameterProperties as property (property.id)}
-            <PropertyView {property} />
+            <PropertyView setup={property.setup} />
           {/each}
         </div>
       </div>
@@ -84,7 +76,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <FlexContainer centered={false} class="flex flex-col p-card">
-        <BasicPropertyList {basicProperties} addPropertyFn={addProperty} />
+        <BasicPropertyList setup={$basicProperties} />
       </FlexContainer>
 
       <!-- Divider -->

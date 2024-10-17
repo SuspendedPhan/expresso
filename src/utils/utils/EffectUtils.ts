@@ -1,7 +1,10 @@
+import assert from "assert-ts";
 import {
   Chunk,
+  Deferred,
   Effect,
   Option,
+  Queue,
   Ref,
   Scope,
   Stream,
@@ -23,7 +26,28 @@ const log55 = log5("EffectUtils.ts");
 
 export type DexSetup<T> = (s: Scope.Scope) => Effect.Effect<T>;
 
+export interface CallbackStream<T> {
+  stream: Stream.Stream<T>;
+  callback: (value: T) => void;
+}
+
 export const EffectUtils = {
+  makeCallbackStream<T>(): CallbackStream<T> {
+    let emit = Option.none<StreamEmit.Emit<never, never, T, void>>();
+    const stream = Stream.async<T>((emit_) => {
+      assert(Option.isNone(emit), "Should only register once.");
+      emit = Option.some(emit_);
+    });
+
+    return {
+      stream,
+      callback: (value) => {
+        const e = Option.getOrThrow(emit);
+        e(Effect.succeed(Chunk.of(value)));
+      },
+    };
+  },
+
   firstValueFrom<T>(source: OBS<T>): Effect.Effect<T> {
     return Effect.promise(() => firstValueFrom(source));
   },
