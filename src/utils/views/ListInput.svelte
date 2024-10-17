@@ -1,33 +1,35 @@
 <script lang="ts">
-  import { switchMap } from "rxjs";
-  import { log5 } from "src/utils/utils/Log5";
-  import { RxFns, type OBS } from "src/utils/utils/Utils";
+  import { Effect } from "effect";
   import FieldLabel from "src/utils/views/FieldLabel.svelte";
-
-  const log55 = log5("ListInput.svelte");
+  import type { Readable } from "svelte/motion";
+  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
+  import type { DexSetupItem } from "../utils/DexUtils";
+  import type { TextFieldState } from "./TextField";
+  import TextField from "./TextField.svelte";
 
   export let label: string;
-  export let fieldValueDataArr$: OBS<FieldValueData[]>;
+  let textFields: Readable<Array<DexSetupItem<TextFieldState>>>;
+  let ready = false;
 
-  let fieldValueDatas = new Array<FieldValueData>();
-  RxFns.onMount$()
-    .pipe(switchMap(() => fieldValueDataArr$))
-    .subscribe((datas) => {
-      log55.debug("fieldValueDataArr", datas);
-      fieldValueDatas = datas;
-    });
+  dexMakeSvelteScope().then((_scope) => {
+    Effect.gen(function* () {
+      ready = true;
+    }).pipe(DexRuntime.runPromise);
+  });
 </script>
 
-<div class="flex">
+{#if ready}
   <div class="flex">
-    <FieldLabel {label} />
-    <div class="flex gap-2">
-      {#each fieldValueDatas as fieldValueData, i (fieldValueData.id)}
-        {#if i > 0}
-          <div class="divider divider-horizontal m-0 w-0" />
-        {/if}
-        <FieldValue fieldData={fieldValueData} />
-      {/each}
+    <div class="flex">
+      <FieldLabel {label} />
+      <div class="flex gap-2">
+        {#each $textFields as textField, i (textField.id)}
+          {#if i > 0}
+            <div class="divider divider-horizontal m-0 w-0" />
+          {/if}
+          <TextField setup={textField.setup} />
+        {/each}
+      </div>
     </div>
   </div>
-</div>
+{/if}

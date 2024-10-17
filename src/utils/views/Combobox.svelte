@@ -14,6 +14,7 @@
   } from "src/utils/views/Combobox";
   import Divider from "src/utils/views/Divider.svelte";
   import { onMount } from "svelte";
+  import { dexMakeSvelteScope } from "../utils/DexRuntime";
 
   export let propsIn: ComboboxPropsIn<T>;
 
@@ -29,9 +30,9 @@
 
   let cleanup: () => void;
 
-  DexRuntime.runPromise(
+  dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
-      const state = yield* propsIn.createState();
+      const state = yield* propsIn.createState(scope);
       query = state.query;
       optionImpls = state.optionImpls;
       onInput = state.onInput;
@@ -62,8 +63,10 @@
       }
 
       cleanup = autoUpdate(rootEl, childEl, updatePosition);
-    })
-  );
+    }).pipe(DexRuntime.runPromise);
+  });
+
+  DexRuntime.runPromise(Effect.gen(function* () {}));
 
   onMount(() => {
     inputEl.focus();

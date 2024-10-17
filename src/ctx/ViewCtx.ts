@@ -14,7 +14,6 @@ export enum DexWindow {
   LibraryProjectList,
   LibraryComponentList,
   LibraryFunctionList,
-  TestView,
   Settings,
 }
 

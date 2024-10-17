@@ -10,10 +10,9 @@
   import type { ElementLayout } from "../layout/ElementLayout";
   import NodeView from "../layout/NodeView.svelte";
   import type { DexSetup } from "../utils/EffectUtils";
+  import ComponentSelect from "./ComponentSelect.svelte";
   import type { ExObjectViewState } from "./ExObjectView";
   import PropertyView from "./PropertyView.svelte";
-  import ComponentSelect from "./ComponentSelect.svelte";
-  import type { TextFieldState } from "./TextField";
 
   export let setup: DexSetup<ExObjectViewState>;
   export let elementLayout: ElementLayout;
@@ -25,8 +24,6 @@
   let cloneCountProperty: ExObjectViewState["cloneCountProperty"];
   let basicProperties: ExObjectViewState["basicProperties"];
   let children: ExObjectViewState["children"];
-
-  let exObjectNameField: DexSetup<TextFieldState>;
 
   dexMakeSvelteScope().then((scope) => {
     Effect.gen(function* () {
@@ -56,7 +53,7 @@
       <div class="p-card flex flex-col">
         <ExObjectHeaderView>Basics</ExObjectHeaderView>
         <div class="flex flex-col gap-2 font-mono">
-          <TextField setup={exObjectNameField} />
+          <TextField setup={nameFieldProp[0]} />
           <ComponentSelect setup={componentFieldProp.setup} />
         </div>
       </div>
