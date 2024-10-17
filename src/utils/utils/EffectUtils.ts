@@ -1,15 +1,13 @@
 import assert from "assert-ts";
 import {
   Chunk,
-  Deferred,
   Effect,
   Option,
-  Queue,
   Ref,
   Scope,
   Stream,
   StreamEmit,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
 import {
   BehaviorSubject,

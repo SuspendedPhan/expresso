@@ -29,7 +29,7 @@ const ctxEffect = Effect.gen(function* () {
     createProp: (expr: Expr): Effect.Effect<RootExprViewProp> => {
       return Effect.gen(function* () {
         const prop: RootExprViewProp = {
-          setup: (svelteScope) =>
+          setup: (_svelteScope) =>
             Effect.gen(function* () {
               const layout = yield* createExprLayout(expr);
 
