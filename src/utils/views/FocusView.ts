@@ -6,7 +6,7 @@ import {
   Ref,
   Scope,
   Stream,
-  SubscriptionRef
+  SubscriptionRef,
 } from "effect";
 import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
 import { writable, type Readable } from "svelte/store";
@@ -53,7 +53,6 @@ const ctxEffect = Effect.gen(function* () {
         const vv: FocusViewPropIn = (svelteScope) => {
           return Effect.gen(function* () {
             yield* focus2Ctx.focusByTarget(target).pipe(
-              Stream.unwrap,
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
               }),
@@ -61,10 +60,7 @@ const ctxEffect = Effect.gen(function* () {
               Effect.forkIn(svelteScope)
             );
 
-            
-
             const vv = focus2Ctx.focusByTarget(target).pipe(
-              Stream.unwrap,
               Stream.runForEach((focus) =>
                 Effect.gen(function* () {
                   assert(Equal.equals(focus.target, target));

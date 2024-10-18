@@ -46,21 +46,19 @@ const ctxEffect = Effect.gen(function* () {
         const vv = Effect.gen(function* () {
           switch (window) {
             case DexWindow.ProjectEditor:
-              const vv = projectCtx.activeProject.changes.pipe(
+              return projectCtx.activeProject.changes.pipe(
                 Stream.flatMap(
                   (project) =>
                     project.pipe(
                       Option.match({
-                        onSome: (project) => {
-                          return createFocusTargets.forEditorView(project);
-                        },
+                        onSome: (project) =>
+                          createFocusTargets.forEditorView(project),
                         onNone: () => Stream.make([]),
                       })
                     ),
                   { switch: true }
                 )
               );
-              return vv;
             default:
               return Stream.empty;
           }
@@ -76,86 +74,66 @@ const ctxEffect = Effect.gen(function* () {
 
   const focusStack = new Array<Focus2>();
 
-  // CHATGPT: PLEASE REFACTOR HERE
-  // const setFocus = ...
-  // const popFocus = ...
-  // const navigateDown = ...
+  const setFocus = (target: FocusTarget) =>
+    Effect.gen(function* () {
+      const currentFocus = yield* focus.get;
+      if (Option.isSome(currentFocus)) {
+        yield* Scope.close(currentFocus.value.scope, Exit.succeed(undefined));
+      }
+
+      const scope = yield* Scope.make();
+      const newFocus = new Focus2({
+        target,
+        scope,
+        isEditing: yield* SubscriptionRef.make(false),
+      });
+      focusStack.push(newFocus);
+      yield* focus.pipe(Ref.set(Option.some(newFocus)));
+    });
+
+  const popFocus = () =>
+    Effect.sync(() => {
+      const previousFocus = focusStack.pop();
+      if (previousFocus) {
+        setFocus(previousFocus.target);
+      }
+    });
+
+  const navigateDown = Effect.gen(function* () {
+    const currentFocus = yield* focus.get;
+    const focusTargets_ = yield* focusTargets.get;
+
+    if (Option.isNone(currentFocus)) {
+      const target = focusTargets_[0];
+      if (target) {
+        yield* setFocus(target);
+      }
+      return;
+    }
+
+    const index = focusTargets_.findIndex(
+      (target) => target === currentFocus.value.target
+    );
+    if (index !== -1 && index + 1 < focusTargets_.length) {
+      yield* setFocus(focusTargets_[index + 1]!);
+    }
+  });
+
+  const focusByTarget = (target: FocusTarget) =>
+    focus.changes.pipe(
+      Stream.filter((f) => Option.isSome(f)),
+      Stream.map((f) => f.value),
+      Stream.filter((f) => Equal.equals(f.target, target))
+    );
+
+  const focus = yield* SubscriptionRef.make(Option.none<Focus2>());
 
   return {
-    // CHATGPT: PLEASE REFACTOR HERE
-    // setFocus,
-    // ...
-
-    setFocus(target: FocusTarget) {
-      return Effect.gen(this, function* () {
-        const f = yield* this.focus.get;
-        if (Option.isSome(f)) {
-          yield* Scope.close(f.value.scope, Exit.succeed(undefined));
-        }
-
-        const scope = yield* Scope.make();
-        const newFocus = new Focus2({
-            target,
-            scope,
-            isEditing: yield* SubscriptionRef.make(false),
-          });
-        const vv = Option.some(
-          newFocus
-        );
-        focusStack.push(newFocus);
-        yield* this.focus.pipe(Ref.set(vv));
-      });
-    },
-
-    focus: yield* SubscriptionRef.make(Option.none<Focus2>()),
-
-    popFocus() {
-      const f = focusStack.pop();
-      if (f !== undefined) {
-        this.setFocus(f.target);
-      }
-    },
-
-    navigateDown() {
-      return Effect.gen(this, function* () {
-        const focus_ = yield* this.focus.get;
-        const focusTargets_ = yield* focusTargets.get;
-
-        if (Option.isNone(focus_)) {
-          const target = focusTargets_[0];
-          if (target === undefined) {
-            return;
-          }
-          yield* this.setFocus(target);
-          return;
-        }
-
-        const index = focusTargets_.findIndex(
-          (target) => target === focus_.value.target
-        );
-        if (index === -1) {
-          throw new Error("Focus target not found");
-        }
-
-        const nextIndex = index + 1;
-        if (nextIndex >= focusTargets_.length) {
-          return;
-        }
-
-        const target = focusTargets_[nextIndex]!;
-        yield* this.setFocus(target);
-      });
-    },
-
-    focusByTarget(target: FocusTarget) {
-      return Effect.gen(this, function* () {
-        return this.focus.changes.pipe(
-          Stream.filter((f) => Option.isSome(f)),
-          Stream.map((f) => f.value),
-          Stream.filter((f) => Equal.equals(f.target, target))
-        );
-      });
-    },
+    setFocus,
+    popFocus,
+    navigateDown,
+    focusByTarget,
+    focus,
   };
 });
 
@@ -163,34 +141,26 @@ export const Focus2CtxLive = Layer.effect(Focus2Ctx, ctxEffect);
 
 const createFocusTargets = {
   forEditorView(project: Project): Stream.Stream<FocusTarget[]> {
-    const v = project.rootExObjects.itemStream.pipe(
+    return project.rootExObjects.itemStream.pipe(
       Stream.flatMap(
         (oo) =>
-          Stream.zipLatestAll(
-            ...oo.map((o) => createFocusTargets.forExObject(o))
-          ),
+          Stream.zipLatestAll(...oo.map((o) => createFocusTargets.forExObject(o))),
         { switch: true }
       ),
       Stream.map((oo) => oo.flat())
     );
-    return v;
   },
 
   forExObject(exObject: ExObject): Stream.Stream<FocusTarget[]> {
     const results = [
       new FocusTarget({ kind: FocusKind2("ExObjectName"), item: exObject }),
-      new FocusTarget({
-        kind: FocusKind2("ExObjectComponent"),
-        item: exObject,
-      }),
+      new FocusTarget({ kind: FocusKind2("ExObjectComponent"), item: exObject }),
     ];
 
     const v1 = exObject.componentParameterProperties_.itemStream.pipe(
       Stream.flatMap(
         (pp) =>
-          Stream.zipLatestAll(
-            ...pp.map((p) => createFocusTargets.forProperty(p))
-          ),
+          Stream.zipLatestAll(...pp.map((p) => createFocusTargets.forProperty(p))),
         { switch: true }
       ),
       Stream.map((vv) => vv.flat())
@@ -199,9 +169,7 @@ const createFocusTargets = {
     const v2 = exObject.basicProperties.itemStream.pipe(
       Stream.flatMap(
         (pp) =>
-          Stream.zipLatestAll(
-            ...pp.map((p) => createFocusTargets.forProperty(p))
-          ),
+          Stream.zipLatestAll(...pp.map((p) => createFocusTargets.forProperty(p))),
         { switch: true }
       ),
       Stream.map((vv) => vv.flat())
@@ -209,43 +177,31 @@ const createFocusTargets = {
 
     const v3 = createFocusTargets.forProperty(exObject.cloneCountProperty);
 
-    const vv = Stream.zipLatestAll(v1, v2, v3).pipe(
+    return Stream.zipLatestAll(v1, v2, v3).pipe(
       Stream.map(([vv1, vv2, vv3]) => [...results, ...vv1, ...vv2, ...vv3])
     );
-
-    return vv;
   },
 
   forProperty(property: Property): Stream.Stream<FocusTarget[]> {
-    const vv = property.expr.changes.pipe(
+    return property.expr.changes.pipe(
       Stream.flatMap((expr) => createFocusTargets.forExpr(expr)),
       Stream.map((vv) => vv.flat())
     );
-
-    return vv;
   },
 
   forExpr(expr: Expr): Stream.Stream<FocusTarget[]> {
     const results = [new FocusTarget({ kind: FocusKind2("Expr"), item: expr })];
     let stream: Stream.Stream<FocusTarget[]> = Stream.make();
     if (expr.type === "Expr/Call") {
-      const vv = expr.args.itemStream.pipe(
+      stream = expr.args.itemStream.pipe(
         Stream.flatMap(
-          (aa) =>
-            Stream.zipLatestAll(
-              ...aa.map((a) => createFocusTargets.forExpr(a))
-            ),
+          (aa) => Stream.zipLatestAll(...aa.map((a) => createFocusTargets.forExpr(a))),
           { switch: true }
         ),
         Stream.map((vv) => vv.flat())
       );
-      stream = vv;
     }
 
-    const vv = stream.pipe(
-      Stream.flatMap((vv) => Stream.make([...results, ...vv]))
-    );
-
-    return vv;
+    return stream.pipe(Stream.flatMap((vv) => Stream.make([...results, ...vv])));
   },
 };
