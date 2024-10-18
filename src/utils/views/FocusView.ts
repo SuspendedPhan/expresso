@@ -52,6 +52,7 @@ const ctxEffect = Effect.gen(function* () {
 
         const vv: FocusViewPropIn = (svelteScope) => {
           return Effect.gen(function* () {
+            // Sync `isEditing`.
             yield* focus2Ctx.focusByTarget(target).pipe(
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
@@ -63,15 +64,20 @@ const ctxEffect = Effect.gen(function* () {
             const vv = focus2Ctx.focusByTarget(target).pipe(
               Stream.runForEach((focus) =>
                 Effect.gen(function* () {
+                  
+                  // CHATGPT: extract onFocus lambda. declare it in the outermost AST scope that is valid.
                   assert(Equal.equals(focus.target, target));
-                  focused.set(focus.target === target);
+                  focused.set(true);
+
                   yield* Scope.addFinalizer(
                     focus.scope,
                     Effect.gen(function* () {
                       focused.set(false);
                     })
                   );
+                  // end onFocus
 
+                  // CHATGPT: same thing - onEditKeyDown
                   if (editable) {
                     yield* EffectUtils.onKeyDown("e").pipe(
                       Stream.runForEach(() => {
@@ -82,6 +88,7 @@ const ctxEffect = Effect.gen(function* () {
                       Effect.forkIn(focus.scope)
                     );
                   }
+                  // end onEditKeyDown
                 })
               ),
               Effect.forkIn(svelteScope)

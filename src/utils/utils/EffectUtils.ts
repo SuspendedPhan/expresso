@@ -7,7 +7,7 @@ import {
   Scope,
   Stream,
   StreamEmit,
-  SubscriptionRef
+  SubscriptionRef,
 } from "effect";
 import {
   BehaviorSubject,
@@ -30,6 +30,37 @@ export interface CallbackStream<T> {
 }
 
 export const EffectUtils = {
+  zipLatestAllOrEmpty<T extends ReadonlyArray<Stream.Stream<any, any, any>>>(
+    ...streams: T
+  ): Stream.Stream<
+    [T[number]] extends [never]
+      ? never
+      : {
+          [K in keyof T]: T[K] extends Stream.Stream<
+            infer A,
+            infer _E,
+            infer _R
+          >
+            ? A
+            : never;
+        },
+    [T[number]] extends [never]
+      ? never
+      : T[number] extends Stream.Stream<infer _A, infer _E, infer _R>
+      ? _E
+      : never,
+    [T[number]] extends [never]
+      ? never
+      : T[number] extends Stream.Stream<infer _A, infer _E, infer _R>
+      ? _R
+      : never
+  > {
+    if (streams.length === 0) {
+      return Stream.make([] as any);
+    }
+    return Stream.zipLatestAll(...streams);
+  },
+
   onKeyDown(key: string): Stream.Stream<void> {
     return Stream.asyncScoped((emit) => {
       return Effect.acquireRelease(
@@ -37,6 +68,7 @@ export const EffectUtils = {
           console.log("acquire");
           const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === key) {
+              e.preventDefault();
               emit(Effect.succeed(Chunk.of(undefined)));
             }
           };
@@ -47,7 +79,7 @@ export const EffectUtils = {
           return Effect.gen(function* () {
             console.log("release");
             window.removeEventListener("keydown", v);
-          })
+          });
         }
       );
     });

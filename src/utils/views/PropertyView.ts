@@ -38,7 +38,6 @@ const ctxEffect = Effect.gen(function* () {
           setup: (svelteScope) =>
             Effect.gen(function* () {
               const editable = property.type === "Property/BasicProperty";
-              console.log("editable", editable);
               const focusProps = yield* focusviewctx.createProps(
                 new FocusTarget({
                   item: property,
