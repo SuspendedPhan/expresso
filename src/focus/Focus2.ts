@@ -18,6 +18,7 @@ import type { ExObject } from "src/ex-object/ExObject";
 import type { Expr } from "src/ex-object/Expr";
 import { Project, ProjectCtx } from "src/ex-object/Project";
 import type { Property } from "src/ex-object/Property";
+import { TreeNode } from "src/utils/TreeNode";
 import { EffectUtils } from "src/utils/utils/EffectUtils";
 
 export type FocusKind2 = string & Brand.Brand<"FocusKind2">;
@@ -27,6 +28,8 @@ export class FocusTarget extends Data.TaggedClass("Focus2")<{
   kind: FocusKind2;
   item: any;
 }> {}
+
+type FocusTargetNode = TreeNode<FocusTarget>;
 
 export class Focus2 extends Data.TaggedClass("Focus2")<{
   target: FocusTarget;
@@ -187,7 +190,7 @@ const ctxEffect = Effect.gen(function* () {
 export const Focus2CtxLive = Layer.effect(Focus2Ctx, ctxEffect);
 
 const createFocusTargets = {
-  forEditorView(project: Project): Stream.Stream<FocusTarget[]> {
+  forEditorView(project: Project): Stream.Stream<FocusTargetNode[]> {
     return project.rootExObjects.itemStream.pipe(
       Stream.flatMap(
         (oo) =>
@@ -200,7 +203,7 @@ const createFocusTargets = {
     );
   },
 
-  forExObject(exObject: ExObject): Stream.Stream<FocusTarget[]> {
+  forExObject(exObject: ExObject): Stream.Stream<FocusTargetNode[]> {
     const results = [
       new FocusTarget({ kind: FocusKind2("ExObjectName"), item: exObject }),
       new FocusTarget({
@@ -253,7 +256,7 @@ const createFocusTargets = {
     );
   },
 
-  forProperty(property: Property): Stream.Stream<FocusTarget[]> {
+  forProperty(property: Property): Stream.Stream<FocusTargetNode[]> {
     const results = [
       new FocusTarget({ kind: FocusKind2("PropertyName"), item: property }),
     ];
@@ -271,28 +274,11 @@ const createFocusTargets = {
     return exprTargets.pipe(Stream.map((vv) => [...results, ...vv]));
   },
 
-  forExpr(expr: Expr): Stream.Stream<FocusTarget[]> {
-    const results = [new FocusTarget({ kind: FocusKind2("Expr"), item: expr })];
-    let stream: Stream.Stream<FocusTarget[]> = Stream.make([]);
-
+  forExpr(expr: Expr): FocusTargetNode {
+    const exprTarget = new FocusTarget({ kind: FocusKind2("Expr"), item: expr });
+    let children = [];
     if (expr.type === "Expr/Call") {
-      stream = expr.args.itemStream.pipe(
-        Stream.flatMap(
-          (aa) => {
-            const arg = aa[0];
-            assert(arg !== undefined);
-            return createFocusTargets.forExpr(arg);
-          },
-          { switch: true }
-        ),
-        Stream.map((vv) => vv.flat())
-      );
+      children = `expr.args.map((arg) => createFocusTargets.forExpr(arg));`
     }
-
-    return stream.pipe(
-      Stream.flatMap((vv) => Stream.make([...results, ...vv]), {
-        switch: true,
-      })
-    );
   },
 };

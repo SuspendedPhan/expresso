@@ -1,22 +1,32 @@
-import assert from "assert-ts";
-
 export class TreeNode<T> {
-  constructor(public value: T, children?: T[]) {
-    if (children !== undefined) {
-      for (const child of children) {
-        this.addChild(new TreeNode(child));
+  constructor(
+    public value: T,
+    public parent: SubscriptionRef.SubscriptionRef<TreeNode<T> | null>,
+    public children: SubscriptionRef.SubscriptionRef<TreeNode<T>[]>
+  ) {}
+
+  static make<T>(
+    value: T,
+    children?: TreeNode<T>[]
+  ): Effect.Effect<TreeNode<T>> {
+    return Effect.gen(function* () {
+      const result = new TreeNode(
+        value,
+        yield* SubscriptionRef.make<TreeNode<T> | null>(null),
+        yield* SubscriptionRef.make<TreeNode<T>[]>(children ?? [])
+      );
+
+      if (children) {
+        for (const child of children) {
+          yield* addChild(result, child);
+        }
       }
-    }
+
+      return result;
+    });
   }
 
-  parent: TreeNode<T> | null = null;
-  children: TreeNode<T>[] = [];
-
-  addChild(child: TreeNode<T>): void {
-    this.children.push(child);
-    child.parent = this;
-  }
-
+  addChild = addChild;
   navigateRight = navigateRight;
 
   getDepth = getDepth;
@@ -24,47 +34,71 @@ export class TreeNode<T> {
   breadthTraversal = breadthTraversal;
 }
 
-function getDepth<T>(node: TreeNode<T>): number {
-  if (node.parent === null) {
-    return 0;
-  }
+import assert from "assert-ts";
+import { Chunk, Effect, Option, Ref, Stream, SubscriptionRef } from "effect";
 
-  return 1 + getDepth(node.parent);
+function getDepth<T>(node: TreeNode<T>): Effect.Effect<number> {
+  return Effect.gen(function* () {
+    const parent = yield* node.parent.get;
+    if (parent === null) {
+      return 0;
+    }
+
+    const parentDepth = yield* getDepth(parent);
+    return 1 + parentDepth;
+  });
 }
 
-function getRoot<T>(node: TreeNode<T>): TreeNode<T> {
-  if (node.parent === null) {
-    return node;
-  }
-
-  return getRoot(node.parent);
+function getRoot<T>(node: TreeNode<T>): Effect.Effect<TreeNode<T>> {
+  return Effect.gen(function* () {
+    const parent = yield* node.parent.get;
+    if (parent === null) {
+      return node;
+    }
+    return yield* getRoot(parent);
+  });
 }
 
-function* breadthTraversal<T>(node: TreeNode<T>): Generator<TreeNode<T>> {
+function breadthTraversal<T>(node: TreeNode<T>): Stream.Stream<TreeNode<T>> {
   const queue = [node];
-  while (true) {
-    const current = queue.shift();
-    if (current === undefined) {
-      break;
-    }
-    yield current;
-    queue.push(...current.children);
-  }
+  return Stream.repeatEffectOption(
+    Effect.gen(function* () {
+      const current = queue.shift();
+      if (current === undefined) {
+        return yield* Effect.fail(Option.none());
+      }
+      queue.push(...(yield* current.children.get));
+      return current;
+    })
+  );
 }
 
-function navigateRight<T>(node: TreeNode<T>): TreeNode<T> | null {
-  const root = getRoot(node);
-  const depth = getDepth(node);
-  const nodes = Array.from(breadthTraversal(root));
-  const index = nodes.indexOf(node);
-
-  // get the next node at the same depth
-  for (let i = index + 1; i < nodes.length; i++) {
-    const next = nodes[i];
-    assert(next !== undefined);
-    if (getDepth(next) === depth) {
-      return next;
+function navigateRight<T>(
+  node: TreeNode<T>
+): Effect.Effect<TreeNode<T> | null> {
+  return Effect.gen(function* () {
+    const root = yield* getRoot(node);
+    const depth = yield* getDepth(node);
+    const nodes1 = yield* breadthTraversal(root).pipe(Stream.runCollect);
+    const nodes = Chunk.toArray(nodes1);
+    const index = nodes.indexOf(node);
+    // get the next node at the same depth
+    for (let i = index + 1; i < nodes.length; i++) {
+      const next = nodes[i];
+      assert(next !== undefined);
+      const nextDepth = yield* getDepth(next);
+      if (nextDepth === depth) {
+        return next;
+      }
     }
-  }
-  return null;
+    return null;
+  });
 }
+
+const addChild = <T>(parent: TreeNode<T>, child: TreeNode<T>) =>
+  Effect.gen(function* () {
+    yield* Ref.set(child.parent, parent);
+    const children = yield* parent.children.get;
+    const children2 = [...children, child];
+    yield* Ref.set(parent.children, children2);
+  });
