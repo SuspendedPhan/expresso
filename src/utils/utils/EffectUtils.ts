@@ -65,7 +65,6 @@ export const EffectUtils = {
     return Stream.asyncScoped((emit) => {
       return Effect.acquireRelease(
         Effect.gen(function* () {
-          console.log("acquire");
           const onKeyDown = (e: KeyboardEvent) => {
             if (e.key === key) {
               e.preventDefault();
@@ -77,7 +76,6 @@ export const EffectUtils = {
         }),
         (v) => {
           return Effect.gen(function* () {
-            console.log("release");
             window.removeEventListener("keydown", v);
           });
         }

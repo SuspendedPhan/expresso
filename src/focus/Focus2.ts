@@ -1,3 +1,4 @@
+import assert from "assert-ts";
 import {
   Brand,
   Console,
@@ -80,6 +81,7 @@ const ctxEffect = Effect.gen(function* () {
 
   const setFocus = (target: FocusTarget) =>
     Effect.gen(function* () {
+      console.log("setFocus", target);
       const currentFocus = yield* focus.get;
       if (Option.isSome(currentFocus)) {
         yield* Scope.close(currentFocus.value.scope, Exit.succeed(undefined));
@@ -110,6 +112,7 @@ const ctxEffect = Effect.gen(function* () {
     if (Option.isNone(currentFocus)) {
       const target = focusTargets_[0];
       if (target) {
+        console.log(1);
         yield* setFocus(target);
       }
       return;
@@ -118,8 +121,33 @@ const ctxEffect = Effect.gen(function* () {
     const index = focusTargets_.findIndex((target) =>
       Equal.equals(target, currentFocus.value.target)
     );
+
     if (index !== -1 && index + 1 < focusTargets_.length) {
-      yield* setFocus(focusTargets_[index + 1]!);
+      const nextIndex = index + 1;
+      const nextTarget = focusTargets_[nextIndex];
+      assert(nextTarget !== undefined);
+      console.log(index, nextIndex, nextTarget, focusTargets_.length);
+      yield* setFocus(nextTarget);
+    }
+  });
+
+  const navigateUp = Effect.gen(function* () {
+    const currentFocus = yield* focus.get;
+    const focusTargets_ = yield* focusTargets.get;
+
+    if (Option.isNone(currentFocus)) {
+      const target = focusTargets_[focusTargets_.length - 1];
+      if (target) {
+        yield* setFocus(target);
+      }
+      return;
+    }
+
+    const index = focusTargets_.findIndex((target) =>
+      Equal.equals(target, currentFocus.value.target)
+    );
+    if (index !== -1 && index - 1 >= 0) {
+      yield* setFocus(focusTargets_[index - 1]!);
     }
   });
 
@@ -127,8 +155,7 @@ const ctxEffect = Effect.gen(function* () {
     focus.changes.pipe(
       Stream.filter((f) => Option.isSome(f)),
       Stream.map((f) => f.value),
-      Stream.filter((f) => Equal.equals(f.target, target)),
-      Stream.tap((f) => Console.log(2, f.target, target))
+      Stream.filter((f) => Equal.equals(f.target, target))
     );
 
   const focus = yield* SubscriptionRef.make(Option.none<Focus2>());
@@ -139,11 +166,12 @@ const ctxEffect = Effect.gen(function* () {
   );
 
   yield* EffectUtils.onKeyDown("ArrowDown").pipe(
-    Stream.runForEach(() =>
-      Effect.gen(function* () {
-        yield* navigateDown;
-      })
-    ),
+    Stream.runForEach(() => navigateDown),
+    Effect.forkDaemon
+  );
+
+  yield* EffectUtils.onKeyDown("ArrowUp").pipe(
+    Stream.runForEach(() => navigateUp),
     Effect.forkDaemon
   );
 
@@ -205,10 +233,23 @@ const createFocusTargets = {
       Stream.map((vv) => vv.flat())
     );
 
-    const v3 = createFocusTargets.forProperty(exObject.cloneCountProperty);
+    const v3 = exObject.children.itemStream.pipe(
+      Stream.flatMap(
+        (oo) => {
+          if (oo.length === 0) {
+            return Stream.make([]);
+          }
+          const o = oo[0];
+          assert(o !== undefined);
+          return createFocusTargets.forExObject(o);
+        },
+        { switch: true }
+      ),
+      Stream.map((oo) => oo.flat())
+    );
 
     return EffectUtils.zipLatestAllOrEmpty(v0, v1, v2, v3).pipe(
-      Stream.map(([vv0, vv1, vv2, vv3]) => [...results, ...vv0, ...vv1, ...vv2, ...vv3])
+      Stream.map((vv) => [...results, ...vv.flat()])
     );
   },
 
@@ -218,7 +259,12 @@ const createFocusTargets = {
     ];
 
     const exprTargets = property.expr.changes.pipe(
-      Stream.flatMap((expr) => createFocusTargets.forExpr(expr)),
+      Stream.flatMap((expr) => {
+        if (expr.type !== "Expr/Call") {
+          return Stream.make([]);
+        }
+        return createFocusTargets.forExpr(expr);
+      }),
       Stream.map((vv) => vv.flat())
     );
 
@@ -233,9 +279,9 @@ const createFocusTargets = {
       stream = expr.args.itemStream.pipe(
         Stream.flatMap(
           (aa) => {
-            return EffectUtils.zipLatestAllOrEmpty(
-              ...aa.map((a) => createFocusTargets.forExpr(a))
-            );
+            const arg = aa[0];
+            assert(arg !== undefined);
+            return createFocusTargets.forExpr(arg);
           },
           { switch: true }
         ),
