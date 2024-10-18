@@ -1,17 +1,17 @@
 import assert from "assert-ts";
 import {
-  Chunk,
   Effect,
   Equal,
   Layer,
   Ref,
   Scope,
   Stream,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
 import { Focus2Ctx, type FocusTarget } from "src/focus/Focus2";
 import { writable, type Readable } from "svelte/store";
 import { DexRuntime } from "../utils/DexRuntime";
+import { EffectUtils } from "../utils/EffectUtils";
 
 export interface FocusViewState {
   focused: Readable<boolean>;
@@ -52,9 +52,7 @@ const ctxEffect = Effect.gen(function* () {
 
         const vv: FocusViewPropIn = (svelteScope) => {
           return Effect.gen(function* () {
-            console.log("createProps");
-
-            focus2Ctx.focusByTarget(target).pipe(
+            yield* focus2Ctx.focusByTarget(target).pipe(
               Stream.unwrap,
               Stream.flatMap((focus) => focus.isEditing.changes, {
                 switch: true,
@@ -63,32 +61,7 @@ const ctxEffect = Effect.gen(function* () {
               Effect.forkIn(svelteScope)
             );
 
-            yield* Stream.asyncScoped((emit) =>
-              Effect.acquireRelease(
-                Effect.gen(function* () {
-                  console.log("acquire");
-                  const vv = () => {
-                    console.log("mousedown");
-                    return emit(Effect.succeed(Chunk.of(undefined)));
-                  };
-
-                  document.addEventListener("mousedown", vv);
-                  return vv;
-                }),
-                (vv) =>
-                  Effect.gen(function* () {
-                    document.removeEventListener("mousedown", vv);
-                  })
-              )
-            ).pipe(
-              Stream.runForEach(() =>
-                Effect.gen(function* () {
-                  console.log("mousedown");
-                  focus2Ctx.setFocus(target);
-                })
-              ),
-              Effect.forkIn(svelteScope)
-            );
+            
 
             const vv = focus2Ctx.focusByTarget(target).pipe(
               Stream.unwrap,
@@ -103,7 +76,16 @@ const ctxEffect = Effect.gen(function* () {
                     })
                   );
 
-                  console.log(editable);
+                  if (editable) {
+                    yield* EffectUtils.onKeyDown("e").pipe(
+                      Stream.runForEach(() => {
+                        return Effect.gen(function* () {
+                          yield* Ref.set(focus.isEditing, true);
+                        });
+                      }),
+                      Effect.forkIn(focus.scope)
+                    );
+                  }
                 })
               ),
               Effect.forkIn(svelteScope)

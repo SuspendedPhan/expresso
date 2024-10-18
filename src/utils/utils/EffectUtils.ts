@@ -30,6 +30,29 @@ export interface CallbackStream<T> {
 }
 
 export const EffectUtils = {
+  onKeyDown(key: string): Stream.Stream<void> {
+    return Stream.asyncScoped((emit) => {
+      return Effect.acquireRelease(
+        Effect.gen(function* () {
+          console.log("acquire");
+          const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === key) {
+              emit(Effect.succeed(Chunk.of(undefined)));
+            }
+          };
+          window.addEventListener("keydown", onKeyDown);
+          return onKeyDown;
+        }),
+        (v) => {
+          return Effect.gen(function* () {
+            console.log("release");
+            window.removeEventListener("keydown", v);
+          })
+        }
+      );
+    });
+  },
+
   makeCallbackStream<T>(): CallbackStream<T> {
     let emit = Option.none<StreamEmit.Emit<never, never, T, void>>();
     const stream = Stream.async<T>((emit_) => {

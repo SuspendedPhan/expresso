@@ -6,10 +6,11 @@ import {
   Option,
   PubSub,
   Ref,
+  Scope,
   Stream,
-  SubscriptionRef,
+  SubscriptionRef
 } from "effect";
-import { Scope } from "effect";
+import { Focus2Ctx } from "src/focus/Focus2";
 import { DexRuntime } from "src/utils/utils/DexRuntime";
 import { EffectUtils, type DexSetup } from "src/utils/utils/EffectUtils";
 import { type Readable } from "svelte/store";
@@ -58,6 +59,8 @@ export class ComboboxCtx extends Effect.Tag("ComboboxCtx")<
 // let ccc = 0;
 
 const ctxEffect = Effect.gen(function* () {
+  const focus2ctx = yield* Focus2Ctx;
+
   return {
     createProps<T extends ComboboxOption>(
       args: ComboboxArgs<T>
@@ -185,7 +188,7 @@ const ctxEffect = Effect.gen(function* () {
                   if (i >= optionImpls_.length) {
                     return optionImpls_.length - 1;
                   }
-            
+
                   if (i < 0) {
                     return 0;
                   }
@@ -197,7 +200,7 @@ const ctxEffect = Effect.gen(function* () {
                   }
                   return Option.none();
                 });
-            
+
                 const eq = Option.getEquivalence(Equivalence.number);
                 if (eq(focusedIndex_, newIndex2) === false) {
                   // console.log(
@@ -209,6 +212,17 @@ const ctxEffect = Effect.gen(function* () {
                 }
               });
             }).pipe(Effect.forkIn(svelteScope));
+
+            yield* Stream.fromPubSub(onOptionSelected).pipe(
+              Stream.runForEach((_value) => {
+                return Effect.gen(function* () {
+                  const v = yield* focus2ctx.focus.get;
+                  assert(Option.isSome(v));
+                  yield* Ref.set(v.value.isEditing, false);
+                });
+              }),
+              Effect.forkIn(svelteScope)
+            );
 
             const state: ComboboxState<T> = {
               onKeydown: (e) => {

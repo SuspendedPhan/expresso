@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends { label: string }">
+  import { Scope } from "effect";
+
   import {
     autoUpdate,
     computePosition,
@@ -13,7 +15,6 @@
     type ComboboxState,
   } from "src/utils/views/Combobox";
   import Divider from "src/utils/views/Divider.svelte";
-  import { onMount } from "svelte";
   import { dexMakeSvelteScope } from "../utils/DexRuntime";
 
   export let propsIn: ComboboxPropsIn<T>;
@@ -48,6 +49,7 @@
 
       yield* Effect.sleep(0);
       childEl.showPopover();
+      inputEl.focus();
 
       function updatePosition() {
         computePosition(rootEl, childEl, {
@@ -63,17 +65,16 @@
       }
 
       cleanup = autoUpdate(rootEl, childEl, updatePosition);
+      yield* Scope.addFinalizer(
+        scope,
+        Effect.gen(function* () {
+          cleanup();
+        })
+      );
     }).pipe(DexRuntime.runPromise);
   });
 
   DexRuntime.runPromise(Effect.gen(function* () {}));
-
-  onMount(() => {
-    inputEl.focus();
-    return () => {
-      cleanup();
-    };
-  });
 </script>
 
 {#if ready}

@@ -74,6 +74,8 @@ const ctxEffect = Effect.gen(function* () {
   const focusTargets = yield* SubscriptionRef.make(new Array<FocusTarget>());
   vv.pipe(Stream.runForEach((vv) => focusTargets.pipe(Ref.set(vv))));
 
+  const focusStack = new Array<Focus2>();
+
   return {
     setFocus(target: FocusTarget) {
       return Effect.gen(this, function* () {
@@ -95,6 +97,13 @@ const ctxEffect = Effect.gen(function* () {
     },
 
     focus: yield* SubscriptionRef.make(Option.none<Focus2>()),
+
+    popFocus() {
+      const f = focusStack.pop();
+      if (f !== undefined) {
+        this.setFocus(f.target);
+      }
+    },
 
     navigateDown() {
       return Effect.gen(this, function* () {

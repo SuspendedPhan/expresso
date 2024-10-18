@@ -57,14 +57,16 @@ const mainLayer = EvaluatorCtxLive.pipe(
   // Inputs
   Layer.provideMerge(TextFieldCtxLive),
   Layer.provideMerge(ComponentSelectCtxLive),
+  Layer.provideMerge(ComboboxCtxLive),
+  Layer.provideMerge(ComboboxFieldCtxLive),
+  Layer.provideMerge(FocusViewCtxLive),
+  Layer.provideMerge(ExprCommandCtxLive),
+
+  Layer.provideMerge(Focus2CtxLive),
 
   Layer.provideMerge(GoBridgeCtxLive),
   Layer.provideMerge(GoModuleCtxLive),
   Layer.provideMerge(ExObjectFocusCtxLive),
-  Layer.provideMerge(ComboboxFieldCtxLive),
-  Layer.provideMerge(FocusViewCtxLive),
-
-  Layer.provideMerge(ExprCommandCtxLive),
 
   Layer.provideMerge(LoadCtxLive),
   Layer.provideMerge(EncodeCtxLive),
@@ -73,7 +75,6 @@ const mainLayer = EvaluatorCtxLive.pipe(
 );
 
 const mainLayer2 = ComponentCtxLive.pipe(
-  Layer.provideMerge(Focus2CtxLive),
   Layer.provideMerge(ProjectCtxLive),
   Layer.provideMerge(LibraryProjectCtxLive),
   Layer.provideMerge(LibraryCtxLive),
@@ -86,7 +87,6 @@ const mainLayer2 = ComponentCtxLive.pipe(
   Layer.provideMerge(TelemetryCtxLive),
   Layer.provideMerge(CloneNumberTargetCtxLive),
   Layer.provideMerge(CanvasComponentCtxLive),
-  Layer.provideMerge(ComboboxCtxLive),
   Layer.provideMerge(SystemExFuncCtxLive),
   Layer.provideMerge(GlobalPropertyCtxLive),
   Layer.provideMerge(CanvasViewCtxLive),
