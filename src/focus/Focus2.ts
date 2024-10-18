@@ -76,7 +76,16 @@ const ctxEffect = Effect.gen(function* () {
 
   const focusStack = new Array<Focus2>();
 
+  // CHATGPT: PLEASE REFACTOR HERE
+  // const setFocus = ...
+  // const popFocus = ...
+  // const navigateDown = ...
+
   return {
+    // CHATGPT: PLEASE REFACTOR HERE
+    // setFocus,
+    // ...
+
     setFocus(target: FocusTarget) {
       return Effect.gen(this, function* () {
         const f = yield* this.focus.get;
@@ -85,13 +94,15 @@ const ctxEffect = Effect.gen(function* () {
         }
 
         const scope = yield* Scope.make();
-        const vv = Option.some(
-          new Focus2({
+        const newFocus = new Focus2({
             target,
             scope,
             isEditing: yield* SubscriptionRef.make(false),
-          })
+          });
+        const vv = Option.some(
+          newFocus
         );
+        focusStack.push(newFocus);
         yield* this.focus.pipe(Ref.set(vv));
       });
     },
@@ -115,15 +126,7 @@ const ctxEffect = Effect.gen(function* () {
           if (target === undefined) {
             return;
           }
-          const scope = yield* Scope.make();
-          const vv = Option.some(
-            new Focus2({
-              target,
-              scope,
-              isEditing: yield* SubscriptionRef.make(false),
-            })
-          );
-          yield* this.focus.pipe(Ref.set(vv));
+          yield* this.setFocus(target);
           return;
         }
 
@@ -140,15 +143,7 @@ const ctxEffect = Effect.gen(function* () {
         }
 
         const target = focusTargets_[nextIndex]!;
-        const scope = yield* Scope.make();
-        const vv = Option.some(
-          new Focus2({
-            target,
-            scope,
-            isEditing: yield* SubscriptionRef.make(false),
-          })
-        );
-        yield* this.focus.pipe(Ref.set(vv));
+        yield* this.setFocus(target);
       });
     },
 

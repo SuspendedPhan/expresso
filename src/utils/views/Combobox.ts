@@ -203,11 +203,6 @@ const ctxEffect = Effect.gen(function* () {
 
                 const eq = Option.getEquivalence(Equivalence.number);
                 if (eq(focusedIndex_, newIndex2) === false) {
-                  // console.log(
-                  //   "Making sure focusedIndex is within bounds",
-                  //   focusedIndex_,
-                  //   newIndex
-                  // );
                   yield* Ref.set(focusedIndex, newIndex2);
                 }
               });
