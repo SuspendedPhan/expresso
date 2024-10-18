@@ -27,7 +27,7 @@ export class FocusTarget extends Data.TaggedClass("Focus2")<{
   item: any;
 }> {}
 
-class Focus2 extends Data.TaggedClass("Focus2")<{
+export class Focus2 extends Data.TaggedClass("Focus2")<{
   target: FocusTarget;
   isEditing: SubscriptionRef.SubscriptionRef<boolean>;
   scope: Scope.CloseableScope;
@@ -115,8 +115,8 @@ const ctxEffect = Effect.gen(function* () {
       return;
     }
 
-    const index = focusTargets_.findIndex(
-      (target) => target === currentFocus.value.target
+    const index = focusTargets_.findIndex((target) =>
+      Equal.equals(target, currentFocus.value.target)
     );
     if (index !== -1 && index + 1 < focusTargets_.length) {
       yield* setFocus(focusTargets_[index + 1]!);
@@ -128,7 +128,7 @@ const ctxEffect = Effect.gen(function* () {
       Stream.filter((f) => Option.isSome(f)),
       Stream.map((f) => f.value),
       Stream.filter((f) => Equal.equals(f.target, target)),
-      Stream.tap((f) => Console.log(2, f.target, target)),
+      Stream.tap((f) => Console.log(2, f.target, target))
     );
 
   const focus = yield* SubscriptionRef.make(Option.none<Focus2>());
@@ -181,6 +181,8 @@ const createFocusTargets = {
       }),
     ];
 
+    const v0 = createFocusTargets.forProperty(exObject.cloneCountProperty);
+
     const v1 = exObject.componentParameterProperties_.itemStream.pipe(
       Stream.flatMap(
         (pp) =>
@@ -205,8 +207,8 @@ const createFocusTargets = {
 
     const v3 = createFocusTargets.forProperty(exObject.cloneCountProperty);
 
-    return EffectUtils.zipLatestAllOrEmpty(v1, v2, v3).pipe(
-      Stream.map(([vv1, vv2, vv3]) => [...results, ...vv1, ...vv2, ...vv3])
+    return EffectUtils.zipLatestAllOrEmpty(v0, v1, v2, v3).pipe(
+      Stream.map(([vv0, vv1, vv2, vv3]) => [...results, ...vv0, ...vv1, ...vv2, ...vv3])
     );
   },
 
