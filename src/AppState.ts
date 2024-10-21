@@ -1,41 +1,52 @@
-import { Data } from "effect";
-import type { DexObject, DexComponent, DexFunction } from "./Domain";
+import type { DexComponent, DexFunction, DexObject } from "./Domain";
 
 // --- State ---
 
 export interface AppState {
-  activeWindow: DexWindow;
+  readonly activeWindow: DexWindow;
+  readonly focus: DexFocus;
 }
 
-export type DexWindow = Data.TaggedEnum<{
-  ProjectEditorHome: ProjectEditorHome;
-  ProjectComponentHome: ProjectComponentHome;
-  ProjectFunctionHome: ProjectFunctionHome;
-  LibraryProjectHome: LibraryProjectHome;
-  LibraryComponentHome: LibraryComponentHome;
-  LibraryFunctionHome: LibraryFunctionHome;
-}>;
+export interface DexFocus {
+  readonly _tag: "Focus";
+  readonly target: any;
+  readonly isEditing: boolean;
+}
+
+export type DexWindow =
+  | ProjectEditorHome
+  | ProjectComponentHome
+  | ProjectFunctionHome
+  | LibraryProjectHome
+  | LibraryComponentHome
+  | LibraryFunctionHome;
 
 export interface ProjectEditorHome {
-  dexObjects: DexObject[];
+  readonly _tag: "ProjectEditorHome";
+  readonly dexObjects: DexObject[];
 }
 
 export interface ProjectComponentHome {
-  dexComponents: DexComponent[];
+  readonly _tag: "ProjectComponentHome";
+  readonly dexComponents: DexComponent[];
 }
 
 export interface ProjectFunctionHome {
-  dexFunctions: DexFunction[];
+  readonly _tag: "ProjectFunctionHome";
+  readonly dexFunctions: DexFunction[];
 }
 
 export interface LibraryProjectHome {
+  readonly _tag: "LibraryProjectHome";
   // TODO
 }
 
 export interface LibraryComponentHome {
+  readonly _tag: "LibraryComponentHome";
   // TODO
 }
 
 export interface LibraryFunctionHome {
+  readonly _tag: "LibraryFunctionHome";
   // TODO
 }
