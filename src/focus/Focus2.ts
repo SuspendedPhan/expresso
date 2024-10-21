@@ -280,5 +280,7 @@ const createFocusTargets = {
     if (expr.type === "Expr/Call") {
       children = `expr.args.map((arg) => createFocusTargets.forExpr(arg));`
     }
+
+    TreeNode.make<FocusTarget>(exprTarget, children);
   },
 };
