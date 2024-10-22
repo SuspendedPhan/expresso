@@ -9,4 +9,10 @@ export namespace DexNode {
       yield* traverse(child);
     }
   }
+
+  export function* traverseAll<T extends DexNode<T>>(nodes: T[]): Generator<T, void, void> {
+    for (const node of nodes) {
+      yield* traverse(node);
+    }
+  }
 }

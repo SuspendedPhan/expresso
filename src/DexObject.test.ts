@@ -40,12 +40,12 @@ test("DexObject", () => {
 
   const a = DexObject({ id: DexId.make(), name: "a", children: [] });
   expect(a.children.length).toBe(0);
-  const project = makeDexProject({ dexObjects: [a] });
+  const project = makeDexProject({ objects: [a] });
   (project as any)[immerable] = true;
   const project2 = produce(project, DexReducer.DexObject.addBlankChild(a));
   console.log(project2);
 
-  const a2 = project2.dexObjects[0];
+  const a2 = project2.objects[0];
   expect(a.children.length).toBe(0);
   expect(a2).not.toBeUndefined();
   expect(a2!.children.length).toBe(1);
