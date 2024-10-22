@@ -16,7 +16,7 @@ import {
   makeDexObject,
   type DexExpr,
   type DexProject,
-  type DexProperty
+  type DexProperty,
 } from "./DexDomain";
 import { DexNode } from "./DexNode";
 
@@ -96,18 +96,12 @@ function* traverseAllProperties(project: WritableDraft<DexProject>): Generator<W
   }
 }
 
-function * traverseAllDexExprs(project: WritableDraft<DexProject>): Generator<WritableDraft<DexExpr>> {
+function* traverseAllDexExprs(project: WritableDraft<DexProject>): Generator<WritableDraft<DexExpr>> {
   for (const property of traverseAllProperties(project)) {
     yield* DexNode.traverse(property.expr);
   }
   for (const func of project.functions) {
-    yield func.expr;
-  }
-  for (const parameter of project.components.flatMap((c) => c.parameters)) {
-    yield parameter.expr;
-  }
-  for (const parameter of project.functions.flatMap((f) => f.parameters)) {
-    yield parameter.expr;
+    yield* DexNode.traverse(func.expr);
   }
 }
 
@@ -288,22 +282,63 @@ function DexBasicProperty_remove(property: DexBasicProperty) {
   };
 }
 
-function DexExpr_replace(expr: DexExpr) {
-  
+function DexExpr_replace(oldExpr: DexExpr, newExpr: DexExpr) {
+  return (project: WritableDraft<DexProject>) => {
+    for (const property of traverseAllProperties(project)) {
+      if (property.expr === oldExpr) {
+        property.expr = newExpr;
+        return;
+      }
+    }
+    for (const func of project.functions) {
+      if (func.expr === oldExpr) {
+        func.expr = newExpr;
+        return;
+      }
+    }
+
+    const parentExpr = traverseAllDexExprs(project).find((expr) => expr.children.includes(oldExpr));
+    assert(parentExpr !== undefined, "Parent not found");
+    parentExpr.children.splice(parentExpr.children.indexOf(oldExpr), 1, newExpr);
+  };
 }
 
 function DexCustomComponentParameter_setName(parameter: DexCustomComponentParameter) {
-  throw new Error("Not implemented");
+  return (project: WritableDraft<DexProject>, name: string) => {
+    const component = project.components.find((c) => c.parameters.includes(parameter));
+    assert(component !== undefined, "Component not found");
+    const parameter2 = component.parameters.find((p) => p.id === parameter.id);
+    assert(parameter2 !== undefined, "Parameter not found");
+    parameter2.name = name;
+  }
 }
 
 function DexCustomComponentParameter_remove(parameter: DexCustomComponentParameter) {
-  throw new Error("Not implemented");
+  return (project: WritableDraft<DexProject>) => {
+    const component = project.components.find((c) => c.parameters.includes(parameter));
+    assert(component !== undefined, "Component not found");
+    const parameter2 = component.parameters.find((p) => p.id === parameter.id);
+    assert(parameter2 !== undefined, "Parameter not found");
+    component.parameters.splice(component.parameters.indexOf(parameter2), 1);
+  }
 }
 
 function DexFunctionParameter_setName(parameter: DexFunctionParameter) {
-  throw new Error("Not implemented");
+  return (project: WritableDraft<DexProject>, name: string) => {
+    const func = project.functions.find((f) => f.parameters.includes(parameter));
+    assert(func !== undefined, "Function not found");
+    const parameter2 = func.parameters.find((p) => p.id === parameter.id);
+    assert(parameter2 !== undefined, "Parameter not found");
+    parameter2.name = name;
+  }
 }
 
 function DexFunctionParameter_remove(parameter: DexFunctionParameter) {
-  throw new Error("Not implemented");
+  return (project: WritableDraft<DexProject>) => {
+    const func = project.functions.find((f) => f.parameters.includes(parameter));
+    assert(func !== undefined, "Function not found");
+    const parameter2 = func.parameters.find((p) => p.id === parameter.id);
+    assert(parameter2 !== undefined, "Parameter not found");
+    func.parameters.splice(func.parameters.indexOf(parameter2), 1);
+  }
 }
