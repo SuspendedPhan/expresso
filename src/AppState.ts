@@ -1,14 +1,15 @@
+import { Data, Option } from "effect";
 import type { DexComponent, DexFunction, DexObject } from "./Domain";
 
 // --- State ---
 
 export interface AppState {
   readonly activeWindow: DexWindow;
-  readonly focus: DexFocus;
+  readonly focus: Option.Option<DexFocus>;
 }
 
 export interface DexFocus {
-  readonly _tag: "Focus";
+  readonly _tag: "DexFocus";
   readonly target: any;
   readonly isEditing: boolean;
 }
@@ -50,3 +51,7 @@ export interface LibraryFunctionHome {
   readonly _tag: "LibraryFunctionHome";
   // TODO
 }
+
+
+export const DexFocus = Data.tagged<DexFocus>("DexFocus");
+export const ProjectEditorHome = Data.tagged<ProjectEditorHome>("ProjectEditorHome");
