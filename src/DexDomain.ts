@@ -170,6 +170,7 @@ export type DexCustomComponentParameterId = string & Brand.Brand<"DexCustomCompo
 export type DexCanvasComponentParameterId = string & Brand.Brand<"DexCanvasComponentParameterId">;
 export type DexFunctionParameterId = string & Brand.Brand<"DexFunctionParameterId">;
 export type DexCloneNumberTargetId = string & Brand.Brand<"DexCloneNumberTargetId">;
+export type DexGlobalPropertyId = string & Brand.Brand<"DexGlobalPropertyId">;
 
 // Constructors
 export const DexProjectId = Brand.nominal<DexProjectId>();
@@ -187,6 +188,7 @@ export const DexCustomComponentParameterId = Brand.nominal<DexCustomComponentPar
 export const DexCanvasComponentParameterId = Brand.nominal<DexCanvasComponentParameterId>();
 export const DexFunctionParameterId = Brand.nominal<DexFunctionParameterId>();
 export const DexCloneNumberTargetId = Brand.nominal<DexCloneNumberTargetId>();
+export const DexGlobalPropertyId = Brand.nominal<DexGlobalPropertyId>();
 
 // --- Constructors ---
 
@@ -230,7 +232,7 @@ export function makeDexFunction(args: PartialCaseArgs<typeof DexFunction>): DexF
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Function",
     dexFunctionParameters: args.dexFunctionParameters ?? [],
-    dexExpr: args.dexExpr ?? DexNumberExpr({ value: 0 }),
+    dexExpr: args.dexExpr ?? makeDexNumberExpr({}),
   };
   return DexFunction(args2);
 }
@@ -242,7 +244,7 @@ export function makeDexObject(args: PartialCaseArgs<typeof DexObject>): DexObjec
     dexCloneCountProperty: args.dexCloneCountProperty ?? makeDexCloneCountProperty({}),
     dexComponentParameterProperties: args.dexComponentParameterProperties ?? [],
     dexBasicProperties: args.dexBasicProperties ?? [],
-    dexCloneNumberTarget: args.dexCloneNumberTarget ?? DexCloneNumberTarget(),
+    dexCloneNumberTarget: args.dexCloneNumberTarget ?? makeDexCloneNumberTarget({}),
     children: args.children ?? [],
   };
   return DexObject(args2);
@@ -331,4 +333,11 @@ export function makeDexFunctionParameter(args: PartialCaseArgs<typeof DexFunctio
     name: args.name ?? "Untitled Function Parameter",
   };
   return DexFunctionParameter(args2);
+}
+
+export function makeDexCloneNumberTarget(args: PartialCaseArgs<typeof DexCloneNumberTarget>): DexCloneNumberTarget {
+  const args2: CaseArgs<typeof DexCloneNumberTarget> = {
+    id: args.id ?? DexId.make(),
+  };
+  return DexCloneNumberTarget(args2);
 }
