@@ -1,22 +1,25 @@
-import { Data, Option } from "effect";
-import { DexProjectId, type DexComponent, type DexFunction, type DexProject } from "./DexDomain";
+import { Option } from "effect";
+import { DexData } from "./DexData";
+import { DexProjectId, type DexComponent, type DexFunction, type DexProject, type PartialCaseArgs } from "./DexDomain";
 
 // --- State ---
 
 export interface AppState {
+  readonly _tag: "AppState";
   readonly activeWindow: DexWindow;
   readonly focus: Option.Option<DexFocus>;
-  projects: DexProject[];
-  activeLibraryProjectId: string;
+  readonly projects: DexProject[];
+  readonly activeProjectId: Option.Option<DexProjectId>;
 }
 
 export interface DexFocus {
   readonly _tag: "DexFocus";
-  readonly target: any;
+  readonly targetId: string;
   readonly isEditing: boolean;
 }
 
 export type DexWindow =
+  | LoadingHome
   | ProjectEditorHome
   | ProjectComponentHome
   | ProjectFunctionHome
@@ -24,9 +27,12 @@ export type DexWindow =
   | LibraryComponentHome
   | LibraryFunctionHome;
 
+export interface LoadingHome {
+  readonly _tag: "LoadingHome";
+}
+
 export interface ProjectEditorHome {
   readonly _tag: "ProjectEditorHome";
-  readonly dexProjectId: DexProjectId;
 }
 
 export interface ProjectComponentHome {
@@ -54,15 +60,21 @@ export interface LibraryFunctionHome {
   // TODO
 }
 
+export const AppState = DexData.tagged<AppState>("AppState");
+export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
+export const LoadingHome = DexData.tagged<LoadingHome>("LoadingHome");
+export const ProjectEditorHome = DexData.tagged<ProjectEditorHome>("ProjectEditorHome");
+export const ProjectComponentHome = DexData.tagged<ProjectComponentHome>("ProjectComponentHome");
+export const ProjectFunctionHome = DexData.tagged<ProjectFunctionHome>("ProjectFunctionHome");
+export const LibraryProjectHome = DexData.tagged<LibraryProjectHome>("LibraryProjectHome");
+export const LibraryComponentHome = DexData.tagged<LibraryComponentHome>("LibraryComponentHome");
 
-export const DexFocus = Data.tagged<DexFocus>("DexFocus");
-export const ProjectEditorHome = Data.tagged<ProjectEditorHome>("ProjectEditorHome");
-
-export function makeAppState(): AppState {
-  return {
-    activeWindow: ProjectEditorHome({ dexProjectId: DexProjectId("1") }),
-    focus: Option.none(),
-    projects: [],
-    activeLibraryProjectId: "",
+export function makeAppState(args: PartialCaseArgs<typeof AppState>): AppState {
+  const args2 = {
+    activeWindow: args.activeWindow ?? LoadingHome(),
+    focus: args.focus ?? Option.none(),
+    projects: args.projects ?? [],
+    activeProjectId: args.activeProjectId ?? Option.none(),
   };
+  return AppState(args2);
 }

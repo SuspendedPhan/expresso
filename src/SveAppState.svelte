@@ -6,5 +6,5 @@
 </script>
 
 {#if state.activeWindow._tag === "ProjectEditorHome"}
-  <ProjectEditorHome projectEditorHome={state.activeWindow} />
+  <ProjectEditorHome />
 {/if}

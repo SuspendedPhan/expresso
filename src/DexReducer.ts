@@ -1,4 +1,6 @@
 import assert from "assert-ts";
+import { Option } from "effect";
+
 import { type WritableDraft } from "immer";
 import type { AppState } from "./AppState";
 import {
@@ -14,6 +16,7 @@ import {
   makeDexFunction,
   makeDexFunctionParameter,
   makeDexObject,
+  makeDexProject,
   type DexExpr,
   type DexProject,
   type DexProperty,
@@ -22,6 +25,10 @@ import { DexNode } from "./DexNode";
 
 export namespace DexReducer {
   export type DexReducer<T> = (state: WritableDraft<T>) => void;
+
+  export const AppState = {
+    addProject: AppState_addProject,
+  };
 
   export const DexProject = {
     setName: DexProject_setName,
@@ -122,6 +129,16 @@ function traverseAllDexExprs(project: WritableDraft<DexProject>): WritableDraft<
 function DexProject_setName(name: string) {
   return (project: WritableDraft<DexProject>) => {
     project.name = name;
+  };
+}
+
+// --- Reducers ---
+
+function AppState_addProject() {
+  return (appState: WritableDraft<AppState>) => {
+    const project = makeDexProject({});
+    appState.projects.push(project);
+    appState.activeProjectId = Option.some(project.id);
   };
 }
 

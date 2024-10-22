@@ -1,19 +1,24 @@
 import assert from "assert-ts";
-import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
+import { Effect, Layer, Option, Ref, Stream, SubscriptionRef } from "effect";
 import { produce } from "immer";
 import { writable } from "svelte/store";
-import { makeAppState, type AppState } from "./AppState";
+import { makeAppState, ProjectEditorHome, type AppState } from "./AppState";
 import { type DexProject } from "./DexDomain";
 import type { DexReducer } from "./DexReducer";
 
 export class AppStateCtx extends Effect.Tag("AppStateCtx")<AppStateCtx, Effect.Effect.Success<typeof ctxEffect>>() {}
 
 const ctxEffect = Effect.gen(function* () {
-  const appState = yield* SubscriptionRef.make<AppState>(makeAppState());
+  const appState = yield* SubscriptionRef.make<AppState>(
+    makeAppState({
+      activeWindow: ProjectEditorHome(),
+    })
+  );
 
   yield* appState.changes.pipe(
     Stream.runForEach((state) =>
       Effect.gen(function* () {
+        console.log(state);
         appStateReadable.set(state);
       })
     ),
@@ -33,7 +38,9 @@ const ctxEffect = Effect.gen(function* () {
         const nextState = produce(state, (draft) => {
           const activeWindow = draft.activeWindow;
           assert(activeWindow._tag === "ProjectEditorHome", "Not in project editor");
-          const project = draft.projects.find((p) => p.id === activeWindow.dexProjectId);
+          const dexProjectId = draft.activeProjectId;
+          assert(Option.isSome(dexProjectId), "No project selected");
+          const project = draft.projects.find((p) => p.id === dexProjectId.value);
           assert(project !== undefined, "Project not found");
           fn(project);
         });
