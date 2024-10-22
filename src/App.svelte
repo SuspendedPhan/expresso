@@ -8,7 +8,7 @@
 
   let appState: Readable<AppState>;
   Effect.gen(function* () {
-    appState = yield* AppStateCtx.getState;
+    appState = yield* AppStateCtx.getAppStateReadable;
   }).pipe(DexRuntime.runPromise);
 </script>
 

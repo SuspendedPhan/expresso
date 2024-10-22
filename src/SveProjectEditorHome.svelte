@@ -1,19 +1,29 @@
 <script lang="ts">
   import { Effect } from "effect";
-  import type { ProjectEditorHome } from "./AppState";
-  import { DexRuntime } from "./DexRuntime";
   import { AppStateCtx } from "./AppStateCtx";
+  import type { DexProject } from "./DexDomain";
+  import { DexGetter } from "./DexGetter";
+  import { DexReducer } from "./DexReducer";
+  import { DexRuntime } from "./DexRuntime";
 
-  export let projectEditorHome: ProjectEditorHome;
+  let ready = false;
+  let project: DexProject;
+  Effect.gen(function* () {
+    const appState = yield* AppStateCtx.getAppState;
+    project = DexGetter.ProjectEditorHome.getProject(appState);
+    ready = true;
+  }).pipe(DexRuntime.runPromise);
 
   function onclick() {
     Effect.gen(function* () {
-      yield* AppStateCtx.addRootDexObject();
+      yield* AppStateCtx.applyProjectReducer(DexReducer.DexProject.addObject());
     }).pipe(DexRuntime.runPromise);
   }
 </script>
 
-{#each projectEditorHome.dexObjects as rootDexObject}
-  <div>{rootDexObject.name}</div>
-{/each}
-<button on:click={onclick}>Add Root Object</button>
+{#if ready}
+  {#each project.objects as rootObject}
+    <div>{rootObject.name}</div>
+  {/each}
+  <button on:click={onclick}>Add Root Object</button>
+{/if}

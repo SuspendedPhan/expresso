@@ -23,7 +23,9 @@ const ctxEffect = Effect.gen(function* () {
   const appStateReadable = writable(yield* appState.get);
 
   return {
-    getState: appStateReadable,
+    getAppStateReadable: appStateReadable,
+
+    getAppState: appState.get,
 
     applyProjectReducer(fn: DexReducer.DexReducer<DexProject>) {
       return Effect.gen(function* () {
@@ -44,7 +46,7 @@ const ctxEffect = Effect.gen(function* () {
         const nextState = produce(yield* appState.get, fn);
         yield* Ref.set(appState, nextState);
       });
-    }
+    },
   };
 });
 
