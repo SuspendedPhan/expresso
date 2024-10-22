@@ -1,11 +1,13 @@
 import { Data, Option } from "effect";
-import type { DexComponent, DexFunction, DexProject } from "./DexDomain";
+import type { DexComponent, DexFunction, DexProject, DexProjectId } from "./DexDomain";
 
 // --- State ---
 
 export interface AppState {
   readonly activeWindow: DexWindow;
   readonly focus: Option.Option<DexFocus>;
+  projects: DexProject[];
+  activeLibraryProjectId: string;
 }
 
 export interface DexFocus {
@@ -24,7 +26,7 @@ export type DexWindow =
 
 export interface ProjectEditorHome {
   readonly _tag: "ProjectEditorHome";
-  readonly dexProject: DexProject;
+  readonly dexProjectId: DexProjectId;
 }
 
 export interface ProjectComponentHome {
