@@ -74,41 +74,49 @@ export namespace DexReducer {
   };
 }
 
-function* traverseAllDexObjects(
-  project: WritableDraft<DexProject>
-): Generator<WritableDraft<DexObject>, void, undefined> {
+function traverseAllDexObjects(project: WritableDraft<DexProject>): WritableDraft<DexObject>[] {
+  const result = new Array<DexObject>();
   for (const component of project.components) {
-    yield* DexNode.traverseAll(component.objects);
+    for (const obj of DexNode.traverseAll(component.objects)) {
+      result.push(obj);
+    }
   }
-  yield* DexNode.traverseAll(project.objects);
+  for (const obj of DexNode.traverseAll(project.objects)) {
+    result.push(obj);
+  }
+  return result;
 }
 
-function* getObjectProperties(
-  object: WritableDraft<DexObject>
-): Generator<WritableDraft<DexProperty>, void, undefined> {
-  yield object.cloneCountProperty;
-  yield* object.componentParameterProperties;
-  yield* object.basicProperties;
+function getObjectProperties(object: WritableDraft<DexObject>): WritableDraft<DexProperty>[] {
+  const result = new Array<DexProperty>();
+  result.push(object.cloneCountProperty);
+  result.push(...object.componentParameterProperties);
+  result.push(...object.basicProperties);
+  return result;
 }
 
-function* traverseAllProperties(
-  project: WritableDraft<DexProject>
-): Generator<WritableDraft<DexProperty>, void, undefined> {
+function traverseAllProperties(project: WritableDraft<DexProject>): WritableDraft<DexProperty>[] {
+  const result = new Array<DexProperty>();
   for (const component of project.components) {
-    yield* component.properties;
+    for (const obj of DexNode.traverseAll(component.objects)) {
+      result.push(...getObjectProperties(obj));
+    }
   }
-  for (const object of traverseAllDexObjects(project)) {
-    yield* getObjectProperties(object);
+  for (const obj of DexNode.traverseAll(project.objects)) {
+    result.push(...getObjectProperties(obj));
   }
+  return result;
 }
 
-function* traverseAllDexExprs(project: WritableDraft<DexProject>): Generator<WritableDraft<DexExpr>, void, undefined> {
+function traverseAllDexExprs(project: WritableDraft<DexProject>): WritableDraft<DexExpr>[] {
+  const result = new Array<DexExpr>();
   for (const property of traverseAllProperties(project)) {
-    yield* DexNode.traverse(property.expr);
+    result.push(property.expr);
   }
   for (const func of project.functions) {
-    yield* DexNode.traverse(func.expr);
+    result.push(func.expr);
   }
+  return result;
 }
 
 function DexProject_setName(name: string) {
