@@ -1,5 +1,5 @@
 import { Data, Option } from "effect";
-import type { DexComponent, DexFunction, DexObject } from "./Domain";
+import type { DexComponent, DexFunction, DexProject } from "./Domain";
 
 // --- State ---
 
@@ -24,7 +24,7 @@ export type DexWindow =
 
 export interface ProjectEditorHome {
   readonly _tag: "ProjectEditorHome";
-  readonly dexObjects: DexObject[];
+  readonly dexProject: DexProject;
 }
 
 export interface ProjectComponentHome {

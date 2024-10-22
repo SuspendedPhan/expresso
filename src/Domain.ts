@@ -1,6 +1,19 @@
 // --- Core types ---
 
+import { Brand, Data } from "effect";
+
+export interface DexProject {
+  readonly _tag: "DexProject";
+  readonly name: string;
+  readonly dexComponents: DexComponent[];
+  readonly dexFunctions: DexFunction[];
+  readonly dexObjects: DexObject[];
+
+  readonly dexObjectOrdinal: number;
+}
+
 export interface DexCustomComponent {
+  readonly _tag: "DexCustomComponent";
   readonly name: string;
   readonly dexCustomComponentParameters: DexCustomComponentParameter[];
   readonly dexProperties: DexBasicProperty[];
@@ -8,6 +21,7 @@ export interface DexCustomComponent {
 }
 
 export interface DexCanvasComponent {
+  readonly _tag: "DexCanvasComponent";
   readonly name: string;
   readonly dexCanvasComponentParameters: DexCanvasComponentParameter[];
 }
@@ -18,6 +32,7 @@ export interface DexFunction {
 
 export interface DexObject {
   readonly _tag: "DexObject";
+  readonly id: DexObjectId;
   readonly name: string;
   readonly children: DexObject[];
 }
@@ -93,3 +108,23 @@ export type DexReferenceTarget =
   | DexCloneNumberTarget
   | DexGlobalProperty;
 
+
+export const DexCustomComponent = Data.tagged<DexCustomComponent>("DexCustomComponent");
+export const DexCanvasComponent = Data.tagged<DexCanvasComponent>("DexCanvasComponent");
+export const DexFunction = Data.tagged<DexFunction>("DexFunction");
+export const DexObject = Data.tagged<DexObject>("DexObject");
+export const DexCloneCountProperty = Data.tagged<DexCloneCountProperty>("DexCloneCountProperty");
+export const DexComponentParameterProperty = Data.tagged<DexComponentParameterProperty>("DexComponentParameterProperty");
+export const DexBasicProperty = Data.tagged<DexBasicProperty>("DexBasicProperty");
+export const DexNumberExpr = Data.tagged<DexNumberExpr>("NumberExpr");
+export const DexCallExpr = Data.tagged<DexCallExpr>("CallExpr");
+export const DexReferenceExpr = Data.tagged<DexReferenceExpr>("ReferenceExpr");
+export const DexCustomComponentParameter = Data.tagged<DexCustomComponentParameter>("DexCustomComponentParameter");
+export const DexCanvasComponentParameter = Data.tagged<DexCanvasComponentParameter>("DexCanvasComponentParameter");
+export const DexFunctionParameter = Data.tagged<DexFunctionParameter>("DexFunctionParameter");
+export const DexCloneNumberTarget = Data.tagged<DexCloneNumberTarget>("DexCloneNumberTarget");
+
+// --- IDs ---
+
+export type DexObjectId = string & Brand.Brand<"DexObjectId">;
+export const DexObjectId = Brand.nominal<DexObjectId>();
