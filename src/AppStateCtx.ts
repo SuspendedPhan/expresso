@@ -4,7 +4,7 @@ import { produce } from "immer";
 import { writable } from "svelte/store";
 import { ProjectEditorHome, type AppState } from "./AppState";
 import type { DexReducer } from "./DexReducer";
-import { makeDexProject, type DexProject } from "./Domain";
+import { makeDexProject, type DexProject } from "./DexDomain";
 
 export class AppStateCtx extends Effect.Tag("AppStateCtx")<AppStateCtx, Effect.Effect.Success<typeof ctxEffect>>() {}
 

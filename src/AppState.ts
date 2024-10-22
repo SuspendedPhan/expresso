@@ -1,5 +1,5 @@
 import { Data, Option } from "effect";
-import type { DexComponent, DexFunction, DexProject } from "./Domain";
+import type { DexComponent, DexFunction, DexProject } from "./DexDomain";
 
 // --- State ---
 

@@ -1,47 +1,52 @@
 // sum.test.js
-import { Data } from "effect";
 import { immerable, produce } from "immer";
 import { expect, test } from "vitest";
+import { DexId } from "./DexId";
+import { DexReducer } from "./DexReducer";
+import { DexObject, makeDexProject } from "./DexDomain";
 
 test("DexObject", () => {
-  interface TestX {
-    readonly _tag: "TestX";
-    readonly id: string;
-    readonly testY: TestY;
-  }
 
-  interface TestY {
-    readonly _tag: "TestY";
-    readonly id: string;
-  }
+  // const project = makeDexProject({ dexObjects: [] });
 
-  const TestX = Data.tagged<TestX>("TestX");
-  const TestY = Data.tagged<TestY>("TestY");
+  // interface TestX {
+  //   readonly _tag: "TestX";
+  //   readonly id: string;
+  //   readonly testY: TestY;
+  // }
 
-  const y = TestY({ id: "2" });
-  const x = TestX({ id: "1", testY: y });
+  // interface TestY {
+  //   readonly _tag: "TestY";
+  //   readonly id: string;
+  // }
 
-  (x as any)[immerable] = true;
-    // (y as any)[immerable] = true;
+  // const TestX = Data.tagged<TestX>("TestX");
+  // const TestY = Data.tagged<TestY>("TestY");
 
-  const x2 = produce(x, (draft) => {
-    draft.testY.id = "3";
-  });
+  // const y = TestY({ id: "2" });
+  // const x = TestX({ id: "1", testY: y });
 
-  expect(x2.testY.id).toBe("3");
-  expect(x.testY.id).toBe("2");
-  expect(x.id).toBe("1");
-  expect(x2.id).toBe("1");
+  // (x as any)[immerable] = true;
+  //   // (y as any)[immerable] = true;
 
-  // const a = DexObject({ id: DexId.make(), name: "a", children: [] });
-  // expect(a.children.length).toBe(0);
-  // const project = makeDexProject({ dexObjects: [a] });
-  // (project as any)[immerable] = true;
-  // const project2 = produce(project, DexReducer.DexObject.addBlankChild(a));
-  // console.log(project2);
+  // const x2 = produce(x, (draft) => {
+  //   draft.testY.id = "3";
+  // });
 
-  // const a2 = project2.dexObjects[0];
-  // expect(a.children.length).toBe(0);
-  // expect(a2).not.toBeUndefined();
-  // expect(a2!.children.length).toBe(1);
+  // expect(x2.testY.id).toBe("3");
+  // expect(x.testY.id).toBe("2");
+  // expect(x.id).toBe("1");
+  // expect(x2.id).toBe("1");
+
+  const a = DexObject({ id: DexId.make(), name: "a", children: [] });
+  expect(a.children.length).toBe(0);
+  const project = makeDexProject({ dexObjects: [a] });
+  (project as any)[immerable] = true;
+  const project2 = produce(project, DexReducer.DexObject.addBlankChild(a));
+  console.log(project2);
+
+  const a2 = project2.dexObjects[0];
+  expect(a.children.length).toBe(0);
+  expect(a2).not.toBeUndefined();
+  expect(a2!.children.length).toBe(1);
 });
