@@ -13,4 +13,7 @@
   }
 </script>
 
+{#each projectEditorHome.dexObjects as rootDexObject}
+  <div>{rootDexObject.name}</div>
+{/each}
 <button on:click={onclick}>Add Root Object</button>
