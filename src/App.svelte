@@ -5,6 +5,12 @@
   import type { AppState } from "./AppState";
   import { DexRuntime } from "./DexRuntime";
   import SveAppState from "./SveAppState.svelte";
+  import { DexId } from "./DexId";
+  import { DexObject, makeDexProject } from "./Domain";
+
+  const a = DexObject({ id: DexId.make(), name: "a", children: [] });
+  const project = makeDexProject({ dexObjects: [a] });
+  console.log(project);
 
   let appState: Readable<AppState>;
   Effect.gen(function* () {

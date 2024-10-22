@@ -108,13 +108,15 @@ export type DexReferenceTarget =
   | DexCloneNumberTarget
   | DexGlobalProperty;
 
-
+export const DexProject = Data.tagged<DexProject>("DexProject");
 export const DexCustomComponent = Data.tagged<DexCustomComponent>("DexCustomComponent");
 export const DexCanvasComponent = Data.tagged<DexCanvasComponent>("DexCanvasComponent");
 export const DexFunction = Data.tagged<DexFunction>("DexFunction");
 export const DexObject = Data.tagged<DexObject>("DexObject");
 export const DexCloneCountProperty = Data.tagged<DexCloneCountProperty>("DexCloneCountProperty");
-export const DexComponentParameterProperty = Data.tagged<DexComponentParameterProperty>("DexComponentParameterProperty");
+export const DexComponentParameterProperty = Data.tagged<DexComponentParameterProperty>(
+  "DexComponentParameterProperty"
+);
 export const DexBasicProperty = Data.tagged<DexBasicProperty>("DexBasicProperty");
 export const DexNumberExpr = Data.tagged<DexNumberExpr>("NumberExpr");
 export const DexCallExpr = Data.tagged<DexCallExpr>("CallExpr");
@@ -128,3 +130,17 @@ export const DexCloneNumberTarget = Data.tagged<DexCloneNumberTarget>("DexCloneN
 
 export type DexObjectId = string & Brand.Brand<"DexObjectId">;
 export const DexObjectId = Brand.nominal<DexObjectId>();
+
+export type PartialCaseArgs<T extends (...args: any) => any> = Partial<Parameters<T>["0"]>
+export type CaseArgs<T extends (...args: any) => any> = Parameters<T>["0"];
+
+export function makeDexProject(args: PartialCaseArgs<typeof DexProject>): DexProject {
+  const args2: CaseArgs<typeof DexProject> = {
+    name: args.name ?? "Untitled Project",
+    dexComponents: args.dexComponents ?? [],
+    dexFunctions: args.dexFunctions ?? [],
+    dexObjects: args.dexObjects ?? [],
+    dexObjectOrdinal: args.dexObjectOrdinal ?? 0,
+  }
+  return DexProject(args2);
+}

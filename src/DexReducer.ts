@@ -15,7 +15,7 @@ export namespace DexReducer {
 function DexObject_addBlankChild(parent: DexObject) {
   return (project: WritableDraft<DexProject>) => {
     const rootDexObjects = project.dexObjects;
-    const dexObjects = rootDexObjects.flatMap((o) => Array.from(DexNode.traverse<DexObject>(o)));
+    const dexObjects = rootDexObjects.flatMap((o) => Array.from(DexNode.traverse<WritableDraft<DexObject>>(o)));
 
     const dexObjectById = DexId.makeValueByIdMap(dexObjects);
     const dParent = HashMap.get(dexObjectById, parent.id);

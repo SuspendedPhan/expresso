@@ -4,13 +4,13 @@ import { produce } from "immer";
 import { writable } from "svelte/store";
 import { ProjectEditorHome, type AppState } from "./AppState";
 import type { DexReducer } from "./DexReducer";
-import type { DexProject } from "./Domain";
+import { makeDexProject, type DexProject } from "./Domain";
 
 export class AppStateCtx extends Effect.Tag("AppStateCtx")<AppStateCtx, Effect.Effect.Success<typeof ctxEffect>>() {}
 
 const ctxEffect = Effect.gen(function* () {
   const appState = yield* SubscriptionRef.make<AppState>({
-    activeWindow: ProjectEditorHome({ dexProject: DexProject({}) }),
+    activeWindow: ProjectEditorHome({ dexProject: makeDexProject({}) }),
     focus: Option.none(),
   });
 
