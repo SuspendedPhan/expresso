@@ -1,5 +1,5 @@
 import { Data, Option } from "effect";
-import type { DexComponent, DexFunction, DexProject, DexProjectId } from "./DexDomain";
+import { DexProjectId, type DexComponent, type DexFunction, type DexProject } from "./DexDomain";
 
 // --- State ---
 
@@ -57,3 +57,12 @@ export interface LibraryFunctionHome {
 
 export const DexFocus = Data.tagged<DexFocus>("DexFocus");
 export const ProjectEditorHome = Data.tagged<ProjectEditorHome>("ProjectEditorHome");
+
+export function makeAppState(): AppState {
+  return {
+    activeWindow: ProjectEditorHome({ dexProjectId: DexProjectId("1") }),
+    focus: Option.none(),
+    projects: [],
+    activeLibraryProjectId: "",
+  };
+}

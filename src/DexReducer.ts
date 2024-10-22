@@ -74,20 +74,26 @@ export namespace DexReducer {
   };
 }
 
-function* traverseAllDexObjects(project: WritableDraft<DexProject>): Generator<WritableDraft<DexObject>> {
+function* traverseAllDexObjects(
+  project: WritableDraft<DexProject>
+): Generator<WritableDraft<DexObject>, void, undefined> {
   for (const component of project.components) {
     yield* DexNode.traverseAll(component.objects);
   }
   yield* DexNode.traverseAll(project.objects);
 }
 
-function* getObjectProperties(object: WritableDraft<DexObject>): Generator<WritableDraft<DexProperty>> {
+function* getObjectProperties(
+  object: WritableDraft<DexObject>
+): Generator<WritableDraft<DexProperty>, void, undefined> {
   yield object.cloneCountProperty;
   yield* object.componentParameterProperties;
   yield* object.basicProperties;
 }
 
-function* traverseAllProperties(project: WritableDraft<DexProject>): Generator<WritableDraft<DexProperty>> {
+function* traverseAllProperties(
+  project: WritableDraft<DexProject>
+): Generator<WritableDraft<DexProperty>, void, undefined> {
   for (const component of project.components) {
     yield* component.properties;
   }
@@ -96,7 +102,7 @@ function* traverseAllProperties(project: WritableDraft<DexProject>): Generator<W
   }
 }
 
-function* traverseAllDexExprs(project: WritableDraft<DexProject>): Generator<WritableDraft<DexExpr>> {
+function* traverseAllDexExprs(project: WritableDraft<DexProject>): Generator<WritableDraft<DexExpr>, void, undefined> {
   for (const property of traverseAllProperties(project)) {
     yield* DexNode.traverse(property.expr);
   }
@@ -310,7 +316,7 @@ function DexCustomComponentParameter_setName(parameter: DexCustomComponentParame
     const parameter2 = component.parameters.find((p) => p.id === parameter.id);
     assert(parameter2 !== undefined, "Parameter not found");
     parameter2.name = name;
-  }
+  };
 }
 
 function DexCustomComponentParameter_remove(parameter: DexCustomComponentParameter) {
@@ -320,7 +326,7 @@ function DexCustomComponentParameter_remove(parameter: DexCustomComponentParamet
     const parameter2 = component.parameters.find((p) => p.id === parameter.id);
     assert(parameter2 !== undefined, "Parameter not found");
     component.parameters.splice(component.parameters.indexOf(parameter2), 1);
-  }
+  };
 }
 
 function DexFunctionParameter_setName(parameter: DexFunctionParameter) {
@@ -330,7 +336,7 @@ function DexFunctionParameter_setName(parameter: DexFunctionParameter) {
     const parameter2 = func.parameters.find((p) => p.id === parameter.id);
     assert(parameter2 !== undefined, "Parameter not found");
     parameter2.name = name;
-  }
+  };
 }
 
 function DexFunctionParameter_remove(parameter: DexFunctionParameter) {
@@ -340,5 +346,5 @@ function DexFunctionParameter_remove(parameter: DexFunctionParameter) {
     const parameter2 = func.parameters.find((p) => p.id === parameter.id);
     assert(parameter2 !== undefined, "Parameter not found");
     func.parameters.splice(func.parameters.indexOf(parameter2), 1);
-  }
+  };
 }
