@@ -9,13 +9,11 @@
 
   export let target: TextFieldFocusTarget;
 
-  let ready = false;
   let state: TextFieldState;
 
   Effect.gen(function* () {
     const appState = yield* AppStateCtx.getAppState;
     state = TextFieldGetter.state(appState, target);
-    ready = true;
   }).pipe(DexRuntime.runPromise);
 
   function onInput(event: Event) {
@@ -23,11 +21,13 @@
   }
 </script>
 
-<div class="flex flex-row">
-  {#if state.label}
-    <FieldLabel label={state.label}></FieldLabel>
-  {/if}
-  <FocusView {target} class="text-emphatic font-mono">
-    <HugInput isEditing={state.isEditing} on:input={onInput} value={state.value}></HugInput>
-  </FocusView>
-</div>
+{#if state}
+  <div class="flex flex-row">
+    {#if state.label}
+      <FieldLabel label={state.label}></FieldLabel>
+    {/if}
+    <FocusView {target} class="text-emphatic font-mono">
+      <HugInput isEditing={state.isEditing} on:input={onInput} value={state.value}></HugInput>
+    </FocusView>
+  </div>
+{/if}

@@ -1,9 +1,7 @@
-import assert from "assert-ts";
-import { Effect, Layer, Option, Ref, Stream, SubscriptionRef } from "effect";
-import { apply, create } from "mutative";
+import { Effect, Layer, Ref, Stream, SubscriptionRef } from "effect";
+import { create } from "mutative";
 import { writable } from "svelte/store";
 import { makeAppState, ProjectEditorHome, type AppState } from "./AppState";
-import { type DexProject } from "./DexDomain";
 import { DexReducer } from "./DexReducer";
 
 export class AppStateCtx extends Effect.Tag("AppStateCtx")<AppStateCtx, Effect.Effect.Success<typeof ctxEffect>>() {}

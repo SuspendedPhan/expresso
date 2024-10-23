@@ -4,7 +4,7 @@
   import type { DexProject } from "./DexDomain";
   import { DexGetter } from "./DexGetter";
   import { DexReducer } from "./DexReducer";
-  import { DexRuntime } from "./DexRuntime";
+  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
   import SveObject from "./SveObject.svelte";
 
   let ready = false;
@@ -17,15 +17,11 @@
   }).pipe(DexRuntime.runPromise);
 
   function createProject() {
-    Effect.gen(function* () {
-      yield* AppStateCtx.applyAppStateReducer(DexReducer.AppState.addProject());
-    }).pipe(DexRuntime.runPromise);
+    DexRuntime_RunReducer(DexReducer.AppState.addProject());
   }
 
   function addObject() {
-    Effect.gen(function* () {
-      yield* AppStateCtx.applyProjectReducer(DexReducer.DexProject.addObject());
-    }).pipe(DexRuntime.runPromise);
+    DexRuntime_RunReducer(DexReducer.DexProject.addObject());
   }
 </script>
 
