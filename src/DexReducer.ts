@@ -22,7 +22,7 @@ import {
   type DexExpr,
   type DexProject
 } from "./DexDomain";
-import type { FocusKind } from "./DexFocus";
+import type { DexFocusTarget } from "./DexFocus";
 import { DexGetter, traverseAllDexExprs, traverseAllDexObjects, traverseAllProperties } from "./DexGetter";
 
 export namespace DexReducer {
@@ -106,7 +106,8 @@ function AppState_addProject() {
   };
 }
 
-function AppState_setFocus(kind: FocusKind, targetId: string) {
+function AppState_setFocus(target: DexFocusTarget) {
+  const { kind, targetId } = target;
   return (appState: Draft<AppState>) => {
     appState.focus = Option.some({
       _tag: "DexFocus",

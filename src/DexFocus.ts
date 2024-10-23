@@ -39,3 +39,8 @@ export enum FocusKind {
 export type TextFieldFocusKind = FocusKind.Object_Name | FocusKind.Property_Name;
 
 export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
+
+export interface DexFocusTarget {
+  kind: FocusKind;
+  targetId: string;
+}

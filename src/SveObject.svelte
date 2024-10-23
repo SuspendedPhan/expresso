@@ -8,13 +8,13 @@
   import ExObjectHeaderView from "./ExObjectHeaderView.svelte";
   import FlexContainer from "./FlexContainer.svelte";
   import SveProperty from "./SveProperty.svelte";
-  import type { TextFieldProps } from "./TextField";
+  import type { TextFieldFocusTarget } from "./TextField";
   import TextField from "./TextField.svelte";
   import { FocusKind } from "./DexFocus";
 
   export let dexObject: DexObject;
 
-  let nameProps: TextFieldProps;
+  let nameProps: TextFieldFocusTarget;
 
   let ready = false;
 

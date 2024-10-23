@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { Option } from "effect";
 import type { AppState } from "./AppState";
 import type { DexExpr, DexObject, DexProject, DexProperty } from "./DexDomain";
-import type { FocusKind } from "./DexFocus";
+import type { DexFocusTarget, FocusKind } from "./DexFocus";
 import { DexNode } from "./DexNode";
 
 export function traverseAllDexObjects(project: DexProject): DexObject[] {
@@ -93,7 +93,8 @@ export namespace DexGetter {
     return focus.value.kind === kind && focus.value.targetId === targetId && focus.value.isEditing;
   }
 
-  export function isFocused(state: AppState, kind: FocusKind, targetId: string): boolean {
+  export function isFocused(state: AppState, target: DexFocusTarget): boolean {
+    const { kind, targetId } = target;
     const focus = state.focus;
     if (Option.isNone(focus)) {
       return false;

@@ -1,6 +1,6 @@
 import assert from "assert-ts";
 import { Effect, Layer, Option, Ref, Stream, SubscriptionRef } from "effect";
-import { create } from "mutative";
+import { apply, create } from "mutative";
 import { writable } from "svelte/store";
 import { makeAppState, ProjectEditorHome, type AppState } from "./AppState";
 import { type DexProject } from "./DexDomain";
@@ -37,26 +37,7 @@ const ctxEffect = Effect.gen(function* () {
 
     getAppState: appState.get,
 
-    applyProjectReducer(fn: DexReducer.DexReducer<DexProject>) {
-      return Effect.gen(function* () {
-        const state = yield* appState.get;
-        const nextState = create(
-          state,
-          (draft) => {
-            const activeWindow = draft.activeWindow;
-            assert(activeWindow._tag === "ProjectEditorHome", "Not in project editor");
-            const dexProjectId = draft.activeProjectId;
-            assert(Option.isSome(dexProjectId), "No project selected");
-            const project = draft.projects.find((p) => p.id === dexProjectId.value);
-            assert(project !== undefined, "Project not found");
-            fn(project);
-          },
-          { mark: () => "immutable" }
-        );
-        yield* Ref.set(appState, nextState);
-      });
-    },
-
+    runReducer: applyAppStateReducer,
     applyAppStateReducer,
 
     getTextFieldOnInput: (makeReducerFromSetter: (value: string) => DexReducer.DexReducer<AppState>) => {

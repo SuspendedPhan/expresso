@@ -3,6 +3,7 @@ import { Layer, Logger, LogLevel, Option } from "effect";
 import { Effect, ManagedRuntime } from "effect";
 import { AppStateCtx, AppStateCtxLive } from "./AppStateCtx";
 import { DexReducer } from "./DexReducer";
+import type { AppState } from "./AppState";
 
 const layer = AppStateCtxLive.pipe(Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All)));
 
@@ -27,3 +28,10 @@ document.addEventListener("keydown", (e) => {
     yield* AppStateCtx.applyAppStateReducer(DexReducer.AppState.setEditing(true));
   }).pipe(DexRuntime.runPromise);
 });
+
+
+export function DexRuntime_RunReducer(reducer: DexReducer.DexReducer<AppState>) {
+  Effect.gen(function* () {
+    yield* AppStateCtx.runReducer(reducer);
+  }).pipe(DexRuntime.runPromise);
+}
