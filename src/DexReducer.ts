@@ -22,7 +22,6 @@ import {
   type DexExpr,
   type DexProject,
 } from "./DexDomain";
-import type { DexBasicFocus, DexFocusTarget, DexTextFieldFocus } from "./DexFocus";
 import { DexGetter, traverseAllDexExprs, traverseAllDexObjects, traverseAllProperties } from "./DexGetter";
 import { TextFieldGetter } from "./TextField";
 
@@ -41,7 +40,6 @@ export namespace DexReducer {
 
   export const AppState = {
     addProject: AppState_addProject,
-    setFocus: AppState_setFocus,
     startEditing: AppState_startEditing,
   };
 
@@ -103,37 +101,6 @@ function AppState_addProject() {
     const project = makeDexProject({});
     appState.projects.push(project);
     appState.activeProjectId = Option.some(project.id);
-  };
-}
-
-
-function AppState_setFocus(target: DexFocusTarget) {
-  return (appState: Draft<AppState>) => {
-    const focus = 
-
-    switch (target._tag) {
-      case "BasicFocusTarget": {
-        const focus: DexBasicFocus = {
-          _tag: "DexFocus",
-          target,
-          editingState: { _tag: "NotEditing" },
-        };
-        appState.focus = Option.some(focus);
-        break;
-      }
-      case "TextFieldFocusTarget": {
-        const focus: DexTextFieldFocus = {
-          _tag: "DexTextFieldFocus",
-          target,
-          editingState: { _tag: "NotEditing" },
-        };
-        appState.focus = Option.some(focus);
-        break;
-      }
-      default:
-        console.log(target);
-        throw new Error("Unknown focus target");
-    }
   };
 }
 

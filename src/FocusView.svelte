@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { Option } from "effect";
-  import { Effect } from "effect";
-  import type { DexFocusTarget } from "./DexFocus";
-  import { DexReducer } from "./DexReducer";
-  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
+  import { Effect, Option } from "effect";
   import { AppStateCtx } from "./AppStateCtx";
+  import { FocusReducer, type DexFocusTarget } from "./DexFocus";
   import { DexGetter } from "./DexGetter";
+  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
 
   export let target: DexFocusTarget;
 
@@ -17,7 +15,7 @@
   }).pipe(DexRuntime.runPromise);
 
   function onMouseDown() {
-    DexRuntime_RunReducer(DexReducer.AppState.setFocus(target));
+    DexRuntime_RunReducer(FocusReducer.focusTarget(target));
   }
 
   let clazz: string = "";
