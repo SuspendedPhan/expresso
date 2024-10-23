@@ -53,8 +53,6 @@ function traverseAllDexExprs(project: DexProject): DexExpr[] {
 export namespace DexGetter {
   export const ProjectEditorHome = {
     getProject: (state: AppState): DexProject | null => {
-      const activeWindow = state.activeWindow;
-      assert(activeWindow._tag === "ProjectEditorHome", "Not in project editor");
       const dexProjectId = state.activeProjectId;
 
       if (Option.isNone(dexProjectId)) {
@@ -76,12 +74,13 @@ export namespace DexGetter {
     },
   };
 
-  export const DexProperty = {
+  export const DexBasicProperty = {
     get: (state: AppState, targetId: string) => {
       const project = ProjectEditorHome.getProject(state);
       assert(project !== null, "Project not found");
       const dexProperty = traverseAllProperties(project).find((prop) => prop.id === targetId);
       assert(dexProperty !== undefined, "Property not found");
+      assert(dexProperty._tag === "DexBasicProperty", "Property is not basic");
       return dexProperty;
     },
   };
@@ -100,5 +99,16 @@ export namespace DexGetter {
       return false;
     }
     return focus.value.kind === kind && focus.value.targetId === targetId;
+  }
+
+  export function getActiveProject(state: AppState): Option.Option<DexProject> {
+    const dexProjectId = state.activeProjectId;
+
+    if (Option.isNone(dexProjectId)) {
+      return Option.none();
+    }
+    const project = state.projects.find((p) => p.id === dexProjectId.value);
+    assert(project !== undefined, "Project not found");
+    return Option.some(project);
   }
 }
