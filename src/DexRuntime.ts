@@ -4,6 +4,7 @@ import { Effect, ManagedRuntime } from "effect";
 import { AppStateCtx, AppStateCtxLive } from "./AppStateCtx";
 import { DexReducer } from "./DexReducer";
 import type { AppState } from "./AppState";
+import { FocusReducer } from "./DexFocus";
 
 const layer = AppStateCtxLive.pipe(Layer.provideMerge(Logger.minimumLogLevel(LogLevel.All)));
 
@@ -27,6 +28,10 @@ document.addEventListener("keydown", (e) => {
 
     yield* AppStateCtx.applyAppStateReducer(DexReducer.AppState.startEditing());
   }).pipe(DexRuntime.runPromise);
+});
+
+document.addEventListener("click", () => {
+  DexRuntime_RunReducer(FocusReducer.setFocusNone());
 });
 
 

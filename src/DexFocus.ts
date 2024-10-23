@@ -1,3 +1,6 @@
+import { Option } from "effect";
+import type { Draft } from "mutative";
+import type { AppState } from "./AppState";
 import { DexData } from "./DexData";
 import type { SelectionRange } from "./TextField";
 
@@ -58,3 +61,12 @@ export interface TextFieldFocusTarget {
 }
 
 export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
+
+
+export const FocusReducer = {
+  setFocusNone() {
+    return (appState: Draft<AppState>) => {
+      appState.focus = Option.none();
+    };
+  }
+}

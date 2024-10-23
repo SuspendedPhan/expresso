@@ -17,6 +17,7 @@
   }).pipe(DexRuntime.runPromise);
 
   function createProject() {
+    console.log("createProject");
     DexRuntime_RunReducer(DexReducer.AppState.addProject());
   }
 
