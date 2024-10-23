@@ -2,9 +2,10 @@ import assert from "assert-ts";
 import { Option } from "effect";
 
 import { type Draft } from "mutative";
-import type { AppState, } from "./AppState";
+import type { AppState } from "./AppState";
 import {
   DexBasicProperty,
+  DexBasicPropertyId,
   DexCustomComponent,
   DexCustomComponentParameter,
   DexFunction,
@@ -19,12 +20,10 @@ import {
   makeDexObject,
   makeDexProject,
   type DexExpr,
-  type DexProject,
-  type DexProperty,
+  type DexProject
 } from "./DexDomain";
 import type { FocusKind } from "./DexFocus";
-import { DexNode } from "./DexNode";
-import { DexGetter } from "./DexGetter";
+import { DexGetter, traverseAllDexExprs, traverseAllDexObjects, traverseAllProperties } from "./DexGetter";
 
 export namespace DexReducer {
   export type DexReducer<T> = (state: Draft<T>) => void;
@@ -36,7 +35,7 @@ export namespace DexReducer {
       const project = appState.projects.find((p) => p.id === activeProjectId.value);
       assert(project !== undefined, "Could not find project");
       reducer(project);
-    }
+    };
   }
 
   export const AppState = {
@@ -97,57 +96,6 @@ export namespace DexReducer {
   };
 }
 
-function traverseAllDexObjects(project: Draft<DexProject>): Draft<DexObject>[] {
-  const result = new Array<DexObject>();
-  for (const component of project.components) {
-    for (const obj of DexNode.traverseAll(component.objects)) {
-      result.push(obj);
-    }
-  }
-  for (const obj of DexNode.traverseAll(project.objects)) {
-    result.push(obj);
-  }
-  return result;
-}
-
-function getObjectProperties(object: Draft<DexObject>): Draft<DexProperty>[] {
-  const result = new Array<DexProperty>();
-  result.push(object.cloneCountProperty);
-  result.push(...object.componentParameterProperties);
-  result.push(...object.basicProperties);
-  return result;
-}
-
-function traverseAllProperties(project: Draft<DexProject>): Draft<DexProperty>[] {
-  const result = new Array<DexProperty>();
-  for (const component of project.components) {
-    for (const obj of DexNode.traverseAll(component.objects)) {
-      result.push(...getObjectProperties(obj));
-    }
-  }
-  for (const obj of DexNode.traverseAll(project.objects)) {
-    result.push(...getObjectProperties(obj));
-  }
-  return result;
-}
-
-function traverseAllDexExprs(project: Draft<DexProject>): Draft<DexExpr>[] {
-  const result = new Array<DexExpr>();
-  for (const property of traverseAllProperties(project)) {
-    result.push(property.expr);
-  }
-  for (const func of project.functions) {
-    result.push(func.expr);
-  }
-  return result;
-}
-
-function DexProject_setName(name: string) {
-  return (project: Draft<DexProject>) => {
-    project.name = name;
-  };
-}
-
 // --- Reducers ---
 
 function AppState_addProject() {
@@ -182,9 +130,18 @@ function AppState_setInputSelection(start: number, end: number) {
   return (appState: Draft<AppState>) => {
     const focus = appState.focus;
     assert(Option.isSome(focus), "No focus");
+    assert(focus.value._tag === "DexTextFieldFocus");
     focus.value.inputCursorIndex = Option.some({ start, end });
   };
 }
+
+function DexProject_setName(name: string) {
+  return (appState: Draft<AppState>) => {
+    const project = DexGetter.getActiveProjectOrThrow(appState) as Draft<DexProject>;
+    project.name = name;
+  }
+}
+
 function DexProject_addComponent() {
   return (appState: Draft<AppState>) => {
     const project = DexGetter.getActiveProjectOrThrow(appState);
@@ -305,7 +262,7 @@ function DexFunction_remove(func: DexFunction) {
 function DexObject_setName(dexObjectId: DexObjectId, name: string) {
   return (appState: Draft<AppState>) => {
     const project = DexGetter.getActiveProjectOrThrow(appState);
-    const object = traverseAllDexObjects(project).find((o) => o.id === dexObjectId);
+    const object = traverseAllDexObjects(project).find((o) => o.id === dexObjectId) as Draft<DexObject>;
     assert(object !== undefined, "Object not found");
     object.name = name;
   };
@@ -342,14 +299,13 @@ function DexObject_remove(dexObject: DexObject) {
   };
 }
 
-function DexBasicProperty_setName(property: DexBasicProperty, name: string) {
+function DexBasicProperty_setName(propertyId: DexBasicPropertyId, name: string) {
   return (appState: Draft<AppState>) => {
     const project = DexGetter.getActiveProjectOrThrow(appState);
-    const object = traverseAllDexObjects(project).find((o) => o.basicProperties.includes(property));
-    assert(object !== undefined, "Object not found");
-    const property2 = object.basicProperties.find((p) => p.id === property.id);
-    assert(property2 !== undefined, "Property not found");
-    property2.name = name;
+    const property = traverseAllProperties(project).find((p) => p.id === propertyId) as Draft<DexBasicProperty>;
+    assert(property !== undefined, "Property not found");
+    assert(property._tag === "DexBasicProperty", "Not a basic property");
+    property.name = name;
   };
 }
 

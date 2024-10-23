@@ -1,9 +1,8 @@
-import type { Draft } from "mutative";
 import type { AppState } from "./AppState";
+import { DexBasicPropertyId, DexObjectId } from "./DexDomain";
 import { FocusKind, type TextFieldFocusKind } from "./DexFocus";
 import { DexGetter } from "./DexGetter";
 import { DexReducer } from "./DexReducer";
-import { DexBasicPropertyId, DexObjectId } from "./DexDomain";
 
 export interface TextFieldProps {
   targetId: string;
@@ -23,7 +22,6 @@ export const TextFieldReducer = {
         return DexReducer.DexObject.setName(DexObjectId(props.targetId), value);
       case FocusKind.Property_Name:
         return DexReducer.DexBasicProperty.setName(DexBasicPropertyId(props.targetId), value);
-        break;
       default:
         throw new Error("Invalid focus kind");
     }

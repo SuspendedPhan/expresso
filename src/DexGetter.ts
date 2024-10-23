@@ -5,7 +5,7 @@ import type { DexExpr, DexObject, DexProject, DexProperty } from "./DexDomain";
 import type { FocusKind } from "./DexFocus";
 import { DexNode } from "./DexNode";
 
-function traverseAllDexObjects(project: DexProject): DexObject[] {
+export function traverseAllDexObjects(project: DexProject): DexObject[] {
   const result = new Array<DexObject>();
   for (const component of project.components) {
     for (const obj of DexNode.traverseAll(component.objects)) {
@@ -18,7 +18,7 @@ function traverseAllDexObjects(project: DexProject): DexObject[] {
   return result;
 }
 
-function getObjectProperties(object: DexObject): DexProperty[] {
+export function getObjectProperties(object: DexObject): DexProperty[] {
   const result = new Array<DexProperty>();
   result.push(object.cloneCountProperty);
   result.push(...object.componentParameterProperties);
@@ -26,7 +26,7 @@ function getObjectProperties(object: DexObject): DexProperty[] {
   return result;
 }
 
-function traverseAllProperties(project: DexProject): DexProperty[] {
+export function traverseAllProperties(project: DexProject): DexProperty[] {
   const result = new Array<DexProperty>();
   for (const component of project.components) {
     for (const obj of DexNode.traverseAll(component.objects)) {
@@ -39,7 +39,7 @@ function traverseAllProperties(project: DexProject): DexProperty[] {
   return result;
 }
 
-function traverseAllDexExprs(project: DexProject): DexExpr[] {
+export function traverseAllDexExprs(project: DexProject): DexExpr[] {
   const result = new Array<DexExpr>();
   for (const property of traverseAllProperties(project)) {
     result.push(property.expr);
