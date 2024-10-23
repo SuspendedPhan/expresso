@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Option } from "effect";
   import { Effect } from "effect";
   import type { DexFocusTarget } from "./DexFocus";
   import { DexReducer } from "./DexReducer";
@@ -12,7 +13,7 @@
 
   Effect.gen(function* () {
     const appState = yield* AppStateCtx.getAppState;
-    focused = DexGetter.isFocused(appState, target);
+    focused = Option.isSome(DexGetter.isFocused(appState, target));
   }).pipe(DexRuntime.runPromise);
 
   function onMouseDown() {

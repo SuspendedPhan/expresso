@@ -16,7 +16,7 @@ const ctxEffect = Effect.gen(function* () {
   yield* appState.changes.pipe(
     Stream.runForEach((state) =>
       Effect.gen(function* () {
-        console.log(state);
+        // console.log(state);
         appStateReadable.set(state);
       })
     ),

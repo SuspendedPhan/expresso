@@ -9,6 +9,7 @@ export interface AppState {
   readonly _tag: "AppState";
   readonly activeWindow: DexWindow;
   readonly focus: Option.Option<DexFocus>;
+  readonly focusStack: DexFocus[];
   readonly projects: DexProject[];
   readonly activeProjectId: Option.Option<DexProjectId>;
 }
@@ -67,6 +68,7 @@ export function makeAppState(args: PartialCaseArgs<typeof AppState>): AppState {
   const args2 = {
     activeWindow: args.activeWindow ?? LoadingHome(),
     focus: args.focus ?? Option.none(),
+    focusStack: args.focusStack ?? [],
     projects: args.projects ?? [],
     activeProjectId: args.activeProjectId ?? Option.none(),
   };

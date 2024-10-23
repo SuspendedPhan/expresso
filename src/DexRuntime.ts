@@ -30,10 +30,19 @@ document.addEventListener("keydown", (e) => {
   }).pipe(DexRuntime.runPromise);
 });
 
+document.addEventListener("keydown", (e) => {
+  Effect.gen(function* () {
+    if (e.key !== "Escape") {
+      return;
+    }
+
+    DexRuntime_RunReducer(FocusReducer.cancelEdit());
+  }).pipe(DexRuntime.runPromise);
+});
+
 document.addEventListener("click", () => {
   DexRuntime_RunReducer(FocusReducer.setFocusNone());
 });
-
 
 export function DexRuntime_RunReducer(reducer: DexReducer.DexReducer<AppState>) {
   Effect.gen(function* () {

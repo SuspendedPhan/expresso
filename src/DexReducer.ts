@@ -106,8 +106,11 @@ function AppState_addProject() {
   };
 }
 
+
 function AppState_setFocus(target: DexFocusTarget) {
   return (appState: Draft<AppState>) => {
+    const focus = 
+
     switch (target._tag) {
       case "BasicFocusTarget": {
         const focus: DexBasicFocus = {

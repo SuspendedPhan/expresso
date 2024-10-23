@@ -3,6 +3,7 @@ import type { Draft } from "mutative";
 import type { AppState } from "./AppState";
 import { DexData } from "./DexData";
 import type { SelectionRange } from "./TextField";
+import assert from "assert-ts";
 
 export type DexFocus = DexBasicFocus | DexTextFieldFocus;
 
@@ -62,11 +63,24 @@ export interface TextFieldFocusTarget {
 
 export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
 
-
 export const FocusReducer = {
   setFocusNone() {
     return (appState: Draft<AppState>) => {
       appState.focus = Option.none();
     };
-  }
-}
+  },
+
+  cancelEdit() {
+    return (appState: Draft<AppState>) => {
+      appState.focus.pipe(
+        Option.filter((focus) => focus.editingState._tag !== "NotEditing"),
+        Option.map(() => {
+          appState.focusStack.pop();
+          const focus = appState.focusStack[appState.focusStack.length - 1];
+          assert(focus !== undefined, "Focus stack should never be empty");
+          appState.focus = Option.some(focus);
+        })
+      );
+    };
+  },
+};
