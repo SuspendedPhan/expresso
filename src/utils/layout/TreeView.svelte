@@ -7,6 +7,7 @@
   import { ElementLayout } from "./ElementLayout";
   import { dexMakeSvelteScope, DexRuntime } from "src/DexRuntime";
   import { RxFns } from "src/Utils";
+  import { DexUtils } from "src/DexUtils";
 
   const log55 = log5("TreeView.svelte");
   log55.debug("TreeView.svelte init");

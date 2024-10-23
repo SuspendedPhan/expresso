@@ -29,16 +29,11 @@
     Effect.gen(function* () {
       const layout = yield* createExObjectLayout(dexObject);
       elementLayout = layout;
-      console.log(layout);
-      console.log(1);
-      log55.debug("layout", layout);
-      log55.debug("element", element);
-
       ready = true;
 
       // Wait for element to be set
+      yield* Effect.sleep(1000);
       yield* Effect.sleep(0);
-      log55.debug("element2", element);
 
       sensor = new ResizeSensor(element, () => {
         tick().then(() => {
@@ -62,6 +57,7 @@
     {#if elementLayout}
       <!-- {#key exObject.id} -->
       <TreeView {elementLayout}>
+        Hello
         <div bind:this={element}>
           <SveObject {dexObject} {elementLayout} />
         </div>
