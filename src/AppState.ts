@@ -14,8 +14,16 @@ export interface AppState {
 
 export interface DexFocus {
   readonly _tag: "DexFocus";
+  readonly kind: FocusKind;
   readonly targetId: string;
   readonly isEditing: boolean;
+}
+
+export enum FocusKind {
+  "Object_Name",
+  "Object_Component",
+  "Property_Name",
+  "Expr"
 }
 
 export type DexWindow =

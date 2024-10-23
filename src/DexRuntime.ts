@@ -1,4 +1,4 @@
-import { ManagedRuntime } from "effect";
-import { AppStateCtxLive } from "./AppStateCtx";
+import { initDexRuntime } from "./DexRuntimeInit";
 
-export const DexRuntime = ManagedRuntime.make(AppStateCtxLive);
+
+export let DexRuntime = initDexRuntime();

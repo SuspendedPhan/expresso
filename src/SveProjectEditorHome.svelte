@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Effect, Option } from "effect";
+  import { Effect } from "effect";
   import { AppStateCtx } from "./AppStateCtx";
   import type { DexProject } from "./DexDomain";
   import { DexGetter } from "./DexGetter";
@@ -7,7 +7,7 @@
   import { DexRuntime } from "./DexRuntime";
 
   let ready = false;
-  let project: Option.Option<DexProject>;
+  let project: DexProject | null;
 
   Effect.gen(function* () {
     const appState = yield* AppStateCtx.getAppState;
@@ -29,11 +29,11 @@
 </script>
 
 {#if ready}
-  {#if Option.isNone(project)}
+  {#if project === null}
     <button on:click={createProject}>Create Project</button>
   {:else}
-    <div>{project.value.name}</div>
-    {#each project.value.objects as rootObject}
+    <div>{project.name}</div>
+    {#each project.objects as rootObject}
       <div>{rootObject.name}</div>
     {/each}
     <button on:click={addObject}>Add Root Object</button>

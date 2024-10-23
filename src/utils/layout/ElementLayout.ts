@@ -1,0 +1,111 @@
+// @ts-nocheck
+
+import { Observable, ReplaySubject } from "rxjs";
+import { log5 } from "src/utils/utils/Log5";
+import type { SUB } from "src/utils/utils/Utils";
+import type { Point } from "./Layout";
+import { type Output, Layout } from "./Layout";
+
+const log55 = log5("ElementLayout.ts");
+
+export class ElementLayout {
+  private layout;
+
+  private getRootNode;
+
+  // onCalculated is a useful event for redrawing the connecting lines and resizing the container.
+  public onCalculated = new ReplaySubject<Output>(1);
+
+  private localPosition$ByKey = new Map<string, SUB<Point>>();
+  private elementByKey = new Map<string, HTMLElement>();
+
+  private getKey;
+
+  // getRootNode is not used.
+  // getChildren refers to the children that we will call getKey() on.
+  constructor(
+    getRootNode: () => any,
+    getChildren: (node: any) => readonly any[],
+    getKey: ((node: any) => string) | null = null,
+    horizontalMargin: number,
+    verticalMargin: number
+  ) {
+    this.getKey = getKey ?? ((node) => node.id);
+
+    this.layout = new Layout(
+      this.getWidth.bind(this),
+      this.getHeight.bind(this),
+      getChildren,
+      this.getKey,
+      horizontalMargin,
+      verticalMargin
+    );
+    this.getRootNode = getRootNode;
+  }
+
+  public recalculate() {
+    const rootNode = this.getRootNode();
+    const output = this.layout.calculate(rootNode);
+
+    for (const [
+      elementKey,
+      localPosition$,
+    ] of this.localPosition$ByKey.entries()) {
+      const newLocal = output.localPositionsByKey.get(elementKey);
+      log55.debug("newLocal", newLocal);
+      if (newLocal !== undefined) {
+        localPosition$.next(newLocal);
+      }
+    }
+
+    log55.debug("output", JSON.stringify(output));
+    log55.debug(
+      "localPositionsByKey",
+      JSON.stringify(Array.from(output.localPositionsByKey.entries()))
+    );
+
+    this.onCalculated.next(output);
+  }
+
+  // registerElement must be called so that the layout knows how to get the width and height of your elements.
+  public registerElement(element: any, elementKey: string) {
+    this.elementByKey.set(elementKey, element);
+  }
+
+  // getLocalPositionObservable is a useful event for positioning each individual element. Note that these are local
+  // positions, which means children are positioned relative to the parent. This works well with nested elements that
+  // all have the "position: absolute" CSS rule.
+  // When the event is fired, a Layout.Point object is passed.
+  public getLocalPositionObservable(elementKey: string): Observable<Point> {
+    const localPosition$ = this.getOrCreateLocalPosition(elementKey);
+    return localPosition$;
+  }
+
+  private getWidth(node: any) {
+    const key = this.getKey(node);
+    const element = this.elementByKey.get(key);
+    // if (!element) {
+    //   throw new Error("Element not found for key", key);
+    // }
+    const width = element?.offsetWidth ?? 0;
+    log55.debug("key", key);
+    log55.debug("width", width);
+    return width;
+  }
+
+  private getHeight(node: any) {
+    const key = this.getKey(node);
+    const element = this.elementByKey.get(key);
+    const answer = element?.offsetHeight ?? 0;
+    return answer;
+  }
+
+  private getOrCreateLocalPosition(elementKey: string) {
+    let localPosition$ = this.localPosition$ByKey.get(elementKey);
+    if (localPosition$ === undefined) {
+      localPosition$ = new ReplaySubject<Point>(1);
+      this.localPosition$ByKey.set(elementKey, localPosition$);
+    }
+    return localPosition$;
+  }
+}
