@@ -20,10 +20,11 @@ import {
   makeDexObject,
   makeDexProject,
   type DexExpr,
-  type DexProject
+  type DexProject,
 } from "./DexDomain";
-import type { DexFocusTarget } from "./DexFocus";
+import type { DexBasicFocus, DexFocusTarget, DexTextFieldFocus } from "./DexFocus";
 import { DexGetter, traverseAllDexExprs, traverseAllDexObjects, traverseAllProperties } from "./DexGetter";
+import { TextFieldGetter } from "./TextField";
 
 export namespace DexReducer {
   export type DexReducer<T> = (state: Draft<T>) => void;
@@ -41,7 +42,7 @@ export namespace DexReducer {
   export const AppState = {
     addProject: AppState_addProject,
     setFocus: AppState_setFocus,
-    setEditing: AppState_setEditing,
+    startEditing: AppState_startEditing,
     setInputSelection: AppState_setInputSelection,
   };
 
@@ -107,23 +108,46 @@ function AppState_addProject() {
 }
 
 function AppState_setFocus(target: DexFocusTarget) {
-  const { kind, targetId } = target;
   return (appState: Draft<AppState>) => {
-    appState.focus = Option.some({
-      _tag: "DexFocus",
-      kind,
-      targetId,
-      isEditing: false,
-      inputCursorIndex: Option.none(),
-    });
+    switch (target._tag) {
+      case "BasicFocusTarget": {
+        const focus: DexBasicFocus = {
+          _tag: "DexFocus",
+          target,
+          editingState: { _tag: "NotEditing" },
+        };
+        appState.focus = Option.some(focus);
+        break;
+      }
+      case "TextFieldFocusTarget": {
+        const focus: DexTextFieldFocus = {
+          _tag: "DexTextFieldFocus",
+          target,
+          editingState: { _tag: "NotEditing" },
+        };
+        appState.focus = Option.some(focus);
+        break;
+      }
+      default:
+        console.log(target);
+        throw new Error("Unknown focus target");
+    }
   };
 }
 
-function AppState_setEditing(editing: boolean) {
+function AppState_startEditing() {
   return (appState: Draft<AppState>) => {
-    const focus = appState.focus;
-    assert(Option.isSome(focus), "No focus");
-    focus.value.isEditing = editing;
+    const focus = Option.getOrThrow(appState.focus);
+
+    if (focus._tag === "DexTextFieldFocus") {
+      const value = TextFieldGetter.textFieldValue(appState, focus.target);
+      focus.editingState = {
+        _tag: "TextFieldEditing",
+        selection: { start: 0, end: value.length },
+      };
+    } else {
+      throw new Error("Not a text field focus");
+    }
   };
 }
 
@@ -132,7 +156,8 @@ function AppState_setInputSelection(start: number, end: number) {
     const focus = appState.focus;
     assert(Option.isSome(focus), "No focus");
     assert(focus.value._tag === "DexTextFieldFocus");
-    focus.value.inputCursorIndex = Option.some({ start, end });
+    assert(focus.value.editingState !== "NotEditing", "Not editing");
+    focus.value.editingState = { start, end };
   };
 }
 
@@ -140,7 +165,7 @@ function DexProject_setName(name: string) {
   return (appState: Draft<AppState>) => {
     const project = DexGetter.getActiveProjectOrThrow(appState) as Draft<DexProject>;
     project.name = name;
-  }
+  };
 }
 
 function DexProject_addComponent() {

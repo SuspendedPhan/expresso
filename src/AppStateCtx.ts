@@ -26,7 +26,8 @@ const ctxEffect = Effect.gen(function* () {
 
   const applyAppStateReducer = (fn: DexReducer.DexReducer<AppState>) =>
     Effect.gen(function* () {
-      const nextState = create(yield* appState.get, fn, { mark: () => "immutable" });
+      const state = yield* appState.get;
+      const nextState = create(state, fn, { mark: () => "immutable" });
       yield* Ref.set(appState, nextState);
     });
 

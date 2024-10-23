@@ -15,7 +15,7 @@
     <div class="p-card flex flex-col">
       <ExObjectHeaderView>Basics</ExObjectHeaderView>
       <div class="flex flex-col gap-2 font-mono">
-        <TextField target={{ kind: FocusKind.Object_Name, targetId: dexObject.id }} />
+        <TextField target={{ _tag: "TextFieldFocusTarget", kind: FocusKind.Object_Name, targetId: dexObject.id }} />
         <!-- <ComponentSelect props={componentProps} /> -->
       </div>
     </div>

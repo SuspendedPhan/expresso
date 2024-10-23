@@ -1,37 +1,44 @@
 <script lang="ts">
-  import { Effect, Option } from "effect";
+  import { Option } from "effect";
+
+  import { Effect } from "effect";
 
   import { onMount } from "svelte";
   import { AppStateCtx } from "./AppStateCtx";
-  import { DexRuntime } from "./DexRuntime";
+  import type { TextFieldFocusTarget } from "./DexFocus";
+  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
+  import { TextFieldGetter, TextFieldReducer, type HugInputState } from "./TextField";
 
-  export let value: string;
-  export let isEditing: boolean;
+  export let target: TextFieldFocusTarget;
 
   let input: HTMLInputElement;
+  let state: HugInputState;
 
   onMount(() => {
-    console.log("HugInput");
     Effect.gen(function* () {
-      if (isEditing) {
-        yield* Effect.sleep(0);
+      yield* Effect.sleep(0);
+      const appState = yield* AppStateCtx.getAppState;
+      state = TextFieldGetter.hugInputState(appState, target);
+
+      Option.map(state.selection, (selection) => {
         input.focus();
-        const state = yield* AppStateCtx.getAppState;
-        const focus = Option.getOrThrow(state.focus);
-        const selectionRange = Option.getOrThrow(focus.inputCursorIndex);
-        input.setSelectionRange(selectionRange.start, selectionRange.end);
-      }
+        input.setSelectionRange(selection.start, selection.end);
+      });
     }).pipe(DexRuntime.runPromise);
   });
+
+  function onInput(event: Event) {
+    DexRuntime_RunReducer(TextFieldReducer.updateValue(target, event));
+  }
 </script>
 
 <div class="text-left relative">
   <input
     bind:this={input}
     class="text-emphatic outline-none absolute left-0 w-full bg-transparent"
-    {value}
-    readonly={!isEditing}
-    on:input
+    value={state.value}
+    readonly={state.readonly}
+    on:input={onInput}
   />
-  <pre class="text-emphatic">{value}</pre>
+  <pre class="text-emphatic">{state.value}</pre>
 </div>

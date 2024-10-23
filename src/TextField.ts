@@ -1,31 +1,50 @@
+import { Option } from "effect";
+
 import type { AppState } from "./AppState";
 import { DexBasicPropertyId, DexObjectId } from "./DexDomain";
-import { FocusKind, type TextFieldFocusKind } from "./DexFocus";
+import { FocusKind, type TextFieldFocusKind, type TextFieldFocusTarget } from "./DexFocus";
 import { DexGetter } from "./DexGetter";
 import { DexReducer } from "./DexReducer";
-
-export interface TextFieldFocusTarget {
-  targetId: string;
-  kind: TextFieldFocusKind;
-}
+import assert from "assert-ts";
 
 export interface TextFieldState {
   label?: string;
+}
+
+export interface SelectionRange {
+  start: number | null;
+  end: number | null;
+}
+
+export interface HugInputState {
   value: string;
-  isEditing: boolean;
+  selection: Option.Option<SelectionRange>;
+  readonly: boolean;
 }
 
 export const TextFieldReducer = {
   updateValue(props: TextFieldFocusTarget, event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    switch (props.kind) {
-      case FocusKind.Object_Name:
-        return DexReducer.DexObject.setName(DexObjectId(props.targetId), value);
-      case FocusKind.Property_Name:
-        return DexReducer.DexBasicProperty.setName(DexBasicPropertyId(props.targetId), value);
-      default:
-        throw new Error("Invalid focus kind");
-    }
+    return (appState: AppState) => {
+      const value = (event.target as HTMLInputElement).value;
+      const selectionStart = (event.target as HTMLInputElement).selectionStart;
+      const selectionEnd = (event.target as HTMLInputElement).selectionEnd;
+      const selectionRange: SelectionRange = { start: selectionStart, end: selectionEnd };
+      const focus = Option.getOrThrow(appState.focus);
+      assert(focus._tag === "DexTextFieldFocus", "Expected DexTextFieldFocus");
+      assert(focus.editingState._tag === "TextFieldEditing", "Expected TextFieldEditing");
+      focus.editingState.selection = selectionRange;
+
+      switch (props.kind) {
+        case FocusKind.Object_Name:
+          DexReducer.DexObject.setName(DexObjectId(props.targetId), value)(appState);
+          break;
+        case FocusKind.Property_Name:
+          DexReducer.DexBasicProperty.setName(DexBasicPropertyId(props.targetId), value)(appState);
+          break;
+        default:
+          throw new Error("Invalid focus kind");
+      }
+    };
   },
 };
 
@@ -40,16 +59,27 @@ function getLabel(kind: TextFieldFocusKind): string {
 }
 
 export const TextFieldGetter = {
-  state(appState: AppState, props: TextFieldFocusTarget): TextFieldState {
-    const { kind: focusKind, targetId } = props;
-    const value = this.textFieldValue(appState, focusKind, targetId);
-    const isEditing = DexGetter.isEditing(appState, focusKind, targetId);
-    const label = getLabel(focusKind);
-    const state: TextFieldState = { label, value, isEditing };
+  state(target: TextFieldFocusTarget): TextFieldState {
+    const label = getLabel(target.kind);
+    const state: TextFieldState = { label };
     return state;
   },
 
-  textFieldValue(appState: AppState, kind: TextFieldFocusKind, targetId: string): string {
+  hugInputState(appState: AppState, target: TextFieldFocusTarget): HugInputState {
+    const focus = DexGetter.isFocused(appState, target);
+    const editingState = Option.map(focus, (focus) => focus.editingState);
+    const editingStateYes = editingState.pipe(
+      Option.filter((editingState) => editingState._tag === "TextFieldEditing")
+    );
+    const isEditing = editingStateYes.pipe(Option.isSome);
+    const readonly = !isEditing;
+    const selection = editingStateYes.pipe(Option.map((editingState) => editingState.selection));
+    const value = TextFieldGetter.textFieldValue(appState, target);
+    return { value, selection, readonly };
+  },
+
+  textFieldValue(appState: AppState, target: TextFieldFocusTarget): string {
+    const { kind, targetId } = target;
     switch (kind) {
       case FocusKind.Object_Name:
         return DexGetter.DexObject.get(appState, targetId).name;

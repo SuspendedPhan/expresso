@@ -21,11 +21,11 @@ document.addEventListener("keydown", (e) => {
     }
 
     const focus = state.focus.value;
-    if (focus.isEditing) {
+    if (focus.editingState._tag !== "NotEditing") {
       return;
     }
 
-    yield* AppStateCtx.applyAppStateReducer(DexReducer.AppState.setEditing(true));
+    yield* AppStateCtx.applyAppStateReducer(DexReducer.AppState.startEditing());
   }).pipe(DexRuntime.runPromise);
 });
 

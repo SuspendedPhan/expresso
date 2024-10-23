@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { Option } from "effect";
 import type { AppState } from "./AppState";
 import type { DexExpr, DexObject, DexProject, DexProperty } from "./DexDomain";
-import type { DexFocusTarget, FocusKind } from "./DexFocus";
+import type { DexFocus, DexFocusTarget } from "./DexFocus";
 import { DexNode } from "./DexNode";
 
 export function traverseAllDexObjects(project: DexProject): DexObject[] {
@@ -85,21 +85,16 @@ export namespace DexGetter {
     },
   };
 
-  export function isEditing(state: AppState, kind: FocusKind, targetId: string): boolean {
-    const focus = state.focus;
-    if (Option.isNone(focus)) {
-      return false;
+  export function isFocused<T extends DexFocus>(state: AppState, target: DexFocusTarget): Option.Option<T> {
+    const focus = Option.getOrNull(state.focus);
+    if (focus === null) {
+      return Option.none();
     }
-    return focus.value.kind === kind && focus.value.targetId === targetId && focus.value.isEditing;
-  }
-
-  export function isFocused(state: AppState, target: DexFocusTarget): boolean {
-    const { kind, targetId } = target;
-    const focus = state.focus;
-    if (Option.isNone(focus)) {
-      return false;
+    const focused = focus.target.kind === target.kind && focus.target.targetId === target.targetId;
+    if (!focused) {
+      return Option.none();
     }
-    return focus.value.kind === kind && focus.value.targetId === targetId;
+    return Option.some(focus as T);
   }
 
   export function getActiveProject(state: AppState): Option.Option<DexProject> {

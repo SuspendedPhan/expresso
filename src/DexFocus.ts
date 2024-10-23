@@ -1,24 +1,29 @@
-import { Option } from "effect";
 import { DexData } from "./DexData";
+import type { SelectionRange } from "./TextField";
 
 export type DexFocus = DexBasicFocus | DexTextFieldFocus;
 
+export type EditingState = NotEditing | TextFieldEditing;
+
+export interface NotEditing {
+  _tag: "NotEditing";
+}
+
+export interface TextFieldEditing {
+  _tag: "TextFieldEditing";
+  selection: SelectionRange;
+}
+
 export interface DexBasicFocus {
   readonly _tag: "DexFocus";
-  readonly kind: FocusKind;
-  readonly targetId: string;
-  readonly isEditing: boolean;
+  readonly target: DexFocusTarget;
+  readonly editingState: NotEditing;
 }
 
 export interface DexTextFieldFocus {
   readonly _tag: "DexTextFieldFocus";
-  readonly kind: TextFieldFocusKind;
-  readonly targetId: string;
-  readonly isEditing: boolean;
-  readonly inputCursorIndex: Option.Option<{
-    readonly start: number;
-    readonly end: number;
-  }>;
+  readonly target: TextFieldFocusTarget;
+  readonly editingState: TextFieldEditing | NotEditing;
 }
 
 export interface DexComboboxFocus {
@@ -40,7 +45,16 @@ export type TextFieldFocusKind = FocusKind.Object_Name | FocusKind.Property_Name
 
 export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
 
-export interface DexFocusTarget {
+export interface BasicFocusTarget {
+  _tag: "BasicFocusTarget";
   kind: FocusKind;
   targetId: string;
 }
+
+export interface TextFieldFocusTarget {
+  _tag: "TextFieldFocusTarget";
+  targetId: string;
+  kind: TextFieldFocusKind;
+}
+
+export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
