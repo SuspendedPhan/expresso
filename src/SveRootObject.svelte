@@ -32,8 +32,9 @@
       ready = true;
 
       // Wait for element to be set
-      yield* Effect.sleep(1000);
       yield* Effect.sleep(0);
+
+      console.log("element", element);
 
       sensor = new ResizeSensor(element, () => {
         tick().then(() => {
@@ -48,7 +49,7 @@
           sensor.detach();
         }),
       );
-    }).pipe(DexRuntime.runPromise);
+    }).pipe(Effect.forkIn(scope), DexRuntime.runPromise);
   });
 </script>
 
@@ -57,7 +58,6 @@
     {#if elementLayout}
       <!-- {#key exObject.id} -->
       <TreeView {elementLayout}>
-        Hello
         <div bind:this={element}>
           <SveObject {dexObject} {elementLayout} />
         </div>

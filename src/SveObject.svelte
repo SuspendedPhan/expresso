@@ -14,8 +14,6 @@
   export let dexObject: DexObject;
   export let elementLayout: ElementLayout;
 
-  console.log(elementLayout);
-
   function addChild() {
     DexRuntime_RunReducer(DexReducer.DexObject.addChild(dexObject));
   }
@@ -57,7 +55,7 @@
       </div>
     </FlexContainer>
     {#each dexObject.children as child (child.id)}
-      <svelte:self dexObject={child} />
+      <svelte:self dexObject={child} {elementLayout} />
     {/each}
   </div>
 </NodeView>
