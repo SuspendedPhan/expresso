@@ -5,7 +5,18 @@ import type { AppState } from "./AppState";
 import { DexData } from "./DexData";
 import type { SelectionRange } from "./TextField";
 
+export enum FocusKind {
+  "Object_Name",
+  "Object_Component",
+  "Property_Name",
+  "Expr",
+  "Command_New",
+}
+
 export type DexFocus = DexBasicFocus | DexTextFieldEditingFocus | DexComboboxEditingFocus;
+export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
+export type TextFieldFocusKind = FocusKind.Object_Name | FocusKind.Property_Name;
+export type ComboboxFocusKind = FocusKind.Object_Component | FocusKind.Expr;
 
 export interface DexBasicFocus {
   readonly _tag: "DexFocus";
@@ -25,18 +36,6 @@ export interface DexComboboxEditingFocus {
   readonly focusedIndex: number;
 }
 
-export enum FocusKind {
-  "Object_Name",
-  "Object_Component",
-  "Property_Name",
-  "Expr",
-  "Command_New",
-}
-
-export type TextFieldFocusKind = FocusKind.Object_Name | FocusKind.Property_Name;
-
-export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
-
 export interface BasicFocusTarget {
   _tag: "BasicFocusTarget";
   kind: FocusKind;
@@ -55,9 +54,7 @@ export interface ComboboxFocusTarget {
   kind: ComboboxFocusKind;
 }
 
-export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
-
-export type ComboboxFocusKind = FocusKind.Object_Component | FocusKind.Expr;
+export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
 
 export const FocusReducer = {
   setFocusNone() {
