@@ -16,10 +16,10 @@
 
   onMount(() => {
     Effect.gen(function* () {
-      yield* Effect.sleep(0);
       const appState = yield* AppStateCtx.getAppState;
       state = TextFieldGetter.hugInputState(appState, target);
 
+      yield* Effect.sleep(0);
       Option.map(state.selection, (selection) => {
         input.focus();
         input.setSelectionRange(selection.start, selection.end);
@@ -32,13 +32,15 @@
   }
 </script>
 
-<div class="text-left relative">
-  <input
-    bind:this={input}
-    class="text-emphatic outline-none absolute left-0 w-full bg-transparent"
-    value={state.value}
-    readonly={state.readonly}
-    on:input={onInput}
-  />
-  <pre class="text-emphatic">{state.value}</pre>
-</div>
+{#if state}
+  <div class="text-left relative">
+    <input
+      bind:this={input}
+      class="text-emphatic outline-none absolute left-0 w-full bg-transparent"
+      value={state.value}
+      readonly={state.readonly}
+      on:input={onInput}
+    />
+    <pre class="text-emphatic">{state.value}</pre>
+  </div>
+{/if}

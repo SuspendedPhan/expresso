@@ -43,7 +43,6 @@ export namespace DexReducer {
     addProject: AppState_addProject,
     setFocus: AppState_setFocus,
     startEditing: AppState_startEditing,
-    setInputSelection: AppState_setInputSelection,
   };
 
   export const DexProject = {
@@ -148,16 +147,6 @@ function AppState_startEditing() {
     } else {
       throw new Error("Not a text field focus");
     }
-  };
-}
-
-function AppState_setInputSelection(start: number, end: number) {
-  return (appState: Draft<AppState>) => {
-    const focus = appState.focus;
-    assert(Option.isSome(focus), "No focus");
-    assert(focus.value._tag === "DexTextFieldFocus");
-    assert(focus.value.editingState !== "NotEditing", "Not editing");
-    focus.value.editingState = { start, end };
   };
 }
 
