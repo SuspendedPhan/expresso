@@ -111,4 +111,10 @@ export namespace DexGetter {
     assert(project !== undefined, "Project not found");
     return Option.some(project);
   }
+
+  export function getActiveProjectOrThrow(state: AppState): DexProject {
+    const project = getActiveProject(state);
+    assert(Option.isSome(project), "Project not found");
+    return project.value;
+  }
 }
