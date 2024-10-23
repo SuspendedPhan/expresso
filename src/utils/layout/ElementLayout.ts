@@ -1,10 +1,8 @@
-// @ts-nocheck
-
 import { Observable, ReplaySubject } from "rxjs";
 import { log5 } from "src/utils/utils/Log5";
-import type { SUB } from "src/utils/utils/Utils";
 import type { Point } from "./Layout";
 import { type Output, Layout } from "./Layout";
+import type { SUB } from "src/Utils";
 
 const log55 = log5("ElementLayout.ts");
 

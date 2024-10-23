@@ -5,7 +5,7 @@
   import { DexGetter } from "./DexGetter";
   import { DexReducer } from "./DexReducer";
   import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
-  import SveObject from "./SveObject.svelte";
+  import SveRootObject from "./SveRootObject.svelte";
 
   let ready = false;
   let project: DexProject | null;
@@ -32,7 +32,7 @@
   {:else}
     <div>{project.name}</div>
     {#each project.objects as rootObject}
-      <SveObject dexObject={rootObject} />
+      <SveRootObject dexObject={rootObject} />
     {/each}
     <button on:click={addObject}>Add Root Object</button>
   {/if}

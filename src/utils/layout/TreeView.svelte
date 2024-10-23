@@ -4,10 +4,9 @@
   import { Effect, Stream } from "effect";
   import type { Line } from "src/utils/layout/Layout";
   import { log5 } from "src/utils/utils/Log5";
-  import { RxFns } from "src/utils/utils/Utils";
-  import { dexMakeSvelteScope, DexRuntime } from "../utils/DexRuntime";
-  import { DexUtils } from "../utils/DexUtils";
   import { ElementLayout } from "./ElementLayout";
+  import { dexMakeSvelteScope, DexRuntime } from "src/DexRuntime";
+  import { RxFns } from "src/Utils";
 
   const log55 = log5("TreeView.svelte");
   log55.debug("TreeView.svelte init");
@@ -38,11 +37,11 @@
           canvasHeight = rootElement.clientHeight;
           yield* Effect.sleep(0);
           drawLines(canvas, lines);
-        })
+        }),
       ),
       Effect.forkIn(scope),
-      DexRuntime.runPromise
-    )
+      DexRuntime.runPromise,
+    ),
   );
 
   function drawLines(canvasElement: HTMLCanvasElement, lines: Line[]) {
@@ -67,11 +66,6 @@
 </script>
 
 <div class="relative w-max" bind:this={rootElement} style={treeLayoutStyle}>
-  <canvas
-    bind:this={canvas}
-    width={canvasWidth}
-    height={canvasHeight}
-    class="w-full h-full absolute"
-  ></canvas>
+  <canvas bind:this={canvas} width={canvasWidth} height={canvasHeight} class="w-full h-full absolute"></canvas>
   <slot></slot>
 </div>
