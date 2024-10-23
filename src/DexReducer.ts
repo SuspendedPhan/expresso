@@ -23,7 +23,6 @@ import {
   type DexProject,
 } from "./DexDomain";
 import { DexGetter, traverseAllDexExprs, traverseAllDexObjects, traverseAllProperties } from "./DexGetter";
-import { TextFieldGetter } from "./TextField";
 
 export namespace DexReducer {
   export type DexReducer<T> = (state: Draft<T>) => void;
@@ -40,7 +39,6 @@ export namespace DexReducer {
 
   export const AppState = {
     addProject: AppState_addProject,
-    startEditing: AppState_startEditing,
   };
 
   export const DexProject = {
@@ -101,22 +99,6 @@ function AppState_addProject() {
     const project = makeDexProject({});
     appState.projects.push(project);
     appState.activeProjectId = Option.some(project.id);
-  };
-}
-
-function AppState_startEditing() {
-  return (appState: Draft<AppState>) => {
-    const focus = Option.getOrThrow(appState.focus);
-
-    if (focus._tag === "DexTextFieldFocus") {
-      const value = TextFieldGetter.textFieldValue(appState, focus.target);
-      focus.editingState = {
-        _tag: "TextFieldEditing",
-        selection: { start: 0, end: value.length },
-      };
-    } else {
-      throw new Error("Not a text field focus");
-    }
   };
 }
 

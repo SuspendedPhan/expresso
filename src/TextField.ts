@@ -6,6 +6,7 @@ import { FocusKind, type TextFieldFocusKind, type TextFieldFocusTarget } from ".
 import { DexGetter } from "./DexGetter";
 import { DexReducer } from "./DexReducer";
 import assert from "assert-ts";
+import type { Draft } from "mutative";
 
 export interface TextFieldState {
   label?: string;
@@ -24,15 +25,14 @@ export interface HugInputState {
 
 export const TextFieldReducer = {
   updateValue(props: TextFieldFocusTarget, event: Event) {
-    return (appState: AppState) => {
+    return (appState: Draft<AppState>) => {
       const value = (event.target as HTMLInputElement).value;
       const selectionStart = (event.target as HTMLInputElement).selectionStart;
       const selectionEnd = (event.target as HTMLInputElement).selectionEnd;
       const selectionRange: SelectionRange = { start: selectionStart, end: selectionEnd };
       const focus = Option.getOrThrow(appState.focus);
       assert(focus._tag === "DexTextFieldFocus", "Expected DexTextFieldFocus");
-      assert(focus.editingState._tag === "TextFieldEditing", "Expected TextFieldEditing");
-      focus.editingState.selection = selectionRange;
+      focus.selection = selectionRange;
 
       switch (props.kind) {
         case FocusKind.Object_Name:
@@ -66,14 +66,14 @@ export const TextFieldGetter = {
   },
 
   hugInputState(appState: AppState, target: TextFieldFocusTarget): HugInputState {
-    const focus = DexGetter.isFocused(appState, target);
-    const editingState = Option.map(focus, (focus) => focus.editingState);
-    const editingStateYes = editingState.pipe(
-      Option.filter((editingState) => editingState._tag === "TextFieldEditing")
+    const focus = appState.focus;
+    const editingFocus = focus.pipe(
+      Option.filter((focus) => focus._tag === "DexTextFieldFocus"),
+      Option.filter((f) => f.target.kind === target.kind && f.target.targetId === target.targetId)
     );
-    const isEditing = editingStateYes.pipe(Option.isSome);
+    const isEditing = editingFocus.pipe(Option.isSome);
     const readonly = !isEditing;
-    const selection = editingStateYes.pipe(Option.map((editingState) => editingState.selection));
+    const selection = editingFocus.pipe(Option.map((f) => f.selection));
     const value = TextFieldGetter.textFieldValue(appState, target);
     return { value, selection, readonly };
   },

@@ -3,7 +3,8 @@ import type { Draft } from "mutative";
 import { match } from "ts-pattern";
 import type { AppState } from "./AppState";
 import { DexData } from "./DexData";
-import type { SelectionRange } from "./TextField";
+import { TextFieldGetter, type SelectionRange } from "./TextField";
+import assert from "assert-ts";
 
 export enum FocusKind {
   "Object_Name",
@@ -57,6 +58,32 @@ export interface ComboboxFocusTarget {
 export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
 
 export const FocusReducer = {
+  tryStartEditing() {
+    return (appState: Draft<AppState>) => {
+      const focus = Option.getOrThrow(appState.focus);
+      if (focus._tag !== "DexFocus") {
+        return;
+      }
+      if (focus.target._tag === "BasicFocusTarget") {
+        return;
+      }
+      match(focus.target)
+        .with({ _tag: "TextFieldFocusTarget" }, (target) => {
+          const value = TextFieldGetter.textFieldValue(appState, target);
+          const editingFocus: DexTextFieldEditingFocus = {
+            _tag: "DexTextFieldFocus",
+            target,
+            selection: {
+              start: 0,
+              end: value.length,
+            },
+          };
+          this.setFocus(Option.some(editingFocus))(appState);
+        })
+        .exhaustive();
+    };
+  },
+
   setFocusNone() {
     return this.setFocus(Option.none());
   },
@@ -79,15 +106,13 @@ export const FocusReducer = {
           const focus: DexBasicFocus = {
             _tag: "DexFocus",
             target,
-            editingState: { _tag: "NotEditing" },
           };
           return focus;
         })
         .with({ _tag: "TextFieldFocusTarget" }, (target) => {
-          const focus: DexTextFieldFocus = {
-            _tag: "DexTextFieldFocus",
+          const focus: DexBasicFocus = {
+            _tag: "DexFocus",
             target,
-            editingState: { _tag: "NotEditing" },
           };
           return focus;
         })
@@ -97,14 +122,21 @@ export const FocusReducer = {
     };
   },
 
-  cancelEdit() {
+  tryCancelEdit() {
     return (appState: Draft<AppState>) => {
       const focus = Option.getOrNull(appState.focus);
       if (focus === null) {
         return;
       }
 
-      focus.editingState = { _tag: "NotEditing" };
+      if (focus._tag === "DexFocus") {
+        return;
+      }
+
+      appState.focusStack.pop();
+      const newFocus = appState.focusStack.pop();
+      assert(newFocus !== undefined);
+      this.setFocus(Option.some(newFocus))(appState);
     };
   },
 };
