@@ -2,7 +2,7 @@ import assert from "assert-ts";
 import { Option } from "effect";
 
 import { type Draft } from "mutative";
-import type { AppState, FocusKind } from "./AppState";
+import type { AppState, } from "./AppState";
 import {
   DexBasicProperty,
   DexCustomComponent,
@@ -21,6 +21,7 @@ import {
   type DexProject,
   type DexProperty,
 } from "./DexDomain";
+import type { FocusKind } from "./DexFocus";
 import { DexNode } from "./DexNode";
 
 export namespace DexReducer {
@@ -39,6 +40,8 @@ export namespace DexReducer {
   export const AppState = {
     addProject: AppState_addProject,
     setFocus: AppState_setFocus,
+    setEditing: AppState_setEditing,
+    setInputSelection: AppState_setInputSelection,
   };
 
   export const DexProject = {
@@ -160,7 +163,24 @@ function AppState_setFocus(kind: FocusKind, targetId: string) {
       kind,
       targetId,
       isEditing: false,
+      inputCursorIndex: Option.none(),
     });
+  };
+}
+
+function AppState_setEditing(editing: boolean) {
+  return (appState: Draft<AppState>) => {
+    const focus = appState.focus;
+    assert(Option.isSome(focus), "No focus");
+    focus.value.isEditing = editing;
+  };
+}
+
+function AppState_setInputSelection(start: number, end: number) {
+  return (appState: Draft<AppState>) => {
+    const focus = appState.focus;
+    assert(Option.isSome(focus), "No focus");
+    focus.value.inputCursorIndex = Option.some({ start, end });
   };
 }
 
@@ -271,6 +291,7 @@ function DexFunction_remove(func: DexFunction) {
 
 function DexObject_setName(dexObject: DexObject, name: string) {
   return (project: Draft<DexProject>) => {
+    console.log(2);
     const object = traverseAllDexObjects(project).find((o) => o.id === dexObject.id);
     assert(object !== undefined, "Object not found");
     object.name = name;

@@ -1,6 +1,7 @@
 import { Option } from "effect";
 import { DexData } from "./DexData";
 import { DexProjectId, type DexComponent, type DexFunction, type DexProject, type PartialCaseArgs } from "./DexDomain";
+import type { DexFocus } from "./DexFocus";
 
 // --- State ---
 
@@ -10,20 +11,6 @@ export interface AppState {
   readonly focus: Option.Option<DexFocus>;
   readonly projects: DexProject[];
   readonly activeProjectId: Option.Option<DexProjectId>;
-}
-
-export interface DexFocus {
-  readonly _tag: "DexFocus";
-  readonly kind: FocusKind;
-  readonly targetId: string;
-  readonly isEditing: boolean;
-}
-
-export enum FocusKind {
-  "Object_Name",
-  "Object_Component",
-  "Property_Name",
-  "Expr"
 }
 
 export type DexWindow =
@@ -69,7 +56,6 @@ export interface LibraryFunctionHome {
 }
 
 export const AppState = DexData.tagged<AppState>("AppState");
-export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
 export const LoadingHome = DexData.tagged<LoadingHome>("LoadingHome");
 export const ProjectEditorHome = DexData.tagged<ProjectEditorHome>("ProjectEditorHome");
 export const ProjectComponentHome = DexData.tagged<ProjectComponentHome>("ProjectComponentHome");

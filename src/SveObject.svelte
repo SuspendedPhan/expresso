@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Effect } from "effect";
-  import { FocusKind } from "./AppState";
   import { AppStateCtx } from "./AppStateCtx";
   import { DexObject } from "./DexDomain";
   import { DexGetter } from "./DexGetter";
@@ -11,6 +10,7 @@
   import SveProperty from "./SveProperty.svelte";
   import type { TextFieldProps } from "./TextField";
   import TextField from "./TextField.svelte";
+  import { FocusKind } from "./DexFocus";
 
   export let dexObject: DexObject;
 
@@ -19,18 +19,28 @@
   let ready = false;
 
   Effect.gen(function* () {
-    const reducer = (value: string) => DexReducer.fromProjectReducer(DexReducer.DexObject.setName(dexObject, value));
+    const onInput = (e: any) => {
+      Effect.gen(function* () {
+        const value = e.target.value;
+        const reducer = DexReducer.DexObject.setName(dexObject, value);
+        const reducer2 = DexReducer.AppState.setInputSelection(e.target.selectionStart, e.target.selectionEnd);
+        yield* AppStateCtx.applyProjectReducer(reducer);
+        yield* AppStateCtx.applyAppStateReducer(reducer2);
+      }).pipe(DexRuntime.runPromise);
+    };
+
     const appState = yield* AppStateCtx.getAppState;
     nameProps = {
       label: "Name",
       value: dexObject.name,
-      onInput: yield* AppStateCtx.getTextFieldOnInput(reducer),
+      onInput: onInput,
       isEditing: DexGetter.isEditing(appState, FocusKind.Object_Name, dexObject.id),
       focusViewProps: {
         focused: DexGetter.isFocused(appState, FocusKind.Object_Name, dexObject.id),
-        onMouseDown: yield* AppStateCtx.makeReducerApplier(
-          DexReducer.AppState.setFocus(FocusKind.Object_Name, dexObject.id),
-        ),
+        onMouseDown: () =>
+          AppStateCtx.applyAppStateReducer(DexReducer.AppState.setFocus(FocusKind.Object_Name, dexObject.id)).pipe(
+            DexRuntime.runPromise,
+          ),
       },
     };
     ready = true;

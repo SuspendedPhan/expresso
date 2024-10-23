@@ -1,13 +1,28 @@
 <script lang="ts">
+  import { Effect, Option } from "effect";
+
+  import { onMount } from "svelte";
+  import { AppStateCtx } from "./AppStateCtx";
+  import { DexRuntime } from "./DexRuntime";
+
   export let value: string;
   export let isEditing: boolean;
 
   let input: HTMLInputElement;
-  $: if (isEditing) {
-    const position = input.value.length; // Set the caret position at the end of the text
-    input.focus();
-    input.setSelectionRange(position, position);
-  }
+
+  onMount(() => {
+    console.log("HugInput");
+    Effect.gen(function* () {
+      if (isEditing) {
+        yield* Effect.sleep(0);
+        input.focus();
+        const state = yield* AppStateCtx.getAppState;
+        const focus = Option.getOrThrow(state.focus);
+        const selectionRange = Option.getOrThrow(focus.inputCursorIndex);
+        input.setSelectionRange(selectionRange.start, selectionRange.end);
+      }
+    }).pipe(DexRuntime.runPromise);
+  });
 </script>
 
 <div class="text-left relative">
