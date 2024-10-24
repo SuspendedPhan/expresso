@@ -72,19 +72,19 @@ export interface DexBasicProperty extends DexPropertyBase {
 export type DexExpr = DexNumberExpr | DexCallExpr | DexReferenceExpr;
 
 export interface DexNumberExpr extends DexExprBase {
-  readonly _tag: "NumberExpr";
+  readonly _tag: "DexNumberExpr";
   readonly id: string;
   readonly value: number;
 }
 
 export interface DexCallExpr extends DexExprBase {
-  readonly _tag: "CallExpr";
+  readonly _tag: "DexCallExpr";
   readonly id: string;
   readonly function: DexFunction;
 }
 
 export interface DexReferenceExpr extends DexExprBase {
-  readonly _tag: "ReferenceExpr";
+  readonly _tag: "DexReferenceExpr";
   readonly id: string;
   readonly target: DexReferenceTarget;
 }
@@ -136,31 +136,15 @@ export type DexReferenceTarget =
   | DexCloneNumberTarget
   | DexGlobalProperty;
 
-export const DexProject = DexData.tagged<DexProject>("DexProject");
-export const DexCustomComponent = DexData.tagged<DexCustomComponent>("DexCustomComponent");
-export const DexCanvasComponent = DexData.tagged<DexCanvasComponent>("DexCanvasComponent");
-export const DexFunction = DexData.tagged<DexFunction>("DexFunction");
-export const DexObject = DexData.tagged<DexObject>("DexObject");
-export const DexCloneCountProperty = DexData.tagged<DexCloneCountProperty>("DexCloneCountProperty");
-export const DexComponentParameterProperty = DexData.tagged<DexComponentParameterProperty>(
-  "DexComponentParameterProperty"
-);
-export const DexBasicProperty = DexData.tagged<DexBasicProperty>("DexBasicProperty");
-export const DexNumberExpr = DexData.tagged<DexNumberExpr>("NumberExpr");
-export const DexCallExpr = DexData.tagged<DexCallExpr>("CallExpr");
-export const DexReferenceExpr = DexData.tagged<DexReferenceExpr>("ReferenceExpr");
-export const DexCustomComponentParameter = DexData.tagged<DexCustomComponentParameter>("DexCustomComponentParameter");
-export const DexCanvasComponentParameter = DexData.tagged<DexCanvasComponentParameter>("DexCanvasComponentParameter");
-export const DexFunctionParameter = DexData.tagged<DexFunctionParameter>("DexFunctionParameter");
-export const DexCloneNumberTarget = DexData.tagged<DexCloneNumberTarget>("DexCloneNumberTarget");
 
 // --- Constructors ---
 
 export type PartialCaseArgs<T extends (...args: any) => any> = Partial<Parameters<T>["0"]>;
 export type CaseArgs<T extends (...args: any) => any> = Parameters<T>["0"];
 
-export function makeDexProject(args: PartialCaseArgs<typeof DexProject>): DexProject {
-  const args2: CaseArgs<typeof DexProject> = {
+export function makeDexProject(args: Partial<DexProject>): DexProject {
+  const args2: DexProject = {
+    _tag: "DexProject",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Project",
     components: args.components ?? [],
@@ -168,41 +152,45 @@ export function makeDexProject(args: PartialCaseArgs<typeof DexProject>): DexPro
     objects: args.objects ?? [],
     dexObjectOrdinal: args.dexObjectOrdinal ?? 0,
   };
-  return DexProject(args2);
+  return args2;
 }
 
-export function makeDexCustomComponent(args: PartialCaseArgs<typeof DexCustomComponent>): DexCustomComponent {
-  const args2: CaseArgs<typeof DexCustomComponent> = {
+export function makeDexCustomComponent(args: Partial<DexCustomComponent>): DexCustomComponent {
+  const args2: DexCustomComponent = {
+    _tag: "DexCustomComponent",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Custom Component",
     parameters: args.parameters ?? [],
     properties: args.properties ?? [],
     objects: args.objects ?? [],
   };
-  return DexCustomComponent(args2);
+  return args2;
 }
 
-export function makeDexCanvasComponent(args: PartialCaseArgs<typeof DexCanvasComponent>): DexCanvasComponent {
-  const args2: CaseArgs<typeof DexCanvasComponent> = {
+export function makeDexCanvasComponent(args: Partial<DexCanvasComponent>): DexCanvasComponent {
+  const args2: DexCanvasComponent = {
+    _tag: "DexCanvasComponent",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Canvas Component",
     parameters: args.parameters ?? [],
   };
-  return DexCanvasComponent(args2);
+  return args2;
 }
 
-export function makeDexFunction(args: PartialCaseArgs<typeof DexFunction>): DexFunction {
-  const args2: CaseArgs<typeof DexFunction> = {
+export function makeDexFunction(args: Partial<DexFunction>): DexFunction {
+  const args2: DexFunction = {
+    _tag: "DexFunction",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Function",
     parameters: args.parameters ?? [],
     expr: args.expr ?? makeDexNumberExpr({}),
   };
-  return DexFunction(args2);
+  return args2;
 }
 
-export function makeDexObject(args: PartialCaseArgs<typeof DexObject>): DexObject {
-  const args2: CaseArgs<typeof DexObject> = {
+export function makeDexObject(args: Partial<DexObject>): DexObject {
+  const args2: DexObject = {
+    _tag: "DexObject",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Object",
     cloneCountProperty: args.cloneCountProperty ?? makeDexCloneCountProperty({}),
@@ -211,101 +199,111 @@ export function makeDexObject(args: PartialCaseArgs<typeof DexObject>): DexObjec
     cloneNumberTarget: args.cloneNumberTarget ?? makeDexCloneNumberTarget({}),
     children: args.children ?? [],
   };
-  return DexObject(args2);
+  return args2;
 }
 
-export function makeDexCloneCountProperty(args: PartialCaseArgs<typeof DexCloneCountProperty>): DexCloneCountProperty {
-  const args2: CaseArgs<typeof DexCloneCountProperty> = {
+export function makeDexCloneCountProperty(args: Partial<DexCloneCountProperty>): DexCloneCountProperty {
+  const args2: DexCloneCountProperty = {
+    _tag: "DexCloneCountProperty",
     id: args.id ?? DexId.make(),
     expr: args.expr ?? makeDexNumberExpr({ value: 1 }),
   };
-  return DexCloneCountProperty(args2);
+  return args2;
 }
 
 export function makeDexComponentParameterProperty(
-  args: PartialCaseArgs<typeof DexComponentParameterProperty>
+  args: Partial<DexComponentParameterProperty>
 ): DexComponentParameterProperty {
   assert(args.parameter !== undefined, "dexComponentParameter is required");
-  const args2: CaseArgs<typeof DexComponentParameterProperty> = {
+  const args2: DexComponentParameterProperty = {
+    _tag: "DexComponentParameterProperty",
     id: args.id ?? DexId.make(),
     expr: args.expr ?? makeDexNumberExpr({}),
     parameter: args.parameter,
   };
-  return DexComponentParameterProperty(args2);
+  return args2;
 }
 
-export function makeDexBasicProperty(args: PartialCaseArgs<typeof DexBasicProperty>): DexBasicProperty {
-  const args2: CaseArgs<typeof DexBasicProperty> = {
+export function makeDexBasicProperty(args: Partial<DexBasicProperty>): DexBasicProperty {
+  const args2: DexBasicProperty = {
+    _tag: "DexBasicProperty",
     id: args.id ?? DexId.make(),
     expr: args.expr ?? makeDexNumberExpr({}),
     name: args.name ?? "Untitled Property",
   };
-  return DexBasicProperty(args2);
+  return args2;
 }
 
-export function makeDexNumberExpr(args: PartialCaseArgs<typeof DexNumberExpr>): DexNumberExpr {
+export function makeDexNumberExpr(args: Partial<DexNumberExpr>): DexNumberExpr {
   assert(args.children === undefined, "children is not allowed");
-  const args2: CaseArgs<typeof DexNumberExpr> = {
+  const args2: DexNumberExpr = {
+    _tag: "DexNumberExpr",
     id: args.id ?? DexId.make(),
     value: args.value ?? 0,
     children: [],
   };
-  return DexNumberExpr(args2);
+  return args2;
 }
 
-export function makeDexCallExpr(args: PartialCaseArgs<typeof DexCallExpr>): DexCallExpr {
+export function makeDexCallExpr(args: Partial<DexCallExpr>): DexCallExpr {
   assert(args.function !== undefined, "dexFunction is required");
   assert(args.children !== undefined, "args is required");
-  const args2: CaseArgs<typeof DexCallExpr> = {
+  const args2: DexCallExpr = {
+    _tag: "DexCallExpr",
     id: args.id ?? DexId.make(),
     function: args.function,
     children: args.children,
   };
-  return DexCallExpr(args2);
+  return args2;
 }
 
-export function makeDexReferenceExpr(args: PartialCaseArgs<typeof DexReferenceExpr>): DexReferenceExpr {
+export function makeDexReferenceExpr(args: Partial<DexReferenceExpr>): DexReferenceExpr {
   assert(args.target !== undefined, "target is required");
   assert(args.children === undefined, "children is not allowed");
-  const args2: CaseArgs<typeof DexReferenceExpr> = {
+  const args2: DexReferenceExpr = {
+    _tag: "DexReferenceExpr",
     id: args.id ?? DexId.make(),
     target: args.target,
     children: [],
   };
-  return DexReferenceExpr(args2);
+  return args2;
 }
 
 export function makeDexCustomComponentParameter(
-  args: PartialCaseArgs<typeof DexCustomComponentParameter>
+  args: Partial<DexCustomComponentParameter>
 ): DexCustomComponentParameter {
-  const args2: CaseArgs<typeof DexCustomComponentParameter> = {
+  const args2: DexCustomComponentParameter = {
+    _tag: "DexCustomComponentParameter",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Custom Component Parameter",
   };
-  return DexCustomComponentParameter(args2);
+  return args2;
 }
 
 export function makeDexCanvasComponentParameter(
-  args: PartialCaseArgs<typeof DexCanvasComponentParameter>
+  args: Partial<DexCanvasComponentParameter>
 ): DexCanvasComponentParameter {
-  const args2: CaseArgs<typeof DexCanvasComponentParameter> = {
+  const args2: DexCanvasComponentParameter = {
+    _tag: "DexCanvasComponentParameter",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Canvas Component Parameter",
   };
-  return DexCanvasComponentParameter(args2);
+  return args2;
 }
 
-export function makeDexFunctionParameter(args: PartialCaseArgs<typeof DexFunctionParameter>): DexFunctionParameter {
-  const args2: CaseArgs<typeof DexFunctionParameter> = {
+export function makeDexFunctionParameter(args: Partial<DexFunctionParameter>): DexFunctionParameter {
+  const args2: DexFunctionParameter = {
+    _tag: "DexFunctionParameter",
     id: args.id ?? DexId.make(),
     name: args.name ?? "Untitled Function Parameter",
   };
-  return DexFunctionParameter(args2);
+  return args2;
 }
 
-export function makeDexCloneNumberTarget(args: PartialCaseArgs<typeof DexCloneNumberTarget>): DexCloneNumberTarget {
-  const args2: CaseArgs<typeof DexCloneNumberTarget> = {
+export function makeDexCloneNumberTarget(args: Partial<DexCloneNumberTarget>): DexCloneNumberTarget {
+  const args2: DexCloneNumberTarget = {
+    _tag: "DexCloneNumberTarget",
     id: args.id ?? DexId.make(),
   };
-  return DexCloneNumberTarget(args2);
+  return args2;
 }
