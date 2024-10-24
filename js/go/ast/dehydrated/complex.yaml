@@ -1,9 +1,0 @@
-name: x
-rootNode:
-  nodeType: PrimitiveFunction
-  functionId: +
-  arguments:
-    - nodeType: Number
-      value: 2
-    - nodeType: AttributeReference
-      attributeId: y
