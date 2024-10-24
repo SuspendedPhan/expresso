@@ -15,7 +15,7 @@ export enum FocusKind {
 }
 
 export type DexFocus = DexBasicFocus | DexTextFieldEditingFocus | DexComboboxEditingFocus;
-export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget;
+export type DexFocusTarget = BasicFocusTarget | TextFieldFocusTarget | ComboboxFocusTarget;
 export type TextFieldFocusKind = FocusKind.Object_Name | FocusKind.Property_Name;
 export type ComboboxFocusKind = FocusKind.Object_Component | FocusKind.Expr;
 
