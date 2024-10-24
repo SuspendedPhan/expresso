@@ -9,7 +9,7 @@ import assert from "assert-ts";
 import type { Draft } from "mutative";
 
 export interface TextFieldState {
-  label?: string;
+  label: string | undefined;
 }
 
 export interface SelectionRange {
@@ -48,11 +48,12 @@ export const TextFieldReducer = {
   },
 };
 
-function getLabel(kind: TextFieldFocusKind): string {
+function getLabel(kind: TextFieldFocusKind): string | undefined {
   switch (kind) {
     case FocusKind.Object_Name:
-    case FocusKind.Property_Name:
       return "Name";
+    case FocusKind.Property_Name:
+      return undefined;
     default:
       throw new Error("Invalid focus kind");
   }

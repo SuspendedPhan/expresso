@@ -3,7 +3,7 @@
   import { AppStateCtx } from "./AppStateCtx";
   import { FocusReducer, type DexFocusTarget } from "./DexFocus";
   import { DexGetter } from "./DexGetter";
-  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
+  import { DexRuntime, dexRunReducer } from "./DexRuntime";
 
   export let target: DexFocusTarget;
 
@@ -15,7 +15,7 @@
   }).pipe(DexRuntime.runPromise);
 
   function onMouseDown() {
-    DexRuntime_RunReducer(FocusReducer.focusTarget(target));
+    dexRunReducer(FocusReducer.focusTarget(target));
   }
 
   let clazz: string = "";

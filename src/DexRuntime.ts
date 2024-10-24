@@ -16,7 +16,7 @@ document.addEventListener("keydown", (e) => {
     return;
   }
 
-  DexRuntime_RunReducer(FocusReducer.tryStartEditing());
+  dexRunReducer(FocusReducer.tryStartEditing());
 });
 
 document.addEventListener("keydown", (e) => {
@@ -24,14 +24,14 @@ document.addEventListener("keydown", (e) => {
     return;
   }
 
-  DexRuntime_RunReducer(FocusReducer.tryCancelEdit());
+  dexRunReducer(FocusReducer.tryCancelEdit());
 });
 
 document.addEventListener("click", () => {
-  DexRuntime_RunReducer(FocusReducer.setFocusNone());
+  dexRunReducer(FocusReducer.setFocusNone());
 });
 
-export function DexRuntime_RunReducer(reducer: DexReducer.DexReducer<AppState>) {
+export function dexRunReducer(reducer: DexReducer.DexReducer<AppState>) {
   Effect.gen(function* () {
     yield* AppStateCtx.runReducer(reducer);
   }).pipe(DexRuntime.runPromise);

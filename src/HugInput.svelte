@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
   import { AppStateCtx } from "./AppStateCtx";
   import type { TextFieldFocusTarget } from "./DexFocus";
-  import { DexRuntime, DexRuntime_RunReducer } from "./DexRuntime";
+  import { DexRuntime, dexRunReducer } from "./DexRuntime";
   import { TextFieldGetter, TextFieldReducer, type HugInputState } from "./TextField";
 
   export let target: TextFieldFocusTarget;
@@ -28,7 +28,7 @@
   });
 
   function onInput(event: Event) {
-    DexRuntime_RunReducer(TextFieldReducer.updateValue(target, event));
+    dexRunReducer(TextFieldReducer.updateValue(target, event));
   }
 </script>
 

@@ -2,10 +2,11 @@
   import { DexObject } from "./DexDomain";
   import { FocusKind } from "./DexFocus";
   import { DexReducer } from "./DexReducer";
-  import { DexRuntime_RunReducer } from "./DexRuntime";
+  import { dexRunReducer } from "./DexRuntime";
   import ExObjectButton from "./ExObjectButton.svelte";
   import ExObjectHeaderView from "./ExObjectHeaderView.svelte";
   import FlexContainer from "./FlexContainer.svelte";
+  import SveBasicPropertyList from "./SveBasicPropertyList.svelte";
   import SveProperty from "./SveProperty.svelte";
   import TextField from "./TextField.svelte";
   import type { ElementLayout } from "./utils/layout/ElementLayout";
@@ -15,7 +16,11 @@
   export let elementLayout: ElementLayout;
 
   function addChild() {
-    DexRuntime_RunReducer(DexReducer.DexObject.addChild(dexObject));
+    dexRunReducer(DexReducer.DexObject.addChild(dexObject));
+  }
+
+  function addProperty() {
+    dexRunReducer(DexReducer.DexObject.addBasicProperty(dexObject));
   }
 </script>
 
@@ -45,7 +50,7 @@
       <!-- Divider -->
       <div class="divider m-0 h-0"></div>
       <FlexContainer centered={false} class="flex flex-col p-card">
-        <!-- <BasicPropertyList properties={dexObject.basicProperties} /> -->
+        <SveBasicPropertyList properties={dexObject.basicProperties} on:addProperty={addProperty} />
       </FlexContainer>
 
       <!-- Divider -->
