@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.0.1",
+    "assert-ts": "^0.3.4",
+    "effect": "^3.10.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^9.1.0"
