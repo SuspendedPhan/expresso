@@ -83,6 +83,16 @@ export const FocusReducer = {
           };
           this.setFocus(Option.some(editingFocus))(appState);
         })
+        .with({ _tag: "ComboboxFocusTarget" }, (target) => {
+          // const options = TextFieldGetter.comboboxOptions(appState, target);
+          const editingFocus: DexComboboxEditingFocus = {
+            _tag: "DexComboboxFocus",
+            target,
+            options: [],
+            focusedIndex: 0,
+          };
+          this.setFocus(Option.some(editingFocus))(appState);
+        })
         .exhaustive();
     };
   },
@@ -113,6 +123,13 @@ export const FocusReducer = {
           return focus;
         })
         .with({ _tag: "TextFieldFocusTarget" }, (target) => {
+          const focus: DexBasicFocus = {
+            _tag: "DexFocus",
+            target,
+          };
+          return focus;
+        })
+        .with({ _tag: "ComboboxFocusTarget" }, (target) => {
           const focus: DexBasicFocus = {
             _tag: "DexFocus",
             target,

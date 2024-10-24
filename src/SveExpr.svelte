@@ -8,6 +8,7 @@
 
   export let expr: DexExpr;
   export let elementLayout: ElementLayout;
+
   const text = match(expr)
     .with({ _tag: "NumberExpr" }, (e) => e.value.toString())
     .with({ _tag: "CallExpr" }, (e) => e.function.name)
@@ -30,5 +31,5 @@
     </div>
   </FocusView>
 
-  <ExprSelect {expr} />
+  <!-- <ExprSelect {expr} /> -->
 </NodeView>
