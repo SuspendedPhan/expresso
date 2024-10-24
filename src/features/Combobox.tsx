@@ -1,4 +1,8 @@
 import { useState } from "react"
+import { Divider } from "./Divider"
+import { useFloating, offset, autoUpdate, FloatingFocusManager } from "@floating-ui/react"
+import { flip } from "effect/Function"
+import { shift } from "effect/MutableList"
 
 interface ComboboxProps {
   options: { label: string }[]
@@ -7,7 +11,14 @@ interface ComboboxProps {
 }
 
 export function Combobox({ options, onQueryChanged, onSubmit }: ComboboxProps) {
-  const optionItems = options.map((option, index) => <div key={index}>{option.label}</div>)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    middleware: [offset(10)],
+    whileElementsMounted: autoUpdate,
+  })
 
   const [index, setIndex] = useState(0)
 
@@ -31,11 +42,29 @@ export function Combobox({ options, onQueryChanged, onSubmit }: ComboboxProps) {
     }
   }
 
+  const optionEls = options.map((option, i) => (
+    <div key={i} className={`${index === i ? "bg-neutral-content" : ""}`} onClick={() => onSubmit(i)}>
+      {option.label}
+    </div>
+  ))
+
   return (
-    <div>
-      <input onInput={onInput} onKeyDown={onKeyDown} />
-      {optionItems}
-      Combobox
+    <div ref={refs.setReference}>
+      {isOpen && (
+        <FloatingFocusManager context={context} modal={false}>
+          <div
+            ref={refs.setFloating}
+            className="p-2 bg-white ring rounded-sm flex flex-col gap-2"
+            style={{ inset: "unset", ...floatingStyles }}
+          >
+            <div>
+              <input className="outline-none" type="text" onInput={onInput} onKeyDown={onKeyDown} />
+            </div>
+            <Divider />
+            <div>{optionEls}</div>
+          </div>
+        </FloatingFocusManager>
+      )}
     </div>
   )
 }

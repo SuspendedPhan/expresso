@@ -1,8 +1,6 @@
-import { useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { makeDexNumberExpr, type DexExpr } from "../../DexDomain"
-import { Combobox } from "../Combobox"
-import { projectActions, projectSelectors, ProjectSlice } from "./DexCoreSlice"
+import { projectActions, ProjectSlice } from "./DexCoreSlice"
+import { SveExpr } from "./SveExpr"
 
 export const Project = () => {
   const dispatch = useAppDispatch()
@@ -19,25 +17,8 @@ export const Project = () => {
     <div>
       {exprItems}
       <button onClick={() => dispatch(projectActions.addExpr())}>Add Expr</button>
+      <h1 className="text-3xl font-bold underline">Hello world!</h1>
     </div>
   )
 }
 
-export function SveExpr({ expr }: { expr: DexExpr }) {
-  const [query, setQuery] = useState("")
-  
-  const options = new Array<{ label: string; expr: DexExpr }>()
-  if (Number.parseFloat(query)) {
-    options.push({ label: "Number", expr: makeDexNumberExpr({}) })
-  }
-
-  const text = useAppSelector(state => projectSelectors.selectExprText(state, expr))
-
-  return (
-    <div>
-      {expr.id}
-      {text}
-      <Combobox options={options} onQueryChanged={v => setQuery(v)} />
-    </div>
-  )
-}

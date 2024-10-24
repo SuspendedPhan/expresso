@@ -20,7 +20,7 @@ export const ProjectSlice = createAppSlice({
   initialState,
   reducers: create => ({
     addExpr: create.reducer(state => {
-      state.exprs.push(makeDexNumberExpr({ id: state.exprs.length.toString() }))
+      state.exprs.push(makeDexNumberExpr({ }))
     }),
     replaceExpr: create.reducer((state, action: PayloadAction<{ oldExpr: DexExpr; newExpr: DexExpr }>) => {
       const index = state.exprs.findIndex(e => e.id === action.payload.oldExpr.id)
