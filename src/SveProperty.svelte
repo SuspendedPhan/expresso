@@ -11,7 +11,7 @@
 
   const name = match(property)
     .with({ _tag: "DexBasicProperty" }, (p) => p.name)
-    .with({ _tag: "DexCloneCountProperty" }, (p) => "Clone Count")
+    .with({ _tag: "DexCloneCountProperty" }, () => "Clone Count")
     .with({ _tag: "DexComponentParameterProperty" }, (p) => p.parameter.name)
     .exhaustive();
 </script>
