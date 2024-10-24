@@ -56,13 +56,11 @@
 {#if ready}
   <FlexContainer class="p-window {clazz}">
     {#if elementLayout}
-      <!-- {#key exObject.id} -->
       <TreeView {elementLayout}>
         <div bind:this={element}>
           <SveObject {dexObject} {elementLayout} />
         </div>
       </TreeView>
-      <!-- {/key} -->
     {/if}
   </FlexContainer>
 {/if}

@@ -56,6 +56,9 @@ export interface ComboboxFocusTarget {
 }
 
 export const DexFocus = DexData.tagged<DexFocus>("DexFocus");
+export const BasicFocusTarget = DexData.tagged<BasicFocusTarget>("BasicFocusTarget");
+export const TextFieldFocusTarget = DexData.tagged<TextFieldFocusTarget>("TextFieldFocusTarget");
+export const ComboboxFocusTarget = DexData.tagged<ComboboxFocusTarget>("ComboboxFocusTarget");
 
 export const FocusReducer = {
   tryStartEditing() {
