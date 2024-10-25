@@ -1,8 +1,8 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { projectActions, ProjectSlice } from "./DexCoreSlice"
+import { projectActions, ProjectSlice } from "./DexProjectSlice"
 import { SveExpr } from "./SveExpr"
 
-export const Project = () => {
+export const SveProject = () => {
   const dispatch = useAppDispatch()
 
   const exprs = useAppSelector(ProjectSlice.selectors.selectExprs)

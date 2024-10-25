@@ -1,22 +1,23 @@
+import { autoUpdate, FloatingFocusManager, useFloating } from "@floating-ui/react"
 import { useState } from "react"
 import { Divider } from "./Divider"
-import { useFloating, offset, autoUpdate, FloatingFocusManager } from "@floating-ui/react"
-import { flip } from "effect/Function"
-import { shift } from "effect/MutableList"
+import { useAppSelector } from "../app/hooks"
+import type { DexFocusTarget } from "../DexFocus"
+import { DexAppSlice } from "./core/DexAppSlice"
 
 interface ComboboxProps {
   options: { label: string }[]
   onQueryChanged: (query: string) => void
   onSubmit: (index: number) => void
+  focusTarget: DexFocusTarget
 }
 
-export function Combobox({ options, onQueryChanged, onSubmit }: ComboboxProps) {
-  const [isOpen, setIsOpen] = useState(false)
+export function Combobox({ options, onQueryChanged, onSubmit, focusTarget }: ComboboxProps) {
+  const isOpen = useAppSelector(state => DexAppSlice.selectors.selectIsFocused(state, focusTarget))
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
-    onOpenChange: setIsOpen,
-    middleware: [offset(10)],
+    // middleware: [offset(10)],
     whileElementsMounted: autoUpdate,
   })
 

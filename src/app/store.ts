@@ -1,13 +1,13 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit"
 import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
-import { counterSlice } from "../features/counter/counterSlice"
+import { DexAppSlice } from "../features/core/DexAppSlice"
+import { ProjectSlice } from "../features/core/DexProjectSlice"
 import { quotesApiSlice } from "../features/quotes/quotesApiSlice"
-import { ProjectSlice } from "../features/core/DexCoreSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(counterSlice, quotesApiSlice, ProjectSlice)
+const rootReducer = combineSlices(DexAppSlice, ProjectSlice)
 
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>

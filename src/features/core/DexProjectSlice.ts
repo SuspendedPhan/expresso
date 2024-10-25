@@ -2,17 +2,20 @@ import { type PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "../../app/createAppSlice"
 import { type DexExpr, type DexFunction, type DexObject, makeDexNumberExpr } from "../../DexDomain"
 import { match } from "ts-pattern"
+import type { DexFocus } from "../../DexFocus"
 
 export interface ProjectSliceState {
   exprs: DexExpr[]
   objects: DexObject[]
   functions: DexFunction[]
+  focus: DexFocus | null
 }
 
 const initialState: ProjectSliceState = {
   exprs: [],
   objects: [],
   functions: [],
+  focus: null,
 }
 
 export const ProjectSlice = createAppSlice({
@@ -20,7 +23,7 @@ export const ProjectSlice = createAppSlice({
   initialState,
   reducers: create => ({
     addExpr: create.reducer(state => {
-      state.exprs.push(makeDexNumberExpr({ }))
+      state.exprs.push(makeDexNumberExpr({}))
     }),
     replaceExpr: create.reducer((state, action: PayloadAction<{ oldExpr: DexExpr; newExpr: DexExpr }>) => {
       const index = state.exprs.findIndex(e => e.id === action.payload.oldExpr.id)
@@ -47,7 +50,6 @@ export const ProjectSlice = createAppSlice({
           throw new Error("Not implemented")
         })
         .exhaustive()
-
     },
   },
 })

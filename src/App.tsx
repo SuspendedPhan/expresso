@@ -1,9 +1,9 @@
 import "./App.css"
-import { Project } from "./features/core/DexCore"
+import { SveProject } from "./features/core/SveProject"
 
 const App = () => {
   return (
-    <Project />
+    <SveProject />
   )
 }
 
